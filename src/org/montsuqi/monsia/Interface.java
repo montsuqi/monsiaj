@@ -43,7 +43,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
@@ -91,8 +90,9 @@ public class Interface {
 	private Protocol protocol;
 
 	private JWindow topLevel;
-    private LinkedList accelGroup;
 	private Map signals;
+	private List accelGroup;
+	private Map accelGroups;
     private Component focusWidget;
 	private Component defaultWidget;
 	private Logger logger;
@@ -174,7 +174,7 @@ public class Interface {
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
-		accelGroup = null;
+		accelGroups = new HashMap();
 		defaultWidget = null;
 		focusWidget = null;
 		this.protocol = protocol;
@@ -560,22 +560,14 @@ public class Interface {
 		focusWidget = null;
 		defaultWidget = null;
 		topLevel = window;
-
-		/* new toplevel needs new accel group */
-		if (accelGroup != null) {
-			accelGroup.removeLast();
-		}
-		accelGroup = null;
+		accelGroup = ensureAccel(topLevel);
 	}
 
-	private List ensureAccel() {
-		if (accelGroup == null) {
-			accelGroup = new LinkedList();
-			if (topLevel != null) {
-				//topLevel.addAccelGroup(accelGroup);
-			}
+	private List ensureAccel(Window w) {
+		if ( ! accelGroups.containsKey(w)) {
+			accelGroups.put(topLevel, accelGroup);
 		}
-		return accelGroup;
+		return (List)accelGroups.get(w);
 	}
 
 	public void addSignal(String handler, SignalData sData) {

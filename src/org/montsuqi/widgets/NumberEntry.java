@@ -120,7 +120,7 @@ class NumberDocument extends PlainDocument {
 
 	private String originalFormat;
 	private NumberFormat format;
-	private static Logger logger;
+	private Logger logger;
 
 	private BigDecimal value;
 	private int scale;

@@ -71,12 +71,7 @@ import org.montsuqi.widgets.Window;
 public class WidgetBuilder {
 
 	private static WidgetPropertySetter propertySetter;
-	private static WidgetBuilder defaultWidgetBuilder;
-	private static WidgetBuilder defaultContainerBuilder;
-
 	static {
-		defaultWidgetBuilder = new WidgetBuilder();
-		defaultContainerBuilder = new ContainerBuilder();
 		propertySetter = WidgetPropertySetter.getInstance();
 	}
 	
@@ -91,6 +86,9 @@ public class WidgetBuilder {
 	static {
 		builderMap = new HashMap();
 		classMap = new HashMap();
+
+		WidgetBuilder defaultWidgetBuilder= new WidgetBuilder();
+		WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
 
 		registerWidgetClass("Button",         JButton.class,       defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Calendar",       Calendar.class,      defaultWidgetBuilder); //$NON-NLS-1$
