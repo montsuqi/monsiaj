@@ -10,15 +10,23 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 public class PandaEntry extends JTextField {
+
+	public static final int KANA = PandaDocument.KANA;
+	public static final int XIM = PandaDocument.XIM;
+	public static final int ASCII = PandaDocument.ASCII;
+
 	public PandaEntry(String text, int columns) {
 		super(new PandaDocument(), text, columns);
 	}
+
 	public PandaEntry(int columns) {
 		this(null, columns);
 	}
+
 	public PandaEntry(String text) {
 		this(text, 0);
 	}
+
 	public PandaEntry() {
 		this(null, 0);
 	}	
@@ -36,7 +44,7 @@ public class PandaEntry extends JTextField {
 	public static void main(String[] args) {
 		final JFrame f = new JFrame("TestPandaEntry"); //$NON-NLS-1$
 		PandaEntry pe = new PandaEntry();
-		pe.setInputMode(PandaDocument.KANA);
+		pe.setInputMode(KANA);
 		System.out.println(pe.getInputMode());
 		f.getContentPane().setLayout(new BorderLayout());
 		f.getContentPane().add(pe, BorderLayout.CENTER);
@@ -51,13 +59,14 @@ public class PandaEntry extends JTextField {
 }
 
 class PandaDocument extends PlainDocument {
+
 	public static final int KANA = 1;
 	public static final int XIM = 2;
 	public static final int ASCII = 3;
 
-	protected int mode;
+	private int mode;
 
-	static final char[] SYMBOL_TABLE = {
+	private static final char[] SYMBOL_TABLE = {
 		'\u3000', '\uff01', '\u201d', '\uff03', '\uff04', '\uff05', '\uff06', '\u2019',
 		'\uff08', '\uff09', '\uff0a', '\uff0b', '\uff0c', '\u30fc', '\uff0e', '\uff0f',
 		'\uff10', '\uff11', '\uff12', '\uff13', '\uff14', '\uff15', '\uff16', '\uff17',
@@ -72,7 +81,7 @@ class PandaDocument extends PlainDocument {
 		   0,    0,    0, '\uff5b', '\uff5c', '\uff5d', '\uffe3',    0
 	};
 
-	static final RuleEntry[] KANA_TABLE = {
+	private static final RuleEntry[] KANA_TABLE = {
 		new RuleEntry("l",  "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		new RuleEntry("x",  "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		new RuleEntry("k",  "\u30ab", "\u30ad", "\u30af", "\u30b1", "\u30b3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
@@ -123,21 +132,21 @@ class PandaDocument extends PlainDocument {
 		new RuleEntry("q",  "\u30af\u30a1", "\u30af\u30a3", "\u30af", "\u30af\u30a7", "\u30af\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	};
 
-	protected static final String LOW_ALPHABETS = "abcdefghijklmnopqrstuvwxyz"; //$NON-NLS-1$
-	protected static final String AEIOU = "aeiou"; //$NON-NLS-1$
+	private static final String LOW_ALPHABETS = "abcdefghijklmnopqrstuvwxyz"; //$NON-NLS-1$
+	private static final String AEIOU = "aeiou"; //$NON-NLS-1$
 
 	PandaDocument() {
 		mode = ASCII;
 	}
 
-	public void setInputMode(int mode) {
+	void setInputMode(int mode) {
 		if (mode != KANA && mode != XIM && mode != ASCII) {
 			throw new IllegalArgumentException();
 		}
 		this.mode = mode;
 	}
 
-	public int getInputMode(){
+	int getInputMode(){
 		return mode;
 	}
 

@@ -46,26 +46,26 @@ import org.montsuqi.util.Logger;
 import org.xml.sax.SAXException;
 
 public class Interface {
-	String fileName;
-    List topLevels;
-    Map infos;
-    Map widgets;
-    Map longNames;
-	Map buttonGroups;
-	Protocol protocol;
+	private String fileName;
+    private List topLevels;
+    private Map infos;
+    private Map widgets;
+    private Map longNames;
+	private Map buttonGroups;
+	private Protocol protocol;
 
-    JWindow topLevel;
-    LinkedList accelGroup;
-	Map signals;
-    Container focusWidget;
-	Container defaultWidget;
-	Logger logger;
+	private JWindow topLevel;
+    private LinkedList accelGroup;
+	private Map signals;
+    private Container focusWidget;
+	private Container defaultWidget;
+	private Logger logger;
 	
-	public void setDefaultWidget(Container widget) {
+	void setDefaultWidget(Container widget) {
 		defaultWidget = widget;
 	}
 
-	public void setFocusWidget(Container widget) {
+	void setFocusWidget(Container widget) {
 		focusWidget = widget;
 	}
 
@@ -300,7 +300,7 @@ public class Interface {
 		return (Container)longNames.get(longName);
 	}
 
-	public String relativeFile(String fileName) {
+	String relativeFile(String fileName) {
 		if (fileName == null) {
 			throw new IllegalArgumentException();
 		}
@@ -344,7 +344,7 @@ public class Interface {
 		return null;
 	}
 
-	public ButtonGroup getButtonGroup(String name) {
+	ButtonGroup getButtonGroup(String name) {
 		if ( ! buttonGroups.containsKey(name)) {
 			buttonGroups.put(name, new ButtonGroup());
 		}
@@ -356,7 +356,7 @@ public class Interface {
 	 * is currently being built.  It is mainly used to enable GtkAccelGroup's to
 	 * be bound to the correct window, but could have other uses.
 	 */
-	public void setTopLevel(JWindow window) {
+	void setTopLevel(JWindow window) {
 		if (focusWidget != null) {
 			focusWidget.requestFocus();
 		}
@@ -375,21 +375,7 @@ public class Interface {
 		accelGroup = null;
 	}
 
-	public void handleWidgetProp(Container widget, String nameName, String valueName) {
-//		value_widget = g_hash_table_lookup(self->priv->name_hash, value_name);
-//		if (value_widget) {
-//			g_object_set(G_OBJECT(widget), prop_name, value_widget, NULL);
-//		} else {
-//			DeferredProperty dprop = new DeferredProperty(valueName, DEFERRED_PROP);
-//			dprop->d.prop.object = G_OBJECT(widget);
-//			dprop->d.prop.prop_name = prop_name;
-//			
-//			self->priv->deferred_props = g_list_prepend(self->priv->deferred_props,
-//														dprop);
-//		}
-	}
-	
-	public List ensureAccel() {
+	private List ensureAccel() {
 		if (accelGroup == null) {
 			accelGroup = new LinkedList();
 			if (topLevel != null) {
@@ -399,15 +385,7 @@ public class Interface {
 		return accelGroup;
 	}
 
-	public String getText(String msgid) {
-		if (msgid == null || msgid.length() == 0) {
-			return ""; //$NON-NLS-1$
-		} else {
-			return msgid;
-		}
-	}
-
-	public void addSignal(String handler, SignalData sData) {
+	void addSignal(String handler, SignalData sData) {
 		if ( ! signals.containsKey(handler)) {
 			signals.put(handler, new ArrayList());
 		}
@@ -415,7 +393,7 @@ public class Interface {
 		signals.add(0, sData);
 	}
 
-	protected void buildInterface(List roots) {
+	void buildInterface(List roots) {
 		if (roots == null || roots.isEmpty()) {
 			return;
 		}
@@ -439,7 +417,7 @@ public class Interface {
 		return null;
 	}
 
-	public void setLongName(String longName, Container widget) {
+	void setLongName(String longName, Container widget) {
 		logger.debug("longName: {0}", longName);
 		longNames.put(longName, widget);
 	}

@@ -1,20 +1,20 @@
 package org.montsuqi.util;
 
-public class OptionParserException extends ChainedRuntimeException {
+class OptionParserException extends ChainedRuntimeException {
 
-	public OptionParserException() {
+	OptionParserException() {
 		super();
 	}
 
-	public OptionParserException(String message) {
+	OptionParserException(String message) {
 		super(message);
 	}
 
-	public OptionParserException(String message, Throwable cause) {
+	OptionParserException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public OptionParserException(Throwable cause) {
+	OptionParserException(Throwable cause) {
 		super(cause);
 	}
 

@@ -5,19 +5,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.montsuqi.util.Logger;
 
-public class MarshalHandler {
+class MarshalHandler {
 
 	private Method receiver;
 	private Method sender;
 	private Logger logger;
 
-	public MarshalHandler(Method receiver, Method sender) {
+	MarshalHandler(Method receiver, Method sender) {
 		this.receiver = receiver;
 		this.sender = sender;
 		logger = Logger.getLogger(MarshalHandler.class);
 	}
 		
-	public boolean sendWidget(WidgetMarshal marshal, String name, Container widget) {
+	boolean sendWidget(WidgetMarshal marshal, String name, Container widget) {
 		if (sender == null) {
 			return false;
 		}
@@ -37,7 +37,7 @@ public class MarshalHandler {
 		}
 	}
 
-	public boolean receiveWidget(WidgetMarshal marshal, Container widget) {
+	boolean receiveWidget(WidgetMarshal marshal, Container widget) {
 		if (receiver == null) {
 			return false;
 		}

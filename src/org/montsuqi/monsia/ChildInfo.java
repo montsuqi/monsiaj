@@ -3,43 +3,44 @@ package org.montsuqi.monsia;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChildInfo {
-	WidgetInfo child;
-    List properties;
-    String internalChild;
+class ChildInfo {
 
-//WidgetInfo info, List properties, String internalChild) {
-	public ChildInfo() {
+	private WidgetInfo child;
+    private List properties;
+    private String internalChild;
+
+	ChildInfo() {
 		this.child = null;
 		this.properties = new ArrayList();
 		this.internalChild = null;
 	}
 	
-	public WidgetInfo getWidgetInfo() {
+	WidgetInfo getWidgetInfo() {
 		return child;
 	}
-	public String getInternalChild() {
+
+	String getInternalChild() {
 		return internalChild;
 	}
 
-	public void setProperties(List properties) {
+	void setProperties(List properties) {
 		this.properties.clear();
 		this.properties.addAll(properties);
 	}
 
-	public Property getProperty(int i) {
+	Property getProperty(int i) {
 		return (Property)properties.get(i);
 	}
 
-	public int getPropertiesCount() {
+	int getPropertiesCount() {
 		return properties.size();
 	}
 
-	public void setWidgetInfo(WidgetInfo child) {
+	void setWidgetInfo(WidgetInfo child) {
 		this.child = child;
 	}
 
-	public void setInternalChild(String child) {
+	void setInternalChild(String child) {
 		internalChild = child;
 	}
 }

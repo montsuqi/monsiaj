@@ -34,14 +34,14 @@ import org.montsuqi.widgets.PandaEntry;
 public class Protocol extends Connection {
 
 	private WidgetMarshal marshal;
-	Map classTable;
-	Map windowTable;
-	Logger logger;
-	Client client;
-	StringBuffer widgetName;
-	Interface xml;
-	boolean ignoreEvent = false;
-	boolean inReceive = false;
+	private Map classTable;
+	private Map windowTable;
+	private Logger logger;
+	private Client client;
+	private StringBuffer widgetName;
+	private Interface xml;
+	private boolean ignoreEvent = false;
+	private boolean inReceive = false;
 
 	public static final int SCREEN_NULL = 0;
 	public static final int SCREEN_CURRENT_WINDOW = 1;
@@ -52,13 +52,13 @@ public class Protocol extends Connection {
 	public static final int SCREEN_FORK_WINDOW = 6;
 	public static final int SCREEN_END_SESSION = 7;
 
-	static final String VERSION = "1.1.2"; //$NON-NLS-1$
+	public static final String VERSION = "1.1.2"; //$NON-NLS-1$
 	
 	public String getVersion() {
 		return VERSION;
 	}
 	
-	public Protocol(Client client, Socket s, String encoding) throws IOException {
+	Protocol(Client client, Socket s, String encoding) throws IOException {
 		super(s, encoding);
 		this.client = client;
 		classTable = new HashMap();
@@ -70,7 +70,7 @@ public class Protocol extends Connection {
 		marshal = new WidgetMarshal(this);
 	}
 
-	protected void initWidgetOperations() {
+	private void initWidgetOperations() {
 		addClass(JTextField.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(NumberEntry.class,      "receiveNumberEntry", "sendNumberEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JTextArea.class, "receiveText",        "sendText"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -91,7 +91,7 @@ public class Protocol extends Connection {
 		addClass(JProgressBar.class,      "receiveProgressBar", "sendProgressBar"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public Interface getInterface() {
+	Interface getInterface() {
 		return xml;
 	}
 
@@ -149,7 +149,7 @@ public class Protocol extends Connection {
 		return buf.toString();
 	}
 
-	boolean receiveFile(String name, String fName) throws IOException {
+	private boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
@@ -180,7 +180,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public Node showWindow(String wName, int type) {
+	private Node showWindow(String wName, int type) {
 		String fName = client.getCacheFileName(wName);
 		Node node = null;
 		if (windowTable.containsKey(wName)) {
@@ -223,7 +223,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void checkScreens(boolean init) throws IOException {
+	void checkScreens(boolean init) throws IOException {
 		while (receivePacketClass() == PacketClass.QueryScreen) {
 			String sName = receiveString();
 			int size = receiveLong();
@@ -250,7 +250,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public boolean receiveWidgetData(Container widget) throws IOException {
+	boolean receiveWidgetData(Container widget) throws IOException {
 		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
 		if (handler != null) {
 			return  handler.receiveWidget(getMarshal(), widget);
@@ -263,7 +263,7 @@ public class Protocol extends Connection {
 		return marshal;
 	}
 
-	public boolean sendWidgetData(String name, Container widget) throws IOException {
+	private boolean sendWidgetData(String name, Container widget) throws IOException {
 		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
 		if (handler != null) {
 			return handler.sendWidget(getMarshal(), name, widget);
@@ -308,7 +308,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void receiveValue(StringBuffer longName, int offset) throws IOException {
+	void receiveValue(StringBuffer longName, int offset) throws IOException {
 		boolean fTrace = true;
 		boolean fDone = false;
 		Container widget = xml.getWidgetByLongName(longName.toString());
@@ -367,11 +367,11 @@ public class Protocol extends Connection {
 		//}
 	}
 
-	public void resetTimer(JFrame window) {
+	void resetTimer(JFrame window) {
 		//gtk_container_forall (GTK_CONTAINER (window), _ResetTimer, NULL);
 	}
 
-	public boolean getScreenData() throws IOException {
+	boolean getScreenData() throws IOException {
 		String window = null;
 		Node node;
 		Container widget;
@@ -447,7 +447,7 @@ public class Protocol extends Connection {
 		return fCancel;
 	}
 
-	public boolean sendConnect(String user, String pass, String apl) throws IOException {
+	boolean sendConnect(String user, String pass, String apl) throws IOException {
 		byte pc;
 		sendPacketClass(PacketClass.Connect);
 		sendString(VERSION);
@@ -481,14 +481,14 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void sendEvent(String window, String widget, String event) throws IOException {
+	private void sendEvent(String window, String widget, String event) throws IOException {
 		sendPacketClass(PacketClass.Event);
 		sendString(window);
 		sendString(widget);
 		sendString(event);
 	}
 
-	void sendWindowData() throws IOException {
+	private void sendWindowData() throws IOException {
 		Iterator i = windowTable.keySet().iterator();
 		while (i.hasNext()) {
 			sendPacketClass(PacketClass.WindowName);
@@ -508,7 +508,7 @@ public class Protocol extends Connection {
 		clearWindowTable();
 	}
 
-	void addClass(Class clazz, String receiverName, String senderName) {
+	private void addClass(Class clazz, String receiverName, String senderName) {
 		try {
 			MarshalHandler handler = WidgetMarshal.getHandler(receiverName, senderName);
 			classTable.put(clazz, handler);
@@ -517,10 +517,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	//
-	// callbacks
-	//
-	public void clearWindowTable() {
+	private void clearWindowTable() {
 		Iterator i = windowTable.values().iterator();
 		while (i.hasNext()) {
 			Node node = (Node)i.next();
@@ -695,7 +692,7 @@ public class Protocol extends Connection {
 		/* DO NOTHING */
 	}
 
-	public StringBuffer getWidgetNameBuffer() {
+	StringBuffer getWidgetNameBuffer() {
 		return widgetName;
 	}
 }

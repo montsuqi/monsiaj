@@ -13,7 +13,9 @@ import java.text.Format;
 import java.text.MessageFormat;
 
 public class OptionParser {
+
 	static final String CONFIG_TRAILER;
+
 	static {
 		if (System.getProperty("os.name").startsWith("Windows")) {
 			CONFIG_TRAILER = ".CFG";
@@ -22,11 +24,11 @@ public class OptionParser {
 		}
 	}
 
-	static final char COMMAND_SWITCH = '-';
-	static final char RESPONSE_FILE_SWITCH = '@';
+	private static final char COMMAND_SWITCH = '-';
+	private static final char RESPONSE_FILE_SWITCH = '@';
 
-    Map options;
-    Logger logger;
+	private Map options;
+	private Logger logger;
 
     public OptionParser() {
         options = new TreeMap();
@@ -45,7 +47,7 @@ public class OptionParser {
 		add(new Option(name, message, defaultValue));
     }
 
-	protected void add(Option option) {
+	private void add(Option option) {
 		options.put(option.getName(), option);
 	}
 
@@ -68,7 +70,7 @@ public class OptionParser {
 		}
 	}
 
-	protected List parseFile(String program, File file) {
+	private List parseFile(String program, File file) {
 		List lines = new LinkedList();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -85,7 +87,7 @@ public class OptionParser {
 		return parseArray(program, lines.toArray(new String[lines.size()]));
 	}
 
-	protected List parseArray(String program, Object[] args) {
+	private List parseArray(String program, Object[] args) {
 		List files = new LinkedList();
 		for (int i = 0; i < args.length; i++) {
 			boolean isParam = false;
@@ -118,7 +120,7 @@ public class OptionParser {
 		return files;
 	}
 
-	protected boolean analyzeLine(String line) {
+	private boolean analyzeLine(String line) {
 		if (line.startsWith(";")) {
 			logger.info("skipping comment: " + line);
 			return false;
@@ -162,7 +164,7 @@ public class OptionParser {
 		return usage.toString();
 	}
 
-	String changeSuffix(String orig, String suffix) {
+	private String changeSuffix(String orig, String suffix) {
 		if (orig.indexOf('.') >= 0) {
 			return orig.substring(0, orig.lastIndexOf('.')) + suffix;
 		} else {

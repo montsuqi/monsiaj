@@ -1,6 +1,11 @@
 package org.montsuqi.util;
 
 public class ByteOrder {
+
+	// inhibit instantiation
+	private ByteOrder() {
+	}
+
 	public static long reverse(long l) {
 		return
 			(((l >> 56) & 0xff) <<  0) |

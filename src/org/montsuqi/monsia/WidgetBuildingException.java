@@ -2,21 +2,21 @@ package org.montsuqi.monsia;
 
 import org.montsuqi.util.ChainedRuntimeException;
 
-public class WidgetBuildingException extends ChainedRuntimeException {
+class WidgetBuildingException extends ChainedRuntimeException {
 
-	public WidgetBuildingException() {
+	WidgetBuildingException() {
 		super();
 	}
 
-	public WidgetBuildingException(String message) {
+	WidgetBuildingException(String message) {
 		super(message);
 	}
 
-	public WidgetBuildingException(String message, Throwable cause) {
+	WidgetBuildingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public WidgetBuildingException(Throwable cause) {
+	WidgetBuildingException(Throwable cause) {
 		super(cause);
 	}
 }

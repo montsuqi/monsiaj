@@ -1,41 +1,42 @@
 package org.montsuqi.util;
 
 class Option {
-	String name;
-	String message;
-	Object value;
+
+	private String name;
+	private String message;
+	private Object value;
 	
-	private Option(String name, String message, Object value) {
+	Option(String name, String message, Object value) {
 		this.name = name;
 		this.message = message;
 		this.value = value;
 	}
 	
-	public Option(String name, String message, boolean defaultValue) {
+	Option(String name, String message, boolean defaultValue) {
 		this(name, message, new Boolean(defaultValue));
 	}
 
-	public Option(String name, String message, int defaultValue) {
+	Option(String name, String message, int defaultValue) {
 		this(name, message, new Integer(defaultValue));
 	}
 
-	public Option(String name, String message, String defaultValue) {
+	Option(String name, String message, String defaultValue) {
 		this(name, message, (Object)defaultValue);
 	}
 
-	public String getName() {
+	String getName() {
 		return name;
 	}
 
-	public String getMessage() {
+	String getMessage() {
 		return message;
 	}
 
-	public Object getValue() {
+	Object getValue() {
 		return value;
 	}
 
-	public Class getType() {
+	Class getType() {
 		return value.getClass();
 	}
 
@@ -52,7 +53,7 @@ class Option {
 		}
 	}
 
-	public void setValue(String arg) {
+	void setValue(String arg) {
 		arg = arg.trim();
 		Class type = value.getClass();
 		if (type == Boolean.class) {
@@ -80,7 +81,7 @@ class Option {
 		}
 	}
 
-	public void setValue(boolean arg) {
+	void setValue(boolean arg) {
 		if (value.getClass() == Boolean.class) {
 			value = new Boolean(arg);
 		} else {
@@ -89,7 +90,7 @@ class Option {
 		
 	}
 
-	public void setValue(int value) {
+	void setValue(int value) {
 		if (this.value.getClass() == Integer.class) {
 			this.value = new Integer(value);
 		} else {

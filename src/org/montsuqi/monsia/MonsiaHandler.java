@@ -17,36 +17,35 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 
-public class MonsiaHandler extends DefaultHandler {
+class MonsiaHandler extends DefaultHandler {
 
-	Logger logger;
+	private Logger logger;
 
-	String fileName;
-	ParserState state;
-    int unknownDepth;    /* handle recursive unrecognised tags */
-    ParserState prevState; /* the lastg `known' state we were in */
-    int widgetDepth;
+	private String fileName;
+	private ParserState state;
+    private int unknownDepth;    /* handle recursive unrecognised tags */
+    private ParserState prevState; /* the lastg `known' state we were in */
+    private int widgetDepth;
 
-    final StringBuffer content;
-	WidgetInfo widget;
-    String propertyName;
-	String propertyType;
+	private final StringBuffer content;
+	private WidgetInfo widget;
+    private String propertyName;
+	private String propertyType;
 
-	final Map widgets;
-	final List topLevels;
+	private final Map widgets;
+	private final List topLevels;
 
-    final List properties; // List<Property>
-    final List signals;
-    final List atkActions;
-    final List relations;
-    final List accels;
+	private final List properties; // List<Property>
+	private final List signals;
+	private final List atkActions;
+	private final List relations;
+	private final List accels;
 
-
-	protected boolean isFinished() {
+	boolean isFinished() {
 		return state == FINISH;
 	}
 	
-	public Interface getInterface(Protocol protocol) {
+	Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
 			return new Interface(fileName, widgets, topLevels, protocol);
 		} else {
@@ -54,7 +53,7 @@ public class MonsiaHandler extends DefaultHandler {
 		}
 	}
 	
-	public MonsiaHandler(String fileName) {
+	MonsiaHandler(String fileName) {
 		super();
 		this.fileName = fileName;
 		logger = Logger.getLogger(MonsiaHandler.class);
@@ -760,7 +759,7 @@ public class MonsiaHandler extends DefaultHandler {
 		}
 	}
 
-	void flushProperties() {
+	private void flushProperties() {
 		if (propertyType == null) {
 			// do nothing
 		} else if (propertyType.equals("WIDGET")) { //$NON-NLS-1$
@@ -791,27 +790,27 @@ public class MonsiaHandler extends DefaultHandler {
 		properties.clear();
 	}
 
-	void flushSignals() {
+	private void flushSignals() {
 		widget.setSignals(signals);
 		signals.clear();
 	}
 
-	void flushActions() {
+	private void flushActions() {
 		widget.setATKActions(atkActions);
 		atkActions.clear();
 	}
 
-	void flushRelations() {
+	private void flushRelations() {
 		widget.setRelations(relations);
 		relations.clear();
 	}
 
-	void flushAccels() {
+	private void flushAccels() {
 		widget.setAccels(accels);
 		accels.clear();
 	}
 
-	WidgetInfo createWidgetInfo(Attributes attrs) {
+	private WidgetInfo createWidgetInfo(Attributes attrs) {
 
 		String className = null;
 		String name = null;

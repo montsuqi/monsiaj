@@ -3,7 +3,7 @@ package org.montsuqi.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StdErrLogger extends Logger {
+class StdErrLogger extends Logger {
 
 	private static Map loggers;
 

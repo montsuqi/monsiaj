@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.BasicConfigurator;
 
-public class Log4JLogger extends Logger {
+class Log4JLogger extends Logger {
 
 	private static Map loggers;
 
@@ -51,5 +51,5 @@ public class Log4JLogger extends Logger {
 		logger.fatal(message);
 	}
 
-	final org.apache.log4j.Logger logger;
+	private final org.apache.log4j.Logger logger;
 }

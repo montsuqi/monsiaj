@@ -13,7 +13,7 @@ import org.montsuqi.util.OptionParser;
 public class Client implements Runnable {
 
 	private boolean connected;
-	static final int PORT_GLTERM = 8000;
+	private static final int PORT_GLTERM = 8000;
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 
 	private int portNumber;
@@ -35,7 +35,7 @@ public class Client implements Runnable {
 	private Protocol protocol;
 	private Logger logger;
 
-	public String getCacheFileName(String name) {
+	String getCacheFileName(String name) {
 		String sep = System.getProperty("file.separator"); //$NON-NLS-1$
 		StringBuffer buf = new StringBuffer();
 		buf.append(cache);
@@ -89,7 +89,7 @@ public class Client implements Runnable {
 		return files;
 	}
 
-	public Client(String[] args) {
+	private Client(String[] args) {
 		logger = Logger.getLogger(Client.class);
 
 		String[] files = parseOptions(args);
@@ -144,8 +144,8 @@ public class Client implements Runnable {
 	}
 		
 	public static void main(String[] args) {
-		showBannar();
 		Client client = new Client(args);
+		client.showBannar();
 		client.run();
 		client.exitSystem();
 	}
@@ -156,7 +156,7 @@ public class Client implements Runnable {
 		}
 	}
 	
-	public void exitSystem() {
+	void exitSystem() {
 		try {
 			synchronized (this) {
 				protocol.sendPacketClass(PacketClass.END);
@@ -171,7 +171,7 @@ public class Client implements Runnable {
 		}
 	}
 
-	protected static void showBannar() {
+	private void showBannar() {
 		String format = Messages.getString("Client.banner_format");
 		Object[] args = new Object[] { CLIENT_VERSION };
 		String banner = MessageFormat.format(format, args);

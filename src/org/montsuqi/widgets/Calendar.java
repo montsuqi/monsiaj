@@ -16,16 +16,16 @@ import javax.swing.JPanel;
 import java.util.Date;
 
 public class Calendar extends JComponent {
-	Date date;
-	DateFormat df;
-	JComponent caption;
-	JButton[][] dateCells;
-	Date[][] cellDates;
-	java.util.Calendar cal;
+	private Date date;
+	private DateFormat df;
+	private JComponent caption;
+	private JButton[][] dateCells;
+	private Date[][] cellDates;
+	private java.util.Calendar cal;
 
-	JButton prev;
-	JButton next;
-	JLabel monthLabel;
+	private JButton prev;
+	private JButton next;
+	private JLabel monthLabel;
 
 	public Calendar() {
 		super();
@@ -105,7 +105,7 @@ public class Calendar extends JComponent {
 		this.date = date;
 	}
 
-	void setCells() {
+	private void setCells() {
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 7; col++) {
 				Date d = cellDate(row, col);
@@ -117,7 +117,7 @@ public class Calendar extends JComponent {
 		monthLabel.setText(df.format(date));
 	}
 	
-	protected Date cellDate(int row, int col) {
+	private Date cellDate(int row, int col) {
 		// compute the first day of the month 
 		cal.setTime(date);
 		cal.set(java.util.Calendar.DATE, 1);

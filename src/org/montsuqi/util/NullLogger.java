@@ -1,6 +1,6 @@
 package org.montsuqi.util;
 
-public class NullLogger extends Logger {
+class NullLogger extends Logger {
 
 	private static Logger instance  = new NullLogger();
 

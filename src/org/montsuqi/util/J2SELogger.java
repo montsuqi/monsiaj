@@ -3,9 +3,10 @@ package org.montsuqi.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class J2SELogger extends Logger {
+class J2SELogger extends Logger {
 
 	private static Map loggers;
+
 	static {
 		loggers = new HashMap();
 	}
@@ -61,5 +62,5 @@ public class J2SELogger extends Logger {
 		info(e);
 	}
 
-	final java.util.logging.Logger logger;
+	private final java.util.logging.Logger logger;
 }

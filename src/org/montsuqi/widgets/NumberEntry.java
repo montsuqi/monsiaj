@@ -20,6 +20,7 @@ import javax.swing.text.PlainDocument;
 import org.montsuqi.util.PrecisionScale;
 
 public class NumberEntry extends JTextField {
+
 	final protected Action clearAction;
 	
 	public NumberEntry(String text, int columns) {
@@ -96,22 +97,22 @@ public class NumberEntry extends JTextField {
 }
 
 class NumberDocument extends PlainDocument {
-	String format;
+	private String format;
 
-	BigDecimal value;
-	int scale;
-	int expo;
+	private BigDecimal value;
+	private int scale;
+	private int expo;
 
 	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
 
-	public NumberDocument() {
+	NumberDocument() {
 		format = DEFAULT_FORMAT;
 		expo = 0;
 		scale = 0;
 		value = new BigDecimal("0.0"); //$NON-NLS-1$
 	}
 	
-	public synchronized void setValue(BigDecimal v) {
+	synchronized void setValue(BigDecimal v) {
 		if ( ! value.equals(v)) {
 			PrecisionScale ps = new PrecisionScale(format);
 			String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
@@ -126,17 +127,17 @@ class NumberDocument extends PlainDocument {
 		}
 	}
 
-	public BigDecimal getValue() {
+	BigDecimal getValue() {
 		PrecisionScale ps = new PrecisionScale(format);
 		value = value.setScale(ps.precision, ps.scale);
 		return value;
 	}
 
-	public void setFormat(String format) {
+	void setFormat(String format) {
 		this.format = (format == null) ? DEFAULT_FORMAT : format;
 	}
 	
-	public String getFormat() {
+	String getFormat() {
 		return format;
 	}
 
@@ -180,7 +181,7 @@ class NumberDocument extends PlainDocument {
 		super.insertString(0, formatValue(format, value), a);
 	}
 
-	protected static String formatValue(String format, BigDecimal v) {
+	private static String formatValue(String format, BigDecimal v) {
 		boolean fMinus, fMark;
 		if (v.signum() < 0) {
 			fMinus = true;

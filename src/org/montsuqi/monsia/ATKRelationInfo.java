@@ -5,19 +5,19 @@ package org.montsuqi.monsia;
  * Java version does not use it.
  */
 class ATKRelationInfo {
-	public ATKRelationInfo(String target, String type) {
+	ATKRelationInfo(String target, String type) {
 		this.target = target;
 		this.type = type;
 	}
 
-	public String getTarget() {
+	String getTarget() {
 		return target;
 	}
 	
-	public String getType() {
+	String getType() {
 		return type;
 	}
 
-    final String target;
-    final String type;
+	private final String target;
+    private final String type;
 }

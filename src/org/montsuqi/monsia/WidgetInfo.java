@@ -7,7 +7,7 @@ import java.util.List;
 
 class WidgetInfo {
 
-	public WidgetInfo(String className, String name) {
+	WidgetInfo(String className, String name) {
 		parent = null;
 		this.className = className;
 		this.name = name;
@@ -20,108 +20,109 @@ class WidgetInfo {
 		children = new LinkedList();
 	}
 
-	public WidgetInfo getParent() {
+	WidgetInfo getParent() {
 		return parent;
 	}
 
-	public void setParent(WidgetInfo parent) {
+	void setParent(WidgetInfo parent) {
 		this.parent = parent;
 	}
 
-	public String getLongName() {
+	String getLongName() {
 		if (parent == null) {
 			return getName();
 		} else {
 			return getParent().getLongName() + '.' + getName();
 		}
 	}
-	public String getClassName() {
+
+	String getClassName() {
 		return className;
 	}
 
-	public String getName() {
+	String getName() {
 		return name;
 	}
 
-	public int getPropertiesCount() {
+	int getPropertiesCount() {
 		return properties.size();
 	}
 
-	public List getProperties() {
+	List getProperties() {
 		return Collections.unmodifiableList(properties);
 	}
 
-	public Property getProperty(int i) {
+	Property getProperty(int i) {
 		return (Property)properties.get(i);
 	}
 
-	public synchronized void setProperties(List properties) {
+	synchronized void setProperties(List properties) {
 		this.properties.clear();
 		this.properties.addAll(properties);
 	}
 
-	public int getATKPropertiesCount() {
+	int getATKPropertiesCount() {
 		return atkProperties.size();
 	}
 
-	public synchronized void setATKProperties(List properties) {
+	synchronized void setATKProperties(List properties) {
 		this.atkProperties.clear();
 		this.atkProperties.addAll(properties);
 	}
 
-	public List getSignals() {
+	List getSignals() {
 		return Collections.unmodifiableList(signals);
 	}
 
-	public synchronized void setSignals(List signals) {
+	synchronized void setSignals(List signals) {
 		this.signals.clear();
 		this.signals.addAll(signals);
 	}
 
-	public synchronized void setATKActions(List actions) {
+	synchronized void setATKActions(List actions) {
 		this.actions.clear();
 		this.actions.addAll(actions);
 	}
 
-	public synchronized void setRelations(List relations) {
+	synchronized void setRelations(List relations) {
 		this.relations.clear();
 		this.relations.addAll(relations);
 	}
 
-	public int getAccelsCount() {
+	int getAccelsCount() {
 		return accels.size();
 	}
 
-	public List getAccels() {
+	List getAccels() {
 		return Collections.unmodifiableList(accels);
 	}
 
-	public synchronized void setAccels(List accels) {
+	synchronized void setAccels(List accels) {
 		this.accels.clear();
 		this.accels.addAll(accels);
 	}
 
-	public int getChildrenCount() {
+	int getChildrenCount() {
 		return children.size();
 	}
 	
-	public void removeLastChild() {
+	void removeLastChild() {
 		children.removeLast();
 	}
 
-	public void addChild(ChildInfo info) {
+	void addChild(ChildInfo info) {
 		children.addLast(info);
 	}
 
-	public ChildInfo getChild(int i) {
+	ChildInfo getChild(int i) {
 		return (ChildInfo)children.get(i);
 	}
 
-	public ChildInfo getLastChild() {
+	ChildInfo getLastChild() {
 		return (ChildInfo)children.getLast();
 	}
 	
-	public List getChildren() {
+	List getChildren() {
 		return Collections.unmodifiableList(children);
 	}
 
@@ -135,15 +136,4 @@ class WidgetInfo {
 	private List relations;      // <ATKRelationInfo>
 	private List accels;         // <Accel>
 	private LinkedList children;       // <ChildInfo> 
-
-	public String toString() {
-		StringBuffer buf = new StringBuffer(14 + className.length() + name.length());
-		buf.append("WidgetInfo(");
-		buf.append(className);
-		buf.append(", ");
-		buf.append(name);
-		buf.append(")");
-		return buf.toString();
-	}
-
 }

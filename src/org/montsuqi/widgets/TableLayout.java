@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JFrame;
 
 public class TableLayout extends GridBagLayout {
+
 	public void addLayoutComponent(Component comp, Object object) {
 		if (object instanceof TableConstraints) {
 			setConstraints(comp, (TableConstraints)object);

@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.swing.JFrame;
 
 public class Node {
+
 	private Interface xml;
 	private String name;
 	private JFrame window;

@@ -37,23 +37,24 @@ import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
 
-public class WidgetBuilder {
+class WidgetBuilder {
 
-	Interface xml;
-	Logger logger;
+	private Interface xml;
+	private Logger logger;
 
-	Map classMap;
-	Map propertyMap;
-	Map builderMap;
+	private Map classMap;
+	private Map propertyMap;
+	private Map builderMap;
 
-	static WidgetBuildData defaultBuildWidgetData;
-	static WidgetBuildData defaultBuildContainerData;
+	private static WidgetBuildData defaultBuildWidgetData;
+	private static WidgetBuildData defaultBuildContainerData;
+
 	static {
 		defaultBuildWidgetData = new WidgetBuildData("standardBuildWidget", null, null); //$NON-NLS-1$
 		defaultBuildContainerData = new WidgetBuildData("standardBuildWidget", "standardBuildChildren", null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	public WidgetBuilder(Interface xml) {
+	WidgetBuilder(Interface xml) {
 		this.xml = xml;
 		builderMap = new HashMap();
 		logger = Logger.getLogger(WidgetBuilder.class);
@@ -308,11 +309,11 @@ public class WidgetBuilder {
 								new WidgetBuildData(build, buildChildren, findInternalChild));
 	}
 
-	public WidgetBuildData getBuildData(String genericClassName) {
+	private WidgetBuildData getBuildData(String genericClassName) {
 		return (WidgetBuildData)builderMap.get(genericClassName);
 	}
 
-	public WidgetBuildData getBuildData(Class clazz) {
+	private WidgetBuildData getBuildData(Class clazz) {
 		Iterator i = classMap.entrySet().iterator();
 		while (i.hasNext()) {
 			Map.Entry e = (Map.Entry)i.next();
@@ -329,7 +330,7 @@ public class WidgetBuilder {
 	
 	//--------------------------------------------------------------------
 
-	public Container buildWidget(WidgetInfo info) {
+	Container buildWidget(WidgetInfo info) {
 		Container widget;
 		String genericClassName = info.getClassName();
 		WidgetBuildData data = getBuildData(genericClassName);
@@ -354,7 +355,7 @@ public class WidgetBuilder {
 		return widget;
 	}
 
-	public Container standardBuildWidget(WidgetInfo info) {
+	Container standardBuildWidget(WidgetInfo info) {
 		String genericClassName = info.getClassName();
 		Class clazz  = (Class)classMap.get(genericClassName);
 		if (clazz == null) {
@@ -374,14 +375,14 @@ public class WidgetBuilder {
 		}
 	}
 
-	public Container buildPreview(WidgetInfo info) {
+	Container buildPreview(WidgetInfo info) {
 		logger.warn(Messages.getString("WidgetBuilder.not_implemented")); //$NON-NLS-1$
 		return null;
 	}
 
 	//--------------------------------------------------------------------
 
-	public void standardBuildChildren(Container parent, WidgetInfo info) {
+	void standardBuildChildren(Container parent, WidgetInfo info) {
 		Iterator i = info.getChildren().iterator();
 		while (i.hasNext()) {
 			ChildInfo cInfo = (ChildInfo)i.next();
@@ -402,7 +403,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildMenuItemChildren(Container parent, WidgetInfo info) {
+	void buildMenuItemChildren(Container parent, WidgetInfo info) {
 		JMenu menu = (JMenu)parent;
 		int cCount = info.getChildrenCount();
 		for (int i = 0; i < cCount; i++) {
@@ -423,12 +424,12 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildDialogChildren(Container parent, WidgetInfo info) {
+	void buildDialogChildren(Container parent, WidgetInfo info) {
 		standardBuildChildren(parent, info);
 	}
 
 
-	public void buildFrameChildren(Container parent, WidgetInfo info) {
+	void buildFrameChildren(Container parent, WidgetInfo info) {
 		int FRAME_ITEM = 0;
 		int LABEL_ITEM = 1;
 		int cCount = info.getChildrenCount();
@@ -460,7 +461,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildNotebookChildren(Container parent, WidgetInfo info) {
+	void buildNotebookChildren(Container parent, WidgetInfo info) {
 		int tab = 0;
 		int PANE_ITEM = 0;
 		int TAB_ITEM = 1;
@@ -495,7 +496,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildOptionMenuChildren(Container parent, WidgetInfo info) {
+	void buildOptionMenuChildren(Container parent, WidgetInfo info) {
 		int history = 0;
 		int cCount = info.getChildrenCount();
 		
@@ -514,7 +515,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildCListChildren(Container parent, WidgetInfo info) {
+	void buildCListChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
@@ -554,7 +555,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildToolBarChildren(Container parent, WidgetInfo info) {
+	void buildToolBarChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		JToolBar toolBar = (JToolBar)parent;
 		for (int i = 0; i < cCount; i++) {
@@ -637,7 +638,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildPanedChildren(Container parent, WidgetInfo info) {
+	void buildPanedChildren(Container parent, WidgetInfo info) {
 		JSplitPane pane = (JSplitPane)parent;
 		int cCount = info.getChildrenCount();
 		if (cCount == 0) {
@@ -700,7 +701,7 @@ public class WidgetBuilder {
 //		registerProperty("top_attach", "setTableTopAttach");
 //		registerProperty("bottom_attach", "setTableBottomAttach");
 
-	public void buildTableChildren(Container parent, WidgetInfo info) {
+	void buildTableChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		TableLayout tl = (TableLayout)parent.getLayout();
 		for (int i = 0; i < cCount; i++) {
@@ -743,7 +744,7 @@ public class WidgetBuilder {
 		}
 	}
 	
-	public void buildLayoutChildren(Container parent, WidgetInfo info) {
+	void buildLayoutChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
@@ -779,7 +780,7 @@ public class WidgetBuilder {
 
 	//--------------------------------------------------------------------
 
-	public Container dialogFindInternalChild(Container parent, String childName) {
+	Container dialogFindInternalChild(Container parent, String childName) {
 		JDialog dialog = (JDialog)parent;
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
@@ -790,7 +791,7 @@ public class WidgetBuilder {
 		return null;
 	}
 
-	public Container imageMenuFindInternalChild(Container parent, String childName) {
+	Container imageMenuFindInternalChild(Container parent, String childName) {
 		if ("image".equals(childName)) { //$NON-NLS-1$
 			return parent; // MenuItem itself is an AbstractButton and hase an icon with it.
 		} else {
@@ -798,7 +799,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public Container scrolledWindowFindInternalChild(Container parent, String childName) {
+	Container scrolledWindowFindInternalChild(Container parent, String childName) {
 		JScrollPane scroll = (JScrollPane)parent;
 		if ("vscrollbar".equals(childName)) { //$NON-NLS-1$
 			return scroll.getVerticalScrollBar();
@@ -810,7 +811,7 @@ public class WidgetBuilder {
 		return null;
 	}
 
-	public Container fileSelectionDialogFindInternalChild(Container parent, String childName) {
+	Container fileSelectionDialogFindInternalChild(Container parent, String childName) {
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -829,7 +830,7 @@ public class WidgetBuilder {
 		return null;
 	}
 
-	public Container colorSelectionDialogFindInternalChild(Container parent, String childName) {
+	Container colorSelectionDialogFindInternalChild(Container parent, String childName) {
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -851,7 +852,7 @@ public class WidgetBuilder {
 		return null;
 	}
 
-	public Container fontSelectionDialogFindInternalChild(Container parent, String childName) {
+	Container fontSelectionDialogFindInternalChild(Container parent, String childName) {
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -873,7 +874,7 @@ public class WidgetBuilder {
 		return null;
 	}
 
-	public Container comboFindInternalChild(Container parent, String childName) {
+	Container comboFindInternalChild(Container parent, String childName) {
 		if ("entry".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -894,7 +895,7 @@ public class WidgetBuilder {
 
 	//--------------------------------------------------------------------
 
-	public void handleInternalChild(Container parent, ChildInfo cInfo) {
+	private void handleInternalChild(Container parent, ChildInfo cInfo) {
 		Container child;
 		WidgetInfo info;
 		Class oClass;
@@ -931,7 +932,7 @@ public class WidgetBuilder {
 		setCommonParams(child, wInfo);
 	}
 
-	protected void setProperties(Container widget, WidgetInfo info) {
+	private void setProperties(Container widget, WidgetInfo info) {
 		for (int i = 0, pCount = info.getPropertiesCount(); i < pCount; i++) {
 			try {
 				Property p = info.getProperty(i);
@@ -965,7 +966,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	protected Method findSetterByFieldName(Class clazz, String field)
+	private Method findSetterByFieldName(Class clazz, String field)
 		throws IllegalAccessException, NoSuchFieldException {
 		BeanInfo bInfo = null;
 		try {
@@ -998,7 +999,7 @@ public class WidgetBuilder {
 		return setter;
 	}
 
-	public void setCommonParams(Container widget, WidgetInfo info) {
+	private void setCommonParams(Container widget, WidgetInfo info) {
 		addSignals(widget, info);
 		addAccels(widget, info);
 		widget.setName(info.getName());

@@ -2,21 +2,21 @@ package org.montsuqi.monsia;
 
 import org.montsuqi.util.ChainedRuntimeException;
 
-public class HandlerInvocationException extends ChainedRuntimeException {
+class HandlerInvocationException extends ChainedRuntimeException {
 
-	public HandlerInvocationException() {
+	HandlerInvocationException() {
 		super();
 	}
 
-	public HandlerInvocationException(String message) {
+	HandlerInvocationException(String message) {
 		super(message);
 	}
 
-	public HandlerInvocationException(String message, Throwable cause) {
+	HandlerInvocationException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public HandlerInvocationException(Throwable cause) {
+	HandlerInvocationException(Throwable cause) {
 		super(cause);
 	}
 

@@ -2,16 +2,16 @@ package org.montsuqi.monsia;
 
 class Property {
 
-	public Property(String name, String value) {
+	Property(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}
 
-	public String getName() {
+	String getName() {
 		return name;
 	}
 	
-	public String getValue() {
+	String getValue() {
 		return value;
 	}
 

@@ -53,8 +53,8 @@ public abstract class Logger {
 	public void debug(String format, Object[] args) {
 		debug(formatMessage(format, args));
 	}
-	
-public void info(String format, Object[] args) {
+
+	public void info(String format, Object[] args) {
 		info(formatMessage(format, args));
 	}
 	

@@ -5,19 +5,19 @@ package org.montsuqi.monsia;
  * Java version does not use it.
  */
 class ATKActionInfo {
-	public ATKActionInfo(String actionName, String description) {
+	ATKActionInfo(String actionName, String description) {
 		this.actionName = actionName;
 		this.description = description;
 	}
 
-	public String getActionName() {
+	String getActionName() {
 		return actionName;
 	}
 	
-	public String getDescription() {
+	String getDescription() {
 		return description;
 	}
 
-    final String actionName;
-    final String description;
+    private final String actionName;
+    private final String description;
 }
