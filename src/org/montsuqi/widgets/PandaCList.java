@@ -30,6 +30,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -82,6 +83,7 @@ public class PandaCList extends JTable {
 	}
 
 	public PandaCList() {
+		setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
 		ActionMap actions = getActionMap();
 		InputMap inputs = getInputMap();
 
@@ -107,18 +109,14 @@ public class PandaCList extends JTable {
 	public void createDefaultColumnsFromModel() {
 		TableColumnModel model = getColumnModel();
 		int n = getColumnCount();
-		int[] widths = new int[n];
 		TableCellRenderer[] renderers = new TableCellRenderer[n];
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
-			widths[i] = column.getPreferredWidth();
 			renderers[i] = column.getHeaderRenderer();
 		}
 		super.createDefaultColumnsFromModel();
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
-			column.setPreferredWidth(widths[i]);
-			column.setMinWidth(widths[i]);
 			column.setHeaderRenderer(renderers[i]);
 		}
 	}
@@ -137,10 +135,30 @@ public class PandaCList extends JTable {
 		super.changeSelection(rowIndex, columnIndex, true, extend);
 	}
 
-	public void registerHeaderRenderer(int index, TableCellRenderer renderer) {
-		TableColumnModel columns = getColumnModel();
-		TableColumn column = columns.getColumn(index);
+	public void registerHeaderComponent(int i, JComponent header) {
+		TableCellRenderer renderer = new CListHeaderRenderer(header);
+		TableColumn column = columnModel.getColumn(i);
 		column.setHeaderRenderer(renderer);
+		int headerWidth = (int)header.getPreferredSize().getWidth();
+		if (headerWidth != 0) {
+			column.setPreferredWidth(headerWidth);
+			column.setWidth(headerWidth);
+		}
 	}
 
+	public void doLayout() {
+		int columnCount = columnModel.getColumnCount();
+		if (columnCount == 0) {
+			return;
+		}
+		int widgetWidth = getPreferredSize().width;
+		int diff = (widgetWidth - columnModel.getTotalColumnWidth()) / columnCount;
+		for (int i = 0; i < columnCount; i++) {
+			TableColumn column = columnModel.getColumn(i);
+			int width = column.getPreferredWidth() + diff;
+			column.setPreferredWidth(width);
+			column.setWidth(width);
+		}
+		super.doLayout();
+	}
 }

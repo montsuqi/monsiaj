@@ -25,23 +25,13 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import javax.swing.JComponent;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
-import org.montsuqi.widgets.CListHeaderRenderer;
 import org.montsuqi.widgets.PandaCList;
 
 class CListBuilder extends ContainerBuilder {
-
-	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, parent, info);
-		JTable table = (JTable)widget;
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		return widget;
-	}
 
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		int cCount = info.getChildren().size();
@@ -58,8 +48,7 @@ class CListBuilder extends ContainerBuilder {
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component header = WidgetBuilder.buildWidget(xml, wInfo, parent);
 			if (header instanceof JComponent) {
-				TableCellRenderer renderer = new CListHeaderRenderer((JComponent)header);
-				clist.registerHeaderRenderer(i, renderer);
+				clist.registerHeaderComponent(i, (JComponent)header);
 			} else {
 				throw new WidgetBuildingException("not-JComponent component for CList header"); //$NON-NLS-1$
 			}

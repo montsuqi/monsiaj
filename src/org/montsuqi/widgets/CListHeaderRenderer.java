@@ -28,7 +28,7 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
-public class CListHeaderRenderer implements TableCellRenderer {
+class CListHeaderRenderer implements TableCellRenderer {
 
 	private Component component;
 

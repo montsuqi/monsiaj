@@ -391,7 +391,7 @@ abstract class WidgetPropertySetter {
 					TableColumn column = model.getColumn(i);
 					int width = ParameterConverter.toInteger(tokens.nextToken());
 					column.setPreferredWidth(width);
-					column.setMinWidth(width);
+					column.setWidth(width);
 					totalWidth += width;
 				}
 				if (parent instanceof JScrollPane) {
@@ -411,7 +411,7 @@ abstract class WidgetPropertySetter {
 							int width = column.getPreferredWidth();
 							width += delta;
 							column.setPreferredWidth(width);
-							column.setMinWidth(width);
+							column.setWidth(width);
 						}
 					}
 				}
