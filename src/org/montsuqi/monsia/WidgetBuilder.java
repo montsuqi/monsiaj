@@ -443,9 +443,10 @@ class WidgetBuilder {
 			}
 		}
 		if (group == null) {
-			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.radio_button_has_no_group")); //$NON-NLS-1$
+			logger.warn(Messages.getString("WidgetBuilder.radio_button_has_no_group"), widget.getName()); //$NON-NLS-1$
+		} else {
+			group.add(widget);
 		}
-		group.add(widget);
 		return widget;
 	}
 
