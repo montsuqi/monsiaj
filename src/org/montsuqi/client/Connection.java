@@ -171,13 +171,21 @@ class Connection {
 		return in.readByte() == T_BYTE ? true : false;
 	}
 
-	public void sendBoolean(boolean data) throws IOException {
+	void sendBoolean(boolean data) throws IOException {
 		out.writeByte(data ? T_BYTE : F_BYTE);
 		((OutputStream)out).flush();
 	}
 
 	void sendFixed(BigDecimal xval) throws IOException {
-		String s = String.valueOf(xval.unscaledValue());
+		String s;
+		if (xval.compareTo(BigDecimal.ZERO) >= 0) {
+			s = String.valueOf(xval.unscaledValue());
+		} else {
+			s = String.valueOf(xval.negate().unscaledValue());
+			char[] chars = s.toCharArray();
+			chars[0] |= 0x40;
+			s = new String(chars);
+		}
 		sendLength(s.length() - xval.scale() - 1); // 1 for the dot
 		sendLength(xval.scale());
 		sendString(s);
