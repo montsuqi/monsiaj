@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.montsuqi.util.Logger;
@@ -51,24 +52,32 @@ public class PandaHTML extends JScrollPane {
 		});
 	}
 
-	public void setURI(String uri) {
-		try {
-			pane.setPage(uri);
-		} catch (FileNotFoundException e) {
-			pane.setText(e.toString());
-		} catch (IOException e) {
-			logger.warn(e);
-		}
+	public void setURI(final String uri) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					pane.setPage(uri);
+				} catch (FileNotFoundException e) {
+					pane.setText(e.toString());
+				} catch (IOException e) {
+					logger.warn(e);
+				}
+			}
+		});
 	}
 
-	public void setURI(URL uri) {
-		try {
-			pane.setPage(uri);
-		} catch (FileNotFoundException e) {
-			pane.setText(e.toString());
-		} catch (IOException e) {
-			logger.warn(e);
-		}
+	public void setURI(final URL uri) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					pane.setPage(uri);
+				} catch (FileNotFoundException e) {
+					pane.setText(e.toString());
+				} catch (IOException e) {
+					logger.warn(e);
+				}
+			}
+		});
 	}
 
 	public URL getURI() {
