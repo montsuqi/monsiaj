@@ -224,6 +224,14 @@
 				<include name="*.jar"/>
 			</fileset>
 		</signjar>
+		<apply executable="jarsigner">
+			<arg value="-verify"/>
+			<arg value="-keystore"/>
+			<arg value="${keystore}"/>
+			<fileset dir="${build.dir}">
+				<include name="*.jar"/>
+			</fileset>
+		</apply>
 	</target>
 
 	<target name="clean" description="Cleans all built files.">
