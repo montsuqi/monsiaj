@@ -33,7 +33,6 @@ import java.nio.channels.SocketChannel;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -44,33 +43,37 @@ import org.montsuqi.util.OptionParser;
 
 public class Client implements Runnable {
 
-	static {
-		StringBuffer trustStore = new StringBuffer();
-		trustStore.append(System.getProperty("user.home")); //$NON-NLS-1$
-		trustStore.append(File.separator);
-		trustStore.append(".jma-receipt"); //$NON-NLS-1$
-		trustStore.append(File.separator);
-		trustStore.append("keystore"); //$NON-NLS-1$
-		System.setProperty("javax.net.ssl.trustStore", trustStore.toString()); //$NON-NLS-1$
-
-		URL sslPropertiesURL = Client.class.getResource("/ssl.properties"); //$NON-NLS-1$
-		Properties sslProperties = new Properties();
-		try {
-			InputStream input = sslPropertiesURL.openStream();
-			sslProperties.load(input);
-			input.close();
-		} catch (IOException e) {
-			throw new ExceptionInInitializerError(e);
-		}
-		String keyStorePassword = sslProperties.getProperty("keyStorePassword"); //$NON-NLS-1$
-		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword); //$NON-NLS-1$
-	}
-
 	private Configuration conf;
 	private Protocol protocol;
 
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 	private static final Logger logger = Logger.getLogger(Client.class);
+
+	static {
+		String[] pathElements = new String[] {
+			System.getProperty("user.home"), //$NON-NLS-1$
+			".jma-receipt", //$NON-NLS-1$
+			"ssl", //$NON-NLS-1$
+			"keystore" //$NON-NLS-1$
+		};
+		String trustStore = createPath(pathElements);
+		File f = new File(trustStore);
+		if (f.exists()) {
+			logger.info("setting trust store explicitly: {0}", trustStore); //$NON-NLS-1$
+			System.setProperty("javax.net.ssl.trustStore", trustStore.toString()); //$NON-NLS-1$
+		}
+	}
+
+	private static String createPath(String[] elements) {
+		StringBuffer buf = new StringBuffer();
+		for (int i = 1; i < elements.length; i++) {
+			if (i > 0) {
+				buf.append(File.separator);
+			}
+			buf.append(elements[i]);
+		}
+		return buf.toString();
+	}
 
 	public Client(Configuration conf) {
 		this.conf = conf;
@@ -116,28 +119,27 @@ public class Client implements Runnable {
 
 		conf.setUseSSL(options.getBoolean("useSSL")); //$NON-NLS-1$
 
-		if (files.length > 0) {
-			conf.setApplication(files[0]);
-		} else {
-			conf.setApplication(null);
-		}
+		conf.setApplication(files.length > 0 ? files[0] : null);
 
 		return new Client(conf);
 	}
 
 	void connect() throws IOException {
-		protocol = new Protocol(this, conf.getEncoding(), loadStyles(), createCacheRootPath(), conf.getProtocolVersion());
-		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
-	}
+		String encoding = conf.getEncoding();
+		Map styles = loadStyles();
+		String[] pathElements = {
+			conf.getCache(),
+			conf.getHost(),
+			String.valueOf(conf.getPort())
+		};
+		String cacheRoot = createPath(pathElements);
+		int protocolVersion = conf.getProtocolVersion();
+		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion);
 
-	private String createCacheRootPath() {
-		StringBuffer cacheRoot = new StringBuffer();
-		cacheRoot.append(conf.getCache());
-		cacheRoot.append(File.separator);
-		cacheRoot.append(conf.getHost());
-		cacheRoot.append(File.separator);
-		cacheRoot.append(conf.getPort());
-		return cacheRoot.toString();
+		String user = conf.getUser();
+		String password = conf.getPass();
+		String application = conf.getApplication();
+		protocol.sendConnect(user, password, application);
 	}
 
 	private Map loadStyles() {
