@@ -43,4 +43,8 @@ class ChildInfo {
 	void setInternalChild(String child) {
 		internalChild = child;
 	}
+
+	void addProperty(Property p) {
+		properties.add(p);
+	}
 }
