@@ -191,7 +191,7 @@ abstract class WidgetPropertySetter {
 		registerProperty(JLabel.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JLabel label = (JLabel)widget;
-				label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value.replaceFirst("\\s+$", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value.replaceFirst("\\s+\\z", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
 			// convert multi-line label value into HTML
