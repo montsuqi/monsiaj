@@ -46,6 +46,9 @@ class TextMarshaller extends WidgetMarshaller {
 			String value = con.receiveStringData();
 			manager.registerValue(widget, name, null);
 			text.setText(value);
+			if ( ! text.isEditable()) {
+				text.setCaretPosition(0);
+			}
 		}
 	}
 

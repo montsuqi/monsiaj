@@ -272,6 +272,9 @@ abstract class WidgetPropertySetter {
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JTextArea text = (JTextArea)widget;
 				text.setText(value);
+				if ( ! text.isEditable()) {
+					text.setCaretPosition(0);
+				}
 			}
 		});
 
