@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -34,13 +36,28 @@ public abstract class SignalHandler {
 	}
 
 	static Map handlers;
-
+	static Timer timer;
+	static TimerTask timerTask;
+	static boolean timerBlocked;
+	
 	private static void registerHandler(String signalName, SignalHandler handler) {
 		handlers.put(signalName, handler);
 	}
 
+	static void blockChangedHandlers() {
+		timerBlocked = true;
+	}
+
+	static void unblockChangedHandlers() {
+		timerBlocked = false;
+	}
+
 	static {
 		handlers = new HashMap();
+	
+		timer = new Timer();
+		timerTask = null;
+		timerBlocked = false;
 
 		registerHandler(null, new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) {
@@ -74,7 +91,7 @@ public abstract class SignalHandler {
 				}
 				con.sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
 				con.sendWindowData();
-//				blockChangedHanders();
+				blockChangedHandlers();
 				if (con.getScreenData()) {
 					ignoreEvent = true;
 //					while (gtk_events_pending()) {
@@ -82,7 +99,7 @@ public abstract class SignalHandler {
 //					}
 					ignoreEvent = false;
 				}
-//				unblockChangedHanders();
+				unblockChangedHandlers();
 			}
 		};
 
@@ -96,8 +113,15 @@ public abstract class SignalHandler {
 		};
 
 		SignalHandler sendEventWhenIdle = new SignalHandler() {
-			public void handle(final Protocol con, final Component widget, final Object userData) {
-				SwingUtilities.invokeLater(new Runnable() {
+			public synchronized void handle(final Protocol con, final Component widget, final Object userData) {
+				if (timerTask != null) {
+					timerTask.cancel();
+					timerTask = null;
+				}
+				if (timerBlocked) {
+					return;
+				}
+				timerTask = new TimerTask() {
 					public void run() {
 						JTextComponent text = (JTextComponent)widget;
 						String t = text.getText();
@@ -111,8 +135,9 @@ public abstract class SignalHandler {
 						} catch (IOException e) {
 							logger.warn(e);
 						}
+						System.out.println("timer task done"); //$NON-NLS-1$
 					}
-				});
+				};
 			}
 		};
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
