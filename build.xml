@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- $Id: build.xml,v 1.1 2003-09-12 08:18:39 ozawa Exp $ -->
+<project name="panda-client" default="compile" basedir=".">
+
+  <!-- properties -->
+
+  <property name="compile.debug"       value="yes"/>
+  <property name="compile.deprecation" value="yes"/>
+  <property name="compile.verbose"     value="no"/>
+  <property name="clean.verbose"       value="no"/>
+
+  <property name="src.dir"             value="src"/>
+  <property name="build.dir"           value="build"/>
+  <property name="dist.dir"            value="dist"/>
+  <property name="resources.dir"       value="resources"/>
+
+  <path id="project.class.path">
+    <pathelement path="/usr/share/java/xerces.jar"/>
+    <pathelement path="/usr/share/java/log4j-1.2.8.jar"/>
+  </path>
+
+  <!-- targets -->
+
+  <target name="prepare"
+          description="Sets the timestamp and creates directories">
+    <tstamp/>
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+    <condition property="exclude.j2selogger" value="**/J2SELogger.java">
+      <not>
+        <available classname="java.util.logging.Logger"/>
+      </not>
+    </condition>
+  </target> 
+
+  <target name="compile" depends="prepare"
+    description="Compiles all Java sources.">
+    <javac srcdir="${src.dir}"
+           destdir="${build.dir}"
+           verbose="${compile.verbose}"
+	   deprecation="${compile.deprecation}" 
+           debug="${compile.debug}"
+	   debuglevel="lines,vars,source">
+      <include name="**/*.java"/>
+      <exclude name="**/TableLayoutOld.java"/>
+      <exclude name="${exclude.j2selogger}"/>
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target>
+
+  <target name="jars" depends="compile"
+          description="Deploy jars">
+    <jar destfile="${dist.dir}/pandaclient.jar"
+         basedir="${build.dir}"
+         includes="**/*.class"
+         manifest="${resources.dir}/manifest.mf"
+         index="yes"/>
+  </target>
+
+  <target name="buildclean"
+          description="Cleans all built files.">
+    <delete verbose="${clean.verbose}">
+      <fileset dir="${build.dir}"/>
+    </delete>
+  </target>
+
+  <target name="clean"
+          description="Cleans temporary files and outputs.">
+    <delete verbose="${clean.verbose}">
+      <fileset dir="." defaultexcludes="no" includes="**/*~,**/.#*#"/>
+    </delete>
+  </target>
+
+  <target name="veryclean" depends="clean,buildclean"
+    description="Cleans all generated files.">
+    <delete dir="${build.dir}" verbose="${clean.verbose}"/>
+    <delete dir="${dist.dir}"  verbose="${clean.verbose}"/>
+  </target>
+
+</project>
+
