@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<project name="panda-client" default="jars" basedir=".">
+<project name="panda-client" default="dist" basedir=".">
 
 	<!-- properties -->
-
-	<property name="compile.debug"       value="yes"/>
-	<property name="compile.deprecation" value="yes"/>
-	<property name="compile.verbose"     value="no"/>
-	<property name="clean.verbose"       value="no"/>
 
 	<property name="src.dir"             value="src"/>
 	<property name="build.dir"           value="bin"/>
@@ -19,6 +14,7 @@
 	<property name="webstart.url"        value="http://localhost/java-client/"/>
 
 	<property name="macosx.app.name"     value="JMAReceipt"/>
+	<property name="macosx.app.dir"      value="${macosx.app.name}.app"/>
 	<property name="macosx.app.stub"     value="JMAReceipt"/>
 
 	<path id="project.class.path">
@@ -30,8 +26,7 @@
 
 	<!-- targets -->
 
-	<target name="prepare"
-		description="Sets the timestamp and creates directories">
+	<target name="prepare">
 		<tstamp/>
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${tmp.dir}"/>
@@ -40,157 +35,86 @@
 		<property name="bin.macosx.name" value="monsiaj-bin-macosx-${DSTAMP}"/>
 		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 		<property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
-		<property name="dist.bin.dir" value="${dist.dir}/${bin.name}"/>
-		<property name="dist.bin.macosx.dir" value="${dist.dir}/${bin.macosx.name}"/>
-		<property name="dist.src.dir" value="${dist.dir}/${src.name}"/>
-		<property name="dist.replay.dir" value="${dist.dir}/${replay.name}"/>
-		<mkdir dir="${dist.bin.dir}"/>
-		<mkdir dir="${dist.bin.macosx.dir}"/>
-		<mkdir dir="${dist.src.dir}"/>
-		<mkdir dir="${dist.replay.dir}"/>
-		<mkdir dir="${report.dir}"/>
-		<property name="macosx.app.dir" value="${dist.bin.macosx.dir}/${macosx.app.name}.app"/>
 	</target>
 
-	<target name="compile" depends="prepare"
-		description="Compiles all Java sources.">
-		<javac srcdir="${src.dir}"
-			destdir="${build.dir}"
-			verbose="${compile.verbose}"
-			deprecation="${compile.deprecation}" 
-			debug="${compile.debug}"
-			source="1.4">
+	<target name="compile" depends="prepare">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4">
 			<include name="**/*.java"/>
 			<exclude name="**/Test*.java"/>
 			<classpath refid="project.class.path"/>
 		</javac>
 	</target>
 
-	<target name="resources" depends="resources-copy-files,resources-copy-jnlp"/>
-
-	<target name="resources-copy-files" depends="prepare">
+	<target name="copy-files" depends="prepare">
 		<copy todir="${build.dir}">
 			<fileset dir="${src.dir}" includes="**/*.properties,**/*.jpg,**/*.png"/>
 			<fileset dir="${resources.dir}" includes="*.properties"/>
+			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, libwebkitsample.jnilib"/>
+			<fileset dir="." includes="README.txt"/>
 		</copy>
-	</target>
-	
-	<target name="resources-copy-jnlp" depends="prepare">
 		<native2ascii src="${resources.dir}" dest="${build.dir}"
 			includes="*.jnlp" encoding="UTF-8"/>
 		<filter token="webstarturl" value="${webstart.url}"/>
 		<copy todir="${tmp.dir}" filtering="true">
 			<fileset dir="${build.dir}" includes="*.jnlp"/>
 		</copy>
-		<delete verbose="${clean.verbose}" quiet="true">
+		<delete>
 			<fileset dir="${build.dir}" includes="*.jnlp"/>
 		</delete>
 		<native2ascii src="${tmp.dir}" dest="${build.dir}"
 			includes="*.jnlp" encoding="UTF-8" reverse="true"/>
 	</target>
 
-	<target name="dist" depends="dist-bin,dist-bin-mac,dist-src"
-		description="Build files to be distributed."/>
+	<target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-src"/>
 
-	<target name="dist-bin" depends="dist-bin-copy-files">
+	<target name="dist-bin" depends="create-jars,copy-files">
+		<copy todir="${build.dir}/${bin.name}">
+			<fileset dir="${build.dir}" includes="*.jar,*.jnilib,*.jnlp,README.txt"/>
+		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.bin.dir}.zip">
-			<fileset dir="${dist.dir}" includes="${bin.name}/**"/>
+		<zip zipfile="${dist.dir}/${bin.name}.zip">
+			<fileset dir="${build.dir}" includes="${bin.name}/**"/>
 		</zip>
 	</target>
 
-	<target name="dist-bin-copy-files" depends="jars">
-		<!-- ant 1.5.x should use destfile instead of jarfile-->
-		<copy todir="${dist.bin.dir}">
-			<fileset dir="${build.dir}" includes="*.jar, *.jnlp"/>
-			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, libwebkitsample.jnilib"/>
-			<fileset dir="." includes="README.txt"/>
-		</copy>
-	</target>
-
-<!--
-deploy.dir=/path/to/the/directory/where/jars/will/go
-alias=whatever
-keystore=path/to/keystore
--->
-	<target name="sign" depends="jars">
-		<copy todir="${deploy.dir}">
-			<fileset dir="${build.dir}" includes="*.jar"/>
-			<fileset dir="${libs.dir}" includes="*.jar"/>
-		</copy>
-		<input message="Input the store password" addproperty="storepass"/>
-		<signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
-			<fileset dir="${deploy.dir}" includes="*.jar"/>
-		</signjar>
-	</target>
-
-	<target name="dist-bin-mac" depends="dist-bin-mac-copy-files">
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.bin.macosx.dir}.zip">
-			<fileset dir="${dist.dir}" includes="${bin.macosx.name}/**"/>
-		</zip>
-	</target>
-
-	<target name="dist-bin-mac-copy-files" depends="dist-bin-copy-files">
-		<mkdir dir="${macosx.app.dir}"/>
-		<mkdir dir="${macosx.app.dir}/Contents"/>
-		<mkdir dir="${macosx.app.dir}/Contents/MacOS"/>
-		<mkdir dir="${macosx.app.dir}/Contents/Resources"/>
-		<mkdir dir="${macosx.app.dir}/Contents/Resources/Java"/>
-		<copy todir="${macosx.app.dir}/Contents">
+	<target name="dist-bin-mac" depends="create-jars,copy-files">
+		<copy todir="${build.dir}/${macosx.app.dir}/Contents">
 			<fileset dir="${resources.dir}" includes="Info.plist, PkgInfo"/>
 		</copy>
-		<copy todir="${macosx.app.dir}/Contents/Resources">
+		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources">
 			<fileset dir="${resources.dir}" includes="*.lproj/**,*.icns"/>
 		</copy>
-		<copy todir="${macosx.app.dir}/Contents/Resources/Java">
-			<fileset dir="${dist.bin.dir}" includes="*.jar, *.jnilib"/>
+		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java">
+			<fileset dir="${build.dir}" includes="*.jar,*.jnilib" excludes="libwebkitsample.jnilib.jar"/>
 		</copy>
-		<copy todir="${macosx.app.dir}/Contents/MacOS">
+		<copy todir="${build.dir}/${macosx.app.dir}/Contents/MacOS">
 			<fileset dir="${resources.dir}" includes="${macosx.app.stub}"/>
 		</copy>
-		<copy todir="${dist.bin.macosx.dir}">
-			<fileset dir="." includes="README.txt"/>
+		<chmod perm="755" file="${build.dir}/${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
+
+		<copy todir="${build.dir}/${bin.macosx.name}">
+			<fileset dir="${build.dir}" includes="${macosx.app.dir}/**,README.txt"/>
 		</copy>
-		<chmod perm="755" file="${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
-	</target>
-		
-	<target name="dist-src" depends="dist-src-copy-files">
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.src.dir}.zip">
-			<fileset dir="${dist.dir}" includes="${src.name}/**"/>
+		<zip zipfile="${dist.dir}/${bin.macosx.name}.zip">
+			<fileset dir="${build.dir}" includes="${bin.macosx.name}/**"/>
 		</zip>
 	</target>
 
-	<target name="dist-src-copy-files" depends="prepare">
-		<copy todir="${dist.src.dir}">
+	<target name="dist-src">
+		<copy todir="${build.dir}/${src.name}">
 			<fileset dir="." includes="src/**,resources/**,libs/**,build.xml,Makefile,README.txt"
 	excludes="**/CVS"/>
 		</copy>
+		<!-- ant 1.5.x should use destfile instead of zipfile-->
+		<zip zipfile="${dist.dir}/${src.name}.zip">
+			<fileset dir="${build.dir}" includes="${src.name}/**"/>
+		</zip>
 	</target>
 
-	<target name="buildclean"
-		description="Cleans all built files.">
-		<delete verbose="${clean.verbose}" quiet="true" includeEmptyDirs="true">
-			<fileset dir="${build.dir}"/>
-		</delete>
-		<delete dir="${tmp.dir}" verbose="${clean.verbose}" quiet="true"/>
-	</target>
+	<target name="create-jars" depends="create-unsigned-jars,sign-jars"/>
 
-	<target name="clean"
-		description="Cleans temporary files and outputs.">
-		<delete verbose="${clean.verbose}" quiet="true">
-			<fileset dir="." defaultexcludes="no" includes="**/*~,**/.#*#"/>
-		</delete>
-	</target>
-
-	<target name="veryclean" depends="clean,buildclean"
-		description="Cleans all generated files.">
-		<delete dir="${dist.dir}" verbose="${clean.verbose}" quiet="true"/>
-		<delete dir="${report.dir}" verbose="${clean.verbose}" quiet="true"/>
-	</target>
-
-	<target name="jars" depends="compile,resources">
+	<target name="create-unsigned-jars" depends="compile,copy-files">
 		<jar jarfile="${build.dir}/pandaclient.jar"
 			basedir="${build.dir}"
 			includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,**/*.png"
@@ -204,13 +128,23 @@ keystore=path/to/keystore
 			includes="libwebkitsample.jnilib"/>
 	</target>
 
-	<target name="compiletests" depends="compile,resources"
+	<target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
+		<input message="Input the store password" addproperty="storepass"/>
+		<signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
+			<fileset dir="${build.dir}" includes="*.jar"/>
+		</signjar>
+	</target>
+
+	<target name="clean" description="Cleans all built files.">
+		<delete includeEmptyDirs="true">
+			<fileset dir="." defaultexcludes="no" includes="**/*~,**/.#*#"/>
+			<fileset dir="." includes="${build.dir}/**,${tmp.dir}/**,${dist.dir}/**"/>
+		</delete>
+	</target>
+
+	<target name="compiletests" depends="compile,copy-files"
 		description="Compiles Test Java sources.">
-		<javac srcdir="${src.dir}"
-			destdir="${build.dir}"
-			verbose="${compile.verbose}"
-			deprecation="${compile.deprecation}"
-			debug="${compile.debug}">
+		<javac srcdir="${src.dir}" destdir="${build.dir}">
 			<include name="**/Test*.java"/>
 			<classpath refid="project.class.path"/>
 		</javac>
@@ -255,7 +189,7 @@ keystore=path/to/keystore
 		</junit>
 	</target>
 
-	<target name="jar.replay" depends="compiletests,resources">
+	<target name="jar.replay" depends="compiletests,copy-files">
 		<jar jarfile="${build.dir}/pandarecord.jar"
 			basedir="${build.dir}"
 			includes="org/montsuqi/tools/TestXMLRecording.class, org/montsuqi/tools/*.xml"
@@ -266,7 +200,7 @@ keystore=path/to/keystore
 			manifest="${resources.dir}/pandareplay.mf"/>
 	</target>
 
-	<target name="dist.replay" depends="dist, jar.replay, resources">
+	<target name="dist.replay" depends="dist, jar.replay, copy-files">
 		<copy todir="${dist.replay.dir}">
 			<fileset dir="${libs.dir}" includes="*.jar"/>
 		</copy>
