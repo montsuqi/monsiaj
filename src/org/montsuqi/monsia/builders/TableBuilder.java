@@ -34,6 +34,14 @@ import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
 
 class TableBuilder extends ContainerBuilder {
+
+	private static final String LEFT_ATTACH_KEY = "left_attach"; //$NON-NLS-1$
+	private static final String RIGHT_ATTACH_KEY = "right_attach"; //$NON-NLS-1$
+	private static final String TOP_ATTACH_KEY = "top_attach"; //$NON-NLS-1$
+	private static final String BOTTOM_ATTACH_KEY = "bottom_attach"; //$NON-NLS-1$
+	private static final String X_KEY = "x"; //$NON-NLS-1$
+	private static final String Y_KEY = "y"; //$NON-NLS-1$
+
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		TableLayout tl = (TableLayout)parent.getLayout();
 		for (int i = 0, n = info.getChildren().size(); i < n; i++) {
@@ -42,23 +50,23 @@ class TableBuilder extends ContainerBuilder {
 			Component child = null;
 			TableConstraints tc = new TableConstraints();
 			child = buildWidget(xml, wInfo, parent);
-			Map properties = wInfo.getProperties();
-			if (properties.containsKey("left_attach")) { //$NON-NLS-1$
-				tc.leftAttach = ParameterConverter.toInteger((String)properties.get("left_attach")); //$NON-NLS-1$
+			Map properties = cInfo.getProperties();
+			if (properties.containsKey(LEFT_ATTACH_KEY)) {
+				tc.leftAttach = ParameterConverter.toInteger((String)properties.get(LEFT_ATTACH_KEY));
 			}
-			if (properties.containsKey("right_attach")) { //$NON-NLS-1$
-				tc.rightAttach = ParameterConverter.toInteger((String)properties.get("right_attach")); //$NON-NLS-1$
+			if (properties.containsKey(RIGHT_ATTACH_KEY)) {
+				tc.rightAttach = ParameterConverter.toInteger((String)properties.get(RIGHT_ATTACH_KEY));
 			}
-			if (properties.containsKey("top_attach")) { //$NON-NLS-1$
-				tc.topAttach = ParameterConverter.toInteger((String)properties.get("top_attach")); //$NON-NLS-1$
+			if (properties.containsKey(TOP_ATTACH_KEY)) {
+				tc.topAttach = ParameterConverter.toInteger((String)properties.get(TOP_ATTACH_KEY));
 			}
-			if (properties.containsKey("botom_attach")) { //$NON-NLS-1$
-				tc.bottomAttach = ParameterConverter.toInteger((String)properties.get("bottom_attach")); //$NON-NLS-1$
+			if (properties.containsKey(BOTTOM_ATTACH_KEY)) {
+				tc.bottomAttach = ParameterConverter.toInteger((String)properties.get(BOTTOM_ATTACH_KEY));
 			}
-			if (properties.containsKey("x")) { //$NON-NLS-1$
+			if (properties.containsKey(X_KEY)) {
 				// x_options = ParameterConverter.toInteger(value);
 			}
-			if (properties.containsKey("y")) { //$NON-NLS-1$
+			if (properties.containsKey(Y_KEY)) {
 				// y_options = ParameterConverter.toInteger(value);
 			}
 			parent.add(child);
