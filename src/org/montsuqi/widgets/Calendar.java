@@ -29,6 +29,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -41,7 +42,7 @@ import java.util.Date;
 public class Calendar extends JComponent {
 
 	private Date date;
-	private DateFormat df;
+	private SimpleDateFormat df;
 	private JComponent caption;
 	private JButton[][] dateCells;
 	private Date[][] cellDates;
@@ -96,16 +97,24 @@ public class Calendar extends JComponent {
 		gbl.setConstraints(monthLabel, gbc);
 		caption.add(monthLabel);
 
-		dateCells = new JButton[6][7];
-		cellDates = new Date[6][7];
+		dateCells = new JButton[7][7];
+		cellDates = new Date[7][7];
 		JComponent dateCellPanel = new JPanel();
-		dateCellPanel.setLayout(new GridLayout(6, 7));
+		dateCellPanel.setLayout(new GridLayout(7, 7));
 		add(dateCellPanel, BorderLayout.CENTER);
 
 		cal = java.util.Calendar.getInstance();
 		setDate(cal.getTime());
 
-		for (int row = 0; row < 6; row++) {
+		DateFormatSymbols symbols = df.getDateFormatSymbols();
+		String[] dayOfWeekNames = symbols.getShortWeekdays();
+		for (int col = 0; col < 7; col++) {
+			JLabel dayOfWeek = new JLabel(dayOfWeekNames[col + 1]);
+			dayOfWeek.setHorizontalAlignment(JLabel.CENTER);
+			dateCellPanel.add(dayOfWeek);
+		}
+
+		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				final JButton cell = new JButton();
 				cell.setHorizontalAlignment(JButton.RIGHT);
@@ -153,7 +162,7 @@ public class Calendar extends JComponent {
 	}
 
 	private void setCells() {
-		for (int row = 0; row < 6; row++) {
+		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				Date d = cellDate(row, col);
 				cellDates[row][col] = d;
@@ -174,7 +183,7 @@ public class Calendar extends JComponent {
 		cal.add(java.util.Calendar.DATE, cal.getFirstDayOfWeek());
 
 		// advance to the desired row/col
-		cal.add(java.util.Calendar.DATE, row * 7 + col);
+		cal.add(java.util.Calendar.DATE, (row - 1) * 7 + col);
 
 		return cal.getTime();
 	}
