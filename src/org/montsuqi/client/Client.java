@@ -104,7 +104,7 @@ public class Client implements Runnable {
 	}
 
 	void connect() throws IOException {
-		protocol = new Protocol(this);
+		protocol = new Protocol(this, conf.getEncoding(), conf.getStyles(), conf.getProtocolVersion());
 		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
 	}
 
@@ -130,18 +130,6 @@ public class Client implements Runnable {
 		cacheRoot.append(File.separator);
 		cacheRoot.append(conf.getPort());
 		return cacheRoot.toString();
-	}
-
-	String getStyles() {
-		return conf.getStyles();
-	}
-
-	String getEncoding() {
-		return conf.getEncoding();
-	}
-
-	int getProtocolVersion() {
-		return conf.getProtocolVersion();
 	}
 
 	public void run() {

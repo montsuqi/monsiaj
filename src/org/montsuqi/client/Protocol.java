@@ -64,11 +64,11 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 
-	Protocol(Client client) throws IOException {
-		super(client.createSocket(), client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
+	Protocol(Client client, String encoding, String styles, int protocolVersion) throws IOException {
+		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		cacheRoot = client.getCacheRoot();
-		switch (client.getProtocolVersion()) {
+		switch (protocolVersion) {
 		case 1:
 			protocol1 = true;
 			protocol2 = false;
@@ -78,12 +78,12 @@ public class Protocol extends Connection {
 			protocol2 = true;
 			break;
 		default:
-			throw new IllegalArgumentException("invalid protocol version: " + client.getProtocolVersion()); //$NON-NLS-1$
+			throw new IllegalArgumentException("invalid protocol version: " + protocolVersion); //$NON-NLS-1$
 		}
 		assert protocol1 ^ protocol2;
 		isReceiving = false;
 		nodeTable = new HashMap();
-		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
+		valueManager = new WidgetValueManager(this, Style.load(styles));
 	}
 
 	private static boolean isNetworkByteOrder() {
