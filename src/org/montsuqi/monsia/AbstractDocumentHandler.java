@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -239,6 +240,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected int keyCode(String keyName) {
 		final Field[] fields = KeyEvent.class.getDeclaredFields();
 		keyName = removePrefix(keyName);
+		keyName = keyName.toUpperCase(Locale.ENGLISH);
 		if ( ! keyName.startsWith("VK_")) { //$NON-NLS-1$
 			keyName = "VK_" + keyName; //$NON-NLS-1$
 		}
