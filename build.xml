@@ -31,132 +31,212 @@
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${tmp.dir}"/>
 		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${report.dir}"/>
 		<property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
 		<property name="bin.macosx.name" value="monsiaj-bin-macosx-${DSTAMP}"/>
-		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 		<property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
+		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 	</target>
 
 	<target name="compile" depends="prepare">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4">
 			<include name="**/*.java"/>
-			<exclude name="**/Test*.java"/>
 			<classpath refid="project.class.path"/>
 		</javac>
 	</target>
 
 	<target name="copy-files" depends="prepare">
 		<copy todir="${build.dir}">
-			<fileset dir="${src.dir}" includes="**/*.properties,**/*.jpg,**/*.png"/>
-			<fileset dir="${resources.dir}" includes="*.properties"/>
-			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, libwebkitsample.jnilib"/>
-			<fileset dir="." includes="README.txt"/>
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.jpg"/>
+				<include name="**/*.png"/>
+				<include name="org/montsuqi/tools/*.xml"/>
+			</fileset>
+			<fileset dir="${resources.dir}">
+				<include name="*.properties"/>
+			</fileset>
+			<fileset dir="${libs.dir}">
+				<include name="log4j.jar"/>
+				<include name="WebKit.jar"/>
+				<include name="*.jnilib"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="README.txt"/>
+			</fileset>
 		</copy>
-		<native2ascii src="${resources.dir}" dest="${build.dir}"
-			includes="*.jnlp" encoding="UTF-8"/>
+		<native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
 		<filter token="webstarturl" value="${webstart.url}"/>
 		<copy todir="${tmp.dir}" filtering="true">
-			<fileset dir="${build.dir}" includes="*.jnlp"/>
+			<fileset dir="${build.dir}">
+				<include name="*.jnlp"/>
+			</fileset>
 		</copy>
 		<delete>
-			<fileset dir="${build.dir}" includes="*.jnlp"/>
+			<fileset dir="${build.dir}">
+				<include name="*.jnlp"/>
+			</fileset>
 		</delete>
-		<native2ascii src="${tmp.dir}" dest="${build.dir}"
-			includes="*.jnlp" encoding="UTF-8" reverse="true"/>
+		<native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8" reverse="true"/>
 	</target>
 
-	<target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-src"/>
+	<target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-bin-replay,dist-src"/>
 
 	<target name="dist-bin" depends="create-jars,copy-files">
 		<copy todir="${build.dir}/${bin.name}">
-			<fileset dir="${build.dir}" includes="*.jar,*.jnilib,*.jnlp,README.txt"/>
+			<fileset dir="${build.dir}">
+				<include name="*.jar"/>
+				<include name="*.jnilib"/>
+				<include name="*.jnlp"/>
+				<include name="README.txt"/>
+				<exclude name="pandarecord.jar"/>
+				<exclude name="pandareplay.jar"/>
+			</fileset>
 		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${bin.name}.zip">
-			<fileset dir="${build.dir}" includes="${bin.name}/**"/>
+			<fileset dir="${build.dir}">
+				<include name="${bin.name}/**"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="dist-bin-replay" depends="create-jars,copy-files">
+		<copy todir="${build.dir}/${replay.name}">
+			<fileset dir="${build.dir}">
+				<include name="pandarecord.jar"/>
+				<include name="pandareplay.jar"/>
+				<include name="README.txt"/>
+			</fileset>
+		</copy>
+		<!-- ant 1.5.x should use destfile instead of zipfile-->
+		<zip zipfile="${dist.dir}/${replay.name}.zip">
+			<fileset dir="${build.dir}">
+				<include name="${replay.name}/**"/>
+			</fileset>
 		</zip>
 	</target>
 
 	<target name="dist-bin-mac" depends="create-jars,copy-files">
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents">
-			<fileset dir="${resources.dir}" includes="Info.plist, PkgInfo"/>
+			<fileset dir="${resources.dir}">
+				<include name="Info.plist"/>
+				<include name="PkgInfo"/>
+			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources">
-			<fileset dir="${resources.dir}" includes="*.lproj/**,*.icns"/>
+			<fileset dir="${resources.dir}">
+				<include name="*.lproj/**"/>
+				<include name="*.icns"/>
+			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java">
-			<fileset dir="${build.dir}" includes="*.jar,*.jnilib" excludes="libwebkitsample.jnilib.jar"/>
+			<fileset dir="${build.dir}">
+				<include name="*.jar"/>
+				<include name="*.jnilib"/>
+				<exclude name="pandarecord.jar"/>
+				<exclude name="pandareplay.jar"/>
+				<exclude name="libwebkitsample.jnilib.jar"/>
+			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/MacOS">
-			<fileset dir="${resources.dir}" includes="${macosx.app.stub}"/>
+			<fileset dir="${resources.dir}">
+				<include name="${macosx.app.stub}"/>
+			</fileset>
 		</copy>
 		<chmod perm="755" file="${build.dir}/${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
 
 		<copy todir="${build.dir}/${bin.macosx.name}">
-			<fileset dir="${build.dir}" includes="${macosx.app.dir}/**,README.txt"/>
+			<fileset dir="${build.dir}">
+				<include name="${macosx.app.dir}/**"/>
+				<include name="README.txt"/>
+			</fileset>
 		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${bin.macosx.name}.zip">
-			<fileset dir="${build.dir}" includes="${bin.macosx.name}/**"/>
+			<fileset dir="${build.dir}">
+				<include name="${bin.macosx.name}/**"/>
+			</fileset>
 		</zip>
 	</target>
 
 	<target name="dist-src">
 		<copy todir="${build.dir}/${src.name}">
-			<fileset dir="." includes="src/**,resources/**,libs/**,build.xml,Makefile,README.txt"
-	excludes="**/CVS"/>
+			<fileset dir=".">
+				<include name="src/**/"/>
+				<include name="resources/**"/>
+				<include name="libs/**"/>
+				<include name="build.xml,Makefile,README.txt"/>
+				<exclude name="**/CVS"/>
+			</fileset>
 		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${src.name}.zip">
-			<fileset dir="${build.dir}" includes="${src.name}/**"/>
+			<fileset dir="${build.dir}">
+				<include name="${src.name}/**"/>
+			</fileset>
 		</zip>
 	</target>
 
 	<target name="create-jars" depends="create-unsigned-jars,sign-jars"/>
 
 	<target name="create-unsigned-jars" depends="compile,copy-files">
-		<jar jarfile="${build.dir}/pandaclient.jar"
-			basedir="${build.dir}"
-			includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,**/*.png"
-			manifest="${resources.dir}/pandaclient.mf"/>
-		<jar jarfile="${build.dir}/jmareceipt.jar"
-			basedir="${build.dir}"
-			includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
-			manifest="${resources.dir}/jmareceipt.mf"/>
-		<jar jarfile="${build.dir}/libwebkitsample.jnilib.jar"
-			basedir="${libs.dir}"
-			includes="libwebkitsample.jnilib"/>
+		<jar jarfile="${build.dir}/pandaclient.jar" manifest="${resources.dir}/pandaclient.mf">
+			<fileset dir="${build.dir}">
+				<include name="org/montsuqi/**"/>
+				<include name="**/*.png"/>
+				<exclude name="org/montsuqi/tools/**"/>
+				<exclude name="jp/or/med/jma_receipt/**"/>
+			</fileset>
+		</jar>
+		<jar jarfile="${build.dir}/jmareceipt.jar" manifest="${resources.dir}/jmareceipt.mf">
+			<fileset dir="${build.dir}">
+				<include name="jp/or/med/jma_receipt/**"/>
+			</fileset>
+		</jar>
+		<jar jarfile="${build.dir}/libwebkitsample.jnilib.jar">
+			<fileset dir="${libs.dir}">
+				<include name="libwebkitsample.jnilib"/>
+			</fileset>
+		</jar>
+		<jar jarfile="${build.dir}/pandarecord.jar" manifest="${resources.dir}/pandarecord.mf">
+			<fileset dir="${build.dir}">
+				<include name="org/montsuqi/tools/TestXMLRecording.class"/>
+				<include name="org/montsuqi/tools/*.xml"/>
+			</fileset>
+		</jar>
+		<jar jarfile="${build.dir}/pandareplay.jar" manifest="${resources.dir}/pandareplay.mf">
+			<fileset dir="${build.dir}">
+				<include name="org/montsuqi/tools/TestXMLReplay.class"/>
+				<include name="org/montsuqi/tools/XMLFileFilter.class"/>
+			</fileset>
+		</jar>
 	</target>
 
 	<target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
 		<input message="Input the store password" addproperty="storepass"/>
 		<signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
-			<fileset dir="${build.dir}" includes="*.jar"/>
+			<fileset dir="${build.dir}">
+				<include name="*.jar"/>
+			</fileset>
 		</signjar>
 	</target>
 
 	<target name="clean" description="Cleans all built files.">
 		<delete includeEmptyDirs="true">
-			<fileset dir="." defaultexcludes="no" includes="**/*~,**/.#*#"/>
-			<fileset dir="." includes="${build.dir}/**,${tmp.dir}/**,${dist.dir}/**"/>
+			<fileset dir="." defaultexcludes="no">
+				<include name="**/*~"/>
+				<include name="**/.#*#"/>
+				<include name="${build.dir}/**"/>
+				<include name="${tmp.dir}/**"/>
+				<include name="${dist.dir}/**"/>
+				<include name="${report.dir}/**"/>
+			</fileset>
 		</delete>
 	</target>
 
-	<target name="compiletests" depends="compile,copy-files"
-		description="Compiles Test Java sources.">
-		<javac srcdir="${src.dir}" destdir="${build.dir}">
-			<include name="**/Test*.java"/>
-			<classpath refid="project.class.path"/>
-		</javac>
-		<copy todir="${build.dir}">
-			<fileset dir="${src.dir}" includes="org/montsuqi/tools/*.xml"/>
-		</copy>
-	</target>
-
-	<target name="runtests" depends="compiletests"
-		description="Run all junit test.">
-		<junit printsummary="on"
-			fork="false">
+	<target name="run-tests" depends="compile,copy-files" description="Run all junit test.">
+		<junit printsummary="on" fork="false">
 			<formatter type="xml"/>
 			<classpath refid="project.class.path"/>
 			<batchtest todir="${report.dir}">
@@ -174,42 +254,13 @@
 			</fileset>
 			<report format="frames" todir="${report.dir}"/>
 		</junitreport>
-
 	</target>
 
-	<target name="singletest" depends="compiletests"
-		description="Run single target junit test.">
-		<property name="testcase"
-			value="org/montsuqi/widgets/TestWindow"/>
-		<junit printsummary="on"
-			fork="false">
+	<target name="single-test" depends="compile,copy-files" description="Run single target junit test." if="testcase">
+		<junit printsummary="on" fork="false">
 			<formatter type="plain" usefile="false"/>
 			<classpath refid="project.class.path"/>
 			<test name="${testcase}"/>
 		</junit>
-	</target>
-
-	<target name="jar.replay" depends="compiletests,copy-files">
-		<jar jarfile="${build.dir}/pandarecord.jar"
-			basedir="${build.dir}"
-			includes="org/montsuqi/tools/TestXMLRecording.class, org/montsuqi/tools/*.xml"
-			manifest="${resources.dir}/pandarecord.mf"/>
-		<jar jarfile="${build.dir}/pandareplay.jar"
-			basedir="${build.dir}"
-			includes="org/montsuqi/tools/TestXMLReplay.class, org/montsuqi/tools/XMLFileFilter.class"
-			manifest="${resources.dir}/pandareplay.mf"/>
-	</target>
-
-	<target name="dist.replay" depends="dist, jar.replay, copy-files">
-		<copy todir="${dist.replay.dir}">
-			<fileset dir="${libs.dir}" includes="*.jar"/>
-		</copy>
-		<copy todir="${dist.replay.dir}">
-			<fileset dir="${build.dir}" includes="*.jar"/>
-		</copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.replay.dir}.zip">
-			<fileset dir="${dist.dir}" includes="${replay.name}/**"/>
-		</zip>
 	</target>
 </project>
