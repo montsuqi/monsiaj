@@ -45,6 +45,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 import java.math.BigDecimal;
 import org.montsuqi.util.Logger;
@@ -341,8 +342,12 @@ class WidgetMarshal {
 		int count = -1;
 		int from = 0;
 		int state;
-		String[] labels = new String[tableModel.getColumnCount()];
+		TableColumnModel columnModel = table.getColumnModel();
+		String[] labels = new String[columnModel.getColumnCount()];
 		int labelNumber = 0;
+		for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
+			labels[i] = (String)columnModel.getColumn(i).getHeaderValue();
+		}
 
 		while (nItem-- != 0) {
 			String name = con.receiveString();
@@ -408,8 +413,8 @@ class WidgetMarshal {
 					}
 				}
 			}
-			tableModel.setColumnIdentifiers(labels);
 		}
+		tableModel.setColumnIdentifiers(labels);
 		return true;
 	}
 
