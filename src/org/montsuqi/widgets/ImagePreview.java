@@ -48,13 +48,14 @@ class ImagePreview extends Preview {
 		}
 		Graphics2D g2d = (Graphics2D)g;
 		AffineTransform old = g2d.getTransform();
-		int w = getScaledImageWidth();
-		int h = getScaledImageHeight();
-		int cx = rotationStep != 1 ? w / 2 : h / 2;
-		int cy = rotationStep != 3 ? h / 2 : w / 2;
+		int w = (int)image.getWidth(this);
+		int h = (int)image.getHeight(this);
+		int x = rotationStep != 1 ? w / 2 : h / 2;
+		int y = rotationStep != 3 ? h / 2 : w / 2;
 		double angle = (Math.PI / 2.0) * rotationStep;
 		AffineTransform t = new AffineTransform();
-		t.rotate(angle, cx, cy);
+		t.scale(scale, scale);
+		t.rotate(angle, x, y);
 		g2d.setTransform(t);
 		g2d.drawImage(image, 0, 0, this);
 		g2d.setTransform(old);
@@ -64,22 +65,12 @@ class ImagePreview extends Preview {
 		if (image == null) {
 			return;
 		}
-		int width = getScaledImageWidth();
-		int height = getScaledImageHeight();
+		int w = (int)(image.getWidth(this) * scale);
+		int h = (int)(image.getHeight(this) * scale);
 		if (newRotationStep % 2 == 0) {
-			setPreferredSize(new Dimension(width, height));
+			setPreferredSize(new Dimension(w, h));
 		} else {
-			setPreferredSize(new Dimension(height, width));
+			setPreferredSize(new Dimension(h, w));
 		}
-	}
-
-	private int getScaledImageWidth() {
-		assert image != null;
-		return (int)(image.getWidth(this) * scale);
-	}
-
-	private int getScaledImageHeight() {
-		assert image != null;
-		return (int)(image.getHeight(this) * scale);
 	}
 }
