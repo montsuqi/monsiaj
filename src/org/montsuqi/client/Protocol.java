@@ -52,6 +52,7 @@ import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
@@ -86,8 +87,8 @@ public class Protocol extends Connection {
 		return VERSION;
 	}
 	
-	Protocol(Client client, Socket s, String encoding) throws IOException {
-		super(s, encoding);
+	Protocol(Client client, Socket s) throws IOException {
+		super(s, client.getEncoding());
 		this.client = client;
 		classTable = new HashMap();
 		windowTable = new HashMap();
@@ -95,7 +96,7 @@ public class Protocol extends Connection {
 		ignoreEvent = false;
 		logger = Logger.getLogger(Connection.class);
 		initWidgetOperations();
-		marshal = new WidgetMarshal(this);
+		marshal = new WidgetMarshal(this, Style.load(client.getStyles()));
 	}
 
 	private void initWidgetOperations() {

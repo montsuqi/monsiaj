@@ -49,17 +49,21 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 import java.math.BigDecimal;
+
+import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.NumberEntry;
 
 class WidgetMarshal {
 
 	private Protocol con;
+	private Map styles;
 	private Logger logger;
 	private Map valueTable;
 
-	WidgetMarshal(Protocol con) {
+	WidgetMarshal(Protocol con, Map styles) {
 		this.con = con;
+		this.styles = styles;
 		logger = Logger.getLogger(Protocol.class);
 		valueTable = new HashMap();
 	}
@@ -108,8 +112,13 @@ class WidgetMarshal {
 		}
 	}
 
-	private void setStyle(Container widget, String style) {
-		logger.debug(Messages.getString("WidgetMarshal.ignoring_style"), new Object[] { style, widget.getName() }); //$NON-NLS-1$
+	private void setStyle(Container widget, String styleName) {
+		Style style = (Style)styles.get(styleName);
+		if (style != null) {
+			style.apply(widget);
+		} else {
+			logger.debug(Messages.getString("WidgetMarshal.ignoring_style"), new Object[] { style, widget.getName() }); //$NON-NLS-1$
+		}
 	}
 
 	boolean receiveEntry(Container widget) throws IOException {
