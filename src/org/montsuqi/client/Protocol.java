@@ -52,7 +52,7 @@ public class Protocol extends Connection {
 	public static final int SCREEN_FORK_WINDOW = 6;
 	public static final int SCREEN_END_SESSION = 7;
 
-	static final String VERSION = "1.2.0"; //$NON-NLS-1$
+	static final String VERSION = "1.1.2"; //$NON-NLS-1$
 	
 	public String getVersion() {
 		return VERSION;
@@ -202,7 +202,8 @@ public class Protocol extends Connection {
 	boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
-
+		byte pc = receivePacketClass();
+		logger.info("packgeClass {0}", new Integer(pc));
 		if (receivePacketClass() == PacketClass.ScreenDefine) {
 			OutputStream out = new FileOutputStream(fName);
 			int left = receiveLong();
@@ -472,7 +473,7 @@ public class Protocol extends Connection {
 	}
 
 	public boolean sendConnect(String user, String pass, String apl) throws IOException {
-		int pc;
+		byte pc;
 		sendPacketClass(PacketClass.Connect);
 		sendString(VERSION);
 		sendString(user);
@@ -500,7 +501,7 @@ public class Protocol extends Connection {
 				break;
 			default:
 				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_other_protocol_error"), //$NON-NLS-1$
-							new Object[] { new Integer(pc) });
+							Integer.toHexString(pc));
 				break;
 			}
 			return false;
