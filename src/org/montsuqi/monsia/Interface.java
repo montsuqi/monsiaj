@@ -38,10 +38,12 @@ import java.util.Map;
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.MenuElement;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -272,12 +274,22 @@ public class Interface {
 			WidgetInfo info = (WidgetInfo)i.next();
 			Component widget = WidgetBuilder.buildWidget(this, info, null);
 			setName(info.getName(), widget);
-			if (widget instanceof JFrame) {
-				JFrame f = (JFrame)widget;
-				if (menuBar != null) {
-					f.setJMenuBar(menuBar);
-				}
+			assert widget instanceof JFrame;
+			JFrame f = (JFrame)widget;
+			if (menuBar != null) {
+				f.setJMenuBar(menuBar);
+				setWindowForMenuElements(f, menuBar);
 			}
+		}
+	}
+
+	private void setWindowForMenuElements(JFrame f, MenuElement me) {
+		MenuElement[] subs = me.getSubElements();
+		for (int i = 0; i < subs.length; i++) {
+			MenuElement sub = subs[i];
+			JComponent c = (JComponent)sub.getComponent();
+			c.putClientProperty("window", f); //$NON-NLS-1$
+			setWindowForMenuElements(f, sub);
 		}
 	}
 
