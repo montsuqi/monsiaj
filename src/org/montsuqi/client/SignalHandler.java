@@ -12,6 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
+import org.montsuqi.util.Logger;
+
 public abstract class SignalHandler {
 
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
@@ -24,11 +26,11 @@ public abstract class SignalHandler {
 	public static SignalHandler getSignalHandler(String handlerName) throws NoSuchMethodException {
 		if (handlers.containsKey(handlerName)) {
 			return (SignalHandler)handlers.get(handlerName);
-		} else {
-			String message = Messages.getString("SignalHandler.handler_not_found"); //$NON-NLS-1$
-			message = MessageFormat.format(message, new Object[] { handlerName });
-			throw new NoSuchMethodException(message);
 		}
+		String message = Messages.getString("SignalHandler.handler_not_found"); //$NON-NLS-1$
+		message = MessageFormat.format(message, new Object[] { handlerName });
+		Logger.getLogger(SignalHandler.class).warn(message);
+		return getSignalHandler(null);
 	}
 
 	static Map handlers;
@@ -39,6 +41,12 @@ public abstract class SignalHandler {
 
 	static {
 		handlers = new HashMap();
+
+		registerHandler(null, new SignalHandler() {
+			public void handle(Protocol con, Component widget, Object userData) {
+				// do nothing
+			}
+		});
 
 		registerHandler("select_all", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {

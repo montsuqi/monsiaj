@@ -90,7 +90,8 @@ abstract class Connector {
 		}
 		String message = Messages.getString("Connector.connector_not_found"); //$NON-NLS-1$
 		message = MessageFormat.format(message, new Object[] { signalName });
-		throw new NoSuchMethodException(message);
+		Logger.getLogger(Connector.class).warn(message);
+		return getConnector(null);
 	}
 
 	static void invoke(Protocol con, SignalHandler handler, Component target, Object other) {
@@ -107,6 +108,12 @@ abstract class Connector {
 
 	static {
 		connectors = new HashMap();
+
+		registerConnector(null, new Connector() {
+			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+				// do nothing
+			}
+		});
 
 		registerConnector("clicked", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
