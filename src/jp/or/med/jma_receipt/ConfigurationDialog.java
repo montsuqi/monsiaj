@@ -29,7 +29,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.net.URL;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -79,7 +81,11 @@ class ConfigurationDialog extends JDialog {
 		});
 
 		JLabel logo = new JLabel();
-		logo.setIcon(new ImageIcon(getClass().getResource("/orca2.jpg"))); //$NON-NLS-1$
+		URL iconURL = getClass().getResource("/orca2.jpg"); //$NON-NLS-1$
+		if (iconURL != null) {
+			Icon icon = new ImageIcon(iconURL);
+			logo.setIcon(icon);
+		}
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
