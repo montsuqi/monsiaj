@@ -34,14 +34,10 @@ public class JMAReceiptLauncher extends Launcher {
 
 	public static void main(String[] args) {
 		Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
-		try {
-			launcher.launch();
-		} catch (Exception e) {
-			logger.fatal(e);
-		}
+		launcher.launch();
 	}
 
-	public JDialog createDialog(Configuration newConf) {
+	public JDialog createConfigurationDialog(Configuration newConf) {
 		return new JMAReceiptConfigurationDialog(title, conf);
 	}
 }
