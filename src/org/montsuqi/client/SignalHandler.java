@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -121,6 +122,11 @@ public abstract class SignalHandler {
 				}
 				if ( ! isWindowActive(con, widget)) {
 					return;
+				}
+				if (widget instanceof JComponent) {
+					if (((JComponent)widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
+						con.addChangedWidget(widget);
+					}
 				}
 				java.awt.Window window = SwingUtilities.windowForComponent(widget);
 				try {

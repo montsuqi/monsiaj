@@ -23,7 +23,6 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -104,14 +103,7 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 	public PandaComboBoxEditor(final PandaCombo combo) {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
 		editor.setBorder(null);
-		editor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String s = e.getActionCommand();
-				combo.setSelectedItem(s);
-				JTextField edit = (JTextField)getEditorComponent();
-				edit.setText(s);
-			}
-		});
+		editor.putClientProperty("panda combo editor", Boolean.TRUE); //$NON-NLS-1$
 	}
 
 	static class BorderlessPandaEntry extends PandaEntry {
