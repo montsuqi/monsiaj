@@ -242,10 +242,10 @@ public class Glade1Handler extends AbstractDocumentHandler {
 				signalName = value;
 			} else if (localName.equals("handler")) {
 				signalHandler = value;
-//			} else if (localName.equals("data")) {
-//				signalData = value;
-			} else if (localName.equals("object")) {
+			} else if (localName.equals("data")) {
 				signalObject = value;
+//			} else if (localName.equals("object")) {
+//				signalObject = value;
 			} else if (localName.equals("after")) {
 				signalAfter = value.charAt(0) == 'T';
 			}
