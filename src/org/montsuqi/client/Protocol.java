@@ -39,8 +39,8 @@ public class Protocol extends Connection {
 	Client client;
 	StringBuffer widgetName;
 	Interface xml;
-	boolean ignoreEvent;
-	boolean inReceive;
+	boolean ignoreEvent = false;
+	boolean inReceive = false;
 
 	public static final int SCREEN_NULL = 0;
 	public static final int SCREEN_CURRENT_WINDOW = 1;
@@ -243,6 +243,7 @@ public class Protocol extends Connection {
 			case SCREEN_CURRENT_WINDOW:
 				Interface xml = Interface.parseFile(fName, this);
 				node = new Node(xml, wName);
+				logger.info("New node: \n{0}", node);
 				windowTable.put(node.getName(), node);
 			}
 		}
@@ -409,12 +410,13 @@ public class Protocol extends Connection {
 		int type;
 		
 		inReceive = true;
+
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
 		sendLong((int)0);     /* get all data */ // In Java: int=>32bit, long=>64bit
 		boolean fCancel = false;
-		int c = receivePacketClass();
-		while (c == PacketClass.WindowName) {
+		byte c;
+		while ((c = receivePacketClass()) == PacketClass.WindowName) {
 			window = receiveString();
 			type = receiveInt();
 			switch (type) {
@@ -520,22 +522,26 @@ public class Protocol extends Connection {
 	}
 
 	void sendWindowData() throws IOException {
+		logger.enter("sendWindowData");
 		Iterator i = windowTable.keySet().iterator();
 		while (i.hasNext()) {
 			sendPacketClass(PacketClass.WindowName);
 			String wName = (String)(i.next());
+			logger.info("window:{0}", wName);
 			sendString(wName);
 			Node node = (Node)windowTable.get(wName);
 			Iterator j = node.updateWidget.keySet().iterator();
 			while (j.hasNext()) {
 				String name = (String)(j.next());
 				Container widget = (Container)(node.updateWidget.get(name));
+				logger.info("widget:{0}", widget);
 				sendWidgetData(wName, widget);
 			}
 			sendPacketClass(PacketClass.END);
 		}
 		sendPacketClass(PacketClass.END);
 		clearWindowTable();
+		logger.leave("sendWindowData");
 	}
 
 	void addClass(Class clazz, String receiverName, String senderName) {
@@ -573,13 +579,19 @@ public class Protocol extends Connection {
 	}
 
 	public void send_event(Container widget, Object userData) throws IOException {
-		if ( ! inReceive  && !ignoreEvent) {
-			Container parent = null;
+		logger.enter("send_event");
+		logger.info("widget: {0}", widget.getName());
+		if (!inReceive  && !ignoreEvent) {
+			logger.info("sending...");
+			Container parent = widget;
 			while (parent.getParent() != null) {
-				parent = widget.getParent();
+				parent = parent.getParent();
 			}
-			sendEvent(parent.getName(), widget.getName(), userData.toString());
+			logger.info("sendEvent({0},{1},{2})", new Object[] {parent.getName(), widget.getName(), userData == null ? "" : userData.toString()});
+			sendEvent(parent.getName(), widget.getName(), userData == null ? "" : userData.toString());
+			logger.info("sendWindowData");
 			sendWindowData();
+			logger.info("sendWindowData done");
 //			blockChangedHanders();
 			if (getScreenData()) {
 				ignoreEvent = true;
@@ -590,6 +602,7 @@ public class Protocol extends Connection {
 			}
 //			unblockChangedHanders();
 		}
+		logger.leave("send_event");
 	}
 
 	public void send_event_on_focus_out(Container widget, Object userData) throws IOException {
@@ -605,9 +618,9 @@ public class Protocol extends Connection {
 	}
 
 	public void entry_next_focus(Container widget, Object userData) {
-		Container parent = null;
+		Container parent = widget;
 		while (parent.getParent() != null) {
-			parent = widget.getParent();
+			parent = parent.getParent();
 		}
 		Node node = (Node)windowTable.get(parent.getName());
 		if (node != null) {
