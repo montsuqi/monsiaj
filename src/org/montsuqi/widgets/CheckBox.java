@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ActionMap;
@@ -45,5 +46,12 @@ public class CheckBox extends JCheckBox {
 		InputMap inputs = getInputMap(JComponent.WHEN_FOCUSED);
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); //$NON-NLS-1$
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
+	}
+
+	public void setSize(Dimension d) {
+		if (d.width == 0) {
+			d.width = d.height;
+		}
+		super.setSize(d);
 	}
 }
