@@ -41,10 +41,21 @@ public class NotebookDummyButton extends JButton {
 		return index;
 	}
 
-	public Notebook getNotebook() {
-		return notebook;
-	}
 	public Container getParent() {
 		return notebook;
+	}
+
+	public void setText(String s) {
+		super.setText(s);
+		if (notebook != null) {
+			notebook.setTitleAt(index, s);
+		}
+	}
+
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		if (notebook != null) {
+			notebook.setEnabledAt(index, enabled);
+		}
 	}
 }

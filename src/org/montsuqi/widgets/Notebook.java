@@ -22,9 +22,9 @@ copies.
 
 package org.montsuqi.widgets;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.AbstractButton;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -32,21 +32,22 @@ import org.montsuqi.util.Logger;
 
 public class Notebook extends JTabbedPane {
 
-	List buttons;
+	Map buttons;
 	Logger logger;
+
 	public Notebook() {
 		super();
+
 		logger = Logger.getLogger(Notebook.class);
-		buttons = new ArrayList();
+		buttons = new HashMap();
+
 		addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				int selected = getSelectedIndex();
-				Iterator i = buttons.iterator();
-				while (i.hasNext()) {
-					NotebookDummyButton dummy = (NotebookDummyButton)i.next();
-					if (dummy.getIndex() == selected) {
+				Integer selected = new Integer(getSelectedIndex());
+				if (buttons.containsKey(selected)) {
+					AbstractButton dummy = (AbstractButton)buttons.get(selected);
+					if (dummy != null) {
 						dummy.doClick();
-						break;
 					}
 				}
 			}
@@ -54,7 +55,6 @@ public class Notebook extends JTabbedPane {
 	}
 
 	public void registerTabButton(NotebookDummyButton button) {
-		buttons.add(button);
+		buttons.put(new Integer(button.getIndex()), button);
 	}
 }
-
