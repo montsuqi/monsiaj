@@ -84,6 +84,10 @@ public class PandaCList extends JTable {
 
 	public PandaCList() {
 		setAutoResizeMode(AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+		initActions();
+	}
+
+	private void initActions() {
 		ActionMap actions = getActionMap();
 		InputMap inputs = getInputMap();
 
@@ -152,10 +156,11 @@ public class PandaCList extends JTable {
 
 	public TableCellRenderer getCellRenderer(int row, int column) {
 		TableCellRenderer headerRenderer = columnModel.getColumn(column).getHeaderRenderer();
-		if (headerRenderer != null) {
-			Component c = headerRenderer.getTableCellRendererComponent(this, getValueAt(row, column), false, false, row, column);
-			if (c instanceof Fixed) {
-				return new CListFixedCellRenderer((Fixed)c);
+		if (headerRenderer != null && headerRenderer instanceof CListHeaderRenderer) {
+			CListHeaderRenderer clistHeaderRenderer = (CListHeaderRenderer)headerRenderer;
+			TableCellRenderer renderer = clistHeaderRenderer.getFixedCellRenderer();
+			if (renderer != null) {
+				return renderer;
 			}
 		}
 		return super.getCellRenderer(row, column);
