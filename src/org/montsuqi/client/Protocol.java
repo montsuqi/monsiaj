@@ -165,16 +165,16 @@ public class Protocol extends Connection {
 	static {
 		NOENCODE = new BitSet(256);
 		for (int i = 0; i < NOENCODE.length(); i++) {
-			NOENCODE.set(i, false);
+			NOENCODE.clear(i);
 		}
 		for (int i = 'a'; i < 'z'; i++) {
-			NOENCODE.set(i, true);
+			NOENCODE.set(i);
 		}
 		for (int i = 'A'; i < 'Z'; i++) {
-			NOENCODE.set(i, true);
+			NOENCODE.set(i);
 		}
 		for (int i = '0'; i < '9'; i++) {
-			NOENCODE.set(i, true);
+			NOENCODE.set(i);
 		}
 		// 1.4 feature
 		//NOENCODE.set(0, NOENCODE.length(), false);
