@@ -116,6 +116,7 @@ abstract class WidgetPropertySetter {
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				AbstractButton button = (AbstractButton)widget;
 				button.setText(value);
+				button.setToolTipText(value);
 			}
 		});
 
@@ -192,6 +193,7 @@ abstract class WidgetPropertySetter {
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JLabel label = (JLabel)widget;
 				label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value); //$NON-NLS-1$
+				label.setToolTipText(value);
 			}
 
 			// convert multi-line label value into HTML
