@@ -117,32 +117,20 @@ public class Protocol extends Connection {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
-		if (pc == PacketClass.ScreenDefine) {
-			OutputStream fileOut = new FileOutputStream(fName);
-			int left = receiveLength();
-			int size;
-			final int SIZE_BUFF = 4096;
-			byte[] buff = new byte[SIZE_BUFF];
-			do {
-				if (left > SIZE_BUFF) {
-					size = SIZE_BUFF;
-				} else {
-					size = left;
-				}
-				size = in.read(buff, 0, size);
-				if (size > 0) {
-					fileOut.write(buff, 0, size);
-					left -= size;
-				}
-			} while (left > 0);
-			fileOut.flush();
-			fileOut.close();
-			return true;
-		} else {
+		if (pc != PacketClass.ScreenDefine) {
 			logger.warn(Messages.getString("Protocol.invalid_protocol_sequence"), //$NON-NLS-1$
 				new Object[] { new Byte(PacketClass.ScreenDefine), new Byte(pc) }); 
 			return false;
 		}
+
+		OutputStream file = new FileOutputStream(fName);
+		int size = receiveLength();
+		byte[] bytes = new byte[size];
+		in.readFully(bytes);
+		file.write(bytes);
+		file.flush();
+		file.close();
+		return true;
 	}
 
 	private Node showWindow(String wName, int type) {

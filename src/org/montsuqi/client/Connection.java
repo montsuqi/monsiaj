@@ -118,9 +118,7 @@ class Connection {
 
 	String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
-		for (int offset = 0, read; offset < size; offset += read) {
-			read = in.read(bytes, offset, size - offset);
-		}
+		in.readFully(bytes);
 		String s = new String(bytes, encoding);
 		return s;
 	}
