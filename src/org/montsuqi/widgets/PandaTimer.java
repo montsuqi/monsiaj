@@ -25,12 +25,11 @@ package org.montsuqi.widgets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.JComponent;
+
 import org.montsuqi.util.Logger;
 
 public class PandaTimer extends JComponent {
@@ -39,37 +38,17 @@ public class PandaTimer extends JComponent {
 
 	private Timer timer;
 
-	private static final Map timers;
-	static {
-		timers = new WeakHashMap();
-	}
-
-	public static void suspendAllTimers() {
-		Iterator i = timers.keySet().iterator();
-		while (i.hasNext()) {
-			Timer timer = (Timer)i.next();
-			timer.stop();
-		}
-	}
-
-	public static void resumeAllTimers() {
-		Iterator i = timers.keySet().iterator();
-		while (i.hasNext()) {
-			Timer timer = (Timer)i.next();
-			timer.start();
-		}
-	}
-
 	public PandaTimer() {
 		super();
-		timer = new Timer(0, new ActionListener() {
+		// initial delay is 60sec, to wait widget construction,
+		// should be set to correct value later
+		timer = new Timer(60 * 1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				fireTimeEvent(new TimerEvent(PandaTimer.this));
 			}
 		});
 		timer.setRepeats(true);
 		timer.start();
-		timers.put(this, null);
 	}
 
 	public void addTimerListener(TimerListener l) {
@@ -86,25 +65,23 @@ public class PandaTimer extends JComponent {
 			TimerListener l = listeners[i];
 			l.timerSignaled(e);
 		}
-		Object[] args = { getName(), new Date(), Thread.currentThread() };
-		logger.debug("timer {0} ring at {1,time} in {2}", args); //$NON-NLS-1$
+		Object[] args = { getName(), new Date(), Thread.currentThread(), SwingUtilities.windowForComponent(this).getName() };
+		logger.debug("timer {0} of {3} ring at {1,time} in {2}", args); //$NON-NLS-1$
 	}
 
 	public void setDuration(int duration) {
+		timer.setInitialDelay(duration * 1000);
 		timer.setDelay(duration * 1000);
-	}
-
-	public int getDuration() {
-		return timer.getDelay() / 1000;
 	}
 
 	public void reset() {
 		timer.restart();
-		Object[] args = { getName(), new Date(), Thread.currentThread() };
-		logger.debug("timer {0} reset at {1,time} in {2}", args); //$NON-NLS-1$
+		Object[] args = { getName(), new Date(), Thread.currentThread(), SwingUtilities.windowForComponent(this).getName() };
+		logger.debug("timer {0} of {3} reset at {1,time} in {2}", args); //$NON-NLS-1$
 	}
 
-	public void finalize() {
-		timers.remove(this);
+	protected void finalize() throws Throwable {
+		timer.stop();
+		super.finalize();
 	}
 }
