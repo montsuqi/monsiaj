@@ -88,6 +88,7 @@ import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
 import org.montsuqi.widgets.VBox;
 import org.montsuqi.widgets.VSeparator;
+import org.montsuqi.widgets.Window;
 
 class WidgetBuilder {
 
@@ -154,7 +155,7 @@ class WidgetBuilder {
 		registerClass("VBox", VBox.class); //$NON-NLS-1$
 		registerClass("VSeparator", VSeparator.class); //$NON-NLS-1$
 		registerClass("Viewport", JViewport.class); //$NON-NLS-1$
-		registerClass("Window", JFrame.class); //$NON-NLS-1$
+		registerClass("Window", Window.class); //$NON-NLS-1$
 	}
 
 	private void initPropertyMap() {

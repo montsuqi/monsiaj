@@ -369,7 +369,7 @@ public class Interface {
 		if (target instanceof Window) {
 			Window window = (Window)target;
 			window.addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
+				public void windowClosed(WindowEvent e) {
 					invoke(handler, target, other);
 				}
 			});
