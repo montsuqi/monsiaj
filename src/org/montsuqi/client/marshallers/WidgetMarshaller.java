@@ -41,6 +41,7 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
+import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaPreviewPane;
 
 public abstract class WidgetMarshaller {
@@ -63,6 +64,7 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(Calendar.class, new CalendarMarshaller());
 		registerMarshaller(JProgressBar.class, new ProgressBarMarshaller());
 		registerMarshaller(PandaPreviewPane.class, new PreviewMarshaller());
+		registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
 	}
 
 	WidgetMarshaller() {
