@@ -58,10 +58,8 @@ public class WidgetOperation {
 	}
 
 	public static void setWidth(Interface xml, Container widget, String name, String value) {
-		Logger logger = Logger.getLogger(WidgetOperation.class);
-		logger.enter("setWidth");
 		if ( ! (widget instanceof Component)) {
-			logger.warn("Attempt to set width to non-Component.");
+			throw new IllegalArgumentException("Attempt to set width to non-Component.");
 		}
 		Component c = (Component)widget;
 		Dimension size = c.getSize();
@@ -71,16 +69,12 @@ public class WidgetOperation {
 			
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Not a number.");
-		} finally {
-			logger.leave("setWidth");
 		}
 	}
 
 	public static void setHeight(Interface xml, Container widget, String name, String value) {
-		Logger logger = Logger.getLogger(WidgetOperation.class);
-		logger.enter("setHeight");
 		if ( ! (widget instanceof Component)) {
-			logger.warn("Attempt to set width to non-Component.");
+			throw new IllegalArgumentException("Attempt to set height to non-Component.");
 		}
 		Component c = (Component)widget;
 		Dimension size = c.getSize();
@@ -89,8 +83,6 @@ public class WidgetOperation {
 			c.setSize(size);
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Not a number.");
-		} finally {
-			logger.leave("setHeight");
 		}
 	}
 
