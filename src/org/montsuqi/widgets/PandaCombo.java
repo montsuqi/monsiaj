@@ -22,7 +22,11 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.event.KeyEvent;
+
+import javax.swing.InputMap;
 import javax.swing.JComboBox;
+import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
@@ -43,6 +47,9 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 	static class BorderlessPandaEntry extends PandaEntry {
 		public BorderlessPandaEntry(String value,int n) {
 			super(value,n);
+			InputMap inputMap = getInputMap();
+			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
+			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
 		}
 
 		// workaround for 4530952
