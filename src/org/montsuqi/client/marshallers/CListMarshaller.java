@@ -38,6 +38,12 @@ import org.montsuqi.monsia.Interface;
 
 class CListMarshaller extends WidgetMarshaller {
 
+	private WidgetMarshaller labelMarshaller;
+
+	CListMarshaller() {
+		labelMarshaller = new LabelMarshaller();
+	}
+
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTable table = (JTable)widget;
@@ -60,7 +66,6 @@ class CListMarshaller extends WidgetMarshaller {
 			Component sub = xml.getWidgetByLongName(label.toString());
 			if (sub != null) {
 				JLabel dummyLabel = (JLabel)sub;
-				WidgetMarshaller labelMarshaller = new LabelMarshaller();
 				labelMarshaller.receive(manager, dummyLabel);
 				labels[col++] = dummyLabel.getText();
 			} else if (handleStateStyle(manager, widget, name)) {
