@@ -37,16 +37,19 @@
 		<mkdir dir="${tmp.dir}"/>
 		<mkdir dir="${dist.dir}"/>
 		<property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
+		<property name="bin.macosx.name" value="monsiaj-bin-macosx-${DSTAMP}"/>
 		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 		<property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
 		<property name="dist.bin.dir" value="${dist.dir}/${bin.name}"/>
+		<property name="dist.bin.macosx.dir" value="${dist.dir}/${bin.macosx.name}"/>
 		<property name="dist.src.dir" value="${dist.dir}/${src.name}"/>
 		<property name="dist.replay.dir" value="${dist.dir}/${replay.name}"/>
 		<mkdir dir="${dist.bin.dir}"/>
+		<mkdir dir="${dist.bin.macosx.dir}"/>
 		<mkdir dir="${dist.src.dir}"/>
 		<mkdir dir="${dist.replay.dir}"/>
 		<mkdir dir="${report.dir}"/>
-		<property name="macosx.app.dir" value="${dist.bin.dir}/JMAReceipt.app"/>
+		<property name="macosx.app.dir" value="${dist.bin.macosx.dir}/${macosx.app.name}.app"/>
 	</target>
 
 	<target name="compile" depends="prepare"
@@ -86,10 +89,10 @@
 			includes="*.jnlp" encoding="UTF-8" reverse="true"/>
 	</target>
 
-	<target name="dist" depends="dist-bin,dist-src"
+	<target name="dist" depends="dist-bin,dist-bin-mac,dist-src"
 		description="Build files to be distributed."/>
 
-	<target name="dist-bin" depends="dist-bin-copy-files,dist-bin-mac-bundle">
+	<target name="dist-bin" depends="dist-bin-copy-files">
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.bin.dir}.zip">
 			<fileset dir="${dist.dir}" includes="${bin.name}/**"/>
@@ -105,7 +108,14 @@
 		</copy>
 	</target>
 
-	<target name="dist-bin-mac-bundle" depends="dist-bin-copy-files">
+	<target name="dist-bin-mac" depends="dist-bin-mac-copy-files">
+		<!-- ant 1.5.x should use destfile instead of zipfile-->
+		<zip zipfile="${dist.bin.macosx.dir}.zip">
+			<fileset dir="${dist.dir}" includes="${bin.macosx.name}/**"/>
+		</zip>
+	</target>
+
+	<target name="dist-bin-mac-copy-files" depends="dist-bin-copy-files">
 		<mkdir dir="${macosx.app.dir}"/>
 		<mkdir dir="${macosx.app.dir}/Contents"/>
 		<mkdir dir="${macosx.app.dir}/Contents/MacOS"/>
