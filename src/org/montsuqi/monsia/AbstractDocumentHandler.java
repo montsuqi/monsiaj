@@ -98,7 +98,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	protected Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
-			return new Interface(widgets, topLevels, protocol);
+			return new Interface(topLevels, protocol);
 		} else {
 			throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
 		}
@@ -284,7 +284,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	}
 
-	/** returns name with all dashes converted to underscores. */
+	// returns name with all dashes converted to underscores.
 	protected String makePropertyName(String name) {
 		return name.replace('-', '_');
 	}

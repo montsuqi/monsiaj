@@ -31,20 +31,20 @@ import org.xml.sax.Attributes;
 public class Glade1Handler extends AbstractDocumentHandler {
 
 	private LinkedList pendingWidgets;
-	private String signalName;
-	private String signalHandler;
-	private String signalObject;
-	private boolean signalAfter;
+	String signalName;
+	String signalHandler;
+	String signalObject;
+	boolean signalAfter;
 
-	private int accelKey;
-	private int accelModifiers;
-	private String accelSignal;
+	int accelKey;
+	int accelModifiers;
+	String accelSignal;
 
-	private WidgetInfo getLastPendingWidget() {
+	WidgetInfo getLastPendingWidget() {
 		return (WidgetInfo)pendingWidgets.getLast();
 	}
 
-	private void initializeWidgetInfo() {
+	void initializeWidgetInfo() {
 		WidgetInfo w = new WidgetInfo();
 		WidgetInfo parent = null;
 		if (pendingWidgets.size() > 0) {
@@ -57,7 +57,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		pendingWidgets.add(w);
 	}
 
-	private void flushWidgetInfo() {
+	void flushWidgetInfo() {
 		WidgetInfo w = getLastPendingWidget();
 		pendingWidgets.removeLast();
 		widgets.put(w.getName(), w);
@@ -100,8 +100,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			state == STYLE_ATTRIBUTE;
 	}
 
-	private void noElementHere(String inner) {
-		/* there should be no tags inside this types of tags */
+	void noElementHere(String inner) {
 		warnUnexpectedElement(state.getName(), inner);
 		prevState = state;
 		state = UNKNOWN;
@@ -151,7 +150,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			} else if (localName.equals("signal") || localName.equals("Signal")) { //$NON-NLS-1$ //$NON-NLS-2$
 				state = SIGNAL;
 			} else if (localName.equals("child")) { //$NON-NLS-1$
-				/* the child section */
+				// the child section
 				state = WIDGET_CHILD;
 			} else if (localName.equals("widget")) { //$NON-NLS-1$
 				initializeWidgetInfo();
@@ -199,9 +198,9 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			} else if (localName.equals("has_focus")) { //$NON-NLS-1$
 				w.addProperty("has_focus", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("style_name")) { //$NON-NLS-1$
-				/* ignore */
+				// ignore
 			} else {
-				/* some other attribute */
+				// some other attribute
 				w.addProperty(propertyName, value);
 			}
 		}

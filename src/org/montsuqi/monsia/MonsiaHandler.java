@@ -55,8 +55,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
 					if (attrName.equals("lib")) { //$NON-NLS-1$
-						/* add to the list of requirements for this module */
-						/* DO NOTHING requires.add(value); */
+						// do nothing requires.add(value);
 					} else {
 						warnUnknownAttribute("requires", value); //$NON-NLS-1$
 					}
@@ -125,7 +124,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 					}
 				}
 				if (badAgent) {
-					/* ignore the property ... */
+					// ignore the property
 					prevState = state;
 					state = UNKNOWN;
 					unknownDepth++;
@@ -229,7 +228,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				warnShouldFindClosing("accessibility", localName); //$NON-NLS-1$
 			}
 			
-			flushProperties(); /* flush the ATK properties */
+			flushProperties(); // flush the ATK properties
 			state = WIDGET_AFTER_ATK;
 		}
 	};
@@ -441,7 +440,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				accels.clear();
 				state = WIDGET;
 			} else if (localName.equals("placeholder")) { //$NON-NLS-1$
-				/* this isn't a real child, so knock off  the last ChildInfo */
+				// this isn't a real child, so knock off  the last ChildInfo
 				state = WIDGET_CHILD_PLACEHOLDER;
 			} else {
 				warnUnexpectedElement("child", localName); //$NON-NLS-1$
@@ -507,7 +506,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 					}
 				}
 				if (badAgent) {
-					/* ignore the property ... */
+					// ignore the property ...
 					prevState = state;
 					state = UNKNOWN;
 					unknownDepth++;
@@ -584,7 +583,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 
     final ParserState WIDGET_CHILD_AFTER_PLACEHOLDER = new ParserState("WIDGET_CHILD_AFTER_PLACEHOLDER") { //$NON-NLS-1$
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			/* this is a placeholder <child> element -- ignore extra elements */
+			// this is a placeholder <child> element -- ignore extra elements
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
@@ -672,7 +671,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			} else if (attrName.equals("object")) { //$NON-NLS-1$
 				object = value;
 			} else if (attrName.equals("last_modification_time")) { //$NON-NLS-1$
-				/* Do nothing. */
+				// do nothing
 			} else {
 				warnUnknownAttribute("signal", attrName); //$NON-NLS-1$
 			}
@@ -720,7 +719,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		widget.addChild(info);
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
 			if (attrName.equals("internal-child")) { //$NON-NLS-1$
 				// ignore
 			} else {
@@ -733,15 +731,14 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		flushProperties();
 	
 		String actionName = null;
-		String description = null;
-	
+
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("action_name")) { //$NON-NLS-1$
 				actionName = value;
 			} else if (attrName.equals("description")) { //$NON-NLS-1$
-				description = value;
+				// ignore
 			} else {
 				warnUnknownAttribute("action", attrName); //$NON-NLS-1$
 			}

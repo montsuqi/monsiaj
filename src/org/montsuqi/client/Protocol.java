@@ -31,10 +31,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.BitSet;
 import java.util.Iterator;
@@ -43,8 +41,6 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
 import org.montsuqi.util.Logger;
@@ -118,11 +114,6 @@ public class Protocol extends Connection {
 		//NOENCODE.set('0', '9', true);
 	}
 
-	private static final Map handlerCache;
-	static {
-		handlerCache = new HashMap();
-	}
-
 	private boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
@@ -144,10 +135,8 @@ public class Protocol extends Connection {
 	}
 
 	private Node showWindow(String name, int type) {
-		Node node = null;
-		if (windowTable.containsKey(name)) {
-			node = (Node)windowTable.get(name);
-		} else {
+		Node node = getNode(name);
+		if (node == null) {
 			switch (type) {
 			case ScreenType.NEW_WINDOW:
 			case ScreenType.CURRENT_WINDOW:
@@ -191,7 +180,7 @@ public class Protocol extends Connection {
 			String sName = receiveString();
 			int size = receiveLong();
 			int mtime = receiveLong();
-			int ctime = receiveLong();
+			/* int ctime = */ receiveLong();
 			String fName = client.getCacheFileName(sName);
 
 			File file = new File(fName);
@@ -419,7 +408,7 @@ public class Protocol extends Connection {
 		if (c == PacketClass.FocusName) {
 			window = receiveString();
 			String wName = receiveString();
-			node = (Node)(windowTable.get(window));
+			node = getNode(window);
 			if (node != null && node.getInterface() != null) {
 				widget = xml.getWidget(wName);
 				if (widget != null) {
@@ -429,7 +418,7 @@ public class Protocol extends Connection {
 			c = receivePacketClass();
 		}
 		// reset GtkPandaTimer if exists
-		node = (Node)windowTable.get(window);
+		node = getNode(window);
 		if (node != null) {
 			resetTimer(node.getWindow());
 		}
@@ -437,7 +426,7 @@ public class Protocol extends Connection {
 		return fCancel;
 	}
 
-	public boolean setReceiving(boolean receiving) {
+	boolean setReceiving(boolean receiving) {
 		return this.receiving = receiving;
 	}
 
@@ -477,20 +466,20 @@ public class Protocol extends Connection {
 		((OutputStream)out).flush();
 	}
 
-	private void sendEvent(String window, String widget, String event) throws IOException {
+	void sendEvent(String window, String widget, String event) throws IOException {
 		sendPacketClass(PacketClass.Event);
 		sendString(window);
 		sendString(widget);
 		sendString(event);
 	}
 
-	private void sendWindowData() throws IOException {
+	void sendWindowData() throws IOException {
 		Iterator i = windowTable.keySet().iterator();
 		while (i.hasNext()) {
 			sendPacketClass(PacketClass.WindowName);
 			String wName = (String)(i.next());
 			sendString(wName);
-			Node node = (Node)windowTable.get(wName);
+			Node node = getNode(wName);
 			Iterator j = node.getChangedWidgets().entrySet().iterator();
 			while (j.hasNext()) {
 				Map.Entry e = (Map.Entry)j.next();
@@ -504,7 +493,7 @@ public class Protocol extends Connection {
 		clearWindowTable();
 	}
 
-	private void clearWindowTable() {
+	void clearWindowTable() {
 		Iterator i = windowTable.values().iterator();
 		while (i.hasNext()) {
 			Node node = (Node)i.next();
@@ -512,193 +501,64 @@ public class Protocol extends Connection {
 		}
 	}
 
-	// public callbacks
-	public boolean select_all(Component widget, Object userData) {
-		JTextField field = (JTextField)widget;
-		field.selectAll();
-		field.setCaretPosition(0);
-		return true;
-	}
-
-	public boolean unselect_all(Component widget, Object userData) {
-		JTextField field = (JTextField)widget;
-		field.select(0, 0);
-		return true;
-	}
-
-	public void send_event(Component widget, Object userData) throws IOException {
-		if ( ! isReceiving()  && !ignoreEvent) {
-			sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
-			sendWindowData();
-//			blockChangedHanders();
-			if (getScreenData()) {
-				ignoreEvent = true;
-//				while (gtk_events_pending()) {
-//					gtk_main_iteration();
-//				}
-				ignoreEvent = false;
-			}
-//			unblockChangedHanders();
-		}
-	}
-
-	public void send_event_when_idle(Component widget, Object userData) throws IOException {
-		send_event(widget, userData);
-	}
-
-	public void send_event_on_focus_out(Component widget, Object userData) throws IOException {
-		send_event(widget, userData);
-	}
-
-	public void clist_send_event(Component widget, Object userData) throws IOException {
-		addChangedWidget(widget, userData);
-		send_event(widget, "SELECT"); //$NON-NLS-1$
-	}
-
-	public void activate_widget(Component widget, Object userData) throws IOException {
-		send_event(widget, "ACTIVATE"); //$NON-NLS-1$
-	}
-
-	public void entry_next_focus(Component widget, Object userData) {
-		Node node = (Node)windowTable.get(SwingUtilities.windowForComponent(widget).getName());
-		if (node != null) {
-			Component nextWidget = node.getInterface().getWidget(userData.toString());
-			if (nextWidget != null) {
-				nextWidget.requestFocus();
-			}
-		}
-	}
-
-	public void addChangedWidget(Component widget, Object userData) {
+	void addChangedWidget(Component widget) {
 		if (isReceiving()) {
 			return;
 		}
 		Window window = SwingUtilities.windowForComponent(widget);
 		String name = xml.getLongName(widget);
-		String windowName = window.getName();
-		Node node = (Node)windowTable.get(windowName);
+		Node node = getNode(window.getName());
 		if (node != null) {
 			node.addChangedWidget(name, widget);
 		}
 	}
 
-	public boolean isReceiving() {
+	boolean isReceiving() {
 		return receiving;
 	}
 
-	public void changed(Component widget, Object userData) {
-		addChangedWidget(widget, null);
+	boolean isIgnoreEvent() {
+		return ignoreEvent;
 	}
 
-	public void entry_changed(Component widget, Object userData) {
-		addChangedWidget(widget, null);
-	}
-	
-	public void text_changed(Component widget, Object userData) {
-		addChangedWidget(widget, userData);
+	void setIgnoreEvent(boolean flag) {
+		ignoreEvent = flag;
 	}
 
-	public void button_toggled(Component widget, Object userData) {
-		addChangedWidget(widget, userData);
+	Node getNode(String name) {
+		return (Node)windowTable.get(name);
 	}
 
-	public void selection_changed(Component widget, Object userData) {
-		addChangedWidget(widget, userData);
+	Node getNode(Component component) {
+		Window window = SwingUtilities.windowForComponent(component);
+		return getNode(window.getName());
 	}
 
-	public void click_column(Component widget, Object userData) {
-		addChangedWidget(widget, userData);
-	}
-
-	public void entry_set_editable(Component widget, Object userData) {
-		// empty???
-	}
-
-	public void map_event(Component widget, Object userData) {
-		clearWindowTable();
-	}
-
-	public void set_focus(Component widget, Object userData) {
-		if(windowTable.containsKey(widget.getName())) {
-			// FocusedScreen = node; // this variable is referred from nowhere.
+	void closeWindow(Component widget) {
+		Node node = getNode(widget);
+		if (node == null) {
+			return;
 		}
-	}
-
-	public void day_selected(Component widget, Object userData) {
-		addChangedWidget(widget, userData);
-	}
-
-	public void switch_page(Component widget, Object userData) {
-		addChangedWidget(widget, userData);
-	}
-
-	private boolean checkWindow(String name, Node node) {
-		return node.getWindow() != null;
-	}
-
-	public void window_close(Component widget, Object userData) {
-		Node node = (Node)windowTable.get(widget.getName());
-		if (node != null) {
-			node.getWindow().setVisible(false);
-			if ( ! isReceiving()) {
-				Iterator i = windowTable.keySet().iterator();
-				boolean checked = false;
-				while (i.hasNext()) {
-					String wName = (String)(i.next());
-					checked = checkWindow(wName, node);
-				}
-				if ( ! checked) {
-					client.exitSystem();
-				}
+		node.getWindow().setVisible(false);
+		if (isReceiving()) {
+			return;
+		}
+		Iterator i = windowTable.values().iterator();
+		while (i.hasNext()) {
+			if (((Node)i.next()).getWindow() != null) {
+				return;
 			}
 		}
+		client.exitSystem();
 	}
 
-	public void window_destroy(Component widget, Object userData) {
+	void exit() {
 		setReceiving(true);
 		client.exitSystem();
 	}
 
-	public void open_browser(Component widget, Object userData) {
-		if ( ! (widget instanceof JTextPane)) {
-			logger.warn(Messages.getString("Protocol.not_a_JTextPane_widget")); //$NON-NLS-1$
-		}
-		JTextPane pane = (JTextPane)widget;
-		URL uri;
-		try {
-			uri = new URL((String)userData);
-			pane.setPage(uri);
-		} catch (Exception e) {
-			logger.warn(e);
-		}
-	}
-
-	public void keypress_filter(Component widget, Object userData) {
-		Component next = xml.getWidget((String)userData);
-		next.requestFocus();
-	}
-
-	public void press_filter(Component widget, Object userData) {
-		logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); //$NON-NLS-1$
-	}
-
-	public void gtk_true(Component widget, Object userData) {
-		// callback placeholder which has no effect
-	}
-
 	public StringBuffer getWidgetNameBuffer() {
 		return widgetName;
-	}
-
-	public static Method getHandler(String handlerName) throws SecurityException, NoSuchMethodException {
-		if (handlerCache.containsKey(handlerName)) {
-			return (Method)handlerCache.get(handlerName);
-		} else {
-			Class[] argTypes = { Component.class, Object.class };
-			Method handler = Protocol.class.getMethod(handlerName, argTypes);
-			handlerCache.put(handlerName, handler);
-			return handler;
-		}
 	}
 }
 
