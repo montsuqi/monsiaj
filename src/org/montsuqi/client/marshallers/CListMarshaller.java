@@ -23,10 +23,15 @@ copies.
 package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.io.IOException;
 
+import javax.swing.BoundedRangeModel;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -60,9 +65,9 @@ class CListMarshaller extends WidgetMarshaller {
 		StringBuffer label = new StringBuffer(widgetName.toString());
 		int offset = label.length();
 		Interface xml = con.getInterface();
-		int row;
-		int column;
-		double rowattrw;
+		int row = 0;
+		int column = 0;
+		double rowattrw = 0.0;
 		for (int i = 0, n = con.receiveInt(), col = 0, count = -1, from = 0; i < n; i++) {
 			String name = con.receiveName();
 			label.replace(offset, label.length(), '.' + name);
@@ -115,7 +120,6 @@ class CListMarshaller extends WidgetMarshaller {
 						tableModel.addRow(rdata);
 					}
 				}
-				// TODO move to visible row
 			} else {
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				manager.registerValue(widget, name, new Integer(from));
@@ -133,6 +137,12 @@ class CListMarshaller extends WidgetMarshaller {
 						}
 					}
 				}
+			}
+			JScrollBar vScroll = getVerticalScrollBar(table);
+			if (vScroll != null) {
+				BoundedRangeModel model = vScroll.getModel();
+				row += rowattrw * model.getExtent();
+				model.setValue(row * table.getRowHeight());
 			}
 		}
 		tableModel.setColumnIdentifiers(labels);
@@ -152,17 +162,38 @@ class CListMarshaller extends WidgetMarshaller {
 			con.sendPacketClass(PacketClass.ScreenData);
 			con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i + opt) + ']');
 			con.sendBooleanData(Type.BOOL, selections.isSelectedIndex(i));
-			if ( ! visibleRow) {
-				boolean visible = false; // TODO detect first visible row(possible?)
-				if	(visible) {
-					con.sendPacketClass(PacketClass.ScreenData);
-					con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
-					con.sendIntegerData(Type.INT, i + 1);
-					visibleRow = true;
-				}
+			if ( ! visibleRow && isVisibleRow(table, i)) {
+				con.sendPacketClass(PacketClass.ScreenData);
+				con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
+				con.sendIntegerData(Type.INT, i);
+				visibleRow = true;
 			}
 		}
 		return true;
+	}
+
+	private boolean isVisibleRow(JTable table, int row) {
+		JScrollBar vScroll = getVerticalScrollBar(table);
+		if (vScroll == null) {
+			return true;
+		}
+		BoundedRangeModel model = vScroll.getModel();
+		int value = model.getValue();
+		int extent = model.getExtent();
+		int rowHeight = table.getRowHeight() * row;
+		return value <= rowHeight && rowHeight < value + extent;
+	}
+
+	private JScrollBar getVerticalScrollBar(JTable table) {
+		Container parent = table.getParent();
+		if (parent instanceof JViewport) {
+			parent = parent.getParent();
+			if (parent instanceof JScrollPane) {
+				JScrollPane scroll = (JScrollPane)parent;
+				return scroll.getVerticalScrollBar();
+			}
+		}
+		return null;
 	}
 }
 
