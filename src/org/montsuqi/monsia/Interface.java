@@ -31,6 +31,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -267,6 +269,14 @@ public class Interface {
 
 	private void connectButtonPressEvent(final Container target, final Method handler, final Object other) {
 		connectClicked(target, handler, other);
+	}
+
+	private void connectKeyPressEvent(final Container target, final Method handler, final Object other) {
+		target.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
 	private void connectChanged(final Container target, final Method handler, final Object other) {
