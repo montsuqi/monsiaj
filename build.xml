@@ -32,10 +32,6 @@
 		<mkdir dir="${tmp.dir}"/>
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${report.dir}"/>
-		<property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
-		<property name="bin.macosx.name" value="monsiaj-bin-macosx-${DSTAMP}"/>
-		<property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
-		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 	</target>
 
 	<target name="compile" depends="prepare">
@@ -43,6 +39,10 @@
 			<include name="**/*.java"/>
 			<classpath refid="project.class.path"/>
 		</javac>
+	</target>
+
+	<target name="set-version" depends="prepare" unless="version">
+		<property name="version" value="${DSTAMP}"/>
 	</target>
 
 	<target name="copy-files" depends="prepare">
@@ -82,7 +82,8 @@
 
 	<target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-bin-replay,dist-src"/>
 
-	<target name="dist-bin" depends="create-jars,copy-files">
+	<target name="dist-bin" depends="create-jars,copy-files,set-version">
+		<property name="bin.name" value="monsiaj-bin-${version}"/>
 		<copy todir="${build.dir}/${bin.name}">
 			<fileset dir="${build.dir}">
 				<include name="*.jar"/>
@@ -101,7 +102,8 @@
 		</zip>
 	</target>
 
-	<target name="dist-bin-replay" depends="create-jars,copy-files">
+	<target name="dist-bin-replay" depends="create-jars,copy-files,set-version">
+		<property name="replay.name" value="monsiaj-replay-${version}"/>
 		<copy todir="${build.dir}/${replay.name}">
 			<fileset dir="${build.dir}">
 				<include name="pandarecord.jar"/>
@@ -117,7 +119,8 @@
 		</zip>
 	</target>
 
-	<target name="dist-bin-mac" depends="create-jars,copy-files">
+	<target name="dist-bin-mac" depends="create-jars,copy-files,set-version">
+		<property name="bin.macosx.name" value="monsiaj-bin-macosx-${version}"/>
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents">
 			<fileset dir="${resources.dir}">
 				<include name="Info.plist"/>
@@ -160,7 +163,8 @@
 		</zip>
 	</target>
 
-	<target name="dist-src">
+	<target name="dist-src" depends="set-version">
+		<property name="src.name" value="monsiaj-src-${version}"/>
 		<copy todir="${build.dir}/${src.name}">
 			<fileset dir=".">
 				<include name="src/**/"/>
