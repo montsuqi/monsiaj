@@ -43,6 +43,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import org.montsuqi.util.Logger;
+import org.montsuqi.client.marshallers.*;
+import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.Calendar;
@@ -86,7 +88,7 @@ public class Protocol extends Connection {
 		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
 	}
 
-	Interface getInterface() {
+	public Interface getInterface() {
 		return xml;
 	}
 
@@ -271,7 +273,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	void receiveValue(StringBuffer longName, int offset) throws IOException {
+	public void receiveValue(StringBuffer longName, int offset) throws IOException {
 		boolean fTrace = true;
 		boolean fDone = false;
 		Component widget = xml.getWidgetByLongName(longName.toString());
@@ -665,7 +667,7 @@ public class Protocol extends Connection {
 		/* DO NOTHING */
 	}
 
-	StringBuffer getWidgetNameBuffer() {
+	public StringBuffer getWidgetNameBuffer() {
 		return widgetName;
 	}
 }

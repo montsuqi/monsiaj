@@ -755,7 +755,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("internal-child")) { //$NON-NLS-1$
-				info.setInternalChild(value);
+				// ignore
 			} else {
 				warnUnknownAttribute("child", attrName); //$NON-NLS-1$
 			}

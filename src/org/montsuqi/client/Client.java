@@ -23,7 +23,6 @@ copies.
 package org.montsuqi.client;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.SocketException;
 import java.text.MessageFormat;
@@ -136,9 +135,8 @@ public class Client implements Runnable {
 				options = null;
 			}
 			Class clazz = Class.forName(factoryName);
-			Class[] argTypes = new Class[] { String.class, Integer.TYPE, Object[].class };
-			Method create = clazz.getDeclaredMethod("create", argTypes); //$NON-NLS-1$
-			s = (Socket)create.invoke(null, new Object[] { host, new Integer(portNumber), options });
+			SocketCreator creator = (SocketCreator)clazz.newInstance();
+			s = creator.create(host, portNumber, options);
 			protocol = new Protocol(this, s);
 			connected = true;
 		} catch (Exception e) {

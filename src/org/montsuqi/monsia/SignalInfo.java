@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
-class SignalInfo {
+public class SignalInfo {
 
 	SignalInfo(String name, String handler, String object, boolean after) {
 		this.name = name;
@@ -31,11 +31,11 @@ class SignalInfo {
 		this.after = after;
 	}
 
-	String getName() {
+	public String getName() {
 		return name;
 	}
 
-	String getHandler() {
+	public String getHandler() {
 		return handler;
 	}
 

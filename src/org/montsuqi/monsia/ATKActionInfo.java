@@ -26,7 +26,7 @@ package org.montsuqi.monsia;
  * Placeholder class for GladeATKActionInfo.
  * Java version does not use it.
  */
-class ATKActionInfo {
+public class ATKActionInfo {
 	ATKActionInfo(String actionName, String description) {
 		this.actionName = actionName;
 		this.description = description;

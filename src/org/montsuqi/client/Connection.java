@@ -49,7 +49,7 @@ class Connection {
 		logger = Logger.getLogger(Connection.class);
 	}
 
-	void sendPacketClass(int c) throws IOException {
+	public void sendPacketClass(int c) throws IOException {
 		out.write((byte)c);
 		out.flush();
 	}
@@ -60,7 +60,7 @@ class Connection {
 		return b;
 	}
 
-	void sendDataType(int c) throws IOException {
+	public void sendDataType(int c) throws IOException {
 		out.write((byte)c);
 		out.flush();
 	}
@@ -74,7 +74,7 @@ class Connection {
 		return dataType;
 	}
 
-	int receiveDataTypeWithCheck(int expected) throws IOException {
+	public int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
 			throw new IOException(Messages.getString("Connection.data_type_mismatch")); //$NON-NLS-1$
@@ -82,7 +82,7 @@ class Connection {
 		return dataType;
 	}
 	
-	int getLastDataType() {
+	public int getLastDataType() {
 		return dataType;
 	}
 
@@ -106,7 +106,7 @@ class Connection {
 		return length;
 	}
 
-	void sendString(String s) throws IOException {
+	public void sendString(String s) throws IOException {
 		byte[] bytes = s.getBytes(encoding);
 		sendLength(bytes.length);
 		out.write(bytes);
@@ -125,7 +125,7 @@ class Connection {
 		return s;
 	}
 
-	String receiveString() throws IOException {
+	public String receiveString() throws IOException {
 		int size = receiveLength();
 		return receiveStringBody(size);
 	}
@@ -141,11 +141,11 @@ class Connection {
 		out.flush();
 	}
 
-	int receiveInt() throws IOException {
+	public int receiveInt() throws IOException {
 		return receiveLong();
 	}
 
-	void sendInt(int data) throws IOException {
+	public void sendInt(int data) throws IOException {
 		sendLong(data);
 	}
 
@@ -181,7 +181,7 @@ class Connection {
 		return value;
 	}
 
-	void sendBoolean(boolean data) throws IOException {
+	public void sendBoolean(boolean data) throws IOException {
 		out.writeByte(data ? T_BYTE : F_BYTE);
 		out.flush();
 	}
@@ -203,7 +203,7 @@ class Connection {
 		return result;
 	}
 
-	BigDecimal receiveFixedData() throws IOException {
+	public BigDecimal receiveFixedData() throws IOException {
 		//logger.debug("receiveFixedData");
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
@@ -212,7 +212,7 @@ class Connection {
 		}
 	}
 
-	void sendFixedData(int type, BigDecimal xval) throws IOException {
+	public void sendFixedData(int type, BigDecimal xval) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -229,7 +229,7 @@ class Connection {
 		}
 	}
 
-	void sendStringData(int type, String str) throws IOException {
+	public void sendStringData(int type, String str) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -252,7 +252,7 @@ class Connection {
 		}
 	}
 
-	String receiveStringData() throws IOException {
+	public String receiveStringData() throws IOException {
 		//logger.debug("receiveStringData");
 		int type = receiveDataType();
 		switch (type) {
@@ -270,7 +270,7 @@ class Connection {
 		}
 	}
 
-	void sendIntegerData(int type, int value) throws IOException {
+	public void sendIntegerData(int type, int value) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -296,7 +296,7 @@ class Connection {
 		}
 	}
 
-	int receiveIntData() throws IOException {
+	public int receiveIntData() throws IOException {
 		//logger.debug("receiveIntData");
 		switch (receiveDataType()) {
 		case Type.INT:
@@ -311,7 +311,7 @@ class Connection {
 		}
 	}
 
-	void sendBooleanData(int type, boolean value) throws IOException {
+	public void sendBooleanData(int type, boolean value) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -334,7 +334,7 @@ class Connection {
 		}
 	}
 
-	boolean receiveBooleanData() throws IOException {
+	public boolean receiveBooleanData() throws IOException {
 		//logger.debug("receiveBooleanData");
 		switch (receiveDataType()) {
 		case Type.INT:

@@ -30,8 +30,8 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 class SSLSocketCreator extends SocketCreator {
-	static Socket create(String host, int port, Object[] options) throws IOException, UnknownHostException {
-		Socket s = new Socket(host, port);
+	Socket create(String host, int port, Object[] options) throws IOException, UnknownHostException {
+		Socket s = super.create(host, port, null);
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		SSLSocket ssl = (SSLSocket)factory.createSocket(s, host, port, true);
 		/* key, cert, capath, cafile */

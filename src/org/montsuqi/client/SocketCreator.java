@@ -27,7 +27,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 class SocketCreator {
-	static Socket create(String host, int port, Object[] options) throws IOException, UnknownHostException {
+	Socket create(String host, int port, Object[] options) throws IOException, UnknownHostException {
 		return new Socket(host, port);
 	}
 }

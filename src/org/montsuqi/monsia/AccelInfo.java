@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
-class AccelInfo {
+public class AccelInfo {
 	AccelInfo(int key, int modifiers, String signal) {
 		this.key = key;
 		this.modifiers = modifiers;
@@ -37,7 +37,7 @@ class AccelInfo {
 		return modifiers;
 	}
 
-	String getSignal() {
+	public String getSignal() {
 		return signal;
 	}
 

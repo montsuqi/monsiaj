@@ -22,17 +22,18 @@ copies.
 
 package org.montsuqi.monsia;
 
-class SignalData {
+public class SignalData {
 
-	SignalData(Object signalObject, SignalInfo sInfo, AccelInfo accel) {
+	public SignalData(Object signalObject, SignalInfo sInfo, AccelInfo accel) {
 		this(signalObject, sInfo);
 		this.accel = accel;
 	}
-	SignalData(Object signalObject, SignalInfo sInfo) {
+
+	public SignalData(Object signalObject, SignalInfo sInfo) {
 		this(signalObject, sInfo.getName(), sInfo.getObject(), sInfo.isAfter());
 	}
 	
-	SignalData(Object signalObject, String name, String connectObject, boolean after) {
+	public SignalData(Object signalObject, String name, String connectObject, boolean after) {
 		this.signalObject = signalObject;
 		this.name = name;
 		this.connectObject = connectObject;

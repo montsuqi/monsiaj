@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
-class Property {
+public class Property {
 
 	private static final String ARROW = "=>"; //$NON-NLS-1$
 
@@ -31,11 +31,11 @@ class Property {
 		this.value = value;
 	}
 
-	String getName() {
+	public String getName() {
 		return name;
 	}
 	
-	String getValue() {
+	public String getValue() {
 		return value;
 	}
 
