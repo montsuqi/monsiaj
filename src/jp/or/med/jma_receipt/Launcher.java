@@ -35,7 +35,9 @@ public final class Launcher {
 		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) { //$NON-NLS-1$ //$NON-NLS-2$
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", Messages.getString("application.title")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		System.setProperty("monsia.logger.factory", "org.montsuqi.util.NullLogger"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
+			System.setProperty("monsia.logger.factory", "org.montsuqi.util.NullLogger"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 	public static void main(String[] args) {
