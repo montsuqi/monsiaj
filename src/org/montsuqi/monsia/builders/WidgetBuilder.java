@@ -54,6 +54,7 @@ import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.CheckBox;
 import org.montsuqi.widgets.Entry;
+import org.montsuqi.widgets.HPaned;
 import org.montsuqi.widgets.Notebook;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaCList;
@@ -73,6 +74,7 @@ import org.montsuqi.widgets.RadioButton;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.ToggleButton;
 import org.montsuqi.widgets.VBox;
+import org.montsuqi.widgets.VPaned;
 import org.montsuqi.widgets.VSeparator;
 import org.montsuqi.widgets.Window;
 
@@ -106,6 +108,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
 		registerWidgetClass("HBox",           HBox.class,          defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("VPaned",         HPaned.class,        defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("HSeparator",     HSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Label",          JLabel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("List",           JList.class,         new ListBuilder()); //$NON-NLS-1$
@@ -129,8 +132,9 @@ public class WidgetBuilder {
 		registerWidgetClass("ScrolledWindow", JScrollPane.class,   new ScrolledWindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Table",          Table.class,         new TableBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Text",           JTextArea.class,     defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("ToggleButton",   ToggleButton.class, defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("ToggleButton",   ToggleButton.class,  defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VBox",           VBox.class,          defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("VPaned",         VPaned.class,        defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Window",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
