@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.io.IOException;
 
 import javax.swing.JLabel;
-
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 
@@ -36,15 +35,16 @@ class LabelMarshaller extends WidgetMarshaller {
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JLabel label = (JLabel)widget;
+
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
-			String buff = con.receiveStringData();
 			manager.registerValue(widget, name, null);
-			label.setText(buff);
+			String text = con.receiveStringData();
+			label.setText(text);
 		}
 		return true;
 	}

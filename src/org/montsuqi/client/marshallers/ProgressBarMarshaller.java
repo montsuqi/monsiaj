@@ -37,12 +37,14 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JProgressBar progress = (JProgressBar)widget;
-		con.receiveDataTypeWithCheck(Type.RECORD);
+
 		StringBuffer longName = con.getWidgetNameBuffer();
 		int offset = longName.length();
+		con.receiveDataTypeWithCheck(Type.RECORD);
+
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("value".equals(name)) { //$NON-NLS-1$
 				manager.registerValue(widget, name, null);
@@ -55,8 +57,9 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JProgressBar progress = (JProgressBar)widget;
-		ValueAttribute va = manager.getValue(name);
+
 		con.sendPacketClass(PacketClass.ScreenData);
+		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getVName());
 		con.sendIntegerData(va.getType(), progress.getValue());
 		return true;

@@ -33,58 +33,62 @@ import org.montsuqi.client.Type;
 
 class CalendarMarshaller extends WidgetMarshaller {
 
-	public synchronized 	boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
+
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		manager.registerValue(widget, "", null); //$NON-NLS-1$
-		int year = 0;
-		int month = -1;
-		int day = 0;
+
+		Calendar calendar = Calendar.getInstance();
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("year".equals(name)) { //$NON-NLS-1$
-				year = con.receiveIntData();
+				int year = con.receiveIntData();
+				calendar.set(Calendar.YEAR, year);
 			} else if ("month".equals(name)) { //$NON-NLS-1$
-				month = con.receiveIntData();
+				int month = con.receiveIntData();
+				calendar.set(Calendar.MONTH, month - 1);
 			} else if ("day".equals(name)) { //$NON-NLS-1$
-				day = con.receiveIntData();
+				int day = con.receiveIntData();
+				calendar.set(Calendar.DATE, day);
 			} else {
 				/*	fatal error	*/
 			}
 		}
-	
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.YEAR, year);
-		calendar.set(Calendar.MONTH, month - 1);
-		calendar.set(Calendar.DATE, day);
-		calendarWidget.setDate(calendar.getTime());
+
+		Date date = calendar.getTime();
+		calendarWidget.setDate(date);
 		return true;
 	}
 	
-	public synchronized boolean send(WidgetValueManager manager, String name, Component calendar) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		String iName;
-		int year, month, day;
-		Date date = ((org.montsuqi.widgets.Calendar)calendar).getDate();
+		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
+
+		Date date = calendarWidget.getDate();
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
+
 		con.sendPacketClass(PacketClass.ScreenData);
 		con.sendString(name + ".year"); //$NON-NLS-1$
 		con.sendDataType(Type.INT);
-		con.sendInt(cal.get(java.util.Calendar.YEAR));
+		int year = cal.get(java.util.Calendar.YEAR);
+		con.sendInt(year);
 	
 		con.sendPacketClass(PacketClass.ScreenData);
 		con.sendString(name + ".month"); //$NON-NLS-1$
 		con.sendDataType(Type.INT);
-		con.sendInt(cal.get(java.util.Calendar.MONTH) + 1);
+		int month = cal.get(java.util.Calendar.MONTH) + 1;
+		con.sendInt(month);
 	
 		con.sendPacketClass(PacketClass.ScreenData);
 		con.sendString(name + ".day"); //$NON-NLS-1$
 		con.sendDataType(Type.INT);
-		con.sendInt(cal.get(java.util.Calendar.DATE));
+		int day = cal.get(java.util.Calendar.DATE);
+		con.sendInt(day);
 	
 		return true;
 	}

@@ -38,13 +38,17 @@ class ListMarshaller extends WidgetMarshaller {
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JList list = (JList)widget;
+
 		DefaultListModel listModel = (DefaultListModel)list.getModel();
-		con.receiveDataTypeWithCheck(Type.RECORD);
+
 		StringBuffer label = con.getWidgetNameBuffer();
 		int offset = label.length();
+
+		con.receiveDataTypeWithCheck(Type.RECORD);
+
 		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
 			int num;
@@ -95,6 +99,7 @@ class ListMarshaller extends WidgetMarshaller {
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JList list = (JList)widget;
+
 		ListSelectionModel model = list.getSelectionModel();
 		ValueAttribute va = manager.getValue(name);
 		int opt = ((Integer)va.getOpt()).intValue();

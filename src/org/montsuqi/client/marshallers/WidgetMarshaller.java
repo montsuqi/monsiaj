@@ -55,16 +55,10 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(JTextField.class, new EntryMarshaller());
 		registerMarshaller(NumberEntry.class, new NumberEntryMarshaller());
 		registerMarshaller(JTextArea.class, new TextMarshaller());
-		//registerMarshaller(PandaEntry.class, new EntryMarshaller());
 		registerMarshaller(JLabel.class, new LabelMarshaller());
 		registerMarshaller(JComboBox.class, new ComboMarshaller());
-		//registerMarshaller(PandaCombo.class, new ComboMarshaller());
 		registerMarshaller(JTable.class, new CListMarshaller());
 		registerMarshaller(AbstractButton.class, new ButtonMarshaller());
-		//registerMarshaller(JButton.class, new ButtonMarshaller());
-		//registerMarshaller(JToggleButton.class, new ButtonMarshaller());
-		//registerMarshaller(JCheckBoxButton.class, new ButtonMarshaller());
-		//registerMarshaller(JRadioButtonButton.class, new ButtonMarshaller());
 		registerMarshaller(JList.class, new ListMarshaller());
 		registerMarshaller(JTabbedPane.class, new NotebookMarshaller());
 		registerMarshaller(Calendar.class, new CalendarMarshaller());
@@ -77,7 +71,7 @@ public abstract class WidgetMarshaller {
 	public abstract boolean receive(WidgetValueManager manager, Component widget) throws IOException;
 	public abstract boolean send(WidgetValueManager manager, String name, Component widget) throws IOException;
 
-	protected boolean handleCommon(WidgetValueManager manager, Component widget, String name) throws IOException {
+	protected boolean handleStateStyle(WidgetValueManager manager, Component widget, String name) throws IOException {
 		Protocol con = manager.getProtocol();
 		if ("state".equals(name)) { //$NON-NLS-1$
 			int state = con.receiveIntData();
@@ -96,16 +90,15 @@ public abstract class WidgetMarshaller {
 		}
 	}
 
-	public static void registerMarshaller(Class clazz, WidgetMarshaller marshaller) {
+	private static void registerMarshaller(Class clazz, WidgetMarshaller marshaller) {
 		classTable.put(clazz, marshaller);
 	}
 
 	public static WidgetMarshaller getMarshaller(Class clazz) throws ClassNotFoundException {
-		while (clazz != Object.class) {
-			if (classTable.containsKey(clazz)) {
-				return (WidgetMarshaller)classTable.get(clazz);
+		for (Class c = clazz; c != null; c = c.getSuperclass()) {
+			if (classTable.containsKey(c)) {
+				return (WidgetMarshaller)classTable.get(c);
 			}
-			clazz = clazz.getSuperclass();
 		}
 	
 		String format = Messages.getString("WidgetMarshaller.marshaller_not_found"); //$NON-NLS-1$

@@ -28,17 +28,20 @@ public final class WidgetValueManager {
 
 	void registerValue(Component widget, String valueName, Object opt) {
 		String longName = con.getInterface().getLongName(widget);
-		ValueAttribute va = (ValueAttribute)(valueTable.get(longName));
 
-		if (va == null) {
+		ValueAttribute va;
+		if ( ! valueTable.containsKey(longName)) {
 			String name = con.getWidgetNameBuffer().toString();
 			va = new ValueAttribute(name, con.getLastDataType(), valueName, opt);
 			valueTable.put(va.getName(), va);
 		} else {
+			va = (ValueAttribute)valueTable.get(longName);
 			va.setVName(valueName);
 			int lastType = con.getLastDataType();
-			va.setType(lastType);
-			va.setOpt(opt);
+			synchronized (va) {
+				va.setType(lastType);
+				va.setOpt(opt);
+			}
 		}
 	}
 

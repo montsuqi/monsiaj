@@ -36,10 +36,11 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		NumberEntry entry = (NumberEntry)widget;
+
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
 			BigDecimal val = con.receiveFixedData();
@@ -52,10 +53,11 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		NumberEntry entry = (NumberEntry)widget;
-		BigDecimal value = entry.getValue();
+
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getVName());
+		BigDecimal value = entry.getValue();
 		va.setOpt(value);
 		con.sendFixedData(va.getType(), value);
 		return true;

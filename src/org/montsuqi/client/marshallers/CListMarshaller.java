@@ -34,36 +34,36 @@ import javax.swing.table.TableColumnModel;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
+import org.montsuqi.monsia.Interface;
 
 class CListMarshaller extends WidgetMarshaller {
 
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTable table = (JTable)widget;
+
 		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
-		con.receiveDataTypeWithCheck(Type.RECORD);
-		int state;
 		TableColumnModel columnModel = table.getColumnModel();
 		String[] labels = new String[columnModel.getColumnCount()];
-		int labelNumber = 0;
 		for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
 			labels[i] = (String)columnModel.getColumn(i).getHeaderValue();
 		}
 
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		StringBuffer widgetName = con.getWidgetNameBuffer();
 		StringBuffer label = new StringBuffer(widgetName.toString());
 		int offset = label.length();
-
-		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
+		Interface xml = con.getInterface();
+		for (int i = 0, n = con.receiveInt(), col = 0, count = -1, from = 0; i < n; i++) {
 			String name = con.receiveString();
 			label.replace(offset, label.length(), '.' + name);
-			Component sub;
-			if ((sub = con.getInterface().getWidgetByLongName(label.toString())) != null) {
+			Component sub = xml.getWidgetByLongName(label.toString());
+			if (sub != null) {
 				JLabel dummyLabel = (JLabel)sub;
 				WidgetMarshaller labelMarshaller = new LabelMarshaller();
 				labelMarshaller.receive(manager, dummyLabel);
-				labels[labelNumber++] = dummyLabel.getText();
-			} else if (handleCommon(manager, widget, name)) {
+				labels[col++] = dummyLabel.getText();
+			} else if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
@@ -123,11 +123,11 @@ class CListMarshaller extends WidgetMarshaller {
 
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		ValueAttribute va = manager.getValue(name);
 		JTable table = (JTable)widget;
+
+		ValueAttribute va = manager.getValue(name);
 		ListSelectionModel selections = table.getSelectionModel();
-		int opt = ((Integer)va.getOpt()).intValue();
-		for (int i = 0, rows = table.getRowCount(); i < rows; i++) {
+		for (int i = 0, rows = table.getRowCount(), opt = ((Integer)va.getOpt()).intValue(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
 			con.sendString(name + '.' + va.getVName() + '[' + String.valueOf(i) + ']' + (i + opt));
 			con.sendDataType(Type.BOOL);

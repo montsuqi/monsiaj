@@ -36,13 +36,16 @@ class NotebookMarshaller extends WidgetMarshaller {
 
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
+		JTabbedPane tabbed = (JTabbedPane)widget;
+
 		con.receiveDataTypeWithCheck(Type.RECORD);
+
 		StringBuffer widgetName = con.getWidgetNameBuffer();
 		int offset = widgetName.length();
 		int page = -1;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("pageno".equals(name)) { //$NON-NLS-1$
 				page = con.receiveIntData();
@@ -55,7 +58,6 @@ class NotebookMarshaller extends WidgetMarshaller {
 		if (page == -1) {
 			throw new IllegalStateException(Messages.getString("NotebookMarshaller.page_not_found")); //$NON-NLS-1$
 		}
-		JTabbedPane tabbed = (JTabbedPane)widget;
 		tabbed.setSelectedIndex(page);
 		return true;
 	}
@@ -63,8 +65,9 @@ class NotebookMarshaller extends WidgetMarshaller {
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTabbedPane tabbed = (JTabbedPane)widget;
-		ValueAttribute va = manager.getValue(name);
+
 		con.sendPacketClass(PacketClass.ScreenData);
+		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getVName());
 		con.sendIntegerData(va.getType(), tabbed.getSelectedIndex());
 		return true;

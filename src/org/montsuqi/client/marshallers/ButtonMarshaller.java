@@ -23,12 +23,9 @@ copies.
 package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.io.IOException;
 
 import javax.swing.AbstractButton;
-import javax.swing.JLabel;
-
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
@@ -41,11 +38,12 @@ class ButtonMarshaller extends WidgetMarshaller {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
 			if ("label".equals(name)) { //$NON-NLS-1$
-				setLabel(button, con.receiveStringData());
+				String label = con.receiveStringData();
+				button.setText(label);
 			} else {
 				boolean selected = con.receiveBooleanData();
 				manager.registerValue(button, name, null);
@@ -61,24 +59,9 @@ class ButtonMarshaller extends WidgetMarshaller {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getVName());
-		con.sendBooleanData(va.getType(), button.isSelected());
+		boolean selected = button.isSelected();
+		con.sendBooleanData(va.getType(), selected);
 		return true;
-	}
-
-	private void setLabel(Component widget, String value) throws IOException {
-		if (widget instanceof JLabel) {
-			JLabel label = (JLabel)widget;
-			label.setText(value);
-		} else if (widget instanceof AbstractButton) {
-			AbstractButton button = (AbstractButton)widget;
-			button.setText(value);
-		} else if (widget instanceof Container) {
-			Container c = (Container)widget;
-			Component[] comps = c.getComponents();
-			for (int i = 0; i < comps.length; i++) {
-				setLabel(comps[i], value);
-			}
-		}
 	}
 }
 

@@ -35,25 +35,29 @@ import javax.swing.JTextField;
 import org.montsuqi.client.Messages;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
+import org.montsuqi.monsia.Interface;
 
 class ComboMarshaller extends WidgetMarshaller {
 
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
-		String selected = null;
+
 		DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
+		String selected = null;
+		Interface xml = con.getInterface();
 		con.receiveDataTypeWithCheck(Type.RECORD);
+
 		for (int i = 0, n = con.receiveInt(), count = 0; i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				List list = new ArrayList();
 				list.add(""); //$NON-NLS-1$
-				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
+				con.receiveDataTypeWithCheck(Type.ARRAY); /* Type.ARRAY */
 				for (int j = 0, num = con.receiveInt(); j < num ; j++) {
 					String buff = null;
 					try {
@@ -76,12 +80,12 @@ class ComboMarshaller extends WidgetMarshaller {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
 				int offset = widgetName.length();
 				widgetName.replace(offset, widgetName.length(), '.' + name);
-				Component sub =  con.getInterface().getWidgetByLongName(widgetName.toString());
+				Component sub =  xml.getWidgetByLongName(widgetName.toString());
 				if (sub != null) {
-					JTextField dummyEntry = (JTextField)sub;
+					JTextField dummy = (JTextField)sub;
 					WidgetMarshaller entryMarshaller = new EntryMarshaller();
-					entryMarshaller.receive(manager, dummyEntry);
-					selected = dummyEntry.getText();
+					entryMarshaller.receive(manager, dummy);
+					selected = dummy.getText();
 				} else {
 					logger.fatal(Messages.getString("ComboMarshaller.subwidget_not_found")); //$NON-NLS-1$
 				}

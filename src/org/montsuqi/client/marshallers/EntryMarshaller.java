@@ -37,15 +37,16 @@ class EntryMarshaller extends WidgetMarshaller {
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTextField entry = (JTextField)widget;
+
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
+			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
-			String buff = con.receiveStringData();
+			String text = con.receiveStringData();
 			manager.registerValue(entry, name, null);
-			entry.setText(buff);
+			entry.setText(text);
 		}
 		return true;
 	}
@@ -53,11 +54,12 @@ class EntryMarshaller extends WidgetMarshaller {
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTextField entry = (JTextField)widget;
-		String value = entry.getText();
+
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getVName());
-		con.sendStringData(va.getType(), value);
+		String text = entry.getText();
+		con.sendStringData(va.getType(), text);
 		return true;
 	}
 }
