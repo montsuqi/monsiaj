@@ -56,6 +56,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -181,6 +182,8 @@ class WidgetBuilder {
 		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(org.montsuqi.widgets.PandaEntry.class, "input_mode", "setPandaEntryInputMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(org.montsuqi.widgets.PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
@@ -497,35 +500,47 @@ class WidgetBuilder {
 	}
 
 	void buildFrameChildren(Container parent, WidgetInfo info) {
-		int FRAME_ITEM = 0;
-		int LABEL_ITEM = 1;
+		logger.enter("buildFrameChildren");
 		int cCount = info.getChildrenCount();
 		if (cCount != 2) {
 			throw new IllegalStateException(Messages.getString("WidgetBuilder.there_should_really_only_be_2_children")); //$NON-NLS-1$
 		}
+
+		Border border = null;
+		JComponent widget = null;
+		boolean isLabel = false;
 		for (int i = 0; i < cCount; i++) {
 			String label = null;
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			int type = FRAME_ITEM;
+			isLabel = false;
 			int pCount = cInfo.getPropertiesCount();
 			for (int j = 0; j < pCount; j++) {
+				logger.debug("property={0}", cInfo.getProperty(j));
 				String pName = cInfo.getProperty(j).getName();
 				String pValue = cInfo.getProperty(j).getValue();
 				if ("type".equals(pName) && "label_item".equals(pValue)) { //$NON-NLS-1$ //$NON-NLS-2$
-					type = LABEL_ITEM;
+					isLabel = true;
 				} else if ("label".equals(pName)) { //$NON-NLS-1$
 					label = pValue;
 				}
 			}
 
-			if (type == LABEL_ITEM || label != null) {
-				JComponent comp = (JComponent)parent;
-				comp.setBorder(BorderFactory.createTitledBorder(label));
+			if (isLabel == true || label != null) {
+				border = BorderFactory.createTitledBorder(label);
 			} else {
-				parent.add(buildWidget(cInfo.getWidgetInfo()));
+				widget = (JComponent)buildWidget(cInfo.getWidgetInfo());
 			}
 		}
+		logger.debug("Frame/widget={0}", widget);
+		logger.debug("Frame/border={0}", border);
+		if (widget != null) {
+			if (border != null) {
+				widget.setBorder(border);
+			}
+			parent.add(widget);
+		}
+		logger.leave("buildFrameChildren");
 	}
 
 	void buildNotebookChildren(Container parent, WidgetInfo info) {
