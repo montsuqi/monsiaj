@@ -187,7 +187,7 @@ public class WidgetInfo {
 	protected void addProperty(Property property) {
 		properties.add(property);
 	}
-	protected void addSignalInfo(SignalInfo signalInfo) {
+	public void addSignalInfo(SignalInfo signalInfo) {
 		signals.add(signalInfo);
 	}
 	protected void addAccelInfo(AccelInfo accelInfo) {
