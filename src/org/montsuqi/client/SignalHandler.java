@@ -140,7 +140,6 @@ public abstract class SignalHandler {
 						String t = text.getText();
 						int length = t.length();
 						if (length > 0) {
-							System.out.println(t);
 							char c = t.charAt(length - 1);
 							if (isKatakana(c) || isSymbol(c)) {
 								try {
