@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Iterator;
 
+import javax.swing.JScrollPane;
 import javax.swing.RootPaneContainer;
 
 import org.montsuqi.monsia.ChildInfo;
@@ -45,5 +46,11 @@ class ContainerBuilder extends WidgetBuilder {
 			Component child = WidgetBuilder.buildWidget(xml, wInfo);
 			parent.add(child);
 		}
+	}
+
+	protected Component underlayScrollPane(Component child) {
+		JScrollPane scroll = new JScrollPane(child);
+		scroll.setSize(child.getSize());
+		return scroll;
 	}
 }

@@ -27,6 +27,8 @@ import java.awt.Container;
 import java.awt.Insets;
 import java.awt.Rectangle;
 
+import javax.swing.JTable;
+
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Property;
@@ -54,6 +56,9 @@ class FixedBuilder extends ContainerBuilder {
 				} else {
 					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_for_Layout"), name); //$NON-NLS-1$
 				}
+			}
+			if (child instanceof JTable) {
+				child = underlayScrollPane(child);
 			}
 			parent.add(child);
 			child.setLocation(x, y);
