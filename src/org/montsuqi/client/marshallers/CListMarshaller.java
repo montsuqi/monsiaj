@@ -50,13 +50,15 @@ class CListMarshaller extends WidgetMarshaller {
 			labels[i] = (String)columnModel.getColumn(i).getHeaderValue();
 		}
 
+		StringBuffer widgetName = con.getWidgetNameBuffer();
+		StringBuffer label = new StringBuffer(widgetName.toString());
+		int offset = label.length();
+
 		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
 			String name = con.receiveString();
-			StringBuffer widgetName = con.getWidgetNameBuffer();
-			int offset = widgetName.length();
-			widgetName.replace(offset, widgetName.length(), '.' + name);
+			label.replace(offset, label.length(), '.' + name);
 			Component sub;
-			if ((sub = con.getInterface().getWidgetByLongName(widgetName.toString())) != null) {
+			if ((sub = con.getInterface().getWidgetByLongName(label.toString())) != null) {
 				JLabel dummyLabel = (JLabel)sub;
 				WidgetMarshaller labelMarshaller = new LabelMarshaller();
 				labelMarshaller.receive(manager, dummyLabel);
