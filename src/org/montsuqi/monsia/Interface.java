@@ -52,11 +52,8 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
-import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -238,6 +235,9 @@ public class Interface {
 		Class[] argTypes = new Class[] { Component.class, Method.class, Object.class };
 		Method method = Interface.class.getDeclaredMethod(connectMethodName(signalName), argTypes);
 		method.setAccessible(true);
+		if (target instanceof JComboBox) {
+			target = getComboEditor((JComboBox)target);
+		}
 		method.invoke(this, new Object[] { target, handler, other });
 	}
 
