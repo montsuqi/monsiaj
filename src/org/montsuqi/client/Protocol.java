@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URL;
@@ -68,7 +69,7 @@ public class Protocol extends Connection {
 	private boolean protocol2;
 
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
-	
+
 	Protocol(Client client, Socket s) throws IOException {
 		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
@@ -115,6 +116,11 @@ public class Protocol extends Connection {
 		//NOENCODE.set('a', 'z', true);
 		//NOENCODE.set('A', 'Z', true);
 		//NOENCODE.set('0', '9', true);
+	}
+
+	private static final Map handlerCache;
+	static {
+		handlerCache = new HashMap();
 	}
 
 	private boolean receiveFile(String name, String fName) throws IOException {
@@ -682,6 +688,17 @@ public class Protocol extends Connection {
 
 	public StringBuffer getWidgetNameBuffer() {
 		return widgetName;
+	}
+
+	public static Method getHandler(String handlerName) throws SecurityException, NoSuchMethodException {
+		if (handlerCache.containsKey(handlerName)) {
+			return (Method)handlerCache.get(handlerName);
+		} else {
+			Class[] argTypes = { Component.class, Object.class };
+			Method handler = Protocol.class.getMethod(handlerName, argTypes);
+			handlerCache.put(handlerName, handler);
+			return handler;
+		}
 	}
 }
 

@@ -184,7 +184,6 @@ public class Interface {
 	}
 
 	private void signalAutoConnect() {
-		Class[] argTypes = { Component.class, Object.class };
 		Iterator entries = signals.entrySet().iterator();
 		while (entries.hasNext()) {
 			Map.Entry entry = (Map.Entry)entries.next();
@@ -192,7 +191,7 @@ public class Interface {
 			handlerName = handlerName.toLowerCase();
 			Iterator i = ((List)entry.getValue()).iterator();
 			try {
-				Method handler = Protocol.class.getMethod(handlerName, argTypes);
+				Method handler = Protocol.getHandler(handlerName);
 				while (i.hasNext()) {
 					SignalData data = (SignalData)i.next();
 					Component target = (Component)data.getSignalObject();
