@@ -32,6 +32,8 @@ import org.montsuqi.widgets.TableLayout;
 
 class WidgetOperation {
 
+	static Logger logger = Logger.getLogger(WidgetOperation.class);
+
 	static Method findMethod(String name) {
 		try {
 			Class[] argTypes = new Class[] { Interface.class,
@@ -131,10 +133,16 @@ class WidgetOperation {
 	}
 
 	static void setCListColumnWidth(Interface xml, Container widget, String name, String value) {
-		TableColumnModel model = ((JTable)widget).getColumnModel();
-		
-		StringTokenizer tokens = new StringTokenizer(value, ","); //$NON-NLS-1$
+		JTable table = (JTable)widget;
+		TableColumnModel model = table.getColumnModel();
+
+		StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
+		int columns = tokens.countTokens();
 		int col = 0;
+		while (model.getColumnCount() < columns) {
+			model.addColumn(new TableColumn());
+		}
+		
 		while (tokens.hasMoreTokens()) {
 			int width = ParameterConverter.toInteger(tokens.nextToken());
 			TableColumn column = model.getColumn(col);
@@ -143,20 +151,25 @@ class WidgetOperation {
 		}
 	}
 
-	void setCListSelectionMode(Interface xml, Container widget, String name, String value) {
+	static void setCListSelectionMode(Interface xml, Container widget, String name, String value) {
+		logger.enter("setCListSelectionMode");
+		logger.debug("widget={0}", widget);
+		logger.debug("name={0}, value={1}", new Object[]{name, value});
 		JTable table = (JTable)widget;
-		ListSelectionModel model = table.getSelectionModel();
+		value = normalizeSelectionMode(value);
+		logger.debug("***name={0}, value={1}", new Object[]{name, value});
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
-			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCListSelectionMode_EXTENDED_is_not_supported")); //$NON-NLS-1$
+			logger.info(Messages.getString("WidgetOperation.setCListSelectionMode_EXTENDED_is_not_supported")); //$NON-NLS-1$
 		} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
-			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCListSelectionMode_BROWSE_is_not_supported")); //$NON-NLS-1$
+			logger.info(Messages.getString("WidgetOperation.setCListSelectionMode_BROWSE_is_not_supported")); //$NON-NLS-1$
 		} else {
 			throw new IllegalArgumentException(value);
 		}
+		logger.leave("setCListSelectionMode");
 	}
 
 	static void setCListShadowType(Interface xml, Container widget, String name, String value) {
@@ -172,6 +185,7 @@ class WidgetOperation {
 	static void setTreeSelectionMode(Interface xml, Container widget, String name, String value) {
 		JTree tree = (JTree)widget;
 		TreeSelectionModel model = tree.getSelectionModel();
+		value = normalizeSelectionMode(value);
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			model.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -196,6 +210,7 @@ class WidgetOperation {
 	static void setListSelectionMode(Interface xml, Container widget, String name, String value) {
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
+		value = normalizeSelectionMode(value);
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -207,6 +222,16 @@ class WidgetOperation {
 		} else {
 			throw new IllegalArgumentException(value);
 		}
+	}
+
+	private static String normalizeSelectionMode(String mode) {
+		if (mode.startsWith("GTK_")) {
+			mode = mode.substring("GTK_".length());
+		}
+		if (mode.startsWith("SELECTION_")) {
+			mode = mode.substring("SELECTION_".length());
+		}
+		return mode;
 	}
 
 	static void setCheckMenuItemAlwaysShowToggle(Interface xml, Container widget, String name, String value) {
