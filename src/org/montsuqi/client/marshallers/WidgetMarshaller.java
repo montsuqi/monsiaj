@@ -40,6 +40,7 @@ import javax.swing.JTextField;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.FileEntry;
 import org.montsuqi.widgets.Frame;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.OptionMenu;
@@ -67,6 +68,7 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(PandaPreviewPane.class, new PreviewMarshaller());
 		registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
 		registerMarshaller(Frame.class, new FrameMarshaller());
+		registerMarshaller(FileEntry.class, new FileEntryMarshaller());
 	}
 
 	public abstract void receive(WidgetValueManager manager, Component widget) throws IOException;
