@@ -60,6 +60,9 @@ class MenuBarBuilder extends ContainerBuilder {
 				WidgetPropertySetter setter = WidgetPropertySetter.getSetter(JMenu.class, "stock_item"); //$NON-NLS-1$
 				setter.set(xml, menuBar, menu, (String)properties.get("stock_item")); //$NON-NLS-1$
 			}
+			if (properties.containsKey("label")) { //$NON-NLS-1$
+				menu.setText((String)properties.get("label")); //$NON-NLS-1$
+			}
 			menuBar.add(menu);
 		}
 	}
