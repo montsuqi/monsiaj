@@ -96,6 +96,7 @@ public class Interface {
 		this.fileName = fileName;
 		this.infos = infos;
 		widgets = new HashMap();
+		longNames = new HashMap();
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
@@ -425,5 +426,21 @@ public class Interface {
 			Container widget = builder.buildWidget(info);
 			widgets.put(info.getName(), widget);
 		}
+	}
+
+	public String getLongName(Container widget) {
+		Iterator i = longNames.entrySet().iterator();
+		while (i.hasNext()) {
+			Map.Entry e = (Map.Entry)i.next();
+			if (widget == e.getValue()) {
+				return (String)e.getKey();
+			}
+		}
+		return null;
+	}
+
+	public void setLongName(String longName, Container widget) {
+		logger.debug("longName: {0}", longName);
+		longNames.put(longName, widget);
 	}
 }

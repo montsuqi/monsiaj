@@ -930,6 +930,7 @@ public class WidgetBuilder {
 		setProperties(child, wInfo);
 		setCommonParams(child, wInfo);
 	}
+
 	protected void setProperties(Container widget, WidgetInfo info) {
 		for (int i = 0, pCount = info.getPropertiesCount(); i < pCount; i++) {
 			try {
@@ -1005,6 +1006,7 @@ public class WidgetBuilder {
 		if (data.hasBuildChildrenMethod() && info.getChildrenCount() > 0) {
 			data.buildChildren(this, widget, info);
 		}
+		xml.setLongName(info.getLongName(), widget);
 	}
 
 	private void addSignals(Container widget, WidgetInfo info) {

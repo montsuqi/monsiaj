@@ -28,6 +28,13 @@ class WidgetInfo {
 		this.parent = parent;
 	}
 
+	public String getLongName() {
+		if (parent == null) {
+			return getName();
+		} else {
+			return getParent().getLongName() + '.' + getName();
+		}
+	}
 	public String getClassName() {
 		return className;
 	}
