@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.21 2004-06-14 06:47:49 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.22 2004-06-25 04:53:07 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -131,9 +131,10 @@
 
   <target name="buildclean"
           description="Cleans all built files.">
-    <delete verbose="${clean.verbose}" quiet="true">
+    <delete verbose="${clean.verbose}" quiet="true" includeEmptyDirs="true">
       <fileset dir="${build.dir}"/>
     </delete>
+    <delete dir="${tmp.dir}" verbose="${clean.verbose}" quiet="true"/>
   </target>
 
   <target name="clean"
@@ -145,8 +146,6 @@
 
   <target name="veryclean" depends="clean,buildclean"
     description="Cleans all generated files.">
-    <delete dir="${build.dir}" verbose="${clean.verbose}" quiet="true"/>
-    <delete dir="${tmp.dir}" verbose="${clean.verbose}" quiet="true"/>
     <delete dir="${dist.dir}" verbose="${clean.verbose}" quiet="true"/>
     <delete dir="${report.dir}" verbose="${clean.verbose}" quiet="true"/>
   </target>
