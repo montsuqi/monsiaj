@@ -45,15 +45,15 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 class ConfigurationDialog extends JDialog {
-	private Configuration conf;
-	private boolean needRun;
+	Configuration conf;
+	boolean needRun;
 
-	private JTextField appEntry;
-	private JTextField hostEntry;
-	private JPasswordField passwordEntry;
-	private JTextField portEntry;
-	private JTextField styleEntry;
-	private JTextField userEntry;
+	JTextField appEntry;
+	JTextField hostEntry;
+	JPasswordField passwordEntry;
+	JTextField portEntry;
+	JTextField styleEntry;
+	JTextField userEntry;
 
 	ConfigurationDialog(Configuration conf) {
 		this.conf = conf;
@@ -79,7 +79,7 @@ class ConfigurationDialog extends JDialog {
 		setTitle(Messages.getString("ConfigurationDialog.JMA_Standard_Receipt")); //$NON-NLS-1$
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
-				closeDialog(evt);
+				closeDialog();
 			}
 		});
 
@@ -279,7 +279,7 @@ class ConfigurationDialog extends JDialog {
 				conf.setPort(Integer.parseInt(portEntry.getText()));
 				conf.setApplication(appEntry.getText());
 				conf.setStyleFile(styleEntry.getText());
-				closeDialog(null);
+				closeDialog();
 			}
 		});
 		gridBagConstraints = new GridBagConstraints();
@@ -291,7 +291,7 @@ class ConfigurationDialog extends JDialog {
 		setSize(320,240);
 	}
 
-	void closeDialog(WindowEvent evt) {
+	void closeDialog() {
 		setVisible(false);
 		dispose();
 	}
