@@ -229,10 +229,18 @@ public class Protocol extends Connection {
 	}
 
 	private void receiveValueSkip() throws IOException {
-		int type = getLastDataType();
-		if (type == Type.NULL) {
+		int type = Type.NULL;
+		if (protocol1) {
 			receiveDataType();
 			type = getLastDataType();
+		} else if (protocol2) {
+			type = getLastDataType();
+			if (type == Type.NULL) {
+				receiveDataType();
+				type = getLastDataType();
+			}
+		} else {
+			assert false;
 		}
 		switch (type) {
 		case Type.INT:
