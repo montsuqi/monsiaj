@@ -1,13 +1,13 @@
 package org.montsuqi.monsia;
 
+import java.util.LinkedList;
+import org.montsuqi.util.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 public class Glade1Handler extends AbstractDocumentHandler {
 
-	private String widgetClass;
-	private String widgetName;
-
+	private LinkedList pendingWidgets;
 	private String signalName;
 	private String signalHandler;
 	private String signalObject;
@@ -16,6 +16,56 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	private int accelKey;
 	private int accelModifiers;
 	private String accelSignal;
+
+	private WidgetInfo getLastPendingWidget() {
+		return (WidgetInfo)pendingWidgets.getLast();
+	}
+
+	private void initializeWidgetInfo() {
+		WidgetInfo w = new WidgetInfo();
+		WidgetInfo parent = null;
+		if (pendingWidgets.size() > 0) {
+			parent = getLastPendingWidget();
+			final ChildInfo childInfo = new ChildInfo();
+			childInfo.setWidgetInfo(w);
+			parent.addChild(childInfo);
+		}
+		w.setParent(parent);
+		pendingWidgets.add(w);
+	}
+
+	private void flushWidgetInfo() {
+		WidgetInfo w = getLastPendingWidget();
+		pendingWidgets.removeLast();
+		widgets.put(w.getName(), w);
+		if (pendingWidgets.size() == 0) {
+			topLevels.add(w);
+			state = GTK_INTERFACE;
+		} else {
+			WidgetInfo parent = getLastPendingWidget();
+			ChildInfo childInfo = parent.getLastChild();
+			// x, y property should go to childinfo
+			for (int i = 0, c = w.getPropertiesCount(); i < c; i++) {
+				Property p = w.getProperty(i);
+				String name = p.getName();
+				if ("x".equals(name) || "y".equals(name)) {
+					childInfo.addProperty(p);
+				}
+			}
+		}
+
+		propertyName = null;
+		properties.clear();
+		signals.clear();
+		accels.clear();
+	}
+
+	public Glade1Handler() {
+		super();
+		startState = START;
+		logger = Logger.getLogger(Glade1Handler.class);
+		pendingWidgets = new LinkedList();
+	}
 
 	public void startDocument() throws SAXException {
 		super.startDocument();
@@ -54,7 +104,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("widget")) {
 				state = WIDGET;
-				widgetDepth++;
+				initializeWidgetInfo();
 			} else if (localName.equals("style")) {
 				state = STYLE;
 				// ignore style stuff in Java
@@ -83,9 +133,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 				/* the child section */
 				state = WIDGET_CHILD;
 			} else if (localName.equals("widget")) {
-				ChildInfo info = new ChildInfo();
-				widget.addChild(info);
-				widgetDepth++;
+				initializeWidgetInfo();
 			} else {
 				propertyType = PropertyType.WIDGET;
 				propertyName = localName;
@@ -95,22 +143,8 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			widget = new WidgetInfo(widgetClass, widgetName);
-			widgets.put(widgetName, widget);
-			flushProperties();
-			flushSignals();
-			flushAccels();
-
-			propertyName = null;
-			properties.clear();
-			signals.clear();
-			accels.clear();
-
-			/* close the widget tag */
-			widget = widget.getParent();
-			widgetDepth--;
-			if (widget == null) {
-				state = GTK_INTERFACE;
+			if (localName.equals("widget")) {
+				flushWidgetInfo();
 			}
 		}
 	};
@@ -123,27 +157,31 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			String value = content.toString();
+			WidgetInfo w = getLastPendingWidget();
 			if (localName.equals("class")) {
-				widgetClass = value;
+				if (value.startsWith("Gtk")) {
+					value = value.substring("Gtk".length());
+				}
+				w.setClassName(value);
 			} else if (localName.equals("name")) {
-				widgetName = value;
+				w.setName(value);
 			} else if (localName.equals("visible")) {
-				properties.add(new Property("visible", content.charAt(0) == 'T' ? "true" : "false"));
+				w.addProperty(new Property("visible", content.charAt(0) == 'T' ? "true" : "false"));
 			} else if (localName.equals("sensitive")) {
-				properties.add(new Property("sensitive", content.charAt(0) == 'T' ? "true" : "false"));
+				w.addProperty(new Property("sensitive", content.charAt(0) == 'T' ? "true" : "false"));
 			} else if (localName.equals("can_default")) {
-				properties.add(new Property("can_default", content.charAt(0) == 'T' ? "true" : "false"));
+				w.addProperty(new Property("can_default", content.charAt(0) == 'T' ? "true" : "false"));
 			} else if (localName.equals("can_focus")) {
-				properties.add(new Property("can_focus", content.charAt(0) == 'T' ? "true" : "false"));
+				w.addProperty(new Property("can_focus", content.charAt(0) == 'T' ? "true" : "false"));
 			} else if (localName.equals("has_default")) {
-				properties.add(new Property("has_default", content.charAt(0) == 'T' ? "true" : "false"));
+				w.addProperty(new Property("has_default", content.charAt(0) == 'T' ? "true" : "false"));
 			} else if (localName.equals("has_focus")) {
-				properties.add(new Property("has_focus", content.charAt(0) == 'T' ? "true" : "false"));
+				w.addProperty(new Property("has_focus", content.charAt(0) == 'T' ? "true" : "false"));
 			} else if (localName.equals("style_name")) {
 				/* ignore */
 			} else {
 				/* some other attribute */
-				properties.add(new Property(propertyName, value));
+				w.addProperty(new Property(propertyName, value));
 			}
 		}
 	};
@@ -157,7 +195,11 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			flushProperties();
+			WidgetInfo w = getLastPendingWidget();
+			WidgetInfo parent = w.getParent();
+			ChildInfo childInfo = parent.getLastChild();
+			childInfo.setProperties(properties);
+			properties.clear();
 			state = WIDGET;
 		}
 	};
@@ -183,7 +225,8 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			SignalInfo signal = new SignalInfo(signalName, signalHandler, signalObject, signalAfter);
-			signals.add(signal);
+			WidgetInfo w = getLastPendingWidget();
+			w.addSignalInfo(signal);
 		}
 	};
 
@@ -218,7 +261,8 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			AccelInfo accel = new AccelInfo(accelKey, accelModifiers, accelSignal);
-			accels.add(accel);
+			WidgetInfo w = getLastPendingWidget();
+			w.addAccelInfo(accel);
 		}
 	};
 
