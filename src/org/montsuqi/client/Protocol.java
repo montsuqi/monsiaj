@@ -713,7 +713,7 @@ public class Protocol extends Connection {
 					checked = checkWindow(wName, (Node)node);
 				}
 				if ( ! checked) {
-					System.exit(0);
+					client.exitSystem();
 				}
 			}
 		}
@@ -721,7 +721,7 @@ public class Protocol extends Connection {
 
 	public void window_destroy(Container widget, Object userData) {
 		inReceive = true;
-		System.exit(0);
+		client.exitSystem();
 	}
 
 	public void open_browser(Container widget, Object userData) {
