@@ -46,12 +46,14 @@ class Connection {
 	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
 		this.socket = s;
 		this.encoding = encoding;
+		InputStream rawIn = new BufferedInputStream(socket.getInputStream());
+		OutputStream rawOut = new BufferedOutputStream(socket.getOutputStream());
 		if (networkByteOrder) {
-			in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-			out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+			in = new DataInputStream(rawIn);
+			out = new DataOutputStream(rawOut);
 		} else {
-			in = new LittleEndianDataInputStream(new BufferedInputStream(socket.getInputStream()));
-			out = new LittleEndianDataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+			in = new LittleEndianDataInputStream(rawIn);
+			out = new LittleEndianDataOutputStream(rawOut);
 		}
 	}
 
@@ -365,6 +367,32 @@ class Connection {
 		default:
 			return false;
 		}
+	}
+
+	public byte[] receiveBinaryData() throws IOException {
+		int type = receiveDataType();
+		switch (type) {
+		case Type.CHAR:
+		case Type.VARCHAR:
+		case Type.DBCODE:
+		case Type.TEXT:
+		case Type.BINARY:
+		case Type.BYTE:
+		case Type.OBJECT:
+			return receiveBinary();
+		default:
+			Object[] args = { Integer.toHexString(type) };
+			throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); //$NON-NLS-1$
+		}
+	}
+
+	private byte[] receiveBinary() throws IOException {
+		int size = receiveLength();
+		byte[] bin = new byte[size];
+		if (size > 0) {
+			in.readFully(bin);
+		}
+		return bin;
 	}
 
 	void close() throws IOException {

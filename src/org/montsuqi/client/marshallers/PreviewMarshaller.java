@@ -23,24 +23,35 @@ copies.
 package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.io.OutputStream;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.widgets.PandaPreviewPane;
 
 class PreviewMarshaller extends WidgetMarshaller {
 
+	private static final String TEMP_PREFIX = "pandapreview"; //$NON-NLS-1$
+	private static final String TEMP_SUFFIX = ".png"; //$NON-NLS-1$
+	
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		PandaPreviewPane preview = (PandaPreviewPane)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveName();
-			String buff = con.receiveStringData();
-			manager.registerValue(preview, name, null);
-			preview.load(buff);
+			/* String dummy = */ con.receiveName();
+			byte[] bin = con.receiveBinaryData();
+			File temp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
+			temp.deleteOnExit();
+			OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+			out.write(bin);
+			out.flush();
+			out.close();
+			preview.load(temp.getAbsolutePath());
 		}
 	}
 
