@@ -288,8 +288,6 @@ public class Protocol extends Connection {
 				int dot = dataName.indexOf('.');
 				if (dot >= 0) {
 					dataName = dataName.substring(dot + 1);
-				} else {
-					dataName = null;
 				}
 				Component widget = xml.getWidget(dataName);
 				if (widget != null) {
@@ -300,7 +298,6 @@ public class Protocol extends Connection {
 				}
 			}
 		}
-		
 		if ( ! done) {
 			needTrace = true;
 		}
