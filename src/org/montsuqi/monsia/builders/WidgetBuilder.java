@@ -117,7 +117,7 @@ public class WidgetBuilder {
 		registerWidgetClass("VBox",           VBox.class,          defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Window",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 	}
 
 	public static Component buildWidget(Interface xml, WidgetInfo info) {
