@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.widgets;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -51,7 +52,9 @@ public class UIStock {
 		if (iconFile != null) {
 			String iconPath = "/org/montsuqi/widgets/images/" + iconFile + ".png"; //$NON-NLS-1$ //$NON-NLS-2$
 			URL url = getClass().getResource(iconPath);
-			icon = new ImageIcon(url);
+			if (url != null) {
+				icon = new ImageIcon(url);
+			}
 		}
 	}
 
@@ -75,6 +78,7 @@ public class UIStock {
 	}
 
 	static {
+		stocks = new HashMap();
 		stocks.put("FILE_TREE",         new UIStock(Messages.getString("UIStock.File"), "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		stocks.put("NEW_ITEM",          new UIStock(Messages.getString("UIStock.New"), "", "new")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		stocks.put("NEW_TREE",          new UIStock(Messages.getString("UIStock.New..."), "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
