@@ -71,7 +71,7 @@
 	<target name="resources-copy-files" depends="prepare">
 		<copy todir="${build.dir}">
 			<fileset dir="${src.dir}" includes="**/*.properties,**/*.jpg,**/*.png"/>
-			<fileset dir="${resources.dir}" includes="style.properties"/>
+			<fileset dir="${resources.dir}" includes="*.properties"/>
 		</copy>
 	</target>
 	

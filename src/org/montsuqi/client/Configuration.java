@@ -45,7 +45,6 @@ public class Configuration {
 	private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
 	private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
 	private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
-	private static final String VERIFY_KEY = "verify"; //$NON-NLS-1$
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
 	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
@@ -178,14 +177,6 @@ public class Configuration {
 	}
 
 
-	public boolean getVerify() {
-		return getBoolean(VERIFY_KEY, DEFAULT_VERIFY);
-	}
-
-	public void setVerify(boolean flag) {
-		setBoolean(VERIFY_KEY, flag);
-	}
-
 	public int getProtocolVersion() {
 		return getInt(PROTOCOL_VERSION_KEY, DEFAULT_PROTOCOL_VERSION);
 	}
@@ -236,13 +227,4 @@ public class Configuration {
 	protected void setBoolean(String key, boolean value) {
 		prefs.putBoolean(key, value);
 	}
-
-	// logger class, debug mode
-	// html rendering
-
-	// if USE_SSL
-	//options.add("key", "key file name(pem)", null);
-	//options.add("cert", "certification file name(pem)", null);
-	//options.add("CApath", "path to CA", null);
-	//options.add("CAfile", "CA file", null);
 }

@@ -78,8 +78,6 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 				break;
 			}
 		}
-		conf.setUseSSL(false);
-		conf.setVerify(false);
 		conf.setUseLogViewer(useLogViewerCheck.isSelected());
 	}
 

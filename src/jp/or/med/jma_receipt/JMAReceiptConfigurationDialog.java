@@ -30,6 +30,7 @@ import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -52,6 +53,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 	private JTextField portEntry;
 	private JTextField styleEntry;
 	private JTextField userEntry;
+	private JCheckBox useSSLCheckbox;
 
 	protected void updateConfiguration() {
 		conf.setUser(userEntry.getText()); //$NON-NLS-1$
@@ -62,8 +64,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		conf.setEncoding("EUC-JP"); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setStyleFileName(styleEntry.getText()); //$NON-NLS-1$
 		conf.setProtocolVersion(1);
-		conf.setUseSSL(false);
-		conf.setVerify(false);
+		conf.setUseSSL(useSSLCheckbox.isSelected());
 	}
 
 	JMAReceiptConfigurationDialog(String title, Configuration conf) {
@@ -98,7 +99,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		hostEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.host"), conf.getHost()); //$NON-NLS-1$
 		portEntry = addIntRow(controls, y++, Messages.getString("DefaultConfigurationDialog.port"), conf.getPort()); //$NON-NLS-1$
 		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyleFileName()); //$NON-NLS-1$
-
+		useSSLCheckbox = addCheckRow(controls, y++, Messages.getString("DefaultConfigurationDialog.use_ssl"), conf.getUseSSL()); //$NON-NLS-1$
 		final JTextComponent entry = styleEntry; // to tunnel access control
 		addButtonFor(controls, styleEntry, Messages.getString("DefaultConfigurationDialog.browse"), new ActionListener() { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {

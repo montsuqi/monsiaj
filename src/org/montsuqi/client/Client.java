@@ -23,17 +23,17 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -43,6 +43,28 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 
 public class Client implements Runnable {
+
+	static {
+		StringBuffer trustStore = new StringBuffer();
+		trustStore.append(System.getProperty("user.home")); //$NON-NLS-1$
+		trustStore.append(File.separator);
+		trustStore.append(".jma-receipt"); //$NON-NLS-1$
+		trustStore.append(File.separator);
+		trustStore.append("keystore"); //$NON-NLS-1$
+		System.setProperty("javax.net.ssl.trustStore", trustStore.toString()); //$NON-NLS-1$
+
+		URL sslPropertiesURL = Client.class.getResource("/ssl.properties"); //$NON-NLS-1$
+		Properties sslProperties = new Properties();
+		try {
+			InputStream input = sslPropertiesURL.openStream();
+			sslProperties.load(input);
+			input.close();
+		} catch (IOException e) {
+			throw new ExceptionInInitializerError(e);
+		}
+		String keyStorePassword = sslProperties.getProperty("keyStorePassword"); //$NON-NLS-1$
+		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword); //$NON-NLS-1$
+	}
 
 	private Configuration conf;
 	private Protocol protocol;
@@ -67,7 +89,6 @@ public class Client implements Runnable {
 		options.add("v1", Messages.getString("Client.use_protocol_version_1"), protocolVersion == 1); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("v2", Messages.getString("Client.use_protocol_version_2"), protocolVersion == 2); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("useSSL", "SSL", Configuration.DEFAULT_USE_SSL); //$NON-NLS-1$ //$NON-NLS-2$
-		options.add("verifypeer", Messages.getString("Client.verify_peer"), Configuration.DEFAULT_VERIFY); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String[] files = options.parse(Client.class.getName(), args);
 		
@@ -82,27 +103,18 @@ public class Client implements Runnable {
 
 		boolean v1 = options.getBoolean("v1"); //$NON-NLS-1$
 		boolean v2 = options.getBoolean("v2"); //$NON-NLS-1$
-		if (v1 ^ v2) {
-			if (v1) {
-				conf.setProtocolVersion(1);
-			} else if (v2) {
-				conf.setProtocolVersion(2);
-			} else {
-				assert false : "-v1 or -v2 should have been given."; //$NON-NLS-1$
-			}
-		} else {
+		if ( ! (v1 ^ v2)) {
 			throw new IllegalArgumentException("specify -v1 or -v2, not both."); //$NON-NLS-1$
+		}
+		if (v1) {
+			conf.setProtocolVersion(1);
+		} else if (v2) {
+			conf.setProtocolVersion(2);
+		} else {
+			assert false : "-v1 or -v2 should have been given."; //$NON-NLS-1$
 		}
 
 		conf.setUseSSL(options.getBoolean("useSSL")); //$NON-NLS-1$
-		if (conf.getUseSSL()) {
-			//key = options.getString("key");
-			//cert = options.getString("cert");
-			//useSSL = options.getBoolean("ssl");
-			conf.setVerify(options.getBoolean("verifypeer")); //$NON-NLS-1$
-			//CApath = options.getString("CApath");
-			//CAfile = options.getString("CAfile");
-		}
 
 		if (files.length > 0) {
 			conf.setApplication(files[0]);
@@ -114,27 +126,27 @@ public class Client implements Runnable {
 	}
 
 	void connect() throws IOException {
+		protocol = new Protocol(this, conf.getEncoding(), loadStyles(), createCacheRootPath(), conf.getProtocolVersion());
+		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
+	}
+
+	private String createCacheRootPath() {
 		StringBuffer cacheRoot = new StringBuffer();
 		cacheRoot.append(conf.getCache());
 		cacheRoot.append(File.separator);
 		cacheRoot.append(conf.getHost());
 		cacheRoot.append(File.separator);
 		cacheRoot.append(conf.getPort());
-
-		protocol = new Protocol(this, conf.getEncoding(), loadStyles(conf.getStyleURL()), cacheRoot.toString(), conf.getProtocolVersion());
-		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
+		return cacheRoot.toString();
 	}
 
-	private Map loadStyles(URL url) throws IOException {
+	private Map loadStyles() {
+		URL url = conf.getStyleURL();
 		try {
 			logger.debug("loading styles from URL: {0}", url); //$NON-NLS-1$
 			InputStream in = url.openStream();
 			return Style.load(in);
-		} catch (MalformedURLException e) {
-			logger.debug(e);
-			logger.debug("using empty style set"); //$NON-NLS-1$
-			return Collections.EMPTY_MAP;
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			logger.debug(e);
 			logger.debug("using empty style set"); //$NON-NLS-1$
 			return Collections.EMPTY_MAP;
@@ -142,9 +154,9 @@ public class Client implements Runnable {
 	}
 
 	Socket createSocket() throws IOException {
-		int port = conf.getPort();
 		String host = conf.getHost();
-		InetSocketAddress address = new InetSocketAddress(host, port);
+		int port = conf.getPort();
+		SocketAddress address = new InetSocketAddress(host, port);
 		SocketChannel socketChannel = SocketChannel.open();
 		socketChannel.connect(address);
 		Socket socket = socketChannel.socket();
@@ -153,8 +165,7 @@ public class Client implements Runnable {
 		}
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		SSLSocket ssl = (SSLSocket)factory.createSocket(socket, host, port, true);
-		// key, cert, capath, cafile
-		ssl.setNeedClientAuth(conf.getVerify());
+		ssl.setWantClientAuth(true);
 		return ssl;
 	}
 
@@ -186,8 +197,8 @@ public class Client implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Object[] bannerArgs = { CLIENT_VERSION };
-		System.out.println(MessageFormat.format(Messages.getString("Client.banner_format"), bannerArgs)); //$NON-NLS-1$
+		Object[] params = { CLIENT_VERSION };
+		System.out.println(MessageFormat.format(Messages.getString("Client.banner_format"), params)); //$NON-NLS-1$
 
 		Client client = Client.parseCommandLine(args);
 		try {
