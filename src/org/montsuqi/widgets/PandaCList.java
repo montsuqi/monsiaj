@@ -149,4 +149,15 @@ public class PandaCList extends JTable {
 			column.setWidth(headerWidth);
 		}
 	}
+
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		TableCellRenderer headerRenderer = columnModel.getColumn(column).getHeaderRenderer();
+		if (headerRenderer != null) {
+			Component c = headerRenderer.getTableCellRendererComponent(this, getValueAt(row, column), false, false, row, column);
+			if (c instanceof Fixed) {
+				return new CListFixedCellRenderer((Fixed)c);
+			}
+		}
+		return super.getCellRenderer(row, column);
+	}
 }
