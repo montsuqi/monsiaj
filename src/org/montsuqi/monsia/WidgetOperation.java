@@ -1,6 +1,7 @@
 package org.montsuqi.monsia;
 
 import java.awt.Container;
+import java.awt.Frame;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 import javax.swing.AbstractButton;
@@ -48,6 +49,10 @@ public class WidgetOperation {
 	public static void setVisible(Interface xml, Container widget, String name, String value) {
 		boolean v = ParameterConverter.toBoolean(value);
 		widget.setVisible(v);
+	}
+
+	public static void setWindowTitle(Interface xml, Container widget, String name, String value) {
+		((Frame)widget).setTitle(value);
 	}
 
 	public static void setJustify(Interface xml, Container widget, String name, String value) {

@@ -103,6 +103,7 @@ public class WidgetBuilder {
 
 	private void initPropertyMap() {
 		propertyMap = new HashMap();
+		registerProperty(java.awt.Frame.class, "title", "setWindowTitle"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(java.awt.Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -759,7 +760,6 @@ public class WidgetBuilder {
 				Property p = wInfo.getProperty(j);
 				String name = p.getName();
 				String value = p.getValue();
-
 				if ("x".equals(name)) { //$NON-NLS-1$
 					x = ParameterConverter.toInteger(value);
 				} else if ("y".equals(value)) { //$NON-NLS-1$
