@@ -27,12 +27,12 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.border.Border;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
@@ -100,13 +100,15 @@ public class PandaCombo extends JComboBox {
 
 class PandaComboBoxEditor extends BasicComboBoxEditor {
 
-	public PandaComboBoxEditor(final PandaCombo combo) {
+	JComboBox combo;
+
+	public PandaComboBoxEditor(final JComboBox combo) {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
-		editor.setBorder(null);
+		this.combo = combo;
 		editor.putClientProperty("panda combo editor", Boolean.TRUE); //$NON-NLS-1$
 	}
 
-	static class BorderlessPandaEntry extends PandaEntry {
+	class BorderlessPandaEntry extends PandaEntry {
 		public BorderlessPandaEntry(String value, int n) {
 			super(value, n);
 			InputMap inputMap = getInputMap();
@@ -114,16 +116,38 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
 		}
 
+		protected void processKeyEvent(KeyEvent e) {
+			if (e.getID() == KeyEvent.KEY_TYPED) {
+				if (selectWithKey(e.getKeyChar())) {
+					return;
+				}
+			} else {
+				int code = e.getKeyCode();
+				if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN) {
+					super.processKeyEvent(e);
+				}
+			}
+		}
+
+		private boolean selectWithKey(char c) {
+			ComboBoxModel model = combo.getModel();
+			String s = String.valueOf(c);
+			for (int i = 0, n = model.getSize(); i < n; i++) {
+				Object o = model.getElementAt(i);
+				if (o.toString().startsWith(s)) {
+					combo.setSelectedIndex(i);
+					setText(o.toString());
+					return true;
+				}
+			}
+			return false;
+		}
 		// workaround for 4530952
 		public void setText(String s) {
 			if (getText().equals(s)) {
 				return;
 			}
 			super.setText(s);
-		}
-
-		public void setBorder(Border b) {
-			//
 		}
 	}
 }
