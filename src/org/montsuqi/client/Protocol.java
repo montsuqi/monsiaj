@@ -3,7 +3,6 @@ package org.montsuqi.client;
 import java.awt.Container;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,9 +162,10 @@ public class Protocol extends Connection {
 				try {
 					InputStream input = new FileInputStream(fName);
 					Interface xml = Interface.parseInput(input, this);
+					input.close();
 					node = new Node(xml, wName);
 					windowTable.put(node.getName(), node);
-				} catch (FileNotFoundException e) {
+				} catch (IOException e) {
 					logger.warn(e);
 				}
 			}
@@ -209,6 +209,7 @@ public class Protocol extends Connection {
 
 			File file = new File(fName);
 			File parent = file.getParentFile();
+			logger.debug("createNewFile:{0}", parent.getAbsolutePath());
 			parent.mkdirs();
 			file.createNewFile();
 			if (file.lastModified() < mtime * 1000 ||
@@ -429,7 +430,7 @@ public class Protocol extends Connection {
 		sendString(user);
 		sendString(pass);
 		sendString(apl);
-
+		logger.debug("user={0}, apl={1}", new Object[] {user, apl});
 		pc = receivePacketClass();
 		if (pc == PacketClass.OK) {
 			return true;
@@ -576,7 +577,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void chagned(Container widget, Object userData) {
+	public void changed(Container widget, Object userData) {
 		addChangedWidget(widget, null);
 	}
 
