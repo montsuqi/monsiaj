@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -108,6 +109,9 @@ public class Calendar extends JComponent {
 		final JSpinner spinner = new JSpinner(model);
 		JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, format);
 		spinner.setEditor(editor);
+
+		JTextField textField = editor.getTextField();
+		textField.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		spinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
