@@ -2,8 +2,11 @@ package org.montsuqi.client;
 
 import java.awt.Container;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.BitSet;
@@ -148,7 +151,6 @@ public class Protocol extends Connection {
 	}
 
 	private Node showWindow(String wName, int type) {
-		String fName = client.getCacheFileName(wName);
 		Node node = null;
 		if (windowTable.containsKey(wName)) {
 			node = (Node)windowTable.get(wName);
@@ -157,9 +159,15 @@ public class Protocol extends Connection {
 			switch (type) {
 			case ScreenType.NEW_WINDOW:
 			case ScreenType.CURRENT_WINDOW:
-				Interface xml = Interface.parseFile(fName, this);
-				node = new Node(xml, wName);
-				windowTable.put(node.getName(), node);
+				String fName = client.getCacheFileName(wName);
+				try {
+					InputStream input = new FileInputStream(fName);
+					Interface xml = Interface.parseInput(input, this);
+					node = new Node(xml, wName);
+					windowTable.put(node.getName(), node);
+				} catch (FileNotFoundException e) {
+					logger.warn(e);
+				}
 			}
 		}
 
