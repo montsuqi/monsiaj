@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.client;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -120,8 +122,17 @@ public abstract class SignalHandler {
 						con.addChangedWidget(widget);
 					}
 				}
-				java.awt.Window window = SwingUtilities.windowForComponent(widget);
+				Window window = null;
+				if (widget instanceof JMenuItem) {
+					JComponent c = (JComponent)widget;
+					window = (Window)c.getClientProperty("window"); //$NON-NLS-1$
+				} else {
+					window = SwingUtilities.windowForComponent(widget);
+				}
+				assert window != null;
 				con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
+				Object[] params = { window.getName(), widget.getName(), userData };
+				logger.info("sendEvent: window={0}, widget={1}, data={2}", params); //$NON-NLS-1$
 				con.sendWindowData();
 				synchronized (this) {
 					blockChangedHandlers();

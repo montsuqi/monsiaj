@@ -451,7 +451,14 @@ abstract class Connector {
 
 		registerConnector("selection_get", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
-				// do nothing
+				if (target instanceof JMenuItem) {
+					JMenuItem item = (JMenuItem)target;
+					item.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent event) {
+							invoke(con, handler, target, other);
+						}
+					});
+				}
 			}
 		});
 	}
