@@ -38,6 +38,11 @@
     Glade version 1形式の定義ファイルを使用。
   : org.montsuqi.monsia.MonsiaHandler
     Monsia形式の定義ファイルを使用。
+  決定手順は以下のとおり。
+  (1) monsia.document.handlerの値
+  (2) monsia.document.handlerが未定義なら、定義ファイルの冒頭40バイト程度を先読みして、GTK-Interfaceという字句を探す。
+  (3) GTK-Interfaceの字句がなければ新形式。
+  (4) ここまでで決定できなければ旧形式。
 : swing.defaultlaf
   ルック&フィールを指定。
   : com.sun.java.swing.plaf.windows.WindowsLookAndFeel
