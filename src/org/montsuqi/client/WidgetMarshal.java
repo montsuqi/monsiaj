@@ -40,18 +40,15 @@ public class WidgetMarshal {
 	static Map valueTable;
 
 	void registerValue(Container widget, String valueName, Object opt) {
-		StringBuffer widgetName = con.getWidgetNameBuffer();
 		String longName = con.getInterface().getLongName(widget);
 		ValueAttribute va = (ValueAttribute)(valueTable.get(longName));
 		if (va == null) {
 			va = new ValueAttribute();
-			va.name = longName;
-			va.suffix = valueName;
-			va.valueName = widgetName.toString();
-			valueTable.put(va.name, va);
-		} else {
-			va.suffix = valueName;
+			va.key = longName;
+			va.valueName = con.getWidgetNameBuffer().toString();
+			valueTable.put(va.key, va);
 		}
+		va.nameSuffix = valueName;
 		va.type = con.getLastDataType();
 		va.opt = opt;
 	}
@@ -112,7 +109,7 @@ public class WidgetMarshal {
 		String p = ((JTextField)widget).getText();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute v = getValue(name);
-		con.sendString(name + '.' + v.valueName); //$NON-NLS-1$
+		con.sendString(v.valueName + '.' + v.nameSuffix); //$NON-NLS-1$
 		con.sendStringData(v.type, p);
 		return true;
 	}
@@ -129,7 +126,7 @@ public class WidgetMarshal {
 					String buff = con.receiveStringData();
 					/* setStyle(widget,getStyle(buff)); */
 				} else {
-					String buff = con.getWidgetNameBuffer().toString() + "." + name; //$NON-NLS-1$
+					String buff = con.getWidgetNameBuffer().toString() + '.' + name;
 					ValueAttribute va = getValue(buff);
 					if (va != null) {
 						BigDecimal val = con.receiveFixedData();
@@ -147,7 +144,7 @@ public class WidgetMarshal {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
 		va.opt = value;
-		con.sendString(name + "." + va.name); //$NON-NLS-1$
+		con.sendString(name + '.' + va.key);
 		con.sendFixedData(va.type, value);
 		return true;
 	}
@@ -174,7 +171,7 @@ public class WidgetMarshal {
 		String p = ((JTextField)widget).getText();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
-		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
+		con.sendString(name + '.' + va.valueName);
 		con.sendStringData(va.type, p);
 		return true;
 	}
@@ -204,7 +201,7 @@ public class WidgetMarshal {
 	public boolean sendButton(String name, Container widget) throws IOException {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
-		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
+		con.sendString(name + '.' + va.valueName);
 		con.sendBooleanData(va.type, ((JButton)widget).isSelected());
 		return true;
 	}
@@ -280,7 +277,7 @@ public class WidgetMarshal {
 			} else {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
 				int offset = widgetName.length();
-				widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
+				widgetName.replace(offset, widgetName.length(), '.' + name);
 				Container sub =  con.getInterface().getWidgetByLongName(widgetName.toString());
 				if (sub != null) {
 					receiveEntry(sub);
@@ -302,8 +299,7 @@ public class WidgetMarshal {
 		JTable table = (JTable)widget;
 		
 		for (int i = 0, rows = table.getRowCount(); i < rows; i++) {
-			String iname =
-				name + "." + va.valueName + "[" + i + ((Integer)va.opt).intValue() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String iname = name + '.' + va.valueName + '[' + i + (Integer)va.opt + ']';
 			con.sendPacketClass(PacketClass.ScreenData);
 			con.sendString(iname);
 			con.sendDataType(Type.BOOL);
@@ -323,7 +319,7 @@ public class WidgetMarshal {
 		
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
+			widgetName.replace(offset, widgetName.length(), '.' + name);
 			Container subWidget = con.getInterface().getWidgetByLongName(widgetName.toString());
 			if (subWidget != null) {
 				con.receiveWidgetData(subWidget);
@@ -391,7 +387,7 @@ public class WidgetMarshal {
 		ListSelectionModel selections = table.getSelectionModel();
 		for (int i = 0, rows = table.getRowCount(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + "." + va.valueName + "[" + i + "]" + va.opt); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			con.sendString(name + '.' + va.valueName + '[' + String.valueOf(i) + ']' + va.opt);
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(selections.isSelectedIndex(i));
 		}
@@ -409,7 +405,7 @@ public class WidgetMarshal {
 		int state;
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
+			widgetName.replace(offset, widgetName.length(), '.' + name);
 			Container subWidget;
 			if ((subWidget = con.getInterface().getWidgetByLongName(widgetName.toString())) != null) {
 				con.receiveWidgetData(subWidget);
@@ -477,10 +473,9 @@ public class WidgetMarshal {
 		ListSelectionModel model = list.getSelectionModel();
 		ValueAttribute va = getValue(name);
 
-		for	(int i = 0, rows = list.getModel().getSize(); i < rows; i++) {
+		for (int i = 0, rows = list.getModel().getSize(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			Integer iObject = (Integer)va.opt;
-			con.sendString(name + "." + va.valueName + "[" + iObject.intValue() + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			con.sendString(name + '.' + va.valueName + '[' + (Integer)va.opt + ']');
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(model.isSelectedIndex(i));
 		}
@@ -610,7 +605,7 @@ public class WidgetMarshal {
 		JTabbedPane tabbed = (JTabbedPane)notebook;
 		ValueAttribute va = getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
+		con.sendString(name + '.' + va.valueName);
 		con.sendIntegerData(va.type, tabbed.getSelectedIndex());
 		return true;
 	}
@@ -634,7 +629,7 @@ public class WidgetMarshal {
 				page = con.receiveIntData();
 				registerValue(widget, name, null);
 			} else {
-				widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
+				widgetName.replace(offset, widgetName.length(), '.' + name);
 				con.receiveValue(widgetName, offset + name.length() + 1);
 			}
 		}
@@ -650,7 +645,7 @@ public class WidgetMarshal {
 		JProgressBar progress = (JProgressBar)widget;
 		ValueAttribute va = getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
+		con.sendString(name + '.' + va.valueName);
 		con.sendIntegerData(va.type, progress.getValue());
 		return true;
 	}
