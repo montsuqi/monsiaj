@@ -208,7 +208,9 @@ class Connection {
 			}
 			return v.movePointLeft(slen);
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(e);
+			IllegalArgumentException iae = new IllegalArgumentException();
+			iae.initCause(e);
+			throw iae;
 		}
 	}
 
