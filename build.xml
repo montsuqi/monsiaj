@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.1 2003-09-12 08:18:39 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.1.1.1 2003-09-12 08:18:39 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
