@@ -2,7 +2,8 @@ package org.montsuqi.monsia;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.KeyAdapter;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -778,6 +779,16 @@ class WidgetBuilder {
 			parent.add(child);
 			child.setLocation(x, y);
 		}
+		Component[] children = parent.getComponents();
+		int bottomMost = 0;
+		int rightMost = 0;
+		for (int i = 0, n = children.length; i < n; i++) {
+			Rectangle rect = children[i].getBounds();
+			bottomMost = Math.max(bottomMost, rect.y + rect.height);
+			rightMost = Math.max(rightMost, rect.x + rect.width);
+		}
+		Insets insets = parent.getInsets();
+		parent.setSize(rightMost + insets.right, bottomMost + insets.bottom);
 	}
 
 	//--------------------------------------------------------------------
@@ -1002,8 +1013,8 @@ class WidgetBuilder {
 	}
 
 	private void setCommonParams(Container widget, WidgetInfo info) {
-		addSignals(widget, info);
 		addAccels(widget, info);
+		addSignals(widget, info);
 		widget.setName(info.getName());
 		String className = info.getClassName();
 		WidgetBuildData data = (WidgetBuildData)builderMap.get(className);
@@ -1025,11 +1036,14 @@ class WidgetBuilder {
 		Iterator i = info.getAccels().iterator();
 		while (i.hasNext()) {
 			AccelInfo accel = (AccelInfo)i.next();
-			widget.addKeyListener(new KeyAdapter() {
-				public void keyPressed() {
-					throw new UnsupportedOperationException(Messages.getString("WidgetBuilder.not_implemented_yet")); //$NON-NLS-1$
+			String accelSignal = accel.getSignal();
+			Iterator j = info.getSignals().iterator();
+			while (j.hasNext()) {
+				SignalInfo sInfo = (SignalInfo)i.next();
+				if (accelSignal.equals(sInfo.getName())) {
+					xml.addSignal(sInfo.getHandler(), new SignalData(widget, sInfo, accel));
 				}
-			});
+			}
 		}
 	}
 }
