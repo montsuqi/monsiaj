@@ -24,14 +24,11 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JComboBox;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 
 class ComboBuilder extends ContainerBuilder {
@@ -49,17 +46,16 @@ class ComboBuilder extends ContainerBuilder {
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		if ( ! "Entry".equals(wInfo.getClassName())) { //$NON-NLS-1$
-			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.not_a_Entry_widget")); //$NON-NLS-1$
-		}
+		ensureValidEntryType(wInfo.getClassName());
 		Component editor = combo.getEditor().getEditorComponent();
-		xml.setLongName(wInfo.getLongName(), editor);
+		setCommonParameters(xml, editor, wInfo);
+		setSignals(xml, editor, wInfo);
 		combo.putClientProperty("editor", editor); //$NON-NLS-1$
-		List signals = wInfo.getSignals();
-		Iterator i = signals.iterator();
-		while (i.hasNext()) {
-			SignalInfo sInfo = (SignalInfo)i.next();
-			info.addSignalInfo(sInfo);
+	}
+
+	protected void ensureValidEntryType(String actualType) {
+		if ( ! "Entry".equals(actualType)) { //$NON-NLS-1$
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.not_a_Entry_widget")); //$NON-NLS-1$
 		}
 	}
 }
