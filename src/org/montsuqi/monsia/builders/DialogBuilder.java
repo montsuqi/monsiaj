@@ -24,11 +24,13 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.event.KeyEvent;
 
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
@@ -50,21 +52,19 @@ public class DialogBuilder extends WindowBuilder {
 	
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		super.buildChildren(xml, parent, info);
-		List buttons = new ArrayList();
-		lookupButtons(parent, buttons);
-		if (buttons.size() == 1) {
-			JDialog dialog = (JDialog)parent;
-			dialog.getRootPane().setDefaultButton((JButton)buttons.get(0));
-		}
+		replaceInputMap(parent);
 	}
 
-	private void lookupButtons(Container parent, List buttons) {
+	private void replaceInputMap(Container parent) {
 		for (int i = 0, n = parent.getComponentCount(); i < n; i++) {
 			Component c = parent.getComponent(i);
 			if (c instanceof JButton) {
-				buttons.add(c);
+				JButton b = (JButton)c;
+				InputMap inputs = b.getInputMap(JComponent.WHEN_FOCUSED);
+				inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "pressed"); //$NON-NLS-1$
+				inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), "released"); //$NON-NLS-1$
 			} else if (c instanceof Container) {
-				lookupButtons((Container)c, buttons);
+				replaceInputMap((Container)c);
 			}
 		}
 	}
