@@ -2,21 +2,21 @@ package org.montsuqi.monsia;
 
 import org.montsuqi.util.ChainedRuntimeException;
 
-class InterfaceBuildingException extends ChainedRuntimeException {
+public class InterfaceBuildingException extends ChainedRuntimeException {
 
-	InterfaceBuildingException() {
+	public InterfaceBuildingException() {
 		super();
 	}
 
-	InterfaceBuildingException(String message) {
+	public InterfaceBuildingException(String message) {
 		super(message);
 	}
 
-	InterfaceBuildingException(String message, Throwable cause) {
+	public InterfaceBuildingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	InterfaceBuildingException(Throwable cause) {
+	public InterfaceBuildingException(Throwable cause) {
 		super(cause);
 	}
 }
