@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.text.MessageFormat;
 
@@ -194,6 +195,7 @@ class Connection {
 	}
 
 	private static final int NEGATIVE_FIXED_MASK = 0x40;
+	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
 
 	BigDecimal receiveFixed() throws IOException {
 		/* int flen = */ receiveLength();
@@ -204,7 +206,7 @@ class Connection {
 		}
 		value = value.trim();
 		if (value.length() == 0) {
-			return BigDecimal.ZERO;
+			return ZERO;
 		}
 		// negative values are represented by masking the first
 		// character with NEGATIVE_FIXED_MASK(0x40),
