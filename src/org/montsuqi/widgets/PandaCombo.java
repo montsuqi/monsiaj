@@ -48,9 +48,12 @@ public class PandaCombo extends JComboBox {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
+			int items = getItemCount();
+			if (items <= 1) {
+				return;
+			}
 			int selected = getSelectedIndex();
 			int newSelected = selected + move;
-			int items = getItemCount();
 			newSelected = newSelected < 0 ? 0 : items <= newSelected ? items - 1 : newSelected;
 			setSelectedIndex(newSelected);
 			JTextField edit = (JTextField)getEditor().getEditorComponent();
@@ -88,8 +91,10 @@ public class PandaCombo extends JComboBox {
 				// do nothing
 			}
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-				JTextField text = (JTextField)getEditor().getEditorComponent();
-				text.postActionEvent();
+				if (getItemCount() > 1) {
+					JTextField text = (JTextField)getEditor().getEditorComponent();
+					text.postActionEvent();
+				}
 			}
 			public void popupMenuCanceled(PopupMenuEvent arg0) {
 				// do nothing
