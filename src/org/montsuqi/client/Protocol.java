@@ -76,6 +76,7 @@ public class Protocol extends Connection {
 		case 2:
 			protocol1 = false;
 			protocol2 = true;
+			break;
 		default:
 			throw new IllegalArgumentException("invalid protocol version: " + client.getProtocolVersion()); //$NON-NLS-1$
 		}
