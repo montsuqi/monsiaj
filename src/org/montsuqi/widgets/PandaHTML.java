@@ -24,11 +24,12 @@ package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -36,17 +37,21 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.AbstractDocument;
+
 import org.montsuqi.util.Logger;
 
 public class PandaHTML extends JScrollPane {
 
-	Logger logger;
+	static Logger logger;
 	JTextPane pane;
 
 	public PandaHTML() {
 		super();
 		logger = Logger.getLogger(PandaHTML.class);
 		pane = new JTextPane();
+		AbstractDocument doc = (AbstractDocument)pane.getDocument();
+		doc.setAsynchronousLoadPriority(1); // load documents asynchronously
 		setViewportView(pane);
 		pane.setEditable(false);
 		pane.addHyperlinkListener(new HyperlinkListener() {
@@ -76,6 +81,16 @@ public class PandaHTML extends JScrollPane {
 		Container container = frame.getContentPane();
 		container.setLayout(new BorderLayout());
 		PandaHTML html = new PandaHTML();
+		html.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				logger.debug("change: {0}: {1} => {2}", //$NON-NLS-1$
+					new Object[] {
+						e.getPropertyName(),
+						e.getOldValue(),
+						e.getNewValue()
+					});
+			}
+		});
 		JScrollPane scroll = new JScrollPane();
 		container.add(scroll, BorderLayout.CENTER);
 		scroll.setViewportView(html);
@@ -98,9 +113,8 @@ public class PandaHTML extends JScrollPane {
 		public void run() {
 			setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
 			try {
-				System.err.println(new Date());
+				logger.debug("loading {0}", uri); //$NON-NLS-1$
 				pane.setPage(uri);
-				System.err.println(new Date());
 			} catch (FileNotFoundException e) {
 				setText(e.toString());
 			} catch (IOException e) {
