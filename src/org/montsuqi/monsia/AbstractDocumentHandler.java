@@ -1,10 +1,6 @@
 package org.montsuqi.monsia;
 
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
