@@ -68,7 +68,6 @@ public abstract class SignalHandler {
 			public void handle(Protocol con, Component widget, Object userData) {
 				JTextField field = (JTextField)widget;
 				field.selectAll();
-				field.setCaretPosition(0);
 			}
 		});
 
