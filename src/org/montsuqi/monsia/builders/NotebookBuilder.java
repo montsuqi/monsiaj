@@ -29,6 +29,7 @@ import java.util.Map;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
+import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.Notebook;
 import org.montsuqi.widgets.NotebookDummyButton;
 
@@ -43,6 +44,7 @@ class NotebookBuilder extends ContainerBuilder {
 		int tabCount = cCount / 2;
 		String[] labels = new String[tabCount];
 		Component[] bodies = new Component[tabCount];
+		boolean[] enabled = new boolean[tabCount];
 		int currentLabel = 0;
 		int currentBody = 0;
 		for (int i = 0; i < cCount; i++) {
@@ -55,6 +57,10 @@ class NotebookBuilder extends ContainerBuilder {
 					Component dummy = new NotebookDummyButton(labels[currentLabel], currentLabel, notebook);
 					setCommonParameters(xml, dummy, wInfo);
 					setSignals(xml, dummy, wInfo);
+					enabled[currentLabel] = true;
+					if (properties.containsKey("sensitive")) { //$NON-NLS-1$
+						enabled[currentLabel] = ParameterConverter.toBoolean((String)properties.get("sensitive")); //$NON-NLS-1$
+					}
 					currentLabel++;
 				} else {
 					throw new WidgetBuildingException(Messages.getString("WidgetBuilder.no_label_for_a_tab")); //$NON-NLS-1$
@@ -70,6 +76,7 @@ class NotebookBuilder extends ContainerBuilder {
 		}
 		for (int i = 0; i < tabCount; i++) {
 			notebook.add(labels[i], bodies[i]);
+			notebook.setEnabledAt(i, enabled[i]);
 		}
 	}
 }

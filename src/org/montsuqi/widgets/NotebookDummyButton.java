@@ -47,15 +47,19 @@ public class NotebookDummyButton extends JButton {
 
 	public void setText(String s) {
 		super.setText(s);
-		if (notebook != null) {
+		if (isValidTab()) {
 			notebook.setTitleAt(index, s);
 		}
 	}
 
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
-		if (notebook != null) {
+		if (isValidTab()) {
 			notebook.setEnabledAt(index, enabled);
 		}
+	}
+
+	private boolean isValidTab() {
+		return notebook != null && 0 <= index && index < notebook.getTabCount();
 	}
 }
