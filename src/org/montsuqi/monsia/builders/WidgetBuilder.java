@@ -38,7 +38,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -51,6 +50,7 @@ import org.montsuqi.monsia.SignalData;
 import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.Fixed;
 import org.montsuqi.widgets.Frame;
@@ -87,7 +87,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Calendar",       Calendar.class,      defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("CheckButton",    JCheckBox.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
-		registerWidgetClass("CList",          JTable.class,        new CListBuilder()); //$NON-NLS-1$
+		registerWidgetClass("CList",          PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Entry",          JTextField.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
@@ -98,7 +98,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Notebook",       JTabbedPane.class,   new NotebookBuilder()); //$NON-NLS-1$
 		registerWidgetClass("NumberEntry",    NumberEntry.class,   defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaCombo",     PandaCombo.class,    new PandaComboBuilder()); //$NON-NLS-1$
-		registerWidgetClass("PandaCList",     JTable.class,        new CListBuilder()); //$NON-NLS-1$
+		registerWidgetClass("PandaCList",     PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaEntry",     PandaEntry.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaHTML",      PandaHTML.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     defaultWidgetBuilder); //$NON-NLS-1$

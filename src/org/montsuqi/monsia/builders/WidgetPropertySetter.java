@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -345,19 +346,31 @@ abstract class WidgetPropertySetter {
 			}
 		});
 
-		registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
+		registerProperty(JTable.class, "columns", new WidgetPropertySetter() {
 			public void set(Interface xml, Component widget, String value) {
 				JTable table = (JTable)widget;
 				TableColumnModel model = table.getColumnModel();
-				StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
-				int columns = tokens.countTokens();
+				int columns = ParameterConverter.toInteger(value);
 				while (model.getColumnCount() < columns) {
 					model.addColumn(new TableColumn());
-				}	
-				int col = 0;
-				while (tokens.hasMoreTokens()) {
-					TableColumn column = model.getColumn(col++);
-					column.setPreferredWidth(ParameterConverter.toInteger(tokens.nextToken()));
+				}
+			}
+		});
+
+		registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
+			public void set(Interface xml, Component widget, String value) {
+				JTable table = (JTable)widget;
+				TableColumnModel model = table.getColumnModel();				
+				StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
+				int columns = tokens.countTokens();
+				if (model.getColumnCount() < columns) {
+					WidgetPropertySetter setter = getSetter(JTable.class, "columns");
+					setter.set(xml, widget, String.valueOf(columns));
+				}
+				for (int col = 0; tokens.hasMoreTokens(); col++) {
+					TableColumn column = model.getColumn(col);
+					int width = ParameterConverter.toInteger(tokens.nextToken());
+					column.setPreferredWidth(width);
 				}
 			}
 		});
@@ -407,6 +420,38 @@ abstract class WidgetPropertySetter {
 			public void set(Interface xml, Component widget, String value) {
 				org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame)widget;
 				frame.setBorder(BorderFactory.createTitledBorder(value));
+			}
+		});
+
+		registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() {
+			public void set(Interface xml, Component widget, String value) {
+				JScrollPane scroll = (JScrollPane)widget;
+				value = normalize(value, "POLICY_");
+				if ("ALWAYS".equals(value)) {
+					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+				} else if ("AUTOMATIC".equals(value)) {
+					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				} else if ("NEVER".equals(value)) {
+					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				} else {
+					throw new IllegalArgumentException(value);
+				}
+			}
+		});
+
+		registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() {
+			public void set(Interface xml, Component widget, String value) {
+				JScrollPane scroll = (JScrollPane)widget;
+				value = normalize(value, "POLICY_");
+				if ("ALWAYS".equals(value)) {
+					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				} else if ("AUTOMATIC".equals(value)) {
+					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				} else if ("NEVER".equals(value)) {
+					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+				} else {
+					throw new IllegalArgumentException(value);
+				}
 			}
 		});
 	}
