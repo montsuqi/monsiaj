@@ -32,6 +32,8 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -85,6 +87,19 @@ public class ConfigurationPanel extends JPanel {
 				File file = fileChooser.getSelectedFile();
 				entry.setText(file.getAbsolutePath());
 			}
+		}
+	}
+
+	private class FieldSelected extends FocusAdapter {
+
+		public void focusGained(FocusEvent e) {
+	           Object o = e.getSource();
+               if ( ! (o instanceof JTextComponent)) {
+                       return;
+               }
+               JTextComponent tc = (JTextComponent)o;
+               tc.setCaretPosition(tc.getText().length());
+               tc.selectAll();
 		}
 	}
 
@@ -303,6 +318,7 @@ public class ConfigurationPanel extends JPanel {
 	protected JTextField addTextRow(Container container, int y, String text, String value) {
 		JTextField entry = new JTextField();
 		entry.setText(value);
+		entry.addFocusListener(new FieldSelected());
 		addRow(container, y, text, entry);
 		return entry;
 	}
@@ -311,6 +327,7 @@ public class ConfigurationPanel extends JPanel {
 		JTextField entry = new JTextField();
 		entry.setHorizontalAlignment(SwingConstants.RIGHT);
 		entry.setText(String.valueOf(value));
+		entry.addFocusListener(new FieldSelected());
 		addRow(container, y, text, entry);
 		return entry;
 	}
@@ -318,6 +335,7 @@ public class ConfigurationPanel extends JPanel {
 	protected JPasswordField addPasswordRow(Container container, int y, String text) {
 		JPasswordField entry = new JPasswordField();
 		entry.setText(""); //$NON-NLS-1$
+		entry.addFocusListener(new FieldSelected());
 		addRow(container, y, text, entry);
 		return entry;
 	}
