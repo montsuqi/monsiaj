@@ -243,7 +243,6 @@ public class Protocol extends Connection {
 			case SCREEN_CURRENT_WINDOW:
 				Interface xml = Interface.parseFile(fName, this);
 				node = new Node(xml, wName);
-				logger.info("Node: {0}", node.toString());
 				windowTable.put(node.getName(), node);
 			}
 		}
