@@ -34,15 +34,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
@@ -110,6 +112,10 @@ abstract class Connector {
 		registerConnector("clicked", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
 				if ( ! (target instanceof AbstractButton)) {
+					return;
+				}
+				// RadioButton event happens only on toggled.
+				if (target instanceof JRadioButton) {
 					return;
 				}
 				AbstractButton button = (AbstractButton)target;
@@ -351,15 +357,41 @@ abstract class Connector {
 				final JToggleButton toggle = (JToggleButton)target;
 				if (target instanceof JRadioButton) {
 					toggle.addMouseListener(new MouseAdapter() {
-						public void mouseClicked(MouseEvent e) {
-							toggle.setSelected( ! toggle.isSelected());
+						public void mousePressed(MouseEvent e) {
+							ButtonGroup g = (ButtonGroup)toggle.getClientProperty("group"); //$NON-NLS-1$
+							JRadioButton deselected = null;
+							if (g == null) {
+								return;
+							}
+							Enumeration elements = g.getElements();
+							while (elements.hasMoreElements()) {
+								JRadioButton radio = (JRadioButton)elements.nextElement();
+								if (radio.isSelected()) {
+									deselected = radio;
+									break;
+								}
+							}
+							if (deselected == null) {
+								return;
+							}
+							JRadioButton none = (JRadioButton)deselected.getClientProperty("none"); //$NON-NLS-1$
+							none.setSelected(true);
+							invoke(con, handler, deselected, other);
+							SignalHandler sendEvent = SignalHandler.getSignalHandler("send_event"); //$NON-NLS-1$
+							assert sendEvent != null;
+							invoke(con, sendEvent, deselected, other);
+
+							toggle.setSelected(true);
 							invoke(con, handler, target, other);
+							invoke(con, sendEvent, target, other);
 						}
 					});
 				} else {
 					toggle.addChangeListener(new ChangeListener() {
 						public void stateChanged(ChangeEvent e) {
-							invoke(con, handler, target, other);
+							if (toggle.isSelected()) {
+								invoke(con, handler, target, other);
+							}
 						}
 					});
 				}
