@@ -95,72 +95,6 @@ public class Protocol extends Connection {
 		return xml;
 	}
 
-	public void sendStringDelim(String s) throws IOException {
-		int size = s == null ? 0 : s.length();
-		if (size > 0) {
-			out.write(s.getBytes());
-			out.flush();
-		}
-	}
-
-	public String receiveStringDelim(int size) throws IOException {
-		int  c;
-		StringBuffer buf = new StringBuffer();
-
-		while ((c = receiveChar()) != '\n') {
-			if (c < 0) {
-				break;
-			} else {
-				buf.append((char)c);
-			}
-		}
-		int i = buf.length();
-		while (i-- != 0) {
-			if (buf.charAt(i) == '\r' || buf.charAt(i) == '\n') {
-				buf.deleteCharAt(i);
-			} else {
-				break;
-			}
-		}
-		return buf.toString();
-	}
-
-	static StringBuffer namebuff;
-
-	public void setValueName(String name) {
-		namebuff = new StringBuffer(name);
-	}
-
-	public void sendValueString(ValueStruct value, int idx, boolean fName) throws IOException {
-		if (idx < 0) {
-			idx = 0;
-		}
-		switch (value.type) {
-		case Type.ARRAY:
-			for (int i = 0; i < value.body.ArrayData.count; i++) {
-				String name = "[" + i + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-				namebuff.replace(idx, namebuff.length(), name);
-				sendValueString(value.body.ArrayData.item[i], idx + name.length(), fName);
-			}
-			break;
-		case Type.RECORD:
-			for (int i = 0; i < value.body.RecordData.count; i++) {
-				String name = "." + value.body.RecordData.names[i]; //$NON-NLS-1$
-				namebuff.replace(idx, namebuff.length(), name);
-				sendValueString(value.body.RecordData.item[i], idx + name.length(), fName);
-			}
-			break;
-		default:
-			if (fName) {
-				sendStringDelim(namebuff.toString());
-				sendStringDelim(": "); //$NON-NLS-1$
-			}
-			sendStringDelim(encode(value.toString()));
-			sendStringDelim("\n"); //$NON-NLS-1$
-			break;
-		}
-	}
-	
 	private static final BitSet NOENCODE;
 	static {
 		NOENCODE = new BitSet(256);
@@ -317,11 +251,12 @@ public class Protocol extends Connection {
 	}
 
 	public boolean receiveWidgetData(Container widget) throws IOException {
-		Handler handler = (Handler)(classTable.get(widget.getClass()));
+		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
 		if (handler != null) {
-			return handler.receiveWidget(getMarshal(), widget);
+			return  handler.receiveWidget(getMarshal(), widget);
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	private WidgetMarshal getMarshal() {
@@ -329,11 +264,12 @@ public class Protocol extends Connection {
 	}
 
 	public boolean sendWidgetData(String name, Container widget) throws IOException {
-		Handler handler = (Handler)(classTable.get(widget.getClass()));
+		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
 		if (handler != null) {
 			return handler.sendWidget(getMarshal(), name, widget);
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	private void receiveValueSkip() throws IOException {
@@ -372,10 +308,10 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void receiveValue(int offset) throws IOException {
+	public void receiveValue(StringBuffer longName, int offset) throws IOException {
 		boolean fTrace = true;
 		boolean fDone = false;
-		Container widget = xml.getWidget(widgetName.toString());
+		Container widget = xml.getWidgetByLongName(longName.toString());
 		if (widget != null) {
 			if (receiveWidgetData(widget)) {
 				fTrace = false;
@@ -389,22 +325,22 @@ public class Protocol extends Connection {
 
 		if (fTrace) {
 			int count;
-			switch (receiveDataType()) {
+			int t = receiveDataType();
+			switch (t) {
 			case Type.RECORD:
 				count = receiveInt();
 				while (count-- != 0) {
 					String name = receiveString();
-					int end = widgetName.length();
-					widgetName.replace(offset, end, "." + name); //$NON-NLS-1$
-					receiveValue(offset);
+					longName.replace(offset, longName.length(), '.' + name);
+					receiveValue(longName, offset + name.length() + 1);
 				}
 				break;
 			case Type.ARRAY:
 				count = receiveInt();
 				for (int i = 0; i < count; i++) {
-					int end = widgetName.length();
-					widgetName.replace(offset, end, "[" + i + "]");
-					receiveValue(offset);	
+					String name = '[' + String.valueOf(i) + ']';
+					longName.replace(offset, longName.length(), name);
+					receiveValue(longName, offset + name.length());
 				}
 				break;
 			default:
@@ -441,7 +377,6 @@ public class Protocol extends Connection {
 		Container widget;
 		int type;
 
-		logger.enter("getScreenData");		
 		inReceive = true;
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
@@ -478,7 +413,7 @@ public class Protocol extends Connection {
 				widgetName = new StringBuffer(window);
 				c = receivePacketClass();
 				if (c == PacketClass.ScreenData) {
-					receiveValue(0);
+					receiveValue(widgetName, widgetName.length());
 				}
 				break;
 			default:
@@ -509,7 +444,6 @@ public class Protocol extends Connection {
 			resetTimer(node.window);
 		}
 		inReceive = false;
-		logger.leave("getScreenData");
 		return fCancel;
 	}
 
@@ -575,7 +509,7 @@ public class Protocol extends Connection {
 
 	void addClass(Class clazz, String receiverName, String senderName) {
 		try {
-			Handler handler = WidgetMarshal.getHandler(receiverName, senderName);
+			MarshalHandler handler = WidgetMarshal.getHandler(receiverName, senderName);
 			classTable.put(clazz, handler);
 		} catch (NoSuchMethodException e) {
 			logger.fatal(e);
@@ -662,17 +596,13 @@ public class Protocol extends Connection {
 				parent = parent.getParent();
 			}
 			//ResetTimer(GTK_WINDOW (window));
-			name = xml.getWidgetName(widget);
+			name = xml.getLongName(widget);
 			String wName = parent.getName();
 			Node node = (Node)windowTable.get(wName);
 			if (node != null && ! node.updateWidget.containsKey(name)) {
 				node.updateWidget.put(name, widget);
 			}
 		}
-	}
-
-	public StringBuffer getWidgetName() {
-		return widgetName;
 	}
 
 	public void chagned(Container widget, Object userData) {
@@ -764,6 +694,10 @@ public class Protocol extends Connection {
 	/** callback placeholder which has no effect */
 	public void gtk_true(Container widget, Object userData) {
 		/* DO NOTHING */
+	}
+
+	public StringBuffer getWidgetNameBuffer() {
+		return widgetName;
 	}
 }
 
