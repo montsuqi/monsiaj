@@ -15,6 +15,7 @@
  $ XMLLIBS=/usr/share/java/xercesImpl.jar:/usr/share/java/xmlParserAPIs.jar
  $ java \
          -cp dist/pandaclient.jar:$XMLLIBS \
+         org.montsuqi.client.Client \
          -host=localhost \
          -user=sample \
          -pass=sample \
