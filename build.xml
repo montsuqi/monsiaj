@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.5 2003-11-13 05:40:16 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.6 2003-11-13 06:17:38 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
@@ -36,6 +36,11 @@
         <available classname="org.apache.log4j.Logger"/>
       </not>
     </condition>
+    <condition property="exclude.ssl" value="**/SSLSocketCreator.java">
+      <not>
+        <available classname="javax.net.ssl.SSLSocket"/>
+      </not>
+    </condition>
   </target> 
 
   <target name="compile" depends="prepare"
@@ -48,6 +53,7 @@
       <include name="**/*.java"/>
       <exclude name="${exclude.j2selogger}"/>
       <exclude name="${exclude.log4jlogger}"/>
+      <exclude name="${exclude.ssl}"/>
       <classpath refid="project.class.path"/>
     </javac>
   </target>

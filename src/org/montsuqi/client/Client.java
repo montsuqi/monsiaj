@@ -1,12 +1,11 @@
 package org.montsuqi.client;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.SocketException;
 import java.text.MessageFormat;
 
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 
@@ -103,19 +102,22 @@ public class Client implements Runnable {
 		
 		Socket s = null;
 		try {
-			s = new Socket(host, portNumber);
-			// if USE_SSL
+			String factoryName;
+			Object[] options;
 			if (useSSL) {
-				SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-				SSLSocket ssl = (SSLSocket)factory.createSocket(s, host, portNumber, true);
-				/* key, cert, capath, cafile */
-				ssl.setNeedClientAuth(verify);
-				s = ssl;
+				factoryName = "org.montsuqi.client.SSLSocketCreator";
+				options = new Object[] { new Boolean(verify) };
+			} else {
+				factoryName = "org.montsuqi.client.SocketCreator";
+				options = null;
 			}
-			
+			Class clazz = Class.forName(factoryName);
+			Class[] argTypes = new Class[] { String.class, Integer.TYPE, Object[].class };
+			Method create = clazz.getDeclaredMethod("create", argTypes);
+			s = (Socket)create.invoke(null, new Object[] { host, new Integer(portNumber), options });
 			protocol = new Protocol(this, s, encoding);
 			connected = true;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.fatal(e);
 			System.exit(0);
 		}
