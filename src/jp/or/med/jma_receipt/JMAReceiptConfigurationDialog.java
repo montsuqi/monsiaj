@@ -22,7 +22,6 @@ copies.
 
 package jp.or.med.jma_receipt;
 
-import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -30,9 +29,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -44,6 +43,25 @@ import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationDialog;
 
 public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
+
+	private final class ExtensionFileFilter extends FileFilter {
+
+		private String extension;
+		private String description;
+
+		ExtensionFileFilter(String extension, String description) {
+			this.extension = extension;
+			this.description = description;
+		}
+
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getPath().endsWith(extension);
+		}
+
+		public String getDescription() {
+			return description;
+		}
+	}
 
 	private JTextField hostEntry;
 	private JPasswordField passwordEntry;
@@ -66,160 +84,140 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
 	JMAReceiptConfigurationDialog(String title, Configuration conf) {
 		super(title, conf);
-		initComponents();
 		setSize(320,240);
 	}
 
-	private void initComponents() {
-		GridBagConstraints gridBagConstraints;
-
-		Container content = getContentPane();
-		content.setLayout(new GridBagLayout());
-
-		JLabel logo = new JLabel();
+	protected JComponent createIcon() {
+		JLabel icon = new JLabel();
 		URL iconURL = getClass().getResource("/orca2.jpg"); //$NON-NLS-1$
 		if (iconURL != null) {
-			Icon icon = new ImageIcon(iconURL);
-			logo.setIcon(icon);
+			icon.setIcon(new ImageIcon(iconURL));
 		}
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 3;
-		content.add(logo, gridBagConstraints);
+		return icon;
+	}
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
+	protected JComponent createControls() {
+		JPanel controls = new JPanel();
+		controls.setLayout(new GridBagLayout());
+		GridBagConstraints gbc;
 
 		JLabel userLabel = new JLabel();
 		userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		userLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.user")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.weighty = 1.0;
-		panel.add(userLabel, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weighty = 1.0;
+		controls.add(userLabel, gbc);
+
+		userEntry = new JTextField();
+		userEntry.setText(conf.getUser());
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		controls.add(userEntry, gbc);
 
 		JLabel passwordLabel = new JLabel();
 		passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		passwordLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.password")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.weighty = 1.0;
-		panel.add(passwordLabel, gridBagConstraints);
-
-		userEntry = new JTextField();
-		userEntry.setText(conf.getUser());
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		panel.add(userEntry, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weighty = 1.0;
+		controls.add(passwordLabel, gbc);
 
 		passwordEntry = new JPasswordField();
 		passwordEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		passwordEntry.setText(""); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		panel.add(passwordEntry, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		controls.add(passwordEntry, gbc);
 
 		JLabel hostLabel = new JLabel();
 		hostLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		hostLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.host")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.weighty = 1.0;
-		panel.add(hostLabel, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weighty = 1.0;
+		controls.add(hostLabel, gbc);
 
 		hostEntry = new JTextField();
 		hostEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		hostEntry.setText(conf.getHost());
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		panel.add(hostEntry, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		controls.add(hostEntry, gbc);
 
 		JLabel portLabel = new JLabel();
 		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		portLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.port")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.weighty = 1.0;
-		panel.add(portLabel, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weighty = 1.0;
+		controls.add(portLabel, gbc);
 
 		portEntry = new JTextField();
 		portEntry.setHorizontalAlignment(SwingConstants.RIGHT);
 		portEntry.setText(String.valueOf(conf.getPort()));
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		panel.add(portEntry, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		controls.add(portEntry, gbc);
 
 		JLabel styleLabel = new JLabel();
 		styleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		styleLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.style")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.weighty = 1.0;
-		panel.add(styleLabel, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weighty = 1.0;
+		controls.add(styleLabel, gbc);
 
 		styleEntry = new JTextField();
 		styleEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		styleEntry.setText(conf.getStyles());
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		panel.add(styleEntry, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		controls.add(styleEntry, gbc);
 
 		JButton browseButton = new JButton();
 		browseButton.setText(Messages.getString("JMAReceiptConfigurationDialog.browse")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 4;
-		panel.add(browseButton, gridBagConstraints);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 4;
+		controls.add(browseButton, gbc);
 
 		browseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home")); //$NON-NLS-1$
-				fileChooser.setFileFilter(new FileFilter() {
-					public boolean accept(File f) {
-						if (f.getPath().endsWith(".properties")) { //$NON-NLS-1$
-							return true;
-						}
-						if (f.isDirectory()) {
-							return true;
-						}
-						return false;
-					}
-
-					public String getDescription() {
-						return Messages.getString("JMAReceiptConfigurationDialog.filter.pattern"); //$NON-NLS-1$
-					}
-				});
+				String extension = ".properties"; //$NON-NLS-1$
+				String description = Messages.getString("JMAReceiptConfigurationDialog.filter_pattern"); //$NON-NLS-1$
+				fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
 				int ret = fileChooser.showOpenDialog(JMAReceiptConfigurationDialog.this);
 				if (ret == JFileChooser.APPROVE_OPTION) {
 					File styleFile = fileChooser.getSelectedFile();
@@ -227,27 +225,6 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 				}
 			}
 		});
-
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.gridheight = 2;
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		content.add(panel, gridBagConstraints);
-
-		JButton runButton = new JButton();
-		runButton.setText(Messages.getString("JMAReceiptConfigurationDialog.run")); //$NON-NLS-1$
-
-		runButton.addActionListener(this);
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		content.add(runButton, gridBagConstraints);
-		getRootPane().setDefaultButton(runButton);
+		return controls;
 	}
 }

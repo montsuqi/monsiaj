@@ -22,20 +22,33 @@ copies.
 
 package org.montsuqi.client;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 
-public abstract class ConfigurationDialog extends JDialog implements ActionListener {
+public abstract class ConfigurationDialog extends JDialog {
 
 	protected Configuration conf;
 
+	protected abstract void updateConfiguration();
+	protected abstract JComponent createIcon();
+	protected abstract JComponent createControls();
+	
 	protected ConfigurationDialog(String title, Configuration conf) {
 		super();
 		setTitle(title);
 		this.conf = conf;
+		initComponents();
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				closeDialog();
@@ -44,16 +57,57 @@ public abstract class ConfigurationDialog extends JDialog implements ActionListe
 		setModal(true);
 	}
 
-	protected abstract void updateConfiguration();
+	private void initComponents() {
+		Container content = getContentPane();
+		content.setLayout(new BorderLayout());
+		content.add(createConfigurationPanel(), BorderLayout.CENTER);
 
-	public void actionPerformed(ActionEvent e) {
-		conf.setConfigured(true);
-		updateConfiguration();
-		closeDialog();
+		JPanel buttonBar = new JPanel();
+		buttonBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		content.add(buttonBar, BorderLayout.SOUTH);
+
+		JButton runButton = new JButton(Messages.getString("ConfigurationDialog.run")); //$NON-NLS-1$
+		runButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				conf.setConfigured(true);
+				updateConfiguration();
+				closeDialog();
+			}
+		});
+		buttonBar.add(runButton);
+		getRootPane().setDefaultButton(runButton);
 	}
 
 	void closeDialog() {
 		setVisible(false);
 		dispose();
 	}
+
+	private JComponent createConfigurationPanel() {
+		JComponent panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc;
+
+		JComponent icon = createIcon();
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridheight = 1;
+		panel.add(icon, gbc);
+
+		JComponent controls = createControls();
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 3;
+		gbc.gridheight = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.NORTHEAST;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		panel.add(controls, gbc);
+
+		return panel;
+	}
+
 }
