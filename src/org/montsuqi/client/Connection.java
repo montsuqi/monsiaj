@@ -199,8 +199,12 @@ class Connection {
 		/* int flen = */ receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
-		if (value == null || value.length() == 0) {
+		if (value == null) {
 			throw new IllegalArgumentException("empty Fixed value"); //$NON-NLS-1$
+		}
+		value = value.trim();
+		if (value.length() == 0) {
+			return BigDecimal.ZERO;
 		}
 		// negative values are represented by masking the first
 		// character with NEGATIVE_FIXED_MASK(0x40),
