@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.11 2004-01-21 10:12:35 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.12 2004-01-23 10:58:25 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -14,7 +14,6 @@
   <property name="dist.dir"            value="dist"/>
   <property name="resources.dir"       value="resources"/>
   <property name="libs.dir"            value="libs"/>
-  <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
   <path id="project.class.path">
     <pathelement path="libs/*.jar"/>
   </path>
@@ -107,4 +106,9 @@
     <delete dir="${dist.dir}"  verbose="${clean.verbose}" quiet="true"/>
   </target>
 
+  <target name="jars"
+    description="*obsolete* Deploy jars.">
+    <echo message="Taret 'jars' is obsolete. Use 'dist' instead."/>
+    <antcall target="dist"/>
+  </target>
 </project>
