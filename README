@@ -1,0 +1,36 @@
+= Running
+== with jar
+
+java \
+	-jar dist/pandaclient.jar \
+	-host=localhost \
+	-user=sample \
+	-pass=sample \
+	panda:helloworld
+
+== without jar
+
+java \
+	-cp bin:src \
+	org.montsuqi.client.Client \
+	-host=localhost \
+	-user=sample \
+	-pass=sample \
+	panda:helloworld
+
+= Properties
+
+: monsia.logger.factory
+  Specify logging class factory name.
+  Possible values are one of:
+  * org.montsuqi.util.NullLogger
+  * org.montsuqi.util.StdErrLogger
+  * org.montsuqi.util.Log4JLogger
+  * org.montsuqi.util.J2SELogger
+
+: swing.defaultlaf
+  Specify look & feel other than the system default(Metal).
+  Possible values are:
+  * com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+  * com.sun.java.swing.plaf.motif.MotifLookAndFeel
+  * etc.
