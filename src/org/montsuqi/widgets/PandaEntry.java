@@ -22,9 +22,12 @@ copies.
 
 package org.montsuqi.widgets;
 
-import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.im.InputSubset;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
@@ -33,12 +36,27 @@ import javax.swing.text.PlainDocument;
 
 public class PandaEntry extends JTextField {
 
+	private boolean ximEnabled;
 	public static final int KANA = PandaDocument.KANA;
 	public static final int XIM = PandaDocument.XIM;
 	public static final int ASCII = PandaDocument.ASCII;
 
 	public PandaEntry(String text, int columns) {
 		super(new PandaDocument(), text, columns);
+		addFocusListener(new FocusListener() {
+			// TODO: only works in japanese environment
+			// <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
+			// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
+			public void focusGained(FocusEvent e) {
+				if (ximEnabled) {
+					getInputContext().setCharacterSubsets(new Character.Subset[] {InputSubset.KANJI});
+				}
+			}
+			public void focusLost(FocusEvent e) {
+				System.err.println("focusLost");
+				getInputContext().setCharacterSubsets(null);
+			}
+		});
 	}
 
 	public PandaEntry(int columns) {
@@ -63,13 +81,25 @@ public class PandaEntry extends JTextField {
 		return doc.getInputMode();
 	}
 
+	public void setXIMEnabled(boolean enabled) {
+		ximEnabled = enabled;
+	}
+
+	public boolean getXIMEnabled() {
+		return ximEnabled;
+	}
+
 	public static void main(String[] args) {
 		final JFrame f = new JFrame("TestPandaEntry"); //$NON-NLS-1$
 		PandaEntry pe = new PandaEntry();
-		pe.setInputMode(KANA);
-		System.out.println(pe.getInputMode());
-		f.getContentPane().setLayout(new BorderLayout());
-		f.getContentPane().add(pe, BorderLayout.CENTER);
+		pe.setInputMode(XIM);
+		pe.setXIMEnabled(true);
+		PandaEntry pe2 = new PandaEntry();
+		pe2.setInputMode(XIM);
+		pe2.setXIMEnabled(false);
+		f.getContentPane().setLayout(new GridLayout(2, 1));
+		f.getContentPane().add(pe);
+		f.getContentPane().add(pe2);
 		f.setSize(200, 50);
 		f.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
