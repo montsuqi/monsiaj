@@ -24,9 +24,9 @@ package org.montsuqi.widgets;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -34,43 +34,60 @@ import javax.imageio.ImageIO;
 
 class ImagePreview extends Preview {
 
-	Image image;
+	BufferedImage sourceImage;
+	BufferedImage image;
 
 	public void load(String fileName) throws IOException {
-		image = ImageIO.read(new File(fileName));
-		resetScale();
+		sourceImage = ImageIO.read(new File(fileName));
+		super.setScale(1.0);
+		super.setRotationStep(0);
+		updatePreferredSize();
 	}
 
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (image == null) {
-			return;
+		if (image != null) {
+			g.drawImage(image, 0, 0, this);
+		} else if (sourceImage == null) {
+			g.drawImage(sourceImage, 0, 0, this);
 		}
-		Graphics2D g2d = (Graphics2D)g;
-		AffineTransform old = g2d.getTransform();
-		int w = (int)image.getWidth(this);
-		int h = (int)image.getHeight(this);
-		int x = rotationStep != 1 ? w / 2 : h / 2;
-		int y = rotationStep != 3 ? h / 2 : w / 2;
-		double angle = (Math.PI / 2.0) * rotationStep;
-		AffineTransform t = new AffineTransform();
-		t.scale(scale, scale);
-		t.rotate(angle, x, y);
-		g2d.setTransform(t);
-		g2d.drawImage(image, 0, 0, this);
-		g2d.setTransform(old);
 	}
 
-	protected void updatePreferredSize(double newScale, int newRotationStep) {
-		if (image == null) {
+	protected void setScale(double newScale) {
+		super.setScale(newScale);
+		updatePreferredSize();
+	}
+
+	protected void setRotationStep(int newRotationStep) {
+		super.setRotationStep(newRotationStep);
+		updatePreferredSize();
+	}
+
+	private void updatePreferredSize() {
+		if (sourceImage == null) {
 			return;
 		}
-		int w = (int)(image.getWidth(this) * scale);
-		int h = (int)(image.getHeight(this) * scale);
-		if (newRotationStep % 2 == 0) {
-			setPreferredSize(new Dimension(w, h));
-		} else {
-			setPreferredSize(new Dimension(h, w));
-		}
+
+		int sw = sourceImage.getWidth();
+		int sh = sourceImage.getHeight();
+
+		int w = (int)(sw * scale);
+		int h = (int)(sh * scale);
+		Dimension size = rotationStep % 2 != 0 ? new Dimension(h, w) : new Dimension(w, h);
+		setPreferredSize(size);
+		image = new BufferedImage(size.width, size.height, sourceImage.getType());
+
+		AffineTransform t = new AffineTransform();
+		t.scale(scale, scale);
+		int cx = rotationStep != 1 ? sw / 2 : sh / 2;
+		int cy = rotationStep != 3 ? sh / 2 : sw / 2;
+		double angle = (Math.PI / 2.0) * rotationStep;
+		t.rotate(angle, cx, cy);
+
+		AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BILINEAR);
+		op.filter(sourceImage, image);
+
+		revalidate();
+		repaint();
 	}
 }

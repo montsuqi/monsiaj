@@ -44,7 +44,7 @@ public abstract class Preview extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			zoomIn();
+			setScale(scale * SCALE_FACTOR);
 		}
 	}
 
@@ -59,7 +59,7 @@ public abstract class Preview extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			zoomOut();
+			setScale(scale / SCALE_FACTOR);
 		}
 	}
 
@@ -74,7 +74,7 @@ public abstract class Preview extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			rotateClockwise();
+			setRotationStep(rotationStep + 1);
 		}
 	}
 
@@ -89,7 +89,7 @@ public abstract class Preview extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			rotateCounterClockwise();
+			setRotationStep(rotationStep - 1);
 		}
 	}
 
@@ -103,8 +103,8 @@ public abstract class Preview extends JPanel {
 		zoomInAction = new ZoomInAction();
 		rotateClockwiseAction = new RotateClockwiseAction();
 		rotateCounterClockwiseAction = new RotateCounterClockwiseAction();
-		resetScale();
-		resetRotationStep();
+		setScale(1.0);
+		setRotationStep(0);
 	}
 
 	public Action getZoomOutAction() {
@@ -126,50 +126,22 @@ public abstract class Preview extends JPanel {
 	public abstract void load(String fileName) throws IOException;
 
 	protected double scale;
-	private static final double SCALE_FACTOR = 1.2;
 	protected int rotationStep;
+	private static final double SCALE_FACTOR = 1.2;
 
-	public void zoomIn() {
-		setScale(scale * SCALE_FACTOR);
-	}
-
-	public void zoomOut() {
-		setScale(scale / SCALE_FACTOR);
-	}
-
-	protected final void setScale(double newScale) {
+	protected void setScale(double newScale) {
 		if ( ! isValidScale(newScale)) {
 			throw new IllegalArgumentException("non-positive scale"); //$NON-NLS-1$
 		}
 		scale = newScale;
-		updatePreferredSize(newScale, rotationStep);
-		revalidate();
-		repaint();
 	}
-
-	protected abstract  void updatePreferredSize(double newScale, int newRotationStep);
 
 	private boolean isValidScale(double newScale) {
 		return ! Double.isNaN(newScale) && 0 < newScale && newScale <= Double.MAX_VALUE;
 	}
 
-	protected void resetScale() {
-		setScale(1.0);
-	}
-
-	void rotateClockwise() {
-		setRotationStep(rotationStep + 1);
-	}
-
-	void rotateCounterClockwise() {
-		setRotationStep(rotationStep - 1);
-	}
-
-	protected void resetRotationStep() {
-		setRotationStep(0);
-	}
-
-	private void setRotationStep(int newRotationStep) {
+	protected void setRotationStep(int newRotationStep) {
+		// normalize rotationStep to the range of [0,4)
 		if (newRotationStep < 0) {
 			newRotationStep += 4 * ((-newRotationStep) / 4 + 1);
 		}
@@ -178,9 +150,6 @@ public abstract class Preview extends JPanel {
 			throw new IllegalArgumentException("invalid rotation"); //$NON-NLS-1$
 		}
 		rotationStep = newRotationStep;
-		updatePreferredSize(scale, newRotationStep);
-		revalidate();
-		repaint();
 	}
 
 	private boolean isValidRotationStep(int newRotationStep) {

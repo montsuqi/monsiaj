@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.WindowConstants;
 
 public class PandaPreviewPane extends JPanel {
 
@@ -62,6 +63,7 @@ public class PandaPreviewPane extends JPanel {
 
 	public static void main(String[] args) throws IOException {
 		JFrame f = new JFrame();
+		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		PandaPreviewPane preview = new PandaPreviewPane();
 		f.add(preview);
 		f.setVisible(true);
