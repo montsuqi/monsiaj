@@ -126,7 +126,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 	protected void updateConfiguration() {
-		
+
 		// Basic Tab
 		conf.setUser(userEntry.getText());
 		conf.setPass(new String(passwordEntry.getPassword()));
@@ -139,7 +139,8 @@ public class ConfigurationPanel extends JPanel {
 		// SSL Tab
 		conf.setServerCertificateFileName(serverCertificateEntry.getText());
 		conf.setClientCertificateFileName(clientCertificateEntry.getText());
-		conf.setClientCertifivatePass(new String(exportPasswordEntry.getPassword()));
+		conf.setClientCertificateAlias(clientCertificateAliasEntry.getText());
+		conf.setClientCertificatePass(new String(exportPasswordEntry.getPassword()));
 
 		// Others Tab
 		conf.setStyleFileName(styleEntry.getText());
@@ -222,6 +223,10 @@ public class ConfigurationPanel extends JPanel {
 		addButtonFor(panel, clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
 		clientCertificateAliasEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.alias"), conf.getClientCertificateAlias()); //$NON-NLS-1$
 		exportPasswordEntry = addPasswordRow(panel, y++, Messages.getString("ConfigurationPanel.password")); //$NON-NLS-1$
+		final boolean savePassword = conf.getSavePassword();
+		if (savePassword) {
+			exportPasswordEntry.setText(conf.getClientCertificatePass());
+		}
 
 		return panel;
 	}
