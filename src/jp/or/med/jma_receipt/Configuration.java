@@ -22,11 +22,14 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import org.montsuqi.client.Client;
 import org.montsuqi.util.Logger;
 
 abstract class Configuration {
+
 	protected Logger logger;
 	private char[] pass;
+
 	public Configuration() {
 		logger = Logger.getLogger(Configuration.class);
 	}
@@ -34,24 +37,58 @@ abstract class Configuration {
 	abstract void load();
 	abstract void save();
 
-	abstract String getUser();
-	abstract String getHost();
-	abstract int getPort();
-	abstract String getStyleFile();
-	abstract String getApplication();
+	abstract String getString(String key, String defaultValue);
+	abstract int getInt(String key, int defaultValue);
+
+	abstract void setString(String key, String value);
+	abstract void setInt(String key, int value);
+
+	String getUser() {
+		return getString("user", System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	String getHost() {
+		return getString("host", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	int getPort() {
+		return getInt("port", Client.PORT_GLTERM); //$NON-NLS-1$
+	}
+
+	String getStyleFile() {
+		return getString("style", ""); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	String getApplication() {
+		return getString("application", "orca00"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 	char[] getPass() {
 		return pass;
 	}
 
-	abstract void setUser(String user);
-	abstract void setHost(String host);
-	abstract void setPort(int port);
-	abstract void setApplication(String app);
-	abstract void setStyleFile(String file);
-
-	void setPass(char[] pass) {
-		this.pass = pass;
+	void setUser(String user) {
+		setString("user", user); //$NON-NLS-1$
 	}
 
+	void setHost(String host) {
+		setString("host", host); //$NON-NLS-1$
+	}
+
+	void setPort(int port) {
+		setInt("port", port); //$NON-NLS-1$
+	}
+
+	void setApplication(String app) {
+		setString("application", app); //$NON-NLS-1$
+	}
+
+	void setStyleFile(String file) {
+		setString("style", file); //$NON-NLS-1$
+	}
+
+	void setPass(char[] pass) {
+		this.pass = new char[pass.length];
+		System.arraycopy(pass, 0, this.pass, 0, pass.length);
+	}
 }

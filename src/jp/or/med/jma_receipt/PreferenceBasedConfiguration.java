@@ -25,8 +25,6 @@ package jp.or.med.jma_receipt;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.montsuqi.client.Client;
-
 class PreferenceBasedConfiguration extends Configuration {
 
 	private Preferences prefs;
@@ -47,43 +45,19 @@ class PreferenceBasedConfiguration extends Configuration {
 		}
 	}
 
-	String getUser() {
-		return prefs.get("user", System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$
+	String getString(String key, String defaultValue) {
+		return prefs.get(key, defaultValue);
 	}
 
-	String getHost() {
-		return prefs.get("host", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
+	int getInt(String key, int defaultValue) {
+		return prefs.getInt(key, defaultValue);
 	}
 
-	int getPort() {
-		return prefs.getInt("port", Client.PORT_GLTERM); //$NON-NLS-1$
+	void setString(String key, String value) {
+		prefs.put(key, value);
 	}
 
-	String getStyleFile() {
-		return prefs.get("style", ""); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	String getApplication() {
-		return prefs.get("application", "orca00"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	void setUser(String user) {
-		prefs.put("user", user); //$NON-NLS-1$
-	}
-
-	void setHost(String host) {
-		prefs.put("host", host); //$NON-NLS-1$
-	}
-
-	void setPort(int port) {
-		prefs.putInt("port", port); //$NON-NLS-1$
-	}
-
-	void setApplication(String app) {
-		prefs.put("application", app); //$NON-NLS-1$
-	}
-
-	void setStyleFile(String file) {
-		prefs.put("style", file); //$NON-NLS-1$
+	void setInt(String key, int value) {
+		prefs.putInt(key, value);
 	}
 }

@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import org.montsuqi.client.Client;
-
 class PropertyFileBasedConfiguration extends Configuration {
 
 	static final String CONFIGURATION_FILE = System.getProperty("user.home") + System.getProperty("file.separator") + "jma-receipt.properties"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -59,67 +57,21 @@ class PropertyFileBasedConfiguration extends Configuration {
 		}
 	}
 
-	String getUser() {
-		String user = props.getProperty("user"); //$NON-NLS-1$
-		if (user == null) {
-			return System.getProperty("user.name"); //$NON-NLS-1$
-		} else {
-			return user;
-		}
-	}
-	String getHost() {
-		String host = props.getProperty("host"); //$NON-NLS-1$
-		if (host == null) {
-			return "localhost"; //$NON-NLS-1$
-		} else {
-			return host;
-		}
+	String getString(String key, String defaultValue) {
+		String value = props.getProperty(key);
+		return value != null ? value : defaultValue;
 	}
 
-	int getPort() {
-		String port = props.getProperty("port"); //$NON-NLS-1$
-		if (port == null) {
-			return Client.PORT_GLTERM;
-		} else {
-			return Integer.parseInt(port);
-		}
+	int getInt(String key, int defaultValue) {
+		String value = props.getProperty(key);
+		return value != null ? Integer.parseInt(value) : defaultValue;
 	}
 
-	String getStyleFile() {
-		String style = props.getProperty("style"); //$NON-NLS-1$
-		if (style == null) {
-			return ""; //$NON-NLS-1$
-		} else {
-			return style;
-		}
+	void setString(String key, String value) {
+		props.put(key, value);
 	}
 
-	String getApplication() {
-		String app = props.getProperty("application"); //$NON-NLS-1$
-		if (app == null) {
-			return "orca00"; //$NON-NLS-1$
-		} else {
-			return app;
-		}
-	}
-
-	void setUser(String user) {
-		props.setProperty("user", user); //$NON-NLS-1$
-	}
-
-	void setHost(String host) {
-		props.setProperty("host", host); //$NON-NLS-1$
-	}
-
-	void setPort(int port) {
-		props.setProperty("port", String.valueOf(port)); //$NON-NLS-1$
-	}
-
-	void setApplication(String app) {
-		props.setProperty("application", app); //$NON-NLS-1$
-	}
-
-	void setStyleFile(String file) {
-		props.setProperty("style", file); //$NON-NLS-1$
+	void setInt(String key, int value) {
+		props.put(key, String.valueOf(value));
 	}
 }
