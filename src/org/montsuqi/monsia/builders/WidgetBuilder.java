@@ -154,7 +154,6 @@ public class WidgetBuilder {
 				UIManager.put(key, new FontUIResource(font.deriveFont(font.getStyle() & ~Font.BOLD,font.getSize() * 0.9f)));
 			}
 		}
-		UIManager.put("Button.margin", new InsetsUIResource(0, 0, 0, 0)); //$NON-NLS-1$
 	}
 
 	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {

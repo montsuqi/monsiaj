@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ActionMap;
@@ -35,6 +36,7 @@ public class Button extends JButton {
 	public Button() {
 		super();
 		initActions();
+		setMargin(new Insets(2, 2, 2, 2));
 	}
 
 	private void initActions() {
