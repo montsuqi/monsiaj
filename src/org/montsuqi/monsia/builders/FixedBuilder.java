@@ -53,7 +53,7 @@ class FixedBuilder extends ContainerBuilder {
 			if (child instanceof JTable) {
 				child = underlayScrollPane(child);
 			}
-			parent.add(child);
+			addChild(parent, child);
 			child.setLocation(x, y);
 		}
 		Component[] children = parent.getComponents();

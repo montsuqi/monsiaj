@@ -22,50 +22,37 @@ copies.
 
 package org.montsuqi.monsia.builders;
 
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Window;
 import java.util.Iterator;
-
-import javax.swing.JFrame;
+import java.util.List;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JScrollPane;
-import javax.swing.RootPaneContainer;
-import javax.swing.SwingUtilities;
-
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
-class ContainerBuilder extends WidgetBuilder {
+class MenuBarBuilder extends ContainerBuilder {
+	
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
+		JMenuBar menuBar = (JMenuBar)parent;
 		Iterator i = info.getChildren().iterator();
-		if (parent instanceof RootPaneContainer) {
-			RootPaneContainer rootPaneContainer = (RootPaneContainer)parent;
-			parent = rootPaneContainer.getContentPane();
-		}
 		while (i.hasNext()) {
+			// Menu structure differences between Gtk+ and Swing.
+			// Gtk: GtkMenuBar       Swing: JMenuBar
+			//       +GtkMenuItem            +JMenu
+			//         +GtkMenu                +JMenuItem
+			//           +GtkMenuItem          +JMenuItem
+			//           +GtkMenuItem
+
+			// skip redundant GtkMenuItem part.
 			ChildInfo cInfo = (ChildInfo)i.next();
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Component child = WidgetBuilder.buildWidget(xml, wInfo, parent);
-			addChild(parent, child);
+			List children = wInfo.getChildren();
+			assert children.size() == 1;
+			ChildInfo menuItemChildInfo = wInfo.getChild(0);
+			WidgetInfo menuInfo = menuItemChildInfo.getWidgetInfo();
+			JMenu menu = (JMenu)WidgetBuilder.buildWidget(xml, menuInfo, menuBar);
+			menuBar.add(menu);
 		}
-	}
-
-	protected void addChild(Container parent, Component child) {
-		if (child instanceof JMenuBar) {
-			Window w = SwingUtilities.windowForComponent(parent);
-			assert w instanceof JFrame;
-			JFrame f = (JFrame)w;
-			f.setJMenuBar((JMenuBar)child);
-		} else {
-			parent.add(child);
-		}
-	}
-
-	protected Component underlayScrollPane(Component child) {
-		JScrollPane scroll = new JScrollPane(child);
-		scroll.setSize(child.getSize());
-		return scroll;
 	}
 }

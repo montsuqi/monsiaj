@@ -38,6 +38,8 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
@@ -514,6 +516,34 @@ abstract class WidgetPropertySetter {
 					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				} else {
 					throw new IllegalArgumentException(value);
+				}
+			}
+		});
+
+		registerProperty(JMenuItem.class, "stock_item", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				JMenuItem item = (JMenuItem)widget;
+				value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
+				UIStock stock = UIStock.get(value);
+				if (stock != null) {
+					String text = stock.getText();
+					if (text != null) {
+						item.setText(text);
+					}
+				}
+			}
+		});
+
+		registerProperty(JMenu.class, "stock_item", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				JMenu item = (JMenu)widget;
+				value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
+				UIStock stock = UIStock.get(value);
+				if (stock != null) {
+					String text = stock.getText();
+					if (text != null) {
+						item.setText(text);
+					}
 				}
 			}
 		});

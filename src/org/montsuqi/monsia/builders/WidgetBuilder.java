@@ -35,6 +35,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -104,7 +107,11 @@ public class WidgetBuilder {
 		registerWidgetClass("HSeparator",     HSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Label",          JLabel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("List",           JList.class,         new ListBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Notebook",       Notebook.class,   new NotebookBuilder()); //$NON-NLS-1$
+		registerWidgetClass("Menu",           JMenu.class,         defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("MenuBar",        JMenuBar.class,      new MenuBarBuilder()); //$NON-NLS-1$
+		registerWidgetClass("MenuItem",       JMenuItem.class,     new MenuItemBuilder()); //$NON-NLS-1$
+		registerWidgetClass("PixmapMenuItem", JMenuItem.class,     new MenuItemBuilder()); //$NON-NLS-1$
+		registerWidgetClass("Notebook",       Notebook.class,      new NotebookBuilder()); //$NON-NLS-1$
 		registerWidgetClass("NumberEntry",    NumberEntry.class,   defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("OptionMenu",     OptionMenu.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaCombo",     PandaCombo.class,    new PandaComboBuilder()); //$NON-NLS-1$
