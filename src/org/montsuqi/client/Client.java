@@ -21,7 +21,7 @@ public class Client implements Runnable {
 	private String cache;
 	private String user;
 	private String pass;
-
+	private String encoding;
 	private String currentApplication;
 
 	// if USE_SSL
@@ -56,9 +56,9 @@ public class Client implements Runnable {
 		options.add("cache", Messages.getString("Client.cache_directory"), "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("user", Messages.getString("Client.user_name"), System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$
 		options.add("v1", Messages.getString("Client.use_protocol_version_1"), true); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("v2", Messages.getString("Client.use_protocol_version_2"), true); //$NON-NLS-1$ //$NON-NLS-2$
-
 		options.add("useSSL", "SSL", false); //$NON-NLS-1$ //$NON-NLS-2$
 		//options.add("key", "key file name(pem)", null);
 		//options.add("cert", "certification file name(pem)", null);
@@ -74,6 +74,7 @@ public class Client implements Runnable {
 		cache = (String)options.getValue("cache"); //$NON-NLS-1$
 		user = (String)options.getValue("user"); //$NON-NLS-1$
 		pass = (String)options.getValue("pass"); //$NON-NLS-1$
+		encoding = (String)options.getValue("encoding");
 
 		useSSL = ((Boolean)options.getValue("useSSL")).booleanValue(); //$NON-NLS-1$
 
@@ -112,7 +113,7 @@ public class Client implements Runnable {
 				s = ssl;
 			}
 			
-			protocol = new Protocol(this, s, "EUC-JP");
+			protocol = new Protocol(this, s, encoding);
 			connected = true;
 		} catch (IOException e) {
 			logger.fatal(e);
