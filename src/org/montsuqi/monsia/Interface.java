@@ -67,7 +67,9 @@ public class Interface {
 
 	public static Interface parseFile(String fileName, Protocol protocol) {
 		try {
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setNamespaceAware(true);
+			SAXParser parser = factory.newSAXParser();
 			File file = new File(fileName);
 			MonsiaHandler handler = new MonsiaHandler(fileName);
 			parser.parse(file, handler);
