@@ -34,7 +34,6 @@ public class Table extends JComponent {
 	}
 
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(VBox.class).info(Messages.getString("Table.ignoring_Table_setLayout")); //$NON-NLS-1$
+		Logger.getLogger(Table.class).info("ignoring Table#setLayout()"); //$NON-NLS-1$
 	}
-
 }

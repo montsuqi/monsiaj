@@ -40,19 +40,21 @@ abstract class ParserState {
 	private final String name;
 
 	protected void warnShouldFindClosing(String element, String found) {
-		logger.warn(Messages.getString("MonsiaHandler.should_find_closing"), new Object[] { element, found }); //$NON-NLS-1$
+		Object[] args = { element, found };
+		logger.warn("should find </{0}> here, found </{1}>", args); //$NON-NLS-1$
 	}
 
 	protected void warnShouldBeEmpty(String element, String found) {
-		logger.warn(Messages.getString("MonsiaHandler.should_be_empty"), new Object[] { element, found }); //$NON-NLS-1$
+		Object[] args = { element, found };
+		logger.warn("<{0}> element should be empty, found <{1}>", args); //$NON-NLS-1$
 	}
 
 	protected void warnShouldHaveNoAttributes(String element) {
-		logger.warn(Messages.getString("MonsiaHandler.should_have_no_attributes"), element); //$NON-NLS-1$
+		logger.warn("<{0}> should have no attributes", element); //$NON-NLS-1$
 	}
 
 	protected void warnInvalidPropertiesDefinedHere(String element) {
-		logger.warn(Messages.getString("MonsiaHandler.invalid_properties_defined_here"), element); //$NON-NLS-1$
+		logger.warn("non {0} properties defined here", element); //$NON-NLS-1$
 	}
 
 	public String getName() {

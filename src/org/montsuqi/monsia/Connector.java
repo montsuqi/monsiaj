@@ -39,7 +39,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,21 +73,15 @@ import org.montsuqi.widgets.TimerListener;
 abstract class Connector {
 
 	private static Map connectors;
-	protected Logger logger;
+	protected static final Logger logger = Logger.getLogger(Connector.class);
 
 	abstract void connect(Protocol con, Component target, SignalHandler handler, Object other);
-
-	protected Connector() {
-		logger = Logger.getLogger(Connector.class);
-	}
 
 	public static Connector getConnector(String signalName) throws NoSuchMethodException {
 		if (connectors.containsKey(signalName)) {
 			return (Connector)connectors.get(signalName);
 		}
-		String message = Messages.getString("Connector.connector_not_found"); //$NON-NLS-1$
-		message = MessageFormat.format(message, new Object[] { signalName });
-		Logger.getLogger(Connector.class).warn(message);
+		logger.warn("connector not found for signal {0}", signalName); //$NON-NLS-1$
 		return getConnector(null);
 	}
 
@@ -322,20 +315,23 @@ abstract class Connector {
 		registerConnector("unselect_row", new Connector() { //$NON-NLS-1$
 			public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
 				// XxxSelectionModels don't care selection/unselection so use connectSelectRow
-				// logger.debug("selection_change: target={0}, handler={1}, other={2}", new Object[]{target, handler, other});
+				// Object[] args = { target, handler, other};
+				// logger.debug("selection_change: target={0}, handler={1}, other={2}", args);
 				// connectSelectRow(target, handler, other);
 			}
 		});
 
 		registerConnector("selection_changed", new Connector() { //$NON-NLS-1$
 			public void connect(Protocol con, final Component target, final SignalHandler handler, final Object other) {
-				logger.debug("selection_change: target={0}, handler={1}, other={2}", new Object[]{target, handler, other}); //$NON-NLS-1$
+				Object[] args = { target, handler, other };
+				logger.debug("selection_change: target={0}, handler={1}, other={2}", args); //$NON-NLS-1$
 			}
 		});
 
 		registerConnector("click_column", new Connector() { //$NON-NLS-1$
 			public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
-				logger.debug("click_column: target={0}, handler={1}, other={2}", new Object[]{target, handler, other}); //$NON-NLS-1$
+				Object[] args = { target, handler, other };
+				logger.debug("click_column: target={0}, handler={1}, other={2}", args); //$NON-NLS-1$
 			}
 		});
 

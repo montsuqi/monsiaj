@@ -117,7 +117,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			logger.warn(Messages.getString("AbstractHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
+			logger.warn("should not be closing any elements in this state"); //$NON-NLS-1$
 		}
 	};
 
@@ -286,7 +286,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 				WidgetInfo w = getLastPendingWidget();
 				w.addAccelInfo(accel);
 			} else {
-				logger.warn(Messages.getString("Glade1Handler.accelerator_ignored")); //$NON-NLS-1$
+				logger.warn("accelerator ignored"); //$NON-NLS-1$
 			}
 		}
 	};

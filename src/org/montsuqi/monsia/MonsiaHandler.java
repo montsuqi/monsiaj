@@ -36,7 +36,8 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if (localName.equals("monsia-interface")) { //$NON-NLS-1$
 				state = MONSIA_INTERFACE;
 			} else {
-				logger.warn(Messages.getString("MonsiaHandler.expected"), new Object[] { "monsia-interface", localName}); //$NON-NLS-2$ //$NON-NLS-1$
+				Object[] args = { "monsia-interface", localName }; //$NON-NLS-1$
+				logger.warn("expected <{0}>, but was <{1}>", args); //$NON-NLS-1$
 				prevState = state;
 				state = UNKNOWN;
 				unknownDepth++;
@@ -44,7 +45,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			logger.warn(Messages.getString("AbstractHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
+			logger.warn("should not be closing any elements in this state"); //$NON-NLS-1$
 		}
 	};
 
@@ -455,7 +456,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if ( ! localName.equals("child")) { //$NON-NLS-1$
 				warnShouldFindClosing("child", localName); //$NON-NLS-1$
 			}
-			logger.warn(Messages.getString("MonsiaHandler.no_widget_element_found_inside_child_Discarding")); //$NON-NLS-1$
+			logger.warn("no <widget> element found inside <child>, discarding"); //$NON-NLS-1$
 			widget.removeLastChild();
 			state = WIDGET_AFTER_ACCEL;
 		}
@@ -548,7 +549,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 
     final ParserState WIDGET_CHILD_AFTER_PACKING = new ParserState("WIDGET_CHILD_AFTER_PACKING") { //$NON-NLS-1$
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			logger.warn(Messages.getString("MonsiaHandler.child_should_have_no_elements_after_packing"), localName); //$NON-NLS-1$
+			logger.warn("<child> should have no elements after <packing>, found <{0}>", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;

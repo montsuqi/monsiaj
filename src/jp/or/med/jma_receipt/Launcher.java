@@ -56,7 +56,7 @@ public final class Launcher {
 			}
 		}
 		if (clazz == null) {
-			logger.fatal(Messages.getString("Launcher.no_configuration_class_found")); //$NON-NLS-1$
+			logger.fatal("no configuration class found"); //$NON-NLS-1$
 		}
 		Configuration conf;
 		try {

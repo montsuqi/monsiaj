@@ -247,10 +247,8 @@ public class Client implements Runnable {
 	}
 
 	public static void main(String[] args) {
-			String format = Messages.getString("Client.banner_format"); //$NON-NLS-1$
-			Object[] bannerArgs = new Object[] { CLIENT_VERSION };
-			String banner = MessageFormat.format(format, bannerArgs);
-			System.out.println(banner);
+			Object[] bannerArgs = { CLIENT_VERSION };
+			System.out.println(MessageFormat.format(Messages.getString("Client.banner_format"), bannerArgs)); //$NON-NLS-1$
 
 			Client client = Client.parseCommandLine(args);
 			try {

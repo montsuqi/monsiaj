@@ -48,7 +48,6 @@ import javax.swing.plaf.InsetsUIResource;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
-import org.montsuqi.monsia.Messages;
 import org.montsuqi.monsia.SignalData;
 import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
@@ -73,6 +72,8 @@ import org.montsuqi.widgets.VSeparator;
 import org.montsuqi.widgets.Window;
 
 public class WidgetBuilder {
+
+	protected static final Logger logger = Logger.getLogger(WidgetBuilder.class);
 
 	private static Map classMap;
 	private static Map builderMap;
@@ -150,11 +151,9 @@ public class WidgetBuilder {
 	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {
 		String genericClassName = info.getClassName();
 		WidgetBuilder builder = (WidgetBuilder)builderMap.get(genericClassName);
-		Logger logger = Logger.getLogger(WidgetBuilder.class);
 		if (builder == null) {
-			logger.warn(Messages.getString("WidgetBuilder.Unknown_widget_class"), genericClassName); //$NON-NLS-1$
-			String labelString = MessageFormat.format("[a {0}]", new Object[] { genericClassName }); //$NON-NLS-1$
-			return new JLabel(labelString);
+			logger.warn("unknown widget class: {0}", genericClassName); //$NON-NLS-1$
+			return new JLabel(MessageFormat.format("[a {0}]", new Object[] { genericClassName })); //$NON-NLS-1$
 		}
 		try {
 			Component widget = builder.buildSelf(xml, parent, info);
@@ -171,12 +170,6 @@ public class WidgetBuilder {
 			logger.warn(e);
 			return new JLabel('[' + e.toString() + ']');
 		}
-	}
-
-	protected Logger logger;
-
-	protected WidgetBuilder() {
-		logger = Logger.getLogger(getClass());
 	}
 
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {

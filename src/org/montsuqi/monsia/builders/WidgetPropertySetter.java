@@ -65,8 +65,12 @@ import org.montsuqi.widgets.PandaTimer;
 abstract class WidgetPropertySetter {
 
 	abstract void set(Interface xml, Container parent, Component widget, String value);
+	protected static final Logger logger = Logger.getLogger(WidgetPropertySetter.class);
 
-	static Logger logger;
+	protected void warnUnsupportedProperty(String value) {
+		logger.info("{0} is not supported", value); //$NON-NLS-1$
+	}
+
 	private static Map propertyMap;
 
 	static WidgetPropertySetter getSetter(Class clazz, String name) {
@@ -92,7 +96,6 @@ abstract class WidgetPropertySetter {
 	}
 
 	static {
-		logger = Logger.getLogger(WidgetPropertySetter.class);
 		propertyMap = new HashMap();
 
 		registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
@@ -234,9 +237,9 @@ abstract class WidgetPropertySetter {
 				} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
 					list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 				} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
-					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
+					warnUnsupportedProperty(value);
 				} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
-					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
+					warnUnsupportedProperty(value);
 				} else {
 					throw new IllegalArgumentException("invalid selection mode"); //$NON-NLS-1$
 				}
@@ -275,7 +278,7 @@ abstract class WidgetPropertySetter {
 				} else if ("RIGHT".equals(value)) { //$NON-NLS-1$
 					text.setHorizontalAlignment(SwingConstants.RIGHT);
 				} else {
-					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
+					warnUnsupportedProperty(value);
 				}
 			}
 		});
@@ -427,9 +430,9 @@ abstract class WidgetPropertySetter {
 				} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
 					table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 				} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
-					logger.info(Messages.getString("WidgetPropertySetter.not_supported")); //$NON-NLS-1$
+					warnUnsupportedProperty(value);
 				} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
-					logger.info(Messages.getString("WidgetPropertySetter.not_supported")); //$NON-NLS-1$
+					warnUnsupportedProperty(value);
 				} else {
 					throw new IllegalArgumentException(value);
 				}

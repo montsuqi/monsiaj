@@ -66,22 +66,20 @@ public final class WidgetValueManager {
 
 	ValueAttribute getValue(String name) {
 		if (valueTable.containsKey(name)) {
-			ValueAttribute va = (ValueAttribute)valueTable.get(name);
-			return va;
+			return (ValueAttribute)valueTable.get(name);
 		}
-		String message = Messages.getString("WidgetValueManager.no_such_value_name"); //$NON-NLS-1$
-		message = MessageFormat.format(message, new Object[] { name });
-		throw new IllegalArgumentException(message);
+		Object[] args = new Object[] { name };
+		throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$
 	}
 
 	void setStyle(Component widget, String styleName) {
 		Style style = (Style)styles.get(styleName);
 		if (style != null) {
 			style.apply(widget);
-		} else {
-			String widgetName = widget == null ? "null" : widget.getName(); //$NON-NLS-1$
-			logger.debug(Messages.getString("WidgetMarshaller.ignoring_style"), new Object[] { styleName, widgetName }); //$NON-NLS-1$
+			return;
 		}
+		Object[] args = { styleName, (widget == null ? "null" : widget.getName()) }; //$NON-NLS-1$
+		logger.debug("ignored style \"{0}\" applying to {1}", args); //$NON-NLS-1$
 	}
 
 }

@@ -35,7 +35,6 @@ public class VBox extends JComponent {
 	}
 
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(VBox.class).info(Messages.getString("VBox.ignoring_VBox_setLayout")); //$NON-NLS-1$
+		Logger.getLogger(VBox.class).info("ignoring VBox#setLayout()"); //$NON-NLS-1$
 	}
-
 }

@@ -27,7 +27,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Properties;
 
 class PropertyFileBasedConfiguration extends Configuration {
@@ -43,9 +42,8 @@ class PropertyFileBasedConfiguration extends Configuration {
 		try {
 			props.load(new FileInputStream(CONFIGURATION_FILE));
 		} catch (FileNotFoundException e) {
-			Object[] args = new Object[] { CONFIGURATION_FILE };
-			String message = MessageFormat.format(Messages.getString("PropertyFileBasedConfiguration.configuration_file_not_found"), args); //$NON-NLS-1$
-			logger.warn(message);
+			Object[] args = { CONFIGURATION_FILE };
+			logger.warn("configuration file not found: {0}", args); //$NON-NLS-1$
 		} catch (IOException e) {
 			logger.warn(e);
 		}

@@ -37,7 +37,7 @@ public class Fixed extends JComponent {
 	}
 
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(Fixed.class).info(Messages.getString("Fixed.ignoring_Fixed__setLayout")); //$NON-NLS-1$
+		Logger.getLogger(Fixed.class).info("ignoring Fixed#setLayout()"); //$NON-NLS-1$
 	}
 
 	public void setBounds(int x, int y, int width, int height) {

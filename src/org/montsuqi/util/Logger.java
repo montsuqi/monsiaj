@@ -39,7 +39,8 @@ public abstract class Logger {
 		try {
 			Class factoryClass = Class.forName(factory);
 			Method getter = factoryClass.getMethod("getLogger", new Class[] { String.class }); //$NON-NLS-1$
-			return (Logger)getter.invoke(null, new Object[] { name });
+			Object[] args = { name };
+			return (Logger)getter.invoke(null, args);
 		} catch (Exception e) {
 			System.out.println(e);
 			return null;
@@ -65,7 +66,8 @@ public abstract class Logger {
 	}
 
 	protected final String formatMessage(String format, Object arg) {
-		return formatMessage(format, new Object[] { arg });
+		Object[] args = { arg };
+		return formatMessage(format, args);
 	}
 
 	public void trace(String format, Object[] args) {

@@ -81,19 +81,26 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	}
 
 	protected void warnNotZero(String name, int actual) {
-		logger.warn(Messages.getString("AbstractDocumentHandler.not_zero"), new Object[] { name, new Integer(actual) }); //$NON-NLS-1$
+		Object[] args = { name, new Integer(actual) };
+		logger.warn("{0} is not  0, but was {1}", args); //$NON-NLS-1$
 	}
 
 	protected void warnUnknownAttribute(String element, String attr) {
-		logger.warn(Messages.getString("AbstractDocumentHandler.unknown_attribute"), new Object[] { attr, element }); //$NON-NLS-1$
+		Object[] args = { attr, element };
+		logger.warn("unknown attribute {0} for <{1}>", args); //$NON-NLS-1$
 	}
 
 	protected void warnMissingAttribute(String element) {
-		logger.warn(Messages.getString("AbstractDocumentHandler.missing_required_attribute"), element); //$NON-NLS-1$
+		logger.warn("<{0}> element missing required attributes", element); //$NON-NLS-1$
 	}
 
 	protected void warnUnexpectedElement(String outer, String inner) {
-		logger.warn(Messages.getString("AbstractDocumentHandler.unexpected_element"), new Object[] { outer, inner }); //$NON-NLS-1$
+		Object[] args = { outer, inner };
+		logger.warn("unexpected element <{0}> inside <{1}>", args); //$NON-NLS-1$
+	}
+
+	protected void warnNotSupported(String value) {
+		logger.warn("{0} is not supported in Java", value); //$NON-NLS-1$
 	}
 
 	protected Interface getInterface(Protocol protocol) {
@@ -147,14 +154,14 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	final ParserState FINISH = new ParserState("FINISH") { //$NON-NLS-1$
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			logger.warn(Messages.getString("AbstractDocumentHandler.there_should_be_no_elements_here"), localName); //$NON-NLS-1$
+			logger.warn("there should be no elements here, but found <{0}>", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			logger.warn(Messages.getString("AbstractDocumentHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
+			logger.warn("should not be closing any elements in this state"); //$NON-NLS-1$
 		}
 	};
 
@@ -175,7 +182,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			// do nothing
 		} else if (propertyType == PropertyType.WIDGET) {
 			if (widget.getProperties().size() != 0) {
-				logger.warn(Messages.getString("AbstractDocumentHandler.we_already_read_all_the_props_for_this_key")); //$NON-NLS-1$
+				logger.warn("we already read all the props for this key, leaking"); //$NON-NLS-1$
 			}
 			widget.setProperties(properties);
 			properties.clear();
@@ -183,7 +190,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			properties.clear();
 		} else if (propertyType == PropertyType.CHILD) {
 			if (widget.getChildren().size() == 0) {
-				logger.warn(Messages.getString("AbstractDocumentHandler.no_children_but_have_child_properties")); //$NON-NLS-1$
+				logger.warn("no children, but have child properties"); //$NON-NLS-1$
 			} else {
 				ChildInfo info = widget.getLastChild();
 				info.setProperties(properties);
@@ -246,7 +253,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 				}
 			}
 		}
-		logger.warn(Messages.getString("AbstractDocumentHandler.key_not_found"), keyName); //$NON-NLS-1$
+		logger.warn("key not found: {0}", keyName); //$NON-NLS-1$
 		return 0;
 	}
 
@@ -259,15 +266,15 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
 				modifiers |= InputEvent.SHIFT_MASK;
 			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+				warnNotSupported("LOCK_MASK"); //$NON-NLS-1$
 			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
 				modifiers |= InputEvent.CTRL_MASK;
 			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+				warnNotSupported("MOD_MASK"); //$NON-NLS-1$
 			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
 				modifiers |= parseButtonMask(modifier.substring(6));
 			} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+				warnNotSupported("RELEASE_MASK"); //$NON-NLS-1$
 			}
 		}
 		return modifiers;
@@ -284,11 +291,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			case 3:
 				return InputEvent.BUTTON3_MASK;
 			default:
-				logger.warn(Messages.getString("AbstractDocumentHandler.only_button_1_3_are_supported_in_Java")); //$NON-NLS-1$
+				logger.warn("only BUTTON[1-3] are supported in Java"); //$NON-NLS-1$
 				return 0;
 			}
 		} catch (NumberFormatException e) {
-			logger.warn(Messages.getString("AbstractDocumentHandler.unknown_button_number"), mask); //$NON-NLS-1$
+			logger.warn("unknown BUTTON #: {0}", mask); //$NON-NLS-1$
 			return 0;
 		}
 	}

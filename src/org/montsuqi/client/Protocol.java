@@ -104,8 +104,8 @@ public class Protocol extends Connection {
 		sendString(name);
 		byte pc = receivePacketClass();
 		if (pc != PacketClass.ScreenDefine) {
-			logger.warn(Messages.getString("Protocol.invalid_protocol_sequence"), //$NON-NLS-1$
-				new Object[] { new Byte(PacketClass.ScreenDefine), new Byte(pc) }); 
+			Object[] args = { new Byte(PacketClass.ScreenDefine), new Byte(pc) };
+			logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args); //$NON-NLS-1$
 			return false;
 		}
 
@@ -430,9 +430,8 @@ public class Protocol extends Connection {
 		case PacketClass.E_APPL:
 			throw new ConnectException("cannot connect to server(application name invalid)"); //$NON-NLS-1$
 		default:
-			String message = "cannot connect to server(other protocol error {0})"; //$NON-NLS-1$
-			message = MessageFormat.format(message, new Object[] { Integer.toHexString(pc) });
-			throw new ConnectException(message);
+			Object[] args = new Object[] { Integer.toHexString(pc) };
+			throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
 		}
 	}
 

@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,12 +16,9 @@ import org.montsuqi.util.Logger;
 
 public abstract class SignalHandler {
 
-	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
-	Logger logger;
+	protected static final Logger logger = Logger.getLogger(SignalHandler.class);
 
-	SignalHandler() {
-		logger = Logger.getLogger(SignalHandler.class);
-	}
+	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 
 	protected boolean isWindowActive(Protocol con, Component widget) {
 		Window window = SwingUtilities.windowForComponent(widget);
@@ -33,9 +29,7 @@ public abstract class SignalHandler {
 		if (handlers.containsKey(handlerName)) {
 			return (SignalHandler)handlers.get(handlerName);
 		}
-		String message = Messages.getString("SignalHandler.handler_not_found"); //$NON-NLS-1$
-		message = MessageFormat.format(message, new Object[] { handlerName });
-		Logger.getLogger(SignalHandler.class).warn(message);
+		logger.warn("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
 		return getSignalHandler(null);
 	}
 

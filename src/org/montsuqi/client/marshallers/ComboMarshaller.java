@@ -33,7 +33,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.montsuqi.client.Messages;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.monsia.Interface;
@@ -111,9 +110,8 @@ class ComboMarshaller extends WidgetMarshaller {
 			JTextField editor = (JTextField)prop;
 			entryMarshaller.send(manager, xml.getWidgetLongName(editor), editor);
 		} else {
-			String message = Messages.getString("Interface.no_such_combo"); //$NON-NLS-1$
-			message = MessageFormat.format(message, new Object[] { combo.getName() });
-			throw new IllegalArgumentException(message);
+			Object[] args = { combo.getName() };
+			throw new IllegalArgumentException(MessageFormat.format("no such combo: {0}", args)); //$NON-NLS-1$
 		}
 	}
 }

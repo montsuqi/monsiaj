@@ -35,7 +35,6 @@ public class HBox extends JComponent {
 	}
 
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(HBox.class).info(Messages.getString("HBox.ignoring_HBox__setLayout")); //$NON-NLS-1$
+		Logger.getLogger(HBox.class).info("ignoring HBox#setLayout()"); //$NON-NLS-1$
 	}
-
 }

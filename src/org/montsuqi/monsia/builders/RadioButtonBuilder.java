@@ -42,7 +42,7 @@ class RadioButtonBuilder extends ContainerBuilder {
 			group.add(button);
 			button.putClientProperty("group", group); //$NON-NLS-1$
 		} else {
-			logger.warn(Messages.getString("WidgetBuilder.radio_button_has_no_group"), widget.getName()); //$NON-NLS-1$
+			logger.warn("RadioButton {0} has no group", widget.getName()); //$NON-NLS-1$
 		}
 		return widget;
 	}

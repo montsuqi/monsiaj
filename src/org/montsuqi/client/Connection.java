@@ -194,7 +194,7 @@ class Connection {
 		String value = receiveString();
 		BigInteger i = BigInteger.ZERO;
 		if (value == null || value.length() == 0) {
-			logger.warn(Messages.getString("Connection.empty_Fixed_value")); //$NON-NLS-1$
+			logger.warn("empty Fixed value"); //$NON-NLS-1$
 		} else {
 			try {
 				i =  new BigInteger(value);
@@ -266,9 +266,8 @@ class Connection {
 		case Type.TEXT:
 			return receiveString();
 		default:
-			String message = "invalid data type(0x{0})"; //$NON-NLS-1$
-			message = MessageFormat.format(message, new Object[] { Integer.toHexString(type) });
-			throw new IllegalArgumentException(message);
+			Object[] args = { Integer.toHexString(type) };
+			throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); //$NON-NLS-1$
 		}
 	}
 
@@ -319,7 +318,7 @@ class Connection {
 		case Type.VARCHAR:
 		case Type.DBCODE:
 		case Type.TEXT:
-			sendString(value ? "T" : "F"); //$NON-NLS-1$ //$NON-NLS-2$
+			sendString(value ? String.valueOf('T') : String.valueOf('F'));
 			break;
 		case Type.INT:
 			sendInt(value ? 1 : 0);

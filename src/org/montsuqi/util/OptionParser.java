@@ -78,9 +78,7 @@ public class OptionParser {
 			return ((Option)options.get(name)).getValue();
 		}
 		Object[] args = { name };
-		String message = Messages.getString("OptionParser.no_such_option"); //$NON-NLS-1$
-		message = MessageFormat.format(message, args);
-		throw new IllegalArgumentException(message);
+		throw new IllegalArgumentException(MessageFormat.format("no such option: {0}", args)); //$NON-NLS-1$
 	}
 
 	public String getString(String key) {
@@ -194,7 +192,8 @@ public class OptionParser {
 		usage.append("\n"); //$NON-NLS-1$
 		while (i.hasNext()) {
 			Option o = (Option)i.next();
-			usage.append(format.format(new Object[] { o.getName(), o.getMessage() }));
+			Object[] args = { o.getName(), o.getMessage() };
+			usage.append(format.format(args));
 			Object value = o.getValue();
 			if (value != null) {
 				usage.append("\t[" + value + "]"); //$NON-NLS-1$ //$NON-NLS-2$

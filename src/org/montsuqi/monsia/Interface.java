@@ -168,12 +168,11 @@ public class Interface {
 			if (prop != null) {
 				target = (JTextField)prop;
 			} else {
-				String message = Messages.getString("Interface.no_such_combo"); //$NON-NLS-1$
-				message = MessageFormat.format(message, new Object[] { combo.getName() });
-				throw new IllegalArgumentException(message);
+				Object[] args = { combo.getName() };
+				throw new IllegalArgumentException(MessageFormat.format("no such combo: {0}", args)); //$NON-NLS-1$
 			}
 		}
-		try {
+			try {
 			Connector connector = Connector.getConnector(data.getName());
 			connector.connect(protocol, target, handler, data.getObject());
 		} catch (NoSuchMethodException e) {
