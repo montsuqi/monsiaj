@@ -143,14 +143,8 @@ public class Configuration {
 				return file.toURL();
 			} catch (MalformedURLException e) {
 				logger.debug(e);
-				return defaultStyleURL();
 			}
-		} else {
-			return defaultStyleURL();
 		}
-	}
-
-	private URL defaultStyleURL() {
 		return Configuration.class.getResource(DEFAULT_STYLE_RESOURCE_NAME);
 	}
 
