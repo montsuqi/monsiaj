@@ -3,7 +3,6 @@ package org.montsuqi.monsia;
 import java.util.LinkedList;
 import org.montsuqi.util.Logger;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 public class Glade1Handler extends AbstractDocumentHandler {
 
@@ -65,10 +64,6 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		startState = START;
 		logger = Logger.getLogger(Glade1Handler.class);
 		pendingWidgets = new LinkedList();
-	}
-
-	public void startDocument() throws SAXException {
-		super.startDocument();
 	}
 
 	protected boolean shouldAppendCharactersToContent() {
@@ -260,9 +255,13 @@ public class Glade1Handler extends AbstractDocumentHandler {
 
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
-			AccelInfo accel = new AccelInfo(accelKey, accelModifiers, accelSignal);
-			WidgetInfo w = getLastPendingWidget();
-			w.addAccelInfo(accel);
+			if (accelKey != 0) {
+				AccelInfo accel = new AccelInfo(accelKey, accelModifiers, accelSignal);
+				WidgetInfo w = getLastPendingWidget();
+				w.addAccelInfo(accel);
+			} else {
+				logger.warn("Accelerator ignored.");
+			}
 		}
 	};
 

@@ -7,6 +7,9 @@ import org.xml.sax.Attributes;
 
 class MonsiaHandler extends AbstractDocumentHandler {
 
+	protected final List atkActions;
+	protected final List relations;
+
 	MonsiaHandler() {
 		super();
 		atkActions = new ArrayList();
@@ -184,7 +187,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				if (propertyType != PropertyType.ATK) { //$NON-NLS-1$
 					warnInvalidPropertiesDefinedHere("atk"); //$NON-NLS-1$
 				}
-				propertyType = PropertyType.ATK; //$NON-NLS-1$
+				propertyType = PropertyType.ATK;
 				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
@@ -520,7 +523,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				warnShouldFindClosing("packing", localName); //$NON-NLS-1$
 			}
 			state = WIDGET_CHILD_AFTER_PACKING;
-			flushProperties(); /* flush the properties. */
+			flushProperties();
 		}
 	};
 
@@ -589,10 +592,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			state = WIDGET_AFTER_ACCEL;
 		}
 	};
-
-	protected final List atkActions;
-
-	protected final List relations;
 
 	protected boolean shouldAppendCharactersToContent() {
 		return state == WIDGET_PROPERTY ||
