@@ -39,6 +39,12 @@ import org.montsuqi.monsia.Interface;
 
 class ComboMarshaller extends WidgetMarshaller {
 
+	private WidgetMarshaller entryMarshaller;
+
+	ComboMarshaller() {
+		entryMarshaller = new EntryMarshaller();
+	}
+
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
@@ -83,7 +89,6 @@ class ComboMarshaller extends WidgetMarshaller {
 				Component sub =  xml.getWidgetByLongName(widgetName.toString());
 				if (sub != null) {
 					JTextField dummy = (JTextField)sub;
-					WidgetMarshaller entryMarshaller = new EntryMarshaller();
 					entryMarshaller.receive(manager, dummy);
 					selected = dummy.getText();
 				} else {
@@ -98,6 +103,11 @@ class ComboMarshaller extends WidgetMarshaller {
 	}
 
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+		Protocol con = manager.getProtocol();
+		JComboBox combo = (JComboBox)widget;
+		Interface xml = con.getInterface();
+		JTextField editor = (JTextField)xml.getComboEditor(combo);
+		entryMarshaller.send(manager, xml.getWidgetLongName(editor), editor);
 		return true;
 	}
 }
