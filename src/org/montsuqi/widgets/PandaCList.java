@@ -24,48 +24,50 @@ package org.montsuqi.widgets;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.InputMap;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class PandaCList extends JTable {
 
-	class MoveAnchorAction extends AbstractAction {
-		int dx;
-		int dy;
-		MoveAnchorAction(int dx, int dy) {
-			this.dx = dx;
-			this.dy = dy;
+	class MoveAction extends AbstractAction {
+
+		int rowMove;
+		int columnMove;
+
+		MoveAction(int rowMove, int columnMove) {
+			this.rowMove = rowMove;
+			this.columnMove = columnMove;
 		}
 
-		int withinRange(int value, int min, int max) {
-			if (value < min) {
-				return min;
-			} else if (max < value) {
-				return max;
-			} else {
-				return value;
-			}
-		}
 		public void actionPerformed(final ActionEvent e) {
 			JTable table = (JTable)e.getSource();
-			ListSelectionModel rowSelections = table.getSelectionModel();
-			ListSelectionModel columnSelections = table.getColumnModel().getSelectionModel();
-			int leadRow = rowSelections.getLeadSelectionIndex();
-			int leadCol = columnSelections.getLeadSelectionIndex();
-			int anchorRow = rowSelections.getAnchorSelectionIndex();
-			int anchorCol = columnSelections.getAnchorSelectionIndex();
-			leadRow = withinRange(leadRow + dx, 0, table.getRowCount() - 1);
-			leadCol = withinRange(leadCol + dy, 0, table.getColumnCount() - 1);
-			anchorRow = withinRange(anchorRow + dx, 0, table.getRowCount() - 1);
-			anchorCol = withinRange(anchorCol + dy, 0, table.getColumnCount() - 1);
+			moveIndex((DefaultListSelectionModel)table.getSelectionModel(), rowMove, table.getRowCount() - 1);
+			moveIndex((DefaultListSelectionModel)table.getColumnModel().getSelectionModel(), columnMove, table.getColumnCount() - 1);
 			table.repaint();
+		}
+
+		private void moveIndex(DefaultListSelectionModel selections, int move, int max) {
+			ListSelectionListener[] listeners = (ListSelectionListener[])selections.getListeners(ListSelectionListener.class);
+			for (int i = 0, n = listeners.length; i < n; i++) {
+				selections.removeListSelectionListener(listeners[i]);
+			}
+			int lead = selections.getLeadSelectionIndex() + move;
+			lead = lead < 0 ? 0 : max < lead ? max : lead;
+			selections.setLeadSelectionIndex(lead);
+			selections.setAnchorSelectionIndex(lead);
+			for (int i = 0, n = listeners.length; i < n; i++) {
+				selections.addListSelectionListener(listeners[i]);
+			}
 		}
 	}
 
@@ -86,23 +88,24 @@ public class PandaCList extends JTable {
 	public PandaCList() {
 		ActionMap actions = getActionMap();
 		InputMap inputs = getInputMap();
+
 		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
-		inputs.put(KeyStroke.getKeyStroke("TAB"), "focusOutNext");  //$NON-NLS-1$//$NON-NLS-2$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "focusOutNext"); //$NON-NLS-1$
 
 		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
-		inputs.put(KeyStroke.getKeyStroke("shift TAB"), "focusOutPrevious"); //$NON-NLS-1$ //$NON-NLS-2$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "focusOutPrevious"); //$NON-NLS-1$
 
-//		actions.put("moveAnchorUp", new MoveAnchorAction(-1, 0)); //$NON-NLS-1$
-//		inputs.put(KeyStroke.getKeyStroke("UP"), "moveAnchorUp");  //$NON-NLS-1$//$NON-NLS-2$
-//
-//		actions.put("moveAnchorDown", new MoveAnchorAction(1, 0)); //$NON-NLS-1$
-//		inputs.put(KeyStroke.getKeyStroke("DOWN"), "moveAnchorDown"); //$NON-NLS-1$ //$NON-NLS-2$
-//
-//		actions.put("moveAnchorLeft", new MoveAnchorAction(0, -1)); //$NON-NLS-1$
-//		inputs.put(KeyStroke.getKeyStroke("LEFT"), "moveAnchorLeft"); //$NON-NLS-1$ //$NON-NLS-2$
-//
-//		actions.put("moveAnchorRight", new MoveAnchorAction(0, 1)); //$NON-NLS-1$
-//		inputs.put(KeyStroke.getKeyStroke("RIGHT"), "moveAnchorRight");  //$NON-NLS-1$//$NON-NLS-2$
+		actions.put("moveUp", new MoveAction(-1, 0)); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "moveUp"); //$NON-NLS-1$
+
+		actions.put("moveDown", new MoveAction(1, 0)); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "moveDown"); //$NON-NLS-1$
+
+		actions.put("moveLeft", new MoveAction(0, -1)); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "moveLeft"); //$NON-NLS-1$
+
+		actions.put("moveRight", new MoveAction(0, 1)); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveRight"); //$NON-NLS-1$
 	}
 
 	public void createDefaultColumnsFromModel() {

@@ -61,14 +61,13 @@ class CListBuilder extends ContainerBuilder {
 				columnNames[i] = (String)properties.get("label"); //$NON-NLS-1$
 			}
 		}
+
 		JTable table = (JTable)parent;
-		DefaultTableModel tableModel = new DefaultTableModel(0, cCount) {
+		table.setModel(new DefaultTableModel(columnNames, 0) {
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
-		};
-		tableModel.setColumnIdentifiers(columnNames);
-		table.setModel(tableModel);
+		});
 
 		TableColumnModel columnModel = table.getColumnModel();
 		for (int i = 0; i < cCount; i++) {
