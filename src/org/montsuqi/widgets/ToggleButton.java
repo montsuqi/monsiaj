@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ActionMap;
@@ -34,6 +35,7 @@ public class ToggleButton extends JToggleButton {
 
 	public ToggleButton() {
 		super();
+		setMargin(new Insets(2, 2, 2, 2));
 		initActions();
 	}
 
