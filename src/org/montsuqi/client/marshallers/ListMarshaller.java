@@ -43,7 +43,9 @@ class ListMarshaller extends WidgetMarshaller {
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
-		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
+		int count = -1;
+		int from = 0;
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;

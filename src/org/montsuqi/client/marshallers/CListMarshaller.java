@@ -69,13 +69,18 @@ class CListMarshaller extends WidgetMarshaller {
 		Interface xml = con.getInterface();
 		int row = 0;
 		double rowattrw = 0.0;
-		for (int i = 0, n = con.receiveInt(), col = 0, count = -1, from = 0; i < n; i++) {
+		int col = 0;
+		int count = -1;
+		int from = 0;
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
 			label.replace(offset, label.length(), '.' + name);
+			logger.debug("receiving: {0}", label.toString());
 			Component sub = xml.getWidgetByLongName(label.toString());
 			if (sub != null) {
 				JLabel dummy = (JLabel)sub;
 				labelMarshaller.receive(manager, dummy);
+				logger.debug("label[{0}]=\"{1}\"", new Object[]{ new Integer(col), dummy.getText()});
 				labels[col++] = dummy.getText();
 			} else if (handleStateStyle(manager, widget, name)) {
 				continue;
@@ -174,7 +179,9 @@ class CListMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getValue(name);
 		ListSelectionModel selections = table.getSelectionModel();
 		boolean visibleRow = false;
-		for (int i = 0, rows = table.getRowCount(), opt = ((Integer)va.getOpt()).intValue(); i < rows; i++) {
+		int rows = table.getRowCount();
+		int opt = ((Integer)va.getOpt()).intValue();
+		for (int i = 0; i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
 			con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i + opt) + ']');
 			con.sendBooleanData(Type.BOOL, selections.isSelectedIndex(i));

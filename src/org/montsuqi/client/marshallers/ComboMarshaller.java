@@ -55,7 +55,8 @@ class ComboMarshaller extends WidgetMarshaller {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		String selectedItem = null;
 
-		for (int i = 0, n = con.receiveInt(), count = 0; i < n; i++) {
+		int count = 0;
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
