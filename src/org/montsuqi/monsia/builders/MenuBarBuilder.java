@@ -56,12 +56,16 @@ class MenuBarBuilder extends ContainerBuilder {
 			ChildInfo menuItemChildInfo = wInfo.getChild(0);
 			WidgetInfo menuInfo = menuItemChildInfo.getWidgetInfo();
 			JMenu menu = (JMenu)WidgetBuilder.buildWidget(xml, menuInfo, menuBar);
-			if (properties.containsKey("stock_item")) { //$NON-NLS-1$
-				WidgetPropertySetter setter = WidgetPropertySetter.getSetter(JMenu.class, "stock_item"); //$NON-NLS-1$
-				setter.set(xml, menuBar, menu, (String)properties.get("stock_item")); //$NON-NLS-1$
-			}
-			if (properties.containsKey("label")) { //$NON-NLS-1$
-				menu.setText((String)properties.get("label")); //$NON-NLS-1$
+			// set properties from the redundant GtkMenuItem part above.
+			String[] keys = {
+				"stock_item", //$NON-NLS-1$
+				"label" //$NON-NLS-1$
+			};
+			for (int k = 0; k < keys.length; k++) {
+				if (properties.containsKey(keys[k])) {
+					WidgetPropertySetter setter = WidgetPropertySetter.getSetter(JMenu.class, keys[k]);
+					setter.set(xml, menuBar, menu, (String)properties.get(keys[k]));
+				}
 			}
 			menuBar.add(menu);
 		}
