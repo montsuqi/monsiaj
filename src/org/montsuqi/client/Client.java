@@ -32,7 +32,7 @@ public class Client implements Runnable {
 	private Logger logger;
 
 	public String getCacheFileName(String name) {
-		String sep = System.getProperty("path.separator");
+		String sep = System.getProperty("file.separator");
 		StringBuffer buf = new StringBuffer();
 		buf.append(cache);
 		buf.append(sep);
@@ -47,21 +47,21 @@ public class Client implements Runnable {
 	private String[] parseOptions(String[] args) {
 		OptionParser options = new OptionParser();
 
-		options.add("port", "¥Ý¡¼¥ÈÈÖ¹æ", PORT_GLTERM);
+		options.add("port", "¥Ý¡¼¥ÈÈÖ¹?", PORT_GLTERM);
 		options.add("host", "¥Û¥¹¥ÈÌ¾", "localhost");
-		options.add("cache", "¥­¥ã¥Ã¥·¥å¥Ç¥£¥ì¥¯¥È¥êÌ¾", "cache");
+		options.add("cache", "¥­¥ã¥Ã¥·¥å¥Ç¥£¥?¥¯¥È¥?Ì¾", "cache");
 		options.add("user", "¥æ¡¼¥¶Ì¾", System.getProperty("user.name"));
-		options.add("pass", "¥Ñ¥¹¥ï¡¼¥É", "");
-		options.add("v1", "¥Ç¡¼¥¿½èÍý¥×¥í¥È¥³¥ë¥Ð¡¼¥¸¥ç¥ó 1 ¤ò»È¤¦", true);
-		options.add("v2", "¥Ç¡¼¥¿½èÍý¥×¥í¥È¥³¥ë¥Ð¡¼¥¸¥ç¥ó 2 ¤ò»È¤¦", true);
+		options.add("pass", "¥Ñ¥¹¥?¡¼¥É", "");
+		options.add("v1", "¥Ç¡¼¥¿½èÍ?¥×¥úÁÈ¥³¥?¥Ð¡¼¥¸¥ç¥? 1 ¤ò»È¤¦", true);
+		options.add("v2", "¥Ç¡¼¥¿½èÍ?¥×¥úÁÈ¥³¥?¥Ð¡¼¥¸¥ç¥? 2 ¤ò»È¤¦", true);
 
 		options.add("useSSL", "SSL", false);
-		//options.add("key", "¸°¥Õ¥¡¥¤¥ëÌ¾(pem)", null);
-		//options.add("cert", "¾ÚÌÀ½ñ¥Õ¥¡¥¤¥ëÌ¾(pem)", null);
+		//options.add("key", "¸°¥Õ¥¡¥¤¥?Ì¾(pem)", null);
+		//options.add("cert", "¾ÚÌÀ½ñ¥Õ¥¡¥¤¥?Ì¾(pem)", null);
 		//options.add("ssl", "SSL¤ò»È¤¦", false);
 		options.add("verifypeer", "¥¯¥é¥¤¥¢¥ó¥È¾ÚÌÀ½ñ¤Î¸¡¾Ú¤ò¹Ô¤¦", false);
 		//options.add("CApath", "CA¾ÚÌÀ½ñ¤Ø¤Î¥Ñ¥¹", null);
-		//options.add("CAfile", "CA¾ÚÌÀ½ñ¥Õ¥¡¥¤¥ë", null);
+		//options.add("CAfile", "CA¾ÚÌÀ½ñ¥Õ¥¡¥¤¥?", null);
 
 		String[] files = options.parse(Client.class.getName(), args);
 
