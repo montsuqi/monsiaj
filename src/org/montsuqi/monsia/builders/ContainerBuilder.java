@@ -43,7 +43,7 @@ class ContainerBuilder extends WidgetBuilder {
 		while (i.hasNext()) {
 			ChildInfo cInfo = (ChildInfo)i.next();
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Component child = WidgetBuilder.buildWidget(xml, wInfo);
+			Component child = WidgetBuilder.buildWidget(xml, wInfo, parent);
 			parent.add(child);
 		}
 	}

@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.monsia.builders;
 
+import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JLabel;
@@ -36,6 +37,14 @@ import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 
 class CListBuilder extends ContainerBuilder {
+
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		Component widget = super.buildSelf(xml, parent, info);
+		JTable table = (JTable)widget;
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		return widget;
+	}
+
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 

@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -32,8 +33,8 @@ import org.montsuqi.monsia.WidgetInfo;
 
 public class WindowBuilder extends ContainerBuilder {
 
-	Component buildSelf(Interface xml, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, info);
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		Component widget = super.buildSelf(xml, parent, info);
 		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
 			Property p = info.getProperty(i);
 			if ( ! p.getName().equals("position")) {

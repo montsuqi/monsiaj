@@ -34,8 +34,8 @@ import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.widgets.PandaCombo;
 
 class PandaComboBuilder extends ContainerBuilder {
-	Component buildSelf(Interface xml, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, info);
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		Component widget = super.buildSelf(xml, parent, info);
 		PandaCombo combo = (PandaCombo)widget;
 		combo.setEditable(true);
 		return widget;

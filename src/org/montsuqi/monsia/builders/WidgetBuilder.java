@@ -115,7 +115,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 	}
 
-	public static Component buildWidget(Interface xml, WidgetInfo info) {
+	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {
 		Component widget;
 		String genericClassName = info.getClassName();
 		WidgetBuilder builder = (WidgetBuilder)builderMap.get(genericClassName);
@@ -126,7 +126,7 @@ public class WidgetBuilder {
 			widget = new JLabel(labelString);
 		} else {
 			try {
-				widget = builder.buildSelf(xml, info);
+				widget = builder.buildSelf(xml, parent, info);
 			} catch (Exception e) {
 				logger.warn(e);
 				widget = new JLabel('[' + e.toString() + ']');
@@ -149,7 +149,7 @@ public class WidgetBuilder {
 		logger = Logger.getLogger(getClass());
 	}
 	
-	Component buildSelf(Interface xml, WidgetInfo info) {
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		String genericClassName = info.getClassName();
 		Class clazz  = (Class)classMap.get(genericClassName);
 		if (clazz == null) {
@@ -158,7 +158,7 @@ public class WidgetBuilder {
 		Component widget = null;
 		try {
 			widget = (Component)clazz.newInstance();
-			WidgetPropertySetter.setProperties(xml, widget, info);
+			WidgetPropertySetter.setProperties(xml, parent, widget, info);
 			xml.addAccels(widget, info);
 			return widget;
 		} catch (InstantiationException e) {

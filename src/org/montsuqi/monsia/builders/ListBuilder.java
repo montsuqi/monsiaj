@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
+import java.awt.Container;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -32,8 +33,8 @@ import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
 class ListBuilder extends ContainerBuilder {
-	Component buildSelf(Interface xml, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, info);
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		Component widget = super.buildSelf(xml, parent, info);
 		JList list = (JList)widget;
 		ListModel model = new DefaultListModel();
 		list.setModel(model);

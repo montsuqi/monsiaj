@@ -604,7 +604,7 @@ public class Interface {
 		Iterator i = roots.iterator();
 		while (i.hasNext()) {
 			WidgetInfo info = (WidgetInfo)i.next();
-			Component widget = WidgetBuilder.buildWidget(this, info);
+			Component widget = WidgetBuilder.buildWidget(this, info, null);
 			setName(info.getName(), widget);
 		}
 	}

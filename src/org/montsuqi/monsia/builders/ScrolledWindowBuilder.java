@@ -40,7 +40,7 @@ class ScrolledWindowBuilder extends ContainerBuilder {
 		JScrollPane scroll = (JScrollPane)parent;
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Component child = buildWidget(xml, wInfo);
+		Component child = buildWidget(xml, wInfo, parent);
 		scroll.setViewportView(child);
 	}
 }

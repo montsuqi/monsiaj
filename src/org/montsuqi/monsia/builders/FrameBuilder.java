@@ -37,7 +37,7 @@ class FrameBuilder extends ContainerBuilder {
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Component child = buildWidget(xml, wInfo);
+		Component child = buildWidget(xml, wInfo, parent);
 		parent.add(child);
 	}
 }

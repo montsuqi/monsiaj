@@ -42,7 +42,7 @@ class TableBuilder extends ContainerBuilder {
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = null;
 			TableConstraints tc = new TableConstraints();
-			child = buildWidget(xml, wInfo);
+			child = buildWidget(xml, wInfo, parent);
 			int pCount = wInfo.getPropertiesCount();
 			for (int j = 0; j < pCount; j++) {
 				Property p = cInfo.getProperty(j);

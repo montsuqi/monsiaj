@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
+import java.awt.Container;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -32,8 +33,8 @@ import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 
 class RadioButtonBuilder extends ContainerBuilder {
-	Component buildSelf(Interface xml, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, info);
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		Component widget = super.buildSelf(xml, parent, info);
 		AbstractButton button = (AbstractButton)widget;
 		ButtonGroup group = null;
 		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {

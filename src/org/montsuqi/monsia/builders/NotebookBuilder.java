@@ -68,7 +68,7 @@ class NotebookBuilder extends ContainerBuilder {
 				labels[currentLabel] = label;
 				currentLabel++;
 			} else {
-				Component body = buildWidget(xml, wInfo);
+				Component body = buildWidget(xml, wInfo, parent);
 				bodies[currentBody] = body;
 				currentBody++;
 			}

@@ -35,8 +35,8 @@ import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 
 class ComboBuilder extends ContainerBuilder {
-	Component buildSelf(Interface xml, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, info);
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		Component widget = super.buildSelf(xml, parent, info);
 		JComboBox combo = (JComboBox)widget;
 		combo.setEditable(true);
 		return widget;

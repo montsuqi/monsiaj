@@ -43,7 +43,7 @@ class FixedBuilder extends ContainerBuilder {
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = null;
 			int x = 0, y = 0;
-			child = buildWidget(xml, wInfo);
+			child = buildWidget(xml, wInfo, parent);
 			int pCount = cInfo.getPropertiesCount();
 			for (int j = 0; j < pCount; j++) {
 				Property p = cInfo.getProperty(j);

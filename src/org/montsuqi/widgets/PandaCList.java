@@ -49,6 +49,7 @@ public class PandaCList extends JTable {
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
 			column.setPreferredWidth(widths[i]);
+			column.setMinWidth(widths[i]);
 		}
 	}
 }
