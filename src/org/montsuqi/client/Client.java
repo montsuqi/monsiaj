@@ -31,21 +31,19 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
-import java.security.KeyManagementException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.montsuqi.monsia.Style;
@@ -153,36 +151,48 @@ public class Client implements Runnable {
 		}
 		try {
 			return createSSLSocket(host, port, socket);
-		} catch (IOException e) {
-			throw e;
-		} catch (Exception e) {
-			final IOException ioe = new IOException();
+		} catch (GeneralSecurityException e) {
+			IOException ioe = new IOException();
 			ioe.initCause(e);
 			throw ioe;
 		}
 	}
 
-	private Socket createSSLSocket(String host, int port, Socket socket) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
-		final CertificateFactory cf = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-		final String serverCertificateFile = conf.getServerCertificateFileName();
-		final X509Certificate cert = (X509Certificate)cf.generateCertificate(new FileInputStream(serverCertificateFile));
-
-		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		final String clientCertificateFile = conf.getClientCertificateFileName();
-		final String clientCertificatePass = conf.getClientCertificatePass();
-		ks.load(new FileInputStream(clientCertificateFile), clientCertificatePass.toCharArray());
-		final String alias = conf.getClientCertificateAlias();
-		ks.setCertificateEntry(alias, cert);
-
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		tmf.init(ks);
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		kmf.init(ks, clientCertificatePass.toCharArray());
-
+	private Socket createSSLSocket(String host, int port, Socket socket) throws GeneralSecurityException, IOException {
+		TrustManager[] tms = getTrustManagers();
+		KeyManager[] kms = getKeyManagers();
 		SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
-		ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+		ctx.init(kms, tms, null);
 		SSLSocketFactory factory = ctx.getSocketFactory();
 		return factory.createSocket(socket, host, port, true);
+	}
+
+	private TrustManager[] getTrustManagers() throws GeneralSecurityException, IOException {
+		String fileName = conf.getServerCertificateFileName();
+		if (fileName.length() == 0) {
+			return null;
+		}
+		CertificateFactory cf = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
+		Certificate cert = cf.generateCertificate(new FileInputStream(fileName));
+		KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+		ks.load(null, null);
+		ks.setCertificateEntry(conf.getClientCertificateAlias(), cert); //$NON-NLS-1$
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+		tmf.init(ks);
+		return tmf.getTrustManagers();
+	}
+
+	private KeyManager[] getKeyManagers() throws GeneralSecurityException, IOException {
+		String fileName = conf.getClientCertificateFileName();
+		if (fileName.length() == 0) {
+			return null;
+		}
+		char[] pass = conf.getClientCertificatePass().toCharArray();
+		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(new FileInputStream(fileName), pass);
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+		kmf.init(ks, pass);
+		return kmf.getKeyManagers();
 	}
 
 	public void run() {
