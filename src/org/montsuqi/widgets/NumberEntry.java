@@ -96,7 +96,7 @@ public class NumberEntry extends JTextField {
 				System.exit(0);
 			}
 		});
-		f.show();
+		f.setVisible(true);
 	}
 
 	protected void processKeyEvent(KeyEvent e) {

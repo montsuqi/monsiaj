@@ -129,7 +129,7 @@ public class PandaEntry extends JTextField {
 				System.exit(0);
 			}
 		});
-		f.show();
+		f.setVisible(true);
 	}
 }
 
