@@ -140,6 +140,7 @@ public abstract class SignalHandler {
 						String t = text.getText();
 						int length = t.length();
 						if (length > 0) {
+							System.out.println(t);
 							char c = t.charAt(length - 1);
 							if (isKatakana(c) || isSymbol(c)) {
 								try {
@@ -153,7 +154,7 @@ public abstract class SignalHandler {
 					}
 
 					private boolean isKatakana(char c) {
-						return Character.UnicodeBlock.of(c) != Character.UnicodeBlock.KATAKANA;
+						return Character.UnicodeBlock.of(c) == Character.UnicodeBlock.KATAKANA;
 					}
 
 					private boolean isSymbol(char c) {
