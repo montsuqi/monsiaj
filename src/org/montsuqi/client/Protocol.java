@@ -64,10 +64,10 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, String encoding, String styles, int protocolVersion) throws IOException {
+	Protocol(Client client, String encoding, String styles, String cacheRoot, int protocolVersion) throws IOException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
-		cacheRoot = client.getCacheRoot();
+		this.cacheRoot = cacheRoot;
 		switch (protocolVersion) {
 		case 1:
 			protocol1 = true;

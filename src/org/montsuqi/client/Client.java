@@ -24,7 +24,9 @@ package org.montsuqi.client;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.text.MessageFormat;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -104,14 +106,24 @@ public class Client implements Runnable {
 	}
 
 	void connect() throws IOException {
-		protocol = new Protocol(this, conf.getEncoding(), conf.getStyles(), conf.getProtocolVersion());
+		StringBuffer cacheRoot = new StringBuffer();
+		cacheRoot.append(conf.getCache());
+		cacheRoot.append(File.separator);
+		cacheRoot.append(conf.getHost());
+		cacheRoot.append(File.separator);
+		cacheRoot.append(conf.getPort());
+
+		protocol = new Protocol(this, conf.getEncoding(), conf.getStyles(), cacheRoot.toString(), conf.getProtocolVersion());
 		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
 	}
 
 	Socket createSocket() throws IOException {
 		int port = conf.getPort();
 		String host = conf.getHost();
-		Socket socket = new Socket(host, port);
+		InetSocketAddress address = new InetSocketAddress(host, port);
+		SocketChannel socketChannel = SocketChannel.open();
+		socketChannel.connect(address);
+		Socket socket = socketChannel.socket();
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
@@ -120,16 +132,6 @@ public class Client implements Runnable {
 		// key, cert, capath, cafile
 		ssl.setNeedClientAuth(conf.getVerify());
 		return ssl;
-	}
-
-	String getCacheRoot() {
-		StringBuffer cacheRoot = new StringBuffer();
-		cacheRoot.append(conf.getCache());
-		cacheRoot.append(File.separator);
-		cacheRoot.append(conf.getHost());
-		cacheRoot.append(File.separator);
-		cacheRoot.append(conf.getPort());
-		return cacheRoot.toString();
 	}
 
 	public void run() {
