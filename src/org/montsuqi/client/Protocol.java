@@ -490,7 +490,7 @@ public class Protocol extends Connection {
 				logger.warn(Messages.getString("Protocol.cannot_connect_to_server")); //$NON-NLS-1$
 				break;
 			case PacketClass.E_VERSION:
-				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_version_missmatch")); //$NON-NLS-1$
+				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_version_mismatch")); //$NON-NLS-1$
 				break;
 			case PacketClass.E_AUTH:
 				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_authentication_error")); //$NON-NLS-1$
