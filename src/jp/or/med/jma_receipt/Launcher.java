@@ -39,7 +39,7 @@ public final class Launcher {
 			clazz = Class.forName("jp.or.med.jma_receipt.PreferenceBasedConfiguration");
 		} catch (ClassNotFoundException e1) {
 			try {
-				clazz = Class.forName("jp.or.med_jma_receipt.PropertyFileBasedConfiguration");
+				clazz = Class.forName("jp.or.med.jma_receipt.PropertyFileBasedConfiguration");
 			} catch (ClassNotFoundException e2) {
 				logger.fatal(e2);
 			}
