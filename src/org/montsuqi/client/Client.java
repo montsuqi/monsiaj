@@ -109,10 +109,8 @@ public class Client implements Runnable {
 				ssl.setNeedClientAuth(verify);
 				s = ssl;
 			}
-			logger.info("socket: {0}", s); //$NON-NLS-1$
 			
 			protocol = new Protocol(this, s);
-			logger.info(protocol.toString());
 		} catch (IOException e) {
 			logger.fatal(e);
 			System.exit(0);
@@ -125,13 +123,9 @@ public class Client implements Runnable {
 
 	public void run() {
 		try {
-			logger.info("sendConnect({0}, {1}, {2})...", new Object[] { user, pass, currentApplication }); //$NON-NLS-1$
 			protocol.sendConnect(user, pass, currentApplication);
-			logger.info("done."); //$NON-NLS-1$
 			while (true) {
-				logger.info("checkScreens(true)"); //$NON-NLS-1$
 				protocol.checkScreens(true);
-				logger.info("getScreenData()"); //$NON-NLS-1$
 				protocol.getScreenData();
 			}
 		} catch (IOException e) {

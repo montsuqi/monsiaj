@@ -142,7 +142,7 @@ public class MonsiaHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attrs)
 		throws SAXException {
 
-		logger.info(Messages.getString("MonsiaHandler.begin_state"), new Object[] { localName, state.getName() }); //$NON-NLS-1$
+		logger.debug(Messages.getString("MonsiaHandler.begin_state"), new Object[] { localName, state.getName() }); //$NON-NLS-1$
 		state.startElement(uri, localName, qName, attrs);
 
 		/* truncate the content string ... */
@@ -151,7 +151,7 @@ public class MonsiaHandler extends DefaultHandler {
 
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
-		logger.info(Messages.getString("MonsiaHandler.end_state"), new Object[] { localName, state.getName() }); //$NON-NLS-1$
+		logger.debug(Messages.getString("MonsiaHandler.end_state"), new Object[] { localName, state.getName() }); //$NON-NLS-1$
 
 		state.endElement(uri, localName, qName);
 	}
@@ -175,7 +175,6 @@ public class MonsiaHandler extends DefaultHandler {
 	
     final ParserState MONSIA_INTERFACE = new ParserState("MONSIA_INTERFACE") { //$NON-NLS-1$
 		public void startElement(String uri, String localName, String qName, Attributes attrs) {
-			logger.info("MONSIA_INTERFACE: local:{0}, q:{1}", new Object[] { localName, qName });
 			if (localName.equals("requires")) { //$NON-NLS-1$
 				for (int i = 0; i < attrs.getLength(); i++) {
 					String attrName = attrs.getLocalName(i);
@@ -439,8 +438,8 @@ public class MonsiaHandler extends DefaultHandler {
 		}
 
 		public void endElement(String uri, String localName, String qName) {
-			if (localName.equals("widget")) { //$NON-NLS-1$
-				warnShouldFindClosing("wiget", localName); //$NON-NLS-1$
+			if ( ! localName.equals("widget")) { //$NON-NLS-1$
+				warnShouldFindClosing("widget", localName); //$NON-NLS-1$
 			}
 			flushProperties();
 			flushSignals();
@@ -630,7 +629,7 @@ public class MonsiaHandler extends DefaultHandler {
 				for (int i = 0; i < attrs.getLength(); i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
-					if (attrName.equals("localName")) { //$NON-NLS-1$
+					if (attrName.equals("name")) { //$NON-NLS-1$
 						propertyName = makePropertyName(value);
 					} else if (attrName.equals("agent")) { //$NON-NLS-1$
 						badAgent = value.equals("libglade"); //$NON-NLS-1$
@@ -999,15 +998,15 @@ public class MonsiaHandler extends DefaultHandler {
 			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
 				modifiers |= KeyEvent.SHIFT_MASK;
 			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.LOCK_MASK_is_not_supported_in_Java")); //$NON-NLS-1$
+				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$
 			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
 				modifiers |= KeyEvent.CTRL_MASK;
 			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.MOD_MASK_is_not_supported_in_Java")); //$NON-NLS-1$
+				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$
 			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
 				modifiers |= parseButtonMask(modifier.substring(6));
 			} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.Release_mask_not_supported_in_Java")); //$NON-NLS-1$
+				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$
 			}
 		}
 		return modifiers;

@@ -203,7 +203,6 @@ public class Protocol extends Connection {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
-		logger.info("receivePacketClass=> {0}", Integer.toHexString(pc));
 		if (pc == PacketClass.ScreenDefine) {
 			OutputStream out = new FileOutputStream(fName);
 			int left = receiveLong();
@@ -484,9 +483,7 @@ public class Protocol extends Connection {
 		sendString(pass);
 		sendString(apl);
 
-		logger.info("receivePacketClass"); //$NON-NLS-1$
 		pc = receivePacketClass();
-		logger.info("done"); //$NON-NLS-1$
 		if (pc == PacketClass.OK) {
 			return true;
 		} else {
