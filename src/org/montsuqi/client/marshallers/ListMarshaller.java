@@ -105,7 +105,7 @@ class ListMarshaller extends WidgetMarshaller {
 		int opt = ((Integer)va.getOpt()).intValue();
 		for (int i = 0, n = list.getModel().getSize(); i < n; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + '.' + va.getVName() + '[' + i + opt + ']');
+			con.sendString(name + '.' + va.getVName() + '[' + (i + opt) + ']');
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(model.isSelectedIndex(i));
 		}
