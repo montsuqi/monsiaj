@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -100,19 +101,19 @@ public class Client implements Runnable {
 		try {
 			protocol.checkScreens(true);
 			protocol.getScreenData();
-			while (connected) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					// ignore
-				}
-			}
-			protocol.close();
 		} catch (IOException e) {
 			logger.fatal(e);
 		}
 	}
-		
+
+	public void loop() throws IOException, InterruptedException {
+		while (connected) {
+			SwingUtilities.invokeLater(this);
+			Thread.sleep(100);
+		}
+		protocol.close();
+	}
+
 	void exitSystem() {
 		try {
 			synchronized (this) {
@@ -128,11 +129,13 @@ public class Client implements Runnable {
 
 	private String[] parseOptions(String[] args) {
 		OptionParser options = new OptionParser();
+		String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+		String userName = System.getProperty("user.name"); //$NON-NLS-1$
 
 		options.add("port", Messages.getString("Client.port_number"), PORT_GLTERM); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("host", Messages.getString("Client.host_name"), "localhost"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		options.add("cache", Messages.getString("Client.cache_directory"), System.getProperty("user.home") + System.getProperty("file.separator") + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		options.add("user", Messages.getString("Client.user_name"), System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		options.add("cache", Messages.getString("Client.cache_directory"), userHome + File.separator + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		options.add("user", Messages.getString("Client.user_name"), userName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("style", Messages.getString("Client.styles"), ""); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -148,22 +151,22 @@ public class Client implements Runnable {
 
 		String[] files = options.parse(Client.class.getName(), args);
 
-		setPortNumber(((Integer)options.getValue("port")).intValue()); //$NON-NLS-1$
-		setHost((String)options.getValue("host")); //$NON-NLS-1$
-		setCache((String)options.getValue("cache")); //$NON-NLS-1$
-		setUser((String)options.getValue("user")); //$NON-NLS-1$
-		setPass((String)options.getValue("pass")); //$NON-NLS-1$
-		setEncoding((String)options.getValue("encoding")); //$NON-NLS-1$
-		setStyles((String)options.getValue("style")); //$NON-NLS-1$
-		setUseSSL(((Boolean)options.getValue("useSSL")).booleanValue()); //$NON-NLS-1$
+		setPortNumber(options.getInt("port")); //$NON-NLS-1$
+		setHost(options.getString("host")); //$NON-NLS-1$
+		setCache(options.getString("cache")); //$NON-NLS-1$
+		setUser(options.getString("user")); //$NON-NLS-1$
+		setPass(options.getString("pass")); //$NON-NLS-1$
+		setEncoding(options.getString("encoding")); //$NON-NLS-1$
+		setStyles(options.getString("style")); //$NON-NLS-1$
+		setUseSSL(options.getBoolean("useSSL")); //$NON-NLS-1$
 
 		if (useSSL) {
-			//key = (String)options.getValue("key");
-			//cert = (String)options.getValue("cert");
-			//useSSL = ((Boolean)options.getValue("ssl")).booleanValue();
-			setVerify(((Boolean)options.getValue("verifypeer")).booleanValue()); //$NON-NLS-1$
-			//CApath = options.getValue("CApath");
-			//CAfile = options.getValue("CAfile");
+			//key = options.getString("key");
+			//cert = options.getString("cert");
+			//useSSL = options.getBoolean("ssl");
+			setVerify(options.getBoolean("verifypeer")); //$NON-NLS-1$
+			//CApath = options.getString("CApath");
+			//CAfile = options.getString("CAfile");
 		}
 		return files;
 	}
@@ -181,7 +184,7 @@ public class Client implements Runnable {
 	}
 
 	String getCacheFileName(String name) {
-		String sep = System.getProperty("file.separator"); //$NON-NLS-1$
+		String sep = File.separator;
 		StringBuffer buf = new StringBuffer();
 		buf.append(cache);
 		buf.append(sep);
@@ -250,7 +253,7 @@ public class Client implements Runnable {
 
 			Client client = Client.parseCommandLine(args);
 			client.connect();
-			SwingUtilities.invokeLater(client);
+			client.loop();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

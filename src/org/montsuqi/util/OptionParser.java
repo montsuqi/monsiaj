@@ -73,8 +73,28 @@ public class OptionParser {
 		options.put(option.getName(), option);
 	}
 
-	public Object getValue(String name) {
-		return ((Option)options.get(name)).getValue();
+	private Object getValue(String name) {
+		if (options.containsKey(name)) {
+			return ((Option)options.get(name)).getValue();
+		} else {
+			Object[] args = { name };
+			String message = Messages.getString("OptionParser.no_such_option"); //$NON-NLS-1$
+			message = MessageFormat.format(message, args);
+			throw new IllegalArgumentException(message);
+		}
+	}
+
+	public String getString(String key) {
+		return (String)getValue(key);
+	}
+
+	public int getInt(String key) {
+		return ((Integer)getValue(key)).intValue();
+	}
+
+
+	public boolean getBoolean(String key) {
+		return ((Boolean)getValue(key)).booleanValue();
 	}
 
 	public String[] parse(String program, String[] args) {
