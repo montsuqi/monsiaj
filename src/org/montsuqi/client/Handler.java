@@ -17,14 +17,17 @@ public class Handler {
 		logger = Logger.getLogger(Handler.class);
 	}
 		
-	public boolean sendWidget(String name, Container widget, Protocol con) {
+	public boolean sendWidget(WidgetMarshal marshal, String name, Container widget) {
+		logger.enter("sendWidget");
 		if (sender == null) {
 			return false;
 		}
-
-		Object[] args = new Object[] { name, widget, con };
+		logger.debug("sender is {0}", sender);
+		Object[] args = new Object[] { name, widget };
 		try {
-			Boolean reply = (Boolean)sender.invoke(null, args);
+			logger.debug("->invoke {0}.sender({1}, {2})", new Object[] {marshal, name, widget});
+			Boolean reply = (Boolean)sender.invoke(marshal, args);
+			logger.debug("<-invoke sender done");
 			return reply.booleanValue();
 		} catch (IllegalAccessException e) {
 			logger.fatal(e);
@@ -38,14 +41,14 @@ public class Handler {
 		}
 	}
 
-	public boolean receiveWidget(Container widget, Protocol con) {
+	public boolean receiveWidget(WidgetMarshal marshal, Container widget) {
 		if (receiver == null) {
 			return false;
 		}
 		
-		Object[] args = new Object[] { widget, con };
+		Object[] args = new Object[] { widget };
 		try {
-			Boolean result = (Boolean)receiver.invoke(null, args);
+			Boolean result = (Boolean)receiver.invoke(marshal, args);
 			return result.booleanValue();
 		} catch (Exception e) {
 			logger.fatal(e);
