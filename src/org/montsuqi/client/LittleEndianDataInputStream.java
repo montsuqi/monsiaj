@@ -59,9 +59,8 @@ public class LittleEndianDataInputStream extends InputStream implements DataInpu
 		return ByteOrder.reverse(dis.readInt());
 	}
 
-	/** @deprecated but must be implemented... sigh */
 	public String readLine() throws IOException {
-		return dis.readLine();
+		throw new UnsupportedOperationException("DataInput#readLine() which is deprecated is not imprementad.");
 	}
 	
 	public long readLong() throws IOException {
