@@ -8,6 +8,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
@@ -17,6 +19,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Keymap;
 import javax.swing.text.PlainDocument;
+import org.montsuqi.util.Logger;
 import org.montsuqi.util.PrecisionScale;
 
 public class NumberEntry extends JTextField {
@@ -68,6 +71,10 @@ public class NumberEntry extends JTextField {
 		
 	}
 
+	public void setValue(double value) {
+		setValue(new BigDecimal(value));	
+	}
+
 	public BigDecimal getValue() {
 		NumberDocument doc = (NumberDocument)getDocument();
 		return doc.getValue();
@@ -97,7 +104,10 @@ public class NumberEntry extends JTextField {
 }
 
 class NumberDocument extends PlainDocument {
-	private String format;
+
+	private String originalFormat;
+	private NumberFormat format;
+	private static Logger logger;
 
 	private BigDecimal value;
 	private int scale;
@@ -106,15 +116,18 @@ class NumberDocument extends PlainDocument {
 	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
 
 	NumberDocument() {
-		format = DEFAULT_FORMAT;
+		
+		//setFormat(DEFAULT_FORMAT);
+		setFormat("-ZZZ,ZZZ.99");
 		expo = 0;
 		scale = 0;
 		value = new BigDecimal("0.0"); //$NON-NLS-1$
+		logger = Logger.getLogger(NumberDocument.class);
 	}
 	
 	synchronized void setValue(BigDecimal v) {
 		if ( ! value.equals(v)) {
-			PrecisionScale ps = new PrecisionScale(format);
+			PrecisionScale ps = new PrecisionScale(originalFormat);
 			String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
 			value = new BigDecimal(BigInteger.ZERO);
 			try {
@@ -128,17 +141,61 @@ class NumberDocument extends PlainDocument {
 	}
 
 	BigDecimal getValue() {
-		PrecisionScale ps = new PrecisionScale(format);
+		PrecisionScale ps = new PrecisionScale(originalFormat);
 		value = value.setScale(ps.precision, ps.scale);
 		return value;
 	}
 
 	void setFormat(String format) {
-		this.format = (format == null) ? DEFAULT_FORMAT : format;
+		this.originalFormat = (format == null) ? DEFAULT_FORMAT : format;
+		this.format = translateFormat(originalFormat); 
 	}
 	
+	private static NumberFormat translateFormat(String originalFormat) {
+		char[] chars = originalFormat.toCharArray();
+		StringBuffer buf = new StringBuffer(originalFormat.length());
+		int i = 0;
+		boolean negative = false;
+		boolean positive = false;
+		switch (chars[i]) {
+		case '-':
+			negative = true;
+			i++;
+			break;
+		case '+':
+			positive = true;
+			i++;
+			break;
+		}
+		for (/**/; i < chars.length; i++) {
+			char c = chars[i];
+			switch (c) {
+			case 'Z':
+				buf.append('#');
+				break;
+			case '9': case '-': case '+':
+				buf.append('0');
+				break;
+			default:
+				buf.append(c);
+				break;
+			}
+		}
+		StringBuffer tmp = new StringBuffer();
+		if (positive) {
+			tmp.append('+');
+		}
+		tmp.append(buf);
+		if (negative) {
+			tmp.append(';');
+			tmp.append('-');
+			tmp.append(buf);
+		}
+		return new DecimalFormat(tmp.toString());
+	}
+
 	String getFormat() {
-		return format;
+		return originalFormat;
 	}
 
 	public void insertString(int offs, String str, AttributeSet a)
@@ -147,7 +204,7 @@ class NumberDocument extends PlainDocument {
 			return;
 		}
 
-		PrecisionScale ps = new PrecisionScale(format);
+		PrecisionScale ps = new PrecisionScale(originalFormat);
 		boolean minus = value.signum() < 0;
 		BigDecimal v = value.abs();
 		char[] p = str.toCharArray();
@@ -155,7 +212,7 @@ class NumberDocument extends PlainDocument {
 			if (p[i] == '-') {
 				minus = (minus) ? false : true;
 			} else if (p[i] == '.') {
-				if (format.indexOf('.') >= 0) {
+				if (originalFormat.indexOf('.') >= 0) {
 					scale = 1;
 				}
 			} else if (Character.isDigit(p[i])) {
@@ -181,162 +238,7 @@ class NumberDocument extends PlainDocument {
 		super.insertString(0, formatValue(format, value), a);
 	}
 
-	private static String formatValue(String format, BigDecimal v) {
-		boolean fMinus, fMark;
-		if (v.signum() < 0) {
-			fMinus = true;
-			v = v.negate();
-		} else {
-			fMinus = false;
-		}
-
-		int buflen;
-
-		boolean fPSign, fNSign, fSup, fSmall;
-		fPSign = false;
-		fNSign = false;
-		fSup = false;
-		fSmall = false;
-		char sup = ' ';
-		char[] fs = format.toCharArray();
-		int f;
-
-		for (f = 0; f < fs.length; f++) {
-			switch (fs[f]) {
-			case '\\':
-				sup = fs[f]; fSup = true; break;
-			case 'Z':
-				sup = ' ';   fSup = true; break;
-			case '-':
-				if (fNSign) { fSup = true; } fNSign = true; break;
-			case '+':
-				if (fPSign) { fSup = true; } fPSign = true;	break;
-			case '.':
-				fSmall = true; break;
-			default:
-				break;
-			}
-		}
-
-		int len, p;
-		for (len = 0, p = 0; p < fs.length && fs[p] != '.'; len++, p++)
-			;
-
-		char[] vs = v.toString().toCharArray();
-		int q, qq;
-		for (q = 0; q < vs.length && vs[q] != '.'; q++)
-			;
-		qq = q - 1;
-		q++;
-
-		char[] buf = new char[format.length()];
-
-		for (int i = 0; i < buf.length; i++) {
-			buf[i] = '0';
-		}
-		
-		if (fSmall) { // when a '.' exists
-			p = len;
-			f = len;
-			while (f < fs.length) {
-				switch (fs[f]) {
-				case '9':
-					if (q < vs.length) {
-						buf[p] = vs[q];
-						q++;
-					}
-					break;
-				default:
-					buf[p] = fs[f];
-					break;
-				}
-				f++;
-				p++;
-			}
-			buflen = p;
-			len--;
-		} else { // otherwise
-			buflen = p + 1;
-		}
-		
-		p = len;
-		f = len;
-
-		if ( ! fSup) {
-			for (/**/; f >= 0; f--, p--) {
-				switch (fs[f]) {
-				case '9':
-					if (qq < 0) {
-						buf[p] = '0';
-					} else {
-						buf[p] = vs[qq];
-						qq --;
-					}
-					break;
-				case '-':
-					if (fMinus) {
-						buf[p] = '-';
-					} else {
-						buf[p] = ' ';
-					}
-					break;
-				case '+':
-					if (fMinus) {
-						buf[p] = '-';
-					} else {
-						buf[p] = '+';
-					}
-					break;
-				default:
-					buf[p] = fs[f];
-					break;
-				}
-			}
-		} else {
-			fMark = false;
-			for (/**/; f >= 0; f--, p--) {
-				if (qq < 0 || (qq == 0 && vs[qq] == '0')) {
-					switch (fs[f]) {
-					case 'Z': case '-': case '+': case '\\': case ',':
-						if (fNSign && fMinus) {
-							fNSign = false;
-							buf[p] = '-';
-							if (fs[f] == '-') {
-								fMark = true;
-							}
-						} else if (fPSign && ! fMinus) {
-							fPSign = false;
-							buf[p] = '+';
-							if (fs[f] == '+') {
-								fMark = true;
-							}
-						} else if ( ! fMark) {
-							buf[p] = sup;
-							fMark = true;
-						} else {
-							buf[p] = ' ';
-						}
-						break;
-					case '9':
-						buf[p] = '0';
-						break;
-					default:
-						buf[p] = fs[f];
-						break;
-					}
-				} else {
-					switch (fs[f]) {
-					case 'Z': case '\\': case '9': case '-': case '+':
-						buf[p] = vs[qq];
-						qq--;
-						break;
-					default:
-						buf[p] = fs[f];
-						break;
-					}
-				}
-			}
-		}
-		return new String(buf, 0, buflen);
+	private static String formatValue(NumberFormat format, BigDecimal v) {
+		return format.format(v);
 	}
 }
