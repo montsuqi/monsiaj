@@ -48,7 +48,7 @@ class ImagePreview extends Preview {
 		super.paintComponent(g);
 		if (image != null) {
 			g.drawImage(image, 0, 0, this);
-		} else if (sourceImage == null) {
+		} else if (sourceImage != null) {
 			g.drawImage(sourceImage, 0, 0, this);
 		}
 	}
