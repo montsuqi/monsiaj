@@ -35,6 +35,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationDialog;
@@ -64,6 +66,13 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
 	JMAReceiptConfigurationDialog(String title, Configuration conf) {
 		super(title, conf);
+		String className = UIManager.getSystemLookAndFeelClassName();
+		try {
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e) {
+			logger.warn(e);
+		}
+		SwingUtilities.updateComponentTreeUI(this);
 		setSize(320,240);
 	}
 
