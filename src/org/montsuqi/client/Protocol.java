@@ -185,9 +185,8 @@ public class Protocol extends Connection {
 		if (marshaller != null) {
 			marshaller.receive(valueManager, widget);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private boolean sendWidgetData(String name, Component widget) throws IOException {
@@ -196,9 +195,8 @@ public class Protocol extends Connection {
 		if (marshaller != null) {
 			marshaller.send(valueManager, name, widget);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private void receiveValueSkip() throws IOException {

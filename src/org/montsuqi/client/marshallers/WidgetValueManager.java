@@ -46,11 +46,10 @@ public final class WidgetValueManager {
 		if (valueTable.containsKey(name)) {
 			ValueAttribute va = (ValueAttribute)valueTable.get(name);
 			return va;
-		} else {
-			String message = Messages.getString("WidgetValueManager.no_such_value_name"); //$NON-NLS-1$
-			message = MessageFormat.format(message, new Object[] { name });
-			throw new IllegalArgumentException(message);
 		}
+		String message = Messages.getString("WidgetValueManager.no_such_value_name"); //$NON-NLS-1$
+		message = MessageFormat.format(message, new Object[] { name });
+		throw new IllegalArgumentException(message);
 	}
 
 	void setStyle(Component widget, String styleName) {

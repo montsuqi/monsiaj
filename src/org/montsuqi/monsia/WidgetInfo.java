@@ -63,9 +63,8 @@ public class WidgetInfo {
 	public String getLongName() {
 		if (parent == null) {
 			return getName();
-		} else {
-			return getParent().getLongName() + '.' + getName();
 		}
+		return getParent().getLongName() + '.' + getName();
 	}
 
 	public String getClassName() {

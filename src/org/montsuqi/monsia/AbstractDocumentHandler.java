@@ -99,9 +99,8 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
 			return new Interface(topLevels, protocol);
-		} else {
-			throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
 		}
+		throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
 	}
 
 	public void startDocument() throws SAXException {

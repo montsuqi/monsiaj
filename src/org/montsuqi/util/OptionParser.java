@@ -76,12 +76,11 @@ public class OptionParser {
 	private Object getValue(String name) {
 		if (options.containsKey(name)) {
 			return ((Option)options.get(name)).getValue();
-		} else {
-			Object[] args = { name };
-			String message = Messages.getString("OptionParser.no_such_option"); //$NON-NLS-1$
-			message = MessageFormat.format(message, args);
-			throw new IllegalArgumentException(message);
 		}
+		Object[] args = { name };
+		String message = Messages.getString("OptionParser.no_such_option"); //$NON-NLS-1$
+		message = MessageFormat.format(message, args);
+		throw new IllegalArgumentException(message);
 	}
 
 	public String getString(String key) {
@@ -209,9 +208,8 @@ public class OptionParser {
 	private String changeSuffix(String orig, String suffix) {
 		if (orig.indexOf('.') >= 0) {
 			return orig.substring(0, orig.lastIndexOf('.')) + suffix;
-		} else {
-			return orig + suffix;
 		}
+		return orig + suffix;
 	}
 
 	public static void main(String[] args) {

@@ -208,9 +208,8 @@ class Connection {
 	public BigDecimal receiveFixedData() throws IOException {
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
-		} else {
-			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
 		}
+		throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
 	}
 
 	public void sendFixedData(int type, BigDecimal xval) throws IOException {

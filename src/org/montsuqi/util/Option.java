@@ -67,12 +67,10 @@ class Option {
 		if (type == Boolean.class) {
 			if (((Boolean)value).booleanValue()) {
 				return "ON"; //$NON-NLS-1$
-			} else {
-				return "OFF"; //$NON-NLS-1$
 			}
-		} else {
-			return value.toString();
+			return "OFF"; //$NON-NLS-1$
 		}
+		return value.toString();
 	}
 
 	void setValue(String arg) {

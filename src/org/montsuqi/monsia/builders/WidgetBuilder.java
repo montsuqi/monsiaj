@@ -151,22 +151,21 @@ public class WidgetBuilder {
 			logger.warn(Messages.getString("WidgetBuilder.Unknown_widget_class"), genericClassName); //$NON-NLS-1$
 			String labelString = MessageFormat.format("[a {0}]", new Object[] { genericClassName }); //$NON-NLS-1$
 			return new JLabel(labelString);
-		} else {
-			try {
-				Component widget = builder.buildSelf(xml, parent, info);
-				if (widget instanceof Window) {
-					xml.setTopLevel(widget);
-				}
-				if (widget instanceof Container) {
-					builder.buildChildren(xml, (Container)widget, info);
-				}
-				builder.setCommonParameters(xml, widget, info);
-				builder.setSignals(xml, widget, info);
-				return widget;
-			} catch (Exception e) {
-				logger.warn(e);
-				return new JLabel('[' + e.toString() + ']');
+		}
+		try {
+			Component widget = builder.buildSelf(xml, parent, info);
+			if (widget instanceof Window) {
+				xml.setTopLevel(widget);
 			}
+			if (widget instanceof Container) {
+				builder.buildChildren(xml, (Container)widget, info);
+			}
+			builder.setCommonParameters(xml, widget, info);
+			builder.setSignals(xml, widget, info);
+			return widget;
+		} catch (Exception e) {
+			logger.warn(e);
+			return new JLabel('[' + e.toString() + ']');
 		}
 	}
 
