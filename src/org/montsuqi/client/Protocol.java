@@ -24,13 +24,13 @@ package org.montsuqi.client;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.util.BitSet;
@@ -41,18 +41,17 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Style;
-import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.PandaTimer;
 
 public class Protocol extends Connection {
 
-	private JFrame oldWindow;
 	private WidgetValueManager valueManager;
 	private Map windowTable;
 	private Logger logger;
@@ -149,9 +148,8 @@ public class Protocol extends Connection {
 			switch (type) {
 			case ScreenType.NEW_WINDOW:
 			case ScreenType.CURRENT_WINDOW:
-				String fName = client.getCacheFileName(wName);
 				try {
-					InputStream input = new FileInputStream(fName);
+					InputStream input = new FileInputStream(client.getCacheFileName(wName));
 					Interface xml = Interface.parseInput(input, this);
 					input.close();
 					node = new Node(xml, wName);
@@ -168,12 +166,9 @@ public class Protocol extends Connection {
 			case ScreenType.CURRENT_WINDOW:
 				w.pack();
 				w.setVisible(true);
-				if (oldWindow != null && oldWindow != w) { 
-					oldWindow.setVisible(false);
-				}
 				break;
 			case ScreenType.CLOSE_WINDOW:
-				oldWindow = w;
+				w.setVisible(false);
 				// fall through
 			default:
 				node = null;
@@ -183,10 +178,9 @@ public class Protocol extends Connection {
 		return node;
 	}
 
-	private void destroyWindow(String sName) {
-		Node node = (Node)windowTable.get(sName);
-		if (node != null) {
-			windowTable.remove(sName);
+	private void destroyWindow(String name) {
+		if (windowTable.containsKey(name)) {
+			windowTable.remove(name);
 		}
 	}
 
@@ -220,7 +214,7 @@ public class Protocol extends Connection {
 		Class clazz = widget.getClass();
 		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
 		if (marshaller != null) {
-			marshaller.receive(valueManager, widget); 
+			marshaller.receive(valueManager, widget);
 			return true;
 		} else {
 			return false;
@@ -347,15 +341,13 @@ public class Protocol extends Connection {
 	}
 
 	void resetTimer(Component widget) {
-		if (widget instanceof Container) {
+		if (widget instanceof PandaTimer) {
+			((PandaTimer)widget).reset();
+		} else if (widget instanceof Container) {
 			Container container = (Container)widget;
 			for (int i = 0, n = container.getComponentCount(); i < n; i++) {
-				Component comp = container.getComponent(i);
-				resetTimer(comp);
+				resetTimer(container.getComponent(i));
 			}
-		} else if (widget instanceof PandaTimer) {
-			PandaTimer timer = (PandaTimer)widget;
-			timer.reset();
 		}
 	}
 
@@ -409,9 +401,9 @@ public class Protocol extends Connection {
 				break;
 			}
 			if (c == PacketClass.NOT) {
-				/* no screen data */
+				// no screen data
 			} else {
-				/* fatal error */
+				// fatal error
 			}
 		}
 		if (c == PacketClass.FocusName) {
@@ -426,7 +418,7 @@ public class Protocol extends Connection {
 			}
 			c = receivePacketClass();
 		}
-		/* reset GtkPandaTimer if exists */
+		// reset GtkPandaTimer if exists
 		node = (Node)windowTable.get(window);
 		if (node != null) {
 			resetTimer(node.getWindow());
@@ -533,11 +525,7 @@ public class Protocol extends Connection {
 
 	public void send_event(Component widget, Object userData) throws IOException {
 		if ( ! isReceiving()  && !ignoreEvent) {
-			Component parent = widget;
-			while (parent.getParent() != null) {
-				parent = parent.getParent();
-			}
-			sendEvent(parent.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
+			sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
 			sendWindowData();
 //			blockChangedHanders();
 			if (getScreenData()) {
@@ -569,11 +557,7 @@ public class Protocol extends Connection {
 	}
 
 	public void entry_next_focus(Component widget, Object userData) {
-		Component parent = widget;
-		while (parent.getParent() != null) {
-			parent = parent.getParent();
-		}
-		Node node = (Node)windowTable.get(parent.getName());
+		Node node = (Node)windowTable.get(SwingUtilities.windowForComponent(widget).getName());
 		if (node != null) {
 			Component nextWidget = node.getInterface().getWidget(userData.toString());
 			if (nextWidget != null) {
@@ -586,12 +570,9 @@ public class Protocol extends Connection {
 		if (isReceiving()) {
 			return;
 		}
-		Component parent = widget;
-		while (parent.getParent() != null) {
-			parent = parent.getParent();
-		}
+		Window window = SwingUtilities.windowForComponent(widget);
 		String name = xml.getLongName(widget);
-		String windowName = parent.getName();
+		String windowName = window.getName();
 		Node node = (Node)windowTable.get(windowName);
 		if (node != null) {
 			node.addChangedWidget(name, widget);
@@ -627,7 +608,7 @@ public class Protocol extends Connection {
 	}
 
 	public void entry_set_editable(Component widget, Object userData) {
-		/* empty??? */
+		// empty???
 	}
 
 	public void map_event(Component widget, Object userData) {
@@ -635,16 +616,13 @@ public class Protocol extends Connection {
 	}
 
 	public void set_focus(Component widget, Object userData) {
-		String name = widget.getName();
-		Node node = (Node)windowTable.get(name);
-		if(node != null) {
-			/*FocusedScreen = node;*/ // this variable is referred from nowhere.
+		if(windowTable.containsKey(widget.getName())) {
+			// FocusedScreen = node; // this variable is referred from nowhere.
 		}
 	}
 
 	public void day_selected(Component widget, Object userData) {
-		Calendar cal = (Calendar)widget;
-		addChangedWidget(cal, userData);
+		addChangedWidget(widget, userData);
 	}
 
 	public void switch_page(Component widget, Object userData) {
@@ -656,8 +634,7 @@ public class Protocol extends Connection {
 	}
 
 	public void window_close(Component widget, Object userData) {
-		String name = widget.getName();
-		Node node = (Node)windowTable.get(name);
+		Node node = (Node)windowTable.get(widget.getName());
 		if (node != null) {
 			node.getWindow().setVisible(false);
 			if ( ! isReceiving()) {
@@ -688,9 +665,7 @@ public class Protocol extends Connection {
 		try {
 			uri = new URL((String)userData);
 			pane.setPage(uri);
-		} catch (MalformedURLException e) {
-			logger.warn(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.warn(e);
 		}
 	}
