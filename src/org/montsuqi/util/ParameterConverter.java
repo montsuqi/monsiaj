@@ -31,7 +31,13 @@ public class ParameterConverter {
 	}
 
 	public static boolean toBoolean(String s) {
-		return "tyTy".indexOf(s.charAt(0)) >= 0 || toInteger(s) != 0; //$NON-NLS-1$
+		if ("tyTY".indexOf(s.charAt(0)) >= 0) { //$NON-NLS-1$
+			return true;
+		} else if ("fnFN".indexOf(s.charAt(0)) >= 0) { //$NON-NLS-1$
+			return false;
+		} else {
+			return toInteger(s) != 0;
+		}
 	}
 
 	public double toDouble(String s) {
