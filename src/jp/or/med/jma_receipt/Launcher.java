@@ -31,18 +31,24 @@ public final class Launcher {
 
 	public static void main(String[] args) {
 		Client client = new Client();
-		Class clazz = null;
 		Logger logger;
 		logger = Logger.getLogger(Launcher.class);
 
-		try {
-			clazz = Class.forName("jp.or.med.jma_receipt.PreferenceBasedConfiguration"); //$NON-NLS-1$
-		} catch (ClassNotFoundException e1) {
+		String[] classes = {
+				"jp.or.med.jma_receipt.PreferenceBasedConfiguration", //$NON-NLS-1$
+				"jp.or.med.jma_receipt.PropertyFileBasedConfiguration" //$NON-NLS-1$
+		};
+		Class clazz = null;
+		for (int i = 0; i < classes.length; i++) {
 			try {
-				clazz = Class.forName("jp.or.med.jma_receipt.PropertyFileBasedConfiguration"); //$NON-NLS-1$
-			} catch (ClassNotFoundException e2) {
-				logger.fatal(e2);
+				clazz = Class.forName(classes[i]);
+				break;
+			} catch (ClassNotFoundException e) {
+				continue;
 			}
+		}
+		if (clazz == null) {
+			logger.fatal(Messages.getString("Launcher.no_configuration_class_found")); //$NON-NLS-1$
 		}
 		Configuration conf;
 		try {
