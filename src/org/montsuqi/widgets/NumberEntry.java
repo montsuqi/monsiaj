@@ -243,7 +243,7 @@ class NumberDocument extends PlainDocument {
 		String formatted = formatValue(format, value);
 		remove(0, getLength());
 		// treat zero value representation specially
-		if (formatted.equals("0") && leaveZeroAsBlank()) { //$NON-NLS-1$
+		if (formatted.trim().equals("0") && leaveZeroAsBlank()) { //$NON-NLS-1$
 			// do nothing
 		} else {
 			super.insertString(0, formatted, a);
