@@ -26,10 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Iterator;
 
-import javax.swing.JApplet;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JWindow;
+import javax.swing.RootPaneContainer;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
@@ -38,19 +35,13 @@ import org.montsuqi.monsia.WidgetInfo;
 class ContainerBuilder extends WidgetBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		Iterator i = info.getChildren().iterator();
+		RootPaneContainer rootPaneContainer = (RootPaneContainer)parent;
+		Container contentPane = rootPaneContainer.getContentPane();
 		while (i.hasNext()) {
 			ChildInfo cInfo = (ChildInfo)i.next();
-			Component child = WidgetBuilder.buildWidget(xml, cInfo.getWidgetInfo());
-			if (parent instanceof JWindow) {
-				parent = ((JWindow)parent).getContentPane();
-			} else if (parent instanceof JFrame) {
-				parent = ((JFrame)parent).getContentPane();
-			} else if (parent instanceof JDialog) {
-				parent = ((JDialog)parent).getContentPane();
-			} else if (parent instanceof JApplet) {
-				parent = ((JApplet)parent).getContentPane();
-			}
-			parent.add(child);
+			WidgetInfo wInfo = cInfo.getWidgetInfo();
+			Component child = WidgetBuilder.buildWidget(xml, wInfo);
+			contentPane.add(child);
 		}
 	}
 }
