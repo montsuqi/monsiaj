@@ -195,11 +195,11 @@ class Connection {
 		// negative values are represented by masking the first
 		// character with NEGATIVE_FIXED_MASK(0x40),
 		// '0'(0x30) -> 'p'(0x70) for instance.
-		char c = value.charAt(0);
-		boolean negative = false;
-		if ((c & NEGATIVE_FIXED_MASK) != 0) {
-			value = (char)(c & ~NEGATIVE_FIXED_MASK) + value.substring(1);
-			negative = true;
+		char[] chars = value.toCharArray();
+		boolean negative = (chars[0] & NEGATIVE_FIXED_MASK) != 0;
+		if (negative) {
+			chars[0] &= ~NEGATIVE_FIXED_MASK;
+			value = new String(chars);
 		}
 		try {
 			BigDecimal v =  new BigDecimal(value);
