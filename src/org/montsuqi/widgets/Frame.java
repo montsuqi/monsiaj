@@ -23,11 +23,19 @@ package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.border.TitledBorder;
 
 public class Frame extends JComponent {
 	public Frame() {
 		super();
 		setLayout(new BorderLayout());
+		setBorder(BorderFactory.createTitledBorder("")); //$NON-NLS-1$
+	}
+
+	public void setTitle(String newTitle) {
+		TitledBorder border = (TitledBorder)getBorder();
+		border.setTitle(newTitle);
 	}
 }
