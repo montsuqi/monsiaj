@@ -133,7 +133,14 @@ class Connection {
 	}
 
 	int receiveLong() throws IOException { // longs: 4-byte long
-		return in.readInt();
+		int i = in.readInt();
+		// WORKAROUND:
+		// some application returns "    "(4 spaces) for
+		// integer 0 even it sends numeric data type beforehand.
+		if (i == 0x20202020) { // " " is 0x20
+			i = 0;
+		}
+		return i;
 	}
 
 	void sendLong(int data) throws IOException {
