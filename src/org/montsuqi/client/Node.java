@@ -1,20 +1,20 @@
-package org.montsuqi.monsia;
+package org.montsuqi.client;
 
 import java.awt.Container;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
 
-public class Node {
+import org.montsuqi.monsia.Interface;
+
+class Node {
 
 	private Interface xml;
 	private String name;
 	private JFrame window;
 	private Map changedWidgets;
 
-	public Node(Interface xml, String wName) {
+	Node(Interface xml, String wName) {
 		this.xml = xml;
 		this.name = wName;
 		Container widget = xml.getWidget(wName);
@@ -22,34 +22,27 @@ public class Node {
 		this.changedWidgets = new HashMap();
 	}
 
-	public String getName() {
+	String getName() {
 		return name;
 	}
 
-	public Interface getInterface() {
+	Interface getInterface() {
 		return xml;
 	}
 
-	public JFrame getWindow() {
+	JFrame getWindow() {
 		return window;
 	}
 
-	public String toString() {
-		StringWriter s = new StringWriter();
-		PrintWriter p = new PrintWriter(s);
-		window.list(p);
-		return s.toString();
-	}
-
-	public void clearChangedWidgets() {
+	void clearChangedWidgets() {
 		changedWidgets.clear();
 	}
 
-	public Map getChangedWidgets() {
+	Map getChangedWidgets() {
 		return changedWidgets;
 	}
 
-	public void addChangedWidget(String name, Container widget) {
+	void addChangedWidget(String name, Container widget) {
 		if ( ! changedWidgets.containsKey(name)) {
 			changedWidgets.put(name, widget);
 		}
