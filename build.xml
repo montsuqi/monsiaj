@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.18 2004-05-28 11:16:52 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.19 2004-06-07 06:52:51 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -73,13 +73,7 @@
 
   <target name="resources" depends="prepare">
     <copy todir="${build.dir}">
-      <fileset dir="${src.dir}" includes="**/*.properties"/>
-    </copy>
-    <copy todir="${build.dir}/jp/or/med/jma_receipt">
-      <fileset dir="${resources.dir}" includes="*.jpg"/>
-    </copy>
-    <copy todir="${build.dir}/org/montsuqi/widgets">
-      <fileset dir="${resources.dir}" includes="*.png"/>
+      <fileset dir="${src.dir}" includes="**/*.properties,**/*.jpg,**/*.png"/>
     </copy>
     <native2ascii src="${resources.dir}" dest="${build.dir}"
       includes="*.jnlp" encoding="EUC-JP"/>
@@ -105,13 +99,13 @@
          basedir="${build.dir}"
          includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
          manifest="${resources.dir}/jmareceipt.mf"/>
-    <!-- ant 1.5.x should use destfile instead of zipfile-->
     <copy todir="${dist.dir}">
       <fileset dir="${libs.dir}" includes="*.jar" excludes="jfcunit.jar"/>
     </copy>
     <copy todir="${dist.dir}">
       <fileset dir="${build.dir}" includes="*.jnlp"/>
     </copy>
+    <!-- ant 1.5.x should use destfile instead of zipfile-->
     <zip zipfile="${dist.dir}/monsiaj-${DSTAMP}.zip">
       <fileset dir="${dist.dir}" includes="*.jar"/>
     </zip>
