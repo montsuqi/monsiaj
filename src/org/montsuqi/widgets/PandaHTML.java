@@ -68,6 +68,7 @@ public class PandaHTML extends JScrollPane {
 	}
 
 	public void setURI(final URL uri) {
+		setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
 		Runnable loader = new HTMLLoader(uri);
 		SwingUtilities.invokeLater(loader);
 	}
@@ -81,7 +82,7 @@ public class PandaHTML extends JScrollPane {
 	}
 
 	public static void main(String[] args) throws MalformedURLException {
-		final JFrame frame = new JFrame();
+		final JFrame frame = new JFrame("PandaHTML Test"); //$NON-NLS-1$
 		Container container = frame.getContentPane();
 		container.setLayout(new BorderLayout());
 		final PandaHTML html = new PandaHTML();
@@ -138,7 +139,6 @@ public class PandaHTML extends JScrollPane {
 		}
 
 		public void run() {
-			setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
 			try {
 				logger.debug("loading {0}", uri); //$NON-NLS-1$
 				pane.setPage(uri);
