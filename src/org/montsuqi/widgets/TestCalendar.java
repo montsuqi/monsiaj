@@ -2,13 +2,13 @@ package org.montsuqi.widgets;
 
 import org.montsuqi.widgets.Window;
 import org.montsuqi.widgets.Calendar;
-import org.montsuqi.widgets.CalendarEvent;
-import org.montsuqi.widgets.CalendarListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.util.Date;
 
 import junit.extensions.jfcunit.JFCTestCase;
@@ -38,19 +38,9 @@ public class TestCalendar extends JFCTestCase {
 		window.setVisible(true);
 		final DateFormat monthFormat = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
 		final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); //$NON-NLS-1$
-		cal.addCalendarListener(new CalendarListener() {
+		cal.addChangeListener(new ChangeListener() {
 
-			public void previousMonth(CalendarEvent e) {
-				Date date = cal.getDate();
-				JOptionPane.showMessageDialog(window, monthFormat.format(date));
-			}
-
-			public void nextMonth(CalendarEvent e) {
-				Date date = cal.getDate();
-				JOptionPane.showMessageDialog(window, monthFormat.format(date));
-			}
-
-			public void daySelected(CalendarEvent e) {
+			public void stateChanged(ChangeEvent e) {
 				Date date = cal.getDate();
 				JOptionPane.showMessageDialog(window, dayFormat.format(date));
 			}

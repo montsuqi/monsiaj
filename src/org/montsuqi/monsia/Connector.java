@@ -67,8 +67,6 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
-import org.montsuqi.widgets.CalendarEvent;
-import org.montsuqi.widgets.CalendarListener;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TimerEvent;
 import org.montsuqi.widgets.TimerListener;
@@ -390,14 +388,8 @@ abstract class Connector {
 					return;
 				}
 				Calendar cal = (Calendar)target;
-				cal.addCalendarListener(new CalendarListener() {
-					public void previousMonth(CalendarEvent e) {
-						// do nothing
-					}
-					public void nextMonth(CalendarEvent e) {
-						// do nothing
-					}
-					public void daySelected(CalendarEvent e) {
+				cal.addChangeListener(new ChangeListener() {
+					public void stateChanged(ChangeEvent e) {
 						invoke(con, handler, target, other);
 					}
 				});

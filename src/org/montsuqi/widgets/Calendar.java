@@ -23,8 +23,6 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -38,67 +36,31 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import java.util.Date;
 
 public class Calendar extends JComponent {
 
-	private Date date;
-	private SimpleDateFormat df;
+	Date date;
 	private JComponent caption;
 	private JButton[][] dateCells;
 	Date[][] cellDates;
-	private java.util.Calendar cal;
-
-	private JButton prev;
-	private JButton next;
-	private JLabel monthLabel;
+	java.util.Calendar cal;
 
 	public Calendar() {
 		super();
-		df = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
 		setLayout(new BorderLayout());
 		caption = new JPanel();
 		add(caption, BorderLayout.NORTH);
-		prev = new JButton("<"); //$NON-NLS-1$
-		next = new JButton(">"); //$NON-NLS-1$
+		caption.setLayout(new GridLayout(1, 2));
 
-		prev.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				previousMonth();
-				fireCalendarEvent(new CalendarEvent(Calendar.this, CalendarEvent.PREVIOUS_MONTH));
-			}
-		});
-
-		next.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				nextMonth();
-				fireCalendarEvent(new CalendarEvent(Calendar.this, CalendarEvent.NEXT_MONTH));
-			}
-		});
-
-		monthLabel = new JLabel();
-		GridBagLayout gbl = new GridBagLayout();
-		caption.setLayout(gbl);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbl.setConstraints(prev, gbc);
-		caption.add(prev);
-
-		gbc.gridx = 2;
-		gbl.setConstraints(next, gbc);
-		caption.add(next);
-
-		gbc.gridx = 1;
-		gbc.weightx = 1.0;
-		gbl.setConstraints(monthLabel, gbc);
-		caption.add(monthLabel);
+		caption.add(createDateSpinner(java.util.Calendar.MONTH, Messages.getString("Calendar.month_format"))); //$NON-NLS-1$
+		caption.add(createDateSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format"))); //$NON-NLS-1$
 
 		dateCells = new JButton[7][7];
 		cellDates = new Date[7][7];
@@ -109,6 +71,7 @@ public class Calendar extends JComponent {
 		cal = java.util.Calendar.getInstance();
 		setDate(cal.getTime());
 
+		SimpleDateFormat df = new SimpleDateFormat();
 		DateFormatSymbols symbols = df.getDateFormatSymbols();
 		String[] dayOfWeekNames = symbols.getShortWeekdays();
 		for (int col = 0; col < 7; col++) {
@@ -129,7 +92,7 @@ public class Calendar extends JComponent {
 				cell.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setDate(cellDates[finalRow][finalCol]);
-						fireCalendarEvent(new CalendarEvent(Calendar.this, CalendarEvent.DAY_SELECTED));
+						fireChangeEvent(new ChangeEvent(Calendar.this));
 					}
 				});
 				dateCells[row][col] = cell;
@@ -139,23 +102,33 @@ public class Calendar extends JComponent {
 		setCells();
 	}
 
-	protected void fireCalendarEvent(CalendarEvent e) {
-		CalendarListener[] listeners = (CalendarListener[])listenerList.getListeners(CalendarListener.class);
-		for (int i = 0, n = listeners.length; i < n; i++) {
-			CalendarListener l = listeners[i];
-			switch (e.getID()) {
-			case CalendarEvent.PREVIOUS_MONTH:
-				l.previousMonth(e);
-				break;
-			case CalendarEvent.NEXT_MONTH:
-				l.nextMonth(e);
-				break;
-			case CalendarEvent.DAY_SELECTED:
-				l.daySelected(e);
-				break;
-			default:
-				throw new IllegalStateException(Messages.getString("Calendar.unknown_event_id")); //$NON-NLS-1$
+	private JSpinner createDateSpinner(final int field, String format) {
+		SpinnerDateModel model = new SpinnerDateModel();
+		model.setCalendarField(field);
+		final JSpinner spinner = new JSpinner(model);
+		JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, format);
+		spinner.setEditor(editor);
+
+		spinner.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Date newDate = (Date)spinner.getValue();
+				cal.setTime(newDate);
+				int value = cal.get(field);
+				cal.setTime(date);
+				cal.set(field, value);
+				setDate(cal.getTime());
+				setCells();
 			}
+		});
+
+		return spinner;
+	}
+
+	protected void fireChangeEvent(ChangeEvent e) {
+		ChangeListener[] listeners = (ChangeListener[])listenerList.getListeners(ChangeListener.class);
+		for (int i = 0, n = listeners.length; i < n; i++) {
+			ChangeListener l = listeners[i];
+			l.stateChanged(e);
 		}
 	}
 
@@ -167,7 +140,7 @@ public class Calendar extends JComponent {
 		this.date = date;
 	}
 
-	private void setCells() {
+	void setCells() {
 		cal.setTime(date);
 		int month = cal.get(java.util.Calendar.MONTH);
 		for (int row = 1; row < 7; row++) {
@@ -180,7 +153,7 @@ public class Calendar extends JComponent {
 				cell.setEnabled(month == cal.get(java.util.Calendar.MONTH));
 			}
 		}
-		monthLabel.setText(df.format(date));
+		//monthLabel.setText(df.format(date));
 	}
 	
 	private Date computeCellDate(int row, int col) {
@@ -198,33 +171,12 @@ public class Calendar extends JComponent {
 		return cal.getTime();
 	}
 
-	public void nextMonth() {
-		cal.setTime(date);
-		cal.roll(java.util.Calendar.MONTH, true);
-		if (cal.getTime().before(date)) {
-			cal.roll(java.util.Calendar.YEAR, true);
-		}
-		
-		date = cal.getTime();
-		setCells();
+	public void addChangeListener(ChangeListener l) {
+		listenerList.add(ChangeListener.class, l);
 	}
 
-	public void previousMonth() {
-		cal.setTime(date);
-		cal.roll(java.util.Calendar.MONTH, false);
-		if (cal.getTime().after(date)) {
-			cal.roll(java.util.Calendar.YEAR, false);
-		}
-		date = cal.getTime();
-		setCells();
-	}
-
-	public void addCalendarListener(CalendarListener l) {
-		listenerList.add(CalendarListener.class, l);
-	}
-
-	public void removeCalendarListener(CalendarListener l) {
-		listenerList.remove(CalendarListener.class, l);
+	public void removeChangeListener(ChangeListener l) {
+		listenerList.remove(ChangeListener.class, l);
 	}
 
 	public static void main(String[] args) {
@@ -235,19 +187,9 @@ public class Calendar extends JComponent {
 		f.setVisible(true);
 		final DateFormat monthFormat = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
 		final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); //$NON-NLS-1$
-		cal.addCalendarListener(new CalendarListener() {
+		cal.addChangeListener(new ChangeListener() {
 
-			public void previousMonth(CalendarEvent e) {
-				Date date = cal.getDate();
-				JOptionPane.showMessageDialog(f, monthFormat.format(date));
-			}
-
-			public void nextMonth(CalendarEvent e) {
-				Date date = cal.getDate();
-				JOptionPane.showMessageDialog(f, monthFormat.format(date));
-			}
-
-			public void daySelected(CalendarEvent e) {
+			public void stateChanged(ChangeEvent e) {
 				Date date = cal.getDate();
 				JOptionPane.showMessageDialog(f, dayFormat.format(date));
 			}
