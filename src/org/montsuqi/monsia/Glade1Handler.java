@@ -59,6 +59,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 
 	void flushWidgetInfo() {
 		WidgetInfo w = getLastPendingWidget();
+		dialogHack(w);
 		pendingWidgets.removeLast();
 		widgets.put(w.getName(), w);
 		if (pendingWidgets.size() == 0) {

@@ -24,6 +24,7 @@ package org.montsuqi.client;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,7 +40,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.montsuqi.util.Logger;
@@ -58,7 +58,6 @@ public class Protocol extends Connection {
 	private Client client;
 	private StringBuffer widgetName;
 	private Interface xml;
-	private boolean ignoreEvent;
 	private boolean receiving;
 	private boolean protocol1;
 	private boolean protocol2;
@@ -70,7 +69,6 @@ public class Protocol extends Connection {
 		this.client = client;
 		windowTable = new HashMap();
 		setReceiving(false);
-		ignoreEvent = false;
 		protocol1 = true;
 		protocol2 = false;
 		logger = Logger.getLogger(Connection.class);
@@ -141,14 +139,14 @@ public class Protocol extends Connection {
 		if (node == null) {
 			return null;
 		}
-		JFrame w = node.getWindow();
+		Window w = node.getWindow();
 		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
 			w.pack();
-			w.setVisible(true);
+			w.show();
 			return node;
 		}
 		if (type == ScreenType.CLOSE_WINDOW){
-			w.setVisible(false);
+			w.hide();
 		}
 		return null;
 	}
@@ -511,16 +509,8 @@ public class Protocol extends Connection {
 		}
 	}
 
-	boolean isReceiving() {
+	public boolean isReceiving() {
 		return receiving;
-	}
-
-	boolean isIgnoreEvent() {
-		return ignoreEvent;
-	}
-
-	void setIgnoreEvent(boolean flag) {
-		ignoreEvent = flag;
 	}
 
 	Node getNode(String name) {

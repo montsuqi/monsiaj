@@ -199,6 +199,16 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		properties.clear();
 	}
 
+	protected void dialogHack(WidgetInfo info) {
+		String genericClassName = info.getClassName();
+		// handle Window/Dialog specially
+		if ("Window".equals(genericClassName)) { //$NON-NLS-1$
+			if ("GTK_WINDOW_DIALOG".equals(info.getProperty("type"))) { //$NON-NLS-1$ //$NON-NLS-2$
+				info.setClassName("Dialog"); //$NON-NLS-1$
+			}
+		}
+	}
+
 	protected void flushSignals() {
 		widget.setSignals(signals);
 		signals.clear();

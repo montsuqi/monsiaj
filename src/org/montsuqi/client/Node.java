@@ -23,10 +23,9 @@ copies.
 package org.montsuqi.client;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JFrame;
-
 import org.montsuqi.monsia.Interface;
 
 class Node {
@@ -49,8 +48,8 @@ class Node {
 		return xml;
 	}
 
-	JFrame getWindow() {
-		return (JFrame)xml.getWidget(name);
+	Window getWindow() {
+		return (Window)xml.getWidget(name);
 	}
 
 	void clearChangedWidgets() {

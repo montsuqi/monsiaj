@@ -50,17 +50,18 @@ public abstract class SignalHandler {
 		});
 
 		final SignalHandler sendEvent = new SignalHandler() {
+			boolean ignoreEvent = false;
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if ( ! con.isReceiving()  && !con.isIgnoreEvent()) {
+				if ( ! con.isReceiving() && ! ignoreEvent) {
 					con.sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
 					con.sendWindowData();
 //					blockChangedHanders();
 					if (con.getScreenData()) {
-						con.setIgnoreEvent(true);
+						ignoreEvent = true;
 //						while (gtk_events_pending()) {
 //							gtk_main_iteration();
 //						}
-						con.setIgnoreEvent(false);
+						ignoreEvent = false;
 					}
 //					unblockChangedHanders();
 				}

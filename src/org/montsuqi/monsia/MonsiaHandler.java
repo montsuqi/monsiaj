@@ -163,6 +163,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			flushProperties();
 			flushSignals();
 			flushAccels();
+			dialogHack(widget);
 			widget = widget.getParent();
 			widgetDepth--;
 			
