@@ -63,6 +63,7 @@ import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.UIStock;
 
 abstract class WidgetPropertySetter {
 
@@ -540,9 +541,9 @@ abstract class WidgetPropertySetter {
 				value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
 				UIStock stock = UIStock.get(value);
 				if (stock != null) {
-					String text = stock.getText();
-					if (text != null) {
-						item.setText(text);
+					String oldText = item.getText();
+					if (oldText == null || oldText.length() == 0) {
+						item.setText(stock.getText());
 					}
 				}
 			}

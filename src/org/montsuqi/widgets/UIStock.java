@@ -20,41 +20,38 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-/*      PANDA -- a simple transaction monitor
+package org.montsuqi.widgets;
 
-Copyright (C) 1998-1999 Ogochan.
-              2000-2003 Ogochan & JMA (Japan Medical Association).
-
-This module is part of PANDA.
-
-		PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
-
-		Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
-*/
-
-package org.montsuqi.monsia.builders;
-
+import java.net.URL;
 import java.util.Map;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
-class UIStock {
+public class UIStock {
 
 	private static Map stocks;
 	private String text;
 	private String tooltip;
+	private Icon icon;
 
 	private UIStock(String text, String tooltip) {
+		this(text, tooltip, null);
+	}
+
+	private UIStock(String text, String tooltip, String iconPath) {
+		if (text == null) {
+			throw new NullPointerException("null text"); //$NON-NLS-1$
+		}
+		if (tooltip == null) {
+			throw new NullPointerException("null tooltip"); //$NON-NLS-1$
+		}
 		this.text = text;
 		this.tooltip = tooltip;
+
+		if (iconPath != null) {
+			URL url = getClass().getResource(iconPath);
+			icon = new ImageIcon(url);
+		}
 	}
 
 	public String getText() {
@@ -63,6 +60,10 @@ class UIStock {
 
 	public String getToolTip() {
 		return tooltip;
+	}
+
+	public Icon getIcon() {
+		return icon;
 	}
 
 	public static UIStock get(String key) {
@@ -121,9 +122,5 @@ class UIStock {
 		stocks.put("HINT_ITEM",         new UIStock(Messages.getString("UIStock.Hint"), Messages.getString("UIStock.HintTip"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		stocks.put("SCORE_ITEM",        new UIStock(Messages.getString("UIStock.Score..."), Messages.getString("UIStock.ScoreTip"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		stocks.put("END_GAME_ITEM",     new UIStock(Messages.getString("UIStock.EndGame"), Messages.getString("UIStock.EndGameTip"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
 	}
 }
-
-/*
-*/
