@@ -149,8 +149,15 @@ abstract class Connector {
 
 		registerConnector("changed", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
-				if (target instanceof JTextComponent) {
-					JTextComponent text = (JTextComponent)target;
+				if (target.getParent() instanceof JComboBox) {
+					JComboBox combo = (JComboBox)target.getParent();
+					combo.addItemListener(new ItemListener() {
+						public void itemStateChanged(ItemEvent e) {
+							invoke(con, handler, target, other);
+						}
+					});
+				} else if (target instanceof JTextComponent) {
+					final JTextComponent text = (JTextComponent)target;
 					text.getDocument().addDocumentListener(new DocumentListener() {
 						public void insertUpdate(DocumentEvent event) {
 							invoke(con, handler, target, other);
@@ -159,13 +166,6 @@ abstract class Connector {
 							invoke(con, handler, target, other);
 						}
 						public void changedUpdate(DocumentEvent event) {
-							invoke(con, handler, target, other);
-						}
-					});
-				} else if (target instanceof JComboBox) {
-					JComboBox combo = (JComboBox)target;
-					combo.addItemListener(new ItemListener() {
-						public void itemStateChanged(ItemEvent e) {
 							invoke(con, handler, target, other);
 						}
 					});

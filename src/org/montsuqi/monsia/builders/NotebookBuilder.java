@@ -26,16 +26,16 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
-import javax.swing.JTabbedPane;
-
+import javax.swing.JButton;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
+import org.montsuqi.widgets.Notebook;
 
 class NotebookBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		// create tabs first
-		JTabbedPane tabbed = (JTabbedPane)parent;
+		Notebook notebook = (Notebook)parent;
 		int cCount = info.getChildren().size();
 		if (cCount % 2 != 0) {
 			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.odd_number_of_notebook_childrens")); //$NON-NLS-1$
@@ -51,11 +51,15 @@ class NotebookBuilder extends ContainerBuilder {
 			Map properties = wInfo.getProperties();
 			if (properties.containsKey("child_name")) { //$NON-NLS-1$
 				if (properties.containsKey("label")) { //$NON-NLS-1$
-					labels[currentLabel] = ((String)properties.get("label")); //$NON-NLS-1$
+					labels[currentLabel] = (String)properties.get("label"); //$NON-NLS-1$
 					currentLabel++;
 				} else {
 					throw new WidgetBuildingException(Messages.getString("WidgetBuilder.no_label_for_a_tab")); //$NON-NLS-1$
 				}
+				JButton button = (JButton)buildWidget(xml, wInfo, parent);
+				setCommonParameters(xml, button, wInfo);
+				setSignals(xml, button, wInfo);
+				notebook.addButton(button);
 			} else {
 				Component body = buildWidget(xml, wInfo, parent);
 				bodies[currentBody] = body;
@@ -66,7 +70,7 @@ class NotebookBuilder extends ContainerBuilder {
 			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.tab_label_count_mismatch")); //$NON-NLS-1$
 		}
 		for (int i = 0; i < tabCount; i++) {
-			tabbed.add(labels[i], bodies[i]);
+			notebook.add(labels[i], bodies[i]);
 		}
 	}
 }

@@ -25,6 +25,7 @@ package org.montsuqi.client.marshallers;
 import java.awt.Component;
 import java.io.IOException;
 import javax.swing.AbstractButton;
+import javax.swing.JTabbedPane;
 
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
@@ -48,6 +49,16 @@ class ButtonMarshaller extends WidgetMarshaller {
 				boolean selected = con.receiveBooleanData();
 				manager.registerValue(button, name, null);
 				button.setSelected(selected);
+			}
+		}
+		Object prop = button.getClientProperty("index"); //$NON-NLS-1$
+		if (prop != null && prop instanceof Number) {
+			Component parent = button.getParent();
+			if (parent instanceof JTabbedPane) {
+				int tabIndex = ((Number)prop).intValue();
+				JTabbedPane tabbed = (JTabbedPane)parent;
+				tabbed.setTitleAt(tabIndex, button.getText());
+				tabbed.setEnabledAt(tabIndex, button.isEnabled());
 			}
 		}
 	}
