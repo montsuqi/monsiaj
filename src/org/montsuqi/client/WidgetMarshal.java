@@ -25,35 +25,34 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.JTextComponent;
 import java.math.BigDecimal;
 import org.montsuqi.util.Logger;
-import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.NumberEntry;
 
 public class WidgetMarshal {
 
 	Protocol con;
 	Logger logger;
-	Interface xml;
 
 	public WidgetMarshal(Protocol con) {
 		this.con = con;
 		logger = Logger.getLogger(Protocol.class);
-		xml = con.getInterface();
 	}
 	
 	static Map valueTable;
 
-	void registerValue(String valueName, Object opt) {
-		StringBuffer widgetName = con.getWidgetName();
-		ValueAttribute va = (ValueAttribute)(valueTable.get(widgetName.toString()));
+	void registerValue(Container widget, String valueName, Object opt) {
+		StringBuffer widgetName = con.getWidgetNameBuffer();
+		String longName = con.getInterface().getLongName(widget);
+		ValueAttribute va = (ValueAttribute)(valueTable.get(longName));
 		if (va == null) {
 			va = new ValueAttribute();
-			va.name = widgetName.toString();
-			va.type = con.getLastDataType();
+			va.name = longName;
+			va.suffix = valueName;
+			va.valueName = widgetName.toString();
 			valueTable.put(va.name, va);
 		} else {
-			va.type = con.getLastDataType();
+			va.suffix = valueName;
 		}
-		va.valueName = valueName;
+		va.type = con.getLastDataType();
 		va.opt = opt;
 	}
 
@@ -61,7 +60,7 @@ public class WidgetMarshal {
 		return (ValueAttribute)(valueTable.get(name));
 	}
 
-	public static Handler getHandler(String receiverName, String senderName)
+	public static MarshalHandler getHandler(String receiverName, String senderName)
 		throws SecurityException, NoSuchMethodException {
 		Class[] parameterTypes = null;
 
@@ -76,8 +75,8 @@ public class WidgetMarshal {
 		if (senderName != null && senderName.length() > 0) {
 			sender = WidgetMarshal.class.getMethod(senderName, parameterTypes);
 		}
-		
-		return new Handler(receiver, sender);
+
+		return new MarshalHandler(receiver, sender);
 	}
 
 	void setState(Container widget, int state) {
@@ -87,17 +86,6 @@ public class WidgetMarshal {
 			widget.setEnabled(false);
 		}
 	}
-
-	//void setStyle(Container widget, Style style) {
-	//	if (widget.getClass() == JLabel.class) {
-	//	/*gtk_widget_set_style(widget,style);*/
-	//	} else {
-	//		Component[] comps = widget.getComponents();
-	//		for (int i = 0; i < comps.length; i++) {
-	//			setStyle(comps[i], style);
-	//		}
-	//	}
-	//}
 
 	public boolean receiveEntry(Container widget) throws IOException {
 		if (con.receiveDataType()  == Type.RECORD) {
@@ -112,7 +100,7 @@ public class WidgetMarshal {
 					/* setStyle(widget, getStyle(buff)); */
 				} else {
 					String buff = con.receiveStringData();
-					registerValue(name, null);
+					registerValue(widget, name, null);
 					((JTextField)widget).setText(buff);
 				}
 			}
@@ -121,20 +109,11 @@ public class WidgetMarshal {
 	}
 
 	public boolean sendEntry(String name, Container widget) throws IOException {
-		logger.enter("sendEntry");
 		String p = ((JTextField)widget).getText();
-		logger.debug("text={0}", p);
 		con.sendPacketClass(PacketClass.ScreenData);
-		logger.debug("packet class sent");
 		ValueAttribute v = getValue(name);
-		logger.debug("v=", v);
-		if (v == null) {
-			logger.debug("v is null");
-		}
-		con.sendString(name + "." + v.valueName); //$NON-NLS-1$
-		logger.debug("sent " + name + "." + v.valueName); //$NON-NLS-1$
+		con.sendString(name + '.' + v.valueName); //$NON-NLS-1$
 		con.sendStringData(v.type, p);
-		logger.leave("sendEntry");
 		return true;
 	}
 
@@ -150,11 +129,11 @@ public class WidgetMarshal {
 					String buff = con.receiveStringData();
 					/* setStyle(widget,getStyle(buff)); */
 				} else {
-					String buff = con.getWidgetName().toString() + "." + name; //$NON-NLS-1$
+					String buff = con.getWidgetNameBuffer().toString() + "." + name; //$NON-NLS-1$
 					ValueAttribute va = getValue(buff);
 					if (va != null) {
 						BigDecimal val = con.receiveFixedData();
-						registerValue(name, val);
+						registerValue(widget, name, val);
 						((NumberEntry)widget).setValue(val);
 					}
 				}
@@ -183,7 +162,7 @@ public class WidgetMarshal {
 					/*gtk_widget_set_style(widget,GetStyle(buff));*/
 				} else {
 					String buff = con.receiveStringData();
-					registerValue(name, null);
+					registerValue(widget, name, null);
 					((JLabel)widget).setText(buff);
 				}
 			}
@@ -213,7 +192,7 @@ public class WidgetMarshal {
 					/*gtk_widget_set_style(widget,GetStyle(buff));*/
 				} else {
 					String buff = con.receiveStringData();
-					registerValue(name, null);
+					registerValue(widget, name, null);
 					JTextComponent text = (JTextComponent)widget;
 					text.setText(buff);
 				}
@@ -259,7 +238,7 @@ public class WidgetMarshal {
 					setLabel(widget, buff);
 				} else {
 					boolean fActive = con.receiveBooleanData();
-					registerValue(name,null);
+					registerValue(widget, name, null);
 					((JButton)widget).setSelected(fActive);
 				}
 			}
@@ -299,10 +278,10 @@ public class WidgetMarshal {
 					combo.addItem(i.next());
 				}
 			} else {
-				StringBuffer label = con.getWidgetName();
-				int offset = label.length();
-				label.replace(offset, label.length(), "." + name); //$NON-NLS-1$
-				Container sub =  xml.getWidget(label.toString());
+				StringBuffer widgetName = con.getWidgetNameBuffer();
+				int offset = widgetName.length();
+				widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
+				Container sub =  con.getInterface().getWidgetByLongName(widgetName.toString());
 				if (sub != null) {
 					receiveEntry(sub);
 				} else {
@@ -335,8 +314,8 @@ public class WidgetMarshal {
 
 	public boolean receivePandaCList(Container widget) throws IOException {
 		con.receiveDataType(Type.RECORD);
-		StringBuffer label = con.getWidgetName();
-		int offset = label.length();
+		StringBuffer widgetName = con.getWidgetNameBuffer();
+		int offset = widgetName.length();
 		int nItem = con.receiveInt();
 		int count = -1;
 		int from = 0;
@@ -344,8 +323,8 @@ public class WidgetMarshal {
 		
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			label.replace(offset, label.length(), "." + name); //$NON-NLS-1$
-			Container subWidget = xml.getWidgetByLongName(label.toString());
+			widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
+			Container subWidget = con.getInterface().getWidgetByLongName(widgetName.toString());
 			if (subWidget != null) {
 				con.receiveWidgetData(subWidget);
 			} else if ("count".equals(name)) { //$NON-NLS-1$
@@ -385,7 +364,7 @@ public class WidgetMarshal {
 				((JTable)widget).setModel(model);
 			} else {
 				con.receiveDataType(Type.ARRAY);
-				registerValue(name, new Integer(from));
+				registerValue(widget, name, new Integer(from));
 				int num = con.receiveInt();
 				if (count < 0) {
 					count = num;
@@ -422,17 +401,17 @@ public class WidgetMarshal {
 	public boolean receiveCList(Container widget) throws IOException {
 		JTable table = (JTable)widget;
 		con.receiveDataType(Type.RECORD);
-		StringBuffer label = con.getWidgetName();
-		int offset = label.length();
+		StringBuffer widgetName = con.getWidgetNameBuffer();
+		int offset = widgetName.length();
 		int nItem = con.receiveInt();
 		int count = -1;
 		int from = 0;
 		int state;
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			label.replace(offset, label.length(), "." + name); //$NON-NLS-1$
+			widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
 			Container subWidget;
-			if ((subWidget = xml.getWidget(label.toString())) != null) {
+			if ((subWidget = con.getInterface().getWidgetByLongName(widgetName.toString())) != null) {
 				con.receiveWidgetData(subWidget);
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
@@ -470,7 +449,7 @@ public class WidgetMarshal {
 				table.setModel(model);
 			} else {
 				con.receiveDataType(Type.ARRAY);
-				registerValue(name, new Integer(from));
+				registerValue(widget, name, new Integer(from));
 				int num = con.receiveInt();
 				if (count < 0) {
 					count = num;
@@ -513,7 +492,7 @@ public class WidgetMarshal {
 		int state;
 		
 		con.receiveDataType(Type.RECORD);
-		StringBuffer label = con.getWidgetName();
+		StringBuffer label = con.getWidgetNameBuffer();
 		int offset = label.length();
 		int nItem = con.receiveInt();
 		int count = -1;
@@ -548,7 +527,7 @@ public class WidgetMarshal {
 				((JList)widget).setModel(model);
 			} else {
 				con.receiveDataType(Type.ARRAY);
-				registerValue(name, new Integer(from));
+				registerValue(widget, name, new Integer(from));
 				num = con.receiveInt();
 				if (count < 0) {
 					count = num;
@@ -595,7 +574,7 @@ public class WidgetMarshal {
 
 	public boolean receiveCalendar(Container widget) throws IOException {
 		con.receiveDataType(Type.RECORD);
-		registerValue("", null); //$NON-NLS-1$
+		registerValue(widget, "", null); //$NON-NLS-1$
 		int nItem = con.receiveInt();
 		int year = 0;
 		int month = -1;
@@ -642,9 +621,9 @@ public class WidgetMarshal {
 
 		con.receiveDataType(Type.RECORD);
 		int nItem = con.receiveInt();
-		StringBuffer widgetName = con.getWidgetName();
+		StringBuffer widgetName = con.getWidgetNameBuffer();
 		int offset = widgetName.length();
-		for	(int i = 0; i < nItem; i++) {
+		for (int i = 0; i < nItem; i++) {
 			String name = con.receiveString();
 			if ("state".equals(name)) { //$NON-NLS-1$
 				setState(widget, con.receiveIntData());
@@ -653,10 +632,10 @@ public class WidgetMarshal {
 				/* gtk_widget_set_style(widget,GetStyle(buff)); */
 			} else if ("pageno".equals(name)) { //$NON-NLS-1$
 				page = con.receiveIntData();
-				registerValue(name, null);
+				registerValue(widget, name, null);
 			} else {
 				widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
-				con.receiveValue(offset + name.length());
+				con.receiveValue(widgetName, offset + name.length() + 1);
 			}
 		}
 		if (page == -1) {
@@ -679,7 +658,7 @@ public class WidgetMarshal {
 	public boolean receiveProgressBar(Container widget) throws IOException {
 		con.receiveDataType(Type.RECORD);
 		int nItem = con.receiveInt();
-		StringBuffer longName = con.getWidgetName();
+		StringBuffer longName = con.getWidgetNameBuffer();
 		int offset = longName.length();
 
 		while (nItem-- != 0) {
@@ -690,7 +669,7 @@ public class WidgetMarshal {
 				String buff = con.receiveStringData();
 				/* gtk_widget_set_style(widget,GetStyle(buff)); */
 			} else if ("value".equals(name)) { //$NON-NLS-1$
-				registerValue(name, null);
+				registerValue(widget, name, null);
 				JProgressBar progress = (JProgressBar)widget;
 				progress.setValue(con.receiveIntData());
 			}
