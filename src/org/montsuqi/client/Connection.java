@@ -197,8 +197,16 @@ class Connection {
 		int flen = receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
-		//logger.debug("receiveFixed: flen={0}, slen={1}, value={2}", new Object[]{ new Integer(flen), new Integer(slen), value});
-		BigInteger i =  new BigInteger(value);
+		BigInteger i = BigInteger.ZERO;
+		if (value == null || value.length() == 0) {
+			logger.warn("empty Fixed value");
+		} else {
+			try {
+				i =  new BigInteger(value);
+			} catch (NumberFormatException e) {
+				logger.warn(e);
+			}
+		}
 		BigDecimal result = (new BigDecimal(i)).movePointLeft(slen);
 		return result;
 	}
@@ -213,6 +221,9 @@ class Connection {
 	}
 
 	public void sendFixedData(int type, BigDecimal xval) throws IOException {
+		if (type == Type.NUMBER) {
+			type = Type.TEXT;
+		}
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -221,9 +232,9 @@ class Connection {
 		case Type.TEXT:
 			sendString(String.valueOf(xval));
 			break;
-		case Type.NUMBER:
-			sendFixed(xval);
-			break;
+		//case Type.NUMBER:
+		//	sendFixed(xval);
+		//	break;
 		default:
 			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
 		}
