@@ -71,7 +71,8 @@ class StdErrLogger extends Logger {
 	private void writeStackTrace(Throwable e) {
 		while (e instanceof ChainedRuntimeException) {
 			writeLog("Nested: " + e.toString());
-			e = e.getCause();
+			ChainedRuntimeException chained = (ChainedRuntimeException)e;
+			e = chained.getCause();
 		}
 		e.printStackTrace(System.err);
 		if (log != null) {
