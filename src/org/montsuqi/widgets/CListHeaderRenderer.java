@@ -35,7 +35,6 @@ public class CListHeaderRenderer implements TableCellRenderer {
 	public CListHeaderRenderer(JComponent c) {
 		c.setBorder(BorderFactory.createEtchedBorder());
 		c.setOpaque(true);
-		c.setForeground(java.awt.Color.red);
 		this.component = c;
 	}
 
