@@ -243,7 +243,8 @@ public class Protocol extends Connection {
 			case SCREEN_CURRENT_WINDOW:
 				Interface xml = Interface.parseFile(fName, this);
 				node = new Node(xml, wName);
-				windowTable.put(node.name, node);
+				logger.info("Node: {0}", node.toString());
+				windowTable.put(node.getName(), node);
 			}
 		}
 
@@ -429,7 +430,7 @@ public class Protocol extends Connection {
 			}
 			node = showWindow(window, type);
 			if (node != null) {
-				xml = node.xml;
+				xml = node.getInterface();
 			}
 			switch (type) {
 			case SCREEN_CURRENT_WINDOW:
@@ -455,7 +456,7 @@ public class Protocol extends Connection {
 			window = receiveString();
 			String wName = receiveString();
 			node = (Node)(windowTable.get(window));
-			if (node != null && node.xml != null) {
+			if (node != null && node.getInterface() != null) {
 				widget = xml.getWidget(wName);
 				if (widget != null) {
 					grabFocus(widget);
@@ -605,7 +606,7 @@ public class Protocol extends Connection {
 		}
 		Node node = (Node)windowTable.get(parent.getName());
 		if (node != null) {
-			Container nextWidget = node.xml.getWidget(userData.toString());
+			Container nextWidget = node.getInterface().getWidget(userData.toString());
 			if (nextWidget != null) {
 				grabFocus(nextWidget);
 			}
