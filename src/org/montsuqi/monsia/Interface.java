@@ -37,6 +37,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +71,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeSelectionModel;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -84,7 +84,6 @@ import org.montsuqi.widgets.PandaFocusManager;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TimerEvent;
 import org.montsuqi.widgets.TimerListener;
-import org.xml.sax.SAXException;
 
 public class Interface {
 	private Map comboMap;
@@ -117,61 +116,56 @@ public class Interface {
 		focusWidget = widget;
 	}
 
-	public static Interface parseInput(InputStream input, Protocol protocol) {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		factory.setNamespaceAware(true);
+	private static final SAXParser saxParser;
+	static {
+		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+		parserFactory.setNamespaceAware(true);
 		try {
-			String handlerClassName = null;
+			saxParser = parserFactory.newSAXParser();
+		} catch (Exception e) {
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new ExceptionInInitializerError(e);
+		}
+	}
 
-			handlerClassName = System.getProperty("monsia.document.handler"); //$NON-NLS-1$
+	private static final String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
+	private static final int OLD_PROLOGUE_LENGTH;
+	static {
+		OLD_PROLOGUE_LENGTH = oldPrologue.getBytes().length;
+	}
 
-			if (handlerClassName == null) {
-				input = new java.io.BufferedInputStream(input);
-				String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
-				int oldPrologueLength = oldPrologue.getBytes().length;
-				input.mark(oldPrologueLength);
-				byte[] bytes = new byte[oldPrologueLength];
-				input.read(bytes);
-				String head = new String(bytes);
-				input.reset();
-				if (head.indexOf("GTK-Interface") < 0) { //$NON-NLS-1$
-					handlerClassName = NEW_HANDLER;
-				}
+	public static Interface parseInput(InputStream input, Protocol protocol) {
+		try {
+			if ( ! (input instanceof BufferedInputStream)) {
+				input = new BufferedInputStream(input);
 			}
+
+			String handlerClassName = System.getProperty("monsia.document.handler"); //$NON-NLS-1$
 			if (handlerClassName == null) {
-				handlerClassName = OLD_HANDLER;
+				handlerClassName = isNewScreenDefinition(input) ? NEW_HANDLER : OLD_HANDLER;
 			}
 
 			Class handlerClass = Class.forName(handlerClassName);
-			AbstractDocumentHandler handler;
-			handler = (AbstractDocumentHandler)handlerClass.newInstance();
+			AbstractDocumentHandler handler = (AbstractDocumentHandler)handlerClass.newInstance();
 
 			if (handlerClassName.equals(OLD_HANDLER)) {
 				input = new FakeEncodingInputStream(input);
 			}
-
-			SAXParser parser = factory.newSAXParser();
-			parser.parse(input, handler);
+			saxParser.parse(input, handler);
 			return handler.getInterface(protocol);
-		} catch (ClassNotFoundException e) {
-			Logger.getLogger(Interface.class).fatal(e);
-			throw new InterfaceBuildingException(e);
-		} catch (IllegalAccessException e) {
-			Logger.getLogger(Interface.class).fatal(e);
-			throw new InterfaceBuildingException(e);
-		} catch (InstantiationException e) {
-			Logger.getLogger(Interface.class).fatal(e);
-			throw new InterfaceBuildingException(e);
-		} catch (IOException e) {
-			Logger.getLogger(Interface.class).fatal(e);
-			throw new InterfaceBuildingException(e);
-		} catch (SAXException e) {
-			Logger.getLogger(Interface.class).fatal(e);
-			throw new InterfaceBuildingException(e);
-		} catch (ParserConfigurationException e) {
+		} catch (Exception e) {
 			Logger.getLogger(Interface.class).fatal(e);
 			throw new InterfaceBuildingException(e);
 		}
+	}
+
+	private static boolean isNewScreenDefinition(InputStream input) throws IOException {
+		byte[] bytes = new byte[OLD_PROLOGUE_LENGTH];
+		input.mark(OLD_PROLOGUE_LENGTH);
+		input.read(bytes);
+		String head = new String(bytes);
+		input.reset();
+		return head.indexOf("GTK-Interface") < 0; //$NON-NLS-1$
 	}
 
 	Interface(Map infos, List roots, Protocol protocol) {
