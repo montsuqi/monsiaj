@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.10 2004-01-20 10:14:40 ozawa Exp $ -->
-<project name="panda-client" default="compile" basedir=".">
+<!-- $Id: build.xml,v 1.11 2004-01-21 10:12:35 ozawa Exp $ -->
+<project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
 
@@ -14,10 +14,9 @@
   <property name="dist.dir"            value="dist"/>
   <property name="resources.dir"       value="resources"/>
   <property name="libs.dir"            value="libs"/>
-
+  <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
   <path id="project.class.path">
-    <pathelement path="/usr/share/java/xerces.jar"/>
-    <pathelement path="/usr/share/java/log4j.jar"/>
+    <pathelement path="libs/*.jar"/>
   </path>
 
   <!-- targets -->
@@ -72,8 +71,8 @@
     </copy>
   </target>
 
-  <target name="jars" depends="compile,resources"
-          description="Deploy jars">
+  <target name="dist" depends="compile,resources"
+          description="Build jars">
     <!-- ant 1.5.x should use destfile instead of jarfile-->
     <jar jarfile="${dist.dir}/pandaclient.jar"
          basedir="${build.dir}"
@@ -83,9 +82,6 @@
          basedir="${build.dir}"
          includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,*.jpg"
          manifest="${resources.dir}/jmareceipt.mf"/>
-  </target>
-
-  <target name="libs">
     <copy todir="${dist.dir}">
       <fileset dir="${libs.dir}" includes="*.jar"/>
     </copy>
@@ -93,7 +89,7 @@
 
   <target name="buildclean"
           description="Cleans all built files.">
-    <delete verbose="${clean.verbose}">
+    <delete verbose="${clean.verbose}" quiet="true">
       <fileset dir="${build.dir}"/>
     </delete>
   </target>
@@ -107,8 +103,8 @@
 
   <target name="veryclean" depends="clean,buildclean"
     description="Cleans all generated files.">
-    <delete dir="${build.dir}" verbose="${clean.verbose}"/>
-    <delete dir="${dist.dir}"  verbose="${clean.verbose}"/>
+    <delete dir="${build.dir}" verbose="${clean.verbose}" quiet="true"/>
+    <delete dir="${dist.dir}"  verbose="${clean.verbose}" quiet="true"/>
   </target>
 
 </project>
