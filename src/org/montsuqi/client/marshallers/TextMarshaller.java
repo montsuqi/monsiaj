@@ -37,15 +37,15 @@ class TextMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		JTextComponent text = (JTextComponent)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int nItem = con.receiveInt();
-		while (nItem-- != 0) {
-			String name= con.receiveString();
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
+			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
 			}
 			String buff = con.receiveStringData();
-			manager.registerValue(text, name, null);
+			manager.registerValue(widget, name, null);
 			text.setText(buff);
+			text.setCaretPosition(0);
 		}
 		return true;
 	}
@@ -55,9 +55,8 @@ class TextMarshaller extends WidgetMarshaller {
 		JTextComponent text = (JTextComponent)widget; 
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getValueName());
-		String value = text.getText();
-		con.sendStringData(va.getType(), value);
+		con.sendString(name + '.' + va.getVName());
+		con.sendStringData(va.getType(), text.getText());
 		return true;
 	}
 }

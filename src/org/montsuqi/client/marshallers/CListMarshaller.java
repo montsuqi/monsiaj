@@ -42,11 +42,6 @@ class CListMarshaller extends WidgetMarshaller {
 		JTable table = (JTable)widget;
 		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		StringBuffer widgetName = con.getWidgetNameBuffer();
-		int offset = widgetName.length();
-		int nItem = con.receiveInt();
-		int count = -1;
-		int from = 0;
 		int state;
 		TableColumnModel columnModel = table.getColumnModel();
 		String[] labels = new String[columnModel.getColumnCount()];
@@ -55,12 +50,14 @@ class CListMarshaller extends WidgetMarshaller {
 			labels[i] = (String)columnModel.getColumn(i).getHeaderValue();
 		}
 
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
 			String name = con.receiveString();
+			StringBuffer widgetName = con.getWidgetNameBuffer();
+			int offset = widgetName.length();
 			widgetName.replace(offset, widgetName.length(), '.' + name);
-			Component subWidget;
-			if ((subWidget = con.getInterface().getWidgetByLongName(widgetName.toString())) != null) {
-				JLabel dummyLabel = (JLabel)subWidget;
+			Component sub;
+			if ((sub = con.getInterface().getWidgetByLongName(widgetName.toString())) != null) {
+				JLabel dummyLabel = (JLabel)sub;
 				WidgetMarshaller labelMarshaller = new LabelMarshaller();
 				labelMarshaller.receive(manager, dummyLabel);
 				labels[labelNumber++] = dummyLabel.getText();
@@ -88,10 +85,10 @@ class CListMarshaller extends WidgetMarshaller {
 					int rNum = con.receiveInt();
 					Object[] rdata = new String[rNum];
 					for (int k = 0; k < rNum; k++) {
-						String iName = con.receiveString();
+						String dummy = con.receiveString();
 						rdata[k] = con.receiveStringData();
 					}
-					if ((j >= from) && ((j - from) < count)) {
+					if (j >= from && j - from < count) {
 						tableModel.addRow(rdata);
 					}
 				}
@@ -103,15 +100,13 @@ class CListMarshaller extends WidgetMarshaller {
 					count = num;
 				}
 				for (int j = 0; j < num; j++) {
-					boolean fActive = con.receiveBooleanData();
 					ListSelectionModel model = table.getSelectionModel();
-					if (fActive) {
-						if ((j >= from) && ((j - from) < count)) {
-							if (fActive) {
-								model.addSelectionInterval(j - from, j - from);
-							} else {
-								model.removeSelectionInterval(j - from, j - from);
-							}
+					boolean selected = con.receiveBooleanData();
+					if (j >= from && j - from < count) {
+						if (selected) {
+							model.addSelectionInterval(j - from, j - from);
+						} else {
+							model.removeSelectionInterval(j - from, j - from);
 						}
 					}
 				}
@@ -129,9 +124,10 @@ class CListMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getValue(name);
 		JTable table = (JTable)widget;
 		ListSelectionModel selections = table.getSelectionModel();
+		int opt = ((Integer)va.getOpt()).intValue();
 		for (int i = 0, rows = table.getRowCount(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + '.' + va.getValueName() + '[' + String.valueOf(i) + ']' + va.getOpt());
+			con.sendString(name + '.' + va.getVName() + '[' + String.valueOf(i) + ']' + (i + opt));
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(selections.isSelectedIndex(i));
 		}

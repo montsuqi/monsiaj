@@ -35,13 +35,13 @@ class CalendarMarshaller extends WidgetMarshaller {
 
 	public synchronized 	boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
+		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		manager.registerValue(widget, "", null); //$NON-NLS-1$
-		int nItem = con.receiveInt();
 		int year = 0;
 		int month = -1;
 		int day = 0;
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
@@ -56,7 +56,6 @@ class CalendarMarshaller extends WidgetMarshaller {
 			}
 		}
 	
-		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, year);
 		calendar.set(Calendar.MONTH, month - 1);

@@ -42,10 +42,7 @@ class ListMarshaller extends WidgetMarshaller {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		StringBuffer label = con.getWidgetNameBuffer();
 		int offset = label.length();
-		int nItem = con.receiveInt();
-		int count = -1;
-		int from = 0;
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
@@ -67,7 +64,7 @@ class ListMarshaller extends WidgetMarshaller {
 				for (int j = 0; j < num; j++) {
 					String buff = con.receiveStringData();
 					if (buff != null) {
-						if ((j >= from) && ((j - from) < count)) {
+						if (j >= from && j - from < count) {
 							listModel.addElement(buff);
 						}
 					}
@@ -81,9 +78,9 @@ class ListMarshaller extends WidgetMarshaller {
 				}
 				ListSelectionModel model = list.getSelectionModel();
 				for (int j = 0; j < num; j++) {
-					boolean fActive = con.receiveBooleanData();
-					if ((j >= from) &&	((j - from) < count)) {
-						if (fActive) {
+					boolean selected = con.receiveBooleanData();
+					if (j >= from && j - from < count) {
+						if (selected) {
 							model.addSelectionInterval(j, j);
 						} else {
 							model.removeSelectionInterval(j, j);
@@ -100,10 +97,10 @@ class ListMarshaller extends WidgetMarshaller {
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
 		ValueAttribute va = manager.getValue(name);
-	
-		for (int i = 0, rows = list.getModel().getSize(); i < rows; i++) {
+		int opt = ((Integer)va.getOpt()).intValue();
+		for (int i = 0, n = list.getModel().getSize(); i < n; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + '.' + va.getValueName() + '[' + (Integer)va.getOpt() + ']');
+			con.sendString(name + '.' + va.getVName() + '[' + i + opt + ']');
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(model.isSelectedIndex(i));
 		}

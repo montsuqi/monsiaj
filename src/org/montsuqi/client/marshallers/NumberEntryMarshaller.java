@@ -37,14 +37,11 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		NumberEntry entry = (NumberEntry)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int nItem = con.receiveInt();
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
 			}
-			String buff = con.getWidgetNameBuffer().toString() + '.' + name;
-			ValueAttribute va = manager.getValue(buff);
 			BigDecimal val = con.receiveFixedData();
 			manager.registerValue(entry, name, val);
 			entry.setValue(val);
@@ -58,8 +55,8 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 		BigDecimal value = entry.getValue();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getKey());
-		//va.setOpt(value);
+		con.sendString(name + '.' + va.getVName());
+		va.setOpt(value);
 		con.sendFixedData(va.getType(), value);
 		return true;
 	}

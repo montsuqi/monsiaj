@@ -39,19 +39,17 @@ class ButtonMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		AbstractButton button = (AbstractButton)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int nItem = con.receiveInt();
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
 			}
 			if ("label".equals(name)) { //$NON-NLS-1$
-				String buff = con.receiveStringData();
-				setLabel(button, buff);
+				setLabel(button, con.receiveStringData());
 			} else {
-				boolean fActive = con.receiveBooleanData();
+				boolean selected = con.receiveBooleanData();
 				manager.registerValue(button, name, null);
-				button.setSelected(fActive);
+				button.setSelected(selected);
 			}
 		}
 		return true;
@@ -62,7 +60,7 @@ class ButtonMarshaller extends WidgetMarshaller {
 		AbstractButton button = (AbstractButton)widget;
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getValueName());
+		con.sendString(name + '.' + va.getVName());
 		con.sendBooleanData(va.getType(), button.isSelected());
 		return true;
 	}

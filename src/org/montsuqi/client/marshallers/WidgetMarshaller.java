@@ -74,7 +74,6 @@ public abstract class WidgetMarshaller {
 	WidgetMarshaller() {
 		logger = Logger.getLogger(WidgetMarshaller.class);
 	}
-
 	public abstract boolean receive(WidgetValueManager manager, Component widget) throws IOException;
 	public abstract boolean send(WidgetValueManager manager, String name, Component widget) throws IOException;
 

@@ -44,9 +44,7 @@ class ComboMarshaller extends WidgetMarshaller {
 		String selected = null;
 		DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int nItem = con.receiveInt();
-		int count = 0;
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(), count = 0; i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
@@ -56,22 +54,23 @@ class ComboMarshaller extends WidgetMarshaller {
 				List list = new ArrayList();
 				list.add(""); //$NON-NLS-1$
 				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
-				int num = con.receiveInt();
-				for (int j = 0; j < num ; j++) {
+				for (int j = 0, num = con.receiveInt(); j < num ; j++) {
 					String buff = null;
 					try {
 						buff = con.receiveStringData();
+						if (buff != null) {
+							if (j < count) {
+								list.add(buff);
+							}
+						}
 					} catch (IllegalArgumentException e) {
 						logger.warn(e.getMessage());
 					}
-					if (buff != null && j < count) {
-						list.add(buff);
-					}
 				}
 				model.removeAllElements();
-				Iterator i = list.iterator();
-				while (i.hasNext()) {
-					model.addElement(i.next());
+				Iterator iter = list.iterator();
+				while (iter.hasNext()) {
+					model.addElement(iter.next());
 				}
 			} else {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
@@ -84,8 +83,7 @@ class ComboMarshaller extends WidgetMarshaller {
 					entryMarshaller.receive(manager, dummyEntry);
 					selected = dummyEntry.getText();
 				} else {
-					logger.warn(Messages.getString("ComboMarshaller.subwidget_not_found")); //$NON-NLS-1$
-					/*	fatal error	*/
+					logger.fatal(Messages.getString("ComboMarshaller.subwidget_not_found")); //$NON-NLS-1$
 				}
 			}
 		}

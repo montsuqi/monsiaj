@@ -31,17 +31,19 @@ public final class WidgetValueManager {
 		ValueAttribute va = (ValueAttribute)(valueTable.get(longName));
 
 		if (va == null) {
-			va = new ValueAttribute(longName, valueName, con.getWidgetNameBuffer().toString(), con.getLastDataType(), opt);
-			valueTable.put(va.getKey(), va);
+			va = new ValueAttribute(con.getWidgetNameBuffer().toString(), con.getLastDataType(), valueName, opt);
+			valueTable.put(va.getName(), va);
 		} else {
-			va.setNameSuffix(valueName);
-			va.setOpt(con.getLastDataType(), opt);
+			va.setVName(valueName);
+			va.setType(con.getLastDataType());
+			va.setOpt(opt);
 		}
 	}
 
 	ValueAttribute getValue(String name) {
 		return (ValueAttribute)(valueTable.get(name));
 	}
+
 	void setStyle(Component widget, String styleName) {
 		Style style = (Style)styles.get(styleName);
 		if (style != null) {

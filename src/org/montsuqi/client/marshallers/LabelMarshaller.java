@@ -37,8 +37,7 @@ class LabelMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		JLabel label = (JLabel)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int nItem = con.receiveInt();
-		while (nItem-- != 0) {
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;

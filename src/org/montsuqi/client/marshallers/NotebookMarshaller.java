@@ -37,11 +37,10 @@ class NotebookMarshaller extends WidgetMarshaller {
 	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int page = -1;
-		int nItem = con.receiveInt();
 		StringBuffer widgetName = con.getWidgetNameBuffer();
 		int offset = widgetName.length();
-		for (int i = 0; i < nItem; i++) {
+		int page = -1;
+		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
@@ -61,12 +60,12 @@ class NotebookMarshaller extends WidgetMarshaller {
 		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component notebook) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JTabbedPane tabbed = (JTabbedPane)notebook;
+		JTabbedPane tabbed = (JTabbedPane)widget;
 		ValueAttribute va = manager.getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + '.' + va.getValueName());
+		con.sendString(name + '.' + va.getVName());
 		con.sendIntegerData(va.getType(), tabbed.getSelectedIndex());
 		return true;
 	}
