@@ -45,6 +45,7 @@ import javax.swing.text.AbstractDocument;
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
+import org.montsuqi.util.SystemEnvironment;
 
 public class PandaHTML extends JScrollPane {
 
@@ -71,8 +72,7 @@ public class PandaHTML extends JScrollPane {
 	static {
 		String disabled = System.getProperty(PROPERTY_KEY_DISABLE_HTML);
 		if (disabled == null) {
-			boolean isMacOS = System.getProperty("os.name").toLowerCase().startsWith("mac os x"); //$NON-NLS-1$ //$NON-NLS-2$
-			System.setProperty(PROPERTY_KEY_DISABLE_HTML, String.valueOf(isMacOS));
+			System.setProperty(PROPERTY_KEY_DISABLE_HTML, String.valueOf(SystemEnvironment.isMacOSX()));
 		}
 	}
 

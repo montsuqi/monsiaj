@@ -40,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
 
 public class Launcher {
@@ -63,9 +64,7 @@ public class Launcher {
 
 	public Launcher(String title) {
 		this.title = title;
-		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) { //$NON-NLS-1$ //$NON-NLS-2$
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
-		}
+		SystemEnvironment.setMacMenuTitle(title);
 		conf = new Configuration(this.getClass());
 		client = new Client(conf);
 	}
