@@ -167,7 +167,7 @@ public abstract class SignalHandler {
 						int length = t.length();
 						if (length > 0) {
 							char c = t.charAt(length - 1);
-							if (isKatakana(c) || isSymbol(c)) {
+							if (isKatakana(c) || isKanji(c) || isSymbol(c)) {
 								try {
 									changed.handle(con, widget, userData);
 									sendEvent.handle(con, widget, userData);
@@ -180,6 +180,10 @@ public abstract class SignalHandler {
 
 					private boolean isKatakana(char c) {
 						return Character.UnicodeBlock.of(c) == Character.UnicodeBlock.KATAKANA;
+					}
+
+					private boolean isKanji(char c) {
+						return Character.UnicodeBlock.of(c) == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS;
 					}
 
 					private boolean isSymbol(char c) {
