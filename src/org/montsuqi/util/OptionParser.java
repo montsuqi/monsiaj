@@ -120,7 +120,7 @@ public class OptionParser {
 
 	protected boolean analyzeLine(String line) {
 		if (line.startsWith(";")) {
-			logger.debug("skipping comment: " + line);
+			logger.info("skipping comment: " + line);
 			return false;
 		}
 		Iterator i = options.values().iterator();
