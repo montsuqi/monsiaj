@@ -49,6 +49,7 @@ import javax.swing.tree.TreeSelectionModel;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.NumberEntry;
+import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
@@ -377,6 +378,11 @@ class WidgetOperation {
 	static void setNumberEntryFormat(Interface xml, Container widget, String name, String value) {
 		NumberEntry entry = (NumberEntry)widget;
 		entry.setFormat(value);		
+	}
+
+	static void setPandaHTMLURI(Interface xml, Container widget, String name, String value) {
+		PandaHTML pane = (PandaHTML)widget;
+		pane.setURI(value);
 	}
 }
 

@@ -114,7 +114,7 @@ class WidgetBuilder {
 		registerClass("PandaCList", javax.swing.JTable.class); //$NON-NLS-1$
 		registerClass("PandaCombo", javax.swing.JComboBox.class); //$NON-NLS-1$
 		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class); //$NON-NLS-1$
-		registerClass("PandaHTML", javax.swing.JTextPane.class); //$NON-NLS-1$
+		registerClass("PandaHTML", org.montsuqi.widgets.PandaHTML.class); //$NON-NLS-1$
 		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
 		registerClass("RadioButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
 		registerClass("ScrolledWindow", javax.swing.JScrollPane.class); //$NON-NLS-1$
@@ -181,7 +181,7 @@ class WidgetBuilder {
 		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JEditorPane.class, "uri", "page"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(org.montsuqi.widgets.PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void initWidgetBuildData() {
