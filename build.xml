@@ -99,11 +99,11 @@
 		description="Build files to be distributed."/>
 
 	<target name="dist-bin" depends="dist-bin-copy-files">
+		<antcall target="dist-bin-mac-bundle"/>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${bin.name}.zip">
 			<fileset dir="${dist.dir}" includes="${bin.name}/**"/>
 		</zip>
-		<antcall target="dist-bin-mac-bundle"/>
 	</target>
 
 	<target name="dist-bin-copy-files" depends="jars">
