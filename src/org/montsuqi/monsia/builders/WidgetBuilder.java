@@ -161,6 +161,7 @@ public class WidgetBuilder {
 					builder.buildChildren(xml, (Container)widget, info);
 				}
 				builder.setCommonParameters(xml, widget, info);
+				builder.setSignals(xml, widget, info);
 				return widget;
 			} catch (Exception e) {
 				logger.warn(e);
@@ -199,15 +200,18 @@ public class WidgetBuilder {
 		// do nothing
 	}
 
-	private void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
+	protected void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
 		widget.setName(info.getName());
 		xml.setName(info.getName(), widget);
 		xml.setLongName(info.getLongName(), widget);
+	}
+
+	protected void setSignals(Interface xml, Component widget, WidgetInfo info) {
 		Iterator i = info.getSignals().iterator();
 		while (i.hasNext()) {
 			xml.addSignal(new SignalData(widget, ((SignalInfo)i.next())));
 		}
-	}	
+	}
 
 	void setProperties(Interface xml, Container parent, Component widget, Map properties) {
 		Iterator i = properties.entrySet().iterator();
