@@ -120,7 +120,7 @@ public class Interface {
 					SignalData data = (SignalData)i.next();
 					Container target = (Container)data.getSignalObject();
 					String signalName = data.getName();
-					Object other = infos.get(data.getConnectObject());
+					Object other = data.getConnectObject();
 					if (data.isAfter()) {
 						connectAfter(target, signalName, handler, other);
 					} else {
@@ -183,9 +183,7 @@ public class Interface {
 		if (target instanceof JButton || target instanceof JRadioButton) {
 			((AbstractButton)target).addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent event) {
-					logger.debug("invoking {0}", handler.getName());
 					invoke(handler, target, other);
-					logger.debug("invoking done");
 				}
 			});
 		}
