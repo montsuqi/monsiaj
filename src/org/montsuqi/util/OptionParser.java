@@ -101,8 +101,7 @@ public class OptionParser {
 				break;
 			case COMMAND_SWITCH:
 				isParam = true;
-				c = arg.charAt(1);
-				if (c == '?' || c == 'h' || c == 'H') {
+				if (arg.equals("?") || arg.equals("h") || arg.equals("H")) {
 					System.out.println(usage("USAGE:" + program + " <option(s)> files..."));
 				} else {
 					isParam = analyzeLine(arg.substring(1));
