@@ -10,15 +10,15 @@ import javax.swing.JFrame;
 public class Node {
 	private Interface xml;
 	private String name;
-	public JFrame window;
-	public Map updateWidget;
+	private JFrame window;
+	private Map changedWidgets;
 
 	public Node(Interface xml, String wName) {
 		this.xml = xml;
 		this.name = wName;
 		Container widget = xml.getWidget(wName);
 		this.window = (JFrame)widget;
-		updateWidget = new HashMap();
+		this.changedWidgets = new HashMap();
 	}
 
 	public String getName() {
@@ -29,6 +29,10 @@ public class Node {
 		return xml;
 	}
 
+	public JFrame getWindow() {
+		return window;
+	}
+
 	public String toString() {
 		StringWriter s = new StringWriter();
 		PrintWriter p = new PrintWriter(s);
@@ -36,5 +40,17 @@ public class Node {
 		return s.toString();
 	}
 
+	public void clearChangedWidgets() {
+		changedWidgets.clear();
+	}
 
+	public Map getChangedWidgets() {
+		return changedWidgets;
+	}
+
+	public void addChangedWidget(String name, Container widget) {
+		if ( ! changedWidgets.containsKey(name)) {
+			changedWidgets.put(name, widget);
+		}
+	}
 }
