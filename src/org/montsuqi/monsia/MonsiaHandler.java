@@ -21,7 +21,6 @@ class MonsiaHandler extends DefaultHandler {
 
 	private Logger logger;
 
-	private String fileName;
 	private ParserState state;
     private int unknownDepth;    /* handle recursive unrecognised tags */
     private ParserState prevState; /* the lastg `known' state we were in */
@@ -49,15 +48,14 @@ class MonsiaHandler extends DefaultHandler {
 	
 	Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
-			return new Interface(fileName, widgets, topLevels, protocol);
+			return new Interface(widgets, topLevels, protocol);
 		} else {
 			throw new IllegalStateException(Messages.getString("MonsiaHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
 		}
 	}
 	
-	MonsiaHandler(String fileName) {
+	MonsiaHandler() {
 		super();
-		this.fileName = fileName;
 		logger = Logger.getLogger(MonsiaHandler.class);
 		content = new StringBuffer();
 		widgets = new HashMap();
@@ -1052,12 +1050,4 @@ class MonsiaHandler extends DefaultHandler {
 	private String makePropertyName(String name) {
 		return name.replace('-', '_');
 	}
-}
-
-class PropertyType {
-	private PropertyType() {}
-	static final PropertyType NONE = new PropertyType();
-	static final PropertyType WIDGET = new PropertyType();
-	static final PropertyType ATK = new PropertyType();
-	static final PropertyType CHILD = new PropertyType();
 }
