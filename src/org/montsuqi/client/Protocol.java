@@ -243,7 +243,6 @@ public class Protocol extends Connection {
 			case SCREEN_CURRENT_WINDOW:
 				Interface xml = Interface.parseFile(fName, this);
 				node = new Node(xml, wName);
-				logger.info("New node: \n{0}", node);
 				windowTable.put(node.getName(), node);
 			}
 		}
@@ -411,7 +410,6 @@ public class Protocol extends Connection {
 		int type;
 		
 		inReceive = true;
-
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
 		sendLong((int)0);     /* get all data */ // In Java: int=>32bit, long=>64bit
@@ -523,26 +521,22 @@ public class Protocol extends Connection {
 	}
 
 	void sendWindowData() throws IOException {
-		logger.enter("sendWindowData");
 		Iterator i = windowTable.keySet().iterator();
 		while (i.hasNext()) {
 			sendPacketClass(PacketClass.WindowName);
 			String wName = (String)(i.next());
-			logger.info("window:{0}", wName);
 			sendString(wName);
 			Node node = (Node)windowTable.get(wName);
 			Iterator j = node.updateWidget.keySet().iterator();
 			while (j.hasNext()) {
 				String name = (String)(j.next());
 				Container widget = (Container)(node.updateWidget.get(name));
-				logger.info("widget:{0}", widget);
 				sendWidgetData(wName, widget);
 			}
 			sendPacketClass(PacketClass.END);
 		}
 		sendPacketClass(PacketClass.END);
 		clearWindowTable();
-		logger.leave("sendWindowData");
 	}
 
 	void addClass(Class clazz, String receiverName, String senderName) {
@@ -580,19 +574,13 @@ public class Protocol extends Connection {
 	}
 
 	public void send_event(Container widget, Object userData) throws IOException {
-		logger.enter("send_event");
-		logger.info("widget: {0}", widget.getName());
 		if (!inReceive  && !ignoreEvent) {
-			logger.info("sending...");
 			Container parent = widget;
 			while (parent.getParent() != null) {
 				parent = parent.getParent();
 			}
-			logger.info("sendEvent({0},{1},{2})", new Object[] {parent.getName(), widget.getName(), userData == null ? "" : userData.toString()});
 			sendEvent(parent.getName(), widget.getName(), userData == null ? "" : userData.toString());
-			logger.info("sendWindowData");
 			sendWindowData();
-			logger.info("sendWindowData done");
 //			blockChangedHanders();
 			if (getScreenData()) {
 				ignoreEvent = true;
@@ -603,7 +591,6 @@ public class Protocol extends Connection {
 			}
 //			unblockChangedHanders();
 		}
-		logger.leave("send_event");
 	}
 
 	public void send_event_on_focus_out(Container widget, Object userData) throws IOException {
@@ -636,12 +623,12 @@ public class Protocol extends Connection {
 		String name;
 		String windowName;
 		if ( ! inReceive) {
-			Container parent = null;
+			Container parent = widget;
 			while (parent.getParent() != null) {
 				parent = parent.getParent();
 			}
 			//ResetTimer(GTK_WINDOW (window));
-			name = xml.getWidgetLongName(widget);
+			name = xml.getWidgetName(widget);
 			String wName = parent.getName();
 			Node node = (Node)windowTable.get(wName);
 			if (node != null && ! node.updateWidget.containsKey(name)) {
