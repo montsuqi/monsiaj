@@ -4,3 +4,5 @@ dist
 .classpath
 cache
 scratch.jpage
+templates
+.jetproperties
