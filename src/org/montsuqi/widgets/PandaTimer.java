@@ -24,14 +24,18 @@ package org.montsuqi.widgets;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.swing.Timer;
 import javax.swing.JComponent;
+import org.montsuqi.util.Logger;
 
 public class PandaTimer extends JComponent {
+
+	protected static final Logger logger = Logger.getLogger(PandaTimer.class);
 
 	private Timer timer;
 
@@ -82,6 +86,8 @@ public class PandaTimer extends JComponent {
 			TimerListener l = listeners[i];
 			l.timerSignaled(e);
 		}
+		Object[] args = { getName(), new Date(), Thread.currentThread() };
+		logger.debug("timer {0} ring at {1,time} in {2}", args); //$NON-NLS-1$
 	}
 
 	public void setDuration(int duration) {
@@ -94,6 +100,8 @@ public class PandaTimer extends JComponent {
 
 	public void reset() {
 		timer.restart();
+		Object[] args = { getName(), new Date(), Thread.currentThread() };
+		logger.debug("timer {0} reset at {1,time} in {2}", args); //$NON-NLS-1$
 	}
 
 	public void finalize() {
