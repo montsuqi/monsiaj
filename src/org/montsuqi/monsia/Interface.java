@@ -30,6 +30,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusAdapter;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -264,6 +265,10 @@ public class Interface {
 		});
 	}
 
+	private void connectButtonPressEvent(final Container target, final Method handler, final Object other) {
+		connectClicked(target, handler, other);
+	}
+
 	private void connectChanged(final Container target, final Method handler, final Object other) {
 		if ( ! (target instanceof JTextComponent)) {
 			return;
@@ -296,6 +301,24 @@ public class Interface {
 	
 	private void connectEnter(final Container target, final Method handler, final Object other) {
 		connectActivate(target, handler, other);
+	}
+
+	private void connectFocusInEvent(final Container target, final Method handler, final Object other) {
+		target.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				invoke(handler, target, other);
+			}
+			public void focusLost(FocusEvent e) {}
+		});
+	}
+
+	private void connectFocusOutEvent(final Container target, final Method handler, final Object other) {
+		target.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {}
+			public void focusLost(FocusEvent e) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
 	private void connectMapEvent(final Container target, final Method handler, final Object other) {
