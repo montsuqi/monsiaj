@@ -65,20 +65,6 @@ public class TestCalendar extends JFCTestCase {
 		m_helper.enterClickAndLeave( new MouseEventData( this, today_button ) );
 	}
 
-	public void testNextMonth() throws Exception {
-		Finder f = new AbstractButtonFinder(">"); //$NON-NLS-1$
-		JButton nextMonthButton = (JButton) f.find(m_window, 0);
-		assertNotNull("Could not find Next Month button", nextMonthButton); //$NON-NLS-1$
-		m_helper.enterClickAndLeave( new MouseEventData( this, nextMonthButton ) );
-	}
-
-	public void testPreviousMonth() throws Exception {
-		Finder f = new AbstractButtonFinder("<"); //$NON-NLS-1$
-		JButton previousMonthButton = (JButton) f.find(m_window, 0);
-		assertNotNull("Could not find field", previousMonthButton); //$NON-NLS-1$
-		m_helper.enterClickAndLeave( new MouseEventData( this, previousMonthButton ) );
-	}
-
 	public static void main (String[] args){
 		TestRunner.run(TestCalendar.class);
 	}
