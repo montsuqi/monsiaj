@@ -44,6 +44,7 @@ public class PandaPreviewPane extends JPanel {
 		preview = new ImagePreview();
 
 		toolbar = new JToolBar();
+		toolbar.setFloatable(false);
 		toolbar.add(preview.getZoomInAction());
 		toolbar.add(preview.getZoomOutAction());
 		toolbar.add(preview.getRotateClockwiseAction());
