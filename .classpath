@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-    <classpathentry kind="src" path="src"/>
-    <classpathentry kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
-    <classpathentry kind="lib" path="/usr/share/java/log4j-1.2.8.jar"/>
-    <classpathentry kind="lib" path="/usr/lib/j2sdk1.4/jre/lib/jsse.jar"/>
-    <classpathentry kind="output" path="build"/>
-</classpath>
