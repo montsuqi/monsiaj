@@ -40,7 +40,14 @@ public class TableConstraints {
 	public boolean yFill;
 
 	public TableConstraints() {
-		// inhibit instantiation
+		leftAttach = 0;
+		topAttach = 0;
+		rightAttach = 1;
+		bottomAttach = 1;
+		xPadding = 0;
+		yPadding = 0;
+		xFill = true;
+		yFill = true;
 	}
 
 	public TableConstraints(GridBagConstraints gbc) {
@@ -50,12 +57,8 @@ public class TableConstraints {
 		bottomAttach = gbc.gridy + gbc.gridheight;
 		xPadding = gbc.ipadx;
 		yPadding = gbc.ipady;
-		xFill =
-			gbc.fill == GridBagConstraints.HORIZONTAL ||
-			gbc.fill == GridBagConstraints.BOTH;
-		yFill =
-			gbc.fill == GridBagConstraints.VERTICAL ||
-			gbc.fill == GridBagConstraints.BOTH;
+		xFill = (gbc.fill & GridBagConstraints.HORIZONTAL) != 0;
+		yFill = (gbc.fill &= GridBagConstraints.VERTICAL) != 0;
 	}
 
 	public GridBagConstraints toGridBagConstraints() {
@@ -76,6 +79,10 @@ public class TableConstraints {
 		gbc.ipady = yPadding;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
+		gbc.insets.left = 0;
+		gbc.insets.right = 0;
+		gbc.insets.top = 0;
+		gbc.insets.bottom = 0;
 		return gbc;
 	}
 }
