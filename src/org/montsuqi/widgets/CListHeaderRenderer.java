@@ -23,9 +23,9 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.Component;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 public class CListHeaderRenderer implements TableCellRenderer {
@@ -33,7 +33,7 @@ public class CListHeaderRenderer implements TableCellRenderer {
 	private Component component;
 
 	public CListHeaderRenderer(JComponent c) {
-		c.setBorder(BorderFactory.createEtchedBorder());
+		c.setBorder(UIManager.getBorder("TableHeader.cellBorder")); //$NON-NLS-1$
 		c.setOpaque(true);
 		this.component = c;
 	}
