@@ -178,7 +178,7 @@ class Connection {
 
 	void sendFixed(BigDecimal xval) throws IOException {
 		String s;
-		if (xval.compareTo(BigDecimal.ZERO) >= 0) {
+		if (xval.signum() >= 0) {
 			s = String.valueOf(xval.unscaledValue());
 		} else {
 			s = String.valueOf(xval.negate().unscaledValue());
