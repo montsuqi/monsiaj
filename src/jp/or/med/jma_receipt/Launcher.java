@@ -22,6 +22,8 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import java.io.File;
+
 import javax.swing.JOptionPane;
 
 import org.montsuqi.client.Client;
@@ -72,8 +74,7 @@ public final class Launcher {
 				client.setPortNumber(conf.getPort());
 				client.setCurrentApplication(conf.getApplication());
 				client.setEncoding("EUC-JP"); //$NON-NLS-1$
-				client.setCache(System.getProperty("user.home") + System.getProperty("file.separator") + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+				client.setCache(System.getProperty("user.home") + File.separator + "cache"); //$NON-NLS-1$ //$NON-NLS-2$
 				try {
 					client.connect();
 					Thread t = new Thread(client);

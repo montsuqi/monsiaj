@@ -22,6 +22,7 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,12 +32,13 @@ import java.util.Properties;
 
 class PropertyFileBasedConfiguration extends Configuration {
 
-	static final String CONFIGURATION_FILE = System.getProperty("user.home") + System.getProperty("file.separator") + "jma-receipt.properties"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	static final String CONFIGURATION_FILE = System.getProperty("user.home") + File.separator + "jma-receipt.properties"; //$NON-NLS-1$ //$NON-NLS-2$
 	Properties props;
 
 	PropertyFileBasedConfiguration() {
 		props = new Properties();
 	}
+
 	void load() {
 		try {
 			props.load(new FileInputStream(CONFIGURATION_FILE));
