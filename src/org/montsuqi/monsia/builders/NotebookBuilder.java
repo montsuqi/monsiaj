@@ -26,11 +26,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
-import javax.swing.JButton;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.widgets.Notebook;
+import org.montsuqi.widgets.NotebookDummyButton;
 
 class NotebookBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
@@ -52,14 +52,13 @@ class NotebookBuilder extends ContainerBuilder {
 			if (properties.containsKey("child_name")) { //$NON-NLS-1$
 				if (properties.containsKey("label")) { //$NON-NLS-1$
 					labels[currentLabel] = (String)properties.get("label"); //$NON-NLS-1$
+					Component dummy = new NotebookDummyButton(labels[currentLabel], currentLabel, notebook);
+					setCommonParameters(xml, dummy, wInfo);
+					setSignals(xml, dummy, wInfo);
 					currentLabel++;
 				} else {
 					throw new WidgetBuildingException(Messages.getString("WidgetBuilder.no_label_for_a_tab")); //$NON-NLS-1$
 				}
-				JButton button = (JButton)buildWidget(xml, wInfo, parent);
-				setCommonParameters(xml, button, wInfo);
-				setSignals(xml, button, wInfo);
-				notebook.addButton(button);
 			} else {
 				Component body = buildWidget(xml, wInfo, parent);
 				bodies[currentBody] = body;
