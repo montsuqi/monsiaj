@@ -213,26 +213,31 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		accels.clear();
 	}
 
-	protected String normalizeKeyName(String keyName) {
-		if (keyName.startsWith("GDK_")) { //$NON-NLS-1$
-			keyName = keyName.substring("GDK_".length()); //$NON-NLS-1$
+	private String removePrefix(String name) {
+		if (name.startsWith("GDK_")) { //$NON-NLS-1$
+			name = name.substring("GDK_".length()); //$NON-NLS-1$
 		}
-		if ( ! keyName.startsWith("VK_")) { //$NON-NLS-1$
-			keyName = "VK_" + keyName; //$NON-NLS-1$
+		if (name.startsWith("GTK_")) { //$NON-NLS-1$
+			name = name.substring("GTK_".length()); //$NON-NLS-1$
 		}
-		return keyName;
+		return name;
 	}
 
 	protected int keyCode(String keyName) {
 		final Field[] fields = KeyEvent.class.getDeclaredFields();
-		keyName = normalizeKeyName(keyName);
-		for (int i = 0; i < fields.length; i++) {
-			if (keyName.equals(fields[i].getName())) {
-				try {
-					return fields[i].getInt(null);
-				} catch (Exception e) {
-					logger.warn(e);
-					return 0;
+		keyName = removePrefix(keyName);
+		if ( ! keyName.startsWith("VK_")) { //$NON-NLS-1$
+			keyName = "VK_" + keyName; //$NON-NLS-1$
+		}
+		if (keyName.length() > 0) {
+			for (int i = 0; i < fields.length; i++) {
+				if (keyName.equals(fields[i].getName())) {
+					try {
+						return fields[i].getInt(null);
+					} catch (Exception e) {
+						logger.warn(e);
+						return 0;
+					}
 				}
 			}
 		}
@@ -245,9 +250,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		int modifiers = 0;
 		while (tokens.hasMoreTokens()) {
 			String modifier = tokens.nextToken();
-			if (modifier.startsWith("GTK_")) { //$NON-NLS-1$
-				modifier = modifier.substring(4);
-			}
+			modifier = removePrefix(modifier);
 			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
 				modifiers |= KeyEvent.SHIFT_MASK;
 			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$

@@ -688,6 +688,9 @@ class WidgetPropertySetter {
 	}
 
 	private String normalize(String value, String prefixToRemove) {
+		if (value.startsWith("GDK_")) { //$NON-NLS-1$
+			value = value.substring("GDK_".length()); //$NON-NLS-1$
+		}
 		if (value.startsWith("GTK_")) { //$NON-NLS-1$
 			value = value.substring("GTK_".length()); //$NON-NLS-1$
 		}
