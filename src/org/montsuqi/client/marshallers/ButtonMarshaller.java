@@ -69,6 +69,9 @@ class ButtonMarshaller extends WidgetMarshaller {
 		if (widget instanceof JLabel) {
 			JLabel label = (JLabel)widget;
 			label.setText(value);
+		} else if (widget instanceof AbstractButton) {
+			AbstractButton button = (AbstractButton)widget;
+			button.setText(value);
 		} else if (widget instanceof Container) {
 			Container c = (Container)widget;
 			Component[] comps = c.getComponents();
