@@ -46,7 +46,7 @@ public class Launcher {
 
 	protected static final Logger logger = Logger.getLogger(Launcher.class);
 
-	protected Client target;
+	private Client client;
 	protected Configuration conf;
 	protected String title;
 
@@ -67,11 +67,11 @@ public class Launcher {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
 		}
 		conf = new Configuration(this.getClass());
-		target = new Client(conf);
+		client = new Client(conf);
 	}
 
 	public void launch() {
-		JDialog d = createConfigurationDialog(conf);
+		JDialog d = createConfigurationDialog();
 		d.setLocationRelativeTo(null);
 		conf.setConfigured(false);
 		d.setVisible(true);
@@ -81,8 +81,8 @@ public class Launcher {
 				createLogFrame();
 			}
 			try {
-				target.connect();
-				Thread t = new Thread(target);
+				client.connect();
+				Thread t = new Thread(client);
 				t.start();
 			} catch (Exception e) {
 				logger.fatal(e);
@@ -92,7 +92,7 @@ public class Launcher {
 		}
 	}
 
-	public JDialog createConfigurationDialog(Configuration newConf) {
+	public JDialog createConfigurationDialog() {
 		return new DefaultConfigurationDialog(title, conf);
 	}
 
