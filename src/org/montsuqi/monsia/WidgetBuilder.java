@@ -17,11 +17,13 @@ import java.util.HashMap;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JApplet;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -30,6 +32,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -101,7 +104,7 @@ class WidgetBuilder {
 		registerClass("Toolbar", javax.swing.JToolBar.class); //$NON-NLS-1$
 		registerClass("VBox", org.montsuqi.widgets.VBox.class); //$NON-NLS-1$
 		//registerClass("VSeparator", null);
-		registerClass("Viewport", javax.swing.JScrollPane.class); //$NON-NLS-1$
+		registerClass("Viewport", javax.swing.JViewport.class); //$NON-NLS-1$
 		registerClass("Window", javax.swing.JFrame.class); //$NON-NLS-1$
 	}
 
@@ -217,7 +220,10 @@ class WidgetBuilder {
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildLayoutChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("List", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("List", //$NON-NLS-1$
+								"buildList", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								null);
 		registerWidgetBuildData("ListItem", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("Menu", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("MenuBar", defaultBuildWidgetData); //$NON-NLS-1$
@@ -272,7 +278,10 @@ class WidgetBuilder {
 								"buildPanedChildren", //$NON-NLS-1$
 								null);
 		registerWidgetBuildData("VSeparator", defaultBuildWidgetData); //$NON-NLS-1$
-		registerWidgetBuildData("Viewport", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("Viewport",
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildViewportChildren", //$NON-NLS-1$
+								null);
 		registerWidgetBuildData("Window", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"standardBuildChildren", //$NON-NLS-1$
@@ -379,6 +388,12 @@ class WidgetBuilder {
 			logger.fatal(e);
 			throw new InterfaceBuildingException(e);
 		}
+	}
+
+	Container buildList(WidgetInfo info) {
+		Container widget = standardBuildWidget(info);
+		((JList)widget).setModel(new DefaultListModel());
+		return widget;
 	}
 
 	Container buildPreview(WidgetInfo info) {
@@ -544,6 +559,18 @@ class WidgetBuilder {
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
 		Container child = buildWidget(wInfo);
 		scroll.setViewportView(child);
+	}
+
+	void buildViewportChildren(Container parent, WidgetInfo info) {
+		int cCount = info.getChildrenCount();
+		if (cCount != 1) {
+			throw new WidgetBuildingException("only one child is allowed in a ScrolledWindow");
+		}
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		Container child = buildWidget(wInfo);
+		JViewport viewport = (JViewport)parent;
+		viewport.setView(child);
 	}
 
 	void buildCListChildren(Container parent, WidgetInfo info) {
