@@ -47,6 +47,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.monsia.builders.WidgetBuilder;
+import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.PandaFocusManager;
 
 public class Interface {
@@ -59,6 +60,8 @@ public class Interface {
 	private List signals;
     private Component focusWidget;
 	private Component defaultWidget;
+
+	private static final Logger logger = Logger.getLogger(Interface.class);
 
 	private static Map accelHandlers;
 	static {
@@ -294,6 +297,9 @@ public class Interface {
 	}
 
 	public void setLongName(String longName, Component widget) {
+		if (longNames.containsKey(longName)) {
+			logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName);
+		}
 		longNames.put(longName, widget);
 	}
 
