@@ -24,15 +24,11 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Window;
 import java.util.Iterator;
 
-import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.RootPaneContainer;
-import javax.swing.SwingUtilities;
-
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
@@ -48,18 +44,11 @@ class ContainerBuilder extends WidgetBuilder {
 			ChildInfo cInfo = (ChildInfo)i.next();
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = WidgetBuilder.buildWidget(xml, wInfo, parent);
-			addChild(parent, child);
-		}
-	}
-
-	protected void addChild(Container parent, Component child) {
-		if (child instanceof JMenuBar) {
-			Window w = SwingUtilities.windowForComponent(parent);
-			assert w instanceof JFrame;
-			JFrame f = (JFrame)w;
-			f.setJMenuBar((JMenuBar)child);
-		} else {
-			parent.add(child);
+			if (child instanceof JMenuBar) {
+				xml.setMenuBar((JMenuBar)child);
+			} else {
+				parent.add(child);
+			}
 		}
 	}
 

@@ -39,6 +39,8 @@ import java.util.Map;
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.xml.parsers.SAXParser;
@@ -48,6 +50,7 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaFocusManager;
 
 public class Interface {
@@ -60,6 +63,7 @@ public class Interface {
 	private List signals;
     private Component focusWidget;
 	private Component defaultWidget;
+	private JMenuBar menuBar;
 
 	private static final Logger logger = Logger.getLogger(Interface.class);
 
@@ -92,6 +96,7 @@ public class Interface {
 
 	private static final String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
 	private static final int OLD_PROLOGUE_LENGTH;
+
 	static {
 		OLD_PROLOGUE_LENGTH = oldPrologue.getBytes().length;
 	}
@@ -158,7 +163,7 @@ public class Interface {
 
 	private void connect(SignalHandler handler, SignalData data) {
 		Component target = data.getTarget();
-		if (target instanceof JComboBox) {
+		if (target instanceof JComboBox && ! (target instanceof OptionMenu)) {
 			JComboBox combo = (JComboBox)target;
 			Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
 			if (prop != null) {
@@ -272,6 +277,12 @@ public class Interface {
 			WidgetInfo info = (WidgetInfo)i.next();
 			Component widget = WidgetBuilder.buildWidget(this, info, null);
 			setName(info.getName(), widget);
+			if (widget instanceof JFrame) {
+				JFrame f = (JFrame)widget;
+				if (menuBar != null) {
+					f.setJMenuBar(menuBar);
+				}
+			}
 		}
 	}
 
@@ -301,5 +312,12 @@ public class Interface {
 		}
 		AccelHandler handler = (AccelHandler)accelHandlers.get(c);
 		return handler;
+	}
+
+	public void setMenuBar(JMenuBar menuBar) {
+		if (this.menuBar != null && this.menuBar != menuBar) {
+			logger.warn("menubar is already set, replacing with new one."); //$NON-NLS-1$
+		}
+		this.menuBar = menuBar;
 	}
 }

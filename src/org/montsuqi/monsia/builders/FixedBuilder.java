@@ -29,6 +29,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Map;
 
+import javax.swing.JMenuBar;
 import javax.swing.JTable;
 
 import org.montsuqi.monsia.ChildInfo;
@@ -42,7 +43,8 @@ class FixedBuilder extends ContainerBuilder {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = null;
-			int x = 0, y = 0;
+			int x = 0;
+			int y = 0;
 			child = buildWidget(xml, wInfo, parent);
 			Map properties = cInfo.getProperties();
 			if (properties.containsKey("x")) { //$NON-NLS-1$
@@ -54,8 +56,12 @@ class FixedBuilder extends ContainerBuilder {
 			if (child instanceof JTable) {
 				child = underlayScrollPane(child);
 			}
-			addChild(parent, child);
-			child.setLocation(ScreenScale.scale(new Point(x, y)));
+			if (child instanceof JMenuBar) {
+				xml.setMenuBar((JMenuBar)child);
+			} else {
+				parent.add(child);
+				child.setLocation(ScreenScale.scale(new Point(x, y)));
+			}
 		}
 		Component[] children = parent.getComponents();
 		int bottomMost = 0;
