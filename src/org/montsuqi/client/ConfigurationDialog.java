@@ -30,9 +30,13 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -41,7 +45,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import org.montsuqi.util.Logger;
 
@@ -58,10 +64,19 @@ public abstract class ConfigurationDialog extends JDialog {
 		initComponents();
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				closeDialog();
+				dispose();
 			}
 		});
 
+		JRootPane root = getRootPane();
+		InputMap inputMap = root.getInputMap();
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it"); //$NON-NLS-1$
+		ActionMap actionMap = root.getActionMap();
+		actionMap.put("close-it", new AbstractAction() { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		setModal(true);
 		setSize(320, 240);
 	}
@@ -82,16 +97,11 @@ public abstract class ConfigurationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				conf.setConfigured(true);
 				updateConfiguration();
-				closeDialog();
+				dispose();
 			}
 		});
 		buttonBar.add(runButton);
 		getRootPane().setDefaultButton(runButton);
-	}
-
-	void closeDialog() {
-		setVisible(false);
-		dispose();
 	}
 
 	private JComponent createConfigurationPanel() {
@@ -217,5 +227,4 @@ public abstract class ConfigurationDialog extends JDialog {
 		addRow(container, y, text, panel);
 		return group;
 	}
-
 }
