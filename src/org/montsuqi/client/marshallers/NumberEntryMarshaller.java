@@ -44,8 +44,6 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 				continue;
 			}
 			BigDecimal val = con.receiveFixedData();
-			Object[] params = { widget.getName(), val };
-			logger.debug("received value of {0}: {1}", params);
 			manager.registerValue(entry, name, val);
 			entry.setValue(val);
 		}

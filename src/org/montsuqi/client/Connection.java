@@ -195,8 +195,17 @@ class Connection {
 		if (value == null || value.length() == 0) {
 			logger.warn("empty Fixed value"); //$NON-NLS-1$
 		} else {
+			boolean minus = false;
+			char c = value.charAt(0);
+			if ((c & 0x40) != 0) {
+				value = (char)(c & ~0x40) + value.substring(1);
+				minus = true;
+			}
 			try {
 				i =  new BigInteger(value);
+				if (minus) {
+					i = i.negate();
+				}
 			} catch (NumberFormatException e) {
 				logger.warn(e);
 			}
