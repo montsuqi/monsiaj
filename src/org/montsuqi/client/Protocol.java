@@ -315,15 +315,6 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private boolean _grabFocus(Object data) {
-		//gtk_widget_grab_focus(data);
-		return false;
-	}
-
-	private void grabFocus(Component widget) {
-		//gtk_idle_add(_GrabFocus, widget);
-	}
-
 	void resetTimer(Component widget) {
 		if (widget instanceof Container) {
 			Container container = (Container)widget;
@@ -346,7 +337,7 @@ public class Protocol extends Connection {
 		setReceiving(true);
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
-		sendLong((int)0);     /* get all data */ // In Java: int=>32bit, long=>64bit
+		sendLong((int)0); // get all data // In Java: int=>32bit, long=>64bit
 		boolean fCancel = false;
 		byte c;
 		while ((c = receivePacketClass()) == PacketClass.WindowName) {
@@ -399,7 +390,7 @@ public class Protocol extends Connection {
 			if (node != null && node.getInterface() != null) {
 				widget = xml.getWidget(wName);
 				if (widget != null) {
-					grabFocus(widget);
+					widget.requestFocus();
 				}
 			}
 			c = receivePacketClass();
@@ -544,7 +535,7 @@ public class Protocol extends Connection {
 		if (node != null) {
 			Component nextWidget = node.getInterface().getWidget(userData.toString());
 			if (nextWidget != null) {
-				grabFocus(nextWidget);
+				nextWidget.requestFocus();
 			}
 		}
 	}
@@ -663,16 +654,17 @@ public class Protocol extends Connection {
 	}
 
 	public void keypress_filter(Component widget, Object userData) {
-		logger.warn(Messages.getString("Protocol.keypress_filter_is_not_impremented_yet")); //$NON-NLS-1$
+		Component next = xml.getWidget((String)userData);
+		next.requestFocus();
+		// TODO: implement this
 	}
 
 	public void press_filter(Component widget, Object userData) {
 		logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); //$NON-NLS-1$
 	}
 
-	/** callback placeholder which has no effect */
 	public void gtk_true(Component widget, Object userData) {
-		/* DO NOTHING */
+		// callback placeholder which has no effect
 	}
 
 	public StringBuffer getWidgetNameBuffer() {

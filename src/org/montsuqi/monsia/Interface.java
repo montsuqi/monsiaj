@@ -588,7 +588,7 @@ public class Interface {
 		while (i.hasNext()) {
 			WidgetInfo info = (WidgetInfo)i.next();
 			Component widget = WidgetBuilder.buildWidget(this, info);
-			widgets.put(info.getName(), widget);
+			setName(info.getName(), widget);
 		}
 	}
 
@@ -601,6 +601,10 @@ public class Interface {
 			}
 		}
 		return null;
+	}
+
+	public void setName(String name, Component widget) {
+		widgets.put(name, widget);
 	}
 
 	public void setLongName(String longName, Component widget) {

@@ -184,6 +184,7 @@ public class WidgetBuilder {
 		//addAccels(xml, widget, info);
 		addSignals(xml, widget, info);
 		widget.setName(info.getName());
+		xml.setName(info.getName(), widget);
 		xml.setLongName(info.getLongName(), widget);
 	}	
 
