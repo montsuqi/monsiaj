@@ -39,6 +39,12 @@ class TableBuilder extends ContainerBuilder {
 	private static final String RIGHT_ATTACH_KEY = "right_attach"; //$NON-NLS-1$
 	private static final String TOP_ATTACH_KEY = "top_attach"; //$NON-NLS-1$
 	private static final String BOTTOM_ATTACH_KEY = "bottom_attach"; //$NON-NLS-1$
+	private static final String XEXPAND_KEY = "xexpand"; //$NON-NLS-1$
+	private static final String YEXPAND_KEY = "yexpand"; //$NON-NLS-1$
+	private static final String XSHRINK_KEY = "xshrink"; //$NON-NLS-1$
+	private static final String YSHRINK_KEY = "yshrink"; //$NON-NLS-1$
+	private static final String XPAD_KEY = "xpad"; //$NON-NLS-1$
+	private static final String YPAD_KEY = "ypad"; //$NON-NLS-1$
 	private static final String X_KEY = "x"; //$NON-NLS-1$
 	private static final String Y_KEY = "y"; //$NON-NLS-1$
 
@@ -68,6 +74,24 @@ class TableBuilder extends ContainerBuilder {
 			}
 			if (properties.containsKey(Y_KEY)) {
 				// y_options = ParameterConverter.toInteger(value);
+			}
+			if (properties.containsKey(XEXPAND_KEY)) {
+				tc.xExpand = ParameterConverter.toBoolean((String)properties.get(XEXPAND_KEY));
+			}
+			if (properties.containsKey(YEXPAND_KEY)) {
+				tc.yExpand = ParameterConverter.toBoolean((String)properties.get(YEXPAND_KEY));
+			}
+			if (properties.containsKey(XSHRINK_KEY)) {
+				tc.xShrink = ParameterConverter.toBoolean((String)properties.get(XSHRINK_KEY));
+			}
+			if (properties.containsKey(YSHRINK_KEY)) {
+				tc.yShrink = ParameterConverter.toBoolean((String)properties.get(YSHRINK_KEY));
+			}
+			if (properties.containsKey(XPAD_KEY)) {
+				tc.xPadding = ParameterConverter.toInteger((String)properties.get(XPAD_KEY));
+			}
+			if (properties.containsKey(YPAD_KEY)) {
+				tc.yPadding = ParameterConverter.toInteger((String)properties.get(YPAD_KEY));
 			}
 			parent.add(child);
 			tl.setConstraints(child, tc);
