@@ -22,11 +22,24 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Rectangle;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
 
 public class VSeparator extends JSeparator {
 	public VSeparator() {
 		super(SwingConstants.VERTICAL);
+	}
+
+	public void setBounds(int x, int y, int width, int height) {
+		// displacement to fit Gtk+'s way of placeing separators
+		x += width / 2;
+		super.setBounds(x, y, width, height);
+	}
+
+	public void setBounds(Rectangle r) {
+		// displacement to fit Gtk+'s way of placeing separators
+		r.x += r.width / 2;
+		super.setBounds(r);
 	}
 }
