@@ -26,15 +26,15 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
+import javax.swing.table.TableCellRenderer;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
-import org.montsuqi.widgets.CListDummyLabel;
+import org.montsuqi.widgets.CListHeaderRenderer;
+import org.montsuqi.widgets.PandaCList;
 
 class CListBuilder extends ContainerBuilder {
 
@@ -53,30 +53,30 @@ class CListBuilder extends ContainerBuilder {
 			columnNames[i] = "?"; //$NON-NLS-1$
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			if ( ! "Label".equals(wInfo.getClassName())) { //$NON-NLS-1$
-				continue;
-			}
 			Map properties = wInfo.getProperties();
 			if (properties.containsKey("label")) { //$NON-NLS-1$
 				columnNames[i] = (String)properties.get("label"); //$NON-NLS-1$
 			}
 		}
 
-		JTable table = (JTable)parent;
-		table.setModel(new DefaultTableModel(columnNames, 0) {
+		PandaCList clist = (PandaCList)parent;
+		clist.setModel(new DefaultTableModel(columnNames, 0) {
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		});
 
-		TableColumnModel columnModel = table.getColumnModel();
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			TableColumn column = columnModel.getColumn(i);
-			String label = (String)column.getHeaderValue();
-			Component dummy = new CListDummyLabel(label, i, table);
-			setCommonParameters(xml, dummy, wInfo);
+			Component header = WidgetBuilder.buildWidget(xml, wInfo, parent);
+			if (header instanceof JComponent) {
+				TableCellRenderer renderer = new CListHeaderRenderer((JComponent)header);
+				clist.registerHeaderRenderer(i, renderer);
+			} else {
+				throw new WidgetBuildingException("not-JComponent component for CList header"); //$NON-NLS-1$
+			}
 		}
 	}
 }
+

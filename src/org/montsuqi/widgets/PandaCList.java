@@ -33,6 +33,7 @@ import javax.swing.InputMap;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -107,15 +108,18 @@ public class PandaCList extends JTable {
 		TableColumnModel model = getColumnModel();
 		int n = getColumnCount();
 		int[] widths = new int[n];
+		TableCellRenderer[] renderers = new TableCellRenderer[n];
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
 			widths[i] = column.getPreferredWidth();
+			renderers[i] = column.getHeaderRenderer();
 		}
 		super.createDefaultColumnsFromModel();
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
 			column.setPreferredWidth(widths[i]);
 			column.setMinWidth(widths[i]);
+			column.setHeaderRenderer(renderers[i]);
 		}
 	}
 
@@ -132,4 +136,11 @@ public class PandaCList extends JTable {
 	public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
 		super.changeSelection(rowIndex, columnIndex, true, extend);
 	}
+
+	public void registerHeaderRenderer(int index, TableCellRenderer renderer) {
+		TableColumnModel columns = getColumnModel();
+		TableColumn column = columns.getColumn(index);
+		column.setHeaderRenderer(renderer);
+	}
+
 }

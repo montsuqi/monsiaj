@@ -40,7 +40,6 @@ import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.widgets.CListDummyLabel;
 
 class CListMarshaller extends WidgetMarshaller {
 
@@ -68,11 +67,8 @@ class CListMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			label.replace(offset, label.length(), '.' + name);
 			Component sub = xml.getWidgetByLongName(label.toString());
-			if (sub != null && sub instanceof CListDummyLabel) {
-				CListDummyLabel dummy = (CListDummyLabel)sub;
-				assert table == dummy.getTable();
+			if (sub != null) {
 				con.receiveValue(widgetName, offset + name.length());
-				labels[dummy.getIndex()] = dummy.getText();
 			} else if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
@@ -149,7 +145,7 @@ class CListMarshaller extends WidgetMarshaller {
 		int rows = table.getRowCount();
 		copySelections(rows, savedSelections, selections);
 		// setColumnIdentifiers resets selection values
-		tableModel.setColumnIdentifiers(labels);
+		//tableModel.setColumnIdentifiers(labels);
 		// restore selection values
 		copySelections(rows, selections, savedSelections);
 	}
