@@ -84,10 +84,10 @@ public class Interface {
 		}
 	}
 
-	Interface(String fileName, Map widgets, List roots, Protocol protocol) {
+	Interface(String fileName, Map infos, List roots, Protocol protocol) {
 		logger = Logger.getLogger(Interface.class);
 		this.fileName = fileName;
-		infos = widgets;
+		this.infos = infos;
 		widgets = new HashMap();
 		signals = new HashMap();
 		buttonGroups = new HashMap();
@@ -280,8 +280,7 @@ public class Interface {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
-		Object container = widgets.get(name);
-		return (Container)container;
+		return (Container)widgets.get(name);
 	}
 
 	public Container getWidgetByLongName(String longName) {
