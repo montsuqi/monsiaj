@@ -298,7 +298,7 @@ public class Interface {
 
 	public void setLongName(String longName, Component widget) {
 		if (longNames.containsKey(longName)) {
-			logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName);
+			logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName); //$NON-NLS-1$
 		}
 		longNames.put(longName, widget);
 	}
