@@ -176,7 +176,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 				properties.clear();
 			}
 		} else {
-			throw new IllegalStateException(Messages.getString("MonsiaHandler.unknown_property_type"));
+			throw new IllegalStateException(Messages.getString("MonsiaHandler.unknown_property_type")); //$NON-NLS-1$
 		}
 	
 		propertyType = PropertyType.NONE;
@@ -217,6 +217,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 				}
 			}
 		}
+		logger.warn(Messages.getString("AbstractDocumentHandler.key_not_found"), keyName); //$NON-NLS-1$
 		return 0;
 	}
 
@@ -231,21 +232,21 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		try {
 			while (tokens.nextToken() != StreamTokenizer.TT_EOF) {
 				String modifier = tokens.sval;
-				if (modifier.startsWith("GTK_")) {
+				if (modifier.startsWith("GTK_")) { //$NON-NLS-1$
 					modifier = modifier.substring(4);
 				}
 				if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
 					modifiers |= KeyEvent.SHIFT_MASK;
 				} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 				} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
 					modifiers |= KeyEvent.CTRL_MASK;
 				} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 				} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
 					modifiers |= parseButtonMask(modifier.substring(6));
 				} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 				}
 			}
 		} catch (IOException e) {
