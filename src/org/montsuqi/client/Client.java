@@ -79,7 +79,7 @@ public class Client implements Runnable {
 		options.add("user", Messages.getString("Client.user_name"), System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		options.add("styles", Messages.getString("Client.styles"), ""); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		options.add("style", Messages.getString("Client.styles"), ""); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("v1", Messages.getString("Client.use_protocol_version_1"), true); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("v2", Messages.getString("Client.use_protocol_version_2"), true); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("useSSL", "SSL", false); //$NON-NLS-1$ //$NON-NLS-2$
@@ -98,7 +98,7 @@ public class Client implements Runnable {
 		user = (String)options.getValue("user"); //$NON-NLS-1$
 		pass = (String)options.getValue("pass"); //$NON-NLS-1$
 		encoding = (String)options.getValue("encoding"); //$NON-NLS-1$
-		styles = (String)options.getValue("styles"); //$NON-NLS-1$
+		styles = (String)options.getValue("style"); //$NON-NLS-1$
 		useSSL = ((Boolean)options.getValue("useSSL")).booleanValue(); //$NON-NLS-1$
 
 		if (useSSL) {
