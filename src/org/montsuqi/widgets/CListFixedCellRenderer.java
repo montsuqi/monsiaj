@@ -22,62 +22,98 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Rectangle;
+import java.awt.Font;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
 class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 
-	Fixed fixed;
-	static Pattern expression;
+    private static final Border NO_FOCUS_BORDER;
+	private static final Pattern EXPRESSION_PATTERN;
 
 	static {
-		expression = Pattern.compile("(?:[ \u3000]+)([0-9\uff10-\uff19]+(?:\u00d7[0-9\uff10-\uff19]+)?)(?:[ \u3000]*)\\z"); //$NON-NLS-1$
+	    NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1); 
+		EXPRESSION_PATTERN = Pattern.compile("(?:[ \u3000]+)([0-9\uff10-\uff19]+(?:\u00d7[0-9\uff10-\uff19]+)?)(?:[ \u3000]*)\\z"); //$NON-NLS-1$
 	}
+
+	private int[] positions;
 
 	public CListFixedCellRenderer(Fixed fixed) {
 		super();
-		this.fixed = fixed;
-	}
 
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		String s = value.toString();
-		setSize(fixed.getSize());
 		int nLabels = fixed.getComponentCount();
-		removeAll();
-		int[] positions = new int[nLabels];
+		positions = new int[nLabels];
 		for (int i = 0; i < nLabels; i++) {
 			positions[i] = fixed.getComponent(i).getX();
 		}
 		Arrays.sort(positions);
-		JLabel[] labels = new JLabel[nLabels];
-		for (int i = 0; i < nLabels; i++) {
-			JLabel label = new JLabel();
-			label.setOpaque(false);
-			label.setText(""); //$NON-NLS-1$
-			label.setLocation(positions[i], 0);
-			Rectangle r = table.getCellRect(row, column, false);
-			r.x = positions[i];
-			r.y = 0;
-			r.width = table.getWidth();
-			label.setBounds(r);
-			labels[i] = label;
-			add(label);
+	}
+
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		JLabel[] labels = createLabels(table, row, column);
+		fillLabels(value.toString(), labels);
+
+		if (isSelected) {
+			setForeground(table.getSelectionForeground());
+			setBackground(table.getSelectionBackground());
+		} else {
+			setForeground(table.getForeground());
+			setBackground(table.getBackground());
 		}
-		for (int i = nLabels - 1; i >= 1; i--) {
-			Matcher match = expression.matcher(s);
+		if (hasFocus) {
+			setBorder(UIManager.getBorder("Table.focusCellHighlightBorder")); //$NON-NLS-1$
+			if ( ! isSelected && table.isCellEditable(row, column)) {
+				Color col = UIManager.getColor("Table.focusCellForeground"); //$NON-NLS-1$
+				if (col != null) {
+					setForeground(col);
+				}
+				col = UIManager.getColor("Table.focusCellBackground"); //$NON-NLS-1$
+				if (col != null) {
+					setBackground(col);
+				}
+			}
+		} else {
+			setBorder(NO_FOCUS_BORDER);
+		}
+
+		return this;
+	}
+
+	private void fillLabels(String value, JLabel[] labels) {
+		for (int i = labels.length - 1; i >= 1; i--) {
+			Matcher match = EXPRESSION_PATTERN.matcher(value);
 			if ( ! match.find(0)) {
 				break;
 			}
 			labels[i].setText(match.group(1));
-			s = match.replaceAll(""); //$NON-NLS-1$
+			value = match.replaceAll(""); //$NON-NLS-1$
 		}
-		labels[0].setText(s);
-		return this;
+		labels[0].setText(value);
+	}
+
+	private JLabel[] createLabels(JTable table, int row, int column) {
+		removeAll();
+		Font font = table.getFont();
+		int tableWidth = table.getWidth();
+		JLabel[] labels = new JLabel[positions.length];
+		for (int i = 0, n = labels.length; i < n; i++) {
+			JLabel label = new JLabel(""); //$NON-NLS-1$
+			label.setFont(font);
+			label.setOpaque(false);
+			label.setLocation(positions[i], 0);
+			label.setSize(tableWidth, table.getCellRect(row, column, false).height);
+			labels[i] = label;
+			add(label);
+		}
+		return labels;
 	}
 }
