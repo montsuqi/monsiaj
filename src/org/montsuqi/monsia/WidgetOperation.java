@@ -51,6 +51,7 @@ import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
+import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
@@ -447,5 +448,14 @@ class WidgetOperation {
 		PandaEntry entry = (PandaEntry)widget;
 		boolean enabled = ParameterConverter.toBoolean(value);
 		entry.setXIMEnabled(enabled);
+	}
+
+	static void setPandaTimerDuration(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof PandaTimer)) {
+			throw new IllegalArgumentException("not a PandaTimer widget");
+		}
+		PandaTimer timer = (PandaTimer)widget;
+		int duration = ParameterConverter.toInteger(value);
+		timer.setDuration(duration);
 	}
 }

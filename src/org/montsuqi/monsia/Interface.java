@@ -73,6 +73,9 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.CalendarEvent;
 import org.montsuqi.widgets.CalendarListener;
+import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.TimerEvent;
+import org.montsuqi.widgets.TimerListener;
 import org.xml.sax.SAXException;
 
 public class Interface {
@@ -413,6 +416,18 @@ public class Interface {
 		JToggleButton toggleButton = (JToggleButton)target;
 		toggleButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				invoke(handler, target, other);
+			}
+		});
+	}
+
+	private void connectTimeout(final Container target, final Method handler, final Object other) {
+		if ( ! (target instanceof PandaTimer)) {
+			return;
+		}
+		PandaTimer timer = (PandaTimer)target;
+		timer.addTimerListener(new TimerListener() {
+			public void timerSignaled(TimerEvent e) {
 				invoke(handler, target, other);
 			}
 		});

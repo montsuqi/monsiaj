@@ -117,6 +117,7 @@ class WidgetBuilder {
 		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class); //$NON-NLS-1$
 		registerClass("PandaHTML", org.montsuqi.widgets.PandaHTML.class); //$NON-NLS-1$
 		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
+		registerClass("PandaTimer", org.montsuqi.widgets.PandaTimer.class); //$NON-NLS-1$
 		registerClass("RadioButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
 		registerClass("ScrolledWindow", javax.swing.JScrollPane.class); //$NON-NLS-1$
 		registerClass("SeparatorMenuItem", javax.swing.JSeparator.class); //$NON-NLS-1$
@@ -185,6 +186,7 @@ class WidgetBuilder {
 		registerProperty(org.montsuqi.widgets.PandaEntry.class, "input_mode", "setPandaEntryInputMode"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(org.montsuqi.widgets.PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void initWidgetBuildData() {
@@ -277,6 +279,7 @@ class WidgetBuilder {
 								null);
 		registerWidgetBuildData("PandaEntry", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("PandaHTML", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("PandaTimer", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("Progress", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("ProgressBar", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("RadioButton", //$NON-NLS-1$
