@@ -22,6 +22,7 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -71,7 +72,8 @@ class ConfigurationDialog extends JDialog {
 	private void initComponents() {
 		GridBagConstraints gridBagConstraints;
 
-		getContentPane().setLayout(new GridBagLayout());
+		Container root = getContentPane();
+		root.setLayout(new GridBagLayout());
 
 		setTitle(Messages.getString("ConfigurationDialog.JMA_Standard_Receipt")); //$NON-NLS-1$
 		addWindowListener(new WindowAdapter() {
@@ -90,7 +92,7 @@ class ConfigurationDialog extends JDialog {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridheight = 3;
-		getContentPane().add(logo, gridBagConstraints);
+		root.add(logo, gridBagConstraints);
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -216,7 +218,7 @@ class ConfigurationDialog extends JDialog {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 5;
 		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		panel.add(styleEntry, gridBagConstraints);
 
@@ -262,7 +264,7 @@ class ConfigurationDialog extends JDialog {
 		gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		getContentPane().add(panel, gridBagConstraints);
+		root.add(panel, gridBagConstraints);
 
 		JButton runButton = new JButton();
 		runButton.setText(Messages.getString("ConfigurationDialog.Run")); //$NON-NLS-1$
@@ -283,9 +285,9 @@ class ConfigurationDialog extends JDialog {
 		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		getContentPane().add(runButton, gridBagConstraints);
-
-		pack();
+		root.add(runButton, gridBagConstraints);
+		getRootPane().setDefaultButton(runButton);
+		setSize(320,240);
 	}
 
 	void closeDialog(WindowEvent evt) {
