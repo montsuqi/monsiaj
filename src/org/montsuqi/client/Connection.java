@@ -24,7 +24,7 @@ public class Connection {
 		out.flush();
 	}
 
-	public int receivePacketClass() throws IOException {
+	public byte receivePacketClass() throws IOException {
 		return in.readByte();
 	}
 
