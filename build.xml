@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.4 2003-10-01 08:33:51 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.5 2003-11-13 05:40:16 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
@@ -16,7 +16,7 @@
 
   <path id="project.class.path">
     <pathelement path="/usr/share/java/xerces.jar"/>
-    <pathelement path="/usr/share/java/log4j-1.2.8.jar"/>
+    <pathelement path="/usr/share/java/log4j.jar"/>
   </path>
 
   <!-- targets -->
@@ -31,6 +31,11 @@
         <available classname="java.util.logging.Logger"/>
       </not>
     </condition>
+    <condition property="exclude.log4jlogger" value="**/Log4JLogger.java">
+      <not>
+        <available classname="org.apache.log4j.Logger"/>
+      </not>
+    </condition>
   </target> 
 
   <target name="compile" depends="prepare"
@@ -42,6 +47,7 @@
            debug="${compile.debug}">
       <include name="**/*.java"/>
       <exclude name="${exclude.j2selogger}"/>
+      <exclude name="${exclude.log4jlogger}"/>
       <classpath refid="project.class.path"/>
     </javac>
   </target>
