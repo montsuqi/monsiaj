@@ -36,7 +36,6 @@ public class TestCalendar extends JFCTestCase {
 		window.getContentPane().add(cal);
 		window.setBounds(100 , 100 , 200 , 200);
 		window.setVisible(true);
-		final DateFormat monthFormat = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
 		final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); //$NON-NLS-1$
 		cal.addChangeListener(new ChangeListener() {
 

@@ -185,7 +185,6 @@ public class Calendar extends JComponent {
 		f.getContentPane().add(cal);
 		f.setSize(400, 300);
 		f.setVisible(true);
-		final DateFormat monthFormat = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
 		final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); //$NON-NLS-1$
 		cal.addChangeListener(new ChangeListener() {
 
