@@ -47,4 +47,8 @@ public class PandaCList extends JTable {
 			column.setMinWidth(widths[i]);
 		}
 	}
+
+	public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+		super.changeSelection(rowIndex, columnIndex, true, extend);
+	}
 }
