@@ -135,9 +135,9 @@ public abstract class SignalHandler {
 						} catch (IOException e) {
 							logger.warn(e);
 						}
-						System.out.println("timer task done"); //$NON-NLS-1$
 					}
 				};
+				timer.schedule(timerTask, 1000);
 			}
 		};
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
