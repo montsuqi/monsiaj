@@ -37,7 +37,7 @@ class ButtonMarshaller extends WidgetMarshaller {
 		AbstractButton button = (AbstractButton)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
@@ -56,9 +56,10 @@ class ButtonMarshaller extends WidgetMarshaller {
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		AbstractButton button = (AbstractButton)widget;
+
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getVName());
+		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		boolean selected = button.isSelected();
 		con.sendBooleanData(va.getType(), selected);
 		return true;

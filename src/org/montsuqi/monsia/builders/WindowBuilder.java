@@ -37,14 +37,14 @@ public class WindowBuilder extends ContainerBuilder {
 		Component widget = super.buildSelf(xml, parent, info);
 		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
 			Property p = info.getProperty(i);
-			if ( ! p.getName().equals("position")) {
+			if ( ! p.getName().equals("position")) { //$NON-NLS-1$
 				continue;
 			}
 			String value = p.getValue();
-			if (value.startsWith("GTK_")) {
-				value = value.substring("GTK_".length());
+			if (value.startsWith("GTK_")) { //$NON-NLS-1$
+				value = value.substring("GTK_".length()); //$NON-NLS-1$
 			}
-			if ( ! value.equals("WIN_POS_CENTER")) {
+			if ( ! value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
 				break;
 			}
 			Toolkit tk = Toolkit.getDefaultToolkit();

@@ -19,46 +19,26 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
 */
-
 package org.montsuqi.client.marshallers;
 
-import java.awt.Component;
-import java.io.IOException;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-import javax.swing.text.JTextComponent;
+public class Messages {
 
-import org.montsuqi.client.PacketClass;
-import org.montsuqi.client.Protocol;
-import org.montsuqi.client.Type;
+	private static final String BUNDLE_NAME = "org.montsuqi.client.marshallers.messages"; //$NON-NLS-1$
 
-class TextMarshaller extends WidgetMarshaller {
+	private static final ResourceBundle RESOURCE_BUNDLE =
+		ResourceBundle.getBundle(BUNDLE_NAME);
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
-		Protocol con = manager.getProtocol();
-		JTextComponent text = (JTextComponent)widget;
-
-		con.receiveDataTypeWithCheck(Type.RECORD);
-		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
-				continue;
-			}
-			String value = con.receiveStringData();
-			manager.registerValue(widget, name, null);
-			text.setText(value);
-		}
-		return true;
+	private Messages() {
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
-		Protocol con = manager.getProtocol();
-		JTextComponent text = (JTextComponent)widget; 
-
-		con.sendPacketClass(PacketClass.ScreenData);
-		ValueAttribute va = manager.getValue(name);
-		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
-		con.sendStringData(va.getType(), text.getText());
-		return true;
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 }
-

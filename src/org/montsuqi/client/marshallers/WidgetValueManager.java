@@ -1,6 +1,7 @@
 package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,21 +29,18 @@ public final class WidgetValueManager {
 
 	void registerValue(Component widget, String valueName, Object opt) {
 		String longName = con.getInterface().getLongName(widget);
-
 		ValueAttribute va;
 		if ( ! valueTable.containsKey(longName)) {
-			String name = con.getWidgetNameBuffer().toString();
-			va = new ValueAttribute(name, con.getLastDataType(), valueName, opt);
-			valueTable.put(va.getName(), va);
+			String widgetName = con.getWidgetNameBuffer().toString();
+			va = new ValueAttribute(longName, valueName, widgetName, con.getLastDataType(), opt);
+			valueTable.put(va.getKey(), va);
 		} else {
 			va = (ValueAttribute)valueTable.get(longName);
-			va.setVName(valueName);
-			int lastType = con.getLastDataType();
-			synchronized (va) {
-				va.setType(lastType);
-				va.setOpt(opt);
-			}
+			va.setNameSuffix(valueName);
 		}
+		int lastType = con.getLastDataType();
+		va.setType(lastType);
+		va.setOpt(opt);
 	}
 
 	ValueAttribute getValue(String name) {
@@ -50,7 +48,9 @@ public final class WidgetValueManager {
 			ValueAttribute va = (ValueAttribute)valueTable.get(name);
 			return va;
 		} else {
-			throw new IllegalArgumentException("no such value name:" + name);
+			String message = Messages.getString("WidgetValueManager.no_such_value_name"); //$NON-NLS-1$
+			message = MessageFormat.format(message, new Object[] { name });
+			throw new IllegalArgumentException(message);
 		}
 	}
 

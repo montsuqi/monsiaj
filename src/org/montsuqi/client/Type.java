@@ -23,18 +23,27 @@ copies.
 package org.montsuqi.client;
 
 public interface Type {
+	final int CLASS = 0xF0;
 	final int NULL = 0x00;
-	final int INT = 0x10;
-	final int BOOL = 0x11;
-	final int FLOAT = 0x20;
-	final int CHAR = 0x30;
-	final int TEXT = 0x31;
-	final int VARCHAR = 0x32;
-	final int BYTE = 0x40;
-	final int NUMBER = 0x50;
-	final int DBCODE = 0x60;
-	final int OBJECT = 0x61;
+
+	final int NUMERIC = 0x10;
+	final int INT = 0x11;
+	final int BOOL = 0x12;
+	final int FLOAT = 0x13;
+	final int NUMBER = 0x14;
+
+	final int STRING = 0x20;
+	final int CHAR = 0x21;
+	final int TEXT = 0x22;
+	final int VARCHAR = 0x23;
+	final int BYTE = 0x24;
+	final int DBCODE = 0x25;
+	final int BINARY = 0x26;
+
+	final int OBJECT = 0x40;
 	final int STRUCTURE = 0x80;
-	final int ARRAY = 0x90;
-	final int RECORD = 0xA0;
+	final int ARRAY = 0x81;
+	final int RECORD = 0x82;
+	final int ALIAS = 0x83;
+	final int VALUES = 0x84;
 }

@@ -60,14 +60,17 @@ class CListMarshaller extends WidgetMarshaller {
 		StringBuffer label = new StringBuffer(widgetName.toString());
 		int offset = label.length();
 		Interface xml = con.getInterface();
+		int row;
+		int column;
+		double rowattrw;
 		for (int i = 0, n = con.receiveInt(), col = 0, count = -1, from = 0; i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			label.replace(offset, label.length(), '.' + name);
 			Component sub = xml.getWidgetByLongName(label.toString());
 			if (sub != null) {
-				JLabel dummyLabel = (JLabel)sub;
-				labelMarshaller.receive(manager, dummyLabel);
-				labels[col++] = dummyLabel.getText();
+				JLabel dummy = (JLabel)sub;
+				labelMarshaller.receive(manager, dummy);
+				labels[col++] = dummy.getText();
 			} else if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
@@ -75,9 +78,22 @@ class CListMarshaller extends WidgetMarshaller {
 			} else if ("from".equals(name)) { //$NON-NLS-1$
 				from = con.receiveIntData();
 			} else if ("row".equals(name)) { //$NON-NLS-1$
-				/* NOP */
-			} else if ("columns".equals(name)) { //$NON-NLS-1$
-				/* NOP */
+				row = con.receiveIntData();
+			} else if ("rowattr".equals(name)) { //$NON-NLS-1$
+				int rowattr = con.receiveIntData();
+				switch	(rowattr) {
+				  case	1: // DOWN
+					rowattrw = 1.0;
+					break;
+				  case	2: // MIDDLE
+					rowattrw = 0.5;
+					break;
+				  default:
+				  	rowattrw = 0.0; // [0] TOP
+					break;
+				}
+			} else if ("column".equals(name)) { //$NON-NLS-1$
+				column = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				while (tableModel.getRowCount() > 0) {
 					tableModel.removeRow(0);
@@ -99,6 +115,7 @@ class CListMarshaller extends WidgetMarshaller {
 						tableModel.addRow(rdata);
 					}
 				}
+				// TODO move to visible row
 			} else {
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				manager.registerValue(widget, name, new Integer(from));
@@ -130,13 +147,20 @@ class CListMarshaller extends WidgetMarshaller {
 		JTable table = (JTable)widget;
 		ValueAttribute va = manager.getValue(name);
 		ListSelectionModel selections = table.getSelectionModel();
+		boolean visibleRow = false;
 		for (int i = 0, rows = table.getRowCount(), opt = ((Integer)va.getOpt()).intValue(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			String iName = name + '.' + va.getVName() + '[' + String.valueOf(i + opt) + ']';
-			con.sendString(iName);
-			con.sendDataType(Type.BOOL);
-			boolean selected = selections.isSelectedIndex(i);
-			con.sendBoolean(selected);
+			con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i + opt) + ']');
+			con.sendBooleanData(Type.BOOL, selections.isSelectedIndex(i));
+			if ( ! visibleRow) {
+				boolean visible = false; // TODO detect first visible row(possible?)
+				if	(visible) {
+					con.sendPacketClass(PacketClass.ScreenData);
+					con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
+					con.sendIntegerData(Type.INT, i + 1);
+					visibleRow = true;
+				}
+			}
 		}
 		return true;
 	}

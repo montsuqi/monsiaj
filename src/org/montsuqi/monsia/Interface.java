@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -437,11 +438,16 @@ public class Interface {
 
 	private void connectUnselectRow(Component target, Method handler, Object other) {
 		// XxxSelectionModels don't care selection/unselection so use connectSelectRow
-		//connectSelectRow(target, handler, other);
+		// logger.debug("selection_change: target={0}, handler={1}, other={2}", new Object[]{target, handler, other});
+		// connectSelectRow(target, handler, other);
+	}
+
+	private void connectSelectionChanged(final Component target, final Method handler, final Object other) {
+		logger.debug("selection_change: target={0}, handler={1}, other={2}", new Object[]{target, handler, other}); //$NON-NLS-1$
 	}
 
 	private void connectClickColumn(Component target, Method handler, Object other) {
-		// NOTE need to implement this?
+		logger.debug("selection_change: target={0}, handler={1}, other={2}", new Object[]{target, handler, other}); //$NON-NLS-1$
 	}
 
 	private void connectSwitchPage(final Component target, final Method handler, final Object other) {
@@ -647,7 +653,9 @@ public class Interface {
 		if (comboMap.containsKey(combo)) {
 			return (JTextField)comboMap.get(combo);
 		} else {
-			throw new IllegalArgumentException("no such combo");
+			String message = Messages.getString("Interface.no_such_combo"); //$NON-NLS-1$
+			message = MessageFormat.format(message, new Object[] { combo.getName() });
+			throw new IllegalArgumentException(message);
 		}
 	}
 }

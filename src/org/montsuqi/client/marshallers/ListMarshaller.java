@@ -47,11 +47,10 @@ class ListMarshaller extends WidgetMarshaller {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
 		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
-			int num;
 			if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
 			} else if ("from".equals(name)) { //$NON-NLS-1$
@@ -61,7 +60,7 @@ class ListMarshaller extends WidgetMarshaller {
 					listModel.clear();
 				}
 				con.receiveDataTypeWithCheck(Type.ARRAY);
-				num = con.receiveInt();
+				int num = con.receiveInt();
 				if (count < 0) {
 					count = num;
 				}
@@ -76,7 +75,7 @@ class ListMarshaller extends WidgetMarshaller {
 			} else {
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				manager.registerValue(widget, name, new Integer(from));
-				num = con.receiveInt();
+				int num = con.receiveInt();
 				if (count < 0) {
 					count = num;
 				}
@@ -105,9 +104,8 @@ class ListMarshaller extends WidgetMarshaller {
 		int opt = ((Integer)va.getOpt()).intValue();
 		for (int i = 0, n = list.getModel().getSize(); i < n; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + '.' + va.getVName() + '[' + (i + opt) + ']');
-			con.sendDataType(Type.BOOL);
-			con.sendBoolean(model.isSelectedIndex(i));
+			con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + (i + opt) + ']');
+			con.sendBooleanData(Type.BOOL, model.isSelectedIndex(i));
 		}
 		return true;
 	}

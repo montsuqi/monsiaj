@@ -36,10 +36,10 @@ public final class Launcher {
 		logger = Logger.getLogger(Launcher.class);
 
 		try {
-			clazz = Class.forName("jp.or.med.jma_receipt.PreferenceBasedConfiguration");
+			clazz = Class.forName("jp.or.med.jma_receipt.PreferenceBasedConfiguration"); //$NON-NLS-1$
 		} catch (ClassNotFoundException e1) {
 			try {
-				clazz = Class.forName("jp.or.med.jma_receipt.PropertyFileBasedConfiguration");
+				clazz = Class.forName("jp.or.med.jma_receipt.PropertyFileBasedConfiguration"); //$NON-NLS-1$
 			} catch (ClassNotFoundException e2) {
 				logger.fatal(e2);
 			}

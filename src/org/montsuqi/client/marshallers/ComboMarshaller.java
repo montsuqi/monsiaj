@@ -50,12 +50,11 @@ class ComboMarshaller extends WidgetMarshaller {
 		JComboBox combo = (JComboBox)widget;
 
 		DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
-		String selected = null;
 		Interface xml = con.getInterface();
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
 		for (int i = 0, n = con.receiveInt(), count = 0; i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
@@ -65,9 +64,8 @@ class ComboMarshaller extends WidgetMarshaller {
 				list.add(""); //$NON-NLS-1$
 				con.receiveDataTypeWithCheck(Type.ARRAY); /* Type.ARRAY */
 				for (int j = 0, num = con.receiveInt(); j < num ; j++) {
-					String buff = null;
 					try {
-						buff = con.receiveStringData();
+						String buff = con.receiveStringData();
 						if (buff != null) {
 							if (j < count) {
 								list.add(buff);
@@ -90,14 +88,11 @@ class ComboMarshaller extends WidgetMarshaller {
 				if (sub != null) {
 					JTextField dummy = (JTextField)sub;
 					entryMarshaller.receive(manager, dummy);
-					selected = dummy.getText();
+					combo.setSelectedItem(dummy.getText());
 				} else {
 					logger.fatal(Messages.getString("ComboMarshaller.subwidget_not_found")); //$NON-NLS-1$
 				}
 			}
-		}
-		if (selected != null) {
-			combo.setSelectedItem(selected);
 		}
 		return true;
 	}

@@ -44,7 +44,7 @@ class NotebookMarshaller extends WidgetMarshaller {
 		int offset = widgetName.length();
 		int page = -1;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("pageno".equals(name)) { //$NON-NLS-1$
@@ -68,7 +68,7 @@ class NotebookMarshaller extends WidgetMarshaller {
 
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getVName());
+		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendIntegerData(va.getType(), tabbed.getSelectedIndex());
 		return true;
 	}

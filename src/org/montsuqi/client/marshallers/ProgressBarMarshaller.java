@@ -43,7 +43,7 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("value".equals(name)) { //$NON-NLS-1$
@@ -60,7 +60,7 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getVName());
+		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendIntegerData(va.getType(), progress.getValue());
 		return true;
 	}

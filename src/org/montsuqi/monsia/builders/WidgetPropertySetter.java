@@ -351,7 +351,7 @@ abstract class WidgetPropertySetter {
 			}
 		});
 
-		registerProperty(JTable.class, "columns", new WidgetPropertySetter() {
+		registerProperty(JTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JTable table = (JTable)widget;
 				TableColumnModel model = table.getColumnModel();
@@ -369,7 +369,7 @@ abstract class WidgetPropertySetter {
 				StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
 				int columns = tokens.countTokens();
 				if (model.getColumnCount() < columns) {
-					WidgetPropertySetter setter = getSetter(JTable.class, "columns");
+					WidgetPropertySetter setter = getSetter(JTable.class, "columns"); //$NON-NLS-1$
 					setter.set(xml, parent, widget, String.valueOf(columns));
 				}
 				int totalWidth = 0;
@@ -458,15 +458,15 @@ abstract class WidgetPropertySetter {
 			}
 		});
 
-		registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() {
+		registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JScrollPane scroll = (JScrollPane)widget;
-				value = normalize(value, "POLICY_");
-				if ("ALWAYS".equals(value)) {
+				value = normalize(value, "POLICY_"); //$NON-NLS-1$
+				if ("ALWAYS".equals(value)) { //$NON-NLS-1$
 					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-				} else if ("AUTOMATIC".equals(value)) {
+				} else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
 					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				} else if ("NEVER".equals(value)) {
+				} else if ("NEVER".equals(value)) { //$NON-NLS-1$
 					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 				} else {
 					throw new IllegalArgumentException(value);
@@ -474,15 +474,15 @@ abstract class WidgetPropertySetter {
 			}
 		});
 
-		registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() {
+		registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JScrollPane scroll = (JScrollPane)widget;
-				value = normalize(value, "POLICY_");
-				if ("ALWAYS".equals(value)) {
+				value = normalize(value, "POLICY_"); //$NON-NLS-1$
+				if ("ALWAYS".equals(value)) { //$NON-NLS-1$
 					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-				} else if ("AUTOMATIC".equals(value)) {
+				} else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
 					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-				} else if ("NEVER".equals(value)) {
+				} else if ("NEVER".equals(value)) { //$NON-NLS-1$
 					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 				} else {
 					throw new IllegalArgumentException(value);

@@ -23,28 +23,34 @@ copies.
 package org.montsuqi.client.marshallers;
 
 class ValueAttribute {
-	private String name;
+	private String key;
+	private String nameSuffix;
+	private String valueName;
 	private int type;
-	private String vname;
 	private Object opt;
 
-	ValueAttribute(String name, int type, String vname, Object opt) {
-		this.name = name;
+	ValueAttribute(String key, String nameSuffix, String valueName, int type, Object opt) {
+		this.key = key;
+		this.nameSuffix = nameSuffix;
+		this.valueName = valueName;
 		this.type = type;
-		this.vname = vname;
 		this.opt = opt;
 	}
 
-	String getName() {
-		return name;
-	}
-    
-	void setVName(String vname) {
-		this.vname = vname;
+	String getKey() {
+		return key;
 	}
 
-	String getVName() {
-		return vname;
+	String getValueName() {
+		return valueName;    
+	}
+
+	void setNameSuffix(String nameSuffix) {
+		this.nameSuffix = nameSuffix;
+	}
+
+	String getNameSuffix() {
+		return nameSuffix;
 	}
 
 	void setType(int type) {

@@ -41,12 +41,13 @@ class CalendarMarshaller extends WidgetMarshaller {
 		manager.registerValue(widget, "", null); //$NON-NLS-1$
 
 		Calendar calendar = Calendar.getInstance();
+		int year = 0;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveString();
+			String name = con.receiveName();
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("year".equals(name)) { //$NON-NLS-1$
-				int year = con.receiveIntData();
+				year = con.receiveIntData();
 				calendar.set(Calendar.YEAR, year);
 			} else if ("month".equals(name)) { //$NON-NLS-1$
 				int month = con.receiveIntData();
@@ -55,40 +56,36 @@ class CalendarMarshaller extends WidgetMarshaller {
 				int day = con.receiveIntData();
 				calendar.set(Calendar.DATE, day);
 			} else {
-				/*	fatal error	*/
+				//	fatal error
 			}
 		}
 
-		Date date = calendar.getTime();
-		calendarWidget.setDate(date);
+		if (year > 0) {
+			Date date = calendar.getTime();
+			calendarWidget.setDate(date);
+		}
 		return true;
 	}
 	
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
-
 		Date date = calendarWidget.getDate();
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
+		ValueAttribute va = manager.getValue(name);
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + ".year"); //$NON-NLS-1$
-		con.sendDataType(Type.INT);
-		int year = cal.get(java.util.Calendar.YEAR);
-		con.sendInt(year);
+		con.sendName(va.getValueName() + ".year"); //$NON-NLS-1$
+		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.YEAR));
 	
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + ".month"); //$NON-NLS-1$
-		con.sendDataType(Type.INT);
-		int month = cal.get(java.util.Calendar.MONTH) + 1;
-		con.sendInt(month);
+		con.sendName(va.getValueName() + ".month"); //$NON-NLS-1$
+		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.MONTH) + 1);
 	
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + ".day"); //$NON-NLS-1$
-		con.sendDataType(Type.INT);
-		int day = cal.get(java.util.Calendar.DATE);
-		con.sendInt(day);
+		con.sendName(va.getValueName() + ".day"); //$NON-NLS-1$
+		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.DATE));
 	
 		return true;
 	}

@@ -71,7 +71,7 @@ public class PandaEntry extends JTextField {
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				Component source = (Component)e.getSource();
-				logger.debug("click on {0}", source.getName());
+				logger.debug("click on {0}", source.getName()); //$NON-NLS-1$
 				Point p = e.getPoint();
 				p.x += source.getX();
 				p.y += source.getY();
@@ -81,10 +81,10 @@ public class PandaEntry extends JTextField {
 					Component c = parent.getComponent(i);
 					if (c instanceof AbstractButton && c.contains(p.x - c.getX(), p.y - c.getY())) {
 						AbstractButton button = (AbstractButton)c;
-						logger.debug("found button \"{0}\"", button.getName());
+						logger.debug("found button \"{0}\"", button.getName()); //$NON-NLS-1$
 						button.setVisible(false);
 						button.doClick();
-						logger.debug("selected? = {0}", new Boolean(button.isSelected()));
+						logger.debug("selected? = {0}", new Boolean(button.isSelected())); //$NON-NLS-1$
 					}
 				}
 			}

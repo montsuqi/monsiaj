@@ -58,8 +58,10 @@ public class Protocol extends Connection {
 	private Client client;
 	private StringBuffer widgetName;
 	private Interface xml;
-	private boolean ignoreEvent = false;
-	private boolean receiving = false;
+	private boolean ignoreEvent;
+	private boolean receiving;
+	private boolean protocol1;
+	private boolean protocol2;
 
 	class ScreenType {
 		static final int NULL = 0;
@@ -72,20 +74,23 @@ public class Protocol extends Connection {
 		static final int END_SESSION = 7;
 	}
 
-	private static final String VERSION = "1.1.2"; //$NON-NLS-1$
-	
-	public String getVersion() {
-		return VERSION;
-	}
+	private static final String VERSION = "1.2"; //$NON-NLS-1$
+//	private static final String VERSION = "symbolic:expand:no"; //$NON-NLS-1$
 	
 	Protocol(Client client, Socket s) throws IOException {
-		super(s, client.getEncoding());
+		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		windowTable = new HashMap();
 		setReceiving(false);
 		ignoreEvent = false;
+		protocol1 = true;
+		protocol2 = false;
 		logger = Logger.getLogger(Connection.class);
 		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
+	}
+
+	private static boolean isNetworkByteOrder() {
+		return VERSION.endsWith(":no"); //$NON-NLS-1$
 	}
 
 	public Interface getInterface() {
@@ -95,7 +100,7 @@ public class Protocol extends Connection {
 	private static final BitSet NOENCODE;
 	static {
 		NOENCODE = new BitSet(256);
-		for (int i = 0; i < NOENCODE.length(); i++) {
+		for (int i = 0, n = NOENCODE.length(); i < n; i++) {
 			NOENCODE.clear(i);
 		}
 		for (int i = 'a'; i < 'z'; i++) {
@@ -113,6 +118,7 @@ public class Protocol extends Connection {
 		//NOENCODE.set('A', 'Z', true);
 		//NOENCODE.set('0', '9', true);
 	}
+
 	private boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
@@ -138,7 +144,7 @@ public class Protocol extends Connection {
 		if (windowTable.containsKey(wName)) {
 			node = (Node)windowTable.get(wName);
 		} else {
-			/* Create new node */
+			// Create new node
 			switch (type) {
 			case ScreenType.NEW_WINDOW:
 			case ScreenType.CURRENT_WINDOW:
@@ -164,7 +170,7 @@ public class Protocol extends Connection {
 				break;
 			case ScreenType.CLOSE_WINDOW:
 				w.setVisible(false);
-				/* fall through */
+				// fall through
 			default:
 				node = null;
 				break;
@@ -225,9 +231,6 @@ public class Protocol extends Connection {
 	}
 
 	private void receiveValueSkip() throws IOException {
-		String name;
-		int count;
-
 		switch (receiveDataType()) {
 		case Type.INT:
 			receiveInt();
@@ -243,15 +246,13 @@ public class Protocol extends Connection {
 			receiveString();
 			break;
 		case Type.ARRAY:
-			count = receiveInt();
-			while (count-- != 0) {
+			for (int i = 0, n = receiveInt(); i < n; i++) {
 				receiveValueSkip();
 			}
 			break;
 		case Type.RECORD:
-			count = receiveInt();
-			while (count-- != 0) {
-				name = receiveString();
+			for (int i = 0, n = receiveInt(); i < n; i++) {
+				receiveString();
 				receiveValueSkip();
 			}
 			break;
@@ -261,35 +262,17 @@ public class Protocol extends Connection {
 	}
 
 	public void receiveValue(StringBuffer longName, int offset) throws IOException {
-		boolean fTrace = true;
-		boolean fDone = false;
-		Component widget = xml.getWidgetByLongName(longName.toString());
-		if (widget != null) {
-			if (receiveWidgetData(widget)) {
-				fTrace = false;
-			}
-			fDone = true;
-		} else {
-			fTrace = false; /* fatal error */
-			fDone = true;
-			receiveValueSkip();
-		}
-
-		if (fTrace) {
-			int count;
-			int t = receiveDataType();
-			switch (t) {
+		if (receiveValueStep1(longName)) {
+			switch (receiveDataType()) {
 			case Type.RECORD:
-				count = receiveInt();
-				while (count-- != 0) {
+				for (int i = 0, n = receiveInt(); i < n; i++) {
 					String name = receiveString();
 					longName.replace(offset, longName.length(), '.' + name);
 					receiveValue(longName, offset + name.length() + 1);
 				}
 				break;
 			case Type.ARRAY:
-				count = receiveInt();
-				for (int i = 0; i < count; i++) {
+				for (int i = 0, n = receiveInt(); i < n; i++) {
 					String name = '[' + String.valueOf(i) + ']';
 					longName.replace(offset, longName.length(), name);
 					receiveValue(longName, offset + name.length());
@@ -300,6 +283,59 @@ public class Protocol extends Connection {
 				break;
 			}
 		}
+	}
+
+	private boolean receiveValueStep1(StringBuffer longName) throws IOException {
+		boolean done = false;
+		boolean needTrace = true;
+		if (protocol1) {
+			Component widget = xml.getWidgetByLongName(longName.toString());
+			if (widget != null) {
+				if (receiveWidgetData(widget)) {
+					needTrace = false;
+				}
+				done = true;
+			} else {
+				if ( ! protocol2) {
+					needTrace = false;	// fatal error
+					done = true;
+					receiveValueSkip();
+				}
+			}
+		}
+		
+		if (protocol2) {
+			if ( ! done) {
+				String dataName = longName.toString();
+				int dot = dataName.indexOf('.');
+				if (dot >= 0) {
+					dataName = dataName.substring(dot + 1);
+				} else {
+					dataName = null;
+				}
+				Component widget = xml.getWidget(dataName);
+				if (widget != null) {
+					if (receiveWidgetData(widget)) {
+						needTrace = false;
+					}
+					done = true;
+				}
+			}
+		}
+		
+		if ( ! done) {
+			needTrace = true;
+		}
+
+		return needTrace;
+	}
+
+	public String receiveName() throws IOException {
+		return receiveString();
+	}
+
+	public void sendName(String name) throws IOException {
+		sendString(name);
 	}
 
 	void resetTimer(Component widget) {
@@ -398,7 +434,7 @@ public class Protocol extends Connection {
 	boolean sendConnect(String user, String pass, String apl) throws IOException {
 		byte pc;
 		sendPacketClass(PacketClass.Connect);
-		sendString(VERSION);
+		sendVersionString();
 		sendString(user);
 		sendString(pass);
 		sendString(apl);
@@ -426,6 +462,16 @@ public class Protocol extends Connection {
 			}
 			return false;
 		}
+	}
+
+	private void sendVersionString() throws IOException {
+		byte[] bytes = VERSION.getBytes();
+		sendChar((byte)(bytes.length & 0xff));
+		sendChar((byte)0);
+		sendChar((byte)0);
+		sendChar((byte)0);
+		out.write(bytes);
+		((OutputStream)out).flush();
 	}
 
 	private void sendEvent(String window, String widget, String event) throws IOException {

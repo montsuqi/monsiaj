@@ -34,7 +34,7 @@ public class Client implements Runnable {
 	private boolean connected;
 	public static final int PORT_GLTERM = 8000;
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
-	private static final String PANDA_SCHEME = "panda:";
+	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
 
 	private int portNumber;
 	private String host;
@@ -68,7 +68,7 @@ public class Client implements Runnable {
 		if (files.length > 0) {
 			client.setCurrentApplication(files[0]);
 		} else {
-			client.setCurrentApplication("demo"); //$NON-NLS-1$
+			client.setCurrentApplication(null);
 		}
 		return client;
 	}
@@ -132,7 +132,7 @@ public class Client implements Runnable {
 
 		options.add("port", Messages.getString("Client.port_number"), PORT_GLTERM); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("host", Messages.getString("Client.host_name"), "localhost"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		options.add("cache", Messages.getString("Client.cache_directory"), System.getProperty("user.home") + System.getProperty("file.separator") + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		options.add("cache", Messages.getString("Client.cache_directory"), System.getProperty("user.home") + System.getProperty("file.separator") + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		options.add("user", Messages.getString("Client.user_name"), System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -227,10 +227,13 @@ public class Client implements Runnable {
 	}
 
 	public void setCurrentApplication(String application) {
-		if ( ! application.startsWith(PANDA_SCHEME)) {
-			application = PANDA_SCHEME + application;
+		if (application == null) {
+			currentApplication = "demo"; //$NON-NLS-1$
+		} else if ( ! application.startsWith(PANDA_SCHEME)) {
+			currentApplication = PANDA_SCHEME + application;
+		} else {
+			currentApplication = application;
 		}
-		currentApplication = application;
 	}
 
 	public void finalize() {

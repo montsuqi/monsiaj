@@ -24,7 +24,13 @@ package org.montsuqi.client;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -36,33 +42,37 @@ class Connection {
 
 	private String encoding;
 	private Socket socket;
-	protected LittleEndianDataInputStream in;
-	protected LittleEndianDataOutputStream out;
+	protected DataInput in;
+	protected DataOutput out;
 	private int dataType;
 	private Logger logger;
 
-	Connection(Socket s, String encoding) throws IOException {
+	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
 		this.socket = s;
 		this.encoding = encoding;
-		in = new LittleEndianDataInputStream(new BufferedInputStream(socket.getInputStream()));
-		out = new LittleEndianDataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+		if (networkByteOrder) {
+			in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+			out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+		} else {
+			in = new LittleEndianDataInputStream(new BufferedInputStream(socket.getInputStream()));
+			out = new LittleEndianDataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+		}
 		logger = Logger.getLogger(Connection.class);
 	}
 
 	public void sendPacketClass(int c) throws IOException {
 		out.write((byte)c);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	byte receivePacketClass() throws IOException {
 		byte b = in.readByte();
-		//logger.debug("receivePacketClass: 0x{0}", Integer.toHexString(b));
 		return b;
 	}
 
 	public void sendDataType(int c) throws IOException {
 		out.write((byte)c);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	int receiveDataType() throws IOException {
@@ -70,7 +80,6 @@ class Connection {
 		if (dataType < 0) {
 			dataType = 0x100 + dataType;
 		}
-		//logger.debug("receiveDataType: 0x{0}", Integer.toHexString(dataType));
 		return dataType;
 	}
 
@@ -88,7 +97,7 @@ class Connection {
 
 	void sendPacketDataType(int t) throws IOException {
 		out.write((byte)t);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	int receivePacketDataType() throws IOException {
@@ -97,19 +106,18 @@ class Connection {
 
 	void sendLength(int size) throws IOException {
 		out.writeInt(size);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	int receiveLength() throws IOException {
-		int length = in.readInt();
-		return length;
+		return in.readInt();
 	}
 
 	public void sendString(String s) throws IOException {
 		byte[] bytes = s.getBytes(encoding);
 		sendLength(bytes.length);
 		out.write(bytes);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	void sendFixedString(String s) throws IOException {
@@ -119,23 +127,20 @@ class Connection {
 	String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
 		in.readFully(bytes);
-		String s = new String(bytes, encoding);
-		return s;
+		return new String(bytes, encoding);
 	}
 
 	public String receiveString() throws IOException {
-		int size = receiveLength();
-		return receiveStringBody(size);
+		return receiveStringBody(receiveLength());
 	}
 
 	int receiveLong() throws IOException { /* longs: 4-byte long */
-		int l = in.readInt();
-		return l;
+		return in.readInt();
 	}
 
 	void sendLong(int data) throws IOException {
 		out.writeInt(data);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	public int receiveInt() throws IOException {
@@ -147,45 +152,38 @@ class Connection {
 	}
 
 	int receiveChar() throws IOException {
-		int c = in.readUnsignedByte();
-		//logger.debug("receiveChar: {0}", new Character((char)c));
-		return c;
+		return in.readUnsignedByte();
 	}
 
 	void sendChar(byte data) throws IOException {
 		out.write(data);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	double receiveFloat() throws IOException {
-		double f = in.readDouble();
-		//logger.debug("receiveFloat: {0}", new Double(f));
-		return f;
+		return in.readDouble();
 	}
 
 	void sendFloat(double data) throws IOException {
 		out.writeDouble(data);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	private static final byte T_BYTE = 0x54;
 	private static final byte F_BYTE = 0x46;
 
-		boolean receiveBoolean() throws IOException {
-		byte b = in.readByte();
-		boolean value = b == T_BYTE ? true : false;
-		//logger.debug("receiveBoolean: {0}", new Boolean(value));
-		return value;
+	boolean receiveBoolean() throws IOException {
+		return in.readByte() == T_BYTE ? true : false;
 	}
 
 	public void sendBoolean(boolean data) throws IOException {
 		out.writeByte(data ? T_BYTE : F_BYTE);
-		out.flush();
+		((OutputStream)out).flush();
 	}
 
 	void sendFixed(BigDecimal xval) throws IOException {
 		String s = String.valueOf(xval.unscaledValue());
-		sendLength(s.length() - xval.scale() - 1); /* 1 for the dot */
+		sendLength(s.length() - xval.scale() - 1); // 1 for the dot
 		sendLength(xval.scale());
 		sendString(s);
 	}
@@ -196,7 +194,7 @@ class Connection {
 		String value = receiveString();
 		BigInteger i = BigInteger.ZERO;
 		if (value == null || value.length() == 0) {
-			logger.warn("empty Fixed value");
+			logger.warn(Messages.getString("Connection.empty_Fixed_value")); //$NON-NLS-1$
 		} else {
 			try {
 				i =  new BigInteger(value);
@@ -204,12 +202,10 @@ class Connection {
 				logger.warn(e);
 			}
 		}
-		BigDecimal result = (new BigDecimal(i)).movePointLeft(slen);
-		return result;
+		return (new BigDecimal(i)).movePointLeft(slen);
 	}
 
 	public BigDecimal receiveFixedData() throws IOException {
-		//logger.debug("receiveFixedData");
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
 		} else {
@@ -304,7 +300,6 @@ class Connection {
 	}
 
 	public int receiveIntData() throws IOException {
-		//logger.debug("receiveIntData");
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt();
@@ -342,7 +337,6 @@ class Connection {
 	}
 
 	public boolean receiveBooleanData() throws IOException {
-		//logger.debug("receiveBooleanData");
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt() != 0;
@@ -361,8 +355,8 @@ class Connection {
 	void close() throws IOException {
 		socket.shutdownInput(); 
 		socket.shutdownOutput();
-		in.close();
-		out.close();
+		((InputStream)in).close();
+		((OutputStream)out).close();
 		socket.close();
 	}
 }
