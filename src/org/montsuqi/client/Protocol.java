@@ -26,7 +26,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Node;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
@@ -43,16 +42,16 @@ public class Protocol extends Connection {
 	private boolean ignoreEvent = false;
 	private boolean inReceive = false;
 
-	public static final int SCREEN_NULL = 0;
-	public static final int SCREEN_CURRENT_WINDOW = 1;
-	public static final int SCREEN_NEW_WINDOW = 2;
-	public static final int SCREEN_CLOSE_WINDOW = 3;
-	public static final int SCREEN_CHANGE_WINDOW = 4;
-	public static final int SCREEN_JOIN_WINDOW = 5;
-	public static final int SCREEN_FORK_WINDOW = 6;
-	public static final int SCREEN_END_SESSION = 7;
+	private static final int SCREEN_NULL = 0;
+	private static final int SCREEN_CURRENT_WINDOW = 1;
+	private static final int SCREEN_NEW_WINDOW = 2;
+	private static final int SCREEN_CLOSE_WINDOW = 3;
+	private static final int SCREEN_CHANGE_WINDOW = 4;
+	private static final int SCREEN_JOIN_WINDOW = 5;
+	private static final int SCREEN_FORK_WINDOW = 6;
+	private static final int SCREEN_END_SESSION = 7;
 
-	public static final String VERSION = "1.1.2"; //$NON-NLS-1$
+	private static final String VERSION = "1.1.2"; //$NON-NLS-1$
 	
 	public String getVersion() {
 		return VERSION;

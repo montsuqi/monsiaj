@@ -8,7 +8,7 @@ import org.montsuqi.util.ByteOrder;
 
 public class LittleEndianDataOutputStream extends OutputStream implements DataOutput {
 
-	protected DataOutputStream dos;
+	private DataOutputStream dos;
 
 	public LittleEndianDataOutputStream(OutputStream os) {
 		super();
