@@ -501,7 +501,7 @@ public class Protocol extends Connection {
 		}
 		Node node = getNode(widget);
 		if (node != null) {
-			node.addChangedWidget(xml.getLongName(widget), widget);
+			node.addChangedWidget(xml.getWidgetLongName(widget), widget);
 		}
 	}
 

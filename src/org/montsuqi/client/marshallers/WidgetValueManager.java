@@ -49,7 +49,7 @@ public final class WidgetValueManager {
 	}
 
 	void registerValue(Component widget, String valueName, Object opt) {
-		String longName = con.getInterface().getLongName(widget);
+		String longName = con.getInterface().getWidgetLongName(widget);
 		ValueAttribute va;
 		if ( ! valueTable.containsKey(longName)) {
 			String widgetName = con.getWidgetNameBuffer().toString();

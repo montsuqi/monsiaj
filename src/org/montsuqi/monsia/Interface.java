@@ -204,34 +204,18 @@ public class Interface {
 		return relativeFile.toString();
 	}
 
-	public String getWidgetName(Component widget) {
-		if (widget == null) {
-			throw new IllegalArgumentException();
-		}
-		Iterator entries = widgets.entrySet().iterator();
-		while (entries.hasNext()) {
-			Map.Entry e = (Map.Entry)entries.next();
-			Component value = (Component)e.getValue();
-			if (value == widget) {
-				return (String)e.getKey();
-			}
-		}
-		return null;
-	}
-
 	public String getWidgetLongName(Component widget) {
 		if (widget == null) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("widget is null"); //$NON-NLS-1$
 		}
 		Iterator entries = longNames.entrySet().iterator();
 		while (entries.hasNext()) {
 			Map.Entry e = (Map.Entry)entries.next();
-			Component value = (Component)e.getValue();
-			if (value == widget) {
+			if (widget == e.getValue()) {
 				return (String)e.getKey();
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("no long name found: " + widget.getName()); //$NON-NLS-1$
 	}
 
 	public ButtonGroup getButtonGroup(String name) {
@@ -279,17 +263,6 @@ public class Interface {
 			Component widget = WidgetBuilder.buildWidget(this, info, null);
 			setName(info.getName(), widget);
 		}
-	}
-
-	public String getLongName(Component widget) {
-		Iterator i = longNames.entrySet().iterator();
-		while (i.hasNext()) {
-			Map.Entry e = (Map.Entry)i.next();
-			if (widget == e.getValue()) {
-				return (String)e.getKey();
-			}
-		}
-		return null;
 	}
 
 	public void setName(String name, Component widget) {
