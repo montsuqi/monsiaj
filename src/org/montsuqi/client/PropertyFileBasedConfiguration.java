@@ -72,7 +72,7 @@ class PropertyFileBasedConfiguration extends Configuration {
 
 	boolean getBoolean(String key, boolean defaultValue) {
 		String value = props.getProperty(key);
-		return value != null ? Boolean.parseBoolean(value) : defaultValue;
+		return value != null && value.equalsIgnoreCase("true"); //$NON-NLS-1$
 	}
 
 	void setString(String key, String value) {
