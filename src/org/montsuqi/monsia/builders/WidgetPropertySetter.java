@@ -36,6 +36,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -565,6 +566,24 @@ abstract class WidgetPropertySetter {
 				}
 			}
 		});
+
+		registerProperty(java.awt.Window.class, "position", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				value = normalize(value, null);
+				if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
+					java.awt.Window window = (java.awt.Window)widget;
+					window.setLocationRelativeTo(null);
+				}
+			}
+		});
+
+		registerProperty(JDialog.class, "modal", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				JDialog dialog = (JDialog)widget;
+				dialog.setModal(ParameterConverter.toBoolean(value));
+				dialog.setModal(false);
+			}
+		});
 	}
 
 	static String normalize(String value, String prefixToRemove) {
@@ -574,8 +593,11 @@ abstract class WidgetPropertySetter {
 		if (value.startsWith("GTK_")) { //$NON-NLS-1$
 			value = value.substring("GTK_".length()); //$NON-NLS-1$
 		}
-		if (value.startsWith(prefixToRemove)) {
-			value = value.substring(prefixToRemove.length());
+		if (prefixToRemove != null) {
+			int length = prefixToRemove.length();
+			if (length > 0 && value.startsWith(prefixToRemove)) {
+				value = value.substring(length);
+			}
 		}
 		return value;
 	}
