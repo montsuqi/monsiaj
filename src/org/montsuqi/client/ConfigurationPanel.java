@@ -28,6 +28,7 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -184,6 +185,7 @@ public class ConfigurationPanel extends JPanel {
 		int y = 0;
 
 		styleEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.style"), conf.getStyleFileName()); //$NON-NLS-1$
+		styleEntry.setColumns(20);
 		final JTextComponent entry = styleEntry;
 		addButtonFor(panel, styleEntry, Messages.getString("ConfigurationPanel.browse"), new ActionListener() { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
@@ -237,8 +239,10 @@ public class ConfigurationPanel extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = y;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 0.0;
 		gbc.weighty = 1.0;
+		gbc.insets = new Insets(2, 2, 2, 2);
 		container.add(label, gbc);
 
 		gbc = new GridBagConstraints();
@@ -247,6 +251,8 @@ public class ConfigurationPanel extends JPanel {
 		gbc.gridwidth = 3;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		gbc.insets = new Insets(2, 2, 2, 2);
 		container.add(component, gbc);
 	}
 
