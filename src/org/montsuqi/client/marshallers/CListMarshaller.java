@@ -27,6 +27,7 @@ import java.awt.Container;
 import java.io.IOException;
 
 import javax.swing.BoundedRangeModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -55,6 +56,7 @@ class CListMarshaller extends WidgetMarshaller {
 
 		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
 		TableColumnModel columnModel = table.getColumnModel();
+		ListSelectionModel selections = table.getSelectionModel();
 		String[] labels = new String[columnModel.getColumnCount()];
 		for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
 			labels[i] = (String)columnModel.getColumn(i).getHeaderValue();
@@ -109,13 +111,13 @@ class CListMarshaller extends WidgetMarshaller {
 				}
 				for (int j = 0; j < num; j++) {
 					con.receiveDataTypeWithCheck(Type.RECORD);
-					int rNum = con.receiveInt();
-					Object[] rdata = new String[rNum];
-					for (int k = 0; k < rNum; k++) {
+					int rows = con.receiveInt();
+					Object[] rdata = new String[rows];
+					for (int k = 0; k < rows; k++) {
 						/* String dummy = */ con.receiveString();
 						rdata[k] = con.receiveStringData();
 					}
-					if (j >= from && j - from < count) {
+					if (0 <= j - from && j - from < count) {
 						tableModel.addRow(rdata);
 					}
 				}
@@ -128,26 +130,42 @@ class CListMarshaller extends WidgetMarshaller {
 				}
 				for (int j = 0; j < num; j++) {
 					boolean selected = con.receiveBooleanData();
-					if (j >= from && j - from < count) {
+					if (0 <= j - from && j - from < count) {
 						if (selected) {
-							table.addRowSelectionInterval(j - from, j - from);
+							selections.addSelectionInterval(j - from, j - from);
 						} else {
-							table.removeRowSelectionInterval(j - from, j - from);
+							selections.removeSelectionInterval(j - from, j - from);
 						}
 					}
 				}
 			}
+
 			JScrollBar vScroll = getVerticalScrollBar(table);
 			if (vScroll != null) {
 				BoundedRangeModel model = vScroll.getModel();
 				row += rowattrw * model.getExtent();
-				model.setValue(row * table.getRowHeight());
+//				model.setValue(row * table.getRowHeight());
 			}
 		}
+
+		// save selection values
+		ListSelectionModel savedSelections = new DefaultListSelectionModel();
+		int rows = table.getRowCount();
+		copySelections(rows, savedSelections, selections);
+		// setColumnIdentifiers resets selection values
 		tableModel.setColumnIdentifiers(labels);
-		//con.setReceiving(false);
-		//con.addChangedWidget(widget, null);
-		//con.setReceiving(true);
+		// restore selection values
+		copySelections(rows, selections, savedSelections);
+	}
+
+	private void copySelections(int rows, ListSelectionModel to, ListSelectionModel from) {
+		for (int i = 0; i < rows; i++) {
+			if (from.isSelectedIndex(i)) {
+				to.addSelectionInterval(i, i);
+			} else {
+				to.removeSelectionInterval(i, i);
+			}
+		}
 	}
 
 	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
@@ -175,10 +193,8 @@ class CListMarshaller extends WidgetMarshaller {
 			return true;
 		}
 		BoundedRangeModel model = vScroll.getModel();
-		int value = model.getValue();
-		int extent = model.getExtent();
-		int rowHeight = table.getRowHeight() * row;
-		return value <= rowHeight && rowHeight < value + extent;
+		int rowHeight = table.getRowHeight() * row - model.getValue();
+		return 0 <= rowHeight && rowHeight < model.getExtent();
 	}
 
 	private JScrollBar getVerticalScrollBar(JTable table) {
