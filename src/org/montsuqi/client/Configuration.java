@@ -24,6 +24,7 @@ package org.montsuqi.client;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import javax.swing.UIManager;
 import org.montsuqi.util.Logger;
 
 public abstract class Configuration {
@@ -41,11 +42,12 @@ public abstract class Configuration {
 	private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
 	private static final String VERIFY_KEY = "verify"; //$NON-NLS-1$
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
+	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
 
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
 	static final int DEFAULT_PORT = 8000;
 	static final String DEFAULT_HOST = "localhost"; //$NON-NLS-1$
-	static final String DEFAULT_USER = System.getProperty("user.anme"); //$NON-NLS-1$
+	static final String DEFAULT_USER = System.getProperty("user.name"); //$NON-NLS-1$
 	static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
 	static final String DEFAULT_ENCODING = "EUC-JP"; //$NON-NLS-1$
 	static final String DEFAULT_CACHE_PATH = System.getProperty("user.home") + File.separator + "cache";  //$NON-NLS-1$//$NON-NLS-2$
@@ -53,6 +55,7 @@ public abstract class Configuration {
 	static final boolean DEFAULT_USE_SSL = false;
 	static final boolean DEFAULT_VERIFY = false;
 	static final int DEFAULT_PROTOCOL_VERSION = 1;
+	static final String DEFAULT_LOOK_AND_FEEL_CLASS_NAME = UIManager.getSystemLookAndFeelClassName();
 
 	protected static final Logger logger = Logger.getLogger(Configuration.class);
 
@@ -200,9 +203,15 @@ public abstract class Configuration {
 		setInt(PROTOCOL_VERSION_KEY, version);
 	}
 
-	// look and feel
-	// logger class
-	// debug mode
+	public String getLookAndFeelClassName() {
+		return getString(LOOK_AND_FEEL_KEY, DEFAULT_LOOK_AND_FEEL_CLASS_NAME);
+	}
+
+	public void setLookAndFeelClassName(String className) {
+		setString(LOOK_AND_FEEL_KEY, className);
+	}
+
+	// logger class, debug mode
 	// html rendering
 
 	// if USE_SSL

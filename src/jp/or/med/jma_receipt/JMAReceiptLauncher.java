@@ -25,11 +25,8 @@ package jp.or.med.jma_receipt;
 import javax.swing.JDialog;
 import org.montsuqi.client.Configuration;
 import org.montsuqi.client.Launcher;
-import org.montsuqi.util.Logger;
 
 public class JMAReceiptLauncher extends Launcher {
-
-	protected static final Logger logger = Logger.getLogger(JMAReceiptLauncher.class);
 
 	protected JMAReceiptLauncher(String title) {
 		super(title);

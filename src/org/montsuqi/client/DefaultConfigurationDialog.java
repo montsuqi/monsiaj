@@ -20,87 +20,140 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jma_receipt;
+package org.montsuqi.client;
 
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.URL;
-
-import javax.swing.ImageIcon;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
-import org.montsuqi.client.Configuration;
-import org.montsuqi.client.ConfigurationDialog;
-import org.montsuqi.client.Messages;
 import org.montsuqi.util.ExtensionFileFilter;
 
-public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
+class DefaultConfigurationDialog extends ConfigurationDialog {
 
 	private JTextField hostEntry;
 	private JPasswordField passwordEntry;
 	private JTextField portEntry;
 	private JTextField styleEntry;
 	private JTextField userEntry;
+	private JTextField appEntry;
+	private JTextField encodingEntry;
+	private JComboBox lookAndFeelCombo;
+	private ButtonGroup protocolVersionRadioGroup;
+	UIManager.LookAndFeelInfo[] lafs;
+
+	public DefaultConfigurationDialog(String title, Configuration conf) {
+		super(title, conf);
+	}
 
 	protected void updateConfiguration() {
+		// basic settings
 		conf.setUser(userEntry.getText()); //$NON-NLS-1$
 		conf.setPass(new String(passwordEntry.getPassword()));
 		conf.setHost(hostEntry.getText()); //$NON-NLS-1$
 		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
-		conf.setApplication("orca00"); //$NON-NLS-1$ //$NON-NLS-2$
-		conf.setEncoding("EUC-JP"); //$NON-NLS-1$ //$NON-NLS-2$
+		conf.setApplication(appEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setStyles(styleEntry.getText()); //$NON-NLS-1$
-		conf.setProtocolVersion(1);
+
+		// advanced settings
+		conf.setEncoding(encodingEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
+		conf.setLookAndFeelClassName(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
+		Object[] selected = protocolVersionRadioGroup.getSelection().getSelectedObjects();
+		if (selected != null) {
+			for (int i = 0; i < selected.length; i++) {
+				conf.setProtocolVersion(Integer.parseInt((String)selected[i]));
+			}
+		}
 		conf.setUseSSL(false);
 		conf.setVerify(false);
 	}
 
-	JMAReceiptConfigurationDialog(String title, Configuration conf) {
-		super(title, conf);
-		setSize(320,240);
-	}
-
-	protected JComponent createIcon() {
-		JLabel icon = new JLabel();
-		URL iconURL = getClass().getResource("/orca2.jpg"); //$NON-NLS-1$
-		if (iconURL != null) {
-			icon.setIcon(new ImageIcon(iconURL));
-		}
-		return icon;
-	}
-
 	protected JComponent createControls() {
+		JTabbedPane tabbed = new JTabbedPane();
+		tabbed.addTab(Messages.getString("DefaultConfigurationDialog.basic_tab_label"), createBasicTab()); //$NON-NLS-1$
+		tabbed.addTab(Messages.getString("DefaultConfigurationDialog.advanced_tab_label"), createAdvancedTab()); //$NON-NLS-1$
+		return tabbed;
+	}
+
+
+	private JComponent createBasicTab() {
 		JPanel controls = new JPanel();
 		controls.setLayout(new GridBagLayout());
 
 		int y = 0;
+
 		userEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.user"), conf.getUser()); //$NON-NLS-1$
 		passwordEntry = addPasswordRow(controls, y++, Messages.getString("DefaultConfigurationDialog.password")); //$NON-NLS-1$
 		hostEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.host"), conf.getHost()); //$NON-NLS-1$
 		portEntry = addIntRow(controls, y++, Messages.getString("DefaultConfigurationDialog.port"), conf.getPort()); //$NON-NLS-1$
+		appEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.application"), conf.getApplication()); //$NON-NLS-1$
 		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyles()); //$NON-NLS-1$
 
-		final JTextComponent entry = styleEntry; // to tunnel access control
+		final JTextComponent entry = styleEntry;
 		addButtonFor(controls, styleEntry, Messages.getString("DefaultConfigurationDialog.browse"), new ActionListener() { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home")); //$NON-NLS-1$
 				String extension = ".properties"; //$NON-NLS-1$
 				String description = Messages.getString("DefaultConfigurationDialog.filter_pattern"); //$NON-NLS-1$
 				fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
-				int ret = fileChooser.showOpenDialog(JMAReceiptConfigurationDialog.this);
+				int ret = fileChooser.showOpenDialog(DefaultConfigurationDialog.this);
 				if (ret == JFileChooser.APPROVE_OPTION) {
 					File styleFile = fileChooser.getSelectedFile();
 					entry.setText(styleFile.getAbsolutePath());
 				}
 			}
 		});
+
+		return controls;
+	}
+
+	private JComponent createAdvancedTab() {
+		JPanel controls = new JPanel();
+		controls.setLayout(new GridBagLayout());
+
+		int y = 0;
+
+		encodingEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.encoding"), conf.getEncoding()); //$NON-NLS-1$
+		lafs = UIManager.getInstalledLookAndFeels();
+		String selectedLookAndFeelClassName = conf.getLookAndFeelClassName();
+		String selected = null;
+		String[] lafNames = new String[lafs.length];
+		for (int i = 0; i < lafNames.length; i++) {
+			lafNames[i] = lafs[i].getName();
+			if (selectedLookAndFeelClassName.equals(lafs[i].getClassName())) {
+				selected = lafNames[i];
+			}
+		}
+		if (selected == null) {
+			selected = lafNames[0];
+		}
+		lookAndFeelCombo = addComboRow(controls, y++, Messages.getString("DefaultConfigurationDialog.look_and_feel"), lafNames, selected); //$NON-NLS-1$
+		final JComboBox combo = lookAndFeelCombo;
+		lookAndFeelCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				try {
+					UIManager.setLookAndFeel(lafs[combo.getSelectedIndex()].getClassName());
+					Window w = SwingUtilities.windowForComponent(combo);
+					SwingUtilities.updateComponentTreeUI(w);
+				} catch (Exception e) {
+					logger.warn(e);
+				}
+			}
+		});
+
+		String[] versions = { String.valueOf(1), String.valueOf(2) };
+		protocolVersionRadioGroup = addRadioGroupRow(controls, y++, Messages.getString("DefaultConfigurationDialog.protocol_version"), versions, String.valueOf(conf.getProtocolVersion())); //$NON-NLS-1$
 		return controls;
 	}
 }

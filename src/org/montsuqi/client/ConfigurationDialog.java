@@ -27,23 +27,30 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import org.montsuqi.util.Logger;
 
 public abstract class ConfigurationDialog extends JDialog {
 
+	protected static final Logger logger = Logger.getLogger(ConfigurationDialog.class);
+
 	protected Configuration conf;
 
-	protected abstract void updateConfiguration();
-	protected abstract JComponent createIcon();
-	protected abstract JComponent createControls();
-	
 	protected ConfigurationDialog(String title, Configuration conf) {
 		super();
 		setTitle(title);
@@ -54,10 +61,14 @@ public abstract class ConfigurationDialog extends JDialog {
 				closeDialog();
 			}
 		});
+
 		setModal(true);
+		setSize(320, 240);
 	}
 
-	private void initComponents() {
+	protected abstract void updateConfiguration();
+
+	protected void initComponents() {
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
 		content.add(createConfigurationPanel(), BorderLayout.CENTER);
@@ -108,6 +119,103 @@ public abstract class ConfigurationDialog extends JDialog {
 		panel.add(controls, gbc);
 
 		return panel;
+	}
+
+	protected JComponent createIcon() {
+		JComponent icon;
+		icon = new JPanel();
+		icon.setBounds(0, 0, 0, 0);
+		return icon;
+	}
+
+	protected abstract JComponent createControls();
+
+	private void addRow(JPanel container, int y, String text, JComponent component) {
+		GridBagConstraints gbc;
+		JLabel label = new JLabel();
+		label.setHorizontalAlignment(SwingConstants.RIGHT);
+		label.setText(text);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = y;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weighty = 1.0;
+		container.add(label, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = y;
+		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		container.add(component, gbc);
+	}
+
+	protected JTextField addTextRow(JPanel container, int y, String text, String value) {
+		JTextField entry = new JTextField();
+		entry.setText(value);
+		addRow(container, y, text, entry);
+		return entry;
+	}
+
+	protected JTextField addIntRow(JPanel container, int y, String text, int value) {
+		JTextField entry = new JTextField();
+		entry.setHorizontalAlignment(SwingConstants.RIGHT);
+		entry.setText(String.valueOf(value));
+		addRow(container, y, text, entry);
+		return entry;
+	}
+
+	protected JPasswordField addPasswordRow(JPanel container, int y, String text) {
+		JPasswordField entry = new JPasswordField();
+		entry.setText(""); //$NON-NLS-1$
+		addRow(container, y, text, entry);
+		return entry;
+	}
+
+	protected void addButtonFor(JPanel container, JTextField entry, String buttonText, ActionListener listener) {
+		GridBagLayout gbl = (GridBagLayout)container.getLayout();
+
+		GridBagConstraints gbc;
+		gbc = gbl.getConstraints(entry);
+		gbc.gridwidth = 2;
+		gbl.setConstraints(entry, gbc);
+
+		int y = gbc.gridy;
+		JButton button = new JButton();
+		button.setText(buttonText);
+		button.addActionListener(listener);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = y;
+		container.add(button, gbc);
+	}
+
+	protected JComboBox addComboRow(JPanel container, int y, String text, String[] selections, String selected) {
+		JComboBox combo = new JComboBox();
+		combo.setEditable(false);
+		for (int i = 0; i < selections.length; i++) {
+			combo.addItem(selections[i]);
+			if (selections[i].equals(selected)) {
+				combo.setSelectedIndex(i);
+			}
+		}
+		addRow(container, y, text, combo);
+		return combo;
+	}
+
+	protected ButtonGroup addRadioGroupRow(JPanel container, int y, String text, String[] selections, String selected) {
+		ButtonGroup group = new ButtonGroup();
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(1, selections.length));
+		for (int i = 0; i < selections.length; i++) {
+			JRadioButton radio = new JRadioButton(selections[i]);
+			radio.setSelected(selections[i].equals(selected));
+			group.add(radio);
+			panel.add(radio);
+		}
+		addRow(container, y, text, panel);
+		return group;
 	}
 
 }

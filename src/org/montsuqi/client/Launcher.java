@@ -24,8 +24,11 @@ package org.montsuqi.client;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import org.montsuqi.util.Logger;
 
-public abstract class Launcher {
+public class Launcher {
+
+	protected static final Logger logger = Logger.getLogger(Launcher.class);
 
 	protected Client target;
 	protected Configuration conf;
@@ -66,5 +69,16 @@ public abstract class Launcher {
 		}
 	}
 
-	public abstract JDialog createDialog(Configuration newConf);
+	public static void main(String[] args) {
+		Launcher launcher = new Launcher(Messages.getString("application.title")); //$NON-NLS-1$
+		try {
+			launcher.launch();
+		} catch (Exception e) {
+			logger.fatal(e);
+		}
+	}
+
+	public JDialog createDialog(Configuration newConf) {
+		return new DefaultConfigurationDialog(title, conf);
+	}
 }
