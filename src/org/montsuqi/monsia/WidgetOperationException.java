@@ -1,6 +1,8 @@
 package org.montsuqi.monsia;
 
-public class WidgetOperationException extends RuntimeException {
+import org.montsuqi.util.ChainedRuntimeException;
+
+public class WidgetOperationException extends ChainedRuntimeException {
 
 	public WidgetOperationException() {
 		super();
