@@ -7,10 +7,8 @@ import java.util.List;
 
 class WidgetInfo {
 
-	WidgetInfo(String className, String name) {
+	WidgetInfo() {
 		parent = null;
-		this.className = className;
-		this.name = name;
 		properties = new ArrayList();
 		atkProperties = new ArrayList();
 		signals = new ArrayList();
@@ -18,6 +16,12 @@ class WidgetInfo {
 		relations = new ArrayList();
 		accels = new ArrayList();
 		children = new LinkedList();
+	}
+
+	WidgetInfo(String className, String name) {
+		this();
+		this.className = className;
+		this.name = name;
 	}
 
 	WidgetInfo getParent() {
@@ -42,6 +46,14 @@ class WidgetInfo {
 
 	String getName() {
 		return name;
+	}
+
+	void setClassName(String className) {
+		this.className = className;
+	}
+
+	void setName(String name) {
+		this.name = name;
 	}
 
 	int getPropertiesCount() {
@@ -126,6 +138,19 @@ class WidgetInfo {
 		return Collections.unmodifiableList(children);
 	}
 
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("WidgetInfo[class=");
+		buf.append(className);
+		buf.append(", name=");
+		buf.append(name);
+		if (parent != null) {
+			buf.append(", parent=");
+			buf.append(parent.getName());
+		}
+		buf.append("]");
+		return buf.toString();
+	}
 	private String className;
 	private String name;
 	private WidgetInfo parent;
@@ -135,5 +160,15 @@ class WidgetInfo {
 	private List actions;        // <ATKActionInfo>
 	private List relations;      // <ATKRelationInfo>
 	private List accels;         // <Accel>
-	private LinkedList children;       // <ChildInfo> 
+	private LinkedList children; // <ChildInfo> 
+
+	protected void addProperty(Property property) {
+		properties.add(property);
+	}
+	protected void addSignalInfo(SignalInfo signalInfo) {
+		signals.add(signalInfo);
+	}
+	protected void addAccelInfo(AccelInfo accelInfo) {
+		accels.add(accelInfo);
+	}
 }
