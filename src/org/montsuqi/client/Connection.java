@@ -76,7 +76,7 @@ public class Connection {
 	}
 
 	public void sendString(String s) throws IOException {
-		byte[] bytes = s.getBytes();
+		byte[] bytes = s.getBytes(encoding);
 		sendLength(bytes.length);
 		out.write(bytes);
 		out.flush();
