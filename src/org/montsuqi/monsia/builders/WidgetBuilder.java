@@ -43,7 +43,6 @@ import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.InsetsUIResource;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
@@ -151,7 +150,7 @@ public class WidgetBuilder {
 			String key = classes[i] + ".font"; //$NON-NLS-1$
 			Font font = (Font)UIManager.get(key);
 			if (font != null) {
-				UIManager.put(key, new FontUIResource(font.deriveFont(font.getStyle() & ~Font.BOLD,font.getSize() * 0.9f)));
+				UIManager.put(key, new FontUIResource(font.deriveFont(font.getStyle() & ~Font.BOLD)));
 			}
 		}
 	}
