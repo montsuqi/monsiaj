@@ -47,11 +47,11 @@ public abstract class Logger {
 	}
 
 	public void enter(String methodName) {
-		trace("entering " + methodName);
+		trace("entering " + methodName); //$NON-NLS-1$
 	}
 	
 	public void leave(String methodName) {
-		trace("leaving " + methodName);
+		trace("leaving " + methodName); //$NON-NLS-1$
 	}
 
 	public abstract void trace(String message);

@@ -2,7 +2,7 @@
                                                                                 
 Copyright (C) 1998-1999 Ogochan.
 			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+                                                           	                     
 This module is part of PANDA.
                                                                                 
 		PANDA is distributed in the hope that it will be useful, but
@@ -80,26 +80,26 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	}
 
 	protected void warnNotZero(String name, int actual) {
-		logger.warn(Messages.getString("MonsiaHandler.not_zero"), new Object[] { name, new Integer(actual) }); //$NON-NLS-1$
+		logger.warn(Messages.getString("AbstractDocumentHandler.not_zero"), new Object[] { name, new Integer(actual) }); //$NON-NLS-1$
 	}
 
 	protected void warnUnknownAttribute(String element, String attr) {
-		logger.warn(Messages.getString("MonsiaHandler.unknown_attribute"), new Object[] { attr, element }); //$NON-NLS-1$
+		logger.warn(Messages.getString("AbstractDocumentHandler.unknown_attribute"), new Object[] { attr, element }); //$NON-NLS-1$
 	}
 
 	protected void warnMissingAttribute(String element) {
-		logger.warn(Messages.getString("MonsiaHandler.missing_required_attribute"), element); //$NON-NLS-1$
+		logger.warn(Messages.getString("AbstractDocumentHandler.missing_required_attribute"), element); //$NON-NLS-1$
 	}
 
 	protected void warnUnexpectedElement(String outer, String inner) {
-		logger.warn(Messages.getString("MonsiaHandler.unexpected_element"), new Object[] { outer, inner }); //$NON-NLS-1$
+		logger.warn(Messages.getString("AbstractDocumentHandler.unexpected_element"), new Object[] { outer, inner }); //$NON-NLS-1$
 	}
 
 	protected Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
 			return new Interface(widgets, topLevels, protocol);
 		} else {
-			throw new IllegalStateException(Messages.getString("MonsiaHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
+			throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
 		}
 	}
 
@@ -147,14 +147,14 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	final ParserState FINISH = new ParserState("FINISH") { //$NON-NLS-1$
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			logger.warn(Messages.getString("AbstractHandler.there_should_be_no_elements_here"), localName); //$NON-NLS-1$
+			logger.warn(Messages.getString("AbstractDocumentHandler.there_should_be_no_elements_here"), localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			logger.warn(Messages.getString("AbstractHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
+			logger.warn(Messages.getString("AbstractDocumentHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
 		}
 	};
 
@@ -175,19 +175,19 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			// do nothing
 		} else if (propertyType == PropertyType.WIDGET) {
 			if (widget.getPropertiesCount() != 0) {
-				logger.warn(Messages.getString("MonsiaHandler.we_already_read_all_the_props_for_this_key")); //$NON-NLS-1$
+				logger.warn(Messages.getString("AbstractDocumentHandler.we_already_read_all_the_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setProperties(properties);
 			properties.clear();
 		} else if (propertyType == PropertyType.ATK) {
 			if (widget.getATKPropertiesCount() != 0) {
-				logger.warn(Messages.getString("MonsiaHandler.we_already_read_all_the_ATK_props_for_this_key")); //$NON-NLS-1$
+				logger.warn(Messages.getString("AbstractDocumentHandler.we_already_read_all_the_ATK_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setATKProperties(properties);
 			properties.clear();
 		} else if (propertyType == PropertyType.CHILD) {
 			if (widget.getChildrenCount() == 0) {
-				logger.warn(Messages.getString("MonsiaHandler.no_children_but_have_child_properties")); //$NON-NLS-1$
+				logger.warn(Messages.getString("AbstractDocumentHandler.no_children_but_have_child_properties")); //$NON-NLS-1$
 				properties.clear();
 			} else {
 				ChildInfo info = widget.getLastChild();
@@ -195,7 +195,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 				properties.clear();
 			}
 		} else {
-			throw new IllegalStateException(Messages.getString("MonsiaHandler.unknown_property_type")); //$NON-NLS-1$
+			throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.unknown_property_type")); //$NON-NLS-1$
 		}
 	
 		propertyType = PropertyType.NONE;
@@ -241,7 +241,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	}
 
 	protected int parseModifiers(String modifierValue) {
-		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|"); 
+		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|");  //$NON-NLS-1$
 		int modifiers = 0;
 		while (tokens.hasMoreTokens()) {
 			String modifier = tokens.nextToken();
@@ -251,15 +251,15 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
 				modifiers |= KeyEvent.SHIFT_MASK;
 			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
 				modifiers |= KeyEvent.CTRL_MASK;
 			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
 				modifiers |= parseButtonMask(modifier.substring(6));
 			} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 			}
 		}
 		return modifiers;
@@ -276,11 +276,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			case 3:
 				return KeyEvent.BUTTON3_MASK;
 			default:
-				logger.warn(Messages.getString("MonsiaHandler.only_BUTTON1-3_are_supported_in_Java")); //$NON-NLS-1$
+				logger.warn(Messages.getString("AbstractDocumentHandler.only_button_1_3_are_supported_in_Java")); //$NON-NLS-1$
 				return 0;
 			}
 		} catch (NumberFormatException e) {
-			logger.warn(Messages.getString("MonsiaHandler.unknown_BUTTON__number"), mask); //$NON-NLS-1$
+			logger.warn(Messages.getString("AbstractDocumentHandler.unknown_button_number"), mask); //$NON-NLS-1$
 			return 0;
 		}
 	}

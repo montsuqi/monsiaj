@@ -82,7 +82,7 @@ public class LittleEndianDataInputStream extends InputStream implements DataInpu
 	}
 
 	public String readLine() throws IOException {
-		throw new UnsupportedOperationException("DataInput#readLine() which is deprecated is not imprementad.");
+		throw new UnsupportedOperationException(Messages.getString("LittleEndianDataInputStream.warn_deprecated")); //$NON-NLS-1$
 	}
 	
 	public long readLong() throws IOException {

@@ -24,7 +24,7 @@ package org.montsuqi.monsia;
 
 class Property {
 
-	private static final String ARROW = "=>";
+	private static final String ARROW = "=>"; //$NON-NLS-1$
 
 	Property(String name, String value) {
 		this.name = name;

@@ -77,7 +77,7 @@ public class Client implements Runnable {
 		options.add("cache", Messages.getString("Client.cache_directory"), "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("user", Messages.getString("Client.user_name"), System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$
+		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("v1", Messages.getString("Client.use_protocol_version_1"), true); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("v2", Messages.getString("Client.use_protocol_version_2"), true); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("useSSL", "SSL", false); //$NON-NLS-1$ //$NON-NLS-2$
@@ -95,7 +95,7 @@ public class Client implements Runnable {
 		cache = (String)options.getValue("cache"); //$NON-NLS-1$
 		user = (String)options.getValue("user"); //$NON-NLS-1$
 		pass = (String)options.getValue("pass"); //$NON-NLS-1$
-		encoding = (String)options.getValue("encoding");
+		encoding = (String)options.getValue("encoding"); //$NON-NLS-1$
 
 		useSSL = ((Boolean)options.getValue("useSSL")).booleanValue(); //$NON-NLS-1$
 
@@ -127,15 +127,15 @@ public class Client implements Runnable {
 			String factoryName;
 			Object[] options;
 			if (useSSL) {
-				factoryName = "org.montsuqi.client.SSLSocketCreator";
+				factoryName = "org.montsuqi.client.SSLSocketCreator"; //$NON-NLS-1$
 				options = new Object[] { new Boolean(verify) };
 			} else {
-				factoryName = "org.montsuqi.client.SocketCreator";
+				factoryName = "org.montsuqi.client.SocketCreator"; //$NON-NLS-1$
 				options = null;
 			}
 			Class clazz = Class.forName(factoryName);
 			Class[] argTypes = new Class[] { String.class, Integer.TYPE, Object[].class };
-			Method create = clazz.getDeclaredMethod("create", argTypes);
+			Method create = clazz.getDeclaredMethod("create", argTypes); //$NON-NLS-1$
 			s = (Socket)create.invoke(null, new Object[] { host, new Integer(portNumber), options });
 			protocol = new Protocol(this, s, encoding);
 			connected = true;
@@ -201,7 +201,7 @@ public class Client implements Runnable {
 	}
 
 	private void showBannar() {
-		String format = Messages.getString("Client.banner_format");
+		String format = Messages.getString("Client.banner_format"); //$NON-NLS-1$
 		Object[] args = new Object[] { CLIENT_VERSION };
 		String banner = MessageFormat.format(format, args);
 		System.out.println(banner);

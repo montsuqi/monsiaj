@@ -140,7 +140,7 @@ class NumberDocument extends PlainDocument {
 	NumberDocument() {
 		
 		//setFormat(DEFAULT_FORMAT);
-		setFormat("-ZZZ,ZZZ.99");
+		setFormat("-ZZZ,ZZZ.99"); //$NON-NLS-1$
 		expo = 0;
 		scale = 0;
 		value = new BigDecimal("0.0"); //$NON-NLS-1$

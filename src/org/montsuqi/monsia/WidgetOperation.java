@@ -84,7 +84,7 @@ class WidgetOperation {
 
 	static void setWidth(Interface xml, Container widget, String name, String value) {
 		if ( ! (widget instanceof Component)) {
-			throw new IllegalArgumentException("Attempt to set width to non-Component.");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.attempt_to_set_width_to_non_component")); //$NON-NLS-1$
 		}
 		Component c = (Component)widget;
 		Dimension size = c.getSize();
@@ -93,13 +93,13 @@ class WidgetOperation {
 			c.setSize(size);
 			
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Not a number.");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_number")); //$NON-NLS-1$
 		}
 	}
 
 	static void setHeight(Interface xml, Container widget, String name, String value) {
 		if ( ! (widget instanceof Component)) {
-			throw new IllegalArgumentException("Attempt to set height to non-Component.");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.attempt_to_set_height_to_non_component")); //$NON-NLS-1$
 		}
 		Component c = (Component)widget;
 		Dimension size = c.getSize();
@@ -107,20 +107,20 @@ class WidgetOperation {
 			size.height = Integer.parseInt(value);
 			c.setSize(size);
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Not a number.");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_number")); //$NON-NLS-1$
 		}
 	}
 
 	static void setJustify(Interface xml, Container widget, String name, String value) {
 		int alignment = SwingConstants.CENTER;
-		if ("JUSTIFY_CENTER".equals(value)) {
+		if ("JUSTIFY_CENTER".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.CENTER;
-		} else if ("JUSTIFY_LEFT".equals(value)) {
+		} else if ("JUSTIFY_LEFT".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.LEFT;
-		} else if ("JUSTIFY_RIGHT".equals(value)) {
+		} else if ("JUSTIFY_RIGHT".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.RIGHT;
 		} else {
-			Logger.getLogger(WidgetOperation.class).warn("not supported");
+			Logger.getLogger(WidgetOperation.class).warn(Messages.getString("WidgetOperation.not_supported")); //$NON-NLS-1$
 		}
 		if (widget instanceof JLabel) {
 			((JLabel)widget).setHorizontalAlignment(alignment);
@@ -243,11 +243,11 @@ class WidgetOperation {
 	}
 
 	private static String normalizeSelectionMode(String mode) {
-		if (mode.startsWith("GTK_")) {
-			mode = mode.substring("GTK_".length());
+		if (mode.startsWith("GTK_")) { //$NON-NLS-1$
+			mode = mode.substring("GTK_".length()); //$NON-NLS-1$
 		}
-		if (mode.startsWith("SELECTION_")) {
-			mode = mode.substring("SELECTION_".length());
+		if (mode.startsWith("SELECTION_")) { //$NON-NLS-1$
+			mode = mode.substring("SELECTION_".length()); //$NON-NLS-1$
 		}
 		return mode;
 	}

@@ -162,15 +162,15 @@ class WidgetInfo {
 
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("WidgetInfo[class=");
+		buf.append("WidgetInfo[class="); //$NON-NLS-1$
 		buf.append(className);
-		buf.append(", name=");
+		buf.append(", name="); //$NON-NLS-1$
 		buf.append(name);
 		if (parent != null) {
-			buf.append(", parent=");
+			buf.append(", parent="); //$NON-NLS-1$
 			buf.append(parent.getName());
 		}
-		buf.append("]");
+		buf.append("]"); //$NON-NLS-1$
 		return buf.toString();
 	}
 	private String className;

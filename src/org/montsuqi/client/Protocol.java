@@ -537,7 +537,7 @@ public class Protocol extends Connection {
 			while (parent.getParent() != null) {
 				parent = parent.getParent();
 			}
-			sendEvent(parent.getName(), widget.getName(), userData == null ? "" : userData.toString());
+			sendEvent(parent.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
 			sendWindowData();
 //			blockChangedHanders();
 			if (getScreenData()) {

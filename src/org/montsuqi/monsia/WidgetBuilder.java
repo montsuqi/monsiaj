@@ -93,7 +93,7 @@ class WidgetBuilder {
 	private void initClassMap() {
 		classMap = new HashMap();
 		registerClass("Button", javax.swing.JButton.class); //$NON-NLS-1$
-		registerClass("Calendar", org.montsuqi.widgets.Calendar.class);
+		registerClass("Calendar", org.montsuqi.widgets.Calendar.class); //$NON-NLS-1$
 		registerClass("CList", javax.swing.JTable.class); //$NON-NLS-1$
 		registerClass("CheckButton", javax.swing.JCheckBox.class); //$NON-NLS-1$
 		registerClass("Combo", javax.swing.JComboBox.class); //$NON-NLS-1$
@@ -136,12 +136,12 @@ class WidgetBuilder {
 		registerProperty(java.awt.Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JLabel.class, "justify", "setJustify");
+		registerProperty(javax.swing.JLabel.class, "justify", "setJustify"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Component.class, "width_request", "setWidth");
-		registerProperty(java.awt.Component.class, "height_request", "setHeight");
-		registerProperty(java.awt.Component.class, "width", "setWidth");
-		registerProperty(java.awt.Component.class, "height", "setHeight");
+		registerProperty(java.awt.Component.class, "width_request", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Component.class, "height_request", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Component.class, "width", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Component.class, "height", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
 
 /*
 		registerProperty("selectable", null);
@@ -180,12 +180,12 @@ class WidgetBuilder {
 //		registerProperty(RULER, "metric", ruler_set_metric);
 		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat");
+		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void initWidgetBuildData() {
 		registerWidgetBuildData("Button", defaultBuildWidgetData); //$NON-NLS-1$
-		registerWidgetBuildData("Calendar", defaultBuildWidgetData);
+		registerWidgetBuildData("Calendar", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("CheckButton", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("CheckMenuItem", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
@@ -253,10 +253,7 @@ class WidgetBuilder {
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildMenuItemChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("MessageDialog", //$NON-NLS-1$
-								"standardBuildWidget", //$NON-NLS-1$
-								"standardBuildChildren", //$NON-NLS-1$
-								null);
+		registerWidgetBuildData("MessageDialog", defaultBuildContainerData); //$NON-NLS-1$
 		registerWidgetBuildData("Notebook", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildNotebookChildren", //$NON-NLS-1$
@@ -303,14 +300,11 @@ class WidgetBuilder {
 								"buildPanedChildren", //$NON-NLS-1$
 								null);
 		registerWidgetBuildData("VSeparator", defaultBuildWidgetData); //$NON-NLS-1$
-		registerWidgetBuildData("Viewport",
+		registerWidgetBuildData("Viewport", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildViewportChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("Window", //$NON-NLS-1$
-								"standardBuildWidget", //$NON-NLS-1$
-								"standardBuildChildren", //$NON-NLS-1$
-								null);
+		registerWidgetBuildData("Window", defaultBuildContainerData); //$NON-NLS-1$
 	}
 
 	private void registerClass(String genericClassName, Class clazz) {
@@ -363,7 +357,7 @@ class WidgetBuilder {
 			}
 		}
 		Object[] args = new Object[] { clazz };
-		String format = Messages.getString("WidgetBuilder.Unknown_widget_class");
+		String format = Messages.getString("WidgetBuilder.Unknown_widget_class"); //$NON-NLS-1$
 		String message = MessageFormat.format(format, args);
 		throw new WidgetBuildingException(message);
 	}
@@ -427,13 +421,13 @@ class WidgetBuilder {
 		ButtonGroup group = null;
 		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
 			Property p = info.getProperty(i);
-			if ("group".equals(p.getName())) {
+			if ("group".equals(p.getName())) { //$NON-NLS-1$
 				group = xml.getButtonGroup(p.getValue());
 				break;
 			}
 		}
 		if (group == null) {
-			throw new WidgetBuildingException("RadioButton has no group");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.radio_button_has_no_group")); //$NON-NLS-1$
 		}
 		group.add(widget);
 		logger.leave("buildRadioButton");
@@ -493,7 +487,6 @@ class WidgetBuilder {
 		standardBuildChildren(parent, info);
 	}
 
-
 	void buildFrameChildren(Container parent, WidgetInfo info) {
 		int FRAME_ITEM = 0;
 		int LABEL_ITEM = 1;
@@ -531,7 +524,7 @@ class WidgetBuilder {
 		JTabbedPane tabbed = (JTabbedPane)parent;
 		int cCount = info.getChildrenCount();
 		if (cCount % 2 != 0) {
-			throw new WidgetBuildingException("odd number of notebook childrens");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.odd_number_of_notebook_childrens")); //$NON-NLS-1$
 		}
 		int tabCount = cCount / 2;
 		String[] labels = new String[tabCount];
@@ -547,16 +540,16 @@ class WidgetBuilder {
 				Property p = wInfo.getProperty(j);
 				String pName = p.getName();
 				String pValue = p.getValue();
-				if (pName.equals("child_name")) {
+				if (pName.equals("child_name")) { //$NON-NLS-1$
 					isTab = true;
 				}
-				if (pName.equals("label")) {
+				if (pName.equals("label")) { //$NON-NLS-1$
 					label = pValue;
 				}
 			}
 			if (isTab) {
 				if (label == null) {
-					throw new WidgetBuildingException("no label for a tab");
+					throw new WidgetBuildingException(Messages.getString("WidgetBuilder.no_label_for_a_tab")); //$NON-NLS-1$
 				}
 				labels[currentLabel] = label;
 				currentLabel++;
@@ -567,7 +560,7 @@ class WidgetBuilder {
 			}
 		}
 		if (currentBody != bodies.length || currentLabel != labels.length) {
-			throw new WidgetBuildingException("tab/label count mismatch");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.tab_label_count_mismatch")); //$NON-NLS-1$
 		}
 		for (int i = 0; i < tabCount; i++) {
 			tabbed.add(labels[i], bodies[i]);
@@ -583,7 +576,7 @@ class WidgetBuilder {
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 
 			if ("Menu".equals(wInfo.getClassName())) { //$NON-NLS-1$
-				logger.warn(Messages.getString("WidgetBuilder.the_child_of_the_option_menu_{0}_was_not_a_Menu_widget_2"), wInfo.getName()); //$NON-NLS-1$
+				logger.warn(Messages.getString("WidgetBuilder.the_child_of_the_option_menu_was_not_a_menu_widget"), wInfo.getName()); //$NON-NLS-1$
 				continue;
 			}
 			Container child = buildWidget(wInfo);
@@ -596,7 +589,7 @@ class WidgetBuilder {
 	void buildScrolledWindowChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		if (cCount != 1) {
-			throw new WidgetBuildingException("only one child is allowed in a ScrolledWindow");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_a_scrolled_window")); //$NON-NLS-1$
 		}
 		JScrollPane scroll = (JScrollPane)parent;
 		ChildInfo cInfo = info.getChild(0);
@@ -608,7 +601,7 @@ class WidgetBuilder {
 	void buildViewportChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		if (cCount != 1) {
-			throw new WidgetBuildingException("only one child is allowed in a ScrolledWindow");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_a_scrolled_window")); //$NON-NLS-1$
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
@@ -622,7 +615,7 @@ class WidgetBuilder {
 
 		String[] columnNames = new String[cCount];
 		for (int i = 0; i < cCount; i++) {
-			columnNames[i] = "?";
+			columnNames[i] = "?"; //$NON-NLS-1$
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			if ( ! "Label".equals(wInfo.getClassName())) { //$NON-NLS-1$
@@ -702,7 +695,7 @@ class WidgetBuilder {
 					} else if ("inconsistent".equals(pName)) { //$NON-NLS-1$
 						/* ignore for now */
 					} else {
-						logger.warn(Messages.getString("WidgetBuilder.Unknown_Toolbar_child_property__{0}_4"), pName); //$NON-NLS-1$
+						logger.warn(Messages.getString("WidgetBuilder.Unknown_Toolbar_child_property"), pName); //$NON-NLS-1$
 					}
 				}
 
@@ -759,7 +752,7 @@ class WidgetBuilder {
 			} else if ("shrink".equals(name)) { //$NON-NLS-1$
 				shrink = ParameterConverter.toBoolean(value);
 			} else {
-				logger.warn(Messages.getString("WidgetBuilder.Unknown_Paned_child_property__{0}_5"), name); //$NON-NLS-1$
+				logger.warn(Messages.getString("WidgetBuilder.Unknown_Paned_child_property"), name); //$NON-NLS-1$
 			}
 		}
 
@@ -786,7 +779,7 @@ class WidgetBuilder {
 			} else if ("shrink".equals(name)) { //$NON-NLS-1$
 				shrink = ParameterConverter.toBoolean(value);
 			} else {
-				logger.warn(Messages.getString("WidgetBuilder.Unknown_Paned_child_property__{0}_6"), name); //$NON-NLS-1$
+				logger.warn(Messages.getString("WidgetBuilder.Unknown_Paned_child_property"), name); //$NON-NLS-1$
 			}
 		}
 
@@ -833,7 +826,7 @@ class WidgetBuilder {
 				} else if ("y_options".equals(value)) { //$NON-NLS-1$
 					// y_options = ParameterConverter.toInteger(value);
 				} else {
-					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_{0}_for_Table_7"), name); //$NON-NLS-1$
+					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_for_Table"), name); //$NON-NLS-1$
 				}
 			}
 			parent.add(child);
@@ -867,7 +860,7 @@ class WidgetBuilder {
 				} else if ("y".equals(name)) { //$NON-NLS-1$
 					y = ParameterConverter.toInteger(value);
 				} else {
-					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_{0}_for_Layout_8"), name); //$NON-NLS-1$
+					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_for_Layout"), name); //$NON-NLS-1$
 				}
 			}
 			parent.add(child);
@@ -1021,7 +1014,7 @@ class WidgetBuilder {
 		}
 
 		if (parentBuildData != null || parentBuildData.hasFindInternalChildMethod()) {
-			logger.warn(Messages.getString("WidgetBuilder.could_not_find_a_parent_that_handles_internal_children_for_`{0}___9"), //$NON-NLS-1$
+			logger.warn(Messages.getString("WidgetBuilder.could_not_find_a_parent_that_handles_internal_children"), //$NON-NLS-1$
 				 cInfo.getInternalChild());
 			return;
 		}
@@ -1029,7 +1022,7 @@ class WidgetBuilder {
 		child = parentBuildData.findInternalChild(this, parent, cInfo.getInternalChild());
 
 		if (child == null) {
-			logger.warn(Messages.getString("WidgetBuilder.could_not_find_internal_child_`{0}___in_parent_of_type_`{1}___10"), //$NON-NLS-1$
+			logger.warn(Messages.getString("WidgetBuilder.could_not_find_internal_child_in_parent"), //$NON-NLS-1$
 					new Object[] { cInfo.getInternalChild(), parent.getClass() });
 			return;
 		}
@@ -1092,14 +1085,14 @@ class WidgetBuilder {
 		}
 		if (pDesc == null) {
 			Object[] args = new Object[] { field, clazz };
-			String format = Messages.getString("WidgetBuilder.Unknown_property");
+			String format = Messages.getString("WidgetBuilder.Unknown_property"); //$NON-NLS-1$
 			String message = MessageFormat.format(format, args);
 			throw new WidgetBuildingException(message);
 		}
 		Method setter = pDesc.getWriteMethod();
 		if (setter == null) {
 			Object[] args = new Object[] { field, clazz };
-			String format = Messages.getString("WidgetBuilder.Field_is_read_only");
+			String format = Messages.getString(Messages.getString("WidgetBuilder.WidgetBuilder.Field_is_read_only_30")); //$NON-NLS-1$
 			String message = MessageFormat.format(format, args);
 			throw new WidgetBuildingException(message);
 		}

@@ -51,7 +51,7 @@ class StdErrLogger extends Logger {
 
 	private StdErrLogger() {
 		log = null;
-		String logName = System.getProperty("monsia.logger.stderr.file");
+		String logName = System.getProperty("monsia.logger.stderr.file"); //$NON-NLS-1$
 		if (logName != null) {
 			try {
 				log = new PrintStream(new FileOutputStream(logName));
@@ -76,23 +76,23 @@ class StdErrLogger extends Logger {
 	}
 
 	public void trace(String message) {
-		writeLog("TRACE:" + message);
+		writeLog("TRACE:" + message); //$NON-NLS-1$
 	}
 
 	public void debug(String message) {
-		writeLog("DEBUG:" + message);
+		writeLog("DEBUG:" + message); //$NON-NLS-1$
 	}
 
 	public void info(String message) {
-		writeLog("INFO:" + message);
+		writeLog("INFO:" + message); //$NON-NLS-1$
 	}
 
 	public void warn(String message) {
-		writeLog("WARN:" + message);
+		writeLog("WARN:" + message); //$NON-NLS-1$
 	}
 
 	public void fatal(String message) {
-		writeLog("FATAL: " + message);
+		writeLog("FATAL: " + message); //$NON-NLS-1$
 	}
 
 	public void warn(Throwable e) {

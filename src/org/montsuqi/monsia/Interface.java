@@ -48,11 +48,15 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.JWindow;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -83,10 +87,9 @@ public class Interface {
 	private Container defaultWidget;
 	private Logger logger;
 
-	public static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler";
+	private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; //$NON-NLS-1$
+	private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; //$NON-NLS-1$
 
-	public static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler";
-	
 	void setDefaultWidget(Container widget) {
 		defaultWidget = widget;
 	}
@@ -101,18 +104,18 @@ public class Interface {
 		try {
 			String handlerClassName = null;
 
-			handlerClassName = System.getProperty("monsia.document.handler");
+			handlerClassName = System.getProperty("monsia.document.handler"); //$NON-NLS-1$
 
 			if (handlerClassName == null) {
 				input = new java.io.BufferedInputStream(input);
-				String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n";
+				String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
 				int oldPrologueLength = oldPrologue.getBytes().length;
 				input.mark(oldPrologueLength);
 				byte[] bytes = new byte[oldPrologueLength];
 				input.read(bytes);
 				String head = new String(bytes);
 				input.reset();
-				if (head.indexOf("GTK-Interface") < 0) {
+				if (head.indexOf("GTK-Interface") < 0) { //$NON-NLS-1$
 					handlerClassName = NEW_HANDLER;
 				}
 			}
@@ -243,39 +246,45 @@ public class Interface {
 	}
 		 
 	private void connectClicked(final Container target, final Method handler, final Object other) {
-		if (target instanceof JButton || target instanceof JRadioButton) {
-			((AbstractButton)target).addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-					invoke(handler, target, other);
-				}
-			});
+		if ( ! (target instanceof JButton) && ! (target instanceof JRadioButton)) {
+			return;
 		}
+		AbstractButton button = (AbstractButton)target;
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
 	private void connectChanged(final Container target, final Method handler, final Object other) {
-		if (target instanceof JTextComponent) {
-			((JTextComponent)target).getDocument().addDocumentListener(new DocumentListener() {
-				public void insertUpdate(DocumentEvent event) {
-					invoke(handler, target, other);
-				}
-				public void removeUpdate(DocumentEvent event) {
-					invoke(handler, target, other);
-				}
-				public void changedUpdate(DocumentEvent event) {
-					invoke(handler, target, other);
-				}
-			});
+		if ( ! (target instanceof JTextComponent)) {
+			return;
 		}
+		JTextComponent text = (JTextComponent)target;
+		text.getDocument().addDocumentListener(new DocumentListener() {
+			public void insertUpdate(DocumentEvent event) {
+				invoke(handler, target, other);
+			}
+			public void removeUpdate(DocumentEvent event) {
+				invoke(handler, target, other);
+			}
+			public void changedUpdate(DocumentEvent event) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
 	private void connectActivate(final Container target, final Method handler, final Object other) {
-		if (target instanceof JTextField) {
-			((JTextField)target).addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-					invoke(handler, target, other);
-				}
-			});
+		if ( ! (target instanceof JTextField)) {
+			return;
 		}
+		JTextField textField = (JTextField)target;
+		textField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
 	private void connectMapEvent(final Container target, final Method handler, final Object other) {
@@ -335,7 +344,6 @@ public class Interface {
 	}
 
 	private void connectSelectRow(final Container target, final Method handler, final Object other) {
-		
 		if (target instanceof JTree) {
 			TreeSelectionModel model = ((JTree)target).getSelectionModel();
 			model.addTreeSelectionListener(new TreeSelectionListener() {
@@ -365,20 +373,35 @@ public class Interface {
 	}
 
 	private void connectSelectionChanged(Container target, Method handler, Object other) {
-		// TODO implement this.
+		connectSelectRow(target, handler, other);
 	}
 
 	private void connectClickColumn(Container target, Method handler, Object other) {
 		// TODO implement this.
 	}
 
-	private void connectSwitchPage(Container target, Method handler, Object other) {
-		// TODO implement this.
+	private void connectSwitchPage(final Container target, final Method handler, final Object other) {
+		if ( ! (target instanceof JTabbedPane)) {
+			return;
+		}
+		JTabbedPane tabbedPane = (JTabbedPane)target;
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent event) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
-	private void connectToggled(Container target, Method handler, Object other) {
-		// TODO implement this.
-		logger.debug("connectToggled stab");
+	private void connectToggled(final Container target, final Method handler, final Object other) {
+		if ( ! (target instanceof JToggleButton)) {
+			return;
+		}
+		JToggleButton toggleButton = (JToggleButton)target;
+		toggleButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				invoke(handler, target, other);
+			}
+		});
 	}
 
 	public Container getWidget(String name) {

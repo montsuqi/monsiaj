@@ -108,7 +108,7 @@ class WidgetMarshal {
 	}
 
 	private void setStyle(Container widget, String style) {
-		logger.debug("apply style \"{0}\" to {1}", new Object[] { style, widget});
+		logger.debug(Messages.getString("WidgetMarshal.ignoring_style"), new Object[] { style, widget.getName() }); //$NON-NLS-1$
 	}
 
 	boolean receiveEntry(Container widget) throws IOException {
@@ -368,6 +368,9 @@ class WidgetMarshal {
 			} else if ("columns".equals(name)) { //$NON-NLS-1$
 				/* NOP */
 			} else if ("item".equals(name)) { //$NON-NLS-1$
+				while (tableModel.getRowCount() > 0) {
+					tableModel.removeRow(0);
+				}
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				int num = con.receiveInt();
 				if (count < 0) {
@@ -450,6 +453,9 @@ class WidgetMarshal {
 			} else if ("from".equals(name)) { //$NON-NLS-1$
 				from = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
+				if (listModel.getSize() > 0) {
+					listModel.clear();
+				}
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				num = con.receiveInt();
 				if (count < 0) {
