@@ -63,6 +63,7 @@ public final class Launcher {
 			conf = (Configuration)clazz.newInstance();
 			conf.load();
 			ConfigurationDialog d = new ConfigurationDialog(conf);
+			d.setLocationRelativeTo(null);
 			d.setVisible(true);
 			if (d.needRun()) {
 				conf = d.getConfiguration();
