@@ -1013,7 +1013,7 @@ class WidgetBuilder {
 	}
 
 	private void setCommonParams(Container widget, WidgetInfo info) {
-		addAccels(widget, info);
+		//addAccels(widget, info);
 		addSignals(widget, info);
 		widget.setName(info.getName());
 		String className = info.getClassName();
