@@ -31,7 +31,7 @@ public class VBox extends JComponent {
 
 	public VBox() {
 		super();
-		super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		super.setLayout(new GtkBoxLayout(this, BoxLayout.Y_AXIS));
 	}
 
 	public void setLayout(LayoutManager layout) {

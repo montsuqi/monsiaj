@@ -31,7 +31,7 @@ public class HBox extends JComponent {
 
 	public HBox() {
 		super();
-		super.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		super.setLayout(new GtkBoxLayout(this, BoxLayout.X_AXIS));
 	}
 
 	public void setLayout(LayoutManager layout) {
