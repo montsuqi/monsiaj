@@ -341,7 +341,7 @@ public class WidgetBuilder {
 				widget = data.build(this, info);
 			} catch (Exception e) {
 				logger.warn(e);
-				widget = new JLabel("[" + e.toString() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+				widget = new JLabel('[' + e.toString() + ']');
 			}
 		}
 		if (widget instanceof JWindow) {
@@ -959,7 +959,8 @@ public class WidgetBuilder {
 			} catch (IllegalAccessException e) {
 				throw new InterfaceBuildingException(e);
 			} catch (InvocationTargetException e) {
-				throw new InterfaceBuildingException(e);
+				Throwable cause = e.getTargetException(); // should use getCause() [J2SE 1.4+]
+				throw new InterfaceBuildingException(cause);
 			}
 		}
 	}
