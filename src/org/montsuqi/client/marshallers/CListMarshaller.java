@@ -102,29 +102,27 @@ class CListMarshaller extends WidgetMarshaller {
 					count = num;
 				}
 				for (int j = 0; j < num; j++) {
-					ListSelectionModel model = table.getSelectionModel();
 					boolean selected = con.receiveBooleanData();
 					if (j >= from && j - from < count) {
 						if (selected) {
-							model.addSelectionInterval(j - from, j - from);
+							table.addRowSelectionInterval(j - from, j - from);
 						} else {
-							model.removeSelectionInterval(j - from, j - from);
+							table.removeRowSelectionInterval(j - from, j - from);
 						}
 					}
 				}
 			}
 		}
 		tableModel.setColumnIdentifiers(labels);
-		con.setReceiving(false);
-		con.addChangedWidget(widget, null);
-		con.setReceiving(true);
+		//con.setReceiving(false);
+		//con.addChangedWidget(widget, null);
+		//con.setReceiving(true);
 		return true;
 	}
 
 	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTable table = (JTable)widget;
-
 		ValueAttribute va = manager.getValue(name);
 		ListSelectionModel selections = table.getSelectionModel();
 		for (int i = 0, rows = table.getRowCount(), opt = ((Integer)va.getOpt()).intValue(); i < rows; i++) {

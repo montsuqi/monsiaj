@@ -405,7 +405,9 @@ public class Interface {
 		} else {
 			ListSelectionListener listener = new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent e) {
-					invoke(handler, target, other);
+					if ( ! e.getValueIsAdjusting()) {
+						invoke(handler, target, other);
+					}
 				}
 			};
 			if (target instanceof JList) {
@@ -422,11 +424,7 @@ public class Interface {
 
 	private void connectUnselectRow(Component target, Method handler, Object other) {
 		// XxxSelectionModels don't care selection/unselection so use connectSelectRow
-		connectSelectRow(target, handler, other);
-	}
-
-	private void connectSelectionChanged(Component target, Method handler, Object other) {
-		connectSelectRow(target, handler, other);
+		//connectSelectRow(target, handler, other);
 	}
 
 	private void connectClickColumn(Component target, Method handler, Object other) {

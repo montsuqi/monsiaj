@@ -229,7 +229,6 @@ public class Protocol extends Connection {
 
 	private boolean sendWidgetData(String name, Component widget) throws IOException {
 		try {
-			// FIXME need special handling for combo
 			WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(widget.getClass());
 			return marshaller.send(valueManager, name, widget);
 		} catch (ClassNotFoundException e) {
@@ -519,6 +518,7 @@ public class Protocol extends Connection {
 	}
 
 	public void clist_send_event(Component widget, Object userData) throws IOException {
+		addChangedWidget(widget, userData);
 		send_event(widget, "SELECT"); //$NON-NLS-1$
 	}
 
