@@ -25,6 +25,7 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ class FixedBuilder extends ContainerBuilder {
 				child = underlayScrollPane(child);
 			}
 			addChild(parent, child);
-			child.setLocation(x, y);
+			child.setLocation(ScreenScale.scale(new Point(x, y)));
 		}
 		Component[] children = parent.getComponents();
 		int bottomMost = 0;

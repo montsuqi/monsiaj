@@ -123,6 +123,7 @@ abstract class WidgetPropertySetter {
 				Dimension size = widget.getSize();
 				try {
 					size.width = Integer.parseInt(value);
+					size = ScreenScale.scale(size);
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
 					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
@@ -136,6 +137,7 @@ abstract class WidgetPropertySetter {
 				Dimension size = widget.getSize();
 				try {
 					size.height = Integer.parseInt(value);
+					size = ScreenScale.scale(size);
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
 					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
