@@ -398,14 +398,15 @@ abstract class Connector {
 							}
 							JRadioButton none = (JRadioButton)deselected.getClientProperty("none"); //$NON-NLS-1$
 							none.setSelected(true);
-							invoke(con, handler, deselected, other);
+							final Object o = "CLICKED"; //$NON-NLS-1$
+							invoke(con, handler, deselected, o);
 							SignalHandler sendEvent = SignalHandler.getSignalHandler("send_event"); //$NON-NLS-1$
 							assert sendEvent != null;
-							invoke(con, sendEvent, deselected, other);
+							invoke(con, sendEvent, deselected, o);
 
 							toggle.setSelected(true);
-							invoke(con, handler, target, other);
-							invoke(con, sendEvent, target, other);
+							invoke(con, handler, target, o);
+							invoke(con, sendEvent, target, o);
 						}
 					});
 				} else {

@@ -244,6 +244,10 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			SignalInfo signal = new SignalInfo(signalName, signalHandler, signalObject, signalAfter);
+			signalName = ""; //$NON-NLS-1$
+			signalHandler = ""; //$NON-NLS-1$
+			signalObject = ""; //$NON-NLS-1$
+			signalAfter = false;
 			WidgetInfo w = getLastPendingWidget();
 			w.addSignalInfo(signal);
 		}
@@ -263,8 +267,6 @@ public class Glade1Handler extends AbstractDocumentHandler {
 				signalHandler = value;
 			} else if (localName.equals("data")) { //$NON-NLS-1$
 				signalObject = value;
-//			} else if (localName.equals("object")) {
-//				signalObject = value;
 			} else if (localName.equals("after")) { //$NON-NLS-1$
 				signalAfter = value.charAt(0) == 'T';
 			}

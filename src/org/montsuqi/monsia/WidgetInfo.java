@@ -23,8 +23,8 @@ copies.
 package org.montsuqi.monsia;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -102,17 +102,12 @@ public class WidgetInfo {
 	}
 
 	public List getSignals() {
-		return signals;
+		return Collections.unmodifiableList(signals);
 	}
 
 	synchronized void setSignals(List signals) {
 		this.signals.clear();
-		// this.signals.addAll(signals);
-		// use addSignalInfo instead to set "clicked" signals on head
-		Iterator i = signals.iterator();
-		while (i.hasNext()) {
-			addSignalInfo((SignalInfo)i.next());
-		}
+		this.signals.addAll(signals);
 	}
 
 	public List getAccels() {
@@ -145,12 +140,7 @@ public class WidgetInfo {
 	}
 
 	public void addSignalInfo(SignalInfo signalInfo) {
-		// "clicked" signal should be first always.
-		if (signalInfo.getName().equals("clicked")) { //$NON-NLS-1$
-			signals.add(0, signalInfo);
-		} else {
-			signals.add(signalInfo);
-		}
+		signals.add(signalInfo);
 	}
 
 	protected void addAccelInfo(AccelInfo accelInfo) {
