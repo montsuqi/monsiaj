@@ -29,6 +29,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -161,27 +162,19 @@ public class Interface {
 	}
 
 	private void connect(SignalHandler handler, SignalData data) {
-		Component target = detectActualTarget(data.getTarget());
+		Component target = data.getTarget();
+		if (target instanceof JComboBox && ! (target instanceof OptionMenu)) {
+			JComboBox combo = (JComboBox)target;
+			Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
+			if (prop != null) {
+				target = (JTextField)prop;
+			} else {
+				Object[] args = { combo.getName() };
+				throw new IllegalArgumentException(MessageFormat.format("no such combo: {0}", args)); //$NON-NLS-1$
+			}
+		}
 		Connector connector = Connector.getConnector(data.getName());
 		connector.connect(protocol, target, handler, data.getObject());
-	}
-
-	public Component detectActualTarget(Component target) {
-		if  ( ! (target instanceof JTextField)) {
-			return target;
-		}
-		// handle entries specially if it is a combo's child
-		String longName = getWidgetLongName(target);
-		int lastDot = longName.lastIndexOf('.');
-		if (lastDot <= 0) {
-			return target;
-		}
-		String parentLongName = longName.substring(0, lastDot);
-		Component parent = getWidgetByLongName(parentLongName);
-		if (parent != null && parent instanceof JComboBox && ! (parent instanceof OptionMenu)) {
-			return parent;
-		}
-		return target;
 	}
 
 	private void connectAfter(SignalHandler handler, SignalData data) {

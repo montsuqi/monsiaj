@@ -30,14 +30,12 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.Window;
 
 public abstract class SignalHandler {
@@ -123,15 +121,6 @@ public abstract class SignalHandler {
 				}
 				if ( ! isWindowActive(con, widget)) {
 					return;
-				}
-				if (widget instanceof JComboBox && ! (widget instanceof OptionMenu)) {
-					JComboBox combo = (JComboBox)widget;
-					Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
-					if (prop != null && prop instanceof JTextField) {
-						JTextField text = (JTextField)prop;
-						con.addChangedWidget(text);
-						widget = text;
-					}
 				}
 				java.awt.Window window = SwingUtilities.windowForComponent(widget);
 				try {
@@ -241,21 +230,7 @@ public abstract class SignalHandler {
 		});
 
 		registerHandler("changed", changed); //$NON-NLS-1$
-		registerHandler("entry_changed", new SignalHandler() { //$NON-NLS-1$
-			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
-				if (widget instanceof JComboBox && !(widget instanceof OptionMenu)) {
-					JComboBox combo = (JComboBox)widget;
-					Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
-					if (prop != null && prop instanceof JTextField) {
-						widget = (JTextField)prop;
-					}
-				}
-				con.addChangedWidget(widget);
-			}
-		});
+		registerHandler("entry_changed", changed); //$NON-NLS-1$
 		registerHandler("text_changed", changed); //$NON-NLS-1$
 		registerHandler("button_toggled", changed); //$NON-NLS-1$
 		registerHandler("selection_changed", changed); //$NON-NLS-1$
