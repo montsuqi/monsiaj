@@ -68,7 +68,7 @@ class WidgetMarshal {
 		valueTable = new HashMap();
 	}
 	
-	private void registerValue(Container widget, String valueName, Object opt) {
+	synchronized private void registerValue(Container widget, String valueName, Object opt) {
 		String longName = con.getInterface().getLongName(widget);
 		ValueAttribute va = (ValueAttribute)(valueTable.get(longName));
 
@@ -122,7 +122,7 @@ class WidgetMarshal {
 		}
 	}
 
-	boolean receiveEntry(Container widget) throws IOException {
+	synchronized boolean receiveEntry(Container widget) throws IOException {
 		if (con.receiveDataType()  == Type.RECORD) {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
@@ -143,7 +143,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendEntry(String name, Container widget) throws IOException {
+	synchronized boolean sendEntry(String name, Container widget) throws IOException {
 		String p = ((JTextField)widget).getText();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute v = getValue(name);
@@ -152,7 +152,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveNumberEntry(Container widget) throws IOException {
+	synchronized boolean receiveNumberEntry(Container widget) throws IOException {
 		if (con.receiveDataType() == Type.RECORD) {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
@@ -176,7 +176,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendNumberEntry(String name, Container widget) throws IOException {
+	synchronized boolean sendNumberEntry(String name, Container widget) throws IOException {
 		NumberEntry entry = (NumberEntry)widget;
 		BigDecimal value = entry.getValue();
 		con.sendPacketClass(PacketClass.ScreenData);
@@ -187,7 +187,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveLabel(Container widget) throws IOException {
+	synchronized boolean receiveLabel(Container widget) throws IOException {
 		if (con.receiveDataType() == Type.RECORD) {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
@@ -205,7 +205,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendText(String name, Container widget) throws IOException {
+	synchronized boolean sendText(String name, Container widget) throws IOException {
 		String p = ((JTextField)widget).getText();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
@@ -214,7 +214,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveText(Container widget) throws IOException {
+	synchronized boolean receiveText(Container widget) throws IOException {
 		if (con.receiveDataType() == Type.RECORD) {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
@@ -236,7 +236,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendButton(String name, Container widget) throws IOException {
+	synchronized boolean sendButton(String name, Container widget) throws IOException {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
 		con.sendString(name + '.' + va.getValueName());
@@ -244,7 +244,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	void setLabel(Container widget, String label) throws IOException {
+	synchronized void setLabel(Container widget, String label) throws IOException {
 		if (widget.getClass() == JLabel.class) {
 			((JLabel)widget).setText(label);
 		} else {
@@ -257,7 +257,7 @@ class WidgetMarshal {
 		}
 	}
 
-	boolean receiveButton(Container widget) throws IOException {
+	synchronized boolean receiveButton(Container widget) throws IOException {
 		if (con.receiveDataType() == Type.RECORD) {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
@@ -281,7 +281,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveCombo(Container widget) throws IOException {
+	synchronized boolean receiveCombo(Container widget) throws IOException {
 		String selected = null;
 		JComboBox combo = (JComboBox)widget;
 		DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
@@ -304,7 +304,12 @@ class WidgetMarshal {
 				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
 				int num = con.receiveInt();
 				for (int j = 0; j < num ; j++) {
-					String buff = con.receiveStringData();
+					String buff = null;
+					try {
+						buff = con.receiveStringData();
+					} catch (IllegalArgumentException e) {
+						logger.warn(e.getMessage());
+					}
 					if (buff != null && j < count) {
 						list.add(buff);
 					}
@@ -335,11 +340,11 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receivePandaCombo(Container widget) throws IOException {
+	synchronized boolean receivePandaCombo(Container widget) throws IOException {
 		return receiveCombo(widget);
 	}
 
-	boolean sendCList(String name, Container widget) throws IOException {
+	synchronized boolean sendCList(String name, Container widget) throws IOException {
 		ValueAttribute va = getValue(name);
 		JTable table = (JTable)widget;
 		ListSelectionModel selections = table.getSelectionModel();
@@ -352,7 +357,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveCList(Container widget) throws IOException {
+	synchronized boolean receiveCList(Container widget) throws IOException {
 		JTable table = (JTable)widget;
 		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
 		con.receiveDataTypeWithCheck(Type.RECORD);
@@ -438,7 +443,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendList(String name, Container widget) throws IOException {
+	synchronized boolean sendList(String name, Container widget) throws IOException {
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
 		ValueAttribute va = getValue(name);
@@ -452,7 +457,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveList(Container widget) throws IOException {
+	synchronized boolean receiveList(Container widget) throws IOException {
 		Container item;
 		int state;
 		JList list = (JList)widget;
@@ -516,7 +521,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendCalendar(String name, Container calendar) throws IOException {
+	synchronized 	boolean sendCalendar(String name, Container calendar) throws IOException {
 		String iName;
 		int year, month, day;
 		Date date = ((org.montsuqi.widgets.Calendar)calendar).getDate();
@@ -540,7 +545,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveCalendar(Container widget) throws IOException {
+	synchronized 	boolean receiveCalendar(Container widget) throws IOException {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		registerValue(widget, "", null); //$NON-NLS-1$
 		int nItem = con.receiveInt();
@@ -574,7 +579,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendNotebook(String name, Container notebook) throws IOException {
+	synchronized boolean sendNotebook(String name, Container notebook) throws IOException {
 		JTabbedPane tabbed = (JTabbedPane)notebook;
 		ValueAttribute va = getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
@@ -583,7 +588,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveNotebook(Container widget) throws IOException {
+	synchronized boolean receiveNotebook(Container widget) throws IOException {
 		int page = -1;
 		int state;
 
@@ -614,7 +619,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean sendProgressBar(String name, Container widget) throws IOException {
+	synchronized boolean sendProgressBar(String name, Container widget) throws IOException {
 		JProgressBar progress = (JProgressBar)widget;
 		ValueAttribute va = getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
@@ -623,7 +628,7 @@ class WidgetMarshal {
 		return true;
 	}
 
-	boolean receiveProgressBar(Container widget) throws IOException {
+	synchronized boolean receiveProgressBar(Container widget) throws IOException {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		StringBuffer longName = con.getWidgetNameBuffer();
