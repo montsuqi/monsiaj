@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.1 2003-09-12 08:18:39 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.2 2003-09-16 10:16:27 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
@@ -39,10 +39,8 @@
            destdir="${build.dir}"
            verbose="${compile.verbose}"
 	   deprecation="${compile.deprecation}" 
-           debug="${compile.debug}"
-	   debuglevel="lines,vars,source">
+           debug="${compile.debug}">
       <include name="**/*.java"/>
-      <exclude name="**/TableLayoutOld.java"/>
       <exclude name="${exclude.j2selogger}"/>
       <classpath refid="project.class.path"/>
     </javac>
