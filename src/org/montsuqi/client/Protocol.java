@@ -59,7 +59,7 @@ public class Protocol extends Connection {
 	private StringBuffer widgetName;
 	private Interface xml;
 	private boolean ignoreEvent = false;
-	private boolean inReceive = false;
+	private boolean receiving = false;
 
 	class ScreenType {
 		static final int NULL = 0;
@@ -82,7 +82,7 @@ public class Protocol extends Connection {
 		super(s, client.getEncoding());
 		this.client = client;
 		windowTable = new HashMap();
-		inReceive = false;
+		setReceiving(false);
 		ignoreEvent = false;
 		logger = Logger.getLogger(Connection.class);
 		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
@@ -343,7 +343,7 @@ public class Protocol extends Connection {
 		Component widget;
 		int type;
 
-		inReceive = true;
+		setReceiving(true);
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
 		sendLong((int)0);     /* get all data */ // In Java: int=>32bit, long=>64bit
@@ -409,8 +409,12 @@ public class Protocol extends Connection {
 		if (node != null) {
 			resetTimer(node.getWindow());
 		}
-		inReceive = false;
+		setReceiving(false);
 		return fCancel;
+	}
+
+	public boolean setReceiving(boolean receiving) {
+		return this.receiving = receiving;
 	}
 
 	boolean sendConnect(String user, String pass, String apl) throws IOException {
@@ -496,7 +500,7 @@ public class Protocol extends Connection {
 	}
 
 	public void send_event(Component widget, Object userData) throws IOException {
-		if (!inReceive  && !ignoreEvent) {
+		if ( ! isReceiving()  && !ignoreEvent) {
 			Component parent = widget;
 			while (parent.getParent() != null) {
 				parent = parent.getParent();
@@ -545,8 +549,8 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private void addChangedWidget(Component widget, Object userData) {
-		if (inReceive) {
+	public void addChangedWidget(Component widget, Object userData) {
+		if (isReceiving()) {
 			return;
 		}
 		Component parent = widget;
@@ -559,6 +563,10 @@ public class Protocol extends Connection {
 		if (node != null) {
 			node.addChangedWidget(name, widget);
 		}
+	}
+
+	public boolean isReceiving() {
+		return receiving;
 	}
 
 	public void changed(Component widget, Object userData) {
@@ -619,7 +627,7 @@ public class Protocol extends Connection {
 		Node node = (Node)windowTable.get(name);
 		if (node != null) {
 			node.getWindow().setVisible(false);
-			if ( ! inReceive) {
+			if ( ! isReceiving()) {
 				Iterator i = windowTable.keySet().iterator();
 				boolean checked = false;
 				while (i.hasNext()) {
@@ -634,7 +642,7 @@ public class Protocol extends Connection {
 	}
 
 	public void window_destroy(Component widget, Object userData) {
-		inReceive = true;
+		setReceiving(true);
 		client.exitSystem();
 	}
 

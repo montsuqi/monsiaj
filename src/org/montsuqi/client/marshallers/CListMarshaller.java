@@ -118,6 +118,9 @@ class CListMarshaller extends WidgetMarshaller {
 			}
 		}
 		tableModel.setColumnIdentifiers(labels);
+		con.setReceiving(false);
+		con.addChangedWidget(widget, null);
+		con.setReceiving(true);
 		return true;
 	}
 
