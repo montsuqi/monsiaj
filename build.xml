@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.16 2004-04-06 13:05:27 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.17 2004-04-19 11:26:11 noborus Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -15,6 +15,7 @@
   <property name="dist.dir"            value="dist"/>
   <property name="resources.dir"       value="resources"/>
   <property name="libs.dir"            value="libs"/>
+  <property name="report.dir"          value="report"/>
 
   <property name="webstart.url"        value="http://localhost/java-client/"/>
 
@@ -30,6 +31,7 @@
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${tmp.dir}"/>
     <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${report.dir}"/>
     <condition property="exclude.j2selogger" value="**/J2SELogger.java">
       <not>
         <available classname="java.util.logging.Logger"/>
@@ -64,6 +66,7 @@
       <exclude name="${exclude.log4jlogger}"/>
       <exclude name="${exclude.ssl}"/>
       <exclude name="${exclude.prefs}"/>
+      <exclude name="**/Test*.java"/>
       <classpath refid="project.class.path"/>
     </javac>
   </target>
@@ -99,7 +102,7 @@
          manifest="${resources.dir}/jmareceipt.mf"/>
     <!-- ant 1.5.x should use destfile instead of zipfile-->
     <copy todir="${dist.dir}">
-      <fileset dir="${libs.dir}" includes="*.jar"/>
+      <fileset dir="${libs.dir}" includes="*.jar" excludes="jfcunit.jar"/>
     </copy>
     <copy todir="${dist.dir}">
       <fileset dir="${build.dir}" includes="*.jnlp"/>
@@ -127,12 +130,73 @@
     description="Cleans all generated files.">
     <delete dir="${build.dir}" verbose="${clean.verbose}" quiet="true"/>
     <delete dir="${dist.dir}"  verbose="${clean.verbose}" quiet="true"/>
+    <delete dir="${report.dir}" verbose="${clean.verbose}" quiet="true"/>
   </target>
 
   <target name="jars"
     description="*obsolete* Deploy jars.">
     <echo message="Taret 'jars' is obsolete. Use 'dist' instead."/>
     <antcall target="dist"/>
+  </target>
+
+  <target name="compiletests" depends="compile,resources"
+    description="Compiles Test Java sources.">
+    <javac srcdir="${src.dir}"
+           destdir="${build.dir}"
+           verbose="${compile.verbose}"
+	   deprecation="${compile.deprecation}" 
+           debug="${compile.debug}">
+      <include name="**/Test*.java"/>
+      <classpath>
+	<pathelement path="libs/jfcunit.jar"/>
+	<pathelement path="${build.dir}"/> 
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="runtests" depends="compiletests"
+    description="Run all junit test.">
+    <junit printsummary="on"
+           fork="false"
+           haltonfailure="false">
+      <formatter type="xml"/>
+      <classpath>
+	<pathelement path="libs/jfcunit.jar"/>
+	<pathelement path="${build.dir}"/> 
+      </classpath>
+  
+      <batchtest todir="${report.dir}">
+	<fileset dir="${src.dir}">
+	  <include name="**/Test*.java"/>
+	</fileset>
+      </batchtest>
+    </junit>
+
+    <junitreport todir="${report.dir}">
+      <fileset dir="${report.dir}">
+	<include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${report.dir}"/>
+    </junitreport>
+
+  </target>
+
+  <target name="singletest" depends="compiletests"
+    description="Run single target junit test.">
+    <property name="testcase"
+              value="org/montsuqi/widgets/TestWindow"/>
+    <junit printsummary="on"
+           fork="false"
+           haltonfailure="false">
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+	<pathelement path="libs/jfcunit.jar"/>
+	<pathelement path="${build.dir}"/> 
+      </classpath>
+
+      <test name="${testcase}"/>
+
+    </junit>
   </target>
 
 </project>
