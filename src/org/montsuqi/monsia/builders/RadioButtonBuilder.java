@@ -36,11 +36,11 @@ class RadioButtonBuilder extends ContainerBuilder {
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
 		AbstractButton button = (AbstractButton)widget;
-		ButtonGroup group = null;
 		Map properties = info.getProperties();
 		if (properties.containsKey("group")) { //$NON-NLS-1$
-			group = xml.getButtonGroup((String)properties.get("group")); //$NON-NLS-1$
+			ButtonGroup group = xml.getButtonGroup((String)properties.get("group")); //$NON-NLS-1$
 			group.add(button);
+			button.putClientProperty("group", group); //$NON-NLS-1$
 		} else {
 			logger.warn(Messages.getString("WidgetBuilder.radio_button_has_no_group"), widget.getName()); //$NON-NLS-1$
 		}
