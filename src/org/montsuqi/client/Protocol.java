@@ -184,22 +184,26 @@ public class Protocol extends Connection {
 
 	private String checkScreen1() throws IOException {
 		String name = receiveString();
+		String cacheFileName = getCacheFileName(name);
 		int size = receiveLong();
 		int mtime = receiveLong();
 		/* int ctime = */ receiveLong();
-		String cachFileName = getCacheFileName(name);
 
-		File file = new File(cachFileName);
-		File parent = file.getParentFile();
-		parent.mkdirs();
-		file.createNewFile();
-		if (file.lastModified() < mtime * 1000L || file.length() != size) {
-			receiveFile(name, cachFileName);
+		if (isCacheOld(size, mtime, cacheFileName)) {
+			receiveFile(name, cacheFileName);
 			destroyNode(name);
 		} else {
 			sendPacketClass(PacketClass.NOT);
 		}
 		return name;
+	}
+
+	private boolean isCacheOld(int size, int mtime, String cacheFileName) throws IOException {
+		File file = new File(cacheFileName);
+		File parent = file.getParentFile();
+		parent.mkdirs();
+		file.createNewFile();
+		return file.lastModified() < mtime * 1000L || file.length() != size;
 	}
 
 	boolean receiveWidgetData(Component widget) throws IOException {
