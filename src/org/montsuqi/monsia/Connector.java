@@ -34,6 +34,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -114,7 +116,6 @@ abstract class Connector {
 				AbstractButton button = (AbstractButton)target;
 				button.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent event) {
-						System.out.println("invoking clicked for " + target.getName());
 						invoke(con, handler, target, other);
 					}
 				});
@@ -349,9 +350,9 @@ abstract class Connector {
 					return;
 				}
 				final JToggleButton toggleButton = (JToggleButton)target;
-				toggleButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						System.out.println("invoking toggled for " + target.getName() + " -> " + toggleButton.isSelected());
+				toggleButton.addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent e) {
+						toggleButton.setSelected( ! toggleButton.isSelected());
 						invoke(con, handler, target, other);
 					}
 				});
