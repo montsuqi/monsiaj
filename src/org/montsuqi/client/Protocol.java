@@ -37,6 +37,7 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
@@ -74,8 +75,7 @@ public class Protocol extends Connection {
 		static final int END_SESSION = 7;
 	}
 
-	private static final String VERSION = "1.2"; //$NON-NLS-1$
-//	private static final String VERSION = "symbolic:expand:no"; //$NON-NLS-1$
+	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 	
 	Protocol(Client client, Socket s) throws IOException {
 		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
@@ -90,7 +90,13 @@ public class Protocol extends Connection {
 	}
 
 	private static boolean isNetworkByteOrder() {
-		return VERSION.endsWith(":no"); //$NON-NLS-1$
+		StringTokenizer tokens = new StringTokenizer(VERSION, String.valueOf(':'));
+		while (tokens.hasMoreTokens()) {
+			if ("no".equals(tokens.nextToken())) { //$NON-NLS-1$
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public Interface getInterface() {
