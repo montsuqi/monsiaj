@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,7 +47,6 @@ import org.montsuqi.util.Logger;
 import org.xml.sax.SAXException;
 
 public class Interface {
-	private String fileName;
     private List topLevels;
     private Map infos;
     private Map widgets;
@@ -69,14 +69,13 @@ public class Interface {
 		focusWidget = widget;
 	}
 
-	public static Interface parseFile(String fileName, Protocol protocol) {
+	public static Interface parseInput(InputStream input, Protocol protocol) {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setNamespaceAware(true);
 		try {
 			SAXParser parser = factory.newSAXParser();
-			File file = new File(fileName);
-			MonsiaHandler handler = new MonsiaHandler(fileName);
-			parser.parse(file, handler);
+			MonsiaHandler handler = new MonsiaHandler();
+			parser.parse(input, handler);
 			return handler.getInterface(protocol);
 		} catch (IOException e) {
 			Logger.getLogger(Interface.class).fatal(e);
@@ -90,10 +89,9 @@ public class Interface {
 		}
 	}
 
-	Interface(String fileName, Map infos, List roots, Protocol protocol)
+	Interface(Map infos, List roots, Protocol protocol)
 	{
 		logger = Logger.getLogger(Interface.class);
-		this.fileName = fileName;
 		this.infos = infos;
 		widgets = new HashMap();
 		longNames = new HashMap();
