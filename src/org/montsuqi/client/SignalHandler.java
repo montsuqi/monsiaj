@@ -1,7 +1,6 @@
 package org.montsuqi.client;
 
 import java.awt.Component;
-import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -15,6 +14,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.Window;
 
 public abstract class SignalHandler {
 
@@ -23,8 +23,7 @@ public abstract class SignalHandler {
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 
 	protected boolean isWindowActive(Protocol con, Component widget) {
-		Window window = SwingUtilities.windowForComponent(widget);
-		return window == con.getActiveWindow();
+		return SwingUtilities.windowForComponent(widget) == con.getActiveWindow();
 	}
 
 	public static SignalHandler getSignalHandler(String handlerName) {
@@ -88,12 +87,18 @@ public abstract class SignalHandler {
 				if ( ! isWindowActive(con, widget)) {
 					return;
 				}
-				con.sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
-				con.sendWindowData();
-				synchronized (this) {
-					blockChangedHandlers();
-					con.getScreenData();
-					unblockChangedHandlers();
+				Window window = (Window)SwingUtilities.windowForComponent(widget);
+				try {
+					window.showBusyCursor();
+					con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
+					con.sendWindowData();
+					synchronized (this) {
+						blockChangedHandlers();
+						con.getScreenData();
+						unblockChangedHandlers();
+					}
+				} finally {
+					window.hideBusyCursor();
 				}
 			}
 		};

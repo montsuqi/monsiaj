@@ -22,11 +22,27 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Cursor;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 public class Window extends JFrame {
 	public Window() {
 		super();
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setGlassPane(new JComponent() {
+			{
+				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			}
+		});
+		getGlassPane().setVisible(false);
+	}
+
+	public void showBusyCursor() {
+		getGlassPane().setVisible(true);
+	}
+
+	public void hideBusyCursor() {
+		getGlassPane().setVisible(false);
 	}
 }
