@@ -24,10 +24,10 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.Map;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.TableConstraints;
@@ -35,34 +35,31 @@ import org.montsuqi.widgets.TableLayout;
 
 class TableBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		int cCount = info.getChildrenCount();
 		TableLayout tl = (TableLayout)parent.getLayout();
-		for (int i = 0; i < cCount; i++) {
+		for (int i = 0, n = info.getChildren().size(); i < n; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = null;
 			TableConstraints tc = new TableConstraints();
 			child = buildWidget(xml, wInfo, parent);
-			int pCount = wInfo.getPropertiesCount();
-			for (int j = 0; j < pCount; j++) {
-				Property p = cInfo.getProperty(j);
-				String name = p.getName();
-				String value = p.getValue();
-				if ("left_attach".equals(name)) { //$NON-NLS-1$
-					tc.leftAttach = ParameterConverter.toInteger(value);
-				} else if ("right_attach".equals(name)) { //$NON-NLS-1$
-					tc.rightAttach = ParameterConverter.toInteger(value);
-				} else if ("top_attach".equals(name)) { //$NON-NLS-1$
-					tc.topAttach = ParameterConverter.toInteger(value);
-				} else if ("bottom_attach".equals(name)) { //$NON-NLS-1$
-					tc.bottomAttach = ParameterConverter.toInteger(value);
-				} else if ("x_options".equals(value)) { //$NON-NLS-1$
-					// x_options = ParameterConverter.toInteger(value);
-				} else if ("y_options".equals(value)) { //$NON-NLS-1$
-					// y_options = ParameterConverter.toInteger(value);
-				} else {
-					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_for_Table"), name); //$NON-NLS-1$
-				}
+			Map properties = wInfo.getProperties();
+			if (properties.containsKey("left_attach")) { //$NON-NLS-1$
+				tc.leftAttach = ParameterConverter.toInteger((String)properties.get("left_attach")); //$NON-NLS-1$
+			}
+			if (properties.containsKey("right_attach")) { //$NON-NLS-1$
+				tc.rightAttach = ParameterConverter.toInteger((String)properties.get("right_attach")); //$NON-NLS-1$
+			}
+			if (properties.containsKey("top_attach")) { //$NON-NLS-1$
+				tc.topAttach = ParameterConverter.toInteger((String)properties.get("top_attach")); //$NON-NLS-1$
+			}
+			if (properties.containsKey("botom_attach")) { //$NON-NLS-1$
+				tc.bottomAttach = ParameterConverter.toInteger((String)properties.get("bottom_attach")); //$NON-NLS-1$
+			}
+			if (properties.containsKey("x")) { //$NON-NLS-1$
+				// x_options = ParameterConverter.toInteger(value);
+			}
+			if (properties.containsKey("y")) { //$NON-NLS-1$
+				// y_options = ParameterConverter.toInteger(value);
 			}
 			parent.add(child);
 			tl.setConstraints(child, tc);

@@ -23,6 +23,8 @@ copies.
 package org.montsuqi.monsia;
 
 import java.util.LinkedList;
+import java.util.Map;
+
 import org.montsuqi.util.Logger;
 import org.xml.sax.Attributes;
 
@@ -66,12 +68,14 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			WidgetInfo parent = getLastPendingWidget();
 			ChildInfo childInfo = parent.getLastChild();
 			// x, y property should go to childinfo
-			for (int i = 0, c = w.getPropertiesCount(); i < c; i++) {
-				Property p = w.getProperty(i);
-				String name = p.getName();
-				if ("x".equals(name) || "y".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
-					childInfo.addProperty(p);
-				}
+			Map widgetProperties = w.getProperties();
+			if (widgetProperties.containsKey("x")) { //$NON-NLS-1$
+				childInfo.addProperty("x", (String)widgetProperties.get("x")); //$NON-NLS-1$ //$NON-NLS-2$
+				widgetProperties.remove("x"); //$NON-NLS-1$
+			}
+			if (widgetProperties.containsKey("y")) { //$NON-NLS-1$
+				childInfo.addProperty("y", (String)widgetProperties.get("y")); //$NON-NLS-1$ //$NON-NLS-2$
+				widgetProperties.remove("y"); //$NON-NLS-1$
 			}
 		}
 
@@ -183,22 +187,22 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			} else if (localName.equals("name")) { //$NON-NLS-1$
 				w.setName(value);
 			} else if (localName.equals("visible")) { //$NON-NLS-1$
-				w.addProperty(new Property("visible", content.charAt(0) == 'T' ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				w.addProperty("visible", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("sensitive")) { //$NON-NLS-1$
-				w.addProperty(new Property("sensitive", content.charAt(0) == 'T' ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				w.addProperty("sensitive", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("can_default")) { //$NON-NLS-1$
-				w.addProperty(new Property("can_default", content.charAt(0) == 'T' ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				w.addProperty("can_default", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("can_focus")) { //$NON-NLS-1$
-				w.addProperty(new Property("can_focus", content.charAt(0) == 'T' ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				w.addProperty("can_focus", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("has_default")) { //$NON-NLS-1$
-				w.addProperty(new Property("has_default", content.charAt(0) == 'T' ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				w.addProperty("has_default", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("has_focus")) { //$NON-NLS-1$
-				w.addProperty(new Property("has_focus", content.charAt(0) == 'T' ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				w.addProperty("has_focus", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} else if (localName.equals("style_name")) { //$NON-NLS-1$
 				/* ignore */
 			} else {
 				/* some other attribute */
-				w.addProperty(new Property(propertyName, value));
+				w.addProperty(propertyName, value);
 			}
 		}
 	};
@@ -227,7 +231,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			properties.add(new Property(propertyName, content.toString()));
+			properties.put(propertyName, content.toString());
 			state = WIDGET_CHILD;
 		}
 	};

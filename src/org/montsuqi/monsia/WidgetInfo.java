@@ -23,15 +23,27 @@ copies.
 package org.montsuqi.monsia;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class WidgetInfo {
 
+	private String className;
+	private String name;
+	private WidgetInfo parent;
+	private final Map properties;     // <Property>
+	private final List atkProperties;  // <Property>
+	private final List signals;        // <SignalInfo>
+	private final List actions;        // <ATKActionInfo>
+	private final List relations;      // <ATKRelationInfo>
+	private final List accels;         // <Accel>
+	private final LinkedList children; // <ChildInfo> public Object getChildren;
+
 	WidgetInfo() {
 		parent = null;
-		properties = new ArrayList();
+		properties = new HashMap();
 		atkProperties = new ArrayList();
 		signals = new ArrayList();
 		actions = new ArrayList();
@@ -78,34 +90,25 @@ public class WidgetInfo {
 		this.name = name;
 	}
 
-	public int getPropertiesCount() {
-		return properties.size();
+	public Map getProperties() {
+		return properties;
 	}
 
-	List getProperties() {
-		return Collections.unmodifiableList(properties);
+	public String getProperty(String name) {
+		return (String)properties.get(name);
 	}
 
-	public Property getProperty(int i) {
-		return (Property)properties.get(i);
-	}
-
-	synchronized void setProperties(List properties) {
+	synchronized void setProperties(Map properties) {
 		this.properties.clear();
-		this.properties.addAll(properties);
+		this.properties.putAll(properties);
 	}
 
-	int getATKPropertiesCount() {
-		return atkProperties.size();
-	}
-
-	synchronized void setATKProperties(List properties) {
-		this.atkProperties.clear();
-		this.atkProperties.addAll(properties);
+	protected void addProperty(String name, String value) {
+		properties.put(name, value);
 	}
 
 	public List getSignals() {
-		return Collections.unmodifiableList(signals);
+		return signals;
 	}
 
 	synchronized void setSignals(List signals) {
@@ -123,12 +126,8 @@ public class WidgetInfo {
 		this.relations.addAll(relations);
 	}
 
-	int getAccelsCount() {
-		return accels.size();
-	}
-
 	public List getAccels() {
-		return Collections.unmodifiableList(accels);
+		return accels;
 	}
 
 	synchronized void setAccels(List accels) {
@@ -136,10 +135,6 @@ public class WidgetInfo {
 		this.accels.addAll(accels);
 	}
 
-	public int getChildrenCount() {
-		return children.size();
-	}
-	
 	void removeLastChild() {
 		children.removeLast();
 	}
@@ -157,39 +152,13 @@ public class WidgetInfo {
 	}
 	
 	public List getChildren() {
-		return Collections.unmodifiableList(children);
+		return children;
 	}
 
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("WidgetInfo[class="); //$NON-NLS-1$
-		buf.append(className);
-		buf.append(", name="); //$NON-NLS-1$
-		buf.append(name);
-		if (parent != null) {
-			buf.append(", parent="); //$NON-NLS-1$
-			buf.append(parent.getName());
-		}
-		buf.append("]"); //$NON-NLS-1$
-		return buf.toString();
-	}
-	private String className;
-	private String name;
-	private WidgetInfo parent;
-	private List properties;     // <Property>
-	private List atkProperties;  // <Property>
-	private List signals;        // <SignalInfo>
-	private List actions;        // <ATKActionInfo>
-	private List relations;      // <ATKRelationInfo>
-	private List accels;         // <Accel>
-	private LinkedList children; // <ChildInfo> 
-
-	protected void addProperty(Property property) {
-		properties.add(property);
-	}
 	public void addSignalInfo(SignalInfo signalInfo) {
 		signals.add(signalInfo);
 	}
+
 	protected void addAccelInfo(AccelInfo accelInfo) {
 		accels.add(accelInfo);
 	}

@@ -26,33 +26,29 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.Map;
 
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 
 public class WindowBuilder extends ContainerBuilder {
 
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
-		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
-			Property p = info.getProperty(i);
-			if ( ! p.getName().equals("position")) { //$NON-NLS-1$
-				continue;
-			}
-			String value = p.getValue();
+		Map properties = info.getProperties();
+		if (properties.containsKey("position")) { //$NON-NLS-1$
+			String value = (String)properties.get("position"); //$NON-NLS-1$
 			if (value.startsWith("GTK_")) { //$NON-NLS-1$
 				value = value.substring("GTK_".length()); //$NON-NLS-1$
 			}
-			if ( ! value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
-				break;
+			if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
+				Toolkit tk = Toolkit.getDefaultToolkit();
+				Dimension screen = tk.getScreenSize();
+				Dimension window = widget.getSize();
+				int x = (screen.width - window.width) / 2;
+				int y = (screen.height - window.height) / 2;
+				widget.setLocation(x, y);
 			}
-			Toolkit tk = Toolkit.getDefaultToolkit();
-			Dimension screen = tk.getScreenSize();
-			Dimension window = widget.getSize();
-			int x = (screen.width - window.width) / 2;
-			int y = (screen.height - window.height) / 2;
-			widget.setLocation(x, y);
 		}
 		return widget;
 	}

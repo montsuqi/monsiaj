@@ -24,6 +24,7 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -33,7 +34,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 
 class CListBuilder extends ContainerBuilder {
@@ -46,7 +46,7 @@ class CListBuilder extends ContainerBuilder {
 	}
 
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		int cCount = info.getChildrenCount();
+		int cCount = info.getChildren().size();
 
 		String[] columnNames = new String[cCount];
 		for (int i = 0; i < cCount; i++) {
@@ -56,13 +56,9 @@ class CListBuilder extends ContainerBuilder {
 			if ( ! "Label".equals(wInfo.getClassName())) { //$NON-NLS-1$
 				continue;
 			}
-			int pCount = wInfo.getPropertiesCount();
-			for (int j = 0; j < pCount; j++) {
-				Property p = wInfo.getProperty(j);
-				if ("label".equals(p.getName())) { //$NON-NLS-1$
-					columnNames[i] = p.getValue();
-					break;
-				}
+			Map properties = wInfo.getProperties();
+			if (properties.containsKey("label")) { //$NON-NLS-1$
+				columnNames[i] = (String)properties.get("label"); //$NON-NLS-1$
 			}
 		}
 		JTable table = (JTable)parent;

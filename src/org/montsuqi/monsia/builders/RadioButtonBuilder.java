@@ -24,12 +24,12 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.Map;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 
 class RadioButtonBuilder extends ContainerBuilder {
@@ -37,17 +37,12 @@ class RadioButtonBuilder extends ContainerBuilder {
 		Component widget = super.buildSelf(xml, parent, info);
 		AbstractButton button = (AbstractButton)widget;
 		ButtonGroup group = null;
-		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
-			Property p = info.getProperty(i);
-			if ("group".equals(p.getName())) { //$NON-NLS-1$
-				group = xml.getButtonGroup(p.getValue());
-				break;
-			}
-		}
-		if (group == null) {
-			logger.warn(Messages.getString("WidgetBuilder.radio_button_has_no_group"), widget.getName()); //$NON-NLS-1$
-		} else {
+		Map properties = info.getProperties();
+		if (properties.containsKey("group")) { //$NON-NLS-1$
+			group = xml.getButtonGroup((String)properties.get("group")); //$NON-NLS-1$
 			group.add(button);
+		} else {
+			logger.warn(Messages.getString("WidgetBuilder.radio_button_has_no_group"), widget.getName()); //$NON-NLS-1$
 		}
 		return widget;
 	}

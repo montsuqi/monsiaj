@@ -44,8 +44,7 @@ class ComboBuilder extends ContainerBuilder {
 
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		JComboBox combo = (JComboBox)parent;
-		int cCount = info.getChildrenCount();
-		if (cCount != 1) {
+		if (info.getChildren().size() != 1) {
 			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_Combo")); //$NON-NLS-1$
 		}
 		ChildInfo cInfo = info.getChild(0);

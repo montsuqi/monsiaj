@@ -43,7 +43,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected final StringBuffer content;
 	protected final Map widgets;
 	protected final List topLevels;
-	protected final List properties;
+	protected final Map properties;
 	protected final List signals;
 	protected final List accels;
 
@@ -63,7 +63,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		content = new StringBuffer();
 		widgets = new HashMap();
 		topLevels = new ArrayList();
-		properties = new ArrayList();
+		properties = new HashMap();
 		signals = new ArrayList();
 		accels = new ArrayList();
 		
@@ -174,26 +174,21 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		if (propertyType == PropertyType.NONE) {
 			// do nothing
 		} else if (propertyType == PropertyType.WIDGET) {
-			if (widget.getPropertiesCount() != 0) {
+			if (widget.getProperties().size() != 0) {
 				logger.warn(Messages.getString("AbstractDocumentHandler.we_already_read_all_the_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setProperties(properties);
 			properties.clear();
 		} else if (propertyType == PropertyType.ATK) {
-			if (widget.getATKPropertiesCount() != 0) {
-				logger.warn(Messages.getString("AbstractDocumentHandler.we_already_read_all_the_ATK_props_for_this_key")); //$NON-NLS-1$
-			}
-			widget.setATKProperties(properties);
 			properties.clear();
 		} else if (propertyType == PropertyType.CHILD) {
-			if (widget.getChildrenCount() == 0) {
+			if (widget.getChildren().size() == 0) {
 				logger.warn(Messages.getString("AbstractDocumentHandler.no_children_but_have_child_properties")); //$NON-NLS-1$
-				properties.clear();
 			} else {
 				ChildInfo info = widget.getLastChild();
 				info.setProperties(properties);
-				properties.clear();
 			}
+			properties.clear();
 		} else {
 			throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.unknown_property_type")); //$NON-NLS-1$
 		}

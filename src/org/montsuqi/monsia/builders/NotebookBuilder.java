@@ -24,19 +24,19 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.Map;
 
 import javax.swing.JTabbedPane;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 
 class NotebookBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		// create tabs first
 		JTabbedPane tabbed = (JTabbedPane)parent;
-		int cCount = info.getChildrenCount();
+		int cCount = info.getChildren().size();
 		if (cCount % 2 != 0) {
 			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.odd_number_of_notebook_childrens")); //$NON-NLS-1$
 		}
@@ -49,24 +49,14 @@ class NotebookBuilder extends ContainerBuilder {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			boolean isTab = false;
-			String label = null;
-			for (int j = 0, n = wInfo.getPropertiesCount(); j < n; j++) {
-				Property p = wInfo.getProperty(j);
-				String pName = p.getName();
-				String pValue = p.getValue();
-				if (pName.equals("child_name")) { //$NON-NLS-1$
-					isTab = true;
-				}
-				if (pName.equals("label")) { //$NON-NLS-1$
-					label = pValue;
-				}
-			}
-			if (isTab) {
-				if (label == null) {
+			Map properties = wInfo.getProperties();
+			if (properties.containsKey("child_name")) { //$NON-NLS-1$
+				if (properties.containsKey("label")) { //$NON-NLS-1$
+					labels[currentLabel] = ((String)properties.get("label")); //$NON-NLS-1$
+					currentLabel++;
+				} else {
 					throw new WidgetBuildingException(Messages.getString("WidgetBuilder.no_label_for_a_tab")); //$NON-NLS-1$
 				}
-				labels[currentLabel] = label;
-				currentLabel++;
 			} else {
 				Component body = buildWidget(xml, wInfo, parent);
 				bodies[currentBody] = body;

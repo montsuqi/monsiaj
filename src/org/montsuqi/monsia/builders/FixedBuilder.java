@@ -26,36 +26,29 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.util.Map;
 
 import javax.swing.JTable;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.ParameterConverter;
 
 class FixedBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		int cCount = info.getChildrenCount();
-		for (int i = 0; i < cCount; i++) {
+		for (int i = 0, n = info.getChildren().size(); i < n; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = null;
 			int x = 0, y = 0;
 			child = buildWidget(xml, wInfo, parent);
-			int pCount = cInfo.getPropertiesCount();
-			for (int j = 0; j < pCount; j++) {
-				Property p = cInfo.getProperty(j);
-				String name = p.getName();
-				String value = p.getValue();
-				if ("x".equals(name)) { //$NON-NLS-1$
-					x = ParameterConverter.toInteger(value);
-				} else if ("y".equals(name)) { //$NON-NLS-1$
-					y = ParameterConverter.toInteger(value);
-				} else {
-					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_for_Layout"), name); //$NON-NLS-1$
-				}
+			Map properties = cInfo.getProperties();
+			if (properties.containsKey("x")) { //$NON-NLS-1$
+				x = ParameterConverter.toInteger((String)properties.get("x")); //$NON-NLS-1$
+			}
+			if (properties.containsKey("y")) { //$NON-NLS-1$
+				y = ParameterConverter.toInteger((String)properties.get("y")); //$NON-NLS-1$
 			}
 			if (child instanceof JTable) {
 				child = underlayScrollPane(child);

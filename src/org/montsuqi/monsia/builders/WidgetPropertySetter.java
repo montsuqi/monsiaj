@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -53,7 +54,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.Property;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
@@ -70,25 +70,22 @@ abstract class WidgetPropertySetter {
 	private static Map propertyMap;
 
 	static void setProperties(Interface xml, Container parent, Component widget, WidgetInfo info) {
-		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
-			Property p = info.getProperty(i);
-			String name = p.getName();
+		Iterator i = info.getProperties().entrySet().iterator();
+		while (i.hasNext()) {
+			Map.Entry ent = (Map.Entry)i.next();
+			String name = (String)ent.getKey();
 			Class clazz = widget.getClass();
 			try {
 				WidgetPropertySetter setter = getSetter(clazz, name);
-				if (setter != null) {
-					try {
-						setter.set(xml, parent, widget, p.getValue());
-					} catch (ClassCastException e) {
-						String message = Messages.getString("WidgetPropertySetter.invalid_widget_type"); //$NON-NLS-1$
-						message = MessageFormat.format(message, new Object[] { clazz });	
-						throw new IllegalArgumentException(message);
-					}
-				} else {
+				if (setter == null) {
 					//logger.debug("setter not found");
+					continue;
 				}
-			} catch (IllegalArgumentException e) {
-				logger.info(e);
+				setter.set(xml, parent, widget, (String)ent.getValue());
+			} catch (ClassCastException e) {
+				String message = Messages.getString("WidgetPropertySetter.invalid_widget_type"); //$NON-NLS-1$
+				message = MessageFormat.format(message, new Object[] { clazz });	
+				throw new IllegalArgumentException(message);
 			}
 		}
 	}

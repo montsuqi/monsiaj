@@ -22,41 +22,37 @@ copies.
 
 package org.montsuqi.monsia;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChildInfo {
 
 	private WidgetInfo child;
-    private List properties;
+    private Map properties;
 
 	ChildInfo() {
 		this.child = null;
-		this.properties = new ArrayList();
+		this.properties = new HashMap();
 	}
 	
 	public WidgetInfo getWidgetInfo() {
 		return child;
 	}
 
-	void setProperties(List properties) {
-		this.properties.clear();
-		this.properties.addAll(properties);
-	}
-
-	public Property getProperty(int i) {
-		return (Property)properties.get(i);
-	}
-
-	public int getPropertiesCount() {
-		return properties.size();
-	}
-
 	void setWidgetInfo(WidgetInfo child) {
 		this.child = child;
 	}
 
-	void addProperty(Property p) {
-		properties.add(p);
+	public Map getProperties() {
+		return properties;
+	}
+
+	void setProperties(Map properties) {
+		this.properties.clear();
+		this.properties.putAll(properties);
+	}
+
+	public void addProperty(String name, String value) {
+		properties.put(name, value);
 	}
 }

@@ -33,8 +33,7 @@ import org.montsuqi.monsia.WidgetInfo;
 
 class ViewportBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		int cCount = info.getChildrenCount();
-		if (cCount != 1) {
+		if (info.getChildren().size() != 1) {
 			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_a_scrolled_window")); //$NON-NLS-1$
 		}
 		ChildInfo cInfo = info.getChild(0);

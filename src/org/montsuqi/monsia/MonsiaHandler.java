@@ -22,20 +22,12 @@ copies.
 
 package org.montsuqi.monsia;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.xml.sax.Attributes;
 
 class MonsiaHandler extends AbstractDocumentHandler {
 
-	protected final List atkActions;
-	protected final List relations;
-
 	MonsiaHandler() {
 		super();
-		atkActions = new ArrayList();
-		relations = new ArrayList();
 		startState = START;
 	}
 
@@ -171,8 +163,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			}
 			flushProperties();
 			flushSignals();
-			flushActions();
-			flushRelations();
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
@@ -197,7 +187,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if ( ! localName.equals("property")) { //$NON-NLS-1$
 				warnShouldFindClosing("property", localName); //$NON-NLS-1$
 			}
-			properties.add(new Property(propertyName, content.toString()));
+			properties.put(propertyName, content.toString());
 			propertyName = null;
 			state = WIDGET;
 		}
@@ -260,7 +250,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if (localName.equals("atkproperty")) { //$NON-NLS-1$
 				warnShouldFindClosing("atkproperty", localName); //$NON-NLS-1$
 			}
-			properties.add(new Property(propertyName, content.toString()));
+			properties.put(propertyName, content.toString());
 			propertyName = null;
 			state = WIDGET_ATK;
 		}
@@ -327,8 +317,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			}
 			flushProperties();
 			flushSignals();
-			flushActions();
-			flushRelations();
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
@@ -379,8 +367,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			}
 			flushProperties();
 			flushSignals();
-			flushActions();
-			flushRelations();
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
@@ -428,8 +414,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			}
 			flushProperties();
 			flushSignals();
-			flushActions();
-			flushRelations();
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
@@ -561,7 +545,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if ( ! localName.equals("property")) { //$NON-NLS-1$
 				warnShouldFindClosing("property", localName); //$NON-NLS-1$
 			}
-			properties.add(new Property(propertyName, content.toString()));
+			properties.put(propertyName, content.toString());
 			propertyName = null;
 			state = WIDGET_CHILD_PACKING;
 		}
@@ -621,16 +605,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			state == WIDGET_CHILD_PACKING_PROPERTY;
 	}
 
-	protected void flushActions() {
-		widget.setATKActions(atkActions);
-		atkActions.clear();
-	}
-
-	protected void flushRelations() {
-		widget.setRelations(relations);
-		relations.clear();
-	}
-
 	protected WidgetInfo createWidgetInfo(Attributes attrs) {
 	
 		String className = null;
@@ -677,8 +651,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			warnMissingAttribute("atkrelation"); //$NON-NLS-1$
 			return;
 		}
-	
-		relations.add(new ATKRelationInfo(target, type));
 	}
 
 	protected void handleSignal(Attributes attrs) {
@@ -717,8 +689,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 	protected void handleAccel(Attributes attrs) {
 		flushProperties();
 		flushSignals();
-		flushActions();
-		flushRelations();
 		int key = 0;
 		int modifiers = 0;
 		String signal = null;
@@ -745,8 +715,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 	protected void handleChild(Attributes attrs) {
 		flushProperties();
 		flushSignals();
-		flushActions();
-		flushRelations();
 		flushAccels();
 	
 		ChildInfo info = new ChildInfo();
@@ -784,7 +752,5 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			warnMissingAttribute("atkaction"); //$NON-NLS-1$
 			return;
 		}
-	
-		atkActions.add(new ATKActionInfo(actionName, description));
 	}
 }
