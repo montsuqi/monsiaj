@@ -44,7 +44,6 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JViewport;
 
-import org.montsuqi.monsia.AccelInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.monsia.Messages;
@@ -181,7 +180,6 @@ public class WidgetBuilder {
 	}
 
 	private void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
-		//addAccels(xml, widget, info);
 		addSignals(xml, widget, info);
 		widget.setName(info.getName());
 		xml.setName(info.getName(), widget);
@@ -193,21 +191,6 @@ public class WidgetBuilder {
 		while (i.hasNext()) {
 			SignalInfo sInfo = (SignalInfo)i.next();
 			xml.addSignal(sInfo.getHandler(), new SignalData(widget, sInfo));
-		}
-	}
-
-	private void addAccels(Interface xml, Component widget, WidgetInfo info) {
-		Iterator i = info.getAccels().iterator();
-		while (i.hasNext()) {
-			AccelInfo accel = (AccelInfo)i.next();
-			String accelSignal = accel.getSignal();
-			Iterator j = info.getSignals().iterator();
-			while (j.hasNext()) {
-				SignalInfo sInfo = (SignalInfo)i.next();
-				if (accelSignal.equals(sInfo.getName())) {
-					xml.addSignal(sInfo.getHandler(), new SignalData(widget, sInfo, accel));
-				}
-			}
 		}
 	}
 }

@@ -35,13 +35,15 @@ import org.montsuqi.monsia.WidgetInfo;
 class ContainerBuilder extends WidgetBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		Iterator i = info.getChildren().iterator();
-		RootPaneContainer rootPaneContainer = (RootPaneContainer)parent;
-		Container contentPane = rootPaneContainer.getContentPane();
+		if (parent instanceof RootPaneContainer) {
+			RootPaneContainer rootPaneContainer = (RootPaneContainer)parent;
+			parent = rootPaneContainer.getContentPane();
+		}
 		while (i.hasNext()) {
 			ChildInfo cInfo = (ChildInfo)i.next();
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = WidgetBuilder.buildWidget(xml, wInfo);
-			contentPane.add(child);
+			parent.add(child);
 		}
 	}
 }
