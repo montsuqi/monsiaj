@@ -611,7 +611,7 @@ abstract class WidgetPropertySetter {
 			void set(Interface xml, Container parent, Component widget, String value) {
 				boolean allowShrink = ParameterConverter.toBoolean(value);
 				if ( ! allowShrink) {
-					logger.warn("allow_shrink is not supported."); //$NON-NLS-1$
+					logger.info("allow_shrink is not supported."); //$NON-NLS-1$
 				}
 			}
 		});

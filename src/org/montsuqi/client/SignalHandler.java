@@ -50,7 +50,7 @@ public abstract class SignalHandler {
 		if (handlers.containsKey(handlerName)) {
 			return (SignalHandler)handlers.get(handlerName);
 		}
-		logger.warn("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
+		logger.info("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
 		return getSignalHandler(null);
 	}
 
@@ -131,8 +131,6 @@ public abstract class SignalHandler {
 				}
 				assert window != null;
 				con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
-				Object[] params = { window.getName(), widget.getName(), userData };
-				logger.info("sendEvent: window={0}, widget={1}, data={2}", params); //$NON-NLS-1$
 				con.sendWindowData();
 				synchronized (this) {
 					blockChangedHandlers();

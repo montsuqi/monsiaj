@@ -88,7 +88,7 @@ abstract class Connector {
 		if (connectors.containsKey(signalName)) {
 			return (Connector)connectors.get(signalName);
 		}
-		logger.warn("connector not found for signal {0}", signalName); //$NON-NLS-1$
+		logger.info("connector not found for signal {0}", signalName); //$NON-NLS-1$
 		return getConnector(null);
 	}
 

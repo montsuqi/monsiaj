@@ -24,7 +24,6 @@ package org.montsuqi.widgets;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -69,8 +68,6 @@ public class PandaTimer extends JComponent {
 			TimerListener l = listeners[i];
 			l.timerSignaled(e);
 		}
-		Object[] args = { getName(), new Date(), Thread.currentThread(), SwingUtilities.windowForComponent(this).getName() };
-		logger.debug("timer {0} of {3} ring at {1,time} in {2}", args); //$NON-NLS-1$
 	}
 
 	public void setDuration(int duration) {
@@ -80,8 +77,6 @@ public class PandaTimer extends JComponent {
 
 	public void reset() {
 		timer.restart();
-		Object[] args = { getName(), new Date(), Thread.currentThread(), SwingUtilities.windowForComponent(this).getName() };
-		logger.debug("timer {0} of {3} reset at {1,time} in {2}", args); //$NON-NLS-1$
 	}
 
 	protected void finalize() throws Throwable {

@@ -67,7 +67,7 @@ public class PandaHTML extends JPanel {
 
 	public void setURI(URL uri) {
 		Runnable loader = createLoader(uri);
-		logger.debug("loading {0}", uri); //$NON-NLS-1$
+		logger.info("loading {0}", uri); //$NON-NLS-1$
 		SwingUtilities.invokeLater(loader);
 	}
 

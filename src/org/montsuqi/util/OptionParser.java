@@ -103,7 +103,7 @@ public class OptionParser {
 			result.addAll(parseArray(program, args));
 			return (String[])result.toArray(new String[result.size()]);
 		} catch (IllegalArgumentException e) {
-			logger.info(e);
+			logger.warn(e);
 			return args;
 		}
 	}

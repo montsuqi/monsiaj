@@ -141,7 +141,7 @@ public class Configuration {
 			try {
 				return file.toURL();
 			} catch (MalformedURLException e) {
-				logger.debug(e);
+				logger.warn(e);
 			}
 		}
 		return Configuration.class.getResource(DEFAULT_STYLE_RESOURCE_NAME);

@@ -153,7 +153,7 @@ public class Protocol extends Connection {
 
 	private Node createNode(String name) {
 		Object[] args = { name };
-		logger.debug("creating node: {0}", args); //$NON-NLS-1$
+		logger.info("creating node: {0}", args); //$NON-NLS-1$
 		try {
 			InputStream input = new FileInputStream(getCacheFileName(name));
 			Node node = new Node(Interface.parseInput(input, this), name);
