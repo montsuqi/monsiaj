@@ -147,9 +147,8 @@ public class Protocol extends Connection {
 			case ScreenType.CURRENT_WINDOW:
 				try {
 					InputStream input = new FileInputStream(client.getCacheFileName(name));
-					Interface xml = Interface.parseInput(input, this);
+					node = new Node(Interface.parseInput(input, this), name);
 					input.close();
-					node = new Node(xml, name);
 					windowTable.put(name, node);
 				} catch (IOException e) {
 					throw new InterfaceBuildingException(e);
@@ -365,7 +364,7 @@ public class Protocol extends Connection {
 		setReceiving(true);
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
-		sendLong((int)0); // get all data // In Java: int=>32bit, long=>64bit
+		sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
 		boolean fCancel = false;
 		byte c;
 		while ((c = receivePacketClass()) == PacketClass.WindowName) {
@@ -640,7 +639,7 @@ public class Protocol extends Connection {
 				boolean checked = false;
 				while (i.hasNext()) {
 					String wName = (String)(i.next());
-					checked = checkWindow(wName, (Node)node);
+					checked = checkWindow(wName, node);
 				}
 				if ( ! checked) {
 					client.exitSystem();

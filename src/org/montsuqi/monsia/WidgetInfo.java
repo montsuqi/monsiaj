@@ -94,8 +94,8 @@ public class WidgetInfo {
 		return properties;
 	}
 
-	public String getProperty(String name) {
-		return (String)properties.get(name);
+	public String getProperty(String key) {
+		return (String)properties.get(key);
 	}
 
 	synchronized void setProperties(Map properties) {
@@ -103,8 +103,8 @@ public class WidgetInfo {
 		this.properties.putAll(properties);
 	}
 
-	protected void addProperty(String name, String value) {
-		properties.put(name, value);
+	protected void addProperty(String key, String value) {
+		properties.put(key, value);
 	}
 
 	public List getSignals() {

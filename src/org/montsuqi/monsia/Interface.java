@@ -336,13 +336,17 @@ public class Interface {
 			public void focusGained(FocusEvent e) {
 				invoke(handler, target, other);
 			}
-			public void focusLost(FocusEvent e) {}
+			public void focusLost(FocusEvent e) {
+				// inhibit instantiation
+			}
 		});
 	}
 
 	private void connectFocusOutEvent(final Component target, final Method handler, final Object other) {
 		target.addFocusListener(new FocusListener() {
-			public void focusGained(FocusEvent e) {}
+			public void focusGained(FocusEvent e) {
+				// inhibit instantiation
+			}
 			public void focusLost(FocusEvent e) {
 				invoke(handler, target, other);
 			}
@@ -494,9 +498,13 @@ public class Interface {
 		Calendar cal = (Calendar)target;
 		cal.addCalendarListener(new CalendarListener() {
 
-			public void previousMonth(CalendarEvent e) {}
+			public void previousMonth(CalendarEvent e) {
+				// inhibit instantiation
+			}
 
-			public void nextMonth(CalendarEvent e) {}
+			public void nextMonth(CalendarEvent e) {
+				// inhibit instantiation
+			}
 
 			public void daySelected(CalendarEvent e) {
 				invoke(handler, target, other);
@@ -586,8 +594,8 @@ public class Interface {
 		if ( ! signals.containsKey(handler)) {
 			signals.put(handler, new ArrayList());
 		}
-		List signals = (List)this.signals.get(handler);
-		signals.add(0, sData);
+		List signalsForHandle = (List)this.signals.get(handler);
+		signalsForHandle.add(0, sData);
 	}
 
 	public void addAccels(Component widget, WidgetInfo info) {

@@ -47,6 +47,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
@@ -198,11 +200,11 @@ abstract class WidgetPropertySetter {
 				JLabel label = (JLabel)widget;
 				value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
 				if ("CENTER".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(JLabel.CENTER);
+					label.setHorizontalAlignment(SwingConstants.CENTER);
 				} else if ("LEFT".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(JLabel.LEFT);
+					label.setHorizontalAlignment(SwingConstants.LEFT);
 				} else if ("RIGHT".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(JLabel.RIGHT);
+					label.setHorizontalAlignment(SwingConstants.RIGHT);
 				} else {
 					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
 				}
@@ -254,11 +256,11 @@ abstract class WidgetPropertySetter {
 				JTextField text = (JTextField)widget;
 				value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
 				if ("CENTER".equals(value)) { //$NON-NLS-1$
-					text.setHorizontalAlignment(JTextField.CENTER);
+					text.setHorizontalAlignment(SwingConstants.CENTER);
 				} else if ("LEFT".equals(value)) { //$NON-NLS-1$
-					text.setHorizontalAlignment(JTextField.LEFT);
+					text.setHorizontalAlignment(SwingConstants.LEFT);
 				} else if ("RIGHT".equals(value)) { //$NON-NLS-1$
-					text.setHorizontalAlignment(JTextField.RIGHT);
+					text.setHorizontalAlignment(SwingConstants.RIGHT);
 				} else {
 					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
 				}
@@ -330,13 +332,13 @@ abstract class WidgetPropertySetter {
 				JProgressBar progress = (JProgressBar)widget;
 				value = normalize(value, "PROGRESS_"); //$NON-NLS-1$
 				if ("LEFT_TO_RIGHT".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(JProgressBar.HORIZONTAL);
+					progress.setOrientation(SwingConstants.HORIZONTAL);
 				} else if ("RIGHT_TO_LEFT".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(JProgressBar.HORIZONTAL);
+					progress.setOrientation(SwingConstants.HORIZONTAL);
 				} else if ("TOP_TO_BOTTOM".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(JProgressBar.VERTICAL);
+					progress.setOrientation(SwingConstants.VERTICAL);
 				} else if ("BOTTOM_TO_TOP".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(JProgressBar.VERTICAL);
+					progress.setOrientation(SwingConstants.VERTICAL);
 				}
 			}
 		});
@@ -460,11 +462,11 @@ abstract class WidgetPropertySetter {
 				JScrollPane scroll = (JScrollPane)widget;
 				value = normalize(value, "POLICY_"); //$NON-NLS-1$
 				if ("ALWAYS".equals(value)) { //$NON-NLS-1$
-					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 				} else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
-					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				} else if ("NEVER".equals(value)) { //$NON-NLS-1$
-					scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 				} else {
 					throw new IllegalArgumentException(value);
 				}
@@ -476,11 +478,11 @@ abstract class WidgetPropertySetter {
 				JScrollPane scroll = (JScrollPane)widget;
 				value = normalize(value, "POLICY_"); //$NON-NLS-1$
 				if ("ALWAYS".equals(value)) { //$NON-NLS-1$
-					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 				} else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
-					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 				} else if ("NEVER".equals(value)) { //$NON-NLS-1$
-					scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				} else {
 					throw new IllegalArgumentException(value);
 				}

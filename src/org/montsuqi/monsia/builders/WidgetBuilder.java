@@ -24,6 +24,7 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -125,12 +126,12 @@ public class WidgetBuilder {
 
 		font = (FontUIResource)UIManager.get("Button.font"); //$NON-NLS-1$
 		if (font != null) {
-			font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN, font.getSize2D() * 0.9f));
+			font = new FontUIResource(font.deriveFont(Font.PLAIN, font.getSize2D() * 0.9f));
 			UIManager.put("Button.font", font); //$NON-NLS-1$
 		}
 		font = (FontUIResource)UIManager.get("ComboBox.font"); //$NON-NLS-1$
 		if (font != null) {
-			font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN));
+			font = new FontUIResource(font.deriveFont(Font.PLAIN));
 			UIManager.put("ComboBox.font", font); //$NON-NLS-1$
 		}
 		UIManager.put("Button.margin", new InsetsUIResource(0, 0, 0, 0)); //$NON-NLS-1$

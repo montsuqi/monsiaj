@@ -24,8 +24,8 @@ package org.montsuqi.util;
 
 public class ByteOrder {
 
-	// inhibit instantiation
 	private ByteOrder() {
+		// inhibit instantiation
 	}
 
 	public static long reverse(long l) {

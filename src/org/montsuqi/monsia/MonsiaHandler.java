@@ -430,9 +430,8 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("widget")) { //$NON-NLS-1$
 				WidgetInfo parent = widget;
-				ChildInfo info = (ChildInfo)(parent.getLastChild());
 				widget = createWidgetInfo(attrs);
-				info.setWidgetInfo(widget);
+				parent.getLastChild().setWidgetInfo(widget);
 				widget.setParent(parent);
 				widgetDepth++;
 				propertyType = PropertyType.NONE;
@@ -673,7 +672,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			} else if (attrName.equals("object")) { //$NON-NLS-1$
 				object = value;
 			} else if (attrName.equals("last_modification_time")) { //$NON-NLS-1$
-				/* Do nothing. */;
+				/* Do nothing. */
 			} else {
 				warnUnknownAttribute("signal", attrName); //$NON-NLS-1$
 			}

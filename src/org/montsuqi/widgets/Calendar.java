@@ -38,6 +38,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
 import java.util.Date;
 
 public class Calendar extends JComponent {
@@ -111,7 +113,7 @@ public class Calendar extends JComponent {
 		String[] dayOfWeekNames = symbols.getShortWeekdays();
 		for (int col = 0; col < 7; col++) {
 			JLabel dayOfWeek = new JLabel(dayOfWeekNames[col + 1]);
-			dayOfWeek.setHorizontalAlignment(JLabel.CENTER);
+			dayOfWeek.setHorizontalAlignment(SwingConstants.CENTER);
 			dateCellPanel.add(dayOfWeek);
 		}
 
@@ -119,7 +121,7 @@ public class Calendar extends JComponent {
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				final JButton cell = new JButton();
-				cell.setHorizontalAlignment(JButton.RIGHT);
+				cell.setHorizontalAlignment(SwingConstants.RIGHT);
 				
 				cell.setMargin(margin);
 				final int finalRow = row;

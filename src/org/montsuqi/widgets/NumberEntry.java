@@ -33,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -43,7 +44,7 @@ public class NumberEntry extends JTextField {
 
 	public NumberEntry(String text, int columns) {
 		super(new NumberDocument(), text, columns);
-		setHorizontalAlignment(JTextField.RIGHT);
+		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
 

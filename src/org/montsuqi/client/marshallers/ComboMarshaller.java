@@ -104,7 +104,7 @@ class ComboMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
 		Interface xml = con.getInterface();
-		JTextField editor = (JTextField)xml.getComboEditor(combo);
+		JTextField editor = xml.getComboEditor(combo);
 		entryMarshaller.send(manager, xml.getWidgetLongName(editor), editor);
 	}
 }

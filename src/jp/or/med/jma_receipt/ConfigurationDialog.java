@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 class ConfigurationDialog extends JDialog {
@@ -98,7 +99,7 @@ class ConfigurationDialog extends JDialog {
 		panel.setLayout(new GridBagLayout());
 
 		JLabel userLabel = new JLabel();
-		userLabel.setHorizontalAlignment(JLabel.RIGHT);
+		userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		userLabel.setText(Messages.getString("ConfigurationDialog.User")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -108,7 +109,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(userLabel, gridBagConstraints);
 
 		JLabel passwordLabel = new JLabel();
-		passwordLabel.setHorizontalAlignment(JLabel.RIGHT);
+		passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		passwordLabel.setText(Messages.getString("ConfigurationDialog.Password")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -128,7 +129,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(userEntry, gridBagConstraints);
 
 		passwordEntry = new JPasswordField();
-		passwordEntry.setHorizontalAlignment(JTextField.LEFT);
+		passwordEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		passwordEntry.setText(""); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -139,7 +140,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(passwordEntry, gridBagConstraints);
 
 		JLabel hostLabel = new JLabel();
-		hostLabel.setHorizontalAlignment(JLabel.RIGHT);
+		hostLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		hostLabel.setText(Messages.getString("ConfigurationDialog.Host")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -149,7 +150,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(hostLabel, gridBagConstraints);
 
 		hostEntry = new JTextField();
-		hostEntry.setHorizontalAlignment(JTextField.LEFT);
+		hostEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		hostEntry.setText(conf.getHost());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -160,7 +161,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(hostEntry, gridBagConstraints);
 
 		JLabel portLabel = new JLabel();
-		portLabel.setHorizontalAlignment(JLabel.RIGHT);
+		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		portLabel.setText(Messages.getString("ConfigurationDialog.Port")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -170,7 +171,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(portLabel, gridBagConstraints);
 
 		portEntry = new JTextField();
-		portEntry.setHorizontalAlignment(JTextField.RIGHT);
+		portEntry.setHorizontalAlignment(SwingConstants.RIGHT);
 		portEntry.setText(String.valueOf(conf.getPort()));
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -181,7 +182,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(portEntry, gridBagConstraints);
 
 		JLabel appLabel = new JLabel();
-		appLabel.setHorizontalAlignment(JLabel.RIGHT);
+		appLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		appLabel.setText(Messages.getString("ConfigurationDialog.Application")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -191,7 +192,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(appLabel, gridBagConstraints);
 
 		appEntry = new JTextField();
-		appEntry.setHorizontalAlignment(JTextField.LEFT);
+		appEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		appEntry.setText("orca00"); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -202,7 +203,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(appEntry, gridBagConstraints);
 
 		JLabel styleLabel = new JLabel();
-		styleLabel.setHorizontalAlignment(JLabel.RIGHT);
+		styleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		styleLabel.setText(Messages.getString("ConfigurationDialog.Style")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -212,7 +213,7 @@ class ConfigurationDialog extends JDialog {
 		panel.add(styleLabel, gridBagConstraints);
 
 		styleEntry = new JTextField();
-		styleEntry.setHorizontalAlignment(JTextField.LEFT);
+		styleEntry.setHorizontalAlignment(SwingConstants.LEFT);
 		styleEntry.setText(String.valueOf(conf.getStyleFile()));
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;

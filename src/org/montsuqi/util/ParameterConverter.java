@@ -23,8 +23,10 @@ copies.
 package org.montsuqi.util;
 
 public class ParameterConverter {
-	// inhibit instantiation
-	private ParameterConverter() {}
+
+	private ParameterConverter() {
+		// inhibit instantiation
+	}
 
 	public static int toInteger(String s) {
 		return Integer.parseInt(s);

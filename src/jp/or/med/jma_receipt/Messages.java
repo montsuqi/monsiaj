@@ -33,7 +33,9 @@ public class Messages {
 		ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private Messages() {
+		// inhibit instantiation
 	}
+
 	public static String getString(String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key);

@@ -34,6 +34,7 @@ public class PandaCombo extends JComboBox {
 }
 
 class PandaComboBoxEditor extends BasicComboBoxEditor {
+
 	public PandaComboBoxEditor() {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
 		editor.setBorder(null);
@@ -43,6 +44,7 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 		public BorderlessPandaEntry(String value,int n) {
 			super(value,n);
 		}
+
 		// workaround for 4530952
 		public void setText(String s) {
 			if (getText().equals(s)) {
@@ -50,7 +52,10 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 			}
 			super.setText(s);
 		}
-		public void setBorder(Border b) {}
+
+		public void setBorder(Border b) {
+			// inhibit instantiation
+		}
 	}
     
 }

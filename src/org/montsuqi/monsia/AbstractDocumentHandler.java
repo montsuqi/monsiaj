@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -247,11 +248,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			String modifier = tokens.nextToken();
 			modifier = removePrefix(modifier);
 			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
-				modifiers |= KeyEvent.SHIFT_MASK;
+				modifiers |= InputEvent.SHIFT_MASK;
 			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
 				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
-				modifiers |= KeyEvent.CTRL_MASK;
+				modifiers |= InputEvent.CTRL_MASK;
 			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
 				logger.warn(Messages.getString("AbstractDocumentHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
 			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
@@ -268,11 +269,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			int value = Integer.parseInt(mask);
 			switch (value) {
 			case 1:
-				return KeyEvent.BUTTON1_MASK;
+				return InputEvent.BUTTON1_MASK;
 			case 2:
-				return KeyEvent.BUTTON2_MASK;
+				return InputEvent.BUTTON2_MASK;
 			case 3:
-				return KeyEvent.BUTTON3_MASK;
+				return InputEvent.BUTTON3_MASK;
 			default:
 				logger.warn(Messages.getString("AbstractDocumentHandler.only_button_1_3_are_supported_in_Java")); //$NON-NLS-1$
 				return 0;

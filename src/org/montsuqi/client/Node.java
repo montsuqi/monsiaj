@@ -61,9 +61,9 @@ class Node {
 		return changedWidgets;
 	}
 
-	void addChangedWidget(String name, Component widget) {
-		if ( ! changedWidgets.containsKey(name)) {
-			changedWidgets.put(name, widget);
+	void addChangedWidget(String widgetName, Component widget) {
+		if ( ! changedWidgets.containsKey(widgetName)) {
+			changedWidgets.put(widgetName, widget);
 		}
 	}
 }

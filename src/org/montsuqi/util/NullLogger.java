@@ -31,6 +31,7 @@ class NullLogger extends Logger {
 	}
 
 	private NullLogger() {
+		// inhibit instantiation
 	}
 
 	public void trace(String message) {

@@ -283,13 +283,13 @@ class Connection {
 			sendString(String.valueOf(value));
 			break;
 		case Type.NUMBER:
-			sendFloat((double)value);
+			sendFloat(value);
 			break;
 		case Type.INT:
 			sendInt(value);
 			break;
 		case Type.FLOAT:
-			sendFloat((double)value);
+			sendFloat(value);
 			break;
 		case Type.BOOL:
 			sendBoolean(value != 0);

@@ -40,6 +40,7 @@ public class TableConstraints {
 	public boolean yFill;
 
 	public TableConstraints() {
+		// inhibit instantiation
 	}
 
 	public TableConstraints(GridBagConstraints gbc) {
@@ -76,17 +77,5 @@ public class TableConstraints {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		return gbc;
-	}
-	
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("TableChild["); //$NON-NLS-1$
-		//		buf.append(comp.toString());
-		buf.append("leftAttach=");   buf.append(leftAttach); //$NON-NLS-1$
-		buf.append(", rightAttach=");  buf.append(rightAttach); //$NON-NLS-1$
-		buf.append(", topAttach=");    buf.append(topAttach); //$NON-NLS-1$
-		buf.append(", bottomAttach="); buf.append(bottomAttach); //$NON-NLS-1$
-		buf.append("]"); //$NON-NLS-1$
-		return buf.toString();
 	}
 }

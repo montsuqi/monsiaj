@@ -23,7 +23,11 @@ copies.
 package org.montsuqi.monsia;
 
 class PropertyType {
-	private PropertyType() {}
+
+	private PropertyType() {
+		// inhibit instantiation
+	}
+
 	static final PropertyType NONE = new PropertyType();
 	static final PropertyType WIDGET = new PropertyType();
 	static final PropertyType ATK = new PropertyType();
