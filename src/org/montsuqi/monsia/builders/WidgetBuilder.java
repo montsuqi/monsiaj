@@ -126,14 +126,14 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaEntry",     PandaEntry.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaHTML",      PandaHTML.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaPS",        PandaPreviewPane.class,  defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("PandaText",      JTextArea.class,     defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Placeholder",    JPanel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("RadioButton",    RadioButton.class,   new RadioButtonBuilder()); //$NON-NLS-1$
 		registerWidgetClass("ScrolledWindow", JScrollPane.class,   new ScrolledWindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Table",          Table.class,         new TableBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Text",           JTextArea.class,     defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Text",           JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("ToggleButton",   ToggleButton.class,  defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VBox",           VBox.class,          defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VPaned",         VPaned.class,        defaultContainerBuilder); //$NON-NLS-1$
