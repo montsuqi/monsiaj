@@ -54,6 +54,7 @@ import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Notebook;
+import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.Fixed;
@@ -104,6 +105,7 @@ public class WidgetBuilder {
 		registerWidgetClass("List",           JList.class,         new ListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Notebook",       Notebook.class,   new NotebookBuilder()); //$NON-NLS-1$
 		registerWidgetClass("NumberEntry",    NumberEntry.class,   defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("OptionMenu",     OptionMenu.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaCombo",     PandaCombo.class,    new PandaComboBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaCList",     PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaEntry",     PandaEntry.class,    defaultWidgetBuilder); //$NON-NLS-1$
