@@ -117,7 +117,8 @@ class WidgetMarshal {
 		if (style != null) {
 			style.apply(widget);
 		} else {
-			logger.debug(Messages.getString("WidgetMarshal.ignoring_style"), new Object[] { style, widget.getName() }); //$NON-NLS-1$
+			String widgetName = widget == null ? "null" : widget.getName();
+			logger.debug(Messages.getString("WidgetMarshal.ignoring_style"), new Object[] { styleName, widgetName }); //$NON-NLS-1$
 		}
 	}
 

@@ -35,9 +35,14 @@ import java.util.Properties;
 
 public class Style {
 
+	private String name;
 	private Color background;
 	private Color foreground;
 	private Font font;
+
+	private Style(String name) {
+		this.name = name;
+	}
 
 	public void apply(Container widget) {
 		if (font != null) {
@@ -72,7 +77,7 @@ public class Style {
 			String attribute = name.substring(dot + 1);
 			Style style;
 			if ( ! styles.containsKey(styleName)) {
-				style = new Style();
+				style = new Style(styleName);
 				styles.put(styleName, style);
 			} else {
 				style = (Style)styles.get(styleName);
@@ -101,5 +106,9 @@ public class Style {
 
 	private void setBackground(Color bg) {
 		this.background = bg;
+	}
+
+	public String getName() {
+		return name;
 	}
 }
