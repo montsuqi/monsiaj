@@ -1,2 +1,2 @@
-Main-Class: jp.or.med.jma_receipt.Launcher
+Main-Class: jp.or.med.jma_receipt.JMAReceiptLauncher
 Class-Path: xercesImpl.jar xmlParserAPIs.jar pandaclient.jar

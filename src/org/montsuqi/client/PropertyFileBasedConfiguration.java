@@ -20,7 +20,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jma_receipt;
+package org.montsuqi.client;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,18 +31,22 @@ import java.util.Properties;
 
 class PropertyFileBasedConfiguration extends Configuration {
 
-	static final String CONFIGURATION_FILE = System.getProperty("user.home") + File.separator + "jma-receipt.properties"; //$NON-NLS-1$ //$NON-NLS-2$
 	Properties props;
+	String fileName;
 
-	PropertyFileBasedConfiguration() {
+	public PropertyFileBasedConfiguration(String title, Class clazz) {
+		super(title);
 		props = new Properties();
-	}
-
-	void load() {
+		String base = clazz.getName();
+		int pos = base.indexOf('.');
+		if (pos != -1) {
+			base = base.substring(pos);
+		}
+		fileName = System.getProperty("user.home") + File.separator + base + ".properties"; //$NON-NLS-1$ //$NON-NLS-2$
 		try {
-			props.load(new FileInputStream(CONFIGURATION_FILE));
+			props.load(new FileInputStream(fileName));
 		} catch (FileNotFoundException e) {
-			Object[] args = { CONFIGURATION_FILE };
+			Object[] args = { fileName };
 			logger.warn("configuration file not found: {0}", args); //$NON-NLS-1$
 		} catch (IOException e) {
 			logger.warn(e);
@@ -51,27 +55,27 @@ class PropertyFileBasedConfiguration extends Configuration {
 
 	void save() {
 		try {
-			props.store(new FileOutputStream(CONFIGURATION_FILE), null);
+			props.store(new FileOutputStream(fileName), null);
 		} catch (IOException e) {
 			logger.warn(e);
 		}
 	}
 
-	String getString(String key, String defaultValue) {
+	public String getString(String key, String defaultValue) {
 		String value = props.getProperty(key);
 		return value != null ? value : defaultValue;
 	}
 
-	int getInt(String key, int defaultValue) {
+	public int getInt(String key, int defaultValue) {
 		String value = props.getProperty(key);
 		return value != null ? Integer.parseInt(value) : defaultValue;
 	}
 
-	void setString(String key, String value) {
+	public void setString(String key, String value) {
 		props.put(key, value);
 	}
 
-	void setInt(String key, int value) {
+	public void setInt(String key, int value) {
 		props.put(key, String.valueOf(value));
 	}
 }

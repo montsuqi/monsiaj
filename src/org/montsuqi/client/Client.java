@@ -62,6 +62,17 @@ public class Client implements Runnable {
 		protocolVersion = 1;
 	}
 
+	void setConfiguration(Configuration conf) {
+		setUser(conf.getString("user", System.getProperty("user.name"))); //$NON-NLS-1$ //$NON-NLS-2$
+		setPass(new String(conf.getPass()));
+		setHost(conf.getString("host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$)
+		setPortNumber(conf.getInt("port", Client.PORT_GLTERM)); //$NON-NLS-1$
+		setCurrentApplication(conf.getString("application", "orca00")); //$NON-NLS-1$ //$NON-NLS-2$
+		setEncoding("EUC-JP"); //$NON-NLS-1$
+		setStyles(conf.getString("style", "")); //$NON-NLS-1$ //$NON-NLS-2$
+		setCache(System.getProperty("user.home") + File.separator + "cache"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 	private static Client parseCommandLine(String[] args) {
 		Client client = new Client();
 

@@ -20,7 +20,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jma_receipt;
+package org.montsuqi.client;
 
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -29,12 +29,9 @@ class PreferenceBasedConfiguration extends Configuration {
 
 	private Preferences prefs;
 
-	PreferenceBasedConfiguration() {
-		prefs = Preferences.userNodeForPackage(PreferenceBasedConfiguration.class);
-	}
-
-	void load() {
-		// do nothing
+	public PreferenceBasedConfiguration(String title, Class clazz) {
+		super(title);
+		prefs = Preferences.userNodeForPackage(clazz);
 	}
 
 	void save() {
@@ -45,19 +42,19 @@ class PreferenceBasedConfiguration extends Configuration {
 		}
 	}
 
-	String getString(String key, String defaultValue) {
+	public String getString(String key, String defaultValue) {
 		return prefs.get(key, defaultValue);
 	}
 
-	int getInt(String key, int defaultValue) {
+	public int getInt(String key, int defaultValue) {
 		return prefs.getInt(key, defaultValue);
 	}
 
-	void setString(String key, String value) {
+	public void setString(String key, String value) {
 		prefs.put(key, value);
 	}
 
-	void setInt(String key, int value) {
+	public void setInt(String key, int value) {
 		prefs.putInt(key, value);
 	}
 }
