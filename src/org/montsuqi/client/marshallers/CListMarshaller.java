@@ -129,9 +129,11 @@ class CListMarshaller extends WidgetMarshaller {
 		ListSelectionModel selections = table.getSelectionModel();
 		for (int i = 0, rows = table.getRowCount(), opt = ((Integer)va.getOpt()).intValue(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + '.' + va.getVName() + '[' + String.valueOf(i) + ']' + (i + opt));
+			String iName = name + '.' + va.getVName() + '[' + String.valueOf(i + opt) + ']';
+			con.sendString(iName);
 			con.sendDataType(Type.BOOL);
-			con.sendBoolean(selections.isSelectedIndex(i));
+			boolean selected = selections.isSelectedIndex(i);
+			con.sendBoolean(selected);
 		}
 		return true;
 	}
