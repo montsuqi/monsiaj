@@ -22,26 +22,13 @@ copies.
 
 package org.montsuqi.widgets;
 
-import javax.swing.JComponent;
+import java.io.IOException;
 
-class PandaPreviewComponent extends JComponent {
+import javax.swing.JPanel;
 
-	public PandaPreviewComponent() {
-		super();
-	}
+public abstract class Preview extends JPanel {
 
-	public void zoomIn() {
-		// TODO Auto-generated method stub
-		System.out.println("zoom-in performed"); //$NON-NLS-1$
-	}
-
-	public void zoomOut() {
-		// TODO Auto-generated method stub
-		System.out.println("zoom-out performed"); //$NON-NLS-1$
-	}
-
-	public void load(String fileName) {
-		// TODO Auto-generated method stub
-		System.out.println("loading: " + fileName); //$NON-NLS-1$
-	}
+	public abstract void zoomIn();
+	public abstract void zoomOut();
+	public abstract void load(String fileName) throws IOException;
 }

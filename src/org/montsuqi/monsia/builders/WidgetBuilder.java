@@ -64,7 +64,7 @@ import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaCombo;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
-import org.montsuqi.widgets.PandaPreview;
+import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.VBox;
@@ -108,7 +108,7 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaCList",     PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaEntry",     PandaEntry.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaHTML",      PandaHTML.class,     defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("PandaPS",        PandaPreview.class,  defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("PandaPS",        PandaPreviewPane.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$

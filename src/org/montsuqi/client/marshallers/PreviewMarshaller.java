@@ -27,13 +27,13 @@ import java.io.IOException;
 
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
-import org.montsuqi.widgets.PandaPreview;
+import org.montsuqi.widgets.PandaPreviewPane;
 
 class PreviewMarshaller extends WidgetMarshaller {
 
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		PandaPreview preview = (PandaPreview)widget;
+		PandaPreviewPane preview = (PandaPreviewPane)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
