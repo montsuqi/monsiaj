@@ -49,6 +49,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
@@ -557,6 +558,11 @@ abstract class WidgetPropertySetter {
 				Icon newIcon = stock.getIcon();
 				if (oldIcon == null && newIcon != null) {
 					item.setIcon(newIcon);
+				}
+				KeyStroke oldAccelerator = item.getAccelerator();
+				KeyStroke newAccelerator = stock.getAccelerator();
+				if (oldAccelerator == null && newAccelerator != null) {
+					item.setAccelerator(newAccelerator);
 				}
 			}
 		});
