@@ -174,7 +174,7 @@ public class Interface {
 			logger.fatal(e);
 			throw new HandlerInvocationException(e);
 		} catch (InvocationTargetException e) {
-			Throwable cause = e.getCause();
+			Throwable cause = e.getTargetException(); // should use getCause() [J2SE 1.4+]
 			logger.fatal(cause);
 			throw new HandlerInvocationException(e);
 		}
