@@ -104,6 +104,7 @@
 		<copy todir="${dist.bin.dir}">
 			<fileset dir="${build.dir}" includes="*.jar, *.jnlp"/>
 			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, libwebkitsample.jnilib"/>
+			<fileset dir="." includes="README.txt"/>
 		</copy>
 	</target>
 
@@ -132,6 +133,9 @@
 		<copy todir="${macosx.app.dir}/Contents/MacOS">
 			<fileset dir="${resources.dir}" includes="${macosx.app.stub}"/>
 		</copy>
+		<copy todir="${dist.bin.macosx.dir}">
+			<fileset dir="." includes="README.txt"/>
+		</copy>
 		<chmod perm="755" file="${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
 	</target>
 		
@@ -144,7 +148,7 @@
 
 	<target name="dist-src-copy-files" depends="prepare">
 		<copy todir="${dist.src.dir}">
-			<fileset dir="." includes="src/**,resources/**,libs/**,docs/**,build.xml,Makefile"
+			<fileset dir="." includes="src/**,resources/**,libs/**,build.xml,Makefile,README.txt"
 	excludes="**/CVS"/>
 		</copy>
 	</target>
