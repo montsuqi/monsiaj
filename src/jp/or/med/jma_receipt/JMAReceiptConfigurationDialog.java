@@ -46,7 +46,6 @@ import org.montsuqi.client.ConfigurationDialog;
 
 public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
-	private JTextField appEntry;
 	private JTextField hostEntry;
 	private JPasswordField passwordEntry;
 	private JTextField portEntry;
@@ -58,7 +57,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		conf.setPass(passwordEntry.getPassword());
 		conf.setString("host", hostEntry.getText()); //$NON-NLS-1$
 		conf.setInt("port", Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
-		conf.setString("application", appEntry.getText()); //$NON-NLS-1$
+		conf.setString("application", "orca00"); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setString("style", styleEntry.getText()); //$NON-NLS-1$
 	}
 
