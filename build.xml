@@ -77,7 +77,7 @@
 	
 	<target name="resources-copy-jnlp" depends="prepare">
 		<native2ascii src="${resources.dir}" dest="${build.dir}"
-			includes="*.jnlp" encoding="EUC-JP"/>
+			includes="*.jnlp" encoding="UTF-8"/>
 		<filter token="webstarturl" value="${webstart.url}"/>
 		<copy todir="${tmp.dir}" filtering="true">
 			<fileset dir="${build.dir}" includes="*.jnlp"/>
@@ -102,9 +102,8 @@
 	<target name="dist-bin-copy-files" depends="jars">
 		<!-- ant 1.5.x should use destfile instead of jarfile-->
 		<copy todir="${dist.bin.dir}">
-			<fileset dir="${dist.dir}" includes="jmareceipt.jar, pandaclient.jar"/>
-			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, *.jnilib"/>
-			<fileset dir="${build.dir}" includes="*.jnlp"/>
+			<fileset dir="${build.dir}" includes="*.jar, *.jnlp"/>
+			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, libwebkitsample.jnilib"/>
 		</copy>
 	</target>
 
@@ -172,14 +171,17 @@
 	</target>
 
 	<target name="jars" depends="compile,resources">
-		<jar jarfile="${dist.dir}/pandaclient.jar"
+		<jar jarfile="${build.dir}/pandaclient.jar"
 			basedir="${build.dir}"
 			includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,**/*.png"
 			manifest="${resources.dir}/pandaclient.mf"/>
-		<jar jarfile="${dist.dir}/jmareceipt.jar"
+		<jar jarfile="${build.dir}/jmareceipt.jar"
 			basedir="${build.dir}"
 			includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
 			manifest="${resources.dir}/jmareceipt.mf"/>
+		<jar jarfile="${build.dir}/libwebkitsample.jnilib.jar"
+			basedir="${libs.dir}"
+			includes="libwebkitsample.jnilib"/>
 	</target>
 
 	<target name="compiletests" depends="compile,resources"
@@ -234,11 +236,11 @@
 	</target>
 
 	<target name="jar.replay" depends="compiletests,resources">
-		<jar jarfile="${dist.dir}/pandarecord.jar"
+		<jar jarfile="${build.dir}/pandarecord.jar"
 			basedir="${build.dir}"
 			includes="org/montsuqi/tools/TestXMLRecording.class, org/montsuqi/tools/*.xml"
 			manifest="${resources.dir}/pandarecord.mf"/>
-		<jar jarfile="${dist.dir}/pandareplay.jar"
+		<jar jarfile="${build.dir}/pandareplay.jar"
 			basedir="${build.dir}"
 			includes="org/montsuqi/tools/TestXMLReplay.class, org/montsuqi/tools/XMLFileFilter.class"
 			manifest="${resources.dir}/pandareplay.mf"/>
@@ -249,7 +251,7 @@
 			<fileset dir="${libs.dir}" includes="*.jar"/>
 		</copy>
 		<copy todir="${dist.replay.dir}">
-			<fileset dir="${dist.dir}" includes="*.jar"/>
+			<fileset dir="${build.dir}" includes="*.jar"/>
 		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.replay.dir}.zip">
