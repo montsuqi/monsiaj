@@ -130,7 +130,18 @@ public abstract class SignalHandler {
 					window = SwingUtilities.windowForComponent(widget);
 				}
 				assert window != null;
-				con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
+				String windowName = window.getName();
+				String widgetName = widget.getName();
+				String event;
+				if (userData == null) {
+					event = widgetName;
+				} else {
+					event = userData.toString();
+					if (event.length() == 0) {
+						event = widgetName;
+					}
+				}
+				con.sendEvent(windowName, widgetName, event);
 				con.sendWindowData();
 				synchronized (this) {
 					blockChangedHandlers();
