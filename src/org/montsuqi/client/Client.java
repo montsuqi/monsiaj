@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.text.MessageFormat;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
@@ -59,7 +61,7 @@ public class Client implements Runnable {
 
 		String[] files = options.parse(Client.class.getName(), args);
 		
-		Configuration conf = Configuration.createConfiguration(Client.class); //$NON-NLS-1$
+		Configuration conf = new Configuration(Client.class);
 		conf.setPort(options.getInt("port")); //$NON-NLS-1$
 		conf.setHost(options.getString("host")); //$NON-NLS-1$
 		conf.setCache(options.getString("cache")); //$NON-NLS-1$
@@ -101,24 +103,23 @@ public class Client implements Runnable {
 		return new Client(conf);
 	}
 
-	public void connect() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public void connect() throws IOException {
 		protocol = new Protocol(this);
 		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
 	}
 
-	Socket createSocket() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		String factoryName;
-		Object[] options;
-		if (conf.getUseSSL()) {
-			factoryName = "org.montsuqi.client.SSLSocketCreator"; //$NON-NLS-1$
-			options = new Object[] { new Boolean(conf.getVerify()) };
-		} else {
-			factoryName = "org.montsuqi.client.SocketCreator"; //$NON-NLS-1$
-			options = null;
+	Socket createSocket() throws IOException {
+		int port = conf.getPort();
+		String host = conf.getHost();
+		Socket socket = new Socket(host, port);
+		if ( ! conf.getUseSSL()) {
+			return socket;
 		}
-		Class clazz = Class.forName(factoryName);
-		SocketCreator creator = (SocketCreator)clazz.newInstance();
-		return creator.create(conf.getHost(), conf.getPort(), options);
+		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+		SSLSocket ssl = (SSLSocket)factory.createSocket(socket, host, port, true);
+		// key, cert, capath, cafile
+		ssl.setNeedClientAuth(conf.getVerify());
+		return ssl;
 	}
 
 	String getCacheRoot() {

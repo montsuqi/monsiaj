@@ -23,14 +23,17 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.UIManager;
 import org.montsuqi.util.Logger;
 
-public abstract class Configuration {
+public class Configuration {
 
 	private String pass;
 	private boolean configured;
+	private Preferences prefs;
+
 
 	private static final String PORT_KEY = "port"; //$NON-NLS-1$
 	private static final String HOST_KEY = "host"; //$NON-NLS-1$
@@ -61,44 +64,17 @@ public abstract class Configuration {
 
 	protected static final Logger logger = Logger.getLogger(Configuration.class);
 
-	public static Configuration createConfiguration(Class clazz) {
+	public Configuration(Class clazz) {
+		prefs = Preferences.userNodeForPackage(clazz);
+	}
+
+	protected void save() {
 		try {
-			Constructor cntr = getConstructor();
-			Object[] params = { clazz };
-			return (Configuration)cntr.newInstance(params);
-		} catch (Exception e) {
-			logger.fatal(e);
-			return null;
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			logger.warn(e);
 		}
 	}
-
-	private static Constructor getConstructor() throws SecurityException, NoSuchMethodException {
-		String[] classes = {
-			"org.montsuqi.client.PreferenceBasedConfiguration", //$NON-NLS-1$
-			"org.montsuqi.client.PropertyFileBasedConfiguration" //$NON-NLS-1$
-		};
-		Class clazz = null;
-		for (int i = 0; i < classes.length; i++) {
-			try {
-				clazz = Class.forName(classes[i]);
-				break;
-			} catch (ClassNotFoundException e) {
-				continue;
-			}
-		}
-		assert clazz != null;
-		Class[] params = { Class.class };
-		return clazz.getConstructor(params);
-	}
-
-	abstract void save();
-	abstract String getString(String key, String defaultValue);
-	abstract int getInt(String key, int defaultValue);
-	abstract boolean getBoolean(String key, boolean defaultValue);
-
-	abstract void setString(String key, String value);
-	abstract void setInt(String key, int value);
-	abstract void setBoolean(String key, boolean value);
 
 	boolean isConfigured() {
 		return configured;
@@ -219,6 +195,30 @@ public abstract class Configuration {
 
 	public void setUseLogViewer(boolean flag) {
 		setBoolean(USE_LOG_VIEWER_KEY, flag);
+	}
+
+	protected String getString(String key, String defaultValue) {
+		return prefs.get(key, defaultValue);
+	}
+
+	protected int getInt(String key, int defaultValue) {
+		return prefs.getInt(key, defaultValue);
+	}
+
+	protected boolean getBoolean(String key, boolean defaultValue) {
+		return prefs.getBoolean(key, defaultValue);
+	}
+
+	protected void setString(String key, String value) {
+		prefs.put(key, value);
+	}
+
+	protected void setInt(String key, int value) {
+		prefs.putInt(key, value);
+	}
+
+	protected void setBoolean(String key, boolean value) {
+		prefs.putBoolean(key, value);
 	}
 
 	// logger class, debug mode

@@ -23,7 +23,6 @@ copies.
 package org.montsuqi.client;
 
 import java.awt.GridBagLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -36,7 +35,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.montsuqi.util.ExtensionFileFilter;
@@ -148,8 +146,6 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 			public void actionPerformed(ActionEvent ev) {
 				try {
 					UIManager.setLookAndFeel(lafs[combo.getSelectedIndex()].getClassName());
-					Window w = SwingUtilities.windowForComponent(combo);
-					SwingUtilities.updateComponentTreeUI(w);
 				} catch (Exception e) {
 					logger.warn(e);
 				}

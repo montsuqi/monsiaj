@@ -64,7 +64,7 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 
-	Protocol(Client client) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+	Protocol(Client client) throws IOException {
 		super(client.createSocket(), client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		cacheRoot = client.getCacheRoot();

@@ -66,7 +66,7 @@ public class Launcher {
 		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) { //$NON-NLS-1$ //$NON-NLS-2$
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
 		}
-		conf = Configuration.createConfiguration(this.getClass());
+		conf = new Configuration(this.getClass());
 		target = new Client(conf);
 	}
 
