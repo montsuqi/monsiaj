@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.PropertyConfigurator;
 
 class Log4JLogger extends Logger {
 
@@ -33,7 +34,12 @@ class Log4JLogger extends Logger {
 
 	static {
 		loggers = new HashMap();
-		BasicConfigurator.configure();
+		String propertyFile = System.getProperty("monsia.logger.log4j.properties");
+		if (propertyFile != null) {
+			PropertyConfigurator.configure(propertyFile);
+		} else {
+			BasicConfigurator.configure();
+		}
 	}
 	
 	public static synchronized Logger getLogger(String name) {
