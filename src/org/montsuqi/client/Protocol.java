@@ -159,27 +159,14 @@ public class Protocol extends Connection {
 			break;
 		}
 	}
-
-	private static final BitSet ALNUM;
-	static {
-		ALNUM = new BitSet(256);
-		ALNUM.clear();
-		
-	}
 	
 	private static final BitSet NOENCODE;
 	static {
 		NOENCODE = new BitSet(256);
-		NOENCODE.clear();
-		for (int i = 'a'; i <= 'z'; i++) {
-			NOENCODE.set(i);
-		}
-		for (int i = 'A'; i <= 'Z'; i++) {
-			NOENCODE.set(i);
-		}
-		for (int i = '0'; i <= '9'; i++) {
-			NOENCODE.set(i);
-		}
+		NOENCODE.set(0, NOENCODE.length(), false);
+		NOENCODE.set('a', 'z', true);
+		NOENCODE.set('A', 'Z', true);
+		NOENCODE.set('0', '9', true);
 	}
 
 	private static String encode(String s) {
