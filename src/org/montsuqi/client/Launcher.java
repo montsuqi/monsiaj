@@ -58,6 +58,9 @@ public class Launcher {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
 			System.setProperty("monsia.logger.factory", "org.montsuqi.util.StdErrLogger"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+		if (SystemEnvironment.isMacOSX()) {
+			System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 	public static void main(String[] args) {
