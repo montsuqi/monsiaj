@@ -666,7 +666,11 @@ class WidgetBuilder {
 			}
 		}
 		JTable table = (JTable)parent;
-		DefaultTableModel tableModel = new DefaultTableModel(0, cCount);
+		DefaultTableModel tableModel = new DefaultTableModel(0, cCount) {
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		tableModel.setColumnIdentifiers(columnNames);
 		table.setModel(tableModel);
 
