@@ -73,7 +73,7 @@ class WidgetBuilder {
 		registerClass("Button", javax.swing.JButton.class); //$NON-NLS-1$
 		registerClass("Calendar", org.montsuqi.widgets.Calendar.class);
 		registerClass("CList", javax.swing.JTable.class); //$NON-NLS-1$
-		registerClass("CheckButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
+		registerClass("CheckButton", javax.swing.JCheckBox.class); //$NON-NLS-1$
 		registerClass("Combo", javax.swing.JComboBox.class); //$NON-NLS-1$
 		registerClass("Entry", javax.swing.JTextField.class); //$NON-NLS-1$
 		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
@@ -246,7 +246,10 @@ class WidgetBuilder {
 								null);
 		registerWidgetBuildData("Progress", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("ProgressBar", defaultBuildWidgetData); //$NON-NLS-1$
-		registerWidgetBuildData("RadioButton", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("RadioButton", //$NON-NLS-1$
+								"buildRadioButton", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								null);
 		registerWidgetBuildData("RadioMenuItem", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildMenuItemChildren", //$NON-NLS-1$
@@ -393,6 +396,25 @@ class WidgetBuilder {
 	Container buildList(WidgetInfo info) {
 		Container widget = standardBuildWidget(info);
 		((JList)widget).setModel(new DefaultListModel());
+		return widget;
+	}
+
+	Container buildRadioButton(WidgetInfo info) {
+		logger.enter("buildRadioButton");
+		AbstractButton widget = (AbstractButton)standardBuildWidget(info);
+		ButtonGroup group = null;
+		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
+			Property p = info.getProperty(i);
+			if ("group".equals(p.getName())) {
+				group = xml.getButtonGroup(p.getValue());
+				break;
+			}
+		}
+		if (group == null) {
+			throw new WidgetBuildingException("RadioButton has no group");
+		}
+		group.add(widget);
+		logger.leave("buildRadioButton");
 		return widget;
 	}
 
