@@ -62,7 +62,7 @@ public class Protocol extends Connection {
 	private Window activeWindow;
 
 	private static final Logger logger = Logger.getLogger(Protocol.class);
-	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
+	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
 	Protocol(Client client, String encoding, String styles, String cacheRoot, int protocolVersion) throws IOException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
