@@ -73,12 +73,12 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 			logger.warn(e);
 		}
 		SwingUtilities.updateComponentTreeUI(this);
-		setSize(320,240);
+		setSize(480, 240);
 	}
 
 	protected JComponent createIcon() {
 		JLabel icon = new JLabel();
-		URL iconURL = getClass().getResource("/orca2.jpg"); //$NON-NLS-1$
+		URL iconURL = getClass().getResource("/jp/or/med/jma_receipt/standard60.png"); //$NON-NLS-1$
 		if (iconURL != null) {
 			icon.setIcon(new ImageIcon(iconURL));
 		}
