@@ -197,7 +197,7 @@ public class Protocol extends Connection {
 		}
 
 		if (node != null) {
-			JFrame w = node.window;
+			JFrame w = node.getWindow();
 			switch (type) {
 			case SCREEN_NEW_WINDOW:
 			case SCREEN_CURRENT_WINDOW:
@@ -441,7 +441,7 @@ public class Protocol extends Connection {
 		/* reset GtkPandaTimer if exists */
 		node = (Node)windowTable.get(window);
 		if (node != null) {
-			resetTimer(node.window);
+			resetTimer(node.getWindow());
 		}
 		inReceive = false;
 		return fCancel;
@@ -495,11 +495,12 @@ public class Protocol extends Connection {
 			String wName = (String)(i.next());
 			sendString(wName);
 			Node node = (Node)windowTable.get(wName);
-			Iterator j = node.updateWidget.keySet().iterator();
+			Iterator j = node.getChangedWidgets().entrySet().iterator();
 			while (j.hasNext()) {
-				String name = (String)(j.next());
-				Container widget = (Container)(node.updateWidget.get(name));
-				sendWidgetData(wName, widget);
+				Map.Entry e = (Map.Entry)j.next();
+				String name = (String)e.getKey();
+				Container widget = (Container)e.getValue();
+				sendWidgetData(name, widget);
 			}
 			sendPacketClass(PacketClass.END);
 		}
@@ -523,7 +524,7 @@ public class Protocol extends Connection {
 		Iterator i = windowTable.values().iterator();
 		while (i.hasNext()) {
 			Node node = (Node)i.next();
-			node.updateWidget = new HashMap();
+			node.clearChangedWidgets();
 		}
 	}
 
@@ -587,46 +588,44 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private void updateWidget(Container widget, Object userData) {
-		String name;
-		String windowName;
-		if ( ! inReceive) {
-			Container parent = widget;
-			while (parent.getParent() != null) {
-				parent = parent.getParent();
-			}
-			//ResetTimer(GTK_WINDOW (window));
-			name = xml.getLongName(widget);
-			String wName = parent.getName();
-			Node node = (Node)windowTable.get(wName);
-			if (node != null && ! node.updateWidget.containsKey(name)) {
-				node.updateWidget.put(name, widget);
-			}
+	private void addChangedWidget(Container widget, Object userData) {
+		if (inReceive) {
+			return;
+		}
+		Container parent = widget;
+		while (parent.getParent() != null) {
+			parent = parent.getParent();
+		}
+		String name = xml.getLongName(widget);
+		String windowName = parent.getName();
+		Node node = (Node)windowTable.get(windowName);
+		if (node != null) {
+			node.addChangedWidget(name, widget);
 		}
 	}
 
 	public void chagned(Container widget, Object userData) {
-		updateWidget(widget, null);
+		addChangedWidget(widget, null);
 	}
 
 	public void entry_changed(Container widget, Object userData) {
-		updateWidget(widget, null);
+		addChangedWidget(widget, null);
 	}
 	
 	public void text_changed(Container widget, Object userData) {
-		updateWidget(widget, userData);
+		addChangedWidget(widget, userData);
 	}
 
 	public void button_toggled(Container widget, Object userData) {
-		updateWidget(widget, userData);
+		addChangedWidget(widget, userData);
 	}
 
 	public void selection_changed(Container widget, Object userData) {
-		updateWidget(widget, userData);
+		addChangedWidget(widget, userData);
 	}
 
 	public void click_column(Container widget, Object userData) {
-		updateWidget(widget, userData);
+		addChangedWidget(widget, userData);
 	}
 
 	public void entry_set_editable(Container widget, Object userData) {
@@ -656,18 +655,18 @@ public class Protocol extends Connection {
 */
 
 	public void switch_page(Container widget, Object userData) {
-		updateWidget(widget, userData);
+		addChangedWidget(widget, userData);
 	}
 
 	private boolean checkWindow(String name, Node node) {
-		return node.window != null;
+		return node.getWindow() != null;
 	}
 
 	public void window_close(Container widget, Object userData) {
 		String name = widget.getName();
 		Node node = (Node)(windowTable.get(name));
 		if (node != null) {
-			node.window.setVisible(false);
+			node.getWindow().setVisible(false);
 			if ( ! inReceive) {
 				Iterator i = windowTable.keySet().iterator();
 				boolean checked = false;
