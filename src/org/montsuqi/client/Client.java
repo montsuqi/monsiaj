@@ -112,7 +112,7 @@ public class Client implements Runnable {
 				s = ssl;
 			}
 			
-			protocol = new Protocol(this, s);
+			protocol = new Protocol(this, s, "EUC-JP");
 			connected = true;
 		} catch (IOException e) {
 			logger.fatal(e);

@@ -58,8 +58,8 @@ public class Protocol extends Connection {
 		return VERSION;
 	}
 	
-	public Protocol(Client client, Socket s) throws IOException {
-		super(s);
+	public Protocol(Client client, Socket s, String encoding) throws IOException {
+		super(s, encoding);
 		this.client = client;
 		classTable = new HashMap();
 		windowTable = new HashMap();
