@@ -120,7 +120,7 @@ public class Interface {
 	}
 
 	private String connectMethodName(String signalName) {
-		StringBuffer methodName = new StringBuffer("connect");
+		StringBuffer methodName = new StringBuffer("connect"); //$NON-NLS-1$
 		char[] chars = signalName.toCharArray();
 		boolean needUpperCase = true;
 		for (int i = 0; i < chars.length; i++) {
@@ -383,7 +383,7 @@ public class Interface {
 
 	public String getText(String msgid) {
 		if (msgid == null || msgid.length() == 0) {
-			return "";
+			return ""; //$NON-NLS-1$
 		} else {
 			return msgid;
 		}

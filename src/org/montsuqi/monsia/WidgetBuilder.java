@@ -43,8 +43,8 @@ public class WidgetBuilder {
 	static WidgetBuildData defaultBuildWidgetData;
 	static WidgetBuildData defaultBuildContainerData;
 	static {
-		defaultBuildWidgetData = new WidgetBuildData("standardBuildWidget", null, null);
-		defaultBuildContainerData = new WidgetBuildData("standardBuildWidget", "standardBuildChildren", null);
+		defaultBuildWidgetData = new WidgetBuildData("standardBuildWidget", null, null); //$NON-NLS-1$
+		defaultBuildContainerData = new WidgetBuildData("standardBuildWidget", "standardBuildChildren", null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public WidgetBuilder(Interface xml) {
@@ -58,49 +58,49 @@ public class WidgetBuilder {
 
 	private void initClassMap() {
 		classMap = new HashMap();
-		registerClass("Button", javax.swing.JButton.class);
+		registerClass("Button", javax.swing.JButton.class); //$NON-NLS-1$
 		//regsiterClass("Calendar", null);
-		registerClass("CList", javax.swing.JTable.class);
-		registerClass("CheckButton", javax.swing.JTable.class);
-		registerClass("Combo", javax.swing.JComboBox.class);
-		registerClass("Entry", javax.swing.JTextField.class);
-		registerClass("Fixed", org.montsuqi.widgets.Fixed.class);
-		registerClass("Frame", javax.swing.JLabel.class);
+		registerClass("CList", javax.swing.JTable.class); //$NON-NLS-1$
+		registerClass("CheckButton", javax.swing.JTable.class); //$NON-NLS-1$
+		registerClass("Combo", javax.swing.JComboBox.class); //$NON-NLS-1$
+		registerClass("Entry", javax.swing.JTextField.class); //$NON-NLS-1$
+		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
+		registerClass("Frame", javax.swing.JLabel.class); //$NON-NLS-1$
 		//registerClass("HSeparator", null);
-		registerClass("ImageMenuItem", javax.swing.JLabel.class);
-		registerClass("Label", javax.swing.JLabel.class);
-		registerClass("List", javax.swing.JList.class);
-		registerClass("Menu", javax.swing.JMenu.class);
-		registerClass("MenuBar", javax.swing.JMenuBar.class);
-		registerClass("MenuItem", javax.swing.JLabel.class);
-		registerClass("Notebook", javax.swing.JTabbedPane.class);
-		registerClass("NumberEntry", org.montsuqi.widgets.NumberEntry.class);
-		registerClass("OptionMenu", javax.swing.JMenu.class);
-		registerClass("PandaCList", javax.swing.JTable.class);
-		registerClass("PandaCombo", javax.swing.JComboBox.class);
-		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class);
+		registerClass("ImageMenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
+		registerClass("Label", javax.swing.JLabel.class); //$NON-NLS-1$
+		registerClass("List", javax.swing.JList.class); //$NON-NLS-1$
+		registerClass("Menu", javax.swing.JMenu.class); //$NON-NLS-1$
+		registerClass("MenuBar", javax.swing.JMenuBar.class); //$NON-NLS-1$
+		registerClass("MenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
+		registerClass("Notebook", javax.swing.JTabbedPane.class); //$NON-NLS-1$
+		registerClass("NumberEntry", org.montsuqi.widgets.NumberEntry.class); //$NON-NLS-1$
+		registerClass("OptionMenu", javax.swing.JMenu.class); //$NON-NLS-1$
+		registerClass("PandaCList", javax.swing.JTable.class); //$NON-NLS-1$
+		registerClass("PandaCombo", javax.swing.JComboBox.class); //$NON-NLS-1$
+		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class); //$NON-NLS-1$
 		//registerClass("PandaHTML", null);
-		registerClass("PandaText", javax.swing.JTextArea.class);
-		registerClass("RadioButton", javax.swing.JRadioButton.class);
-		registerClass("ScrolledWindow", javax.swing.JScrollPane.class);
-		registerClass("SeparatorMenuItem", javax.swing.JSeparator.class);
-		registerClass("Table", org.montsuqi.widgets.Table.class);
-		registerClass("Text", javax.swing.JTextArea.class);
-		registerClass("TextView", javax.swing.JTextArea.class);
-		registerClass("ToggleButton", javax.swing.JToggleButton.class);
-		registerClass("Toolbar", javax.swing.JToolBar.class);
-		registerClass("VBox", org.montsuqi.widgets.VBox.class);
+		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
+		registerClass("RadioButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
+		registerClass("ScrolledWindow", javax.swing.JScrollPane.class); //$NON-NLS-1$
+		registerClass("SeparatorMenuItem", javax.swing.JSeparator.class); //$NON-NLS-1$
+		registerClass("Table", org.montsuqi.widgets.Table.class); //$NON-NLS-1$
+		registerClass("Text", javax.swing.JTextArea.class); //$NON-NLS-1$
+		registerClass("TextView", javax.swing.JTextArea.class); //$NON-NLS-1$
+		registerClass("ToggleButton", javax.swing.JToggleButton.class); //$NON-NLS-1$
+		registerClass("Toolbar", javax.swing.JToolBar.class); //$NON-NLS-1$
+		registerClass("VBox", org.montsuqi.widgets.VBox.class); //$NON-NLS-1$
 		//registerClass("VSeparator", null);
-		registerClass("Viewport", null);
-		registerClass("Window", javax.swing.JFrame.class);
+		registerClass("Viewport", null); //$NON-NLS-1$
+		registerClass("Window", javax.swing.JFrame.class); //$NON-NLS-1$
 	}
 
 	private void initPropertyMap() {
 		propertyMap = new HashMap();
-		registerProperty(java.awt.Container.class, "visible", "setVisible");
-		registerProperty(javax.swing.AbstractButton.class, "label", "text");
-		registerProperty(javax.swing.JLabel.class, "justify", "horizontalAlignment");
-		registerProperty(javax.swing.JTextField.class, "justify", "horizontalAlignment");
+		registerProperty(java.awt.Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JLabel.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
 
 /*
 		registerProperty("selectable", null);
@@ -115,150 +115,150 @@ public class WidgetBuilder {
 		registerProperty("row_spacing", null);
 		registerProperty("column_spacing", null);
 */
-	    registerProperty(java.awt.Container.class, "visible", "setVisible");
-		registerProperty(java.awt.Container.class, "tooltip", "setTooltip");
-		registerProperty(java.awt.Container.class, "has_default", "setHasDefault");
-		registerProperty(java.awt.Container.class, "has_focus", "setHasFocus");
+	    registerProperty(java.awt.Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Container.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Container.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Container.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 //		registerProperty(PIXMAP, "build_insensitive", pixmap_set_build_insensitive);
 //		registerProperty(PIXMAP, "filename", pixmap_set_filename);
-		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextViewText");
+		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
 //		registerProperty(CALENDAR, "display_options", calendar_set_display_options);
-		registerProperty(javax.swing.JTable.class, "column_widths", "setCListColumnWidth");
-		registerProperty(javax.swing.JTable.class, "selection_mode", "setCListSelectionMode");
-		registerProperty(javax.swing.JTable.class, "shadow_type", "setCListShadowType");
-		registerProperty(javax.swing.JTable.class, "show_titles", "setCListSetShowTitles");
-		registerProperty(javax.swing.JTree.class, "selection_mode", "setTreeSelectionMode");
-		registerProperty(javax.swing.JTree.class, "view_mode", "setTreeViewMode");
-		registerProperty(javax.swing.JTree.class, "view_line", "setTreeViewLine");
-		registerProperty(javax.swing.JList.class, "selection_mode", "setListSelectionMode");
-		registerProperty(javax.swing.JCheckBoxMenuItem.class, "always_show_toggle", "setCheckMenuItemAlwaysShowToggle");
-		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextText");
-		registerProperty(javax.swing.JRadioButtonMenuItem.class, "group", "setRadioMenuItemGroup");
-		registerProperty(javax.swing.JToolBar.class, "tooltips", "setToolbarTooltips");
+		registerProperty(javax.swing.JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTable.class, "show_titles", "setCListSetShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTree.class, "selection_mode", "setTreeSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTree.class, "view_mode", "setTreeViewMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTree.class, "view_line", "setTreeViewLine"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JList.class, "selection_mode", "setListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JCheckBoxMenuItem.class, "always_show_toggle", "setCheckMenuItemAlwaysShowToggle"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JRadioButtonMenuItem.class, "group", "setRadioMenuItemGroup"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JToolBar.class, "tooltips", "setToolbarTooltips"); //$NON-NLS-1$ //$NON-NLS-2$
 //		registerPrfoperty(STATUSBAR, "has_resize_grip", statusbar_set_has_resize_grip);
 //		registerProperty(RULER, "metric", ruler_set_metric);
-		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel");
-		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar");
+		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void initWidgetBuildData() {
-		registerWidgetBuildData("Button", defaultBuildWidgetData);
+		registerWidgetBuildData("Button", defaultBuildWidgetData); //$NON-NLS-1$
 		//registerWidgetBuildData("Calendar", defaultBuildWidgetData);
-		registerWidgetBuildData("CheckButton", defaultBuildWidgetData);
-		registerWidgetBuildData("CheckMenuItem",
-								"standardBuildWidget",
-								"buildMenuItemChildren",
+		registerWidgetBuildData("CheckButton", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("CheckMenuItem", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildMenuItemChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("CList",
-								"standardBuildWidget",
-								"buildCListChildren",
+		registerWidgetBuildData("CList", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildCListChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("ColorSelection", defaultBuildWidgetData);
-		registerWidgetBuildData("ColorSelectionDialog",
-								"standardBuildWidget",
-								"standardBuildChildren",
-								"colorSelectionDialogFindInternalChild");
-		registerWidgetBuildData("Combo",
-								"standardBuildWidget",
-								"standardBuildChildren",
-								"comboFindInternalChild");
-		registerWidgetBuildData("CTree",
-								"standardBuildWidget",
-								"buildCListChildren",
+		registerWidgetBuildData("ColorSelection", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("ColorSelectionDialog", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								"colorSelectionDialogFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("Combo", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								"comboFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("CTree", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildCListChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("Dialog",
-								"standardBuildWidget",
-								"buildDialogChildren",
-								"dialogFindInternalChild");
-		registerWidgetBuildData("DrawingArea", defaultBuildWidgetData);
-		registerWidgetBuildData("Entry", defaultBuildWidgetData);
-		registerWidgetBuildData("FileSelection",
-								"standardBuildWidget",
-								"standardBuildChildren",
-								"fileSelectionDialogFindInternalChild");
-		registerWidgetBuildData("Fixed",
-								"standardBuildWidget",
-								"buildLayoutChildren",
+		registerWidgetBuildData("Dialog", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildDialogChildren", //$NON-NLS-1$
+								"dialogFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("DrawingArea", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("Entry", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("FileSelection", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								"fileSelectionDialogFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("Fixed", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildLayoutChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("FontSelection", defaultBuildWidgetData);
-		registerWidgetBuildData("FontSelectionDialog",
-								"standardBuildWidget",
-								"standardBuildChildren",
-								"fontSelectionDialogFindInternalChild");
-		registerWidgetBuildData("Frame",	
-								"standardBuildWidget",
-								"buildFrameChildren",
+		registerWidgetBuildData("FontSelection", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("FontSelectionDialog", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								"fontSelectionDialogFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("Frame",	 //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildFrameChildren", //$NON-NLS-1$
 								null);
-	registerWidgetBuildData("HBox", defaultBuildContainerData);
-		registerWidgetBuildData("HPaned",
-								"standardBuildWidget",
-								"buildPanedChildren",
+	registerWidgetBuildData("HBox", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("HPaned", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildPanedChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("HSeparator", defaultBuildWidgetData);
-		registerWidgetBuildData("Label", defaultBuildWidgetData);
-		registerWidgetBuildData("Layout",
-								"standardBuildWidget",
-								"buildLayoutChildren",
+		registerWidgetBuildData("HSeparator", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("Label", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("Layout", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildLayoutChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("List", defaultBuildWidgetData);
-		registerWidgetBuildData("ListItem", defaultBuildWidgetData);
-		registerWidgetBuildData("Menu", defaultBuildWidgetData);
-		registerWidgetBuildData("MenuBar", defaultBuildWidgetData);
-		registerWidgetBuildData("MenuItem",
-								"standardBuildWidget",
-								"buildMenuItemChildren",
+		registerWidgetBuildData("List", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("ListItem", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("Menu", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("MenuBar", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("MenuItem", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildMenuItemChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("MessageDialog",
-								"standardBuildWidget",
-								"standardBuildChildren",
+		registerWidgetBuildData("MessageDialog", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("Notebook",
-								"standardBuildWidget",
-								"buildNotebookChildren",
+		registerWidgetBuildData("Notebook", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildNotebookChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("OptionMenu",
-								"standardBuildWidget",
-								"buildOptionMenuChildren",
+		registerWidgetBuildData("OptionMenu", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildOptionMenuChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("Progress", defaultBuildWidgetData);
-		registerWidgetBuildData("ProgressBar", defaultBuildWidgetData);
-		registerWidgetBuildData("RadioButton", defaultBuildContainerData);
-		registerWidgetBuildData("RadioMenuItem",
-								"standardBuildWidget",
-								"buildMenuItemChildren",
+		registerWidgetBuildData("Progress", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("ProgressBar", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("RadioButton", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("RadioMenuItem", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildMenuItemChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("ScrolledWindow",
-								"standardBuildWidget",
-								"standardBuildChildren",
-								"scrolledWindowFindInternalChild");
-		registerWidgetBuildData("SeparatorMenuItem", defaultBuildWidgetData);
-		registerWidgetBuildData("SpinButton", defaultBuildWidgetData);
-		registerWidgetBuildData("StatusBar", defaultBuildWidgetData);
-		registerWidgetBuildData("Table",
-								"standardBuildWidget",
-								"buildTableChildren",
+		registerWidgetBuildData("ScrolledWindow", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								"scrolledWindowFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("SeparatorMenuItem", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("SpinButton", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("StatusBar", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("Table", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildTableChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("TeaoffMenuItem", defaultBuildWidgetData);
-		registerWidgetBuildData("Text", defaultBuildWidgetData);
-		registerWidgetBuildData("TextView", defaultBuildWidgetData);
-		registerWidgetBuildData("ToggleButton", defaultBuildContainerData);
-		registerWidgetBuildData("ToolBar",
-								"standardBuildWidget",
-								"buildToolBarChildren",
+		registerWidgetBuildData("TeaoffMenuItem", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("Text", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("TextView", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("ToggleButton", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("ToolBar", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildToolBarChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("Tree", defaultBuildWidgetData);
-		registerWidgetBuildData("TreeView", defaultBuildWidgetData);
-		registerWidgetBuildData("VBox", defaultBuildContainerData);
-		registerWidgetBuildData("VPaned",
-								"standardBuildWidget",
-								"buildPanedChildren",
+		registerWidgetBuildData("Tree", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("TreeView", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("VBox", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("VPaned", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildPanedChildren", //$NON-NLS-1$
 								null);
-		registerWidgetBuildData("VSeparator", defaultBuildWidgetData);
-		registerWidgetBuildData("ViewPort", defaultBuildContainerData);
-		registerWidgetBuildData("Window",
-								"standardBuildWidget",
-								"standardBuildChildren",
+		registerWidgetBuildData("VSeparator", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("ViewPort", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("Window", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
 								null);
 	}
 
@@ -274,7 +274,7 @@ public class WidgetBuilder {
 		Method setter = null;
 		if (setterName != null) {
 			try {
-				if (setterName.startsWith("set")) {
+				if (setterName.startsWith("set")) { //$NON-NLS-1$
 					setter = WidgetOperation.findMethod(setterName);
 				} else { // assume that the setter name is field name.
 					setter = findSetterByFieldName(clazz, setterName);
@@ -319,14 +319,14 @@ public class WidgetBuilder {
 		String genericClassName = info.getClassName();
 		WidgetBuildData data = getBuildData(genericClassName);
 		if (data == null) {
-			logger.warn("Unknown widget class {0}", genericClassName);
-			widget = new JLabel("[a " + genericClassName + "]");
+			logger.warn(Messages.getString("WidgetBuilder.Unknown_widget_class_{0}_1"), genericClassName); //$NON-NLS-1$
+			widget = new JLabel("[a " + genericClassName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			try {
 				widget = data.build(this, info);
 			} catch (Exception e) {
 				logger.warn(e);
-				widget = new JLabel("[" + e.toString() + "]");
+				widget = new JLabel("[" + e.toString() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		if (widget instanceof JWindow) {
@@ -357,7 +357,7 @@ public class WidgetBuilder {
 	}
 
 	public Container buildPreview(WidgetInfo info) {
-		logger.warn("not implemented");
+		logger.warn(Messages.getString("WidgetBuilder.not_implemented")); //$NON-NLS-1$
 		return null;
 	}
 
@@ -409,7 +409,7 @@ public class WidgetBuilder {
 		int LABEL_ITEM = 1;
 		int cCount = info.getChildrenCount();
 		if (cCount != 2) {
-			throw new IllegalStateException("there should really only be 2 children");
+			throw new IllegalStateException(Messages.getString("WidgetBuilder.there_should_really_only_be_2_children")); //$NON-NLS-1$
 		}
 		for (int i = 0; i < cCount; i++) {
 			String label = null;
@@ -420,9 +420,9 @@ public class WidgetBuilder {
 			for (int j = 0; j < pCount; j++) {
 				String pName = cInfo.getProperty(j).getName();
 				String pValue = cInfo.getProperty(j).getValue();
-				if ("type".equals(pName) && "label_item".equals(pValue)) {
+				if ("type".equals(pName) && "label_item".equals(pValue)) { //$NON-NLS-1$ //$NON-NLS-2$
 					type = LABEL_ITEM;
-				} else if ("label".equals(pName)) {
+				} else if ("label".equals(pName)) { //$NON-NLS-1$
 					label = pValue;
 				}
 			}
@@ -451,9 +451,9 @@ public class WidgetBuilder {
 			for (int j = 0; j < pCount; j++) {
 				Property p = cInfo.getProperty(j);
 				String pName = p.getName();
-				if ("type".equals(pName)) {
+				if ("type".equals(pName)) { //$NON-NLS-1$
 					String value = p.getValue();
-					if ("tab".equals(value)) {
+					if ("tab".equals(value)) { //$NON-NLS-1$
 						type = TAB_ITEM;
 					}
 					break;
@@ -479,8 +479,8 @@ public class WidgetBuilder {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 
-			if ("Menu".equals(wInfo.getClassName())) {
-				logger.warn("the child of the option menu {0} was not a Menu widget", wInfo.getName());
+			if ("Menu".equals(wInfo.getClassName())) { //$NON-NLS-1$
+				logger.warn(Messages.getString("WidgetBuilder.the_child_of_the_option_menu_{0}_was_not_a_Menu_widget_2"), wInfo.getName()); //$NON-NLS-1$
 				continue;
 			}
 			Container child = buildWidget(wInfo);
@@ -498,16 +498,16 @@ public class WidgetBuilder {
 			Container child = null;
 
 			/* treat Labels specially */
-			if ("Label".equals(wInfo.getClassName())) {
+			if ("Label".equals(wInfo.getClassName())) { //$NON-NLS-1$
 				String label = null;
 				int pCount = wInfo.getPropertiesCount();
 				for (int j = 0; j < pCount; j++) {
 					Property p = wInfo.getProperty(j);
-					if ("label".equals(p.getName())) {
+					if ("label".equals(p.getName())) { //$NON-NLS-1$
 						label = p.getValue();
 						break;
 					} else {
-						logger.warn("Unknown CList child property: {0}", p.getName());
+						logger.warn(Messages.getString("WidgetBuilder.Unknown_CList_child_property__{0}_3"), p.getName()); //$NON-NLS-1$
 					}
 				}
 				
@@ -538,9 +538,9 @@ public class WidgetBuilder {
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Container child = null;
 			String className = wInfo.getClassName();
-			if ("toggle".equals(className) ||
-				"radio".equals(className) ||
-				"button".equals(className)) {
+			if ("toggle".equals(className) || //$NON-NLS-1$
+				"radio".equals(className) || //$NON-NLS-1$
+				"button".equals(className)) { //$NON-NLS-1$
 				String label = null;
 				String stock = null;
 				String groupName = null;
@@ -555,32 +555,32 @@ public class WidgetBuilder {
 					String pName = p.getName();
 					String pValue = p.getValue();
 					
-					if ("label".equals(pName)) {
+					if ("label".equals(pName)) { //$NON-NLS-1$
 						label = pValue;
-					} else if ("use_stock".equals(pName)) {
+					} else if ("use_stock".equals(pName)) { //$NON-NLS-1$
 						useStock = true;
-					} else if ("icon".equals(pName)) {
+					} else if ("icon".equals(pName)) { //$NON-NLS-1$
 						stock = null;
 						icon = xml.relativeFile(pValue);
-					} else if ("stock_pixmap".equals(pName)) {
+					} else if ("stock_pixmap".equals(pName)) { //$NON-NLS-1$
 						icon = null;
 						stock = pValue;
-					} else if ("active".equals(pName)) {
+					} else if ("active".equals(pName)) { //$NON-NLS-1$
 						active = ParameterConverter.toBoolean(pValue);
-					} else  if ("group".equals(pName)) {
+					} else  if ("group".equals(pName)) { //$NON-NLS-1$
 						groupName = pValue;
-					} else if ("new_group".equals(pName)) {
+					} else if ("new_group".equals(pName)) { //$NON-NLS-1$
 						newGroup = ParameterConverter.toBoolean(pValue);
-					} else if ("visible".equals(pName)) {
+					} else if ("visible".equals(pName)) { //$NON-NLS-1$
 						/* ignore for now */
-					} else if ("tooltip".equals(pName)) {
+					} else if ("tooltip".equals(pName)) { //$NON-NLS-1$
 						/* ignore for now */
-					} else if ("use_underline".equals(pName)) {
+					} else if ("use_underline".equals(pName)) { //$NON-NLS-1$
 						/* useUnderline = ParameterConverter.toBoolean(pValue); */
-					} else if ("inconsistent".equals(pName)) {
+					} else if ("inconsistent".equals(pName)) { //$NON-NLS-1$
 						/* ignore for now */
 					} else {
-						logger.warn("Unknown Toolbar child property: {0}", pName);
+						logger.warn(Messages.getString("WidgetBuilder.Unknown_Toolbar_child_property__{0}_4"), pName); //$NON-NLS-1$
 					}
 				}
 
@@ -589,11 +589,11 @@ public class WidgetBuilder {
 					toolBar.addSeparator();
 				}
 
-				if ("toggle".equals(className)) {
+				if ("toggle".equals(className)) { //$NON-NLS-1$
 					child = new JToggleButton(label);
 					toolBar.add(child);
 					child.setEnabled(active);
-				} else if ("radio".equals(className)) {
+				} else if ("radio".equals(className)) { //$NON-NLS-1$
 					child = new JRadioButton(label);
 					toolBar.add(child);
 					if (groupName != null) {
@@ -632,12 +632,12 @@ public class WidgetBuilder {
 			String name = p.getName();
 			String value = p.getValue();
 			
-			if ("resize".equals(name)) {
+			if ("resize".equals(name)) { //$NON-NLS-1$
 				resize = ParameterConverter.toBoolean(value);
-			} else if ("shrink".equals(name)) {
+			} else if ("shrink".equals(name)) { //$NON-NLS-1$
 				shrink = ParameterConverter.toBoolean(value);
 			} else {
-				logger.warn("Unknown Paned child property: {0}", name);
+				logger.warn(Messages.getString("WidgetBuilder.Unknown_Paned_child_property__{0}_5"), name); //$NON-NLS-1$
 			}
 		}
 
@@ -659,12 +659,12 @@ public class WidgetBuilder {
 			String name = p.getName();
 			String value = p.getValue();
 			
-			if ("resize".equals(name)) {
+			if ("resize".equals(name)) { //$NON-NLS-1$
 				resize = ParameterConverter.toBoolean(value);
-			} else if ("shrink".equals(name)) {
+			} else if ("shrink".equals(name)) { //$NON-NLS-1$
 				shrink = ParameterConverter.toBoolean(value);
 			} else {
-				logger.warn("Unknown Paned child property: {0}", name);
+				logger.warn(Messages.getString("WidgetBuilder.Unknown_Paned_child_property__{0}_6"), name); //$NON-NLS-1$
 			}
 		}
 
@@ -698,20 +698,20 @@ public class WidgetBuilder {
 				String name = p.getName();
 				String value = p.getValue();
 
-				if ("left_attach".equals(name)) {
+				if ("left_attach".equals(name)) { //$NON-NLS-1$
 					tc.leftAttach = ParameterConverter.toInteger(value);
-				} else if ("right_attach".equals(name)) {
+				} else if ("right_attach".equals(name)) { //$NON-NLS-1$
 					tc.rightAttach = ParameterConverter.toInteger(value);
-				} else if ("top_attach".equals(name)) {
+				} else if ("top_attach".equals(name)) { //$NON-NLS-1$
 					tc.topAttach = ParameterConverter.toInteger(value);
-				} else if ("bottom_attach".equals(name)) {
+				} else if ("bottom_attach".equals(name)) { //$NON-NLS-1$
 					tc.bottomAttach = ParameterConverter.toInteger(value);
-				} else if ("x_options".equals(value)) {
+				} else if ("x_options".equals(value)) { //$NON-NLS-1$
 					// x_options = ParameterConverter.toInteger(value);
-				} else if ("y_options".equals(value)) {
+				} else if ("y_options".equals(value)) { //$NON-NLS-1$
 					// y_options = ParameterConverter.toInteger(value);
 				} else {
-					logger.warn("unknown child packing property {0} for Table", name);
+					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_{0}_for_Table_7"), name); //$NON-NLS-1$
 				}
 			}
 			parent.add(child);
@@ -740,12 +740,12 @@ public class WidgetBuilder {
 				String name = p.getName();
 				String value = p.getValue();
 
-				if ("x".equals(name)) {
+				if ("x".equals(name)) { //$NON-NLS-1$
 					x = ParameterConverter.toInteger(value);
-				} else if ("y".equals(value)) {
+				} else if ("y".equals(value)) { //$NON-NLS-1$
 					y = ParameterConverter.toInteger(value);
 				} else {
-					logger.warn("unknown child packing property {0} for Layout", name);
+					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_{0}_for_Layout_8"), name); //$NON-NLS-1$
 				}
 			}
 			parent.add(child);
@@ -774,7 +774,7 @@ public class WidgetBuilder {
 		}
 
 		if (parentBuildData != null || parentBuildData.hasFindInternalChildMethod()) {
-			logger.warn("could not find a parent that handles internal children for `{0}'",
+			logger.warn(Messages.getString("WidgetBuilder.could_not_find_a_parent_that_handles_internal_children_for_`{0}___9"), //$NON-NLS-1$
 				 cInfo.getInternalChild());
 			return;
 		}
@@ -782,7 +782,7 @@ public class WidgetBuilder {
 		child = parentBuildData.findInternalChild(this, parent, cInfo.getInternalChild());
 
 		if (child == null) {
-			logger.warn("could not find internal child `{0}' in parent of type `{1}'",
+			logger.warn(Messages.getString("WidgetBuilder.could_not_find_internal_child_`{0}___in_parent_of_type_`{1}___10"), //$NON-NLS-1$
 					new Object[] { cInfo.getInternalChild(), parent.getClass() });
 			return;
 		}
@@ -812,7 +812,7 @@ public class WidgetBuilder {
 					set = true;
 				}
 				if ( ! set) {
-					logger.info("{0} is ignored in Java.", pName);
+					logger.info(Messages.getString("WidgetBuilder.{0}_is_ignored_in_Java"), pName); //$NON-NLS-1$
 				}
 			} catch (Exception e) {
 				logger.warn(e);
@@ -837,11 +837,11 @@ public class WidgetBuilder {
 			}
 		}
 		if (pDesc == null) {
-			throw new NoSuchFieldException("unknown property " + field + " for " + clazz);
+			throw new NoSuchFieldException(Messages.getString("WidgetBuilder.unknown_property__11") + field + Messages.getString("WidgetBuilder._for__12") + clazz); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		Method setter = pDesc.getWriteMethod();
 		if (setter == null) {
-			throw new IllegalAccessException(field + " of " + clazz + " is read only.");
+			throw new IllegalAccessException(field + Messages.getString("WidgetBuilder._of__13") + clazz + Messages.getString("WidgetBuilder._is_read_only._14")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return setter;
 	}
@@ -871,7 +871,7 @@ public class WidgetBuilder {
 			AccelInfo accel = (AccelInfo)i.next();
 			widget.addKeyListener(new KeyAdapter() {
 				public void keyPressed() {
-					throw new UnsupportedOperationException("not implemented yet.");
+					throw new UnsupportedOperationException(Messages.getString("WidgetBuilder.not_implemented_yet")); //$NON-NLS-1$
 				}
 			});
 		}

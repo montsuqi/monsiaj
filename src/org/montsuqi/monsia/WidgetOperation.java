@@ -79,7 +79,7 @@ public class WidgetOperation {
 	public static void setCListColumnWidth(Interface xml, Container widget, String name, String value) {
 		TableColumnModel model = ((JTable)widget).getColumnModel();
 		
-		StringTokenizer tokens = new StringTokenizer(value, ",");
+		StringTokenizer tokens = new StringTokenizer(value, ","); //$NON-NLS-1$
 		int col = 0;
 		while (tokens.hasMoreTokens()) {
 			int width = ParameterConverter.toInteger(tokens.nextToken());
@@ -92,21 +92,21 @@ public class WidgetOperation {
 	public static void setCListSelectionMode(Interface xml, Container widget, String name, String value) {
 		JTable table = (JTable)widget;
 		ListSelectionModel model = table.getSelectionModel();
-		if ("SINGLE".equals(value)) {
+		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		} else if ("MULTIPLE".equals(value)) {
+		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		} else if ("EXTENDED".equals(value)) {
-			Logger.getLogger(WidgetOperation.class).info("setCListSelectionMode(EXTENDED) is not supported.");
-		} else if ("BROWSE".equals(value)) {
-			Logger.getLogger(WidgetOperation.class).info("setCListSelectionMode(BROWSE) is not supported.");
+		} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
+			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCListSelectionMode_EXTENDED_is_not_supported")); //$NON-NLS-1$
+		} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
+			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCListSelectionMode_BROWSE_is_not_supported")); //$NON-NLS-1$
 		} else {
 			throw new IllegalArgumentException(value);
 		}
 	}
 
 	public static void setCListShadowType(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setCListShadowType is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCListShadowType_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setCListShowTitles(Interface xml, Container widget, String name, String value) {
@@ -118,45 +118,45 @@ public class WidgetOperation {
 	public static void setTreeSelectionMode(Interface xml, Container widget, String name, String value) {
 		JTree tree = (JTree)widget;
 		TreeSelectionModel model = tree.getSelectionModel();
-		if ("SINGLE".equals(value)) {
+		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			model.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		} else if ("MULTIPLE".equals(value)) {
+		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
 			model.setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-		} else if ("EXTENDED".equals(value)) {
-			Logger.getLogger(WidgetOperation.class).info("setTreeSelectionMode(EXTENDED) is not supported.");
-		} else if ("BROWSE".equals(value)) {
-			Logger.getLogger(WidgetOperation.class).info("setTreeSelectionMode(BROWSE) is not supported.");
+		} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
+			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setTreeSelectionMode_EXTENDED_is_not_supported")); //$NON-NLS-1$
+		} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
+			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setTreeSelectionMode_BROWSE_is_not_supported")); //$NON-NLS-1$
 		} else {
 			throw new IllegalArgumentException(value);
 		}
 	}
 
 	public static void setTreeViewMode(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setTreeViewMode is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setTreeViewMode_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setTreeViewLine(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setTreeViewLine is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setTreeViewLine_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setListSelectionMode(Interface xml, Container widget, String name, String value) {
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
-		if ("SINGLE".equals(value)) {
+		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		} else if ("MULTIPLE".equals(value)) {
+		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
 			list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		} else if ("EXTENDED".equals(value)) {
-			Logger.getLogger(WidgetOperation.class).info("setListSelectionMode(EXTENDED) is not supported.");
-		} else if ("BROWSE".equals(value)) {
-			Logger.getLogger(WidgetOperation.class).info("setListSelectionMode(BROWSE) is not supported.");
+		} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
+			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setListSelectionMode_EXTENDED_is_not_supported")); //$NON-NLS-1$
+		} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
+			Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setListSelectionMode_BROWSE_is_not_supported")); //$NON-NLS-1$
 		} else {
 			throw new IllegalArgumentException(value);
 		}
 	}
 
 	public static void setCheckMenuItemAlwaysShowToggle(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setCheckMenuItemAlwaysShowToggle is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCheckMenuItemAlwaysShowToggle_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setTextText(Interface xml, Container widget, String name, String value) {
@@ -169,12 +169,12 @@ public class WidgetOperation {
 		group = xml.getButtonGroup(value);
 
 		if (group == null) {
-			Logger.getLogger(WidgetOperation.class).warn("Radio button group {0} could not be found", value);
+			Logger.getLogger(WidgetOperation.class).warn(Messages.getString("WidgetOperation.Radio_button_group_n_could_not_be_found"), value); //$NON-NLS-1$
 			return;
 		}
 
 		if ((Object)group == (Object)widget) {
-			Logger.getLogger(WidgetOperation.class).warn("Group is self, skipping.");
+			Logger.getLogger(WidgetOperation.class).warn("Group is self, skipping."); //$NON-NLS-1$
 			return;
 		}
 
@@ -184,7 +184,7 @@ public class WidgetOperation {
 	public static void setToolbarTooltips(Interface xml, Container widget, String name, String value) {
 		ToolTipManager manager = ToolTipManager.sharedInstance();
 		if ( !(widget instanceof JToolBar)) {
-			throw new IllegalArgumentException("not a JToolBar");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JToolBar")); //$NON-NLS-1$
 		}
 
 		if (widget instanceof JComponent) {
@@ -197,11 +197,11 @@ public class WidgetOperation {
 	}
 	
 	public static void setStatusBarHasResizeGrip(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setStatusBarResizeGrip is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setStatusBarResizeGrip_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setRulerMetric(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setRulerMetric is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setRulerMetric_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setMenuItemLabel(Interface xml, Container widget, String name, String value) {
@@ -210,20 +210,20 @@ public class WidgetOperation {
 	}
 
 	public static void setMenuItemUseUnderline(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setMenuItemUseUnderline is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setMenuItemUseUnderline_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setMenuItemUseStock(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setMenuItemUseStock is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setMenuItemUseStock_is_not_supported")); //$NON-NLS-1$
 	}
 
 	public static void setWindowWMClassName(Interface xml, Container widget, String name, String value) {
-		Logger.getLogger(WidgetOperation.class).info("setWindowWMClassName is not supported.");
+		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setWindowWMClassName_is_not_supported")); //$NON-NLS-1$
 	}
 	
 	public static void setEntryInvisibleChar(Interface xml, Container widget, String name, String value) {
 		if ( !(widget instanceof JPasswordField)) {
-			throw new IllegalArgumentException("not a Password field.");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Password_field")); //$NON-NLS-1$
 		}
 		JPasswordField password = (JPasswordField)widget;
 		password.setEchoChar(value.charAt(0));
@@ -231,17 +231,17 @@ public class WidgetOperation {
 
 	public Container dialogFindInternalChild(Container parent, String childName) {
 		JDialog dialog = (JDialog)parent;
-		if ("vbox".equals(childName)) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("action_area".equals(childName)) {
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
 		return null;
 	}
 
 	public Container imageMenuFindInternalChild(Container parent, String childName) {
-		if ("image".equals(childName)) {
+		if ("image".equals(childName)) { //$NON-NLS-1$
 			return parent; // MenuItem itself is an AbstractButton and hase an icon with it.
 		} else {
 			return null;
@@ -250,10 +250,10 @@ public class WidgetOperation {
 
 	public Container scrolledWindowFindInternalChild(Container parent, String childName) {
 		JScrollPane scroll = (JScrollPane)parent;
-		if ("vscrollbar".equals(childName)) {
+		if ("vscrollbar".equals(childName)) { //$NON-NLS-1$
 			return scroll.getVerticalScrollBar();
 		}
-		if ("hscrollbar".equals(childName)) {
+		if ("hscrollbar".equals(childName)) { //$NON-NLS-1$
 			return scroll.getHorizontalScrollBar();
 		}
 		
@@ -261,82 +261,82 @@ public class WidgetOperation {
 	}
 
 	public Container fileSelectionDialogFindInternalChild(Container parent, String childName) {
-		if ("vbox".equals(childName)) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("action_area".equals(childName)) {
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("ok_button".equals(childName)) {
+		if ("ok_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("cancel_button".equals(childName)) {
+		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("help_button".equals(childName)) {
+		if ("help_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
 		return null;
 	}
 
 	public Container colorSelectionDialogFindInternalChild(Container parent, String childName) {
-		if ("vbox".equals(childName)) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("action_area".equals(childName)) {
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("ok_button".equals(childName)) {
+		if ("ok_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("cancel_button".equals(childName)) {
+		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("help_button".equals(childName)) {
+		if ("help_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("color_selection".equals(childName)) {
+		if ("color_selection".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
 		return null;
 	}
 
 	public Container fontSelectionDialogFindInternalChild(Container parent, String childName) {
-		if ("vbox".equals(childName)) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("action_area".equals(childName)) {
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("ok_button".equals(childName)) {
+		if ("ok_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("cancel_button".equals(childName)) {
+		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("apply_button".equals(childName)) {
+		if ("apply_button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("font_selection".equals(childName)) {
+		if ("font_selection".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
 		return null;
 	}
 
 	public Container comboFindInternalChild(Container parent, String childName) {
-		if ("entry".equals(childName)) {
+		if ("entry".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("button".equals(childName)) {
+		if ("button".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("popup".equals(childName)) {
+		if ("popup".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("popwin".equals(childName)) {
+		if ("popwin".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
-		if ("list".equals(childName)) {
+		if ("list".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
 		return null;
@@ -345,7 +345,7 @@ public class WidgetOperation {
 	public static void setTableLeftAttach(Interface xml, Container widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
-			throw new IllegalArgumentException("not a Table widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
 		}
 		
 		TableLayout layout = (TableLayout)parent.getLayout();
@@ -357,7 +357,7 @@ public class WidgetOperation {
 	public static void setTableRightAttach(Interface xml, Container widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
-			throw new IllegalArgumentException("not a Table widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
 		}
 
 		TableLayout layout = (TableLayout)parent.getLayout();
@@ -369,7 +369,7 @@ public class WidgetOperation {
 	public static void setTableTopAttach(Interface xml, Container widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
-			throw new IllegalArgumentException("not a Table widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
 		}
 
 		TableLayout layout = (TableLayout)parent.getLayout();
@@ -381,7 +381,7 @@ public class WidgetOperation {
 	public static void setTableBottomAttach(Interface xml, Container widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
-			throw new IllegalArgumentException("not a Table widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
 		}
 
 		TableLayout layout = (TableLayout)parent.getLayout();
