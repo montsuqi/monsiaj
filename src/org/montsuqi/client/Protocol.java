@@ -491,7 +491,6 @@ public class Protocol extends Connection {
 		if (isReceiving) {
 			return;
 		}
-		resetTimer(SwingUtilities.windowForComponent(widget));
 		Node node = getNode(widget);
 		if (node != null) {
 			node.addChangedWidget(xml.getLongName(widget), widget);
