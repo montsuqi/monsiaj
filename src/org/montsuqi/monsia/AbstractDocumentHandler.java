@@ -61,6 +61,26 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		return state == FINISH;
 	}
 
+	protected void clearContent() {
+		content.delete(0, content.length());
+	}
+
+	protected void warnNotZero(String name, int actual) {
+		logger.warn(Messages.getString("MonsiaHandler.not_zero"), new Object[] { name, new Integer(actual) }); //$NON-NLS-1$
+	}
+
+	protected void warnUnknownAttribute(String element, String attr) {
+		logger.warn(Messages.getString("MonsiaHandler.unknown_attribute"), new Object[] { attr, element }); //$NON-NLS-1$
+	}
+
+	protected void warnMissingAttribute(String element) {
+		logger.warn(Messages.getString("MonsiaHandler.missing_required_attribute"), element); //$NON-NLS-1$
+	}
+
+	protected void warnUnexpectedElement(String outer, String inner) {
+		logger.warn(Messages.getString("MonsiaHandler.unexpected_element"), new Object[] { outer, inner }); //$NON-NLS-1$
+	}
+
 	protected Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
 			return new Interface(widgets, topLevels, protocol);
@@ -75,8 +95,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		prevState = UNKNOWN;
 	
 		widgetDepth = 0;
-		content.delete(0, content.length());
-	
+		clearContent();
 		widget = null;
 		propertyName = null;
 	}
@@ -92,7 +111,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 		state.startElement(uri, localName, qName, attrs);
-		content.delete(0, content.length());
+		clearContent();
 	}
 
 	public void endElement(String uri, String localName, String qName) throws SAXException {
@@ -135,38 +154,6 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	public void fatalError(SAXParseException e) throws SAXException {
 		logger.fatal(e);
-	}
-
-	protected void warnNotZero(String name, int actual) {
-		logger.warn(Messages.getString("MonsiaHandler.not_zero"), new Object[] { name, new Integer(actual) }); //$NON-NLS-1$
-	}
-
-	protected void warnUnknownAttribute(String element, String attr) {
-		logger.warn(Messages.getString("MonsiaHandler.unknown_attribute"), new Object[] { attr, element }); //$NON-NLS-1$
-	}
-
-	protected void warnUnexpectedElement(String outer, String inner) {
-		logger.warn(Messages.getString("MonsiaHandler.unexpected_element"), new Object[] { outer, inner }); //$NON-NLS-1$
-	}
-
-	protected void warnShouldFindClosing(String element, String found) {
-		logger.warn(Messages.getString("MonsiaHandler.should_find_closing"), new Object[] { element, found }); //$NON-NLS-1$
-	}
-
-	protected void warnShouldBeEmpty(String element, String found) {
-		logger.warn(Messages.getString("MonsiaHandler.should_be_empty"), new Object[] { element, found }); //$NON-NLS-1$
-	}
-
-	protected void warnShouldHaveNoAttributes(String element) {
-		logger.warn(Messages.getString("MonsiaHandler.should_have_no_attributes"), element); //$NON-NLS-1$
-	}
-
-	protected void warnMissingAttribute(String element) {
-		logger.warn(Messages.getString("MonsiaHandler.missing_required_attribute"), element); //$NON-NLS-1$
-	}
-
-	protected void warnInvalidPropertiesDefinedHere(String element) {
-		logger.warn(Messages.getString("MonsiaHandler.invalid_properties_defined_here"), element); //$NON-NLS-1$
 	}
 
 	protected void flushProperties() {
@@ -370,6 +357,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		try {
 			while (tokens.nextToken() != StreamTokenizer.TT_EOF) {
 				String modifier = tokens.sval;
+				if (modifier.startsWith("GTK_")) {
+					modifier = modifier.substring(4);
+				}
 				if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
 					modifiers |= KeyEvent.SHIFT_MASK;
 				} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
@@ -465,7 +455,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		if (shouldAppendCharactersToContent()) {
 			content.append(chars, start, length);
 		} else {
-			content.delete(0, content.length());
+			clearContent();
 		}
 	}
 }
