@@ -64,7 +64,6 @@ public class NumberEntry extends JTextField {
 	public void setValue(BigDecimal value) {
 		NumberDocument doc = (NumberDocument)getDocument();
 		doc.setValue(value);
-
 	}
 
 	public void setValue(double value) {
@@ -86,8 +85,8 @@ public class NumberEntry extends JTextField {
 		final JFrame f = new JFrame("TestNumberEntry"); //$NON-NLS-1$
 		final NumberEntry ne = new NumberEntry();
 		ne.setForeground(Color.red);
-		ne.setFormat("99.9"); //$NON-NLS-1$
-		ne.setValue(NumberDocument.ZERO);
+		ne.setFormat("---,---,---"); //$NON-NLS-1$
+		ne.setValue(new BigDecimal(-123456));
 		f.getContentPane().setLayout(new BorderLayout());
 		f.getContentPane().add(ne, BorderLayout.CENTER);
 		f.setSize(200, 50);
@@ -140,20 +139,26 @@ class NumberDocument extends PlainDocument {
 	}
 
 	synchronized void setValue(BigDecimal v) {
-		if ( ! value.equals(v)) {
-			PrecisionScale ps = new PrecisionScale(originalFormat);
-			String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
-			value = ZERO;
-			try {
-				expo = 0;
-				scale = 0;
-				insertString(0, t, null);
-			} catch (BadLocationException e) {	
-				logger.warn(e);
-			}
+		logger.debug("setting value to {0}", v);
+		if (value.equals(v)) {
+			return;
+		}
+		PrecisionScale ps = new PrecisionScale(originalFormat);
+		String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
+		logger.debug("\tformat is \"{0}\"", getFormat());
+		Object[] params = { v, t };
+		logger.debug("\tformatted \"{0}\" -> \"{1}\"", params);
+		value = ZERO;
+		try {
 			expo = 0;
 			scale = 0;
+			insertString(0, t, null);
+		} catch (BadLocationException e) {	
+			logger.warn(e);
 		}
+		expo = 0;
+		scale = 0;
+		logger.debug("\tdone");
 	}
 
 	BigDecimal getValue() {
@@ -200,6 +205,8 @@ class NumberDocument extends PlainDocument {
 		StringBuffer tmp = new StringBuffer();
 		if (positive) {
 			tmp.append('+');
+		} else if (negative) {
+			tmp.append(' ');
 		}
 		tmp.append(buf);
 		if (negative) {
@@ -207,6 +214,8 @@ class NumberDocument extends PlainDocument {
 			tmp.append('-');
 			tmp.append(buf);
 		}
+		Object[] params = { originalFormat, tmp.toString() };
+		logger.debug("translated format: \"{0}\" -> \"{1}\"", params);
 		return new DecimalFormat(tmp.toString());
 	}
 
