@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://192.168.118.159/java-client/" href="jmareceipt.jnlp">
+<jnlp spec="1.0+" codebase="@webstarturl@" href="jmareceipt.jnlp">
   <information>
-    <title>æ—¥åŒ»æ¨™æº–ãƒ¬ã‚»ãƒ—ãƒˆã‚½ãƒ•ãƒˆ</title>
+    <title>Æü°åÉ¸½à¥ì¥»¥×¥È¥½¥Õ¥È</title>
     <vendor>NaCl</vendor>
     <description>demo</description>
     <offline-allowed/>
