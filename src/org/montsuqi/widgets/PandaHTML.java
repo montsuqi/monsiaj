@@ -24,18 +24,16 @@ package org.montsuqi.widgets;
 
 import java.io.IOException;
 import java.net.URL;
-
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-
 import org.montsuqi.util.Logger;
 
 public class PandaHTML extends JScrollPane {
 
-	Logger logger;
-	JTextPane pane;
+	private Logger logger;
+	private JTextPane pane;
 
 	public PandaHTML() {
 		super();
@@ -46,11 +44,7 @@ public class PandaHTML extends JScrollPane {
 		pane.addHyperlinkListener(new HyperlinkListener() {
 			public void hyperlinkUpdate(HyperlinkEvent event) {
 				if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-					try {
-						pane.setPage(event.getURL());
-					 } catch (Exception e) {
-						 logger.warn(e);
-					 }
+					setURI(event.getURL());
 				}
 			 }
 		});
