@@ -44,7 +44,7 @@ public abstract class Logger {
 			return (Logger)getter.invoke(null, args);
 		} catch (Exception e) {
 			System.out.println(e);
-			return null;
+			return StdErrLogger.getLogger(name);
 		}
 	}
 
