@@ -166,12 +166,16 @@ public class Calendar extends JComponent {
 	}
 
 	private void setCells() {
+		cal.setTime(date);
+		int month = cal.get(java.util.Calendar.MONTH);
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				Date d = computeCellDate(row, col);
 				cellDates[row][col] = d;
 				cal.setTime(d);
-				dateCells[row][col].setText(String.valueOf(cal.get(java.util.Calendar.DATE)));
+				JButton cell = dateCells[row][col];
+				cell.setText(String.valueOf(cal.get(java.util.Calendar.DATE)));
+				cell.setEnabled(month == cal.get(java.util.Calendar.MONTH));
 			}
 		}
 		monthLabel.setText(df.format(date));
