@@ -41,7 +41,7 @@ public class Connection {
 	public synchronized int receiveDataType(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
-			throw new IOException("data type mismatch");
+			throw new IOException(Messages.getString("Connection.data_type_mismatch")); //$NON-NLS-1$
 		}
 		return dataType;
 	}
@@ -61,7 +61,6 @@ public class Connection {
 
 	public void sendLength(int size) throws IOException {
 		out.writeInt(size);
-		logger.info("length: {0}", new Object[] { new Integer(size) });
 		out.flush();
 	}
 
@@ -72,7 +71,6 @@ public class Connection {
 	public void sendString(String s) throws IOException {
 		byte[] bytes = s.getBytes();
 		sendLength(bytes.length);
-		logger.info("bytes: {0}", bytes);
 		out.write(bytes);
 		out.flush();
 	}
@@ -159,7 +157,7 @@ public class Connection {
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
 		} else {
-			throw new IllegalArgumentException("invalid data conversion");
+			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
 		}
 	}
 
@@ -176,7 +174,7 @@ public class Connection {
 			sendFixed(xval);
 			break;
 		default:
-			throw new IllegalArgumentException("invalid data conversion");
+			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
 		}
 	}
 
@@ -213,7 +211,7 @@ public class Connection {
 		case Type.TEXT:
 			return receiveString();
 		default:
-			throw new IllegalArgumentException("not valid type");
+			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_type")); //$NON-NLS-1$
 		}
 	}
 
@@ -264,7 +262,7 @@ public class Connection {
 		case Type.VARCHAR:
 		case Type.DBCODE:
 		case Type.TEXT:
-			sendString(value ? "T" : "F");
+			sendString(value ? "T" : "F"); //$NON-NLS-1$ //$NON-NLS-2$
 			break;
 		case Type.INT:
 			sendInt(value ? 1 : 0);
@@ -315,7 +313,7 @@ public class Connection {
 			sendBoolean(value != 0.0);
 			break;
 		default:
-			throw new IllegalArgumentException("invalid data conversion");
+			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
 		}
 	}
 
@@ -392,7 +390,7 @@ public class Connection {
 		int type = receiveDataType();
 
 		if (type != value.type) {
-			throw new IllegalArgumentException("fatal type miss match");
+			throw new IllegalArgumentException(Messages.getString("Connection.data_type_missmatch")); //$NON-NLS-1$
 		}
 
 		switch (type) {
