@@ -153,7 +153,8 @@ public class WidgetBuilder {
 		WidgetBuilder builder = (WidgetBuilder)builderMap.get(genericClassName);
 		if (builder == null) {
 			logger.warn("unknown widget class: {0}", genericClassName); //$NON-NLS-1$
-			return new JLabel(MessageFormat.format("[a {0}]", new Object[] { genericClassName })); //$NON-NLS-1$
+			Object[] args = { genericClassName };
+			return new JLabel(MessageFormat.format("[a {0}]", args)); //$NON-NLS-1$
 		}
 		try {
 			Component widget = builder.buildSelf(xml, parent, info);

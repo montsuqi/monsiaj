@@ -68,7 +68,7 @@ public final class WidgetValueManager {
 		if (valueTable.containsKey(name)) {
 			return (ValueAttribute)valueTable.get(name);
 		}
-		Object[] args = new Object[] { name };
+		Object[] args = { name };
 		throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$
 	}
 

@@ -436,7 +436,7 @@ public class Protocol extends Connection {
 		case PacketClass.E_APPL:
 			throw new ConnectException("cannot connect to server(application name invalid)"); //$NON-NLS-1$
 		default:
-			Object[] args = new Object[] { Integer.toHexString(pc) };
+			Object[] args = { Integer.toHexString(pc) };
 			throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
 		}
 	}

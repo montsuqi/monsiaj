@@ -38,7 +38,8 @@ public abstract class Logger {
 		}
 		try {
 			Class factoryClass = Class.forName(factory);
-			Method getter = factoryClass.getMethod("getLogger", new Class[] { String.class }); //$NON-NLS-1$
+			Class[] types = { String.class };
+			Method getter = factoryClass.getMethod("getLogger", types); //$NON-NLS-1$
 			Object[] args = { name };
 			return (Logger)getter.invoke(null, args);
 		} catch (Exception e) {

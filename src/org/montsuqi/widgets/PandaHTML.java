@@ -88,11 +88,7 @@ public class PandaHTML extends JScrollPane {
 		final PandaHTML html = new PandaHTML();
 		html.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
-				Object[] logArgs = new Object[] {
-						e.getPropertyName(),
-						e.getOldValue(),
-						e.getNewValue()
-					};
+				Object[] logArgs = { e.getPropertyName(), e.getOldValue(), e.getNewValue() };
 				logger.debug("change: {0}: {1} => {2}", logArgs); //$NON-NLS-1$
 			}
 		});
