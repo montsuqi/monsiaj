@@ -32,6 +32,12 @@
     ApacheのLog4Jを使用。
   : org.montsuqi.util.J2SELogger
     Java2 SDK 1.4のロギングAPIを使用。
+: monsia.document.handler
+  画面定義ファイルのパーズに使用するクラスを指定。
+  : org.montsuqi.monsia.Glade1Handler
+    Glade version 1形式の定義ファイルを使用。
+  : org.montsuqi.monsia.MonsiaHandler
+    Monsia形式の定義ファイルを使用。
 : swing.defaultlaf
   ルック&フィールを指定。
   : com.sun.java.swing.plaf.windows.WindowsLookAndFeel
