@@ -40,7 +40,6 @@ class ImagePreview extends Preview {
 	public void load(String fileName) throws IOException {
 		sourceImage = ImageIO.read(new File(fileName));
 		super.setScale(1.0);
-		super.setRotationStep(0);
 		updatePreferredSize();
 	}
 
