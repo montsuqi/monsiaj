@@ -80,8 +80,7 @@ public class OptionParser {
 				}
 			}
 		} catch (IOException e) {
-			logger.warn(e);
-			return null;
+			throw new OptionParserException(e);
 		}
 		return parseArray(program, lines.toArray(new String[lines.size()]));
 	}
