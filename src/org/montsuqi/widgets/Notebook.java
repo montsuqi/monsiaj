@@ -22,61 +22,38 @@ copies.
 
 package org.montsuqi.widgets;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.JButton;
+import java.util.ArrayList;
 import javax.swing.JTabbedPane;
-
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.montsuqi.util.Logger;
 
 public class Notebook extends JTabbedPane {
-	List buttons;
 
+	List buttons;
+	Logger logger;
 	public Notebook() {
 		super();
-		initButtonSensor();
-	}
-
-	public Notebook(int tabPlacement) {
-		super(tabPlacement);
-		initButtonSensor();
-	}
-
-	public Notebook(int tabPlacement, int tabLayoutPolicy) {
-		super(tabPlacement, tabLayoutPolicy);
-		initButtonSensor();
-	}
-
-	private void initButtonSensor() {
+		logger = Logger.getLogger(Notebook.class);
 		buttons = new ArrayList();
-		MouseListener listener = new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				Point p = e.getPoint();
-				for (int i = 0, n = getTabCount(); i < n; i++) {
-					Rectangle r = getBoundsAt(i);
-					if (r == null) {
-						continue;
-					}
-					if (r.contains(p)) {
-						JButton b = (JButton)buttons.get(i);
-						if (b != null) {
-							b.doClick();
-							break;
-						}
+		addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				int selected = getSelectedIndex();
+				Iterator i = buttons.iterator();
+				while (i.hasNext()) {
+					NotebookDummyButton dummy = (NotebookDummyButton)i.next();
+					if (dummy.getIndex() == selected) {
+						dummy.doClick();
+						break;
 					}
 				}
 			}
-		};
-		addMouseListener(listener);
+		});
 	}
 
-	public void addButton(JButton button) {
-		button.putClientProperty("index", new Integer(buttons.size())); //$NON-NLS-1$
+	public void registerTabButton(NotebookDummyButton button) {
 		buttons.add(button);
 	}
 }
