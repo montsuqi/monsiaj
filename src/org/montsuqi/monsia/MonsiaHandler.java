@@ -761,9 +761,9 @@ public class MonsiaHandler extends DefaultHandler {
 		if (state == WIDGET_PROPERTY ||
 			state == WIDGET_ATK_PROPERTY ||
 			state == WIDGET_CHILD_PACKING_PROPERTY) {
-			content.append(chars);
+			content.append(chars, start, length);
 		} else {
-			/* don't care about content in any other states */
+			content.delete(0, content.length());
 		}
 	}
 
