@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -37,6 +38,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
 import javax.swing.text.JTextComponent;
 import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationDialog;
@@ -82,6 +84,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		if (iconURL != null) {
 			icon.setIcon(new ImageIcon(iconURL));
 		}
+		icon.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 		return icon;
 	}
 
