@@ -140,10 +140,10 @@ public class WidgetBuilder {
 		if (widget instanceof Window) {
 			xml.setTopLevel(widget);
 		}
-		builder.setCommonParameters(xml, widget, info);
 		if (widget instanceof Container) {
 			builder.buildChildren(xml, (Container)widget, info);
 		}
+		builder.setCommonParameters(xml, widget, info);
 		return widget;
 		
 	}
