@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.17 2004-04-19 11:26:11 noborus Exp $ -->
+<!-- $Id: build.xml,v 1.18 2004-05-28 11:16:52 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -74,7 +74,12 @@
   <target name="resources" depends="prepare">
     <copy todir="${build.dir}">
       <fileset dir="${src.dir}" includes="**/*.properties"/>
+    </copy>
+    <copy todir="${build.dir}/jp/or/med/jma_receipt">
       <fileset dir="${resources.dir}" includes="*.jpg"/>
+    </copy>
+    <copy todir="${build.dir}/org/montsuqi/widgets">
+      <fileset dir="${resources.dir}" includes="*.png"/>
     </copy>
     <native2ascii src="${resources.dir}" dest="${build.dir}"
       includes="*.jnlp" encoding="EUC-JP"/>
@@ -94,11 +99,11 @@
     <!-- ant 1.5.x should use destfile instead of jarfile-->
     <jar jarfile="${dist.dir}/pandaclient.jar"
          basedir="${build.dir}"
-         includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties"
+         includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,org/montsuqi/**/*.png"
          manifest="${resources.dir}/manifest.mf"/>
     <jar jarfile="${dist.dir}/jmareceipt.jar"
          basedir="${build.dir}"
-         includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,*.jpg"
+         includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
          manifest="${resources.dir}/jmareceipt.mf"/>
     <!-- ant 1.5.x should use destfile instead of zipfile-->
     <copy todir="${dist.dir}">

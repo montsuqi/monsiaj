@@ -53,7 +53,7 @@ public class PandaPreview extends JPanel {
 
 		toolbar.add(new AbstractAction() {
 			{
-				URL iconURL = getClass().getResource("/zoom-in.png"); //$NON-NLS-1$
+				URL iconURL = getClass().getResource("/org/montsuqi/widgets/zoom-in.png"); //$NON-NLS-1$
 				if (iconURL != null) {
 					putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 				}
@@ -67,7 +67,7 @@ public class PandaPreview extends JPanel {
 		});
 		toolbar.add(new AbstractAction() {
 			{
-				URL iconURL = getClass().getResource("/zoom-out.png"); //$NON-NLS-1$
+				URL iconURL = getClass().getResource("/org/montsuqi/widgets/zoom-out.png"); //$NON-NLS-1$
 				if (iconURL != null) {
 					putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 				}
