@@ -76,7 +76,7 @@ class ConfigurationDialog extends JDialog {
 		Container root = getContentPane();
 		root.setLayout(new GridBagLayout());
 
-		setTitle(Messages.getString("ConfigurationDialog.JMA_Standard_Receipt")); //$NON-NLS-1$
+		setTitle(Messages.getString("application.title")); //$NON-NLS-1$
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
 				closeDialog();
