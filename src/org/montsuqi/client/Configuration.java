@@ -31,6 +31,17 @@ public abstract class Configuration {
 	private String pass;
 	private boolean configured;
 
+	private static final String PORT_KEY = "port"; //$NON-NLS-1$
+	private static final String HOST_KEY = "host"; //$NON-NLS-1$
+	private static final String USER_KEY = "user"; //$NON-NLS-1$
+	private static final String CACHE_KEY = "cache"; //$NON-NLS-1$
+	private static final String ENCODING_KEY = "encoding"; //$NON-NLS-1$
+	private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
+	private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
+	private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
+	private static final String VERIFY_KEY = "verify"; //$NON-NLS-1$
+	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
+
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
 	static final int DEFAULT_PORT = 8000;
 	static final String DEFAULT_HOST = "localhost"; //$NON-NLS-1$
@@ -101,55 +112,55 @@ public abstract class Configuration {
 	}
 
 	public int getPort() {
-		return getInt("port", DEFAULT_PORT); //$NON-NLS-1$
+		return getInt(PORT_KEY, DEFAULT_PORT);
 	}
 
 	public void setPort(int port) {
-		setInt("port", port); //$NON-NLS-1$
+		setInt(PORT_KEY, port);
 	}
 
 	public String getHost() {
-		return getString("host", DEFAULT_HOST); //$NON-NLS-1$
+		return getString(HOST_KEY, DEFAULT_HOST);
 	}
 
 	public void setHost(String host) {
-		setString("host", host); //$NON-NLS-1$
+		setString(HOST_KEY, host);
 	}
 
 	public String getUser() {
-		return getString("user", DEFAULT_USER); //$NON-NLS-1$
+		return getString(USER_KEY, DEFAULT_USER);
 	}
 
 	public void setUser(String user) {
-		setString("user", user); //$NON-NLS-1$
+		setString(USER_KEY, user);
 	}
 
 	public String getCache() {
-		return getString("cache", DEFAULT_CACHE_PATH); //$NON-NLS-1$
+		return getString(CACHE_KEY, DEFAULT_CACHE_PATH);
 	}
 
 	public void setCache(String cache) {
-		setString("cache", cache); //$NON-NLS-1$
+		setString(CACHE_KEY, cache);
 	}
 
 	public String getEncoding() {
-		return getString("encoding", DEFAULT_ENCODING); //$NON-NLS-1$ //$NON-NLS-2$
+		return getString(ENCODING_KEY, DEFAULT_ENCODING);
 	}
 
 	public void setEncoding(String encoding) {
-		setString("encoding", encoding); //$NON-NLS-1$
+		setString(ENCODING_KEY, encoding);
 	}
 
 	public String getStyles() {
-		return getString("styles", DEFAULT_STYLES); //$NON-NLS-1$ //$NON-NLS-2$
+		return getString(STYLES_KEY, DEFAULT_STYLES);
 	}
 
 	public void setStyles(String styles) {
-		setString("styles", styles); //$NON-NLS-1$
+		setString(STYLES_KEY, styles);
 	}
 
 	public String getApplication() {
-		return getString("application", DEFAULT_APPLICATION); //$NON-NLS-1$ //$NON-NLS-2$
+		return getString(APPLICATION_KEY, DEFAULT_APPLICATION);
 	}
 
 	public void setApplication(String app) {
@@ -158,40 +169,45 @@ public abstract class Configuration {
 		} else if ( ! app.startsWith(PANDA_SCHEME)) {
 			app = PANDA_SCHEME + app;
 		}
-		setString("application", app); //$NON-NLS-1$
+		setString(APPLICATION_KEY, app);
 	}
 
 	public boolean getUseSSL() {
-		return getBoolean("use_ssl", DEFAULT_USE_SSL); //$NON-NLS-1$
+		return getBoolean(USE_SSL_KEY, DEFAULT_USE_SSL);
 	}
 
 	public void setUseSSL(boolean flag) {
-		setBoolean("use_ssl", flag); //$NON-NLS-1$
+		setBoolean(USE_SSL_KEY, flag);
 	}
 
 
 	public boolean getVerify() {
-		return getBoolean("verify", DEFAULT_VERIFY); //$NON-NLS-1$
+		return getBoolean(VERIFY_KEY, DEFAULT_VERIFY);
 	}
 
 	public void setVerify(boolean flag) {
-		setBoolean("verify", flag); //$NON-NLS-1$
+		setBoolean(VERIFY_KEY, flag);
 	}
 
 	public int getProtocolVersion() {
-		return getInt("protocol_version", DEFAULT_PROTOCOL_VERSION); //$NON-NLS-1$
+		return getInt(PROTOCOL_VERSION_KEY, DEFAULT_PROTOCOL_VERSION);
+	}
+
+	public void setProtocolVersion(int version) {
+		if (version != 1 && version != 2) {
+			throw new IllegalArgumentException("only protocol version 1 and 2 are acceptable."); //$NON-NLS-1$
+		}
+		setInt(PROTOCOL_VERSION_KEY, version);
 	}
 
 	// look and feel
 	// logger class
+	// debug mode
+	// html rendering
 
 	// if USE_SSL
 	//options.add("key", "key file name(pem)", null);
 	//options.add("cert", "certification file name(pem)", null);
 	//options.add("CApath", "path to CA", null);
 	//options.add("CAfile", "CA file", null);
-
-	public void setProtocolVersion(int version) {
-		setInt("protocol_version", version); //$NON-NLS-1$
-	}
 }
