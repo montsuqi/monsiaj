@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.7 2003-11-19 08:56:45 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.8 2003-12-02 05:05:29 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
@@ -69,8 +69,7 @@
     <jar jarfile="${dist.dir}/pandaclient.jar"
          basedir="${build.dir}"
          includes="**/*.class,**/*.properties"
-         manifest="${resources.dir}/manifest.mf"
-         index="yes"/>
+         manifest="${resources.dir}/manifest.mf"/>
   </target>
 
   <target name="buildclean"
