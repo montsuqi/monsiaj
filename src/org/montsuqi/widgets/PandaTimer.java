@@ -24,6 +24,9 @@ package org.montsuqi.widgets;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.Timer;
 import javax.swing.JComponent;
@@ -31,6 +34,27 @@ import javax.swing.JComponent;
 public class PandaTimer extends JComponent {
 
 	private Timer timer;
+
+	private static final Map timers;
+	static {
+		timers = new WeakHashMap();
+	}
+
+	public static void suspendAllTimers() {
+		Iterator i = timers.keySet().iterator();
+		while (i.hasNext()) {
+			Timer timer = (Timer)i.next();
+			timer.stop();
+		}
+	}
+
+	public static void resumeAllTimers() {
+		Iterator i = timers.keySet().iterator();
+		while (i.hasNext()) {
+			Timer timer = (Timer)i.next();
+			timer.start();
+		}
+	}
 
 	public PandaTimer() {
 		super();
@@ -41,6 +65,7 @@ public class PandaTimer extends JComponent {
 		});
 		timer.setRepeats(true);
 		timer.start();
+		timers.put(this, null);
 	}
 
 	public void addTimerListener(TimerListener l) {
@@ -69,5 +94,9 @@ public class PandaTimer extends JComponent {
 
 	public void reset() {
 		timer.restart();
+	}
+
+	public void finalize() {
+		timers.remove(this);
 	}
 }
