@@ -112,7 +112,8 @@ class WidgetBuilder {
 		registerProperty(javax.swing.JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(java.awt.Component.class, "width_request", "setWidth");
 		registerProperty(java.awt.Component.class, "height_request", "setHeight");
-		
+		registerProperty(java.awt.Component.class, "width", "setWidth");
+		registerProperty(java.awt.Component.class, "height", "setHeight");
 
 /*
 		registerProperty("selectable", null);
