@@ -13,8 +13,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,7 +44,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class Interface {
@@ -92,15 +89,11 @@ public class Interface {
 			handlerClass = Class.forName(type);
 			handler = (AbstractDocumentHandler)handlerClass.newInstance();
 
-			InputSource source;
 			if (type.equals(oldHandler)) {
-				Reader reader = new InputStreamReader(input, "EUC-JP");
-				source = new InputSource(reader);
-			} else {
-				source = new InputSource(input);	
+				input = new FakeEncodingInputStream(input);
 			}
 
-			parser.parse(source, handler);
+			parser.parse(input, handler);
 			return handler.getInterface(protocol);
 		} catch (ClassNotFoundException e) {
 			Logger.getLogger(Interface.class).fatal(e);
@@ -265,6 +258,22 @@ public class Interface {
 	}
 
 	private void connectDeleteEvent(final Container target, final Method handler, final Object other) {
+		if (target instanceof Window) {
+			((Window)target).addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					invoke(handler, target, other);
+				}
+			});
+		} else {
+			target.addComponentListener(new ComponentAdapter() {
+				public void componentHidden(ComponentEvent e) {
+					invoke(handler, target, other);
+				}
+			});
+		}
+	}
+
+	private void connectDestroy(final Container target, final Method handler, final Object other) {
 		if (target instanceof Window) {
 			((Window)target).addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
