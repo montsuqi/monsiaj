@@ -18,7 +18,7 @@ public class TestPandaCList extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreatePandaCList() {
+	public void createPandaCList() {
 		final Window window = new Window();
 		window.setTitle("PandaCList Test");
 		window.setBounds(100 , 100 , 200 , 200);
@@ -29,7 +29,7 @@ public class TestPandaCList extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreatePandaCList();
+		createPandaCList();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaCList Test"));
 	}
 

@@ -17,7 +17,7 @@ public class TestWindow extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreateWindow() {
+	public void createWindow() {
 		final Window window = new Window();
 		window.setTitle("Window Test");
 		window.setBounds(100, 100, 200, 100);
@@ -26,7 +26,7 @@ public class TestWindow extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreateWindow();
+		createWindow();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("Window Test"));
 	}
 

@@ -18,7 +18,7 @@ public class TestPandaTimer extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreatePandaTimer() {
+	public void createPandaTimer() {
 		final Window window = new Window();
 		window.setTitle("PandaTimer Test");
 		window.setBounds(100 , 100 , 200 , 200);
@@ -29,7 +29,7 @@ public class TestPandaTimer extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreatePandaTimer();
+		createPandaTimer();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaTimer Test"));
 	}
 

@@ -18,7 +18,7 @@ public class TestHSeparator extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreateHSeparator() {
+	public void createHSeparator() {
 		final Window window = new Window();
 		window.setTitle("HSeparator Test");
 		window.setBounds(100 , 100 , 200 , 200);
@@ -29,7 +29,7 @@ public class TestHSeparator extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreateHSeparator();
+		createHSeparator();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("HSeparator Test"));
 	}
 

@@ -31,7 +31,7 @@ public class TestCalendar extends JFCTestCase {
 		super(name);
 	}
 
-	public static void CreateCalendar() {
+	public static void createCalendar() {
 		final Window window = new Window();
 		window.setTitle("CalendarTest"); 
 		final Calendar cal = new Calendar();
@@ -61,7 +61,7 @@ public class TestCalendar extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreateCalendar();
+		createCalendar();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("CalendarTest"));
 	}
 

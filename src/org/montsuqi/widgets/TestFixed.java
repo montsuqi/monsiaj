@@ -18,7 +18,7 @@ public class TestFixed extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreateFixed() {
+	public void createFixed() {
 		final Window window = new Window();
 		window.setTitle("Fixed Test");
 		window.setBounds(100 , 100 , 200 , 200);
@@ -30,7 +30,7 @@ public class TestFixed extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreateFixed();
+		createFixed();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("Fixed Test"));
 	}
 

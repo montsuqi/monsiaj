@@ -21,7 +21,7 @@ public class TestNumberEntry extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreateNumberEntry() {
+	public void createNumberEntry() {
 		final Window window = new Window();
 		window.setTitle("NumberEntry Test");
 		window.setBounds(100 , 100 , 200 , 50);
@@ -33,7 +33,7 @@ public class TestNumberEntry extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreateNumberEntry();
+		createNumberEntry();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("NumberEntry Test"));
 		NamedComponentFinder f = new NamedComponentFinder(
 			NumberEntry.class, "NumberEntery1");
@@ -78,6 +78,19 @@ public class TestNumberEntry extends JFCTestCase {
 		text = m_numberEntry.getText();
 		assertEquals("ZZ.Z format ", "1", text);
 
+	}
+
+	public void testZZZ9format() throws Exception {
+		String text;
+		m_numberEntry.setFormat("ZZZ9");
+		m_helper.sendString(new StringEventData(this,
+							m_numberEntry, "0"));
+		text = m_numberEntry.getText();
+		assertEquals("99.9 format ", "0", text);
+		m_helper.sendString(new StringEventData(this,
+							m_numberEntry, "101"));
+		text = m_numberEntry.getText();
+		assertEquals("ZZZ9 format ", "101", text);
 	}
 
 	public void testHyphenformat() throws Exception {

@@ -21,7 +21,7 @@ public class TestPandaHTML extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreatePandaHTML() throws MalformedURLException {
+	public void createPandaHTML() throws MalformedURLException {
 		final Window window = new Window();
 		window.setTitle("PandaHTML Test");
 		window.setBounds(100 , 100 , 600 , 400);
@@ -34,7 +34,7 @@ public class TestPandaHTML extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreatePandaHTML();
+		createPandaHTML();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaHTML Test"));
 	}
 

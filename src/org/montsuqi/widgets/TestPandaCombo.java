@@ -18,7 +18,7 @@ public class TestPandaCombo extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreatePandaCombo() {
+	public void createPandaCombo() {
 		final Window window = new Window();
 		window.setTitle("PandaCombo Test");
 		window.setBounds(100 , 100 , 200 , 50);
@@ -30,7 +30,7 @@ public class TestPandaCombo extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreatePandaCombo();
+		createPandaCombo();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaCombo Test"));
 	}
 

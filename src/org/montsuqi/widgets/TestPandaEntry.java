@@ -21,7 +21,7 @@ public class TestPandaEntry extends JFCTestCase {
 		super(name);
 	}
 
-	public void CreatePandaEntry() {
+	public void createPandaEntry() {
 		final Window window = new Window();
 		window.setTitle("PandaEntry Test");
 		window.setBounds(100 , 100 , 200 , 50);
@@ -33,7 +33,7 @@ public class TestPandaEntry extends JFCTestCase {
 
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
-		CreatePandaEntry();
+		createPandaEntry();
 		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaEntry Test"));
 
 		NamedComponentFinder f = new NamedComponentFinder(
