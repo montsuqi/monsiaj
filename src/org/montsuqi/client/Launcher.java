@@ -28,11 +28,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -50,7 +50,7 @@ public class Launcher {
 
 	protected static final Logger logger = Logger.getLogger(Launcher.class);
 
-	private Client client;
+	Client client;
 	protected Configuration conf;
 	protected String title;
 
@@ -131,16 +131,14 @@ public class Launcher {
 		JPanel bar = new JPanel();
 		bar.setLayout(new FlowLayout());
 		container.add(bar, BorderLayout.SOUTH);
-		JButton clear = new JButton(Messages.getString("Launcher.log_clear")); //$NON-NLS-1$
-		clear.addActionListener(new ActionListener() {
+		JButton clear = new JButton(new AbstractAction(Messages.getString("Launcher.log_clear")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				console.setText(""); //$NON-NLS-1$
 			}
 		});
 		bar.add(clear);
 
-		JButton save = new JButton(Messages.getString("Launcher.log_save_log_as")); //$NON-NLS-1$
-		save.addActionListener(new ActionListener() {
+		JButton save = new JButton(new AbstractAction(Messages.getString("Launcher.log_save_log_as")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent ev) {
 				JFileChooser chooser = new JFileChooser();
 				int ret = chooser.showSaveDialog(f);
@@ -157,6 +155,13 @@ public class Launcher {
 			}
 		});
 		bar.add(save);
+
+		JButton quit = new JButton(new AbstractAction(Messages.getString("Launcher.log_quit")) { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				client.exitSystem();
+			}
+		});
+		bar.add(quit);
 
 		f.setSize(640, 480);
 		int state = f.getExtendedState();
