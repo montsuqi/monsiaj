@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Point;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -123,7 +124,9 @@ abstract class WidgetPropertySetter {
 				Dimension size = widget.getSize();
 				try {
 					size.width = Integer.parseInt(value);
+					int height = size.height;
 					size = ScreenScale.scale(size);
+					size.height = height;
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
 					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
@@ -137,7 +140,9 @@ abstract class WidgetPropertySetter {
 				Dimension size = widget.getSize();
 				try {
 					size.height = Integer.parseInt(value);
+					int width = size.width;
 					size = ScreenScale.scale(size);
+					size.width = width;
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
 					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
@@ -574,8 +579,26 @@ abstract class WidgetPropertySetter {
 				value = normalize(value, null);
 				if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
 					java.awt.Window window = (java.awt.Window)widget;
-					window.setLocationRelativeTo(null);
+					ScreenScale.centerWindow(window);
 				}
+			}
+		});
+
+		registerProperty(java.awt.Window.class, "x", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				java.awt.Window window = (java.awt.Window)widget;
+				int x = ParameterConverter.toInteger(value);
+				int y = window.getY();
+				window.setLocation(ScreenScale.scale(new Point(x, y)));
+			}
+		});
+
+		registerProperty(java.awt.Window.class, "y", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				java.awt.Window window = (java.awt.Window)widget;
+				int x = window.getX();
+				int y = ParameterConverter.toInteger(value);
+				window.setLocation(ScreenScale.scale(new Point(x, y)));
 			}
 		});
 

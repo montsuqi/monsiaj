@@ -29,11 +29,12 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 
 final class ScreenScale {
 	private static double widthScale;
 	private static double heightScale;
-
+	private static Point center;
 	static {
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -43,6 +44,9 @@ final class ScreenScale {
 		Dimension screenSize = tk.getScreenSize();
 		widthScale = (screenSize.width - insets.right - insets.left) / (double)screenSize.width;
 		heightScale = (screenSize.height - insets.top - insets.bottom) / (double)screenSize.height;
+		center = new Point();
+		center.x = (screenSize.width - insets.right + insets.left) / 2;
+		center.y = (screenSize.height - insets.bottom + insets.top) / 2;
 	}
 
 	static Dimension scale(Dimension size) {
@@ -50,5 +54,9 @@ final class ScreenScale {
 	}
 	static Point scale(Point pos) {
 		return new Point((int)(pos.x * widthScale), (int)(pos.y * heightScale));
+	}
+
+	static void centerWindow(Window window) {
+		window.setLocation(center.x - window.getWidth() / 2, center.y - window.getHeight() / 2);
 	}
 }

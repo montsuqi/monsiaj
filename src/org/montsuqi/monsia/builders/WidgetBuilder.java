@@ -221,12 +221,23 @@ public class WidgetBuilder {
 	}
 
 	void setProperties(Interface xml, Container parent, Component widget, Map properties) {
-		Iterator i = properties.entrySet().iterator();
 		Class clazz = widget.getClass();
+		Iterator i = properties.entrySet().iterator();
+		String positionValue = null;
 		while (i.hasNext()) {
 			Map.Entry ent = (Map.Entry)i.next();
-			WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, (String)ent.getKey());
-			setter.set(xml, parent, widget, (String)ent.getValue());
+			String name = (String)ent.getKey();
+			String value = (String)ent.getValue();
+			if ("position".equals(name)) { //$NON-NLS-1$
+				positionValue = value;
+				continue; // set position after size of this window is determined.
+			}
+			WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, name);
+			setter.set(xml, parent, widget, value);
+		}
+		if (positionValue != null) {
+			WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, "position"); //$NON-NLS-1$
+			setter.set(xml, parent, widget, positionValue);
 		}
 	}
 }
