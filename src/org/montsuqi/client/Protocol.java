@@ -636,15 +636,10 @@ public class Protocol extends Connection {
 		}
 	}
 
-/*
-  public void day_selected(Container widget, Object userData) {
-  updateWidget(cal, userData);
-  printf("%d\n",(int)user_data);
-  printf("year = %d\n",widget->year);
-  printf("month = %d\n",widget->month+1);
-  printf("day = %d\n",widget->selected_day);
-  }
-*/
+	public void day_selected(Container widget, Object userData) {
+		Calendar cal = (Calendar)widget;
+		addChangedWidget(cal, userData);
+	}
 
 	public void switch_page(Container widget, Object userData) {
 		addChangedWidget(widget, userData);

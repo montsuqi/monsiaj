@@ -70,6 +70,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.CalendarEvent;
+import org.montsuqi.widgets.CalendarListener;
 import org.xml.sax.SAXException;
 
 public class Interface {
@@ -399,6 +402,23 @@ public class Interface {
 		JToggleButton toggleButton = (JToggleButton)target;
 		toggleButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				invoke(handler, target, other);
+			}
+		});
+	}
+
+	private void connectDaySelected(final Container target, final Method handler, final Object other) {
+		if ( ! (target instanceof Calendar)) {
+			return;
+		}
+		Calendar cal = (Calendar)target;
+		cal.addCalendarListener(new CalendarListener() {
+
+			public void previousMonth(CalendarEvent e) {}
+
+			public void nextMonth(CalendarEvent e) {}
+
+			public void daySelected(CalendarEvent e) {
 				invoke(handler, target, other);
 			}
 		});

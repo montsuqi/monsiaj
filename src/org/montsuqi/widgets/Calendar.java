@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import java.util.Date;
 
 public class Calendar extends JComponent {
+
 	private Date date;
 	private DateFormat df;
 	private JComponent caption;
@@ -61,12 +62,14 @@ public class Calendar extends JComponent {
 		prev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				previousMonth();
+				fireCalendarEvent(new CalendarEvent(prev, CalendarEvent.PREVIOUS_MONTH));
 			}
 		});
 
 		next.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				nextMonth();
+				fireCalendarEvent(new CalendarEvent(next, CalendarEvent.NEXT_MONTH));
 			}
 		});
 
@@ -110,6 +113,7 @@ public class Calendar extends JComponent {
 				cell.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setDate(cellDates[finalRow][finalCol]);
+						fireCalendarEvent(new CalendarEvent(cell, CalendarEvent.DAY_SELECTED));
 					}
 				});
 				dateCells[row][col] = cell;
@@ -117,6 +121,26 @@ public class Calendar extends JComponent {
 			}
 		}
 		setCells();
+	}
+
+	protected void fireCalendarEvent(CalendarEvent e) {
+		CalendarListener[] listeners = (CalendarListener[])listenerList.getListeners(CalendarListener.class);
+		for (int i = 0, n = listeners.length; i < n; i++) {
+			CalendarListener l = listeners[i];
+			switch (e.getID()) {
+			case CalendarEvent.PREVIOUS_MONTH:
+				l.previousMonth(e);
+				break;
+			case CalendarEvent.NEXT_MONTH:
+				l.nextMonth(e);
+				break;
+			case CalendarEvent.DAY_SELECTED:
+				l.daySelected(e);
+				break;
+			default:
+				throw new IllegalStateException("unknown event id");
+			}
+		}
 	}
 
 	public Date getDate() {
@@ -173,6 +197,14 @@ public class Calendar extends JComponent {
 		}
 		date = cal.getTime();
 		setCells();
+	}
+
+	public void addCalendarListener(CalendarListener l) {
+		listenerList.add(CalendarListener.class, l);
+	}
+
+	public void removeCalendarListener(CalendarListener l) {
+		listenerList.remove(CalendarListener.class, l);
 	}
 
 	public static void main(String[] args) {

@@ -57,7 +57,7 @@ public class NumberEntry extends JTextField {
 				setValue(NumberDocument.ZERO);
 			}
 		};
-
+//		addInputMethodListener(new InputMethodListener() {});
 		Keymap km = getKeymap();
 		int clearKeys[] = new int[] 
 			{
