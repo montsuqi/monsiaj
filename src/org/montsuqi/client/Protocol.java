@@ -249,14 +249,15 @@ public class Protocol extends Connection {
 		}
 
 		if (node != null) {
+			JFrame w = node.window;
 			switch (type) {
 			case SCREEN_NEW_WINDOW:
 			case SCREEN_CURRENT_WINDOW:
-				node.window.setVisible(true);
-				node.window.pack();
+				w.pack();
+				w.setVisible(true);
 				break;
 			case SCREEN_CLOSE_WINDOW:
-				node.window.setVisible(false);
+				w.setVisible(false);
 				/* fall through */
 			default:
 				node = null;
