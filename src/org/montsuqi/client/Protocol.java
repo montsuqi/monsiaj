@@ -52,6 +52,7 @@ import org.montsuqi.widgets.PandaTimer;
 
 public class Protocol extends Connection {
 
+	private JFrame oldWindow;
 	private WidgetValueManager valueManager;
 	private Map windowTable;
 	private Logger logger;
@@ -167,9 +168,12 @@ public class Protocol extends Connection {
 			case ScreenType.CURRENT_WINDOW:
 				w.pack();
 				w.setVisible(true);
+				if (oldWindow != null && oldWindow != w) { 
+					oldWindow.setVisible(false);
+				}
 				break;
 			case ScreenType.CLOSE_WINDOW:
-				w.setVisible(false);
+				oldWindow = w;
 				// fall through
 			default:
 				node = null;
