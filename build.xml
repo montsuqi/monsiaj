@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.8 2003-12-02 05:05:29 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.9 2004-01-20 09:01:00 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
@@ -41,6 +41,11 @@
         <available classname="javax.net.ssl.SSLSocket"/>
       </not>
     </condition>
+    <condition property="exclude.prefs" value="**/PreferenceBasedConfiguration.java">
+      <not>
+        <available classname="java.util.prefs.Preferences"/>
+      </not>
+    </condition>
   </target> 
 
   <target name="compile" depends="prepare"
@@ -54,6 +59,7 @@
       <exclude name="${exclude.j2selogger}"/>
       <exclude name="${exclude.log4jlogger}"/>
       <exclude name="${exclude.ssl}"/>
+      <exclude name="${exclude.prefs}"/>
       <classpath refid="project.class.path"/>
     </javac>
   </target>
@@ -61,6 +67,7 @@
   <target name="resources" depends="prepare">
     <copy todir="${build.dir}">
       <fileset dir="${src.dir}" includes="**/*.properties"/>
+      <fileset dir="${resources.dir}" includes="*.jpg"/>
     </copy>
   </target>
   <target name="jars" depends="compile,resources"
@@ -68,8 +75,12 @@
     <!-- ant 1.5.x should use destfile instead of jarfile-->
     <jar jarfile="${dist.dir}/pandaclient.jar"
          basedir="${build.dir}"
-         includes="**/*.class,**/*.properties"
+         includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties"
          manifest="${resources.dir}/manifest.mf"/>
+    <jar jarfile="${dist.dir}/jmareceipt.jar"
+         basedir="${build.dir}"
+         includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties"
+         manifest="${resources.dir}/jmareceipt.mf"/>
   </target>
 
   <target name="buildclean"
@@ -93,4 +104,3 @@
   </target>
 
 </project>
-

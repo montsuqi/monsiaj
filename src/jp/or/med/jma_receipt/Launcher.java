@@ -25,32 +25,51 @@ package jp.or.med.jma_receipt;
 import javax.swing.JOptionPane;
 
 import org.montsuqi.client.Client;
+import org.montsuqi.util.Logger;
 
 public final class Launcher {
 
 	public static void main(String[] args) {
 		Client client = new Client();
-		Configuration conf = new PreferenceBasedConfiguration();
-		ConfigurationDialog d = new ConfigurationDialog(conf);
-		d.setVisible(true);
-		if (d.needRun()) {
-			conf = d.getConfiguration();
-			client.setUser(conf.getUser());
-			String pass = new String(conf.getPass());
-			client.setPass(pass);
-			client.setHost(conf.getHost());
-			client.setPortNumber(conf.getPort());
-			client.setCurrentApplication(conf.getApplication());
-			client.setEncoding(System.getProperty("file.encoding")); //$NON-NLS-1$
+		Class clazz = null;
+		Logger logger;
+		logger = Logger.getLogger(Launcher.class);
+
+		try {
+			clazz = Class.forName("jp.or.med.jma_receipt.PreferenceBasedConfiguration");
+		} catch (ClassNotFoundException e1) {
 			try {
-				client.connect();
-				Thread t = new Thread(client);
-				t.start();
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
+				clazz = Class.forName("jp.or.med_jma_receipt.PropertyFileBasedConfiguration");
+			} catch (ClassNotFoundException e2) {
+				logger.fatal(e2);
 			}
-		} else {
-			System.exit(0);
+		}
+		Configuration conf;
+		try {
+			conf = (Configuration)clazz.newInstance();
+			ConfigurationDialog d = new ConfigurationDialog(conf);
+			d.setVisible(true);
+			if (d.needRun()) {
+				conf = d.getConfiguration();
+				client.setUser(conf.getUser());
+				String pass = new String(conf.getPass());
+				client.setPass(pass);
+				client.setHost(conf.getHost());
+				client.setPortNumber(conf.getPort());
+				client.setCurrentApplication(conf.getApplication());
+				client.setEncoding(System.getProperty("file.encoding")); //$NON-NLS-1$
+				try {
+					client.connect();
+					Thread t = new Thread(client);
+					t.start();
+				} catch (Exception e2) {
+					JOptionPane.showMessageDialog(null, e2.getMessage());
+				}
+			} else {
+				System.exit(0);
+			}
+		} catch (Exception e) {
+			logger.fatal(e);
 		}
 	}
 }
