@@ -77,7 +77,7 @@ abstract class Connector {
 
 	abstract void connect(Protocol con, Component target, SignalHandler handler, Object other);
 
-	public static Connector getConnector(String signalName) throws NoSuchMethodException {
+	public static Connector getConnector(String signalName) {
 		if (connectors.containsKey(signalName)) {
 			return (Connector)connectors.get(signalName);
 		}
@@ -120,11 +120,7 @@ abstract class Connector {
 			}
 		});
 
-		try {
-			registerConnector("button_press_event", getConnector("clicked")); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (NoSuchMethodException e) {
-			throw new ExceptionInInitializerError(e);
-		}
+		registerConnector("button_press_event", getConnector("clicked")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		registerConnector("key_press_event", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -188,11 +184,7 @@ abstract class Connector {
 			}
 		});
 
-		try {
-			registerConnector("enter", getConnector("activate")); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (NoSuchMethodException e) {
-			throw new ExceptionInInitializerError(e);
-		}
+		registerConnector("enter", getConnector("activate")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		registerConnector("focus_in_event", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {

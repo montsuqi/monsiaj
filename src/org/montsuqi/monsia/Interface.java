@@ -144,15 +144,11 @@ public class Interface {
 		while (entries.hasNext()) {
 			SignalData data = (SignalData)entries.next();
 			String handlerName = data.getHandler().toLowerCase();
-			try {
-				SignalHandler handler = SignalHandler.getSignalHandler(handlerName);
-				if (data.isAfter()) {
-					connectAfter(handler, data);
-				} else {
-					connect(handler, data);
-				}
-			} catch (NoSuchMethodException e) {
-				throw new InterfaceBuildingException(e);
+			SignalHandler handler = SignalHandler.getSignalHandler(handlerName);
+			if (data.isAfter()) {
+				connectAfter(handler, data);
+			} else {
+				connect(handler, data);
 			}
 		}
 	}
@@ -169,12 +165,8 @@ public class Interface {
 				throw new IllegalArgumentException(MessageFormat.format("no such combo: {0}", args)); //$NON-NLS-1$
 			}
 		}
-		try {
-			Connector connector = Connector.getConnector(data.getName());
-			connector.connect(protocol, target, handler, data.getObject());
-		} catch (NoSuchMethodException e) {
-			throw new InterfaceBuildingException(e);
-		}
+		Connector connector = Connector.getConnector(data.getName());
+		connector.connect(protocol, target, handler, data.getObject());
 	}
 
 	private void connectAfter(SignalHandler handler, SignalData data) {

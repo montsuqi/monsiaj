@@ -27,7 +27,7 @@ public abstract class SignalHandler {
 		return window == con.getActiveWindow();
 	}
 
-	public static SignalHandler getSignalHandler(String handlerName) throws NoSuchMethodException {
+	public static SignalHandler getSignalHandler(String handlerName) {
 		if (handlers.containsKey(handlerName)) {
 			return (SignalHandler)handlers.get(handlerName);
 		}
