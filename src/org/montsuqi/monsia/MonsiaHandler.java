@@ -30,7 +30,15 @@ class MonsiaHandler extends DefaultHandler {
 	private final StringBuffer content;
 	private WidgetInfo widget;
     private String propertyName;
-	private String propertyType;
+
+	class PropertyType {
+		static final int NONE = 0;
+		static final int WIDGET = 1;
+		static final int ATK = 2;
+		static final int CHILD = 3;
+	}
+	private int propertyType;
+
 
 	private final Map widgets;
 	private final List topLevels;
@@ -149,7 +157,7 @@ class MonsiaHandler extends DefaultHandler {
 	}
 
     final ParserState START = new ParserState("START") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("monsia-interface")) { //$NON-NLS-1$
 				state = MONSIA_INTERFACE;
 			} else {
@@ -160,13 +168,13 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			logger.warn(Messages.getString("MonsiaHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
 		}
 	};
 	
     final ParserState MONSIA_INTERFACE = new ParserState("MONSIA_INTERFACE") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("requires")) { //$NON-NLS-1$
 				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
@@ -196,7 +204,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("monsia-interface")) { //$NON-NLS-1$
 				warnShouldFindClosing("monsia-interface", localName); //$NON-NLS-1$
 			}
@@ -205,13 +213,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState REQUIRES = new ParserState("REQUIRES") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("requires", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
-		public void endElement(String uri, String localName, String qName) {
+
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("requires")) { //$NON-NLS-1$
 				warnShouldFindClosing("requires", localName); //$NON-NLS-1$
 			}
@@ -220,11 +229,11 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET = new ParserState("WIDGET") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("property")) { //$NON-NLS-1$
 				boolean badAgent = false;
 				
-				if (propertyType != null && ! propertyType.equals("WIDGET")) { //$NON-NLS-1$
+				if (propertyType != PropertyType.WIDGET) {
 					warnInvalidPropertiesDefinedHere("widget"); //$NON-NLS-1$
 				}
 				for (int i = 0, n = attrs.getLength(); i < n; i++) {
@@ -246,7 +255,7 @@ class MonsiaHandler extends DefaultHandler {
 					state = UNKNOWN;
 					unknownDepth++;
 				} else {
-					propertyType = "WIDGET"; //$NON-NLS-1$
+					propertyType = PropertyType.WIDGET; //$NON-NLS-1$
 					state = WIDGET_PROPERTY;
 				}
 			} else if (localName.equals("accessibility")) { //$NON-NLS-1$
@@ -273,7 +282,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("widget")) { //$NON-NLS-1$
 				warnShouldFindClosing("widget", localName); //$NON-NLS-1$
 			}
@@ -294,14 +303,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_PROPERTY = new ParserState("WIDGET_PROPERTY") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("property", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("property")) { //$NON-NLS-1$
 				warnShouldFindClosing("property", localName); //$NON-NLS-1$
 			}
@@ -312,12 +321,12 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_ATK = new ParserState("WIDGET_ATK") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("atkproperty")) { //$NON-NLS-1$
-				if (propertyType != null && ! propertyType.equals("ATK")) { //$NON-NLS-1$
+				if (propertyType != PropertyType.ATK) { //$NON-NLS-1$
 					warnInvalidPropertiesDefinedHere("atk"); //$NON-NLS-1$
 				}
-				propertyType = "ATK"; //$NON-NLS-1$
+				propertyType = PropertyType.ATK; //$NON-NLS-1$
 				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
@@ -342,7 +351,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("accessibility")) { //$NON-NLS-1$
 				warnShouldFindClosing("accessibility", localName); //$NON-NLS-1$
 			}
@@ -353,7 +362,7 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_ATK_PROPERTY = new ParserState("WIDGET_ATK_PROPERTY") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("accessibility")) { //$NON-NLS-1$
 				state = WIDGET_ATK;
 			} else {
@@ -364,7 +373,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if (localName.equals("atkproperty")) { //$NON-NLS-1$
 				warnShouldFindClosing("atkproperty", localName); //$NON-NLS-1$
 			}
@@ -375,14 +384,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_ATK_ACTION = new ParserState("WIDGET_ATK_ACTION") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("atkaction", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if (localName.equals("atkaction")) { //$NON-NLS-1$
 				warnShouldFindClosing("atkaction", localName); //$NON-NLS-1$
 			}
@@ -393,14 +402,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_ATK_RELATION = new ParserState("WIDGET_ATK_RELATION") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("atkrelation", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if (localName.equals("atkrelation")) { //$NON-NLS-1$
 				warnShouldFindClosing("atkrelation", localName); //$NON-NLS-1$
 			}
@@ -411,7 +420,7 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_AFTER_ATK = new ParserState("WIDGET_AFTER_ATK") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("signal")) { //$NON-NLS-1$
 				handleSignal(attrs);
 				state = WIDGET_SIGNAL;
@@ -429,7 +438,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("widget")) { //$NON-NLS-1$
 				warnShouldFindClosing("widget", localName); //$NON-NLS-1$
 			}
@@ -450,14 +459,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_SIGNAL = new ParserState("WIDGET_SIGNAL") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("signal", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("signal")) { //$NON-NLS-1$
 				warnShouldFindClosing("signal", localName); //$NON-NLS-1$
 			}
@@ -466,7 +475,7 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_AFTER_SIGNAL = new ParserState("WIDGET_AFTER_SIGNAL") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("accelerator")) { //$NON-NLS-1$
 				handleAccel(attrs);
 				state = WIDGET_ACCEL;
@@ -481,7 +490,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("widget")) { //$NON-NLS-1$
 				warnShouldFindClosing("widget", localName); //$NON-NLS-1$
 			}
@@ -502,14 +511,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_ACCEL = new ParserState("WIDGET_ACCEL") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("accelerator", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("accelerator")) { //$NON-NLS-1$
 				warnShouldFindClosing("accelerator", localName); //$NON-NLS-1$
 			}
@@ -518,7 +527,7 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_AFTER_ACCEL = new ParserState("WIDGET_AFTER_ACCEL") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("child")) { //$NON-NLS-1$
 				handleChild(attrs);
 				state = WIDGET_CHILD;
@@ -530,7 +539,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("widget")) { //$NON-NLS-1$
 				warnShouldFindClosing("widget", localName); //$NON-NLS-1$
 			}
@@ -551,7 +560,7 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD = new ParserState("WIDGET_CHILD") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("widget")) { //$NON-NLS-1$
 				WidgetInfo parent = widget;
 				ChildInfo info = (ChildInfo)(parent.getLastChild());
@@ -559,7 +568,7 @@ class MonsiaHandler extends DefaultHandler {
 				info.setWidgetInfo(widget);
 				widget.setParent(parent);
 				widgetDepth++;
-				propertyType = null;
+				propertyType = PropertyType.NONE;
 				propertyName = null;
 				properties.clear();
 				signals.clear();
@@ -576,7 +585,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("child")) { //$NON-NLS-1$
 				warnShouldFindClosing("child", localName); //$NON-NLS-1$
 			}
@@ -591,7 +600,7 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD_AFTER_WIDGET = new ParserState("WIDGET_CHILD_AFTER_WIDGET") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("packing")) { //$NON-NLS-1$
 				state = WIDGET_CHILD_PACKING;
 			} else {
@@ -602,7 +611,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("child")) { //$NON-NLS-1$
 				warnShouldFindClosing("child", localName); //$NON-NLS-1$
 			}
@@ -611,11 +620,11 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD_PACKING = new ParserState("WIDGET_CHILD_PACKING") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("property")) { //$NON-NLS-1$
 				boolean badAgent = false;
 				
-				if (propertyType != null && ! propertyType.equals("CHILD")) { //$NON-NLS-1$
+				if (propertyType != PropertyType.CHILD) { //$NON-NLS-1$
 					warnInvalidPropertiesDefinedHere("child"); //$NON-NLS-1$
 				}
 				for (int i = 0, n = attrs.getLength(); i < n; i++) {
@@ -637,7 +646,7 @@ class MonsiaHandler extends DefaultHandler {
 					state = UNKNOWN;
 					unknownDepth++;
 				} else {
-					propertyType = "CHILD"; //$NON-NLS-1$
+					propertyType = PropertyType.CHILD; //$NON-NLS-1$
 					state = WIDGET_CHILD_PACKING_PROPERTY;
 				}
 			} else {
@@ -648,7 +657,7 @@ class MonsiaHandler extends DefaultHandler {
 			}
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("packing")) { //$NON-NLS-1$
 				warnShouldFindClosing("packing", localName); //$NON-NLS-1$
 			}
@@ -658,14 +667,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD_PACKING_PROPERTY = new ParserState("WIDGET_CHILD_PACKING_PROPERTY") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("property", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("property")) { //$NON-NLS-1$
 				warnShouldFindClosing("property", localName); //$NON-NLS-1$
 			}
@@ -676,14 +685,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD_AFTER_PACKING = new ParserState("WIDGET_CHILD_AFTER_PACKING") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			logger.warn(Messages.getString("MonsiaHandler.child_should_have_no_elements_after_packing"), localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("child")) { //$NON-NLS-1$
 				warnShouldFindClosing("child", localName); //$NON-NLS-1$
 			}
@@ -692,14 +701,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD_PLACEHOLDER = new ParserState("WIDGET_CHILD_PLACEHOLDER") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			warnShouldBeEmpty("placeholder", localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("placeholder")) { //$NON-NLS-1$
 				warnShouldFindClosing("placeholder", localName); //$NON-NLS-1$
 			}
@@ -708,14 +717,14 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState WIDGET_CHILD_AFTER_PLACEHOLDER = new ParserState("WIDGET_CHILD_AFTER_PLACEHOLDER") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			/* this is a placeholder <child> element -- ignore extra elements */
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			if ( ! localName.equals("child")) { //$NON-NLS-1$
 				warnShouldFindClosing("child", localName); //$NON-NLS-1$
 			}
@@ -724,24 +733,24 @@ class MonsiaHandler extends DefaultHandler {
 	};
 
     final ParserState FINISH = new ParserState("FINISH") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			logger.warn(Messages.getString("MonsiaHandler.there_should_be_no_elements_here"), localName); //$NON-NLS-1$
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			logger.warn(Messages.getString("MonsiaHandler.should_not_be_closing_any_elements_in_this_state")); //$NON-NLS-1$
 		}
 	};
 
     final ParserState UNKNOWN = new ParserState("UNKNOWN") { //$NON-NLS-1$
-		public void startElement(String uri, String localName, String qName, Attributes attrs) {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			unknownDepth++;
 		}
 
-		public void endElement(String uri, String localName, String qName) {
+		void endElement(String uri, String localName, String qName) {
 			unknownDepth--;
 			if (unknownDepth == 0) {
 				state = prevState;
@@ -760,21 +769,25 @@ class MonsiaHandler extends DefaultHandler {
 	}
 
 	private void flushProperties() {
-		if (propertyType == null) {
+		switch (propertyType) {
+		case PropertyType.NONE:
 			// do nothing
-		} else if (propertyType.equals("WIDGET")) { //$NON-NLS-1$
+			break;
+		case PropertyType.WIDGET:
 			if (widget.getPropertiesCount() != 0) {
 				logger.warn(Messages.getString("MonsiaHandler.we_already_read_all_the_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setProperties(properties);
 			properties.clear();
-		} else if (propertyType.equals("ATK")) { //$NON-NLS-1$
+			break;
+		case PropertyType.ATK:
 			if (widget.getATKPropertiesCount() != 0) {
 				logger.warn(Messages.getString("MonsiaHandler.we_already_read_all_the_ATK_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setATKProperties(properties);
 			properties.clear();
-		} else if (propertyType.equals("CHILD")) { //$NON-NLS-1$
+			break;
+		case PropertyType.CHILD:
 			if (widget.getChildrenCount() == 0) {
 				logger.warn(Messages.getString("MonsiaHandler.no_children_but_have_child_properties")); //$NON-NLS-1$
 				properties.clear();
@@ -783,9 +796,12 @@ class MonsiaHandler extends DefaultHandler {
 				info.setProperties(properties);
 				properties.clear();
 			}
+			break;
+		default:
+			logger.fatal(Messages.getString("MonsiaHandler.unknown_property_type"), new Integer(propertyType));
 		}
 
-		propertyType = null;
+		propertyType = PropertyType.NONE;
 		propertyName = null;
 		properties.clear();
 	}
