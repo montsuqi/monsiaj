@@ -47,7 +47,7 @@ class ButtonMarshaller extends WidgetMarshaller {
 			} else {
 				boolean selected = con.receiveBooleanData();
 				manager.registerValue(button, name, null);
-				button.setEnabled(selected);
+				button.setSelected(selected);
 			}
 		}
 	}
