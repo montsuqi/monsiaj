@@ -68,7 +68,7 @@ class CListMarshaller extends WidgetMarshaller {
 			label.replace(offset, label.length(), '.' + name);
 			Component sub = xml.getWidgetByLongName(label.toString());
 			if (sub != null) {
-				con.receiveValue(widgetName, offset + name.length());
+				con.receiveValue(label, offset + 1 + name.length());
 			} else if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
