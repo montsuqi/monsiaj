@@ -85,6 +85,9 @@ class WidgetMarshal {
 		}
 	}
 
+	private void setStyle(Container widget, String style) {
+		logger.debug("apply style \"{0}\" to {1}", new Object[] { style, widget});
+	}
 	boolean receiveEntry(Container widget) throws IOException {
 		if (con.receiveDataType()  == Type.RECORD) {
 			int nItem = con.receiveInt();
@@ -95,7 +98,7 @@ class WidgetMarshal {
 					setState(widget, state);
 				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
-					/* setStyle(widget, getStyle(buff)); */
+					setStyle(widget, buff);
 				} else {
 					String buff = con.receiveStringData();
 					registerValue(widget, name, null);
@@ -125,7 +128,7 @@ class WidgetMarshal {
 					setState(widget, state);
 				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
-					/* setStyle(widget,getStyle(buff)); */
+					setStyle(widget, buff);
 				} else {
 					String buff = con.getWidgetNameBuffer().toString() + '.' + name;
 					ValueAttribute va = getValue(buff);
@@ -155,7 +158,7 @@ class WidgetMarshal {
 				String name = con.receiveString();
 				if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
-					/*gtk_widget_set_style(widget,GetStyle(buff));*/
+					setStyle(widget, buff);
 				} else {
 					String buff = con.receiveStringData();
 					registerValue(widget, name, null);
@@ -185,7 +188,7 @@ class WidgetMarshal {
 					setState(widget,state);
 				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
-					/*gtk_widget_set_style(widget,GetStyle(buff));*/
+					setStyle(widget, buff);
 				} else {
 					String buff = con.receiveStringData();
 					registerValue(widget, name, null);
@@ -228,7 +231,7 @@ class WidgetMarshal {
 					setState(widget, state);
 				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
-					/*setStyle(widget,getStyle(buff));*/
+					setStyle(widget, buff);
 				} else if ("label".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					setLabel(widget, buff);
@@ -253,7 +256,7 @@ class WidgetMarshal {
 				setState(widget, state);
 			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
-				/* gtk_widget_set_style(widget,GetStyle(buff)); */
+				setStyle(widget, buff);
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
@@ -336,7 +339,7 @@ class WidgetMarshal {
 				setState(widget, state);
 			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
-				/* gtk_widget_set_style(widget,GetStyle(buff)); */
+				setStyle(widget, buff);
 			} else if ("row".equals(name)) { //$NON-NLS-1$
 				/* NOP */
 			} else if ("columns".equals(name)) { //$NON-NLS-1$
@@ -402,7 +405,8 @@ class WidgetMarshal {
 	boolean receiveList(Container widget) throws IOException {
 		Container item;
 		int state;
-		
+		JList list = (JList)widget;
+		DefaultListModel listModel = (DefaultListModel)list.getModel();
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		StringBuffer label = con.getWidgetNameBuffer();
 		int offset = label.length();
@@ -413,30 +417,29 @@ class WidgetMarshal {
 			String name = con.receiveString();
 			int num;
 			if ("state".equals(name)) { //$NON-NLS-1$
-				setState(widget,con.receiveIntData());
+				state = con.receiveIntData();
+				setState(widget, state);
 			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
-				/*gtk_widget_set_style(widget,GetStyle(buff));*/
+				setStyle(widget, buff);
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
 			} else if ("from".equals(name)) { //$NON-NLS-1$
 				from = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
-				DefaultListModel model = new DefaultListModel();
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				num = con.receiveInt();
 				if (count < 0) {
 					count = num;
 				}
-				for	(int j = 0; j < num; j++) {
+				for (int j = 0; j < num; j++) {
 					String buff = con.receiveStringData();
 					if (buff != null) {
 						if ((j >= from) && ((j - from) < count)) {
-							model.addElement(buff);
+							listModel.addElement(buff);
 						}
 					}
 				}
-				((JList)widget).setModel(model);
 			} else {
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				registerValue(widget, name, new Integer(from));
@@ -444,7 +447,7 @@ class WidgetMarshal {
 				if (count < 0) {
 					count = num;
 				}
-				ListSelectionModel model = ((JList)widget).getSelectionModel();
+				ListSelectionModel model = list.getSelectionModel();
 				for	(int j = 0; j < num; j++) {
 					boolean fActive = con.receiveBooleanData();
 					if ((j >= from) &&	((j - from) < count)) {
@@ -497,7 +500,7 @@ class WidgetMarshal {
 				setState(widget, con.receiveIntData());
 			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
-				/*gtk_widget_set_style(widget,GetStyle(buff));*/
+				setStyle(widget, buff);
 			} else if ("year".equals(name)) { //$NON-NLS-1$
 				year = con.receiveIntData();
 			} else if ("month".equals(name)) { //$NON-NLS-1$
@@ -541,7 +544,7 @@ class WidgetMarshal {
 				setState(widget, con.receiveIntData());
 			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
-				/* gtk_widget_set_style(widget,GetStyle(buff)); */
+				setStyle(widget, buff);
 			} else if ("pageno".equals(name)) { //$NON-NLS-1$
 				page = con.receiveIntData();
 				registerValue(widget, name, null);
@@ -579,7 +582,7 @@ class WidgetMarshal {
 				setState(widget, con.receiveIntData());
 			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
-				/* gtk_widget_set_style(widget,GetStyle(buff)); */
+				setStyle(widget, buff);
 			} else if ("value".equals(name)) { //$NON-NLS-1$
 				registerValue(widget, name, null);
 				JProgressBar progress = (JProgressBar)widget;
