@@ -26,7 +26,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.monsia.Node;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
@@ -242,16 +241,9 @@ public class Protocol extends Connection {
 			switch (type) {
 			case SCREEN_NEW_WINDOW:
 			case SCREEN_CURRENT_WINDOW:
-				try {
-					Interface xml = Interface.parseFile(fName, this);
-					node = new Node(xml, wName);
-					windowTable.put(node.name, node);
-				} catch (InterfaceBuildingException e) {
-					logger.fatal(e);
-					Error error = new InternalError();
-					error.initCause(e);
-					throw error;
-				}
+				Interface xml = Interface.parseFile(fName, this);
+				node = new Node(xml, wName);
+				windowTable.put(node.name, node);
 			}
 		}
 
