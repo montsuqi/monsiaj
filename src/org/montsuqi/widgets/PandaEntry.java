@@ -101,6 +101,7 @@ public class PandaEntry extends Entry {
 	public void setInputMode(int mode) {
 		PandaDocument doc = (PandaDocument)getDocument();
 		doc.setInputMode(mode);
+		enableInputMethods(mode != ASCII);
 	}
 
 	public int getInputMode() {
@@ -110,6 +111,7 @@ public class PandaEntry extends Entry {
 
 	public void setXIMEnabled(boolean enabled) {
 		ximEnabled = enabled;
+		enableInputMethods(enabled);
 	}
 
 	public boolean getXIMEnabled() {
