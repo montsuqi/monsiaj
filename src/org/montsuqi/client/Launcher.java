@@ -89,6 +89,7 @@ public class Launcher {
 			client.connect();
 			Thread t = new Thread(client);
 			t.start();
+			t.join();
 		} catch (Exception e) {
 			logger.fatal(e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
