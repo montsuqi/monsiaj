@@ -96,7 +96,7 @@ public class WidgetBuilder {
 		WidgetBuilder defaultWidgetBuilder= new WidgetBuilder();
 		WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
 
-		registerWidgetClass("Button",         JButton.class,       defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Button",         JButton.class,       new ButtonBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Calendar",       Calendar.class,      defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("CheckButton",    JCheckBox.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
