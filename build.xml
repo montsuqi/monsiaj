@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.20 2004-06-10 09:34:02 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.21 2004-06-14 06:47:49 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -31,6 +31,8 @@
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${tmp.dir}"/>
     <mkdir dir="${dist.dir}"/>
+    <property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
+    <property name="src.name" value="monsiaj-src-${DSTAMP}"/>
     <mkdir dir="${report.dir}"/>
     <condition property="exclude.j2selogger" value="**/J2SELogger.java">
       <not>
@@ -89,26 +91,41 @@
       includes="*.jnlp" encoding="UTF-8" reverse="true"/>
   </target>
 
-  <target name="dist" depends="compile,resources"
-          description="Build files to be distributed.">
+  <target name="dist" depends="dist-bin,dist-src"
+          description="Build files to be distributed."/>
+
+  <target name="dist-bin" depends="compile,resources">
+    <mkdir dir="${dist.dir}/${bin.name}"/>
     <!-- ant 1.5.x should use destfile instead of jarfile-->
-    <jar jarfile="${dist.dir}/pandaclient.jar"
+    <jar jarfile="${dist.dir}/${bin.name}/pandaclient.jar"
          basedir="${build.dir}"
          includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,org/montsuqi/**/*.png"
          manifest="${resources.dir}/manifest.mf"/>
-    <jar jarfile="${dist.dir}/jmareceipt.jar"
+    <jar jarfile="${dist.dir}/${bin.name}/jmareceipt.jar"
          basedir="${build.dir}"
          includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
          manifest="${resources.dir}/jmareceipt.mf"/>
-    <copy todir="${dist.dir}">
+    <copy todir="${dist.dir}/${bin.name}">
       <fileset dir="${libs.dir}" includes="*.jar" excludes="jfcunit.jar"/>
     </copy>
-    <copy todir="${dist.dir}">
+    <copy todir="${dist.dir}/${bin.name}">
       <fileset dir="${build.dir}" includes="*.jnlp"/>
     </copy>
     <!-- ant 1.5.x should use destfile instead of zipfile-->
-    <zip zipfile="${dist.dir}/monsiaj-${DSTAMP}.zip">
-      <fileset dir="${dist.dir}" includes="*.jar"/>
+    <zip zipfile="${dist.dir}/monsiaj-bin-${DSTAMP}.zip">
+      <fileset dir="${dist.dir}" includes="${bin.name}/**"/>
+    </zip>
+  </target>
+
+  <target name="dist-src" depends="prepare">
+    <mkdir dir="${dist.dir}/${src.name}"/>
+    <copy todir="${dist.dir}/${src.name}">
+      <fileset dir="." includes="src/**,resources/**,libs/**,docs/**,build.xml,Makefile"
+	excludes="**/CVS"/>
+    </copy>
+    <!-- ant 1.5.x should use destfile instead of zipfile-->
+    <zip zipfile="${dist.dir}/monsiaj-src-${DSTAMP}.zip">
+      <fileset dir="${dist.dir}" includes="${src.name}/**"/>
     </zip>
   </target>
 
@@ -129,7 +146,8 @@
   <target name="veryclean" depends="clean,buildclean"
     description="Cleans all generated files.">
     <delete dir="${build.dir}" verbose="${clean.verbose}" quiet="true"/>
-    <delete dir="${dist.dir}"  verbose="${clean.verbose}" quiet="true"/>
+    <delete dir="${tmp.dir}" verbose="${clean.verbose}" quiet="true"/>
+    <delete dir="${dist.dir}" verbose="${clean.verbose}" quiet="true"/>
     <delete dir="${report.dir}" verbose="${clean.verbose}" quiet="true"/>
   </target>
 
