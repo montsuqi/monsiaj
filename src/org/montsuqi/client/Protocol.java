@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.client;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,32 +37,20 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
-import javax.swing.JToggleButton;
+
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.Calendar;
-import org.montsuqi.widgets.NumberEntry;
-import org.montsuqi.widgets.PandaEntry;
-import org.montsuqi.widgets.PandaCombo;
+import org.montsuqi.widgets.PandaTimer;
 
 public class Protocol extends Connection {
 
-	private WidgetMarshal marshal;
-	private Map classTable;
+	private WidgetValueManager valueManager;
 	private Map windowTable;
 	private Logger logger;
 	private Client client;
@@ -90,32 +79,11 @@ public class Protocol extends Connection {
 	Protocol(Client client, Socket s) throws IOException {
 		super(s, client.getEncoding());
 		this.client = client;
-		classTable = new HashMap();
 		windowTable = new HashMap();
 		inReceive = false;
 		ignoreEvent = false;
 		logger = Logger.getLogger(Connection.class);
-		initWidgetOperations();
-		marshal = new WidgetMarshal(this, Style.load(client.getStyles()));
-	}
-
-	private void initWidgetOperations() {
-		addClass(JTextField.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(NumberEntry.class,      "receiveNumberEntry", "sendNumberEntry"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JTextArea.class,        "receiveText",        "sendText"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(PandaEntry.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JLabel.class,           "receiveLabel",       null); //$NON-NLS-1$
-		addClass(JComboBox.class,        "receiveCombo",       null); //$NON-NLS-1$
-		addClass(PandaCombo.class,       "receiveCombo",       null); //$NON-NLS-1$
-		addClass(JTable.class,           "receiveCList",       "sendCList"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JButton.class,          "receiveButton",      null); //$NON-NLS-1$
-		addClass(JToggleButton.class,    "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JCheckBox.class,        "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JRadioButton.class,     "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JList.class,            "receiveList",        "sendList"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(Calendar.class,         "receiveCalendar",    "sendCalendar"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JTabbedPane.class,      "receiveNotebook",    "sendNotebook"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JProgressBar.class,     "receiveProgressBar", "sendProgressBar"); //$NON-NLS-1$ //$NON-NLS-2$
+		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
 	}
 
 	Interface getInterface() {
@@ -248,25 +216,21 @@ public class Protocol extends Connection {
 		}
 	}
 
-	boolean receiveWidgetData(Container widget) throws IOException {
-		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
-		if (handler != null) {
-			return  handler.receiveWidget(getMarshal(), widget);
-		} else {
+	boolean receiveWidgetData(Component widget) throws IOException {
+		try {
+			WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(widget.getClass());
+			return marshaller.receive(valueManager, widget);
+		} catch (ClassNotFoundException e) {
 			return false;
 		}
 	}
 
-	private WidgetMarshal getMarshal() {
-		return marshal;
-	}
-
-	private boolean sendWidgetData(String name, Container widget) throws IOException {
-		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
-		if (handler != null) {
+	private boolean sendWidgetData(String name, Component widget) throws IOException {
+		try {
 			// FIXME need special handling for combo
-			return handler.sendWidget(getMarshal(), name, widget);
-		} else {
+			WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(widget.getClass());
+			return marshaller.send(valueManager, name, widget);
+		} catch (ClassNotFoundException e) {
 			return false;
 		}
 	}
@@ -310,7 +274,7 @@ public class Protocol extends Connection {
 	void receiveValue(StringBuffer longName, int offset) throws IOException {
 		boolean fTrace = true;
 		boolean fDone = false;
-		Container widget = xml.getWidgetByLongName(longName.toString());
+		Component widget = xml.getWidgetByLongName(longName.toString());
 		if (widget != null) {
 			if (receiveWidgetData(widget)) {
 				fTrace = false;
@@ -354,26 +318,27 @@ public class Protocol extends Connection {
 		return false;
 	}
 
-	private void grabFocus(Container widget) {
+	private void grabFocus(Component widget) {
 		//gtk_idle_add(_GrabFocus, widget);
 	}
 
-	private void _resetTimer(Container widget, Object data) {
-		//if (GTK_IS_CONTAINER (widget)) {
-		//gtk_container_forall (GTK_CONTAINER (widget), _ResetTimer, NULL);
-		//} else if (GTK_IS_PANDA_TIMER (widget)) {
-		//gtk_panda_timer_reset (GTK_PANDA_TIMER (widget));
-		//}
-	}
-
-	void resetTimer(JFrame window) {
-		//gtk_container_forall (GTK_CONTAINER (window), _ResetTimer, NULL);
+	void resetTimer(Component widget) {
+		if (widget instanceof Container) {
+			Container container = (Container)widget;
+			for (int i = 0, n = container.getComponentCount(); i < n; i++) {
+				Component comp = container.getComponent(i);
+				resetTimer(comp);
+			}
+		} else if (widget instanceof PandaTimer) {
+			PandaTimer timer = (PandaTimer)widget;
+			timer.reset();
+		}
 	}
 
 	boolean getScreenData() throws IOException {
 		String window = null;
 		Node node;
-		Container widget;
+		Component widget;
 		int type;
 
 		inReceive = true;
@@ -497,22 +462,13 @@ public class Protocol extends Connection {
 			while (j.hasNext()) {
 				Map.Entry e = (Map.Entry)j.next();
 				String name = (String)e.getKey();
-				Container widget = (Container)e.getValue();
+				Component widget = (Component)e.getValue();
 				sendWidgetData(name, widget);
 			}
 			sendPacketClass(PacketClass.END);
 		}
 		sendPacketClass(PacketClass.END);
 		clearWindowTable();
-	}
-
-	private void addClass(Class clazz, String receiverName, String senderName) {
-		try {
-			MarshalHandler handler = WidgetMarshal.getHandler(receiverName, senderName);
-			classTable.put(clazz, handler);
-		} catch (NoSuchMethodException e) {
-			logger.fatal(e);
-		}
 	}
 
 	private void clearWindowTable() {
@@ -524,22 +480,22 @@ public class Protocol extends Connection {
 	}
 
 	// public callbacks
-	public boolean select_all(Container widget, Object userData) {
+	public boolean select_all(Component widget, Object userData) {
 		JTextField field = (JTextField)widget;
 		field.selectAll();
 		field.setCaretPosition(0);
 		return true;
 	}
 
-	public boolean unselect_all(Container widget, Object userData) {
+	public boolean unselect_all(Component widget, Object userData) {
 		JTextField field = (JTextField)widget;
 		field.select(0, 0);
 		return true;
 	}
 
-	public void send_event(Container widget, Object userData) throws IOException {
+	public void send_event(Component widget, Object userData) throws IOException {
 		if (!inReceive  && !ignoreEvent) {
-			Container parent = widget;
+			Component parent = widget;
 			while (parent.getParent() != null) {
 				parent = parent.getParent();
 			}
@@ -557,41 +513,41 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void send_event_when_idle(Container widget, Object userData) throws IOException {
+	public void send_event_when_idle(Component widget, Object userData) throws IOException {
 		send_event(widget, userData);
 	}
 
-	public void send_event_on_focus_out(Container widget, Object userData) throws IOException {
+	public void send_event_on_focus_out(Component widget, Object userData) throws IOException {
 		send_event(widget, userData);
 	}
 
-	public void clist_send_event(Container widget, Object userData) throws IOException {
+	public void clist_send_event(Component widget, Object userData) throws IOException {
 		send_event(widget, "SELECT"); //$NON-NLS-1$
 	}
 
-	public void activate_widget(Container widget, Object userData) throws IOException {
+	public void activate_widget(Component widget, Object userData) throws IOException {
 		send_event(widget, "ACTIVATE"); //$NON-NLS-1$
 	}
 
-	public void entry_next_focus(Container widget, Object userData) {
-		Container parent = widget;
+	public void entry_next_focus(Component widget, Object userData) {
+		Component parent = widget;
 		while (parent.getParent() != null) {
 			parent = parent.getParent();
 		}
 		Node node = (Node)windowTable.get(parent.getName());
 		if (node != null) {
-			Container nextWidget = node.getInterface().getWidget(userData.toString());
+			Component nextWidget = node.getInterface().getWidget(userData.toString());
 			if (nextWidget != null) {
 				grabFocus(nextWidget);
 			}
 		}
 	}
 
-	private void addChangedWidget(Container widget, Object userData) {
+	private void addChangedWidget(Component widget, Object userData) {
 		if (inReceive) {
 			return;
 		}
-		Container parent = widget;
+		Component parent = widget;
 		while (parent.getParent() != null) {
 			parent = parent.getParent();
 		}
@@ -603,39 +559,39 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void changed(Container widget, Object userData) {
+	public void changed(Component widget, Object userData) {
 		addChangedWidget(widget, null);
 	}
 
-	public void entry_changed(Container widget, Object userData) {
+	public void entry_changed(Component widget, Object userData) {
 		addChangedWidget(widget, null);
 	}
 	
-	public void text_changed(Container widget, Object userData) {
+	public void text_changed(Component widget, Object userData) {
 		addChangedWidget(widget, userData);
 	}
 
-	public void button_toggled(Container widget, Object userData) {
+	public void button_toggled(Component widget, Object userData) {
 		addChangedWidget(widget, userData);
 	}
 
-	public void selection_changed(Container widget, Object userData) {
+	public void selection_changed(Component widget, Object userData) {
 		addChangedWidget(widget, userData);
 	}
 
-	public void click_column(Container widget, Object userData) {
+	public void click_column(Component widget, Object userData) {
 		addChangedWidget(widget, userData);
 	}
 
-	public void entry_set_editable(Container widget, Object userData) {
+	public void entry_set_editable(Component widget, Object userData) {
 		/* empty??? */
 	}
 
-	public void map_event(Container widget, Object userData) {
+	public void map_event(Component widget, Object userData) {
 		clearWindowTable();
 	}
 
-	public void set_focus(Container widget, Object userData) {
+	public void set_focus(Component widget, Object userData) {
 		String name = widget.getName();
 		Node node = (Node)windowTable.get(name);
 		if(node != null) {
@@ -643,12 +599,12 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void day_selected(Container widget, Object userData) {
+	public void day_selected(Component widget, Object userData) {
 		Calendar cal = (Calendar)widget;
 		addChangedWidget(cal, userData);
 	}
 
-	public void switch_page(Container widget, Object userData) {
+	public void switch_page(Component widget, Object userData) {
 		addChangedWidget(widget, userData);
 	}
 
@@ -656,7 +612,7 @@ public class Protocol extends Connection {
 		return node.getWindow() != null;
 	}
 
-	public void window_close(Container widget, Object userData) {
+	public void window_close(Component widget, Object userData) {
 		String name = widget.getName();
 		Node node = (Node)windowTable.get(name);
 		if (node != null) {
@@ -675,14 +631,14 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void window_destroy(Container widget, Object userData) {
+	public void window_destroy(Component widget, Object userData) {
 		inReceive = true;
 		client.exitSystem();
 	}
 
-	public void open_browser(Container widget, Object userData) {
+	public void open_browser(Component widget, Object userData) {
 		if ( ! (widget instanceof JTextPane)) {
-			logger.warn("not a JTextPane widget");
+			logger.warn(Messages.getString("Protocol.not_a_JTextPane_widget")); //$NON-NLS-1$
 		}
 		JTextPane pane = (JTextPane)widget;
 		URL uri;
@@ -696,16 +652,16 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void keypress_filter(Container widget, Object userData) {
-		logger.warn("keypress_filter is not impremented yet");
+	public void keypress_filter(Component widget, Object userData) {
+		logger.warn(Messages.getString("Protocol.keypress_filter_is_not_impremented_yet")); //$NON-NLS-1$
 	}
 
-	public void press_filter(Container widget, Object userData) {
-		logger.warn("press_filter is not impremented yet");
+	public void press_filter(Component widget, Object userData) {
+		logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); //$NON-NLS-1$
 	}
 
 	/** callback placeholder which has no effect */
-	public void gtk_true(Container widget, Object userData) {
+	public void gtk_true(Component widget, Object userData) {
 		/* DO NOTHING */
 	}
 
