@@ -162,6 +162,15 @@ public class WidgetBuilder {
 				UIManager.put(key, new FontUIResource(font));
 			}
 		}
+		if (SystemEnvironment.isMacOSX()) {
+			String key = "TextField.font"; //$NON-NLS-1$
+			Font font = (Font)UIManager.get(key);
+			if (font != null) {
+				font = new Font("Osaka", Font.PLAIN, font.getSize()); //$NON-NLS-1$
+				font = ScreenScale.scale(font);
+				UIManager.put(key, new FontUIResource(font));
+			}
+		}
 	}
 
 	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {
