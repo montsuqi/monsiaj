@@ -35,6 +35,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.montsuqi.util.ExtensionFileFilter;
@@ -55,6 +56,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 
 	public DefaultConfigurationDialog(String title, Configuration conf) {
 		super(title, conf);
+		changeLookAndFeel(conf.getLookAndFeelClassName());
 	}
 
 	protected void updateConfiguration() {
@@ -144,11 +146,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		final JComboBox combo = lookAndFeelCombo;
 		lookAndFeelCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				try {
-					UIManager.setLookAndFeel(lafs[combo.getSelectedIndex()].getClassName());
-				} catch (Exception e) {
-					logger.warn(e);
-				}
+				changeLookAndFeel(lafs[combo.getSelectedIndex()].getClassName());
 			}
 		});
 
@@ -157,5 +155,15 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 
 		useLogViewerCheck = addCheckRow(controls, y, Messages.getString("DefaultConfigurationDialog.use_log_viewer"), conf.getUseLogViewer()); //$NON-NLS-1$
 		return controls;
+	}
+
+
+	protected void changeLookAndFeel(String className) {
+		try {
+			UIManager.setLookAndFeel(className);
+			SwingUtilities.updateComponentTreeUI(this);
+		} catch (Exception e) {
+			logger.warn(e);
+		}
 	}
 }
