@@ -34,6 +34,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.util.Date;
 
@@ -62,14 +63,14 @@ public class Calendar extends JComponent {
 		prev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				previousMonth();
-				fireCalendarEvent(new CalendarEvent(prev, CalendarEvent.PREVIOUS_MONTH));
+				fireCalendarEvent(new CalendarEvent(Calendar.this, CalendarEvent.PREVIOUS_MONTH));
 			}
 		});
 
 		next.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				nextMonth();
-				fireCalendarEvent(new CalendarEvent(next, CalendarEvent.NEXT_MONTH));
+				fireCalendarEvent(new CalendarEvent(Calendar.this, CalendarEvent.NEXT_MONTH));
 			}
 		});
 
@@ -113,7 +114,7 @@ public class Calendar extends JComponent {
 				cell.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setDate(cellDates[finalRow][finalCol]);
-						fireCalendarEvent(new CalendarEvent(cell, CalendarEvent.DAY_SELECTED));
+						fireCalendarEvent(new CalendarEvent(Calendar.this, CalendarEvent.DAY_SELECTED));
 					}
 				});
 				dateCells[row][col] = cell;
@@ -208,9 +209,29 @@ public class Calendar extends JComponent {
 	}
 
 	public static void main(String[] args) {
-		JFrame f = new JFrame("CalendarTest"); //$NON-NLS-1$
-		f.getContentPane().add(new Calendar());
+		final JFrame f = new JFrame("CalendarTest"); //$NON-NLS-1$
+		final Calendar cal = new Calendar();
+		f.getContentPane().add(cal);
 		f.setSize(400, 300);
 		f.setVisible(true);
+		final DateFormat monthFormat = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
+		final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); //$NON-NLS-1$
+		cal.addCalendarListener(new CalendarListener() {
+
+			public void previousMonth(CalendarEvent e) {
+				Date date = cal.getDate();
+				JOptionPane.showMessageDialog(f, monthFormat.format(date));
+			}
+
+			public void nextMonth(CalendarEvent e) {
+				Date date = cal.getDate();
+				JOptionPane.showMessageDialog(f, monthFormat.format(date));
+			}
+
+			public void daySelected(CalendarEvent e) {
+				Date date = cal.getDate();
+				JOptionPane.showMessageDialog(f, dayFormat.format(date));
+			}
+		});
 	}
 }
