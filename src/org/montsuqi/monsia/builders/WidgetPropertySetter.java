@@ -45,7 +45,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
@@ -385,6 +384,8 @@ abstract class WidgetPropertySetter {
 					WidgetPropertySetter setter = getSetter(JTable.class, "columns"); //$NON-NLS-1$
 					setter.set(xml, parent, widget, String.valueOf(columns));
 				}
+				assert columns == model.getColumnCount();
+
 				int totalWidth = 0;
 				for (int i = 0; tokens.hasMoreTokens(); i++) {
 					TableColumn column = model.getColumn(i);
@@ -403,14 +404,8 @@ abstract class WidgetPropertySetter {
 						ComponentUI ui = vScrollBar.getUI();
 						parentWidth -= ui.getPreferredSize(vScrollBar).getWidth();
 					}
-					JViewport columnHeader = scroll.getColumnHeader();
-					if (columnHeader != null) {
-						ComponentUI ui = columnHeader.getUI();
-						parentWidth -= ui.getPreferredSize(columnHeader).getWidth();
-					}
 					if (totalWidth < parentWidth) {
-						int diff = parentWidth - totalWidth;
-						int delta = diff / columns;
+						int delta = (parentWidth - totalWidth) / columns;
 						for (int i = 0; i < columns; i++) {
 							TableColumn column = model.getColumn(i);
 							int width = column.getPreferredWidth();

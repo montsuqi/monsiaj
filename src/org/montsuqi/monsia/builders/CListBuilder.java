@@ -24,8 +24,6 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.util.Map;
-
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -48,19 +46,8 @@ class CListBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		int cCount = info.getChildren().size();
 
-		String[] columnNames = new String[cCount];
-		for (int i = 0; i < cCount; i++) {
-			columnNames[i] = "?"; //$NON-NLS-1$
-			ChildInfo cInfo = info.getChild(i);
-			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Map properties = wInfo.getProperties();
-			if (properties.containsKey("label")) { //$NON-NLS-1$
-				columnNames[i] = (String)properties.get("label"); //$NON-NLS-1$
-			}
-		}
-
 		PandaCList clist = (PandaCList)parent;
-		clist.setModel(new DefaultTableModel(columnNames, 0) {
+		clist.setModel(new DefaultTableModel(0, cCount) {
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
