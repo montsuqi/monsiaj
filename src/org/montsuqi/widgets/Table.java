@@ -30,7 +30,7 @@ public class Table extends JComponent {
 
 	public Table() {
 		super();
-		super.setLayout(new TableLayout());
+		super.setLayout(new LatticeLayout());
 	}
 
 	public void setLayout(LayoutManager layout) {
