@@ -193,7 +193,32 @@ abstract class WidgetPropertySetter {
 		registerProperty(JLabel.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JLabel label = (JLabel)widget;
-				label.setText(value);
+				label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value); //$NON-NLS-1$
+			}
+
+			// convert multi-line label value into HTML
+			private String makeHTML(String value) {
+				StringBuffer buf = new StringBuffer("<html>"); //$NON-NLS-1$
+				StringTokenizer tokens = new StringTokenizer(value, "\n\"<>&", true); //$NON-NLS-1$
+				while (tokens.hasMoreTokens()) {
+					String token = tokens.nextToken();
+					if ("\n".equals(token)) { //$NON-NLS-1$
+						buf.append("<br>"); //$NON-NLS-1$
+					} else if ("\"".equals(token)) { //$NON-NLS-1$
+						buf.append("&dquot;"); //$NON-NLS-1$
+					} else if ("<".equals(token)) { //$NON-NLS-1$
+						buf.append("&lt;"); //$NON-NLS-1$
+					} else if (">".equals(token)) { //$NON-NLS-1$
+						buf.append("&gt;"); //$NON-NLS-1$
+					} else if ("&".equals(token)) { //$NON-NLS-1$
+						buf.append("&amp;"); //$NON-NLS-1$
+					} else {
+						buf.append(token);
+					}
+				}
+				buf.append("</html>"); //$NON-NLS-1$
+				value = buf.toString();
+				return value;
 			}
 		});
 
