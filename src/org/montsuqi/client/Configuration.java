@@ -29,6 +29,7 @@ import org.montsuqi.util.Logger;
 public abstract class Configuration {
 
 	private String pass;
+	private boolean configured;
 
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
 	static final int DEFAULT_PORT = 8000;
@@ -82,6 +83,14 @@ public abstract class Configuration {
 	abstract void setString(String key, String value);
 	abstract void setInt(String key, int value);
 	abstract void setBoolean(String key, boolean value);
+
+	boolean isConfigured() {
+		return configured;
+	}
+
+	void setConfigured(boolean flag) {
+		configured = flag;
+	}
 
 	public String getPass() {
 		return pass;
