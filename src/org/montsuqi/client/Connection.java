@@ -187,28 +187,30 @@ class Connection {
 		sendString(s);
 	}
 
+	private static final int NEGATIVE_FIXED_MASK = 0x40;
+
 	BigDecimal receiveFixed() throws IOException {
 		/* int flen = */ receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
 		BigInteger i = BigInteger.ZERO;
+		boolean negative = false;
 		if (value == null || value.length() == 0) {
 			logger.warn("empty Fixed value"); //$NON-NLS-1$
 		} else {
-			boolean minus = false;
 			char c = value.charAt(0);
-			if ((c & 0x40) != 0) {
-				value = (char)(c & ~0x40) + value.substring(1);
-				minus = true;
+			if ((c & NEGATIVE_FIXED_MASK) != 0) {
+				value = (char)(c & ~NEGATIVE_FIXED_MASK) + value.substring(1);
+				negative = true;
 			}
 			try {
 				i =  new BigInteger(value);
-				if (minus) {
-					i = i.negate();
-				}
 			} catch (NumberFormatException e) {
 				logger.warn(e);
 			}
+		}
+		if (negative) {
+			i = i.negate();
 		}
 		return (new BigDecimal(i)).movePointLeft(slen);
 	}
