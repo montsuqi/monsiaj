@@ -122,6 +122,9 @@ public class Protocol extends Connection {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
+		String expected = Integer.toHexString(0x000000ff&PacketClass.ScreenDefine);
+		String actual   = Integer.toHexString(0x000000ff&pc);
+		logger.debug("receiveFile: expected 0x{0}, actual 0x{1}", new Object[] { expected, actual });
 		if (pc == PacketClass.ScreenDefine) {
 			OutputStream fileOut = new FileOutputStream(fName);
 			int left = receiveLength();

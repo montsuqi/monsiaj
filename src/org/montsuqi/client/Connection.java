@@ -29,7 +29,9 @@ class Connection {
 	}
 
 	byte receivePacketClass() throws IOException {
-		return in.readByte();
+		byte b = in.readByte();
+		logger.debug("*** receivePacketClass = 0x{0}", Integer.toHexString(0x000000ff&b));
+		return b;
 	}
 
 	void sendDataType(int c) throws IOException {
