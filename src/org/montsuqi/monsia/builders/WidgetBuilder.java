@@ -33,6 +33,7 @@ import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -100,7 +101,7 @@ public class WidgetBuilder {
 		registerWidgetClass("CheckButton",    JCheckBox.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
 		registerWidgetClass("CList",          PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Dialog",         Window.class,       new WindowBuilder()); //$NON-NLS-1$
+		registerWidgetClass("Dialog",         JDialog.class,       new DialogBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Entry",          JTextField.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$

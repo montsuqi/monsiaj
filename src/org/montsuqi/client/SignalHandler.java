@@ -122,9 +122,11 @@ public abstract class SignalHandler {
 				if ( ! isWindowActive(con, widget)) {
 					return;
 				}
-				Window window = (Window)SwingUtilities.windowForComponent(widget);
+				java.awt.Window window = SwingUtilities.windowForComponent(widget);
 				try {
-					window.showBusyCursor();
+					if (window instanceof Window) {
+						((Window)window).showBusyCursor();
+					}
 					con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
 					con.sendWindowData();
 					synchronized (this) {
@@ -133,7 +135,9 @@ public abstract class SignalHandler {
 						unblockChangedHandlers();
 					}
 				} finally {
-					window.hideBusyCursor();
+					if (window instanceof Window) {
+						((Window)window).hideBusyCursor();
+					}
 				}
 			}
 		};

@@ -24,7 +24,10 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 
 import org.montsuqi.monsia.Interface;
@@ -42,5 +45,27 @@ public class DialogBuilder extends WindowBuilder {
 			dialog.setModal(false);
 		}
 		return widget;
+	}
+
+	
+	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
+		super.buildChildren(xml, parent, info);
+		List buttons = new ArrayList();
+		lookupButtons(parent, buttons);
+		if (buttons.size() == 1) {
+			JDialog dialog = (JDialog)parent;
+			dialog.getRootPane().setDefaultButton((JButton)buttons.get(0));
+		}
+	}
+
+	private void lookupButtons(Container parent, List buttons) {
+		for (int i = 0, n = parent.getComponentCount(); i < n; i++) {
+			Component c = parent.getComponent(i);
+			if (c instanceof JButton) {
+				buttons.add(c);
+			} else if (c instanceof Container) {
+				lookupButtons((Container)c, buttons);
+			}
+		}
 	}
 }
