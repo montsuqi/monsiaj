@@ -31,13 +31,7 @@ class MonsiaHandler extends DefaultHandler {
 	private WidgetInfo widget;
     private String propertyName;
 
-	class PropertyType {
-		static final int NONE = 0;
-		static final int WIDGET = 1;
-		static final int ATK = 2;
-		static final int CHILD = 3;
-	}
-	private int propertyType;
+	private PropertyType propertyType = PropertyType.NONE;
 
 
 	private final Map widgets;
@@ -769,25 +763,21 @@ class MonsiaHandler extends DefaultHandler {
 	}
 
 	private void flushProperties() {
-		switch (propertyType) {
-		case PropertyType.NONE:
+		if (propertyType == PropertyType.NONE) {
 			// do nothing
-			break;
-		case PropertyType.WIDGET:
+		} else if (propertyType == PropertyType.WIDGET) {
 			if (widget.getPropertiesCount() != 0) {
 				logger.warn(Messages.getString("MonsiaHandler.we_already_read_all_the_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setProperties(properties);
 			properties.clear();
-			break;
-		case PropertyType.ATK:
+		} else if (propertyType == PropertyType.ATK) {
 			if (widget.getATKPropertiesCount() != 0) {
 				logger.warn(Messages.getString("MonsiaHandler.we_already_read_all_the_ATK_props_for_this_key")); //$NON-NLS-1$
 			}
 			widget.setATKProperties(properties);
 			properties.clear();
-			break;
-		case PropertyType.CHILD:
+		} else if (propertyType == PropertyType.CHILD) {
 			if (widget.getChildrenCount() == 0) {
 				logger.warn(Messages.getString("MonsiaHandler.no_children_but_have_child_properties")); //$NON-NLS-1$
 				properties.clear();
@@ -796,9 +786,8 @@ class MonsiaHandler extends DefaultHandler {
 				info.setProperties(properties);
 				properties.clear();
 			}
-			break;
-		default:
-			logger.fatal(Messages.getString("MonsiaHandler.unknown_property_type"), new Integer(propertyType));
+		} else {
+			throw new IllegalStateException(Messages.getString("MonsiaHandler.unknown_property_type"));
 		}
 
 		propertyType = PropertyType.NONE;
@@ -1065,3 +1054,10 @@ class MonsiaHandler extends DefaultHandler {
 	}
 }
 
+class PropertyType {
+	private PropertyType() {}
+	static final PropertyType NONE = new PropertyType();
+	static final PropertyType WIDGET = new PropertyType();
+	static final PropertyType ATK = new PropertyType();
+	static final PropertyType CHILD = new PropertyType();
+}
