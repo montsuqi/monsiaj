@@ -80,6 +80,10 @@ import org.montsuqi.widgets.TableLayout;
 class WidgetPropertySetter {
 
 	private static WidgetPropertySetter theInstance;
+	static {
+		theInstance = new WidgetPropertySetter();
+	}
+
 	private Logger logger;
 	private Map propertyMap;
 
@@ -90,7 +94,7 @@ class WidgetPropertySetter {
 				String pName = p.getName();
 				String pValue = p.getValue();
 				boolean set = false;
-				for (Class clazz = widget.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+				for (Class clazz = widget.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
 					Map map = (Map)propertyMap.get(clazz);
 					if (map == null || ! map.containsKey(pName)) {
 						continue;
@@ -121,16 +125,7 @@ class WidgetPropertySetter {
 	private WidgetPropertySetter() {
 		logger = Logger.getLogger(WidgetPropertySetter.class);
 		propertyMap = new HashMap();
-		registerProperty(java.awt.Frame.class, "title", "setWindowTitle"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(Component.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JLabel.class, "justify", "setJustify"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTextComponent.class, "editable", "setEditable"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTextComponent.class, "text", "setTextText"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTextArea.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "width_request", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "height_request", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "width", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -139,33 +134,31 @@ class WidgetPropertySetter {
 		registerProperty(Component.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JTable.class, "show_titles", "setCListShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JTree.class, "selection_mode", "setTreeSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JTree.class, "view_mode", "setTreeViewMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JTree.class, "view_line", "setTreeViewLine"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Frame.class, "title", "setWindowTitle"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JLabel.class, "justify", "setJustify"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JList.class, "selection_mode", "setListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JCheckBoxMenuItem.class, "always_show_toggle", "setCheckMenuItemAlwaysShowToggle"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JRadioButtonMenuItem.class, "group", "setRadioMenuItemGroup"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JToolBar.class, "tooltips", "setToolbarTooltips"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(PandaEntry.class, "input_mode", "setPandaEntryInputMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JProgressBar.class, "lower", "setProgressBarLower"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JProgressBar.class, "upper", "setProgressBarUpper"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JProgressBar.class, "value", "setProgressBarValue"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JProgressBar.class, "orientation", "setProgressBarOrientation"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JProgressBar.class, "show_text", "setProgressBarShowText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextComponent.class, "editable", "setEditable"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextComponent.class, "text", "setTextText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextArea.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "show_titles", "setCListShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaEntry.class, "input_mode", "setPandaEntryInputMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Frame.class, "label", "setFrameLabel"); //$NON-NLS-1$ //$NON-NLS-2$
-		//registerProperty(Table.class, "rows", "setTableRows");
-		//registerProperty(Table.class, "columns", "setTableColumns");
-		//registerProperty(Table.class, "row_spacing", "setTableRowSpacing");
-		//registerProperty(Table.class, "column_spacing", "setTableColumnSpacing");
 	}
 
 	private void registerProperty(Class clazz, String propertyName, String setterName) {
@@ -174,20 +167,24 @@ class WidgetPropertySetter {
 		}
 		Map map = (Map)propertyMap.get(clazz);
 		Method setter = null;
-		if (setterName != null) {
-			if (setterName.startsWith("set")) { //$NON-NLS-1$
-				setter = findSetter(setterName);
-			} else { // assume that the setter name is field name.
-				try {
-					setter = findSetterByFieldName(clazz, setterName);
-				} catch (IllegalAccessException e) {
-					logger.fatal(e);
-				} catch (NoSuchFieldException e) {
-					logger.fatal(e);
-				}
-			}
-			map.put(propertyName, setter);
+		if (propertyName == null) {
+			throw new IllegalArgumentException("propertyName is null");
 		}
+		if (setterName == null) {
+			throw new IllegalArgumentException("setterName is null");
+		}
+		if (setterName.startsWith("set")) { //$NON-NLS-1$
+			setter = findSetter(setterName);
+		} else { // assume that the setter name is field name.
+			try {
+				setter = findSetterByFieldName(clazz, setterName);
+			} catch (IllegalAccessException e) {
+				logger.fatal(e);
+			} catch (NoSuchFieldException e) {
+				logger.fatal(e);
+			}
+		}
+		map.put(propertyName, setter);
 	}
 
 	private Method findSetterByFieldName(Class clazz, String field)
@@ -224,9 +221,6 @@ class WidgetPropertySetter {
 	}
 
 	public static WidgetPropertySetter getInstance() {
-		if (theInstance == null) {
-			theInstance = new WidgetPropertySetter();
-		}
 		return theInstance;
 	}
 
