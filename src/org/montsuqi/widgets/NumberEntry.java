@@ -47,14 +47,14 @@ import org.montsuqi.util.PrecisionScale;
 public class NumberEntry extends JTextField {
 
 	final protected Action clearAction;
-	
+
 	public NumberEntry(String text, int columns) {
 		super(new NumberDocument(), text, columns);
 		setHorizontalAlignment(JTextField.RIGHT);
 
 		clearAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				setValue(new BigDecimal(BigInteger.ZERO));
+				setValue(NumberDocument.ZERO);
 			}
 		};
 
@@ -65,7 +65,7 @@ public class NumberEntry extends JTextField {
 				KeyEvent.VK_DELETE,
 				KeyEvent.VK_CLEAR,
 				KeyEvent.VK_HOME,
-				KeyEvent.VK_END
+				KeyEvent.VK_END,
 			};
 
 		for (int i = 0; i < clearKeys.length; i++) {
@@ -105,14 +105,15 @@ public class NumberEntry extends JTextField {
 	public void setFormat(String format) {
 		NumberDocument doc = (NumberDocument)getDocument();
 		doc.setFormat(format);
+		setValue(getValue());
 	}
 
 	public static void main(String[] args) {
 		final JFrame f = new JFrame("TestNumberEntry"); //$NON-NLS-1$
 		final NumberEntry ne = new NumberEntry();
 		ne.setForeground(Color.red);
-		ne.setFormat("----,---.99"); //$NON-NLS-1$
-		ne.setValue(new BigDecimal("100.0")); //$NON-NLS-1$
+		ne.setFormat("99.9"); //$NON-NLS-1$
+		ne.setValue(NumberDocument.ZERO);
 		f.getContentPane().setLayout(new BorderLayout());
 		f.getContentPane().add(ne, BorderLayout.CENTER);
 		f.setSize(200, 50);
@@ -136,14 +137,14 @@ class NumberDocument extends PlainDocument {
 	private int expo;
 
 	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
+	static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
+	static final BigDecimal ONE = new BigDecimal(BigInteger.ONE);
 
 	NumberDocument() {
-		
-		//setFormat(DEFAULT_FORMAT);
-		setFormat("-ZZZ,ZZZ.99"); //$NON-NLS-1$
+		setFormat(DEFAULT_FORMAT);
 		expo = 0;
 		scale = 0;
-		value = new BigDecimal("0.0"); //$NON-NLS-1$
+		value = ZERO;
 		logger = Logger.getLogger(NumberDocument.class);
 	}
 	
@@ -151,7 +152,7 @@ class NumberDocument extends PlainDocument {
 		if ( ! value.equals(v)) {
 			PrecisionScale ps = new PrecisionScale(originalFormat);
 			String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
-			value = new BigDecimal(BigInteger.ZERO);
+			value = ZERO;
 			try {
 				insertString(0, t, null);
 			} catch (BadLocationException e) {	
@@ -170,7 +171,7 @@ class NumberDocument extends PlainDocument {
 
 	void setFormat(String format) {
 		this.originalFormat = (format == null) ? DEFAULT_FORMAT : format;
-		this.format = translateFormat(originalFormat); 
+		this.format = translateFormat(originalFormat);
 	}
 	
 	private static NumberFormat translateFormat(String originalFormat) {
@@ -221,7 +222,7 @@ class NumberDocument extends PlainDocument {
 	}
 
 	public void insertString(int offs, String str, AttributeSet a)
-		throws BadLocationException { 
+		throws BadLocationException {
 		if (str.length() <= 0) {
 			return;
 		}
@@ -230,9 +231,9 @@ class NumberDocument extends PlainDocument {
 		boolean minus = value.signum() < 0;
 		BigDecimal v = value.abs();
 		char[] p = str.toCharArray();
-		for	(int i = 0; i < p.length; i++) {
+		for (int i = 0; i < p.length; i++) {
 			if (p[i] == '-') {
-				minus = (minus) ? false : true;
+				minus = minus ? false : true;
 			} else if (p[i] == '.') {
 				if (originalFormat.indexOf('.') >= 0) {
 					scale = 1;
@@ -243,12 +244,13 @@ class NumberDocument extends PlainDocument {
 					if (expo < (ps.precision - ps.scale)) {
 						v = v.movePointRight(1);
 						v = v.add(input);
-						expo++;
+						if ( ! v.equals(ZERO)) {
+							expo++;
+						}
 					}
 				} else {
 					if (scale <= ps.scale) {
-						BigDecimal one = new BigDecimal(BigInteger.ONE);
-						BigDecimal small = one.movePointLeft(scale);
+						BigDecimal small = ONE.movePointLeft(scale);
 						scale++;
 						v = v.add(small.multiply(input));
 					}
@@ -256,8 +258,19 @@ class NumberDocument extends PlainDocument {
 			}
 		}
 		value = minus ? v.negate() : v;
+		String formatted = formatValue(format, value);
 		remove(0, getLength());
-		super.insertString(0, formatValue(format, value), a);
+		// treat zero value representation specially
+		if (formatted.equals("0") && isBlankForZeroValue()) { //$NON-NLS-1$
+			super.insertString(0, "", a); //$NON-NLS-1$
+		} else {
+			super.insertString(0, formatted, a);
+		}
+	}
+
+	private boolean isBlankForZeroValue() {
+		return originalFormat.indexOf("Z.") >= 0 || //$NON-NLS-1$
+			originalFormat.lastIndexOf('Z') == originalFormat.length() - 1;
 	}
 
 	private static String formatValue(NumberFormat format, BigDecimal v) {
