@@ -209,7 +209,8 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		String genericClassName = info.getClassName();
 		// handle Window/Dialog specially
 		if ("Window".equals(genericClassName)) { //$NON-NLS-1$
-			if ("GTK_WINDOW_DIALOG".equals(info.getProperty("type"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			String type = info.getProperty("type"); //$NON-NLS-1$
+			if ("WINDOW_DIALOG".equals(removePrefix(type))) { //$NON-NLS-1$
 				info.setClassName("Dialog"); //$NON-NLS-1$
 			}
 		}
