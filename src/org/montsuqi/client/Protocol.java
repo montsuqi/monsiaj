@@ -203,8 +203,8 @@ public class Protocol extends Connection {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
-		logger.info("packgeClass {0}", new Integer(pc));
-		if (receivePacketClass() == PacketClass.ScreenDefine) {
+		logger.info("receivePacketClass=> {0}", Integer.toHexString(pc));
+		if (pc == PacketClass.ScreenDefine) {
 			OutputStream out = new FileOutputStream(fName);
 			int left = receiveLong();
 			int size;
@@ -241,9 +241,13 @@ public class Protocol extends Connection {
 			switch (type) {
 			case SCREEN_NEW_WINDOW:
 			case SCREEN_CURRENT_WINDOW:
-				Interface xml = Interface.parseFile(fName, this);
-				node = new Node(xml, wName);
-				windowTable.put(node.name, node);
+				try {
+					Interface xml = Interface.parseFile(fName, this);
+					node = new Node(xml, wName);
+					windowTable.put(node.name, node);
+				} catch (Exception e) {
+					logger.warn(e);
+				}
 			}
 		}
 

@@ -11,6 +11,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,10 +38,12 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeSelectionModel;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
+import org.xml.sax.SAXException;
 
 public class Interface {
 	String fileName;
@@ -65,16 +68,16 @@ public class Interface {
 		focusWidget = widget;
 	}
 
-	public static Interface parseFile(String fileName, Protocol protocol) {
+	public static Interface parseFile(String fileName, Protocol protocol) throws IOException, SAXException {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		factory.setNamespaceAware(true);
 		try {
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setNamespaceAware(true);
 			SAXParser parser = factory.newSAXParser();
 			File file = new File(fileName);
 			MonsiaHandler handler = new MonsiaHandler(fileName);
 			parser.parse(file, handler);
 			return handler.getInterface(protocol);
-		} catch (Exception e) {
+		} catch (ParserConfigurationException e) {
 			Logger.getLogger(Interface.class).warn(e);
 			return null;
 		}
