@@ -30,7 +30,7 @@ class PreferenceBasedConfiguration extends Configuration {
 	private Preferences prefs;
 
 	PreferenceBasedConfiguration() {
-		prefs = Preferences.userNodeForPackage(this.getClass());
+		prefs = Preferences.userNodeForPackage(PreferenceBasedConfiguration.class);
 	}
 
 	void load() {
