@@ -285,7 +285,6 @@ public class Interface {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					invoke(handler, target, other);
 				}
-				e.consume();
 			}
 		});
 	}
