@@ -24,8 +24,7 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.Window;
 import java.util.Map;
 
 import org.montsuqi.monsia.Interface;
@@ -42,12 +41,8 @@ public class WindowBuilder extends ContainerBuilder {
 				value = value.substring("GTK_".length()); //$NON-NLS-1$
 			}
 			if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
-				Toolkit tk = Toolkit.getDefaultToolkit();
-				Dimension screen = tk.getScreenSize();
-				Dimension window = widget.getSize();
-				int x = (screen.width - window.width) / 2;
-				int y = (screen.height - window.height) / 2;
-				widget.setLocation(x, y);
+				Window window = (Window)widget;
+				window.setLocationRelativeTo(null);
 			}
 		}
 		return widget;
