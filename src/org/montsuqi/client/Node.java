@@ -23,10 +23,10 @@ copies.
 package org.montsuqi.client;
 
 import java.awt.Component;
-import java.awt.Window;
 import java.util.HashMap;
 import java.util.Map;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.widgets.Window;
 
 class Node {
 

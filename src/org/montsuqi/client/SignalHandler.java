@@ -37,17 +37,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.Window;
 
 public abstract class SignalHandler {
 
 	protected static final Logger logger = Logger.getLogger(SignalHandler.class);
 
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
-
-	protected boolean isWindowActive(Protocol con, Component widget) {
-		return SwingUtilities.windowForComponent(widget) == con.getActiveWindow();
-	}
 
 	public static SignalHandler getSignalHandler(String handlerName) {
 		if (handlers.containsKey(handlerName)) {
@@ -120,39 +115,24 @@ public abstract class SignalHandler {
 				if (con.isReceiving()) {
 					return;
 				}
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
 				if (widget instanceof JComponent) {
 					if (((JComponent)widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
 						con.addChangedWidget(widget);
 					}
 				}
 				java.awt.Window window = SwingUtilities.windowForComponent(widget);
-				try {
-					if (window instanceof Window) {
-						((Window)window).showBusyCursor();
-					}
-					con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
-					con.sendWindowData();
-					synchronized (this) {
-						blockChangedHandlers();
-						con.getScreenData();
-						unblockChangedHandlers();
-					}
-				} finally {
-					if (window instanceof Window) {
-						((Window)window).hideBusyCursor();
-					}
+				con.sendEvent(window.getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
+				con.sendWindowData();
+				synchronized (this) {
+					blockChangedHandlers();
+					con.getScreenData();
+					unblockChangedHandlers();
 				}
 			}
 		};
 
 		final SignalHandler changed = new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
 				con.addChangedWidget(widget);
 			}
 		};
@@ -209,9 +189,6 @@ public abstract class SignalHandler {
 
 		registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
 				con.addChangedWidget(widget);
 				sendEvent.handle(con, widget, "SELECT"); //$NON-NLS-1$
 			}
@@ -265,18 +242,12 @@ public abstract class SignalHandler {
 
 		registerHandler("window_close", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
 				con.closeWindow(widget);
 			}
 		});
 
 		registerHandler("window_destroy", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
 				con.exit();
 			}
 		});
@@ -284,9 +255,6 @@ public abstract class SignalHandler {
 		registerHandler("open_browser", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				if ( ! (widget instanceof JTextPane)) {
-					return;
-				}
-				if ( ! isWindowActive(con, widget)) {
 					return;
 				}
 				JTextPane pane = (JTextPane)widget;
@@ -298,9 +266,6 @@ public abstract class SignalHandler {
 
 		registerHandler("keypress_filter", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
 				Component next = con.getInterface().getWidget((String)userData);
 				next.requestFocus();
 			}
