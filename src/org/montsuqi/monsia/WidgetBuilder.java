@@ -74,6 +74,7 @@ class WidgetBuilder {
 		registerClass("Entry", javax.swing.JTextField.class); //$NON-NLS-1$
 		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
 		registerClass("Frame", javax.swing.JLabel.class); //$NON-NLS-1$
+		registerClass("HBox", org.montsuqi.widgets.HBox.class); //$NON-NLS-1$
 		//registerClass("HSeparator", null);
 		registerClass("ImageMenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
 		registerClass("Label", javax.swing.JLabel.class); //$NON-NLS-1$
@@ -99,7 +100,7 @@ class WidgetBuilder {
 		registerClass("Toolbar", javax.swing.JToolBar.class); //$NON-NLS-1$
 		registerClass("VBox", org.montsuqi.widgets.VBox.class); //$NON-NLS-1$
 		//registerClass("VSeparator", null);
-		registerClass("Viewport", null); //$NON-NLS-1$
+		registerClass("Viewport", javax.swing.JViewport.class); //$NON-NLS-1$
 		registerClass("Window", javax.swing.JFrame.class); //$NON-NLS-1$
 	}
 
@@ -203,7 +204,7 @@ class WidgetBuilder {
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildFrameChildren", //$NON-NLS-1$
 								null);
-	registerWidgetBuildData("HBox", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("HBox", defaultBuildContainerData); //$NON-NLS-1$
 		registerWidgetBuildData("HPaned", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildPanedChildren", //$NON-NLS-1$
@@ -269,7 +270,7 @@ class WidgetBuilder {
 								"buildPanedChildren", //$NON-NLS-1$
 								null);
 		registerWidgetBuildData("VSeparator", defaultBuildWidgetData); //$NON-NLS-1$
-		registerWidgetBuildData("ViewPort", defaultBuildContainerData); //$NON-NLS-1$
+		registerWidgetBuildData("Viewport", defaultBuildContainerData); //$NON-NLS-1$
 		registerWidgetBuildData("Window", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"standardBuildChildren", //$NON-NLS-1$
@@ -465,36 +466,36 @@ class WidgetBuilder {
 	}
 
 	void buildNotebookChildren(Container parent, WidgetInfo info) {
-		int tab = 0;
-		int PANE_ITEM = 0;
-		int TAB_ITEM = 1;
-		int MENU_ITEM = 2;
+		// create tabs first
 		int cCount = info.getChildrenCount();
+		String tabLabel = null;
+		Component body = null;
+		JTabbedPane tabbed = (JTabbedPane)parent;
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Container child = buildWidget(wInfo);
-			int type = PANE_ITEM;
-			int pCount = wInfo.getPropertiesCount();
-			for (int j = 0; j < pCount; j++) {
-				Property p = cInfo.getProperty(j);
+			String name = null;
+			boolean isTab = false;
+			for (int j = 0, n = wInfo.getPropertiesCount(); j < n; j++) {
+				Property p = wInfo.getProperty(j);
 				String pName = p.getName();
-				if ("type".equals(pName)) { //$NON-NLS-1$
-					String value = p.getValue();
-					if ("tab".equals(value)) { //$NON-NLS-1$
-						type = TAB_ITEM;
-					}
-					break;
+				String pValue = p.getValue();
+				if (pName.equals("name")) {
+					name = pValue;
+				}
+				if (pName.equals("child_name")) {
+					isTab = true;
 				}
 			}
-
-			JTabbedPane tabbed = (JTabbedPane)parent;
-			if (type == TAB_ITEM) { /* The GtkNotebook API blows */
-				Component body = tabbed.getComponentAt(tab);
-				//tabbed.setTitleAt(tab, child);
+			if (isTab) {
+				tabLabel = name;
 			} else {
-				tabbed.add(child);
-				tab++;
+				body = buildWidget(wInfo);
+			}
+			if (tabLabel != null && body != null) {
+				tabbed.add(tabLabel, body);
+				tabLabel = null;
+				body = null;
 			}
 		}
 	}
@@ -946,11 +947,14 @@ class WidgetBuilder {
 	}
 
 	private void setProperties(Container widget, WidgetInfo info) {
+		logger.enter("setProperties()");
+		logger.debug("widget={0}", widget);
 		for (int i = 0, pCount = info.getPropertiesCount(); i < pCount; i++) {
 			try {
 				Property p = info.getProperty(i);
 				String pName = p.getName();
 				String pValue = p.getValue();
+				logger.debug("name={0}, value={1}", new Object[]{pName, pValue});
 				boolean set = false;
 				for (Class clazz = widget.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
 					Map map = (Map)propertyMap.get(clazz);
@@ -958,10 +962,15 @@ class WidgetBuilder {
 						continue;
 					}
 					Method setter = (Method)map.get(pName);
+					logger.debug("setter={0}", setter);
 					if (setter.getDeclaringClass() == WidgetOperation.class) {
+						logger.debug("invoking WidgetOperation\'s");
 						setter.invoke(null, new Object[] { xml, widget, pName, pValue });
+						logger.debug("seter invocation done");
 					} else {
+						logger.debug("invoking widget\'s");
 						setter.invoke(widget, new Object[] { pValue });
+						logger.debug("seter invocation done");
 					}
 					set = true;
 				}
