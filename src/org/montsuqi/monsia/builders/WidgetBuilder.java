@@ -124,13 +124,15 @@ public class WidgetBuilder {
 		FontUIResource font;
 
 		font = (FontUIResource)UIManager.get("Button.font"); //$NON-NLS-1$
-		font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN, font.getSize2D() * 0.9f));
-		UIManager.put("Button.font", font); //$NON-NLS-1$
-
+		if (font != null) {
+			font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN, font.getSize2D() * 0.9f));
+			UIManager.put("Button.font", font); //$NON-NLS-1$
+		}
 		font = (FontUIResource)UIManager.get("ComboBox.font"); //$NON-NLS-1$
-		font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN));
-		UIManager.put("ComboBox.font", font); //$NON-NLS-1$
-
+		if (font != null) {
+			font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN));
+			UIManager.put("ComboBox.font", font); //$NON-NLS-1$
+		}
 		UIManager.put("Button.margin", new InsetsUIResource(0, 0, 0, 0)); //$NON-NLS-1$
 	}
 
