@@ -34,8 +34,7 @@ class PropertyFileBasedConfiguration extends Configuration {
 	Properties props;
 	String fileName;
 
-	public PropertyFileBasedConfiguration(String title, Class clazz) {
-		super(title);
+	public PropertyFileBasedConfiguration(Class clazz) {
 		props = new Properties();
 		String base = clazz.getName();
 		int pos = base.indexOf('.');
@@ -47,7 +46,7 @@ class PropertyFileBasedConfiguration extends Configuration {
 			props.load(new FileInputStream(fileName));
 		} catch (FileNotFoundException e) {
 			Object[] args = { fileName };
-			logger.warn("configuration file not found: {0}", args); //$NON-NLS-1$
+			logger.info("configuration file not found: {0}", args); //$NON-NLS-1$
 		} catch (IOException e) {
 			logger.warn(e);
 		}
@@ -61,21 +60,30 @@ class PropertyFileBasedConfiguration extends Configuration {
 		}
 	}
 
-	public String getString(String key, String defaultValue) {
+	String getString(String key, String defaultValue) {
 		String value = props.getProperty(key);
 		return value != null ? value : defaultValue;
 	}
 
-	public int getInt(String key, int defaultValue) {
+	int getInt(String key, int defaultValue) {
 		String value = props.getProperty(key);
 		return value != null ? Integer.parseInt(value) : defaultValue;
 	}
 
-	public void setString(String key, String value) {
+	boolean getBoolean(String key, boolean defaultValue) {
+		String value = props.getProperty(key);
+		return value != null ? Boolean.parseBoolean(value) : defaultValue;
+	}
+
+	void setString(String key, String value) {
 		props.put(key, value);
 	}
 
-	public void setInt(String key, int value) {
+	void setInt(String key, int value) {
+		props.put(key, String.valueOf(value));
+	}
+
+	void setBoolean(String key, boolean value) {
 		props.put(key, String.valueOf(value));
 	}
 }

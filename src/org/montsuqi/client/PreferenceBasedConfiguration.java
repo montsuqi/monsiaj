@@ -29,8 +29,7 @@ class PreferenceBasedConfiguration extends Configuration {
 
 	private Preferences prefs;
 
-	public PreferenceBasedConfiguration(String title, Class clazz) {
-		super(title);
+	public PreferenceBasedConfiguration(Class clazz) {
 		prefs = Preferences.userNodeForPackage(clazz);
 	}
 
@@ -42,19 +41,27 @@ class PreferenceBasedConfiguration extends Configuration {
 		}
 	}
 
-	public String getString(String key, String defaultValue) {
+	String getString(String key, String defaultValue) {
 		return prefs.get(key, defaultValue);
 	}
 
-	public int getInt(String key, int defaultValue) {
+	int getInt(String key, int defaultValue) {
 		return prefs.getInt(key, defaultValue);
 	}
 
-	public void setString(String key, String value) {
+	boolean getBoolean(String key, boolean defaultValue) {
+		return prefs.getBoolean(key, defaultValue);
+	}
+
+	void setString(String key, String value) {
 		prefs.put(key, value);
 	}
 
-	public void setInt(String key, int value) {
+	void setInt(String key, int value) {
 		prefs.putInt(key, value);
+	}
+
+	void setBoolean(String key, boolean value) {
+		prefs.putBoolean(key, value);
 	}
 }
