@@ -118,6 +118,7 @@ class WidgetBuilder {
 		registerClass("PandaHTML", org.montsuqi.widgets.PandaHTML.class); //$NON-NLS-1$
 		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
 		registerClass("PandaTimer", org.montsuqi.widgets.PandaTimer.class); //$NON-NLS-1$
+		registerClass("ProgressBar", javax.swing.JProgressBar.class); //$NON-NLS-1$
 		registerClass("RadioButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
 		registerClass("ScrolledWindow", javax.swing.JScrollPane.class); //$NON-NLS-1$
 		registerClass("SeparatorMenuItem", javax.swing.JSeparator.class); //$NON-NLS-1$
@@ -164,6 +165,7 @@ class WidgetBuilder {
 		registerProperty(java.awt.Container.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
 //		registerProperty(PIXMAP, "build_insensitive", pixmap_set_build_insensitive);
 //		registerProperty(PIXMAP, "filename", pixmap_set_filename);
+		registerProperty(javax.swing.text.JTextComponent.class, "editable", "setEditable"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
 //		registerProperty(CALENDAR, "display_options", calendar_set_display_options);
 		registerProperty(javax.swing.JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -187,6 +189,13 @@ class WidgetBuilder {
 		registerProperty(org.montsuqi.widgets.PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JProgressBar.class, "lower", "setProgressBarLower");
+		registerProperty(javax.swing.JProgressBar.class, "upper", "setProgressBarUpper");
+		registerProperty(javax.swing.JProgressBar.class, "value", "setProgressBarValue");
+		registerProperty(javax.swing.JProgressBar.class, "orientation", "setProgressBarOrientation");
+		registerProperty(javax.swing.JProgressBar.class, "activity_mode", "setProgressBarActivityMode");
+		registerProperty(javax.swing.JProgressBar.class, "show_text", "setProgressBarShowText");
+
 	}
 	
 	private void initWidgetBuildData() {

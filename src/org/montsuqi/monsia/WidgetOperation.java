@@ -29,12 +29,14 @@ import java.awt.Frame;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 import javax.swing.AbstractButton;
+import javax.swing.BoundedRangeModel;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
@@ -79,6 +81,15 @@ class WidgetOperation {
 	static void setVisible(Interface xml, Container widget, String name, String value) {
 		boolean v = ParameterConverter.toBoolean(value);
 		widget.setVisible(v);
+	}
+
+	static void setEditable(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTextComponent)) {
+			return;
+		}
+		JTextComponent text = (JTextComponent)widget;
+		boolean v = ParameterConverter.toBoolean(value);
+		text.setEditable(v);
 	}
 
 	static void setWindowTitle(Interface xml, Container widget, String name, String value) {
@@ -457,5 +468,72 @@ class WidgetOperation {
 		PandaTimer timer = (PandaTimer)widget;
 		int duration = ParameterConverter.toInteger(value);
 		timer.setDuration(duration);
+	}
+
+	static void setProgressBarLower(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JProgressBar)) {
+			throw new IllegalArgumentException("not a ProgressBar widget");
+		}
+		JProgressBar progress = (JProgressBar)widget;
+		BoundedRangeModel model = progress.getModel();
+		model.setMinimum(ParameterConverter.toInteger(value));
+	}
+
+	static void setProgressBarUpper(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JProgressBar)) {
+			throw new IllegalArgumentException("not a ProgressBar widget");
+		}
+		JProgressBar progress = (JProgressBar)widget;
+		BoundedRangeModel model = progress.getModel();
+		model.setMaximum(ParameterConverter.toInteger(value));
+	}
+
+	static void setProgressBarValue(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JProgressBar)) {
+			throw new IllegalArgumentException("not a ProgressBar widget");
+		}
+		JProgressBar progress = (JProgressBar)widget;
+		BoundedRangeModel model = progress.getModel();
+		model.setValue(ParameterConverter.toInteger(value));
+	}
+
+	static void setProgressBarOrientation(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JProgressBar)) {
+			throw new IllegalArgumentException("not a ProgressBar widget");
+		}
+		JProgressBar progress = (JProgressBar)widget;
+		if (value.startsWith("GTK_")) {
+			value = value.substring("GTK_".length());
+		}
+		if (value.startsWith("PROGRESS_")) {
+			value = value.substring("PROGRESS_".length());
+		}
+		if ("LEFT_TO_RIGHT".equals(value)) {
+			progress.setOrientation(JProgressBar.HORIZONTAL);
+		} else if ("RIGHT_TO_LEFT".equals(value)) {
+			progress.setOrientation(JProgressBar.HORIZONTAL);
+		} else if ("TOP_TO_BOTTOM".equals(value)) {
+			progress.setOrientation(JProgressBar.VERTICAL);
+		} else if ("BOTTOM_TO_TOP".equals(value)) {
+			progress.setOrientation(JProgressBar.VERTICAL);
+		}
+	}
+
+	static void setProgressBarActivityMode(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JProgressBar)) {
+			throw new IllegalArgumentException("not a ProgressBar widget");
+		}
+		JProgressBar progress = (JProgressBar)widget;
+		boolean indeterminate = ParameterConverter.toBoolean(value);
+		progress.setIndeterminate(indeterminate);
+	}
+
+	static void setProgressBarShowText(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JProgressBar)) {
+			throw new IllegalArgumentException("not a ProgressBar widget");
+		}
+		JProgressBar progress = (JProgressBar)widget;
+		boolean showText = ParameterConverter.toBoolean(value);
+		progress.setStringPainted(showText);
 	}
 }
