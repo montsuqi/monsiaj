@@ -81,9 +81,8 @@ public abstract class SignalHandler {
 		});
 
 		final SignalHandler sendEvent = new SignalHandler() {
-			boolean ignoreEvent = false;
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if (con.isReceiving() || ignoreEvent) {
+				if (con.isReceiving()) {
 					return;
 				}
 				if ( ! isWindowActive(con, widget)) {
@@ -91,15 +90,11 @@ public abstract class SignalHandler {
 				}
 				con.sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
 				con.sendWindowData();
-				blockChangedHandlers();
-				if (con.getScreenData()) {
-					ignoreEvent = true;
-//					while (gtk_events_pending()) {
-//						gtk_main_iteration();
-//					}
-					ignoreEvent = false;
+				synchronized (this) {
+					blockChangedHandlers();
+					con.getScreenData();
+					unblockChangedHandlers();
 				}
-				unblockChangedHandlers();
 			}
 		};
 
