@@ -263,7 +263,7 @@ public class Protocol extends Connection {
 	private boolean sendWidgetData(String name, Container widget) throws IOException {
 		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
 		if (handler != null) {
-			// TODO: need special handling for combo
+			// FIXME need special handling for combo
 			return handler.sendWidget(getMarshal(), name, widget);
 		} else {
 			return false;
@@ -554,6 +554,10 @@ public class Protocol extends Connection {
 			}
 //			unblockChangedHanders();
 		}
+	}
+
+	public void send_event_when_idle(Container widget, Object userData) throws IOException {
+		send_event(widget, userData);
 	}
 
 	public void send_event_on_focus_out(Container widget, Object userData) throws IOException {
