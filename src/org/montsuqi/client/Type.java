@@ -22,28 +22,52 @@ copies.
 
 package org.montsuqi.client;
 
-public interface Type {
-	final int CLASS = 0xF0;
-	final int NULL = 0x00;
+import java.lang.reflect.Field;
 
-	final int NUMERIC = 0x10;
-	final int INT = 0x11;
-	final int BOOL = 0x12;
-	final int FLOAT = 0x13;
-	final int NUMBER = 0x14;
+public final class Type {
+	public static final int CLASS = 0xF0;
+	public static final int NULL = 0x00;
 
-	final int STRING = 0x20;
-	final int CHAR = 0x21;
-	final int TEXT = 0x22;
-	final int VARCHAR = 0x23;
-	final int BYTE = 0x24;
-	final int DBCODE = 0x25;
-	final int BINARY = 0x26;
+	public static final int NUMERIC = 0x10;
+	public static final int INT = 0x11;
+	public static final int BOOL = 0x12;
+	public static final int FLOAT = 0x13;
+	public static final int NUMBER = 0x14;
 
-	final int OBJECT = 0x40;
-	final int STRUCTURE = 0x80;
-	final int ARRAY = 0x81;
-	final int RECORD = 0x82;
-	final int ALIAS = 0x83;
-	final int VALUES = 0x84;
+	public static final int STRING = 0x20;
+	public static final int CHAR = 0x21;
+	public static final int TEXT = 0x22;
+	public static final int VARCHAR = 0x23;
+	public static final int BYTE = 0x24;
+	public static final int DBCODE = 0x25;
+	public static final int BINARY = 0x26;
+
+	public static final int OBJECT = 0x40;
+	public static final int STRUCTURE = 0x80;
+	public static final int ARRAY = 0x81;
+	public static final int RECORD = 0x82;
+	public static final int ALIAS = 0x83;
+	public static final int VALUES = 0x84;
+
+	private Type() {
+		// inhibit instantiation
+	}
+
+	public static String getName(int type) {
+		Field[] fields = Type.class.getDeclaredFields();
+		for (int i = 0, n = fields.length; i < n; i++) {
+			if (fields[i].getType() != Integer.TYPE) {
+				continue;
+			}
+			try {
+				if (fields[i].getInt(null) == type) {
+					return fields[i].getName();
+				}
+			} catch (Exception e) {
+				throw new InternalError();
+			}
+		}
+		throw new IllegalArgumentException("type not found: " + type); //$NON-NLS-1$
+	}
+
 }

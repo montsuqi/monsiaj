@@ -86,7 +86,7 @@ class Connection {
 	public int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
-			throw new IOException("data type mismatch"); //$NON-NLS-1$
+			throw new IOException("data type mismatch: expected " + Type.getName(expected) + ", but was " + Type.getName(dataType)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return dataType;
 	}
