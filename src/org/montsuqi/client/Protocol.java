@@ -58,7 +58,7 @@ public class Protocol extends Connection {
 	private Client client;
 	private StringBuffer widgetName;
 	private Interface xml;
-	private boolean receiving;
+	private boolean isReceiving;
 	private boolean protocol1;
 	private boolean protocol2;
 
@@ -68,7 +68,7 @@ public class Protocol extends Connection {
 		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		windowTable = new HashMap();
-		setReceiving(false);
+		isReceiving = false;
 		protocol1 = true;
 		protocol2 = false;
 		logger = Logger.getLogger(Connection.class);
@@ -90,6 +90,7 @@ public class Protocol extends Connection {
 	}
 
 	private static final BitSet NOENCODE;
+	private Window activeWindow;
 	static {
 		NOENCODE = new BitSet(256);
 		for (int i = 0, n = NOENCODE.length(); i < n; i++) {
@@ -140,6 +141,7 @@ public class Protocol extends Connection {
 			return null;
 		}
 		Window w = node.getWindow();
+		activeWindow = w;
 		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
 			w.pack();
 			w.show();
@@ -349,82 +351,81 @@ public class Protocol extends Connection {
 		}
 	}
 
-	boolean getScreenData() throws IOException {
+	synchronized boolean getScreenData() throws IOException {
 		String window = null;
 		Node node;
-
-		setReceiving(true);
-		checkScreens(false);
-		sendPacketClass(PacketClass.GetData);
-		sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
 		boolean fCancel = false;
-		byte c;
-		while ((c = receivePacketClass()) == PacketClass.WindowName) {
-			window = receiveString();
-			int type = receiveInt();
-			switch (type) {
-			case ScreenType.END_SESSION:
-				client.exitSystem();
-				fCancel= true;
-				break;
-			case ScreenType.CLOSE_WINDOW:
-			case ScreenType.JOIN_WINDOW:
-			case ScreenType.NEW_WINDOW:
-			case ScreenType.CHANGE_WINDOW:
-				fCancel = true;
-				break;
-			case ScreenType.CURRENT_WINDOW:
-				break;
-			default:
-				break;
-			}
-			node = showWindow(window, type);
-			if (node != null) {
-				xml = node.getInterface();
-			}
-			switch (type) {
-			case ScreenType.CURRENT_WINDOW:
-			case ScreenType.NEW_WINDOW:
-			case ScreenType.CHANGE_WINDOW:
-				widgetName = new StringBuffer(window);
-				c = receivePacketClass();
-				if (c == PacketClass.ScreenData) {
-					receiveValue(widgetName, widgetName.length());
-				}
-				break;
-			default:
-				c = receivePacketClass();
-				break;
-			}
-			if (c == PacketClass.NOT) {
-				// no screen data
-			} else {
-				// fatal error
-			}
-		}
-		if (c == PacketClass.FocusName) {
-			window = receiveString();
-			String wName = receiveString();
-			node = getNode(window);
-			if (node != null && node.getInterface() != null) {
-				Component widget = xml.getWidget(wName);
-				if (widget != null) {
-					widget.requestFocus();
-				}
-			}
-			c = receivePacketClass();
-		}
-		// reset GtkPandaTimer if exists
-		node = getNode(window);
-		if (node != null) {
-			resetTimer(node.getWindow());
-		}
-		setReceiving(false);
-		return fCancel;
-	}
 
-	boolean setReceiving(boolean receiving) {
-		return this.receiving = receiving;
+		try {
+			isReceiving = true;
+			checkScreens(false);
+			sendPacketClass(PacketClass.GetData);
+			sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
+			byte c;
+			while ((c = receivePacketClass()) == PacketClass.WindowName) {
+				window = receiveString();
+				int type = receiveInt();
+				switch (type) {
+				case ScreenType.END_SESSION:
+					client.exitSystem();
+					fCancel= true;
+					break;
+				case ScreenType.CLOSE_WINDOW:
+				case ScreenType.JOIN_WINDOW:
+				case ScreenType.NEW_WINDOW:
+				case ScreenType.CHANGE_WINDOW:
+					fCancel = true;
+					break;
+				case ScreenType.CURRENT_WINDOW:
+					break;
+				default:
+					break;
+				}
+				node = showWindow(window, type);
+				if (node != null) {
+					xml = node.getInterface();
+				}
+				switch (type) {
+				case ScreenType.CURRENT_WINDOW:
+				case ScreenType.NEW_WINDOW:
+				case ScreenType.CHANGE_WINDOW:
+					widgetName = new StringBuffer(window);
+					c = receivePacketClass();
+					if (c == PacketClass.ScreenData) {
+						receiveValue(widgetName, widgetName.length());
+					}
+					break;
+				default:
+					c = receivePacketClass();
+					break;
+				}
+				if (c == PacketClass.NOT) {
+					// no screen data
+				} else {
+					// fatal error
+				}
+			}
+			if (c == PacketClass.FocusName) {
+				window = receiveString();
+				String wName = receiveString();
+				node = getNode(window);
+				if (node != null && node.getInterface() != null) {
+					Component widget = xml.getWidget(wName);
+					if (widget != null) {
+						widget.requestFocus();
+					}
+				}
+				c = receivePacketClass();
+			}
+			// reset GtkPandaTimer if exists
+			node = getNode(window);
+			if (node != null) {
+				resetTimer(node.getWindow());
+			}
+		} finally {
+			isReceiving = false;
+		}
+		return fCancel;
 	}
 
 	void sendConnect(String user, String pass, String app) throws IOException {
@@ -499,8 +500,8 @@ public class Protocol extends Connection {
 		}
 	}
 
-	void addChangedWidget(Component widget) {
-		if (isReceiving()) {
+	synchronized void addChangedWidget(Component widget) {
+		if (isReceiving) {
 			return;
 		}
 		Node node = getNode(widget);
@@ -510,7 +511,7 @@ public class Protocol extends Connection {
 	}
 
 	public boolean isReceiving() {
-		return receiving;
+		return isReceiving;
 	}
 
 	Node getNode(String name) {
@@ -539,12 +540,16 @@ public class Protocol extends Connection {
 		client.exitSystem();
 	}
 
-	void exit() {
-		setReceiving(true);
+	synchronized void exit() {
+		isReceiving = true;
 		client.exitSystem();
 	}
 
 	public StringBuffer getWidgetNameBuffer() {
 		return widgetName;
+	}
+
+	public Window getActiveWindow() {
+		return activeWindow;
 	}
 }
