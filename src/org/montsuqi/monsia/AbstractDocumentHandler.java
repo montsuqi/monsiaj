@@ -215,7 +215,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	protected String normalizeKeyName(String keyName) {
 		if (keyName.startsWith("GDK_")) { //$NON-NLS-1$
-			keyName = keyName.substring(4);
+			keyName = keyName.substring("GDK_".length()); //$NON-NLS-1$
 		}
 		if ( ! keyName.startsWith("VK_")) { //$NON-NLS-1$
 			keyName = "VK_" + keyName; //$NON-NLS-1$
@@ -224,7 +224,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	}
 
 	protected int keyCode(String keyName) {
-		final Field[] fields = KeyEvent.class.getFields();
+		final Field[] fields = KeyEvent.class.getDeclaredFields();
 		keyName = normalizeKeyName(keyName);
 		for (int i = 0; i < fields.length; i++) {
 			if (keyName.equals(fields[i].getName())) {
