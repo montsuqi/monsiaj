@@ -182,6 +182,7 @@ public class Interface {
 		while (entries.hasNext()) {
 			Map.Entry entry = (Map.Entry)entries.next();
 			String handlerName = (String)entry.getKey();
+			handlerName = handlerName.toLowerCase();
 			Iterator i = ((List)entry.getValue()).iterator();
 			try {
 				Method handler = Protocol.class.getMethod(handlerName, argTypes);
@@ -289,10 +290,15 @@ public class Interface {
 			}
 		});
 	}
+	
+	private void connectEnter(final Container target, final Method handler, final Object other) {
+		connectActivate(target, handler, other);
+	}
 
 	private void connectMapEvent(final Container target, final Method handler, final Object other) {
 		if (target instanceof Window) {
-			((Window)target).addWindowListener(new WindowAdapter() {
+			Window window = (Window)target;
+			window.addWindowListener(new WindowAdapter() {
 				public void windowOpened(WindowEvent e) {
 					invoke(handler, target, other);
 				}
@@ -308,7 +314,8 @@ public class Interface {
 
 	private void connectDeleteEvent(final Container target, final Method handler, final Object other) {
 		if (target instanceof Window) {
-			((Window)target).addWindowListener(new WindowAdapter() {
+			Window window = (Window)target;
+			window.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					invoke(handler, target, other);
 				}
@@ -324,7 +331,8 @@ public class Interface {
 
 	private void connectDestroy(final Container target, final Method handler, final Object other) {
 		if (target instanceof Window) {
-			((Window)target).addWindowListener(new WindowAdapter() {
+			Window window = (Window)target;
+			window.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					invoke(handler, target, other);
 				}
@@ -348,7 +356,8 @@ public class Interface {
 
 	private void connectSelectRow(final Container target, final Method handler, final Object other) {
 		if (target instanceof JTree) {
-			TreeSelectionModel model = ((JTree)target).getSelectionModel();
+			JTree tree = (JTree)target;
+			TreeSelectionModel model = tree.getSelectionModel();
 			model.addTreeSelectionListener(new TreeSelectionListener() {
 				public void valueChanged(TreeSelectionEvent e) {
 					invoke(handler, target, other);
@@ -361,10 +370,12 @@ public class Interface {
 				}
 			};
 			if (target instanceof JList) {
-				ListSelectionModel model = ((JList)target).getSelectionModel();
+				JList list = (JList)target;
+				ListSelectionModel model = list.getSelectionModel();
 				model.addListSelectionListener(listener);
 			} else if (target instanceof JTable) {
-				ListSelectionModel model = ((JTable)target).getSelectionModel();
+				JTable table = (JTable)target;
+				ListSelectionModel model = table.getSelectionModel();
 				model.addListSelectionListener(listener);
 			}
 		}
@@ -489,11 +500,6 @@ public class Interface {
 		return (ButtonGroup)buttonGroups.get(name);
 	}
 	
-	/**
-	 * This is used while the tree is being built to set the toplevel window that
-	 * is currently being built.  It is mainly used to enable GtkAccelGroup's to
-	 * be bound to the correct window, but could have other uses.
-	 */
 	void setTopLevel(JWindow window) {
 		if (focusWidget != null) {
 			focusWidget.requestFocus();
