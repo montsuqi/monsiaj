@@ -21,8 +21,13 @@ copies.
 */
 package org.montsuqi.widgets;
 
+import java.awt.BorderLayout;
+
 import javax.swing.JComponent;
 
 public class Frame extends JComponent {
-
+	public Frame() {
+		super();
+		setLayout(new BorderLayout());
+	}
 }
