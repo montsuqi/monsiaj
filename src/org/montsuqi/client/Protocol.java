@@ -253,6 +253,7 @@ public class Protocol extends Connection {
 			case SCREEN_NEW_WINDOW:
 			case SCREEN_CURRENT_WINDOW:
 				node.window.setVisible(true);
+				node.window.pack();
 				break;
 			case SCREEN_CLOSE_WINDOW:
 				node.window.setVisible(false);
