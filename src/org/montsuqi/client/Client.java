@@ -171,16 +171,16 @@ public class Client implements Runnable {
 	}
 
 	public static void main(String[] args) {
-			Object[] bannerArgs = { CLIENT_VERSION };
-			System.out.println(MessageFormat.format(Messages.getString("Client.banner_format"), bannerArgs)); //$NON-NLS-1$
+		Object[] bannerArgs = { CLIENT_VERSION };
+		System.out.println(MessageFormat.format(Messages.getString("Client.banner_format"), bannerArgs)); //$NON-NLS-1$
 
-			Client client = Client.parseCommandLine(args);
-			try {
-				client.connect();
-				Thread t = new Thread(client);
-				t.start();
-			} catch (Exception e) {
-				throw new Error(e);
-			}
+		Client client = Client.parseCommandLine(args);
+		try {
+			client.connect();
+			Thread t = new Thread(client);
+			t.start();
+		} catch (Exception e) {
+			throw new Error(e);
+		}
 	}
 }
