@@ -36,7 +36,7 @@ public class PandaTimer extends JComponent {
 		super();
 		timer = new Timer(0, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fireTimerSingal(PandaTimer.this);	
+				fireTimeEvent(new TimerEvent(PandaTimer.this));
 			}
 		});
 		timer.setRepeats(true);
@@ -51,11 +51,11 @@ public class PandaTimer extends JComponent {
 		listenerList.remove(TimerListener.class, l);
 	}
 
-	protected void fireTimerSingal(PandaTimer timer) {
+	protected void fireTimeEvent(TimerEvent e) {
 		TimerListener[] listeners = (TimerListener[])listenerList.getListeners(TimerListener.class);
 		for (int i = 0, n = listeners.length; i < n; i++) {
 			TimerListener l = listeners[i];
-			l.timerSignaled(new TimerEvent(timer));
+			l.timerSignaled(e);
 		}
 	}
 

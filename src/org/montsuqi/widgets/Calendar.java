@@ -164,7 +164,7 @@ public class Calendar extends JComponent {
 	private void setCells() {
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
-				Date d = cellDate(row, col);
+				Date d = computeCellDate(row, col);
 				cellDates[row][col] = d;
 				cal.setTime(d);
 				dateCells[row][col].setText(String.valueOf(cal.get(java.util.Calendar.DATE)));
@@ -173,7 +173,7 @@ public class Calendar extends JComponent {
 		monthLabel.setText(df.format(date));
 	}
 	
-	private Date cellDate(int row, int col) {
+	private Date computeCellDate(int row, int col) {
 		// compute the first day of the month 
 		cal.setTime(date);
 		cal.set(java.util.Calendar.DATE, 1);

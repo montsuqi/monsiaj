@@ -22,10 +22,13 @@ copies.
 
 package org.montsuqi.widgets;
 
-import java.util.EventObject;
+import java.awt.AWTEvent;
 
-public class TimerEvent extends EventObject {
+public class TimerEvent extends AWTEvent {
+
+	protected static final int TIMER_SIGNALED = AWTEvent.RESERVED_ID_MAX + 4;
+
 	TimerEvent(PandaTimer source) {
-		super(source);
+		super(source, TIMER_SIGNALED);
 	}
 }

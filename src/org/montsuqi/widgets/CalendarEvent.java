@@ -26,9 +26,9 @@ import java.awt.AWTEvent;
 
 public class CalendarEvent extends AWTEvent {
 
-	protected static final int PREVIOUS_MONTH = 0;
-	protected static final int NEXT_MONTH = 1;
-	protected static final int DAY_SELECTED = 2;
+	protected static final int PREVIOUS_MONTH = AWTEvent.RESERVED_ID_MAX + 1;
+	protected static final int NEXT_MONTH = AWTEvent.RESERVED_ID_MAX + 2;
+	protected static final int DAY_SELECTED = AWTEvent.RESERVED_ID_MAX + 3;
 
 	public CalendarEvent(Object source, int id) {
 		super(source, id);
