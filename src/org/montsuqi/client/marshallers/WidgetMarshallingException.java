@@ -22,9 +22,7 @@ copies.
 
 package org.montsuqi.client.marshallers;
 
-import org.montsuqi.util.ChainedRuntimeException;
-
-class WidgetMarshallingException extends ChainedRuntimeException {
+class WidgetMarshallingException extends RuntimeException {
 
 	public WidgetMarshallingException() {
 		super();
@@ -41,5 +39,4 @@ class WidgetMarshallingException extends ChainedRuntimeException {
 	public WidgetMarshallingException(Throwable cause) {
 		super(cause);
 	}
-
 }

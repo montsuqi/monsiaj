@@ -22,9 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
-import org.montsuqi.util.ChainedRuntimeException;
-
-class HandlerInvocationException extends ChainedRuntimeException {
+class HandlerInvocationException extends RuntimeException {
 
 	HandlerInvocationException() {
 		super();
@@ -41,5 +39,4 @@ class HandlerInvocationException extends ChainedRuntimeException {
 	HandlerInvocationException(Throwable cause) {
 		super(cause);
 	}
-
 }

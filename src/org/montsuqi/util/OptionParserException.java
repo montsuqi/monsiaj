@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.util;
 
-class OptionParserException extends ChainedRuntimeException {
+class OptionParserException extends RuntimeException {
 
 	OptionParserException() {
 		super();
@@ -39,5 +39,4 @@ class OptionParserException extends ChainedRuntimeException {
 	OptionParserException(Throwable cause) {
 		super(cause);
 	}
-
 }

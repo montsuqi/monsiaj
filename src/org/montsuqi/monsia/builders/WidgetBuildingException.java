@@ -22,9 +22,7 @@ copies.
 
 package org.montsuqi.monsia.builders;
 
-import org.montsuqi.util.ChainedRuntimeException;
-
-class WidgetBuildingException extends ChainedRuntimeException {
+class WidgetBuildingException extends RuntimeException {
 
 	WidgetBuildingException() {
 		super();

@@ -22,9 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
-import org.montsuqi.util.ChainedRuntimeException;
-
-public class InterfaceBuildingException extends ChainedRuntimeException {
+public class InterfaceBuildingException extends RuntimeException {
 
 	public InterfaceBuildingException() {
 		super();
