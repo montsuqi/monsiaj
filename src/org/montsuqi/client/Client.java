@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -30,12 +31,22 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.net.ssl.SSLSocket;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
@@ -140,10 +151,38 @@ public class Client implements Runnable {
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
-		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-		SSLSocket ssl = (SSLSocket)factory.createSocket(socket, host, port, true);
-		ssl.setWantClientAuth(true);
-		return ssl;
+		try {
+			return createSSLSocket(host, port, socket);
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			final IOException ioe = new IOException();
+			ioe.initCause(e);
+			throw ioe;
+		}
+	}
+
+	private Socket createSSLSocket(String host, int port, Socket socket) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
+		final CertificateFactory cf = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
+		final String serverCertificateFile = conf.getServerCertificateFileName();
+		final X509Certificate cert = (X509Certificate)cf.generateCertificate(new FileInputStream(serverCertificateFile));
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		final String clientCertificateFile = conf.getClientCertificateFileName();
+		final String clientCertificatePass = conf.getClientCertificatePass();
+		ks.load(new FileInputStream(clientCertificateFile), clientCertificatePass.toCharArray());
+		final String alias = conf.getClientCertificateAlias();
+		ks.setCertificateEntry(alias, cert);
+
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+		tmf.init(ks);
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+		kmf.init(ks, clientCertificatePass.toCharArray());
+
+		SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+		ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+		SSLSocketFactory factory = ctx.getSocketFactory();
+		return factory.createSocket(socket, host, port, true);
 	}
 
 	public void run() {
