@@ -20,16 +20,13 @@ import org.xml.sax.helpers.DefaultHandler;
 
 abstract class AbstractDocumentHandler extends DefaultHandler {
 
-	protected final Logger logger;
+	protected Logger logger;
 	protected final StringBuffer content;
 	protected final Map widgets;
 	protected final List topLevels;
 	protected final List properties;
 	protected final List signals;
-	protected final List atkActions;
-	protected final List relations;
 	protected final List accels;
-
 
 	protected ParserState state;
 	protected ParserState prevState;
@@ -49,8 +46,6 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		topLevels = new ArrayList();
 		properties = new ArrayList();
 		signals = new ArrayList();
-		atkActions = new ArrayList();
-		relations = new ArrayList();
 		accels = new ArrayList();
 		
 	}
@@ -194,102 +189,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		signals.clear();
 	}
 
-	protected void flushActions() {
-		widget.setATKActions(atkActions);
-		atkActions.clear();
-	}
-
-	protected void flushRelations() {
-		widget.setRelations(relations);
-		relations.clear();
-	}
-
 	protected void flushAccels() {
 		widget.setAccels(accels);
 		accels.clear();
-	}
-
-	protected WidgetInfo createWidgetInfo(Attributes attrs) {
-	
-		String className = null;
-		String name = null;
-		for (int i = 0, n = attrs.getLength(); i < n; i++) {
-			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
-			if (attrName.equals("class")) { //$NON-NLS-1$
-				className = value;
-			} else if (attrName.equals("id")) { //$NON-NLS-1$
-				name = value;
-			} else {
-				warnUnknownAttribute("widget", attrName); //$NON-NLS-1$
-			}
-		}
-	
-		if (className == null || name == null) {
-			warnMissingAttribute("widget"); //$NON-NLS-1$
-		}
-		WidgetInfo info = new WidgetInfo(className, name);
-		widgets.put(name, info);
-		return info;
-	}
-
-	protected void handleATKRelation(Attributes attrs) {
-	
-		flushProperties();
-	
-		String target = null;
-		String type = null;
-	
-		for (int i = 0, n = attrs.getLength(); i < n; i++) {
-			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
-			if (attrName.equals("target")) { //$NON-NLS-1$
-				target = value;
-			} else if (attrName.equals("type")) { //$NON-NLS-1$
-				type = value;
-			} else {
-				warnUnknownAttribute("signal", attrName); //$NON-NLS-1$
-			}
-		}
-		if (target == null || type == null) {
-			warnMissingAttribute("atkrelation"); //$NON-NLS-1$
-			return;
-		}
-	
-		relations.add(new ATKRelationInfo(target, type));
-	}
-
-	protected void handleSignal(Attributes attrs) {
-		flushProperties();
-	
-		String name = null;
-		String handler = null;
-		String object = null;
-		boolean after = false;
-	
-		for (int i = 0, n = attrs.getLength(); i < n; i++) {  
-			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
-			if (attrName.equals("name")) { //$NON-NLS-1$
-				name = value;
-			} else if (attrName.equals("handler")) { //$NON-NLS-1$
-				handler = value;
-			} else if (attrName.equals("after")) { //$NON-NLS-1$
-				after = value.startsWith("y"); //$NON-NLS-1$
-			} else if (attrName.equals("object")) { //$NON-NLS-1$
-				object = value;
-			} else if (attrName.equals("last_modification_time")) { //$NON-NLS-1$
-				/* Do nothing. */;
-			} else {
-				warnUnknownAttribute("signal", attrName); //$NON-NLS-1$
-			}
-		}
-	
-		if (name == null || handler == null) {
-			warnMissingAttribute("signal"); //$NON-NLS-1$
-			return;
-		}
-		signals.add(new SignalInfo(name, handler, object, after));
 	}
 
 	protected String normalizeKeyName(String keyName) {
@@ -316,34 +218,6 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			}
 		}
 		return 0;
-	}
-
-	protected void handleAccel(Attributes attrs) {
-		flushProperties();
-		flushSignals();
-		flushActions();
-		flushRelations();
-		int key = 0;
-		int modifiers = 0;
-		String signal = null;
-		for (int i = 0, n = attrs.getLength(); i < n; i++) {  
-			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
-			if (attrName.equals("key")) { //$NON-NLS-1$
-				key = keyCode(value);
-			} else if (attrName.equals("modifiers")) { //$NON-NLS-1$
-				modifiers = parseModifiers(value);
-			} else if (attrName.equals("signal")) { //$NON-NLS-1$
-				signal = value;
-			} else {
-				warnUnknownAttribute("accelerator", attrName); //$NON-NLS-1$
-			}
-		}
-		if (key == 0 || signal == null) {
-			warnMissingAttribute("accelerator"); //$NON-NLS-1$
-			return;
-		}
-		accels.add(new AccelInfo(key, modifiers, signal));
 	}
 
 	protected int parseModifiers(String modifierValue) {
@@ -400,55 +274,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	}
 
-	protected void handleChild(Attributes attrs) {
-		flushProperties();
-		flushSignals();
-		flushActions();
-		flushRelations();
-		flushAccels();
-	
-		ChildInfo info = new ChildInfo();
-		widget.addChild(info);
-		for (int i = 0, n = attrs.getLength(); i < n; i++) {
-			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
-			if (attrName.equals("internal-child")) { //$NON-NLS-1$
-				info.setInternalChild(value);
-			} else {
-				warnUnknownAttribute("child", attrName); //$NON-NLS-1$
-			}
-		}
-	}
-
 	/** returns name with all dashes converted to underscores. */
 	protected String makePropertyName(String name) {
 		return name.replace('-', '_');
-	}
-
-	protected void handleATKAction(Attributes attrs) {
-		flushProperties();
-	
-		String actionName = null;
-		String description = null;
-	
-		for (int i = 0, n = attrs.getLength(); i < n; i++) {
-			String attrName = attrs.getLocalName(i);
-			String value = attrs.getValue(i);
-			if (attrName.equals("action_name")) { //$NON-NLS-1$
-				actionName = value;
-			} else if (attrName.equals("description")) { //$NON-NLS-1$
-				description = value;
-			} else {
-				warnUnknownAttribute("action", attrName); //$NON-NLS-1$
-			}
-		}
-	
-		if (actionName == null) {
-			warnMissingAttribute("atkaction"); //$NON-NLS-1$
-			return;
-		}
-	
-		atkActions.add(new ATKActionInfo(actionName, description));
 	}
 
 	public void characters(char[] chars, int start, int length) throws SAXException {
