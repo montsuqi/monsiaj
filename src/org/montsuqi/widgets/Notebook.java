@@ -33,12 +33,11 @@ import org.montsuqi.util.Logger;
 public class Notebook extends JTabbedPane {
 
 	Map buttons;
-	Logger logger;
+	protected static final Logger logger = Logger.getLogger(Notebook.class);
 
 	public Notebook() {
 		super();
 
-		logger = Logger.getLogger(Notebook.class);
 		buttons = new HashMap();
 
 		addChangeListener(new ChangeListener() {

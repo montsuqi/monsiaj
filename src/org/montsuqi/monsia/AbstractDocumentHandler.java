@@ -40,7 +40,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 abstract class AbstractDocumentHandler extends DefaultHandler {
 
-	protected Logger logger;
+	protected static final Logger logger = Logger.getLogger(AbstractDocumentHandler.class);
+
 	protected final StringBuffer content;
 	protected final Map widgets;
 	protected final List topLevels;
@@ -60,7 +61,6 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	public AbstractDocumentHandler() {
 		super();
-		logger = Logger.getLogger(AbstractDocumentHandler.class);
 		content = new StringBuffer();
 		widgets = new HashMap();
 		topLevels = new ArrayList();

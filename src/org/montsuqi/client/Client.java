@@ -55,11 +55,10 @@ public class Client implements Runnable {
 	//private String CAfile;
 
 	Protocol protocol;
-	Logger logger;
+	private static final Logger logger = Logger.getLogger(Client.class);
 	private int protocolVersion;
 
 	public Client() {
-		logger = Logger.getLogger(Client.class);
 		protocolVersion = 1;
 	}
 

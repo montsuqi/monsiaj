@@ -46,7 +46,7 @@ import org.montsuqi.widgets.PandaPreviewPane;
 
 public abstract class WidgetMarshaller {
 
-	protected Logger logger;
+	protected static final Logger logger = Logger.getLogger(WidgetMarshaller.class);
 
 	private static Map classTable;
 
@@ -67,9 +67,6 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
 	}
 
-	WidgetMarshaller() {
-		logger = Logger.getLogger(WidgetMarshaller.class);
-	}
 	public abstract void receive(WidgetValueManager manager, Component widget) throws IOException;
 	public abstract void send(WidgetValueManager manager, String name, Component widget) throws IOException;
 

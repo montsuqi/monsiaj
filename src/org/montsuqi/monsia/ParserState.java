@@ -27,11 +27,10 @@ import org.xml.sax.Attributes;
 
 abstract class ParserState {
 
-	private Logger logger;
+	protected static final Logger logger = Logger.getLogger(ParserState.class);
 
 	ParserState(String name) {
 		this.name = name;
-		logger = Logger.getLogger(ParserState.class);
 	}
 
 	abstract void startElement(String uri, String localName, String qName, Attributes attrs);

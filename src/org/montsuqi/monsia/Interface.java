@@ -47,7 +47,6 @@ import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.monsia.builders.WidgetBuilder;
-import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.PandaFocusManager;
 
 public class Interface {
@@ -84,7 +83,6 @@ public class Interface {
 		try {
 			saxParser = parserFactory.newSAXParser();
 		} catch (Exception e) {
-			Logger.getLogger(Interface.class).fatal(e);
 			throw new ExceptionInInitializerError(e);
 		}
 	}
@@ -115,7 +113,6 @@ public class Interface {
 			saxParser.parse(input, handler);
 			return handler.getInterface(protocol);
 		} catch (Exception e) {
-			Logger.getLogger(Interface.class).fatal(e);
 			throw new InterfaceBuildingException(e);
 		}
 	}

@@ -53,7 +53,7 @@ public class Protocol extends Connection {
 
 	private WidgetValueManager valueManager;
 	private Map windowTable;
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(Connection.class);
 	private Client client;
 	private StringBuffer widgetName;
 	private Interface xml;
@@ -79,7 +79,6 @@ public class Protocol extends Connection {
 		default:
 			throw new IllegalArgumentException("invalid protocol version: " + protocolVersion); //$NON-NLS-1$
 		}
-		logger = Logger.getLogger(Connection.class);
 		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
 	}
 

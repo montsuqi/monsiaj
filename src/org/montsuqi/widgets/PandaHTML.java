@@ -48,12 +48,11 @@ import org.montsuqi.util.Logger;
 
 public class PandaHTML extends JScrollPane {
 
-	static Logger logger;
+	protected static final Logger logger = Logger.getLogger(PandaHTML.class);
 	JTextPane pane;
 
 	public PandaHTML() {
 		super();
-		logger = Logger.getLogger(PandaHTML.class);
 		pane = new JTextPane();
 		AbstractDocument doc = (AbstractDocument)pane.getDocument();
 		doc.setAsynchronousLoadPriority(1); // load documents asynchronously

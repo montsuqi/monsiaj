@@ -45,7 +45,7 @@ class Connection {
 	protected DataInput in;
 	protected DataOutput out;
 	private int dataType;
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(Connection.class);
 
 	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
 		this.socket = s;
@@ -57,7 +57,6 @@ class Connection {
 			in = new LittleEndianDataInputStream(new BufferedInputStream(socket.getInputStream()));
 			out = new LittleEndianDataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		}
-		logger = Logger.getLogger(Connection.class);
 	}
 
 	public void sendPacketClass(int c) throws IOException {

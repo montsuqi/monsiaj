@@ -50,11 +50,10 @@ public class OptionParser {
 	private static final char RESPONSE_FILE_SWITCH = '@';
 
 	private Map options;
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(OptionParser.class);
 
     public OptionParser() {
         options = new TreeMap();
-		logger = Logger.getLogger(OptionParser.class);
     }
 
     public void add(String name, String message, boolean defaultValue) {

@@ -32,7 +32,8 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.monsia.Style;
 
 public final class WidgetValueManager {
-	private Logger logger;
+
+	protected static final Logger logger = Logger.getLogger(WidgetValueManager.class);
 	private Protocol con;
 	private Map styles;
 	private Map valueTable;
@@ -40,7 +41,6 @@ public final class WidgetValueManager {
 	public WidgetValueManager(Protocol con, Map styles) {
 		this.con = con;
 		this.styles = styles;
-		logger = Logger.getLogger(WidgetValueManager.class);
 		valueTable = new HashMap();
 	}
 

@@ -25,7 +25,6 @@ package org.montsuqi.monsia;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.montsuqi.util.Logger;
 import org.xml.sax.Attributes;
 
 public class Glade1Handler extends AbstractDocumentHandler {
@@ -89,7 +88,6 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	public Glade1Handler() {
 		super();
 		startState = START;
-		logger = Logger.getLogger(Glade1Handler.class);
 		pendingWidgets = new LinkedList();
 	}
 
