@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.24 2004-06-30 09:13:03 ozawa Exp $ -->
-<project name="panda-client" default="dist" basedir=".">
+<!-- $Id: build.xml,v 1.25 2004-07-02 04:40:36 noborus Exp $ -->
+<project name="panda-client" default="jars" basedir=".">
 
   <!-- properties -->
 
@@ -20,7 +20,10 @@
   <property name="webstart.url"        value="http://localhost/java-client/"/>
 
   <path id="project.class.path">
-    <pathelement path="libs/*.jar"/>
+    <pathelement path="${build.dir}"/> 
+    <fileset dir="libs">
+      <include name="**/*.jar" />
+    </fileset>
   </path>
 
   <!-- targets -->
@@ -33,6 +36,7 @@
     <mkdir dir="${dist.dir}"/>
     <property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
     <property name="src.name" value="monsiaj-src-${DSTAMP}"/>
+    <property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
     <mkdir dir="${report.dir}"/>
     <condition property="exclude.log4jlogger" value="**/Log4JLogger.java">
       <not>
@@ -76,19 +80,14 @@
   <target name="dist" depends="dist-bin,dist-src"
           description="Build files to be distributed."/>
 
-  <target name="dist-bin" depends="compile,resources">
+  <target name="dist-bin" depends="jars">
     <mkdir dir="${dist.dir}/${bin.name}"/>
     <!-- ant 1.5.x should use destfile instead of jarfile-->
-    <jar jarfile="${dist.dir}/${bin.name}/pandaclient.jar"
-         basedir="${build.dir}"
-         includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,org/montsuqi/**/*.png"
-         manifest="${resources.dir}/pandaclient.mf"/>
-    <jar jarfile="${dist.dir}/${bin.name}/jmareceipt.jar"
-         basedir="${build.dir}"
-         includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
-         manifest="${resources.dir}/jmareceipt.mf"/>
     <copy todir="${dist.dir}/${bin.name}">
-      <fileset dir="${libs.dir}" includes="*.jar" excludes="jfcunit.jar"/>
+      <fileset dir="${dist.dir}" includes="jmareceipt.jar, pandaclient.jar"/>
+    </copy>
+    <copy todir="${dist.dir}/${bin.name}">
+      <fileset dir="${libs.dir}" includes="log4j.jar"/>
     </copy>
     <copy todir="${dist.dir}/${bin.name}">
       <fileset dir="${build.dir}" includes="*.jnlp"/>
@@ -132,10 +131,15 @@
     <delete dir="${report.dir}" verbose="${clean.verbose}" quiet="true"/>
   </target>
 
-  <target name="jars"
-    description="*obsolete* Deploy jars.">
-    <echo message="Taret 'jars' is obsolete. Use 'dist' instead."/>
-    <antcall target="dist"/>
+  <target name="jars" depends="compile,resources">
+    <jar jarfile="${dist.dir}/pandaclient.jar"
+         basedir="${build.dir}"
+         includes="org/montsuqi/**/*.class,org/montsuqi/**/*.properties,org/montsuqi/**/*.png"
+         manifest="${resources.dir}/pandaclient.mf"/>
+    <jar jarfile="${dist.dir}/jmareceipt.jar"
+         basedir="${build.dir}"
+         includes="jp/or/med/jma_receipt/**/*.class,jp/or/med/jma_receipt/**/*.properties,jp/or/med/jma_receipt/**/*.jpg"
+         manifest="${resources.dir}/jmareceipt.mf"/>
   </target>
 
   <target name="compiletests" depends="compile,resources"
@@ -146,27 +150,24 @@
 	   deprecation="${compile.deprecation}" 
            debug="${compile.debug}">
       <include name="**/Test*.java"/>
-      <classpath>
-	<pathelement path="libs/jfcunit.jar"/>
-	<pathelement path="${build.dir}"/> 
-      </classpath>
+      <classpath refid="project.class.path"/>
     </javac>
+    <copy todir="${build.dir}">
+      <fileset dir="${src.dir}" includes="org/montsuqi/tools/*.xml"/>
+    </copy>
   </target>
 
   <target name="runtests" depends="compiletests"
     description="Run all junit test.">
     <junit printsummary="on"
-           fork="false"
-           haltonfailure="false">
+           fork="false">
       <formatter type="xml"/>
-      <classpath>
-	<pathelement path="libs/jfcunit.jar"/>
-	<pathelement path="${build.dir}"/> 
-      </classpath>
-  
+      <classpath refid="project.class.path"/>
       <batchtest todir="${report.dir}">
 	<fileset dir="${src.dir}">
 	  <include name="**/Test*.java"/>
+	  <exclude name="**/TestXMLRecording.java"/>
+	  <exclude name="**/TestXMLReplay.java"/>
 	</fileset>
       </batchtest>
     </junit>
@@ -185,17 +186,35 @@
     <property name="testcase"
               value="org/montsuqi/widgets/TestWindow"/>
     <junit printsummary="on"
-           fork="false"
-           haltonfailure="false">
+           fork="false">
       <formatter type="plain" usefile="false"/>
-      <classpath>
-	<pathelement path="libs/jfcunit.jar"/>
-	<pathelement path="${build.dir}"/> 
-      </classpath>
-
+      <classpath refid="project.class.path"/>
       <test name="${testcase}"/>
-
     </junit>
   </target>
 
+  <target name="jar.replay" depends="compiletests,resources">
+    <jar jarfile="${dist.dir}/pandarecord.jar"
+         basedir="${build.dir}"
+         includes="org/montsuqi/tools/TestXMLRecording.class, org/montsuqi/tools/*.xml"
+         manifest="${resources.dir}/pandarecord.mf"/>
+    <jar jarfile="${dist.dir}/pandareplay.jar"
+         basedir="${build.dir}"
+         includes="org/montsuqi/tools/TestXMLReplay.class, org/montsuqi/tools/XMLFileFilter.class"
+         manifest="${resources.dir}/pandareplay.mf"/>
+  </target>
+
+  <target name="dist.replay" depends="dist, jar.replay, resources">
+    <mkdir dir="${dist.dir}/${replay.name}"/>
+    <copy todir="${dist.dir}/${replay.name}">
+      <fileset dir="${libs.dir}" includes="*.jar"/>
+    </copy>
+    <copy todir="${dist.dir}/${replay.name}">
+      <fileset dir="${dist.dir}" includes="*.jar"/>
+    </copy>
+    <!-- ant 1.5.x should use destfile instead of zipfile-->
+    <zip zipfile="${dist.dir}/monsiaj-replay-${DSTAMP}.zip">
+      <fileset dir="${dist.dir}" includes="${replay.name}/**"/>
+    </zip>
+  </target>
 </project>

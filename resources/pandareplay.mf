@@ -1,0 +1,2 @@
+Main-Class: org.montsuqi.tools.TestXMLReplay
+Class-Path: junit.jar regexp.jar jfcunit.jar pandaclient.jar xercesImpl.jar xmlParserAPIs.jar xerces.jar
