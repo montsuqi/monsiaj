@@ -101,7 +101,7 @@ class WidgetBuilder {
 		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
 		registerClass("Frame", javax.swing.JLabel.class); //$NON-NLS-1$
 		registerClass("HBox", org.montsuqi.widgets.HBox.class); //$NON-NLS-1$
-		//registerClass("HSeparator", null);
+		registerClass("HSeparator", org.montsuqi.widgets.HSeparator.class); //$NON-NLS-1$
 		registerClass("ImageMenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
 		registerClass("Label", javax.swing.JLabel.class); //$NON-NLS-1$
 		registerClass("List", javax.swing.JList.class); //$NON-NLS-1$
@@ -114,7 +114,7 @@ class WidgetBuilder {
 		registerClass("PandaCList", javax.swing.JTable.class); //$NON-NLS-1$
 		registerClass("PandaCombo", javax.swing.JComboBox.class); //$NON-NLS-1$
 		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class); //$NON-NLS-1$
-		//registerClass("PandaHTML", null);
+		registerClass("PandaHTML", javax.swing.JTextPane.class); //$NON-NLS-1$
 		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
 		registerClass("RadioButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
 		registerClass("ScrolledWindow", javax.swing.JScrollPane.class); //$NON-NLS-1$
@@ -125,7 +125,7 @@ class WidgetBuilder {
 		registerClass("ToggleButton", javax.swing.JToggleButton.class); //$NON-NLS-1$
 		registerClass("Toolbar", javax.swing.JToolBar.class); //$NON-NLS-1$
 		registerClass("VBox", org.montsuqi.widgets.VBox.class); //$NON-NLS-1$
-		//registerClass("VSeparator", null);
+		registerClass("VSeparator", org.montsuqi.widgets.VSeparator.class); //$NON-NLS-1$
 		registerClass("Viewport", javax.swing.JViewport.class); //$NON-NLS-1$
 		registerClass("Window", javax.swing.JFrame.class); //$NON-NLS-1$
 	}
@@ -181,6 +181,7 @@ class WidgetBuilder {
 		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JEditorPane.class, "uri", "page"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void initWidgetBuildData() {
@@ -263,6 +264,16 @@ class WidgetBuilder {
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildOptionMenuChildren", //$NON-NLS-1$
 								null);
+		registerWidgetBuildData("PandaCombo", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"standardBuildChildren", //$NON-NLS-1$
+								"comboFindInternalChild"); //$NON-NLS-1$
+		registerWidgetBuildData("PandaCList", //$NON-NLS-1$
+								"standardBuildWidget", //$NON-NLS-1$
+								"buildCListChildren", //$NON-NLS-1$
+								null);
+		registerWidgetBuildData("PandaEntry", defaultBuildWidgetData); //$NON-NLS-1$
+		registerWidgetBuildData("PandaHTML", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("Progress", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("ProgressBar", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("RadioButton", //$NON-NLS-1$
@@ -416,7 +427,6 @@ class WidgetBuilder {
 	}
 
 	Container buildRadioButton(WidgetInfo info) {
-		logger.enter("buildRadioButton");
 		AbstractButton widget = (AbstractButton)standardBuildWidget(info);
 		ButtonGroup group = null;
 		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
@@ -430,7 +440,6 @@ class WidgetBuilder {
 			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.radio_button_has_no_group")); //$NON-NLS-1$
 		}
 		group.add(widget);
-		logger.leave("buildRadioButton");
 		return widget;
 	}
 

@@ -29,7 +29,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -46,6 +48,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 
 import org.montsuqi.util.Logger;
@@ -676,7 +679,16 @@ public class Protocol extends Connection {
 	}
 
 	public void open_browser(Container widget, Object userData) {
-		logger.warn("NOT SUPPORTED"); //$NON-NLS-1$
+		JTextPane pane = (JTextPane)widget;
+		URL uri;
+		try {
+			uri = new URL((String)userData);
+			pane.setPage(uri);
+		} catch (MalformedURLException e) {
+			logger.warn(e);
+		} catch (IOException e) {
+			logger.warn(e);
+		}
 	}
 
 	/** callback placeholder which has no effect */

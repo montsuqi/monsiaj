@@ -287,7 +287,7 @@ class WidgetMarshal {
 				list.add(""); //$NON-NLS-1$
 				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
 				int num = con.receiveInt();
-				for	(int j = 0; j < num ; j++) {
+				for (int j = 0; j < num ; j++) {
 					String buff = con.receiveStringData();
 					if (buff != null && j < count) {
 						list.add(buff);
@@ -477,7 +477,7 @@ class WidgetMarshal {
 					count = num;
 				}
 				ListSelectionModel model = list.getSelectionModel();
-				for	(int j = 0; j < num; j++) {
+				for (int j = 0; j < num; j++) {
 					boolean fActive = con.receiveBooleanData();
 					if ((j >= from) &&	((j - from) < count)) {
 						if (fActive) {
