@@ -27,28 +27,16 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 class ImagePreview extends Preview {
 
 	Image image;
-	private double scale;
-
-	public ImagePreview() {
-		setScale(1.0);
-	}
-
-	public void zoomIn() {
-		setScale(scale * 1.2);
-	}
-
-	public void zoomOut() {
-		setScale(scale / 1.2);
-	}
 
 	public void load(String fileName) throws IOException {
 		image = ImageIO.read(new File(fileName));
-		setScale(1.0);
+		resetScale();
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -59,10 +47,5 @@ class ImagePreview extends Preview {
 			setPreferredSize(new Dimension(width, height));
 			g.drawImage(image, 0, 0, width, height, this);
 		}
-	}
-
-	private void setScale(double scale) {
-		this.scale = scale;
-		repaint();
 	}
 }
