@@ -144,7 +144,8 @@ public class Protocol extends Connection {
 			fileOut.close();
 			return true;
 		} else {
-			logger.warn(Messages.getString("Protocol.invalid_protocol_sequence")); //$NON-NLS-1$
+			logger.warn(Messages.getString("Protocol.invalid_protocol_sequence"), //$NON-NLS-1$
+				new Object[] { new Byte(PacketClass.ScreenDefine), new Byte(pc) }); 
 			return false;
 		}
 	}
