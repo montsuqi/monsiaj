@@ -183,10 +183,10 @@ class NumberDocument extends PlainDocument {
 		for (/**/; i < chars.length; i++) {
 			char c = chars[i];
 			switch (c) {
-			case 'Z':
+			case 'Z': case '-': case '+':
 				buf.append('#');
 				break;
-			case '9': case '-': case '+':
+			case '9':
 				buf.append('0');
 				break;
 			default:
@@ -251,16 +251,20 @@ class NumberDocument extends PlainDocument {
 		String formatted = formatValue(format, value);
 		remove(0, getLength());
 		// treat zero value representation specially
-		if (formatted.equals("0") && isBlankForZeroValue()) { //$NON-NLS-1$
-			super.insertString(0, "", a); //$NON-NLS-1$
+		if (formatted.equals("0") && leaveZeroAsBlank()) { //$NON-NLS-1$
+			// do nothing
 		} else {
 			super.insertString(0, formatted, a);
 		}
 	}
 
-	private boolean isBlankForZeroValue() {
-		return originalFormat.indexOf("Z.") >= 0 || //$NON-NLS-1$
-			originalFormat.lastIndexOf('Z') == originalFormat.length() - 1;
+	private boolean leaveZeroAsBlank() {
+		int pos = originalFormat.indexOf('.');
+		if (pos < 1) {
+			pos = originalFormat.length();
+		}
+		char last = originalFormat.charAt(pos - 1);
+		return last == 'Z' || last == '-' || last == '+';
 	}
 
 	private static String formatValue(NumberFormat format, BigDecimal v) {
