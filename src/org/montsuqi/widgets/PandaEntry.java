@@ -58,69 +58,69 @@ class PandaDocument extends PlainDocument {
 	protected int mode;
 
 	static final char[] SYMBOL_TABLE = {
-		'　', '！', '”', '＃', '＄', '％', '＆', '’',
-		'（', '）', '＊', '＋', '，', 'ー', '．', '／',
-		'０', '１', '２', '３', '４', '５', '６', '７',
-		'８', '９', '：', '；', '＜', '＝', '＞', '？',
-		'＠', 'Ａ', 'Ｂ', 'Ｃ', 'Ｄ', 'Ｅ', 'Ｆ', 'Ｇ',
-		'Ｈ', 'Ｉ', 'Ｊ', 'Ｋ', 'Ｌ', 'Ｍ', 'Ｎ', 'Ｏ',
-		'Ｐ', 'Ｑ', 'Ｒ', 'Ｓ', 'Ｔ', 'Ｕ', 'Ｖ', 'Ｗ',
-		'Ｘ', 'Ｙ', 'Ｚ', '［', '￥', '］', '＾', '＿',
-		'‘', 'ア',    0,    0,    0, 'エ',    0,    0,
-		   0, 'イ',    0,    0,    0,    0,    0, 'オ',
-		   0,    0,    0,    0,    0, 'ウ',    0,    0,
-		   0,    0,    0, '｛', '｜', '｝', '￣',    0
+		'\u3000', '\uff01', '\u201d', '\uff03', '\uff04', '\uff05', '\uff06', '\u2019',
+		'\uff08', '\uff09', '\uff0a', '\uff0b', '\uff0c', '\u30fc', '\uff0e', '\uff0f',
+		'\uff10', '\uff11', '\uff12', '\uff13', '\uff14', '\uff15', '\uff16', '\uff17',
+		'\uff18', '\uff19', '\uff1a', '\uff1b', '\uff1c', '\uff1d', '\uff1e', '\uff1f',
+		'\uff20', '\uff21', '\uff22', '\uff23', '\uff24', '\uff25', '\uff26', '\uff27',
+		'\uff28', '\uff29', '\uff2a', '\uff2b', '\uff2c', '\uff2d', '\uff2e', '\uff2f',
+		'\uff30', '\uff31', '\uff32', '\uff33', '\uff34', '\uff35', '\uff36', '\uff37',
+		'\uff38', '\uff39', '\uff3a', '\uff3b', '\uffe5', '\uff3d', '\uff3e', '\uff3f',
+		'\u2018', '\u30a2',    0,    0,    0, '\u30a8',    0,    0,
+		   0, '\u30a4',    0,    0,    0,    0,    0, '\u30aa',
+		   0,    0,    0,    0,    0, '\u30a6',    0,    0,
+		   0,    0,    0, '\uff5b', '\uff5c', '\uff5d', '\uffe3',    0
 	};
 
 	static final RuleEntry[] KANA_TABLE = {
-		new RuleEntry("l",  "ァ", "ィ", "ゥ", "ェ", "ォ"),
-		new RuleEntry("x",  "ァ", "ィ", "ゥ", "ェ", "ォ"),
-		new RuleEntry("k",  "カ", "キ", "ク", "ケ", "コ"),
-		new RuleEntry("ky", "キャ", "キィ", "キュ", "キェ", "キョ"),
-		new RuleEntry("g",  "ガ", "ギ", "グ", "ゲ", "ゴ"),
-		new RuleEntry("gy", "ギャ", "ギィ", "ギュ", "ギェ", "ギョ"),
-		new RuleEntry("s",  "サ", "シ", "ス", "セ", "ソ"),
-		new RuleEntry("sh", "シャ", "シ", "シュ", "シェ", "ショ"),
-		new RuleEntry("sy", "シャ", "シィ", "シュ", "シェ", "ショ"),
-		new RuleEntry("z",  "ザ", "ジ", "ズ", "ゼ", "ゾ"),
-		new RuleEntry("j",  "ジャ", "ジ", "ジュ", "ジェ", "ジョ"),
-		new RuleEntry("jy", "ジャ", "ジィ", "ジュ", "ジェ", "ジョ"),
-		new RuleEntry("zy", "ジャ", "ジィ", "ジュ", "ジェ", "ジョ"),
-		new RuleEntry("t",  "タ", "チ", "ツ", "テ", "ト"),
-		new RuleEntry("ts", null, null, "ツ", null, null),
-		new RuleEntry("lt", null, null, "ッ", null, null),
-		new RuleEntry("xt", null, null, "ッ", null, null),
-		new RuleEntry("ty", "チャ", "チィ", "チュ", "チェ", "チョ"),
-		new RuleEntry("cy", "チャ", "チィ", "チュ", "チェ", "チョ"),
-		new RuleEntry("ch", "チャ", "チ", "チュ", "チェ", "チョ"),
-		new RuleEntry("th", "テャ", "ティ", "テュ", "テェ", "テョ"),
-		new RuleEntry("d",  "ダ", "ヂ", "ヅ", "デ", "ド"),
-		new RuleEntry("dy", "ヂャ", "ヂィ", "ヂュ", "ヂェ", "ヂョ"),
-		new RuleEntry("dh", "デャ", "ディ", "デュ", "デェ", "デョ"),
-		new RuleEntry("dw", "ドァ", "ドィ", "ドゥ", "ドェ", "ドォ"),
-		new RuleEntry("n",  "ナ", "ニ", "ヌ", "ネ", "ノ"),
-		new RuleEntry("ny", "ニャ", "ニィ", "ニュ", "ニェ", "ニョ"),
-		new RuleEntry("h",  "ハ", "ヒ", "フ", "ヘ", "ホ"),
-		new RuleEntry("f",  "ファ", "フィ", "フ", "フェ", "フォ"),
-		new RuleEntry("hy", "ヒャ", "ヒィ", "ヒュ", "ヒェ", "ヒョ"),
-		new RuleEntry("fy", "フャ", "フィ", "フュ", "フェ", "フョ"),
-		new RuleEntry("b",  "バ", "ビ", "ブ", "ベ", "ボ"),
-		new RuleEntry("by", "ビャ", "ビィ", "ビュ", "ビェ", "ビョ"),
-		new RuleEntry("p",  "パ", "ピ", "プ", "ペ", "ポ"),
-		new RuleEntry("py", "ピャ", "ピィ", "ピュ", "ピェ", "ピョ"),
-		new RuleEntry("m",  "マ", "ミ", "ム", "メ", "モ"),
-		new RuleEntry("my", "ミャ", "ミィ", "ミュ", "ミェ", "ミョ"),
-		new RuleEntry("y",  "ヤ", "イ", "ユ", "イェ", "ヨ"),
-		new RuleEntry("ly", "ャ", null, "ュ", null, "ョ"),
-		new RuleEntry("xy", "ャ", null, "ュ", null, "ョ"),
-		new RuleEntry("r",  "ラ", "リ", "ル", "レ", "ロ"),
-		new RuleEntry("ry", "リャ", "リィ", "リュ", "リェ", "リョ"),
-		new RuleEntry("w",  "ワ", "ヰ", "ウ", "ヱ", "ヲ"),
-		new RuleEntry("wh", "ワ", "ウィ", "ウ", "ウェ", "ウォ"),
-		new RuleEntry("lw", "ヮ", null, null, null, null),
-		new RuleEntry("xw", "ヮ", null, null, null, null),
-		new RuleEntry("v",  "ヴァ", "ヴィ", "ヴ", "ヴェ", "ヴォ"),
-		new RuleEntry("q",  "クァ", "クィ", "ク", "クェ", "クォ"),
+		new RuleEntry("l",  "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"),
+		new RuleEntry("x",  "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"),
+		new RuleEntry("k",  "\u30ab", "\u30ad", "\u30af", "\u30b1", "\u30b3"),
+		new RuleEntry("ky", "\u30ad\u30e3", "\u30ad\u30a3", "\u30ad\u30e5", "\u30ad\u30a7", "\u30ad\u30e7"),
+		new RuleEntry("g",  "\u30ac", "\u30ae", "\u30b0", "\u30b2", "\u30b4"),
+		new RuleEntry("gy", "\u30ae\u30e3", "\u30ae\u30a3", "\u30ae\u30e5", "\u30ae\u30a7", "\u30ae\u30e7"),
+		new RuleEntry("s",  "\u30b5", "\u30b7", "\u30b9", "\u30bb", "\u30bd"),
+		new RuleEntry("sh", "\u30b7\u30e3", "\u30b7", "\u30b7\u30e5", "\u30b7\u30a7", "\u30b7\u30e7"),
+		new RuleEntry("sy", "\u30b7\u30e3", "\u30b7\u30a3", "\u30b7\u30e5", "\u30b7\u30a7", "\u30b7\u30e7"),
+		new RuleEntry("z",  "\u30b6", "\u30b8", "\u30ba", "\u30bc", "\u30be"),
+		new RuleEntry("j",  "\u30b8\u30e3", "\u30b8", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"),
+		new RuleEntry("jy", "\u30b8\u30e3", "\u30b8\u30a3", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"),
+		new RuleEntry("zy", "\u30b8\u30e3", "\u30b8\u30a3", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"),
+		new RuleEntry("t",  "\u30bf", "\u30c1", "\u30c4", "\u30c6", "\u30c8"),
+		new RuleEntry("ts", null, null, "\u30c4", null, null),
+		new RuleEntry("lt", null, null, "\u30c3", null, null),
+		new RuleEntry("xt", null, null, "\u30c3", null, null),
+		new RuleEntry("ty", "\u30c1\u30e3", "\u30c1\u30a3", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"),
+		new RuleEntry("cy", "\u30c1\u30e3", "\u30c1\u30a3", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"),
+		new RuleEntry("ch", "\u30c1\u30e3", "\u30c1", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"),
+		new RuleEntry("th", "\u30c6\u30e3", "\u30c6\u30a3", "\u30c6\u30e5", "\u30c6\u30a7", "\u30c6\u30e7"),
+		new RuleEntry("d",  "\u30c0", "\u30c2", "\u30c5", "\u30c7", "\u30c9"),
+		new RuleEntry("dy", "\u30c2\u30e3", "\u30c2\u30a3", "\u30c2\u30e5", "\u30c2\u30a7", "\u30c2\u30e7"),
+		new RuleEntry("dh", "\u30c7\u30e3", "\u30c7\u30a3", "\u30c7\u30e5", "\u30c7\u30a7", "\u30c7\u30e7"),
+		new RuleEntry("dw", "\u30c9\u30a1", "\u30c9\u30a3", "\u30c9\u30a5", "\u30c9\u30a7", "\u30c9\u30a9"),
+		new RuleEntry("n",  "\u30ca", "\u30cb", "\u30cc", "\u30cd", "\u30ce"),
+		new RuleEntry("ny", "\u30cb\u30e3", "\u30cb\u30a3", "\u30cb\u30e5", "\u30cb\u30a7", "\u30cb\u30e7"),
+		new RuleEntry("h",  "\u30cf", "\u30d2", "\u30d5", "\u30d8", "\u30db"),
+		new RuleEntry("f",  "\u30d5\u30a1", "\u30d5\u30a3", "\u30d5", "\u30d5\u30a7", "\u30d5\u30a9"),
+		new RuleEntry("hy", "\u30d2\u30e3", "\u30d2\u30a3", "\u30d2\u30e5", "\u30d2\u30a7", "\u30d2\u30e7"),
+		new RuleEntry("fy", "\u30d5\u30e3", "\u30d5\u30a3", "\u30d5\u30e5", "\u30d5\u30a7", "\u30d5\u30e7"),
+		new RuleEntry("b",  "\u30d0", "\u30d3", "\u30d6", "\u30d9", "\u30dc"),
+		new RuleEntry("by", "\u30d3\u30e3", "\u30d3\u30a3", "\u30d3\u30e5", "\u30d3\u30a7", "\u30d3\u30e7"),
+		new RuleEntry("p",  "\u30d1", "\u30d4", "\u30d7", "\u30da", "\u30dd"),
+		new RuleEntry("py", "\u30d4\u30e3", "\u30d4\u30a3", "\u30d4\u30e5", "\u30d4\u30a7", "\u30d4\u30e7"),
+		new RuleEntry("m",  "\u30de", "\u30df", "\u30e0", "\u30e1", "\u30e2"),
+		new RuleEntry("my", "\u30df\u30e3", "\u30df\u30a3", "\u30df\u30e5", "\u30df\u30a7", "\u30df\u30e7"),
+		new RuleEntry("y",  "\u30e4", "\u30a4", "\u30e6", "\u30a4\u30a7", "\u30e8"),
+		new RuleEntry("ly", "\u30e3", null, "\u30e5", null, "\u30e7"),
+		new RuleEntry("xy", "\u30e3", null, "\u30e5", null, "\u30e7"),
+		new RuleEntry("r",  "\u30e9", "\u30ea", "\u30eb", "\u30ec", "\u30ed"),
+		new RuleEntry("ry", "\u30ea\u30e3", "\u30ea\u30a3", "\u30ea\u30e5", "\u30ea\u30a7", "\u30ea\u30e7"),
+		new RuleEntry("w",  "\u30ef", "\u30f0", "\u30a6", "\u30f1", "\u30f2"),
+		new RuleEntry("wh", "\u30ef", "\u30a6\u30a3", "\u30a6", "\u30a6\u30a7", "\u30a6\u30a9"),
+		new RuleEntry("lw", "\u30ee", null, null, null, null),
+		new RuleEntry("xw", "\u30ee", null, null, null, null),
+		new RuleEntry("v",  "\u30f4\u30a1", "\u30f4\u30a3", "\u30f4", "\u30f4\u30a7", "\u30f4\u30a9"),
+		new RuleEntry("q",  "\u30af\u30a1", "\u30af\u30a3", "\u30af", "\u30af\u30a7", "\u30af\u30a9"),
 	};
 
 	protected static final String LOW_ALPHABETS = "abcdefghijklmnopqrstuvwxyz";
@@ -184,7 +184,7 @@ class PandaDocument extends PlainDocument {
 					return;
 				}
 			} else if (AEIOU.indexOf(thisChar) >= 0) {
-				// カナ
+				// \u30ab\u30ca
 				String s = getKana(prefix, thisChar);
 				if (s != null) {
 					str = s;
@@ -193,14 +193,14 @@ class PandaDocument extends PlainDocument {
 					return;
 				}
 			} else if (prefix.charAt(0) == 'n' && thisChar != 'y') {
-				// n -> ン
-				str = "ン";
+				// n -> \u30f3
+				str = "\u30f3";
 				if (thisChar != 'n' && thisChar != '\'') {
 					str += thisChar;
 				}
 			} else if (thisChar == prefix.charAt(0)) {
-				// xx -> ッ
-				str = "ッ" + thisChar;
+				// xx -> \u30c3
+				str = "\u30c3" + thisChar;
 			} else {
 				super.insertString(offs, str, a);
 				return;
