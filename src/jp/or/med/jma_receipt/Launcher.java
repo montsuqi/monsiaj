@@ -60,7 +60,7 @@ public final class Launcher {
 				client.setPortNumber(conf.getPort());
 				client.setCurrentApplication(conf.getApplication());
 				client.setEncoding(System.getProperty("file.encoding")); //$NON-NLS-1$
-				client.setCache("cache"); //$NON-NLS-1$
+				client.setCache(System.getProperty("user.home") + System.getProperty("file.separator") + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 				try {
 					client.connect();

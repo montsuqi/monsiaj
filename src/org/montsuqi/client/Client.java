@@ -133,7 +133,7 @@ public class Client implements Runnable {
 
 		options.add("port", Messages.getString("Client.port_number"), PORT_GLTERM); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("host", Messages.getString("Client.host_name"), "localhost"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		options.add("cache", Messages.getString("Client.cache_directory"), "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		options.add("cache", Messages.getString("Client.cache_directory"), System.getProperty("user.home") + System.getProperty("file.separator") + "cache"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("user", Messages.getString("Client.user_name"), System.getProperty("user.name")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

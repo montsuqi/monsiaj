@@ -33,7 +33,7 @@ import org.montsuqi.client.Client;
 
 class PropertyFileBasedConfiguration extends Configuration {
 
-	static final String CONFIGURATION_FILE = "jma-receipt.properties"; //$NON-NLS-1$
+	static final String CONFIGURATION_FILE = System.getProperty("user.home") + System.getProperty("file.separator") + "jma-receipt.properties"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	Properties props;
 
 	PropertyFileBasedConfiguration() {
