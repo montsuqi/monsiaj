@@ -22,10 +22,14 @@ copies.
 
 package org.montsuqi.client;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.text.MessageFormat;
+
 import org.montsuqi.util.Logger;
 
 class Connection {
@@ -40,8 +44,8 @@ class Connection {
 	Connection(Socket s, String encoding) throws IOException {
 		this.socket = s;
 		this.encoding = encoding;
-		in = new LittleEndianDataInputStream(socket.getInputStream());
-		out = new LittleEndianDataOutputStream(socket.getOutputStream());
+		in = new LittleEndianDataInputStream(new BufferedInputStream(socket.getInputStream()));
+		out = new LittleEndianDataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		logger = Logger.getLogger(Connection.class);
 	}
 
@@ -51,7 +55,9 @@ class Connection {
 	}
 
 	byte receivePacketClass() throws IOException {
-		return in.readByte();
+		byte b = in.readByte();
+		//logger.debug("receivePacketClass: 0x{0}", Integer.toHexString(b));
+		return b;
 	}
 
 	void sendDataType(int c) throws IOException {
@@ -59,15 +65,16 @@ class Connection {
 		out.flush();
 	}
 
-	synchronized int receiveDataType() throws IOException {
+	int receiveDataType() throws IOException {
 		dataType = in.readByte();
 		if (dataType < 0) {
 			dataType = 0x100 + dataType;
 		}
+		//logger.debug("receiveDataType: 0x{0}", Integer.toHexString(dataType));
 		return dataType;
 	}
 
-	synchronized int receiveDataTypeWithCheck(int expected) throws IOException {
+	int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
 			throw new IOException(Messages.getString("Connection.data_type_mismatch")); //$NON-NLS-1$
@@ -94,7 +101,9 @@ class Connection {
 	}
 
 	int receiveLength() throws IOException {
-		return in.readInt();
+		int length = in.readInt();
+		//logger.debug("receiveLength: {0}", new Integer(length));
+		return length;
 	}
 
 	void sendString(String s) throws IOException {
@@ -111,7 +120,9 @@ class Connection {
 	String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
 		in.read(bytes);
-		return new String(bytes, encoding);
+		String s = new String(bytes, encoding);
+		//logger.debug("receiveStringBody: {0}", s);
+		return s;
 	}
 
 	String receiveString() throws IOException {
@@ -120,7 +131,9 @@ class Connection {
 	}
 
 	int receiveLong() throws IOException { /* longs: 4-byte long */
-		return in.readInt();
+		int l = in.readInt();
+		//logger.debug("receiveLong: {0}", new Integer(l));
+		return l;
 	}
 
 	void sendLong(int data) throws IOException {
@@ -137,7 +150,9 @@ class Connection {
 	}
 
 	int receiveChar() throws IOException {
-		return in.readUnsignedByte();
+		int c = in.readUnsignedByte();
+		//logger.debug("receiveChar: {0}", new Character((char)c));
+		return c;
 	}
 
 	void sendChar(byte data) throws IOException {
@@ -146,7 +161,9 @@ class Connection {
 	}
 
 	double receiveFloat() throws IOException {
-		return in.readDouble();
+		double f = in.readDouble();
+		//logger.debug("receiveFloat: {0}", new Double(f));
+		return f;
 	}
 
 	void sendFloat(double data) throws IOException {
@@ -156,9 +173,12 @@ class Connection {
 
 	private static final byte T_BYTE = 0x54;
 	private static final byte F_BYTE = 0x46;
-	
-	boolean receiveBoolean() throws IOException {
-		return in.readByte() == T_BYTE ? true : false;
+
+		boolean receiveBoolean() throws IOException {
+		byte b = in.readByte();
+		boolean value = b == T_BYTE ? true : false;
+		//logger.debug("receiveBoolean: {0}", new Boolean(value));
+		return value;
 	}
 
 	void sendBoolean(boolean data) throws IOException {
@@ -177,12 +197,14 @@ class Connection {
 		int flen = receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
+		//logger.debug("receiveFixed: flen={0}, slen={1}, value={2}", new Object[]{ new Integer(flen), new Integer(slen), value});
 		BigInteger i =  new BigInteger(value);
 		BigDecimal result = (new BigDecimal(i)).movePointLeft(slen);
 		return result;
 	}
 
 	BigDecimal receiveFixedData() throws IOException {
+		//logger.debug("receiveFixedData");
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
 		} else {
@@ -231,7 +253,9 @@ class Connection {
 	}
 
 	String receiveStringData() throws IOException {
-		switch (receiveDataType()) {
+		//logger.debug("receiveStringData");
+		int type = receiveDataType();
+		switch (type) {
 		case Type.INT:
 			return String.valueOf(receiveInt());
 		case Type.CHAR:
@@ -240,7 +264,9 @@ class Connection {
 		case Type.TEXT:
 			return receiveString();
 		default:
-			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_type")); //$NON-NLS-1$
+			String message = Messages.getString("Connection.invalid_data_type"); //$NON-NLS-1$
+			message = MessageFormat.format(message, new Object[] { Integer.toHexString(type) });
+			throw new IllegalArgumentException(message);
 		}
 	}
 
@@ -271,6 +297,7 @@ class Connection {
 	}
 
 	int receiveIntData() throws IOException {
+		//logger.debug("receiveIntData");
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt();
@@ -308,6 +335,7 @@ class Connection {
 	}
 
 	boolean receiveBooleanData() throws IOException {
+		//logger.debug("receiveBooleanData");
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt() != 0;
@@ -331,4 +359,3 @@ class Connection {
 		socket.close();
 	}
 }
-
