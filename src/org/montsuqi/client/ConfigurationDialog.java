@@ -31,13 +31,11 @@ import javax.swing.JDialog;
 public abstract class ConfigurationDialog extends JDialog implements ActionListener {
 
 	protected Configuration conf;
-	protected boolean needRun;
 
 	protected ConfigurationDialog(String title, Configuration conf) {
 		super();
 		setTitle(title);
 		this.conf = conf;
-		needRun = false;
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				closeDialog();
@@ -48,12 +46,8 @@ public abstract class ConfigurationDialog extends JDialog implements ActionListe
 
 	protected abstract void updateConfiguration();
 
-	boolean needRun() {
-		return needRun;
-	}
-
 	public void actionPerformed(ActionEvent e) {
-		needRun = true;
+		conf.setConfigured(true);
 		updateConfiguration();
 		closeDialog();
 	}

@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.client;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 public abstract class Launcher {
@@ -46,10 +47,11 @@ public abstract class Launcher {
 	}
 
 	public void launch() {
-		ConfigurationDialog d = createDialog(conf);
+		JDialog d = createDialog(conf);
 		d.setLocationRelativeTo(null);
+		conf.setConfigured(false);
 		d.setVisible(true);
-		if (d.needRun()) {
+		if (conf.isConfigured()) {
 			conf.save();
 			try {
 				target.connect();
@@ -64,5 +66,5 @@ public abstract class Launcher {
 		}
 	}
 
-	public abstract ConfigurationDialog createDialog(Configuration newConf);
+	public abstract JDialog createDialog(Configuration newConf);
 }

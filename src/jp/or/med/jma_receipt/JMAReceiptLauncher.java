@@ -22,8 +22,8 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import javax.swing.JDialog;
 import org.montsuqi.client.Configuration;
-import org.montsuqi.client.ConfigurationDialog;
 import org.montsuqi.client.Launcher;
 import org.montsuqi.util.Logger;
 
@@ -44,7 +44,7 @@ public class JMAReceiptLauncher extends Launcher {
 		}
 	}
 
-	public ConfigurationDialog createDialog(Configuration newConf) {
+	public JDialog createDialog(Configuration newConf) {
 		return new JMAReceiptConfigurationDialog(title, conf);
 	}
 }
