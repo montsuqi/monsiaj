@@ -28,7 +28,6 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -338,8 +337,6 @@ public class ConfigurationPanel extends JPanel {
 				Component root = SwingUtilities.windowForComponent(ConfigurationPanel.this);
 				if (root == null) {
 					root = ConfigurationPanel.this;
-				} else {
-					((Window)root).pack();
 				}
 				try {
 					SwingUtilities.updateComponentTreeUI(root);
