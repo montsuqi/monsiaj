@@ -22,14 +22,87 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class PandaCList extends JTable {
 
+	class MoveAnchorAction extends AbstractAction {
+		int dx;
+		int dy;
+		MoveAnchorAction(int dx, int dy) {
+			this.dx = dx;
+			this.dy = dy;
+		}
+
+		int withinRange(int value, int min, int max) {
+			if (value < min) {
+				return min;
+			} else if (max < value) {
+				return max;
+			} else {
+				return value;
+			}
+		}
+		public void actionPerformed(final ActionEvent e) {
+			JTable table = (JTable)e.getSource();
+			ListSelectionModel rowSelections = table.getSelectionModel();
+			ListSelectionModel columnSelections = table.getColumnModel().getSelectionModel();
+			int leadRow = rowSelections.getLeadSelectionIndex();
+			int leadCol = columnSelections.getLeadSelectionIndex();
+			int anchorRow = rowSelections.getAnchorSelectionIndex();
+			int anchorCol = columnSelections.getAnchorSelectionIndex();
+			leadRow = withinRange(leadRow + dx, 0, table.getRowCount() - 1);
+			leadCol = withinRange(leadCol + dy, 0, table.getColumnCount() - 1);
+			anchorRow = withinRange(anchorRow + dx, 0, table.getRowCount() - 1);
+			anchorCol = withinRange(anchorCol + dy, 0, table.getColumnCount() - 1);
+			table.repaint();
+		}
+	}
+
+	public class FocusOutNextAction extends AbstractAction {
+		public void actionPerformed(ActionEvent e) {
+			Component c = (Component)e.getSource();
+			c.transferFocus();
+		}
+	}
+
+	public class FocusOutPreviousAction extends AbstractAction {
+		public void actionPerformed(ActionEvent e) {
+			Component c = (Component)e.getSource();
+			c.transferFocusBackward();
+		}
+	}
+
 	public PandaCList() {
-		super();
+		ActionMap actions = getActionMap();
+		InputMap inputs = getInputMap();
+		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke("TAB"), "focusOutNext");  //$NON-NLS-1$//$NON-NLS-2$
+
+		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke("shift TAB"), "focusOutPrevious"); //$NON-NLS-1$ //$NON-NLS-2$
+
+//		actions.put("moveAnchorUp", new MoveAnchorAction(-1, 0)); //$NON-NLS-1$
+//		inputs.put(KeyStroke.getKeyStroke("UP"), "moveAnchorUp");  //$NON-NLS-1$//$NON-NLS-2$
+//
+//		actions.put("moveAnchorDown", new MoveAnchorAction(1, 0)); //$NON-NLS-1$
+//		inputs.put(KeyStroke.getKeyStroke("DOWN"), "moveAnchorDown"); //$NON-NLS-1$ //$NON-NLS-2$
+//
+//		actions.put("moveAnchorLeft", new MoveAnchorAction(0, -1)); //$NON-NLS-1$
+//		inputs.put(KeyStroke.getKeyStroke("LEFT"), "moveAnchorLeft"); //$NON-NLS-1$ //$NON-NLS-2$
+//
+//		actions.put("moveAnchorRight", new MoveAnchorAction(0, 1)); //$NON-NLS-1$
+//		inputs.put(KeyStroke.getKeyStroke("RIGHT"), "moveAnchorRight");  //$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	public void createDefaultColumnsFromModel() {
