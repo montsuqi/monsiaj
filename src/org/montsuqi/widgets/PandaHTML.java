@@ -22,9 +22,15 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
+
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -53,18 +59,8 @@ public class PandaHTML extends JScrollPane {
 	}
 
 	public void setURI(final URL uri) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
-				try {
-					pane.setPage(uri);
-				} catch (FileNotFoundException e) {
-					setText(e.toString());
-				} catch (IOException e) {
-					logger.warn(e);
-				}
-			}
-		});
+		Runnable loader = new HTMLLoader(uri);
+		SwingUtilities.invokeLater(loader);
 	}
 
 	public URL getURI() {
@@ -73,5 +69,43 @@ public class PandaHTML extends JScrollPane {
 
 	public void setText(String text) {
 		pane.setText(text);
+	}
+
+	public static void main(String[] args) throws MalformedURLException {
+		JFrame frame = new JFrame();
+		Container container = frame.getContentPane();
+		container.setLayout(new BorderLayout());
+		PandaHTML html = new PandaHTML();
+		JScrollPane scroll = new JScrollPane();
+		container.add(scroll, BorderLayout.CENTER);
+		scroll.setViewportView(html);
+		frame.setSize(640, 480);
+		frame.setVisible(true);
+		if (args.length > 0) {
+			URL uri = new URL(args[0]);
+			html.setURI(uri);
+		}
+	}
+
+	class HTMLLoader implements Runnable {
+
+		URL uri;
+
+		HTMLLoader(URL uri) {
+			this.uri = uri;
+		}
+
+		public void run() {
+			setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
+			try {
+				System.err.println(new Date());
+				pane.setPage(uri);
+				System.err.println(new Date());
+			} catch (FileNotFoundException e) {
+				setText(e.toString());
+			} catch (IOException e) {
+				logger.warn(e);
+			}
+		}
 	}
 }
