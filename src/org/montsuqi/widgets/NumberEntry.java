@@ -24,7 +24,6 @@ package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -32,48 +31,21 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Keymap;
 import javax.swing.text.PlainDocument;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.PrecisionScale;
 
 public class NumberEntry extends JTextField {
 
-	final protected Action clearAction;
-
 	public NumberEntry(String text, int columns) {
 		super(new NumberDocument(), text, columns);
 		setHorizontalAlignment(JTextField.RIGHT);
-
-		clearAction = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				setValue(NumberDocument.ZERO);
-			}
-		};
-//		addInputMethodListener(new InputMethodListener() {});
-		Keymap km = getKeymap();
-		int clearKeys[] = new int[] 
-			{
-				KeyEvent.VK_BACK_SPACE,
-				KeyEvent.VK_DELETE,
-				KeyEvent.VK_CLEAR,
-				KeyEvent.VK_HOME,
-				KeyEvent.VK_END,
-			};
-
-		for (int i = 0; i < clearKeys.length; i++) {
-			KeyStroke stroke = KeyStroke.getKeyStroke(clearKeys[i], 0);
-			km.addActionForKeyStroke(stroke, clearAction);
-		}
-		setKeymap(km);
 	}
+
 
 	public NumberEntry(int columns) {
 		this(null, columns);
@@ -123,6 +95,24 @@ public class NumberEntry extends JTextField {
 			}
 		});
 		f.show();
+	}
+
+	protected void processKeyEvent(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_BACK_SPACE: /*fall through*/
+		case KeyEvent.VK_DELETE: /*fall through*/
+		case KeyEvent.VK_CLEAR: /*fall through*/
+		case KeyEvent.VK_HOME: /*fall through*/
+		case KeyEvent.VK_END:
+			if (e.getID() == KeyEvent.KEY_PRESSED || e.getID() == KeyEvent.KEY_RELEASED) {
+				setValue(NumberDocument.ZERO);
+			}
+			e.consume();
+			break;
+		default:
+			super.processKeyEvent(e);
+			break;
+		}
 	}
 }
 
