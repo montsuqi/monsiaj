@@ -4,14 +4,12 @@ import org.montsuqi.widgets.Window;
 import org.montsuqi.widgets.VSeparator;
 
 import junit.extensions.jfcunit.JFCTestCase;
-import junit.extensions.jfcunit.JFCTestHelper;
 import junit.extensions.jfcunit.TestHelper;
 import junit.extensions.jfcunit.finder.FrameFinder;
 
 import junit.textui.TestRunner;
 
 public class TestVSeparator extends JFCTestCase {
-	private transient TestHelper m_helper;
 	private transient Window m_window;
 
 	public TestVSeparator(final String name) {
@@ -20,7 +18,7 @@ public class TestVSeparator extends JFCTestCase {
 
 	public void createVSeparator() {
 		final Window window = new Window();
-		window.setTitle("VSeparator Test");
+		window.setTitle("VSeparator Test"); //$NON-NLS-1$
 		window.setBounds(100 , 100 , 200 , 200);
 		VSeparator vSeparator = new VSeparator();
 		window.getContentPane().add(vSeparator);
@@ -28,9 +26,8 @@ public class TestVSeparator extends JFCTestCase {
 	}
 
 	public void setUp() throws Exception{
-		m_helper = new JFCTestHelper();
 		createVSeparator();
-		m_window = (Window) TestHelper.getWindow(new FrameFinder("VSeparator Test"));
+		m_window = (Window) TestHelper.getWindow(new FrameFinder("VSeparator Test")); //$NON-NLS-1$
 	}
 
 	public void tearDown() throws Exception{
@@ -39,7 +36,7 @@ public class TestVSeparator extends JFCTestCase {
 
 
 	public void testWindowframe() throws Exception {
-		assertNotNull("Could not find window:", m_window);
+		assertNotNull("Could not find window:", m_window); //$NON-NLS-1$
 	}
 
 	public static void main (String[] args){

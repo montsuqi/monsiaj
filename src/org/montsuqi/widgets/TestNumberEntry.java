@@ -23,10 +23,10 @@ public class TestNumberEntry extends JFCTestCase {
 
 	public void createNumberEntry() {
 		final Window window = new Window();
-		window.setTitle("NumberEntry Test");
+		window.setTitle("NumberEntry Test"); //$NON-NLS-1$
 		window.setBounds(100 , 100 , 200 , 50);
 		NumberEntry numberEntry = new NumberEntry();
-		numberEntry.setName("NumberEntery1");
+		numberEntry.setName("NumberEntery1"); //$NON-NLS-1$
 		window.getContentPane().add(numberEntry);
 		window.setVisible(true);
 	}
@@ -34,9 +34,9 @@ public class TestNumberEntry extends JFCTestCase {
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
 		createNumberEntry();
-		m_window = (Window) TestHelper.getWindow(new FrameFinder("NumberEntry Test"));
+		m_window = (Window) TestHelper.getWindow(new FrameFinder("NumberEntry Test")); //$NON-NLS-1$
 		NamedComponentFinder f = new NamedComponentFinder(
-			NumberEntry.class, "NumberEntery1");
+			NumberEntry.class, "NumberEntery1"); //$NON-NLS-1$
 
 		m_numberEntry = (NumberEntry) f.find(m_window, 0);
 	}
@@ -48,62 +48,62 @@ public class TestNumberEntry extends JFCTestCase {
 
 	public void test9format() throws Exception {
 		String text;
-		m_numberEntry.setFormat("99.9");
+		m_numberEntry.setFormat("99.9"); //$NON-NLS-1$
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "0"));
+							m_numberEntry, "0")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("99.9 format ", "00.0", text);
+		assertEquals("99.9 format ", "00.0", text); //$NON-NLS-1$//$NON-NLS-2$
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "1.0"));
+							m_numberEntry, "1.0")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("99.9 format ", "01.0", text);
+		assertEquals("99.9 format ", "01.0", text); //$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	public void testZformat() throws Exception {
 		String text;
-		m_numberEntry.setFormat("ZZ.Z");
+		m_numberEntry.setFormat("ZZ.Z"); //$NON-NLS-1$
 
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "AA"));
+							m_numberEntry, "AA")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("ZZ.Z format ", "", text);
+		assertEquals("ZZ.Z format ", "", text); //$NON-NLS-1$//$NON-NLS-2$
 
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "0"));
+							m_numberEntry, "0")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("ZZ.Z format ", "", text);
+		assertEquals("ZZ.Z format ", "", text); //$NON-NLS-1$//$NON-NLS-2$
 
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "1.0"));
+							m_numberEntry, "1.0")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("ZZ.Z format ", "1", text);
+		assertEquals("ZZ.Z format ", "1", text); //$NON-NLS-1$//$NON-NLS-2$
 
 	}
 
 	public void testZZZ9format() throws Exception {
 		String text;
-		m_numberEntry.setFormat("ZZZ9");
+		m_numberEntry.setFormat("ZZZ9"); //$NON-NLS-1$
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "0"));
+							m_numberEntry, "0")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("99.9 format ", "0", text);
+		assertEquals("99.9 format ", "0", text); //$NON-NLS-1$ //$NON-NLS-2$
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "101"));
+							m_numberEntry, "101")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("ZZZ9 format ", "101", text);
+		assertEquals("ZZZ9 format ", "101", text); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public void testHyphenformat() throws Exception {
 		String text;
-		m_numberEntry.setFormat("---,---,---");
+		m_numberEntry.setFormat("---,---,---"); //$NON-NLS-1$
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "0"));
+							m_numberEntry, "0")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("Hypthen and comma format ", "", text);
+		assertEquals("Hypthen and comma format ", "", text); //$NON-NLS-1$ //$NON-NLS-2$
 		m_helper.sendString(new StringEventData(this,
-							m_numberEntry, "10000"));
+							m_numberEntry, "10000")); //$NON-NLS-1$
 		text = m_numberEntry.getText();
-		assertEquals("Hypthen and comma format ", "10,000", text);
+		assertEquals("Hypthen and comma format ", "10,000", text); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 

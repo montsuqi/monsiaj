@@ -23,10 +23,10 @@ public class TestPandaEntry extends JFCTestCase {
 
 	public void createPandaEntry() {
 		final Window window = new Window();
-		window.setTitle("PandaEntry Test");
+		window.setTitle("PandaEntry Test"); //$NON-NLS-1$
 		window.setBounds(100 , 100 , 200 , 50);
 		PandaEntry pandaEntry = new PandaEntry();
-		pandaEntry.setName("PandaEntry1");
+		pandaEntry.setName("PandaEntry1"); //$NON-NLS-1$
 		window.getContentPane().add(pandaEntry);
 		window.setVisible(true);
 	}
@@ -34,10 +34,10 @@ public class TestPandaEntry extends JFCTestCase {
 	public void setUp() throws Exception{
 		m_helper = new JFCTestHelper();
 		createPandaEntry();
-		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaEntry Test"));
+		m_window = (Window) TestHelper.getWindow(new FrameFinder("PandaEntry Test")); //$NON-NLS-1$
 
 		NamedComponentFinder f = new NamedComponentFinder(
-			PandaEntry.class, "PandaEntry1");
+			PandaEntry.class, "PandaEntry1"); //$NON-NLS-1$
 
 		m_pandaEntry = (PandaEntry) f.find(m_window, 0);
 	}
@@ -50,27 +50,27 @@ public class TestPandaEntry extends JFCTestCase {
 		String text;
 		m_pandaEntry.setInputMode(PandaDocument.KANA);
 		m_helper.sendString(new StringEventData(this,
-						m_pandaEntry, "aiueo"));
+						m_pandaEntry, "aiueo")); //$NON-NLS-1$
 		text = m_pandaEntry.getText();
-		assertEquals("KANA input ", "\u30a2\u30a4\u30a6\u30a8\u30aa", text);
+		assertEquals("KANA input ", "\u30a2\u30a4\u30a6\u30a8\u30aa", text); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public void testASCIIentry() throws Exception {
 		String text;
 		m_pandaEntry.setInputMode(PandaDocument.ASCII);
 		m_helper.sendString(new StringEventData(this,
-							m_pandaEntry, "aa"));
+							m_pandaEntry, "aa")); //$NON-NLS-1$
 		text = m_pandaEntry.getText();
-		assertEquals("KANA input ", "aa", text);
+		assertEquals("KANA input ", "aa", text); //$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	public void testXIMentry() throws Exception {
 		String text;
 		m_pandaEntry.setInputMode(PandaDocument.XIM);
 		m_helper.sendString(new StringEventData(this,
-							m_pandaEntry, "aa"));
+							m_pandaEntry, "aa")); //$NON-NLS-1$
 		text = m_pandaEntry.getText();
-		assertEquals("KANA input ", "aa", text);
+		assertEquals("KANA input ", "aa", text); //$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	public static void main (String[] args){
