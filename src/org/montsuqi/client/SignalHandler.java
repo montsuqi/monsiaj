@@ -108,8 +108,7 @@ public abstract class SignalHandler {
 						JTextComponent text = (JTextComponent)widget;
 						String t = text.getText();
 						int length = t.length();
-						char lastChar = t.charAt(length - 1);
-						if (length != 0 && Character.UnicodeBlock.of(lastChar) != Character.UnicodeBlock.KATAKANA) {
+						if (length != 0 && Character.UnicodeBlock.of(t.charAt(length - 1)) != Character.UnicodeBlock.KATAKANA) {
 							return;
 						}
 						try {
