@@ -35,6 +35,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,6 +61,32 @@ import org.montsuqi.util.Logger;
 
 public class ConfigurationPanel extends JPanel {
 
+	private final class FileSelectionAction extends AbstractAction {
+
+		private JTextComponent entry;
+		private String home;
+		private String extension;
+		private String description;
+
+		private FileSelectionAction(JTextComponent entry, String home, String extension, String description) {
+			super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
+			this.entry = entry;
+			this.home = home;
+			this.extension = extension;
+			this.description = description;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser(home); //$NON-NLS-1$
+			fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
+			int ret = fileChooser.showOpenDialog(null);
+			if (ret == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				entry.setText(file.getAbsolutePath());
+			}
+		}
+	}
+
 	protected static final Logger logger = Logger.getLogger(ConfigurationPanel.class);
 	protected Configuration conf;
 
@@ -72,6 +100,10 @@ public class ConfigurationPanel extends JPanel {
 	protected JTextField appEntry;
 
 	// SSL Tab
+	protected JTextField serverCertificateEntry;
+	protected JTextField clientCertificateEntry;
+	protected JPasswordField exportPasswordEntry;
+	protected JTextField clientCertificateAliasEntry;
 
 	// Misc Tab
 	protected JTextField styleEntry;
@@ -104,6 +136,9 @@ public class ConfigurationPanel extends JPanel {
 		conf.setApplication(appEntry.getText());
 
 		// SSL Tab
+		conf.setServerCertificateFileName(serverCertificateEntry.getText());
+		conf.setClientCertificateFileName(clientCertificateEntry.getText());
+		conf.setClientCertifivatePass(new String(exportPasswordEntry.getPassword()));
 
 		// Others Tab
 		conf.setStyleFileName(styleEntry.getText());
@@ -174,7 +209,19 @@ public class ConfigurationPanel extends JPanel {
 	private Component createSslTab() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
-		panel.add(new JLabel("under construction")); //$NON-NLS-1$
+
+		final String home = System.getProperty("user.home"); //$NON-NLS-1$
+		final String serverCertificateDescription = Messages.getString("ConfigurationPanel.server_certificate_description"); //$NON-NLS-1$
+		final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
+		int y = 0;
+		serverCertificateEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.server_certificate"), conf.getServerCertificateFileName()); //$NON-NLS-1$
+		addButtonFor(panel, serverCertificateEntry, new FileSelectionAction(serverCertificateEntry, home, ".pem", serverCertificateDescription)); //$NON-NLS-1$
+
+		clientCertificateEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.client_certificate"), conf.getClientCertificateFileName()); //$NON-NLS-1$
+		addButtonFor(panel, clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
+		clientCertificateAliasEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.alias"), conf.getClientCertificateAlias()); //$NON-NLS-1$
+		exportPasswordEntry = addPasswordRow(panel, y++, Messages.getString("ConfigurationPanel.password")); //$NON-NLS-1$
+
 		return panel;
 	}
 
@@ -183,23 +230,12 @@ public class ConfigurationPanel extends JPanel {
 		panel.setLayout(new GridBagLayout());
 
 		int y = 0;
-
 		styleEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.style"), conf.getStyleFileName()); //$NON-NLS-1$
 		styleEntry.setColumns(20);
-		final JTextComponent entry = styleEntry;
-		addButtonFor(panel, styleEntry, Messages.getString("ConfigurationPanel.browse"), new ActionListener() { //$NON-NLS-1$
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home")); //$NON-NLS-1$
-				String extension = ".properties"; //$NON-NLS-1$
-				String description = Messages.getString("ConfigurationPanel.filter_pattern"); //$NON-NLS-1$
-				fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
-				int ret = fileChooser.showOpenDialog(null);
-				if (ret == JFileChooser.APPROVE_OPTION) {
-					File styleFile = fileChooser.getSelectedFile();
-					entry.setText(styleFile.getAbsolutePath());
-				}
-			}
-		});
+		final String home = System.getProperty("user.home"); //$NON-NLS-1$
+		final String extension = ".properties"; //$NON-NLS-1$
+		final String description = Messages.getString("ConfigurationPanel.filter_pattern"); //$NON-NLS-1$
+		addButtonFor(panel, styleEntry, new FileSelectionAction(styleEntry, home, extension, description));
 
 		encodingEntry = addTextRow(panel, y++, Messages.getString("ConfigurationPanel.encoding"), conf.getEncoding()); //$NON-NLS-1$
 		lafs = UIManager.getInstalledLookAndFeels();
@@ -242,6 +278,8 @@ public class ConfigurationPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.weightx = 0.0;
 		gbc.weighty = 1.0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
 		gbc.insets = new Insets(2, 2, 2, 2);
 		container.add(label, gbc);
 
@@ -251,7 +289,7 @@ public class ConfigurationPanel extends JPanel {
 		gbc.gridwidth = 3;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
+		gbc.weighty = 1.0;
 		gbc.insets = new Insets(2, 2, 2, 2);
 		container.add(component, gbc);
 	}
@@ -314,7 +352,7 @@ public class ConfigurationPanel extends JPanel {
 		return radios;
 	}
 
-	protected void addButtonFor(JPanel container, JTextField entry, String buttonText, ActionListener listener) {
+	protected void addButtonFor(JPanel container, JTextField entry, Action action) {
 		GridBagLayout gbl = (GridBagLayout)container.getLayout();
 
 		GridBagConstraints gbc;
@@ -322,13 +360,11 @@ public class ConfigurationPanel extends JPanel {
 		gbc.gridwidth = 2;
 		gbl.setConstraints(entry, gbc);
 
-		int y = gbc.gridy;
 		JButton button = new JButton();
-		button.setText(buttonText);
-		button.addActionListener(listener);
+		button.setAction(action);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
-		gbc.gridy = y;
+		gbc.gridwidth = 1;
 		container.add(button, gbc);
 	}
 

@@ -33,6 +33,7 @@ import org.montsuqi.util.Logger;
 public class Configuration {
 
 	private String pass;
+	private String clientCertificatePass;
 	private Preferences prefs;
 
 	private static final String PORT_KEY = "port"; //$NON-NLS-1$
@@ -45,6 +46,10 @@ public class Configuration {
 	private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
 	private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
 	private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
+	private static final String SERVER_CERTIFICATE_KEY = "server_certificate"; //$NON-NLS-1$
+	private static final String CLIENT_CERTIFICATE_KEY = "client_certificate"; //$NON-NLS-1$
+	private static final String CLIENT_CERTIFICATE_PASSWORD_KEY = "client_certificate_password"; //$NON-NLS-1$
+	private static final String CLIENT_CERTIFICATE_ALIAS_KEY = "client_certificate_alias"; //$NON-NLS-1$
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
 	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
@@ -54,6 +59,9 @@ public class Configuration {
 	static final String DEFAULT_HOST = "localhost"; //$NON-NLS-1$
 	static final String DEFAULT_USER = System.getProperty("user.name"); //$NON-NLS-1$
 	static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
+	static final String DEFAULT_SERVER_CERTIFICATE = ""; //$NON-NLS-1$
+	static final String DEFAULT_CLIENT_CERTIFICATE = ""; //$NON-NLS-1$
+	static final String DEFAULT_CLIENT_CERTIFICATE_ALIAS = ""; //$NON-NLS-1$
 	static final boolean DEFAULT_SAVE_PASSWORD = false;
 	static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
 	static final String DEFAULT_ENCODING = "EUC-JP"; //$NON-NLS-1$
@@ -187,6 +195,47 @@ public class Configuration {
 		setBoolean(USE_SSL_KEY, flag);
 	}
 
+
+	public String getServerCertificateFileName() {
+		return getString(SERVER_CERTIFICATE_KEY, DEFAULT_SERVER_CERTIFICATE);
+	}
+
+	public void setServerCertificateFileName(String fileName) {
+		setString(SERVER_CERTIFICATE_KEY, fileName);
+	}
+
+	public String getClientCertificateFileName() {
+		return getString(CLIENT_CERTIFICATE_KEY, DEFAULT_CLIENT_CERTIFICATE);
+	}
+
+	public void setClientCertificateFileName(String fileName) {
+		setString(CLIENT_CERTIFICATE_KEY, fileName);
+	}
+
+	public String getClientCertificatePass() {
+		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
+			return getString(CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_PASSWORD);
+		} else {
+			return clientCertificatePass;
+		}
+	}
+
+	public void setClientCertifivatePass(String pass) {
+		this.clientCertificatePass = pass;
+		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
+			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, pass);
+		} else {
+			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_PASSWORD);
+		}
+	}
+
+	public String getClientCertificateAlias() {
+		return getString(CLIENT_CERTIFICATE_ALIAS_KEY, DEFAULT_CLIENT_CERTIFICATE_ALIAS);
+	}
+
+	public void setClientCertificateAlias(String alias) {
+		setString(CLIENT_CERTIFICATE_ALIAS_KEY, alias);
+	}
 
 	public int getProtocolVersion() {
 		return getInt(PROTOCOL_VERSION_KEY, DEFAULT_PROTOCOL_VERSION);

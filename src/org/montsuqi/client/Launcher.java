@@ -40,6 +40,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -52,16 +53,6 @@ public class Launcher {
 	private Client client;
 	protected Configuration conf;
 	protected String title;
-
-	protected File getKeyStoreFile() {
-		String[] pathElements = new String[] {
-			System.getProperty("user.home"), //$NON-NLS-1$
-			".monsiaj", //$NON-NLS-1$
-			"ssl", //$NON-NLS-1$
-			"keystore" //$NON-NLS-1$
-		};
-		return SystemEnvironment.createFilePath(pathElements);
-	}
 
 	static {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -77,11 +68,6 @@ public class Launcher {
 	public Launcher(String title) {
 		this.title = title;
 		SystemEnvironment.setMacMenuTitle(title);
-		File keyStore = getKeyStoreFile();
-		if (keyStore.exists()) {
-			logger.info("setting trust store explicitly: {0}", keyStore); //$NON-NLS-1$
-			System.setProperty("javax.net.ssl.trustStore", keyStore.toString()); //$NON-NLS-1$
-		}
 		conf = new Configuration(this.getClass());
 		client = new Client(conf);
 	}
@@ -90,21 +76,22 @@ public class Launcher {
 		ConfigurationPanel panel = createConfigurationPanel();
 		Icon icon = createIcon();
 		int result = configure(panel, icon);
-		if (result == JOptionPane.OK_OPTION) {
-			panel.updateConfiguration();
-			conf.save();
-			if (conf.getUseLogViewer()) {
-				createLogFrame();
-			}
-			try {
-				client.connect();
-				Thread t = new Thread(client);
-				t.start();
-			} catch (Exception e) {
-				logger.fatal(e);
-			}
-		} else {
+		if (result != JOptionPane.OK_OPTION) {
 			System.exit(0);
+		}
+		panel.updateConfiguration();
+		conf.save();
+		JFrame logFrame = conf.getUseLogViewer() ? createLogFrame() : null;
+		try {
+			client.connect();
+			Thread t = new Thread(client);
+			t.start();
+		} catch (Exception e) {
+			logger.fatal(e);
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+			if (logFrame != null) {
+				logFrame.setExtendedState(Frame.NORMAL);
+			}
 		}
 	}
 
@@ -122,7 +109,7 @@ public class Launcher {
 		return JOptionPane.showOptionDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, icon, options, initial);
 	}
 
-	private void createLogFrame() {
+	private JFrame createLogFrame() {
 		final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); //$NON-NLS-1$
 		Container container = f.getContentPane();
 		container.setLayout(new BorderLayout());
@@ -132,6 +119,8 @@ public class Launcher {
 		System.setErr(console.getErr());
 
 		JScrollPane scroll = new JScrollPane(console);
+		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setPreferredSize(new Dimension(640, 480));
 		container.add(scroll, BorderLayout.CENTER);
 
@@ -172,5 +161,6 @@ public class Launcher {
 
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		return f;
 	}
 }
