@@ -141,8 +141,8 @@ public class Protocol extends Connection {
 			return null;
 		}
 		Window w = node.getWindow();
-		activeWindow = w;
 		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
+			activeWindow = w;
 			w.pack();
 			w.show();
 			return node;
