@@ -24,6 +24,7 @@ package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -51,7 +52,6 @@ public class PandaPreviewPane extends JPanel {
 		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		add(scroll, BorderLayout.CENTER);
-
 	}
 
 	public void load(String fileName) throws IOException {
@@ -60,9 +60,11 @@ public class PandaPreviewPane extends JPanel {
 
 	public static void main(String[] args) throws IOException {
 		JFrame f = new JFrame();
-		PandaPreviewPane prev = new PandaPreviewPane();
-		f.add(prev);
+		PandaPreviewPane preview = new PandaPreviewPane();
+		f.add(preview);
 		f.setVisible(true);
-		prev.load("C:\\Documents and Settings\\crouton\\My Documents\\My Pictures\\fmo-wall-ex1024.jpg"); //$NON-NLS-1$
+		JFileChooser chooser = new JFileChooser();
+		chooser.showOpenDialog(preview);
+		preview.load(chooser.getSelectedFile().getAbsolutePath());
 	}
 }
