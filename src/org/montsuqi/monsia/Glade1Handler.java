@@ -295,7 +295,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = ACCELERATOR;
 			String value = content.toString();
-			if (localName.equals("key") && value.startsWith("GTK_")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (localName.equals("key") && value.startsWith("GDK_")) { //$NON-NLS-1$ //$NON-NLS-2$
 				accelKey = keyCode(value);
 			} else if (localName.equals("modifiers")) { //$NON-NLS-1$
 				accelModifiers = parseModifiers(value);

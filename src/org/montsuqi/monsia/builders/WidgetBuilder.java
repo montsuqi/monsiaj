@@ -43,7 +43,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JViewport;
-import javax.swing.JWindow;
 
 import org.montsuqi.monsia.AccelInfo;
 import org.montsuqi.monsia.Interface;
@@ -139,15 +138,12 @@ public class WidgetBuilder {
 				widget = new JLabel('[' + e.toString() + ']');
 			}
 		}
-		if (widget instanceof JWindow) {
-			xml.setTopLevel((JWindow)widget);
+		if (widget instanceof Window) {
+			xml.setTopLevel(widget);
 		}
 		builder.setCommonParameters(xml, widget, info);
 		if (widget instanceof Container) {
 			builder.buildChildren(xml, (Container)widget, info);
-		}
-		if (widget instanceof JWindow) {
-			xml.setTopLevel(null);
 		}
 		return widget;
 		
@@ -169,6 +165,7 @@ public class WidgetBuilder {
 		try {
 			widget = (Component)clazz.newInstance();
 			propertySetter.setProperties(xml, widget, info);
+			xml.addAccels(widget, info);
 			return widget;
 		} catch (InstantiationException e) {
 			logger.fatal(e);

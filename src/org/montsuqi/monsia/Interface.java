@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.FocusManager;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
@@ -55,7 +56,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
-import javax.swing.JWindow;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -70,12 +70,14 @@ import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.montsuqi.client.Protocol;
 import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.CalendarEvent;
 import org.montsuqi.widgets.CalendarListener;
+import org.montsuqi.widgets.PandaFocusManager;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TimerEvent;
 import org.montsuqi.widgets.TimerListener;
@@ -89,14 +91,17 @@ public class Interface {
 	private Map buttonGroups;
 	private Protocol protocol;
 
-	private JWindow topLevel;
+	private Component topLevel;
 	private Map signals;
-	private List accelGroup;
-	private Map accelGroups;
     private Component focusWidget;
 	private Component defaultWidget;
 	private Logger logger;
 
+	private static Map accelHandlers;
+	static {
+		FocusManager.setCurrentManager(new PandaFocusManager());
+		accelHandlers = new HashMap();
+	}
 	private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; //$NON-NLS-1$
 	private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; //$NON-NLS-1$
 
@@ -165,8 +170,7 @@ public class Interface {
 		}
 	}
 
-	Interface(Map infos, List roots, Protocol protocol)
-	{
+	Interface(Map infos, List roots, Protocol protocol) {
 		logger = Logger.getLogger(Interface.class);
 		this.infos = infos;
 		widgets = new HashMap();
@@ -174,7 +178,6 @@ public class Interface {
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
-		accelGroups = new HashMap();
 		defaultWidget = null;
 		focusWidget = null;
 		this.protocol = protocol;
@@ -182,7 +185,6 @@ public class Interface {
 		signalAutoConnect();
 	}
 
-	// FIXME signal with accels
 	private void signalAutoConnect() {
 		Class[] argTypes = { Component.class, Object.class };
 		Iterator entries = signals.entrySet().iterator();
@@ -549,7 +551,7 @@ public class Interface {
 		return (ButtonGroup)buttonGroups.get(name);
 	}
 	
-	public void setTopLevel(JWindow window) {
+	public void setTopLevel(Component widget) {
 		if (focusWidget != null) {
 			focusWidget.requestFocus();
 		}
@@ -559,15 +561,7 @@ public class Interface {
 		}
 		focusWidget = null;
 		defaultWidget = null;
-		topLevel = window;
-		accelGroup = ensureAccel(topLevel);
-	}
-
-	private List ensureAccel(Window w) {
-		if ( ! accelGroups.containsKey(w)) {
-			accelGroups.put(topLevel, accelGroup);
-		}
-		return (List)accelGroups.get(w);
+		topLevel = widget;
 	}
 
 	public void addSignal(String handler, SignalData sData) {
@@ -576,6 +570,14 @@ public class Interface {
 		}
 		List signals = (List)this.signals.get(handler);
 		signals.add(0, sData);
+	}
+
+	public void addAccels(Component widget, WidgetInfo info) {
+		if (widget instanceof Window) {
+			return;
+		}
+		AccelHandler handler = getAccelHandler(topLevel);
+		handler.addAccels(widget, info.getAccels());
 	}
 
 	void buildWidgetTree(List roots) {
@@ -603,5 +605,22 @@ public class Interface {
 
 	public void setLongName(String longName, Component widget) {
 		longNames.put(longName, widget);
+	}
+
+	public static boolean handleAccels(KeyEvent e) {
+		Component c = (Component)e.getSource();
+		while (c.getParent() != null) {
+			c = c.getParent();
+		}
+		AccelHandler handler = getAccelHandler(c);
+		return handler.handleAccel(e);
+	}
+
+	private static AccelHandler getAccelHandler(Component c) {
+		if ( ! accelHandlers.containsKey(c)) {
+			accelHandlers.put(c, new AccelHandler());
+		}
+		AccelHandler handler = (AccelHandler)accelHandlers.get(c);
+		return handler;
 	}
 }
