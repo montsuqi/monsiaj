@@ -129,4 +129,14 @@ class WidgetInfo {
 	private List accels;         // <Accel>
 	private LinkedList children;       // <ChildInfo> 
 
+	public String toString() {
+		StringBuffer buf = new StringBuffer(14 + className.length() + name.length());
+		buf.append("WidgetInfo(");
+		buf.append(className);
+		buf.append(", ");
+		buf.append(name);
+		buf.append(")");
+		return buf.toString();
+	}
+
 }
