@@ -102,7 +102,6 @@ class Connection {
 
 	int receiveLength() throws IOException {
 		int length = in.readInt();
-		//logger.debug("receiveLength: {0}", new Integer(length));
 		return length;
 	}
 
@@ -119,9 +118,10 @@ class Connection {
 
 	String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
-		in.read(bytes);
+		for (int offset = 0, read; offset < size; offset += read) {
+			read = in.read(bytes, offset, size - offset);
+		}
 		String s = new String(bytes, encoding);
-		//logger.debug("receiveStringBody: {0}", s);
 		return s;
 	}
 
@@ -132,7 +132,6 @@ class Connection {
 
 	int receiveLong() throws IOException { /* longs: 4-byte long */
 		int l = in.readInt();
-		//logger.debug("receiveLong: {0}", new Integer(l));
 		return l;
 	}
 
@@ -264,7 +263,6 @@ class Connection {
 	}
 
 	public String receiveStringData() throws IOException {
-		//logger.debug("receiveStringData");
 		int type = receiveDataType();
 		switch (type) {
 		case Type.INT:
