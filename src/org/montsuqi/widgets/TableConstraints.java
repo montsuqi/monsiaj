@@ -57,8 +57,8 @@ public class TableConstraints {
 		bottomAttach = gbc.gridy + gbc.gridheight;
 		xPadding = gbc.ipadx;
 		yPadding = gbc.ipady;
-		xFill = (gbc.fill & GridBagConstraints.HORIZONTAL) != 0;
-		yFill = (gbc.fill &= GridBagConstraints.VERTICAL) != 0;
+		xFill = gbc.fill == GridBagConstraints.BOTH || gbc.fill == GridBagConstraints.HORIZONTAL;
+		yFill = gbc.fill == GridBagConstraints.BOTH || gbc.fill == GridBagConstraints.VERTICAL;
 	}
 
 	public GridBagConstraints toGridBagConstraints() {
@@ -66,10 +66,18 @@ public class TableConstraints {
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.fill = GridBagConstraints.NONE;
 		if (xFill) {
-			gbc.fill |= GridBagConstraints.HORIZONTAL;
+			if (yFill) {
+				gbc.fill = GridBagConstraints.BOTH;
+			} else {
+				gbc.fill = GridBagConstraints.HORIZONTAL;
+			}
 		}
 		if (yFill) {
-			gbc.fill |= GridBagConstraints.VERTICAL;
+			if (xFill) {
+				gbc.fill = GridBagConstraints.BOTH;
+			} else {
+				gbc.fill = GridBagConstraints.VERTICAL;
+			}
 		}
 		gbc.gridheight = bottomAttach - topAttach;
 		gbc.gridwidth = rightAttach - leftAttach;
