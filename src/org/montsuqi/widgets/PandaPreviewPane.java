@@ -45,6 +45,8 @@ public class PandaPreviewPane extends JPanel {
 		toolbar = new JToolBar();
 		toolbar.add(preview.getZoomInAction());
 		toolbar.add(preview.getZoomOutAction());
+		toolbar.add(preview.getRotateClockwiseAction());
+		toolbar.add(preview.getRotateCounterClockwiseAction());
 		add(toolbar, BorderLayout.NORTH);
 
 		JScrollPane scroll = new JScrollPane();

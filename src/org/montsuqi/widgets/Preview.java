@@ -35,7 +35,7 @@ public abstract class Preview extends JPanel {
 
 	private final class ZoomInAction extends AbstractAction {
 		ZoomInAction() {
-			URL iconURL = getClass().getResource("/org/montsuqi/widgets/zoom-in.png"); //$NON-NLS-1$
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-in.png"); //$NON-NLS-1$
 			if (iconURL != null) {
 				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 			}
@@ -50,7 +50,7 @@ public abstract class Preview extends JPanel {
 
 	private final class ZoomOutAction extends AbstractAction {
 		ZoomOutAction() {
-			URL iconURL = getClass().getResource("/org/montsuqi/widgets/zoom-out.png"); //$NON-NLS-1$
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-out.png"); //$NON-NLS-1$
 			if (iconURL != null) {
 				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 			}
@@ -63,13 +63,48 @@ public abstract class Preview extends JPanel {
 		}
 	}
 
+	private final class RotateClockwiseAction extends AbstractAction {
+		RotateClockwiseAction() {
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/redo.png"); //$NON-NLS-1$
+			if (iconURL != null) {
+				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+			}
+			putValue(Action.NAME, Messages.getString("PandaPreview.rotate_clockwise")); //$NON-NLS-1$
+			putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.rotate_clockwise_short_description")); //$NON-NLS-1$
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			rotateClockwise();
+		}
+	}
+
+	private final class RotateCounterClockwiseAction extends AbstractAction {
+		RotateCounterClockwiseAction() {
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/undo.png"); //$NON-NLS-1$
+			if (iconURL != null) {
+				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+			}
+			putValue(Action.NAME, Messages.getString("PandaPreview.rotate_counter_clockwise")); //$NON-NLS-1$
+			putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.rotate_counter_clockwise_short_description")); //$NON-NLS-1$
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			rotateCounterClockwise();
+		}
+	}
+
 	private final Action zoomOutAction;
 	private final Action zoomInAction;
+	private final Action rotateClockwiseAction;
+	private final Action rotateCounterClockwiseAction;
 
 	public Preview() {
 		zoomOutAction = new ZoomOutAction();
 		zoomInAction = new ZoomInAction();
-		setScale(1.0);
+		rotateClockwiseAction = new RotateClockwiseAction();
+		rotateCounterClockwiseAction = new RotateCounterClockwiseAction();
+		resetScale();
+		resetRotationStep();
 	}
 
 	public Action getZoomOutAction() {
@@ -80,10 +115,19 @@ public abstract class Preview extends JPanel {
 		return zoomInAction;
 	}
 
+	public Action getRotateClockwiseAction() {
+		return rotateClockwiseAction;
+	}
+
+	public Action getRotateCounterClockwiseAction() {
+		return rotateCounterClockwiseAction;
+	}
+
 	public abstract void load(String fileName) throws IOException;
 
 	protected double scale;
 	private static final double SCALE_FACTOR = 1.2;
+	protected int rotationStep;
 
 	public void zoomIn() {
 		setScale(scale * SCALE_FACTOR);
@@ -94,17 +138,16 @@ public abstract class Preview extends JPanel {
 	}
 
 	protected final void setScale(double newScale) {
-		doSetScale(newScale);
-		revalidate();
-		repaint();
-	}
-
-	protected void doSetScale(double newScale) {
 		if ( ! isValidScale(newScale)) {
 			throw new IllegalArgumentException("non-positive scale"); //$NON-NLS-1$
 		}
 		this.scale = newScale;
+		updatePreferredSize(newScale, rotationStep);
+		revalidate();
+		repaint();
 	}
+
+	protected abstract  void updatePreferredSize(double newScale, int newRotationStep);
 
 	private boolean isValidScale(double newScale) {
 		return ! Double.isNaN(newScale) && 0 < newScale && newScale <= Double.MAX_VALUE;
@@ -112,5 +155,24 @@ public abstract class Preview extends JPanel {
 
 	protected void resetScale() {
 		setScale(1.0);
+	}
+
+	void rotateClockwise() {
+		setRotationStep(rotationStep + 1);
+	}
+
+	void rotateCounterClockwise() {
+		setRotationStep(rotationStep - 1);
+	}
+
+	protected void resetRotationStep() {
+		setRotationStep(0);
+	}
+
+	private void setRotationStep(int newRotationStep) {
+		this.rotationStep = newRotationStep % 4;
+		updatePreferredSize(scale, newRotationStep);
+		revalidate();
+		repaint();
 	}
 }

@@ -24,7 +24,9 @@ package org.montsuqi.widgets;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,19 +43,33 @@ class ImagePreview extends Preview {
 
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (image != null) {
-			int width = getScaledImageWidth();
-			int height = getScaledImageHeight();
-			g.drawImage(image, 0, 0, width, height, this);
+		if (image == null) {
+			return;
 		}
+		Graphics2D g2d = (Graphics2D)g;
+		AffineTransform old = g2d.getTransform();
+		int w = getScaledImageWidth();
+		int h = getScaledImageHeight();
+		int cx = rotationStep != 1 ? w / 2 : h / 2;
+		int cy = rotationStep != 3 ? h / 2 : w / 2;
+		double angle = (Math.PI / 2.0) * rotationStep;
+		AffineTransform t = new AffineTransform();
+		t.rotate(angle, cx, cy);
+		g2d.setTransform(t);
+		g2d.drawImage(image, 0, 0, this);
+		g2d.setTransform(old);
 	}
 
-	protected void doSetScale(double newScale) {
-		super.doSetScale(newScale);
-		if (image != null) {
-			int width = getScaledImageWidth();
-			int height = getScaledImageHeight();
+	protected void updatePreferredSize(double newScale, int newRotationStep) {
+		if (image == null) {
+			return;
+		}
+		int width = getScaledImageWidth();
+		int height = getScaledImageHeight();
+		if (newRotationStep % 2 == 0) {
 			setPreferredSize(new Dimension(width, height));
+		} else {
+			setPreferredSize(new Dimension(height, width));
 		}
 	}
 
