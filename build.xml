@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.19 2004-06-07 06:52:51 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.20 2004-06-10 09:34:02 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -60,7 +60,8 @@
            destdir="${build.dir}"
            verbose="${compile.verbose}"
 	   deprecation="${compile.deprecation}" 
-           debug="${compile.debug}">
+           debug="${compile.debug}"
+           source="1.4">
       <include name="**/*.java"/>
       <exclude name="${exclude.j2selogger}"/>
       <exclude name="${exclude.log4jlogger}"/>
