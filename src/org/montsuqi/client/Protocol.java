@@ -213,19 +213,23 @@ public class Protocol extends Connection {
 	}
 
 	boolean receiveWidgetData(Component widget) throws IOException {
-		try {
-			WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(widget.getClass());
-			return marshaller.receive(valueManager, widget);
-		} catch (ClassNotFoundException e) {
+		Class clazz = widget.getClass();
+		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
+		if (marshaller != null) {
+			marshaller.receive(valueManager, widget); 
+			return true;
+		} else {
 			return false;
 		}
 	}
 
 	private boolean sendWidgetData(String name, Component widget) throws IOException {
-		try {
-			WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(widget.getClass());
-			return marshaller.send(valueManager, name, widget);
-		} catch (ClassNotFoundException e) {
+		Class clazz = widget.getClass();
+		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
+		if (marshaller != null) {
+			marshaller.send(valueManager, name, widget);
+			return true;
+		} else {
 			return false;
 		}
 	}

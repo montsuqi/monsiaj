@@ -45,7 +45,7 @@ class ComboMarshaller extends WidgetMarshaller {
 		entryMarshaller = new EntryMarshaller();
 	}
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
 
@@ -91,23 +91,21 @@ class ComboMarshaller extends WidgetMarshaller {
 					entryMarshaller.receive(manager, dummy);
 					selectedItem = dummy.getText();
 				} else {
-					logger.fatal(Messages.getString("ComboMarshaller.subwidget_not_found")); //$NON-NLS-1$
+					throw new WidgetMarshallingException(Messages.getString("ComboMarshaller.subwidget_not_found")); //$NON-NLS-1$
 				}
 			}
 		}
 		if (selectedItem != null) {
 			combo.setSelectedItem(selectedItem);
 		}
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
 		Interface xml = con.getInterface();
 		JTextField editor = (JTextField)xml.getComboEditor(combo);
 		entryMarshaller.send(manager, xml.getWidgetLongName(editor), editor);
-		return true;
 	}
 }
 

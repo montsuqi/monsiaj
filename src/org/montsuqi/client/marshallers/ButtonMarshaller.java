@@ -32,7 +32,7 @@ import org.montsuqi.client.Type;
 
 class ButtonMarshaller extends WidgetMarshaller {
 	
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		AbstractButton button = (AbstractButton)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
@@ -50,10 +50,9 @@ class ButtonMarshaller extends WidgetMarshaller {
 				button.setSelected(selected);
 			}
 		}
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		AbstractButton button = (AbstractButton)widget;
 
@@ -62,7 +61,6 @@ class ButtonMarshaller extends WidgetMarshaller {
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		boolean selected = button.isSelected();
 		con.sendBooleanData(va.getType(), selected);
-		return true;
 	}
 }
 

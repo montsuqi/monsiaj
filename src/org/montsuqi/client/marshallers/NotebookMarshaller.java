@@ -34,7 +34,7 @@ import org.montsuqi.client.Type;
 
 class NotebookMarshaller extends WidgetMarshaller {
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTabbedPane tabbed = (JTabbedPane)widget;
 
@@ -56,13 +56,12 @@ class NotebookMarshaller extends WidgetMarshaller {
 			}
 		}
 		if (page == -1) {
-			throw new IllegalStateException(Messages.getString("NotebookMarshaller.page_not_found")); //$NON-NLS-1$
+			throw new WidgetMarshallingException(Messages.getString("NotebookMarshaller.page_not_found")); //$NON-NLS-1$
 		}
 		tabbed.setSelectedIndex(page);
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTabbedPane tabbed = (JTabbedPane)widget;
 
@@ -70,6 +69,5 @@ class NotebookMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getValue(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendIntegerData(va.getType(), tabbed.getSelectedIndex());
-		return true;
 	}
 }

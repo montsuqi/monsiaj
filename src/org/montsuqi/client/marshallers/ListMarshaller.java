@@ -35,7 +35,7 @@ import org.montsuqi.client.Type;
 
 class ListMarshaller extends WidgetMarshaller {
 	
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JList list = (JList)widget;
 
@@ -92,10 +92,9 @@ class ListMarshaller extends WidgetMarshaller {
 				}
 			}
 		}
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JList list = (JList)widget;
 
@@ -107,7 +106,6 @@ class ListMarshaller extends WidgetMarshaller {
 			con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + (i + opt) + ']');
 			con.sendBooleanData(Type.BOOL, model.isSelectedIndex(i));
 		}
-		return true;
 	}
 }
 

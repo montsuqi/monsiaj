@@ -33,7 +33,7 @@ import org.montsuqi.client.Type;
 
 class CalendarMarshaller extends WidgetMarshaller {
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
 
@@ -56,7 +56,7 @@ class CalendarMarshaller extends WidgetMarshaller {
 				int day = con.receiveIntData();
 				calendar.set(Calendar.DATE, day);
 			} else {
-				//	fatal error
+				throw new WidgetMarshallingException();
 			}
 		}
 
@@ -64,10 +64,9 @@ class CalendarMarshaller extends WidgetMarshaller {
 			Date date = calendar.getTime();
 			calendarWidget.setDate(date);
 		}
-		return true;
 	}
 	
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
 		Date date = calendarWidget.getDate();
@@ -86,8 +85,6 @@ class CalendarMarshaller extends WidgetMarshaller {
 		con.sendPacketClass(PacketClass.ScreenData);
 		con.sendName(va.getValueName() + ".day"); //$NON-NLS-1$
 		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.DATE));
-	
-		return true;
 	}
 }
 

@@ -34,7 +34,7 @@ import org.montsuqi.client.Type;
 
 class ProgressBarMarshaller extends WidgetMarshaller {
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JProgressBar progress = (JProgressBar)widget;
 
@@ -51,10 +51,9 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 				progress.setValue(con.receiveIntData());
 			}
 		}
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JProgressBar progress = (JProgressBar)widget;
 
@@ -62,6 +61,5 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getValue(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendIntegerData(va.getType(), progress.getValue());
-		return true;
 	}
 }

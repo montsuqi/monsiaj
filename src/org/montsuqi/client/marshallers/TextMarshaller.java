@@ -33,7 +33,7 @@ import org.montsuqi.client.Type;
 
 class TextMarshaller extends WidgetMarshaller {
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTextComponent text = (JTextComponent)widget;
 
@@ -47,10 +47,9 @@ class TextMarshaller extends WidgetMarshaller {
 			manager.registerValue(widget, name, null);
 			text.setText(value);
 		}
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTextComponent text = (JTextComponent)widget; 
 
@@ -58,7 +57,6 @@ class TextMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getValue(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendStringData(va.getType(), text.getText());
-		return true;
 	}
 }
 

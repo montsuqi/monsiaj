@@ -32,7 +32,7 @@ import org.montsuqi.client.Type;
 
 class LabelMarshaller extends WidgetMarshaller {
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JLabel label = (JLabel)widget;
 
@@ -46,10 +46,9 @@ class LabelMarshaller extends WidgetMarshaller {
 			String text = con.receiveStringData();
 			label.setText(text);
 		}
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
-		return true;
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
+		// do nothing
 	}
 }

@@ -49,7 +49,7 @@ class CListMarshaller extends WidgetMarshaller {
 		labelMarshaller = new LabelMarshaller();
 	}
 
-	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTable table = (JTable)widget;
 
@@ -149,10 +149,9 @@ class CListMarshaller extends WidgetMarshaller {
 		//con.setReceiving(false);
 		//con.addChangedWidget(widget, null);
 		//con.setReceiving(true);
-		return true;
 	}
 
-	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JTable table = (JTable)widget;
 		ValueAttribute va = manager.getValue(name);
@@ -169,7 +168,6 @@ class CListMarshaller extends WidgetMarshaller {
 				visibleRow = true;
 			}
 		}
-		return true;
 	}
 
 	private boolean isVisibleRow(JTable table, int row) {

@@ -22,43 +22,24 @@ copies.
 
 package org.montsuqi.client.marshallers;
 
-import java.awt.Component;
-import java.io.IOException;
-import java.math.BigDecimal;
+import org.montsuqi.util.ChainedRuntimeException;
 
-import org.montsuqi.client.PacketClass;
-import org.montsuqi.client.Protocol;
-import org.montsuqi.client.Type;
-import org.montsuqi.widgets.NumberEntry;
+class WidgetMarshallingException extends ChainedRuntimeException {
 
-class NumberEntryMarshaller extends WidgetMarshaller {
-
-	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
-		Protocol con = manager.getProtocol();
-		NumberEntry entry = (NumberEntry)widget;
-
-		con.receiveDataTypeWithCheck(Type.RECORD);
-		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
-				continue;
-			}
-			BigDecimal val = con.receiveFixedData();
-			manager.registerValue(entry, name, val);
-			entry.setValue(val);
-		}
+	public WidgetMarshallingException() {
+		super();
 	}
 
-	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
-		Protocol con = manager.getProtocol();
-		NumberEntry entry = (NumberEntry)widget;
-
-		con.sendPacketClass(PacketClass.ScreenData);
-		ValueAttribute va = manager.getValue(name);
-		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
-		BigDecimal value = entry.getValue();
-		va.setOpt(value);
-		con.sendFixedData(va.getType(), value);
+	public WidgetMarshallingException(String message) {
+		super(message);
 	}
+
+	public WidgetMarshallingException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public WidgetMarshallingException(Throwable cause) {
+		super(cause);
+	}
+
 }
-

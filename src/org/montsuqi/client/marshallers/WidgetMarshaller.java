@@ -24,7 +24,6 @@ package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +37,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.montsuqi.client.Messages;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
@@ -68,8 +66,8 @@ public abstract class WidgetMarshaller {
 	WidgetMarshaller() {
 		logger = Logger.getLogger(WidgetMarshaller.class);
 	}
-	public abstract boolean receive(WidgetValueManager manager, Component widget) throws IOException;
-	public abstract boolean send(WidgetValueManager manager, String name, Component widget) throws IOException;
+	public abstract void receive(WidgetValueManager manager, Component widget) throws IOException;
+	public abstract void send(WidgetValueManager manager, String name, Component widget) throws IOException;
 
 	protected boolean handleStateStyle(WidgetValueManager manager, Component widget, String name) throws IOException {
 		Protocol con = manager.getProtocol();
@@ -100,15 +98,12 @@ public abstract class WidgetMarshaller {
 		classTable.put(clazz, marshaller);
 	}
 
-	public static WidgetMarshaller getMarshaller(Class clazz) throws ClassNotFoundException {
+	public static WidgetMarshaller getMarshaller(Class clazz) {
 		for (Class c = clazz; c != null; c = c.getSuperclass()) {
 			if (classTable.containsKey(c)) {
 				return (WidgetMarshaller)classTable.get(c);
 			}
 		}
-	
-		String format = Messages.getString("WidgetMarshaller.marshaller_not_found"); //$NON-NLS-1$
-		String message = MessageFormat.format(format, new Object[] { clazz.getName() });
-		throw new ClassNotFoundException(message);
+		return null;
 	}
 }
