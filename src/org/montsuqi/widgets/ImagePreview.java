@@ -41,13 +41,29 @@ class ImagePreview extends Preview {
 
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		int width = 0;
-		int height = 0;
 		if (image != null) {
-			width = (int)(image.getWidth(this) * scale);
-			height = (int)(image.getHeight(this) * scale);
+			int width = getScaledImageWidth();
+			int height = getScaledImageHeight();
 			g.drawImage(image, 0, 0, width, height, this);
 		}
-		setPreferredSize(new Dimension(width, height));
+	}
+
+	protected void doSetScale(double newScale) {
+		super.doSetScale(newScale);
+		if (image != null) {
+			int width = getScaledImageWidth();
+			int height = getScaledImageHeight();
+			setPreferredSize(new Dimension(width, height));
+		}
+	}
+
+	private int getScaledImageWidth() {
+		assert image != null;
+		return (int)(image.getWidth(this) * scale);
+	}
+
+	private int getScaledImageHeight() {
+		assert image != null;
+		return (int)(image.getHeight(this) * scale);
 	}
 }

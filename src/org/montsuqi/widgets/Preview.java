@@ -93,14 +93,21 @@ public abstract class Preview extends JPanel {
 		setScale(scale / SCALE_FACTOR);
 	}
 
-	protected void setScale(double scale) {
-		if ( ! Double.isNaN(scale) && 0 < scale && scale < Double.MAX_VALUE) {
-			this.scale = scale;
-			revalidate();
-			repaint();
-		} else {
-			throw new IllegalArgumentException(Messages.getString("ImagePreview.non_positive_scale_factor")); //$NON-NLS-1$
+	protected final void setScale(double newScale) {
+		doSetScale(newScale);
+		revalidate();
+		repaint();
+	}
+
+	protected void doSetScale(double newScale) {
+		if ( ! isValidScale(newScale)) {
+			throw new IllegalArgumentException("non-positive scale"); //$NON-NLS-1$
 		}
+		this.scale = newScale;
+	}
+
+	private boolean isValidScale(double newScale) {
+		return ! Double.isNaN(newScale) && 0 < newScale && newScale <= Double.MAX_VALUE;
 	}
 
 	protected void resetScale() {
