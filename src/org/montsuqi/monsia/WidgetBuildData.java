@@ -1,10 +1,12 @@
 package org.montsuqi.monsia;
 
 import java.awt.Container;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.montsuqi.util.Logger;
 
 public class WidgetBuildData {
+	protected Logger logger;
 	protected Method buildMethod;
 	protected Method buildChildrenMethod;
 	protected Method findInternalChildMethod;
@@ -15,6 +17,7 @@ public class WidgetBuildData {
 		this.buildMethod = buildMethod;
 		this.buildChildrenMethod = buildChildrenMethod;
 		this.findInternalChildMethod = findInternalChildMethod;
+		logger = Logger.getLogger(WidgetBuildData.class);
 	}
 
 	public WidgetBuildData(String build, String buildChildren, String findInternalChild) {
@@ -57,17 +60,26 @@ public class WidgetBuildData {
 		try {
 			return WidgetBuilder.class.getMethod(methodName, argTypes);
 		} catch (Exception e) {
-			Logger.getLogger(WidgetBuildData.class).warn(e);
+			Logger.getLogger(WidgetBuilder.class).warn(e);
 			return null;
 		}
 	}
 
 	protected Object invoke(WidgetBuilder builder, Method method, Object[] args) {
+		logger.enter("WidgetBuildData.invoke");
 		try {
+			logger.debug("method={0}", method);
 			return method.invoke(builder, args);
-		} catch (Exception e) {
-			Logger.getLogger(WidgetBuildData.class).warn(e);
+		} catch (IllegalAccessException e) {
+			logger.warn(e);
 			return null;
+		} catch (InvocationTargetException e) {
+			logger.warn(e.getCause().getMessage());
+			logger.warn(e.getCause());
+			return null;
+		} finally {
+			logger.leave("WidgetBuildData.invoke");
 		}
+		
 	}
 }
