@@ -1,6 +1,7 @@
 =begin
 = 実行方法
-== jarアーカイブを使用する場合
+
+== Java2 SE 1.4
 
  $ java \
          -jar dist/pandaclient.jar \
@@ -9,11 +10,11 @@
          -pass=sample \
          panda:helloworld
 
-== without jar
+== Java2 SE 1.3
 
+ $ XMLLIBS=/usr/share/java/xercesImpl.jar:/usr/share/java/xmlParserAPIs.jar
  $ java \
-         -cp bin:src \
-         org.montsuqi.client.Client \
+         -cp dist/pandaclient.jar:$XMLLIBS \
          -host=localhost \
          -user=sample \
          -pass=sample \
