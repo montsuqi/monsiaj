@@ -3,12 +3,15 @@ package org.montsuqi.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.BasicConfigurator;
+
 public class Log4JLogger extends Logger {
 
 	private static Map loggers;
 
 	static {
 		loggers = new HashMap();
+		BasicConfigurator.configure();
 	}
 	
 	public static synchronized Logger getLogger(String name) {
