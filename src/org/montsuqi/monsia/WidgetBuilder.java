@@ -229,6 +229,7 @@ class WidgetBuilder {
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildNotebookChildren", //$NON-NLS-1$
 								null);
+		registerWidgetBuildData("NumberEntry", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("OptionMenu", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
 								"buildOptionMenuChildren", //$NON-NLS-1$
