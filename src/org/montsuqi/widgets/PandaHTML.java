@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import javax.swing.JScrollPane;
@@ -53,6 +54,8 @@ public class PandaHTML extends JScrollPane {
 	public void setURI(String uri) {
 		try {
 			pane.setPage(uri);
+		} catch (FileNotFoundException e) {
+			pane.setText(e.toString());
 		} catch (IOException e) {
 			logger.warn(e);
 		}
@@ -61,6 +64,8 @@ public class PandaHTML extends JScrollPane {
 	public void setURI(URL uri) {
 		try {
 			pane.setPage(uri);
+		} catch (FileNotFoundException e) {
+			pane.setText(e.toString());
 		} catch (IOException e) {
 			logger.warn(e);
 		}
