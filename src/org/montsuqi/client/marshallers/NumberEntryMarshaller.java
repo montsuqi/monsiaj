@@ -20,19 +20,22 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.math.BigDecimal;
 
-import javax.swing.JLabel;
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
+import org.montsuqi.widgets.NumberEntry;
 
+class NumberEntryMarshaller extends WidgetMarshaller {
 
-class LabelMarshaller extends WidgetMarshaller {
-
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JLabel label = (JLabel)widget;
+		NumberEntry entry = (NumberEntry)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		while (nItem-- != 0) {
@@ -40,14 +43,25 @@ class LabelMarshaller extends WidgetMarshaller {
 			if (handleCommon(manager, widget, name)) {
 				continue;
 			}
-			String buff = con.receiveStringData();
-			manager.registerValue(widget, name, null);
-			label.setText(buff);
+			String buff = con.getWidgetNameBuffer().toString() + '.' + name;
+			ValueAttribute va = manager.getValue(buff);
+			BigDecimal val = con.receiveFixedData();
+			manager.registerValue(entry, name, val);
+			entry.setValue(val);
 		}
 		return true;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+		Protocol con = manager.getProtocol();
+		NumberEntry entry = (NumberEntry)widget;
+		BigDecimal value = entry.getValue();
+		con.sendPacketClass(PacketClass.ScreenData);
+		ValueAttribute va = manager.getValue(name);
+		con.sendString(name + '.' + va.getKey());
+		//va.setOpt(value);
+		con.sendFixedData(va.getType(), value);
 		return true;
 	}
 }
+

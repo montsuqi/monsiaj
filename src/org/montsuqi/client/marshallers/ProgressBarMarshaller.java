@@ -20,45 +20,47 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
-import java.math.BigDecimal;
 
-import org.montsuqi.widgets.NumberEntry;
+import javax.swing.JProgressBar;
 
-class NumberEntryMarshaller extends WidgetMarshaller {
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
 
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+
+class ProgressBarMarshaller extends WidgetMarshaller {
+
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		NumberEntry entry = (NumberEntry)widget;
+		JProgressBar progress = (JProgressBar)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
+		StringBuffer longName = con.getWidgetNameBuffer();
+		int offset = longName.length();
+	
 		while (nItem-- != 0) {
 			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
+			} else if ("value".equals(name)) { //$NON-NLS-1$
+				manager.registerValue(widget, name, null);
+				progress.setValue(con.receiveIntData());
 			}
-			String buff = con.getWidgetNameBuffer().toString() + '.' + name;
-			ValueAttribute va = manager.getValue(buff);
-			BigDecimal val = con.receiveFixedData();
-			manager.registerValue(entry, name, val);
-			entry.setValue(val);
 		}
 		return true;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		NumberEntry entry = (NumberEntry)widget;
-		BigDecimal value = entry.getValue();
-		con.sendPacketClass(PacketClass.ScreenData);
+		JProgressBar progress = (JProgressBar)widget;
 		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getKey());
-		//va.setOpt(value);
-		con.sendFixedData(va.getType(), value);
+		con.sendPacketClass(PacketClass.ScreenData);
+		con.sendString(name + '.' + va.getValueName());
+		con.sendIntegerData(va.getType(), progress.getValue());
 		return true;
 	}
 }
-

@@ -1,19 +1,21 @@
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.montsuqi.util.Logger;
+import org.montsuqi.client.Messages;
+import org.montsuqi.client.Protocol;
 import org.montsuqi.monsia.Style;
 
-final class WidgetValueManager {
+public final class WidgetValueManager {
 	private Logger logger;
 	private Protocol con;
 	private Map styles;
 	private Map valueTable;
 
-	WidgetValueManager(Protocol con, Map styles) {
+	public WidgetValueManager(Protocol con, Map styles) {
 		this.con = con;
 		this.styles = styles;
 		logger = Logger.getLogger(WidgetValueManager.class);

@@ -20,16 +20,20 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
+
 class CalendarMarshaller extends WidgetMarshaller {
 
-	synchronized 	boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized 	boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		manager.registerValue(widget, "", null); //$NON-NLS-1$
@@ -61,7 +65,7 @@ class CalendarMarshaller extends WidgetMarshaller {
 		return true;
 	}
 	
-	synchronized boolean send(WidgetValueManager manager, String name, Component calendar) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component calendar) throws IOException {
 		Protocol con = manager.getProtocol();
 		String iName;
 		int year, month, day;

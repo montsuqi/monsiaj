@@ -20,7 +20,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -29,9 +29,13 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
+
 class ListMarshaller extends WidgetMarshaller {
 	
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JList list = (JList)widget;
 		DefaultListModel listModel = (DefaultListModel)list.getModel();
@@ -91,7 +95,7 @@ class ListMarshaller extends WidgetMarshaller {
 		return true;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();

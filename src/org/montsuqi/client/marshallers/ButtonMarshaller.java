@@ -20,41 +20,64 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.io.IOException;
 
-import javax.swing.text.JTextComponent;
+import javax.swing.AbstractButton;
+import javax.swing.JLabel;
 
-class TextMarshaller extends WidgetMarshaller {
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
 
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+class ButtonMarshaller extends WidgetMarshaller {
+	
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JTextComponent text = (JTextComponent)widget;
+		AbstractButton button = (AbstractButton)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		while (nItem-- != 0) {
-			String name= con.receiveString();
+			String name = con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
 			}
-			String buff = con.receiveStringData();
-			manager.registerValue(text, name, null);
-			text.setText(buff);
+			if ("label".equals(name)) { //$NON-NLS-1$
+				String buff = con.receiveStringData();
+				setLabel(button, buff);
+			} else {
+				boolean fActive = con.receiveBooleanData();
+				manager.registerValue(button, name, null);
+				button.setSelected(fActive);
+			}
 		}
 		return true;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JTextComponent text = (JTextComponent)widget; 
+		AbstractButton button = (AbstractButton)widget;
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getValueName());
-		String value = text.getText();
-		con.sendStringData(va.getType(), value);
+		con.sendBooleanData(va.getType(), button.isSelected());
 		return true;
+	}
+
+	private void setLabel(Component widget, String value) throws IOException {
+		if (widget instanceof JLabel) {
+			JLabel label = (JLabel)widget;
+			label.setText(value);
+		} else if (widget instanceof Container) {
+			Container c = (Container)widget;
+			Component[] comps = c.getComponents();
+			for (int i = 0; i < comps.length; i++) {
+				setLabel(comps[i], value);
+			}
+		}
 	}
 }
 

@@ -20,43 +20,53 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
-import java.awt.Component;
-import java.io.IOException;
+class ValueAttribute {
+	private String key;
+	private String nameSuffix;
+	private String valueName;
+	private int type;
+	private Object opt;
 
-import javax.swing.JProgressBar;
-
-
-class ProgressBarMarshaller extends WidgetMarshaller {
-
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
-		Protocol con = manager.getProtocol();
-		JProgressBar progress = (JProgressBar)widget;
-		con.receiveDataTypeWithCheck(Type.RECORD);
-		int nItem = con.receiveInt();
-		StringBuffer longName = con.getWidgetNameBuffer();
-		int offset = longName.length();
-	
-		while (nItem-- != 0) {
-			String name = con.receiveString();
-			if (handleCommon(manager, widget, name)) {
-				continue;
-			} else if ("value".equals(name)) { //$NON-NLS-1$
-				manager.registerValue(widget, name, null);
-				progress.setValue(con.receiveIntData());
-			}
-		}
-		return true;
+	String getKey() {
+		return key;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
-		Protocol con = manager.getProtocol();
-		JProgressBar progress = (JProgressBar)widget;
-		ValueAttribute va = manager.getValue(name);
-		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + '.' + va.getValueName());
-		con.sendIntegerData(va.getType(), progress.getValue());
-		return true;
+	ValueAttribute(String key, String nameSuffix, String valueName, int type, Object opt) {
+		this.key = key;
+		this.nameSuffix = nameSuffix;
+		this.valueName = valueName;
+		this.type = type;
+		this.opt = opt;
+	}
+
+	void setOpt(int type, Object opt) {
+		this.type = type;
+		this.opt = opt;
+	}
+
+	void setNameSuffix(String nameSuffix) {
+		this.nameSuffix = nameSuffix;
+	}
+
+	String getNameSuffix() {
+		return nameSuffix;
+	}
+
+	String getValueName() {
+		return valueName;
+	}
+
+	int getType() {
+		return type;
+	}
+
+	void setOpt(Object opt) {
+		this.opt = opt;
+	}
+
+	Object getOpt() {
+		return opt;
 	}
 }

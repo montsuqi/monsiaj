@@ -20,49 +20,45 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
 
-import javax.swing.JTabbedPane;
+import javax.swing.text.JTextComponent;
 
-class NotebookMarshaller extends WidgetMarshaller {
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
 
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+class TextMarshaller extends WidgetMarshaller {
+
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
+		JTextComponent text = (JTextComponent)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		int page = -1;
 		int nItem = con.receiveInt();
-		StringBuffer widgetName = con.getWidgetNameBuffer();
-		int offset = widgetName.length();
-		for (int i = 0; i < nItem; i++) {
-			String name = con.receiveString();
+		while (nItem-- != 0) {
+			String name= con.receiveString();
 			if (handleCommon(manager, widget, name)) {
 				continue;
-			} else if ("pageno".equals(name)) { //$NON-NLS-1$
-				page = con.receiveIntData();
-				manager.registerValue(widget, name, null);
-			} else {
-				widgetName.replace(offset, widgetName.length(), '.' + name);
-				con.receiveValue(widgetName, offset + name.length() + 1);
 			}
+			String buff = con.receiveStringData();
+			manager.registerValue(text, name, null);
+			text.setText(buff);
 		}
-		if (page == -1) {
-			throw new IllegalStateException(Messages.getString("NotebookMarshaller.page_not_found")); //$NON-NLS-1$
-		}
-		JTabbedPane tabbed = (JTabbedPane)widget;
-		tabbed.setSelectedIndex(page);
 		return true;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component notebook) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JTabbedPane tabbed = (JTabbedPane)notebook;
-		ValueAttribute va = manager.getValue(name);
+		JTextComponent text = (JTextComponent)widget; 
 		con.sendPacketClass(PacketClass.ScreenData);
+		ValueAttribute va = manager.getValue(name);
 		con.sendString(name + '.' + va.getValueName());
-		con.sendIntegerData(va.getType(), tabbed.getSelectedIndex());
+		String value = text.getText();
+		con.sendStringData(va.getType(), value);
 		return true;
 	}
 }
+

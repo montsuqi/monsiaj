@@ -20,7 +20,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -38,11 +38,13 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.montsuqi.client.Messages;
+import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
 
-abstract class WidgetMarshaller {
+public abstract class WidgetMarshaller {
 
 	protected Logger logger;
 
@@ -73,8 +75,8 @@ abstract class WidgetMarshaller {
 		logger = Logger.getLogger(WidgetMarshaller.class);
 	}
 
-	abstract boolean receive(WidgetValueManager manager, Component widget) throws IOException;
-	abstract boolean send(WidgetValueManager manager, String name, Component widget) throws IOException;
+	public abstract boolean receive(WidgetValueManager manager, Component widget) throws IOException;
+	public abstract boolean send(WidgetValueManager manager, String name, Component widget) throws IOException;
 
 	protected boolean handleCommon(WidgetValueManager manager, Component widget, String name) throws IOException {
 		Protocol con = manager.getProtocol();

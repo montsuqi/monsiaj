@@ -20,20 +20,23 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.io.IOException;
 
-import javax.swing.AbstractButton;
-import javax.swing.JLabel;
+import javax.swing.JTextField;
 
-class ButtonMarshaller extends WidgetMarshaller {
-	
-	synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+import org.montsuqi.client.PacketClass;
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
+
+
+class EntryMarshaller extends WidgetMarshaller {
+
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		AbstractButton button = (AbstractButton)widget;
+		JTextField entry = (JTextField)widget;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		while (nItem-- != 0) {
@@ -41,39 +44,21 @@ class ButtonMarshaller extends WidgetMarshaller {
 			if (handleCommon(manager, widget, name)) {
 				continue;
 			}
-			if ("label".equals(name)) { //$NON-NLS-1$
-				String buff = con.receiveStringData();
-				setLabel(button, buff);
-			} else {
-				boolean fActive = con.receiveBooleanData();
-				manager.registerValue(button, name, null);
-				button.setSelected(fActive);
-			}
+			String buff = con.receiveStringData();
+			manager.registerValue(entry, name, null);
+			entry.setText(buff);
 		}
 		return true;
 	}
 
-	synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		AbstractButton button = (AbstractButton)widget;
+		JTextField entry = (JTextField)widget;
 		con.sendPacketClass(PacketClass.ScreenData);
-		ValueAttribute va = manager.getValue(name);
-		con.sendString(name + '.' + va.getValueName());
-		con.sendBooleanData(va.getType(), button.isSelected());
+		ValueAttribute v = manager.getValue(name);
+		con.sendString(v.getValueName() + '.' + v.getNameSuffix()); //$NON-NLS-1$
+		String value = entry.getText();
+		con.sendStringData(v.getType(), value);
 		return true;
-	}
-
-	private void setLabel(Component widget, String value) throws IOException {
-		if (widget instanceof JLabel) {
-			JLabel label = (JLabel)widget;
-			label.setText(value);
-		} else if (widget instanceof Container) {
-			Container c = (Container)widget;
-			Component[] comps = c.getComponents();
-			for (int i = 0; i < comps.length; i++) {
-				setLabel(comps[i], value);
-			}
-		}
 	}
 }
-

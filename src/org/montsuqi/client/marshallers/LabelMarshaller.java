@@ -20,53 +20,37 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.client;
+package org.montsuqi.client.marshallers;
 
-class ValueAttribute {
-	private String key;
-	private String nameSuffix;
-	private String valueName;
-	private int type;
-	private Object opt;
+import java.awt.Component;
+import java.io.IOException;
 
-	String getKey() {
-		return key;
+import javax.swing.JLabel;
+
+import org.montsuqi.client.Protocol;
+import org.montsuqi.client.Type;
+
+
+class LabelMarshaller extends WidgetMarshaller {
+
+	public synchronized boolean receive(WidgetValueManager manager, Component widget) throws IOException {
+		Protocol con = manager.getProtocol();
+		JLabel label = (JLabel)widget;
+		con.receiveDataTypeWithCheck(Type.RECORD);
+		int nItem = con.receiveInt();
+		while (nItem-- != 0) {
+			String name = con.receiveString();
+			if (handleCommon(manager, widget, name)) {
+				continue;
+			}
+			String buff = con.receiveStringData();
+			manager.registerValue(widget, name, null);
+			label.setText(buff);
+		}
+		return true;
 	}
 
-	ValueAttribute(String key, String nameSuffix, String valueName, int type, Object opt) {
-		this.key = key;
-		this.nameSuffix = nameSuffix;
-		this.valueName = valueName;
-		this.type = type;
-		this.opt = opt;
-	}
-
-	void setOpt(int type, Object opt) {
-		this.type = type;
-		this.opt = opt;
-	}
-
-	void setNameSuffix(String nameSuffix) {
-		this.nameSuffix = nameSuffix;
-	}
-
-	String getNameSuffix() {
-		return nameSuffix;
-	}
-
-	String getValueName() {
-		return valueName;
-	}
-
-	int getType() {
-		return type;
-	}
-
-	void setOpt(Object opt) {
-		this.opt = opt;
-	}
-
-	Object getOpt() {
-		return opt;
+	public synchronized boolean send(WidgetValueManager manager, String name, Component widget) throws IOException {
+		return true;
 	}
 }
