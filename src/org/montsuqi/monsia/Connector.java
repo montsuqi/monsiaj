@@ -50,7 +50,6 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
@@ -70,6 +69,7 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TimerEvent;
 import org.montsuqi.widgets.TimerListener;
@@ -306,10 +306,15 @@ abstract class Connector {
 						JList list = (JList)target;
 						ListSelectionModel model = list.getSelectionModel();
 						model.addListSelectionListener(listener);
-					} else if (target instanceof JTable) {
-						JTable table = (JTable)target;
+					} else if (target instanceof PandaCList) {
+						PandaCList table = (PandaCList)target;
 						ListSelectionModel model = table.getSelectionModel();
 						model.addListSelectionListener(listener);
+						table.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent arg0) {
+								invoke(con, handler, target, other);
+							}
+						});
 					}
 				}
 			}

@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -102,6 +103,20 @@ public class PandaCList extends JTable {
 
 		actions.put("moveRight", new MoveAction(0, 1)); //$NON-NLS-1$
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveRight"); //$NON-NLS-1$
+
+		actions.put("doAction", new AbstractAction() { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				fireActionEvent(e);
+			}
+		});
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "doAction"); //$NON-NLS-1$
+	}
+
+	protected void fireActionEvent(ActionEvent e) {
+		ActionListener[] listeners = (ActionListener[])listenerList.getListeners(ActionListener.class);
+		for (int i = 0; i < listeners.length; i++) {
+			listeners[i].actionPerformed(e);
+		}
 	}
 
 	public void createDefaultColumnsFromModel() {
@@ -158,5 +173,12 @@ public class PandaCList extends JTable {
 			}
 		}
 		return super.getCellRenderer(row, column);
+	}
+
+	public void addActionListener(ActionListener listener) {
+		listenerList.add(ActionListener.class, listener);
+	}
+	public void removeActionListener(ActionListener listener) {
+		listenerList.remove(ActionListener.class, listener);
 	}
 }
