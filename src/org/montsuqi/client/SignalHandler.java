@@ -38,6 +38,7 @@ public abstract class SignalHandler {
 	static Timer timer;
 	static TimerTask timerTask;
 	static boolean timerBlocked;
+	static final String SYMBOLS;
 	
 	private static void registerHandler(String signalName, SignalHandler handler) {
 		handlers.put(signalName, handler);
@@ -57,6 +58,19 @@ public abstract class SignalHandler {
 		timer = new Timer();
 		timerTask = null;
 		timerBlocked = false;
+
+		StringBuffer buf = new StringBuffer();
+		buf.append("\u3000\uff01\u201d\uff03\uff04\uff05\uff06\u2019"); //$NON-NLS-1$
+		buf.append("\uff08\uff09\uff0a\uff0b\uff0c\u30fc\uff0e\uff0f"); //$NON-NLS-1$
+		buf.append("\uff10\uff11\uff12\uff13\uff14\uff15\uff16\uff17"); //$NON-NLS-1$
+		buf.append("\uff18\uff19\uff1a\uff1b\uff1c\uff1d\uff1e\uff1f"); //$NON-NLS-1$
+		buf.append("\uff20\uff21\uff22\uff23\uff24\uff25\uff26\uff27"); //$NON-NLS-1$
+		buf.append("\uff28\uff29\uff2a\uff2b\uff2c\uff2d\uff2e\uff2f"); //$NON-NLS-1$
+		buf.append("\uff30\uff31\uff32\uff33\uff34\uff35\uff36\uff37"); //$NON-NLS-1$
+		buf.append("\uff38\uff39\uff3a\uff3b\uffe5\uff3d\uff3e\uff3f"); //$NON-NLS-1$
+		buf.append("\u2018\u30a2\u30a8\u30a4\u30aa\u30a6\uff5b\uff5c"); //$NON-NLS-1$
+		buf.append("\uff5d\uffe3"); //$NON-NLS-1$
+		SYMBOLS = buf.toString();
 
 		registerHandler(null, new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) {
@@ -125,15 +139,25 @@ public abstract class SignalHandler {
 						JTextComponent text = (JTextComponent)widget;
 						String t = text.getText();
 						int length = t.length();
-						if (length != 0 && Character.UnicodeBlock.of(t.charAt(length - 1)) != Character.UnicodeBlock.KATAKANA) {
-							return;
+						if (length > 0) {
+							char c = t.charAt(length - 1);
+							if (isKatakana(c) || isSymbol(c)) {
+								try {
+									changed.handle(con, widget, userData);
+									sendEvent.handle(con, widget, userData);
+								} catch (IOException e) {
+									logger.warn(e);
+								}
+							}
 						}
-						try {
-							changed.handle(con, widget, userData);
-							sendEvent.handle(con, widget, userData);
-						} catch (IOException e) {
-							logger.warn(e);
-						}
+					}
+
+					private boolean isKatakana(char c) {
+						return Character.UnicodeBlock.of(c) != Character.UnicodeBlock.KATAKANA;
+					}
+
+					private boolean isSymbol(char c) {
+						return SYMBOLS.indexOf(c) >= 0;
 					}
 				};
 				timer.schedule(timerTask, 1000);
