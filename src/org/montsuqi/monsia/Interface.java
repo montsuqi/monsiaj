@@ -178,21 +178,21 @@ public class Interface {
 
 	public Component getWidget(String name) {
 		if (name == null) {
-			throw new IllegalArgumentException();
+			throw new NullPointerException("name is null."); //$NON-NLS-1$
 		}
 		return (Component)widgets.get(name);
 	}
 
 	public Component getWidgetByLongName(String longName) {
 		if (longName == null) {
-			throw new IllegalArgumentException();
+			throw new NullPointerException("long name is null."); //$NON-NLS-1$
 		}
 		return (Component)longNames.get(longName);
 	}
 
 	String relativeFile(String fileName) {
 		if (fileName == null) {
-			throw new IllegalArgumentException();
+			throw new NullPointerException("file name is null."); //$NON-NLS-1$
 		}
 
 		File targetFile = new File(fileName);
@@ -206,7 +206,7 @@ public class Interface {
 
 	public String getWidgetLongName(Component widget) {
 		if (widget == null) {
-			throw new IllegalArgumentException("widget is null"); //$NON-NLS-1$
+			throw new NullPointerException("widget is null."); //$NON-NLS-1$
 		}
 		Iterator entries = longNames.entrySet().iterator();
 		while (entries.hasNext()) {
