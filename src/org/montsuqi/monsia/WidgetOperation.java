@@ -49,6 +49,7 @@ import javax.swing.tree.TreeSelectionModel;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.NumberEntry;
+import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.TableConstraints;
@@ -80,7 +81,11 @@ class WidgetOperation {
 	}
 
 	static void setWindowTitle(Interface xml, Container widget, String name, String value) {
-		((Frame)widget).setTitle(value);
+		if ( ! (widget instanceof Frame)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Frame_widget")); //$NON-NLS-1$
+		}
+		Frame frame = (Frame)widget;
+		frame.setTitle(value);
 	}
 
 	static void setWidth(Interface xml, Container widget, String name, String value) {
@@ -113,6 +118,9 @@ class WidgetOperation {
 	}
 
 	static void setJustify(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JLabel)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JLabel_widget")); //$NON-NLS-1$
+		}
 		int alignment = SwingConstants.CENTER;
 		if ("JUSTIFY_CENTER".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.CENTER;
@@ -123,15 +131,16 @@ class WidgetOperation {
 		} else {
 			Logger.getLogger(WidgetOperation.class).warn(Messages.getString("WidgetOperation.not_supported")); //$NON-NLS-1$
 		}
-		if (widget instanceof JLabel) {
-			((JLabel)widget).setHorizontalAlignment(alignment);
-		}
+		JLabel label = (JLabel)widget;
+		label.setHorizontalAlignment(alignment);
 	}
 
 	static void setTooltip(Interface xml, Container widget, String name, String value) {
-		if (widget instanceof JComponent) {
-			((JComponent)widget).setToolTipText(value);
+		if ( ! (widget instanceof JComponent)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JComponent_widget")); //$NON-NLS-1$
 		}
+		JComponent c = (JComponent)widget;
+		c.setToolTipText(value);
 	}
 
 	static void setHasDefault(Interface xml, Container widget, String name, String value) {
@@ -147,16 +156,25 @@ class WidgetOperation {
 	}
 
 	static void setListItemLabel(Interface xml, Container widget, String name, String value) {
-		((JLabel)widget).setText(value);
+		if ( ! (widget instanceof JLabel)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JLabel_widget")); //$NON-NLS-1$
+		}
+		JLabel label = (JLabel)widget;
+		label.setText(value);
 	}
 
 	void setTextViewText(Interface xml, Container widget, String name, String value) {
-		if (widget instanceof JTextComponent) {
-			((JTextComponent)widget).setText(value);
+		if ( ! (widget instanceof JTextComponent)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
 		}
+		JTextComponent text = (JTextComponent)widget;
+		text.setText(value);
 	}
 
 	static void setCListColumnWidth(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTable)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
+		}
 		JTable table = (JTable)widget;
 		TableColumnModel model = table.getColumnModel();
 
@@ -176,6 +194,9 @@ class WidgetOperation {
 	}
 
 	static void setCListSelectionMode(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTable)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
+		}
 		JTable table = (JTable)widget;
 		value = normalizeSelectionMode(value);
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
@@ -196,12 +217,18 @@ class WidgetOperation {
 	}
 
 	static void setCListShowTitles(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTable)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
+		}
 		JTable table = (JTable)widget;
 		JTableHeader header = table.getTableHeader();
 		header.setVisible(ParameterConverter.toBoolean(value));
 	}
 
 	static void setTreeSelectionMode(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTree)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTree_widget")); //$NON-NLS-1$
+		}
 		JTree tree = (JTree)widget;
 		TreeSelectionModel model = tree.getSelectionModel();
 		value = normalizeSelectionMode(value);
@@ -227,6 +254,9 @@ class WidgetOperation {
 	}
 
 	static void setListSelectionMode(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JList)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JList_widget")); //$NON-NLS-1$
+		}
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
 		value = normalizeSelectionMode(value);
@@ -258,6 +288,9 @@ class WidgetOperation {
 	}
 
 	static void setTextText(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTextComponent)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
+		}
 		JTextComponent text = (JTextComponent)widget;
 		text.setText(value);
 	}
@@ -281,7 +314,7 @@ class WidgetOperation {
 
 	static void setToolbarTooltips(Interface xml, Container widget, String name, String value) {
 		ToolTipManager manager = ToolTipManager.sharedInstance();
-		if ( !(widget instanceof JToolBar)) {
+		if ( ! (widget instanceof JToolBar)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JToolBar")); //$NON-NLS-1$
 		}
 
@@ -376,13 +409,43 @@ class WidgetOperation {
 	}
 
 	static void setNumberEntryFormat(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof NumberEntry)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_NumberEntry_widget")); //$NON-NLS-1$
+		}
 		NumberEntry entry = (NumberEntry)widget;
 		entry.setFormat(value);		
 	}
 
 	static void setPandaHTMLURI(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof PandaHTML)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaHTML_widget")); //$NON-NLS-1$
+		}
 		PandaHTML pane = (PandaHTML)widget;
 		pane.setURI(value);
 	}
-}
 
+	static void setPandaEntryInputMode(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof PandaEntry)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaEntry_widget")); //$NON-NLS-1$
+		}
+		PandaEntry entry = (PandaEntry)widget;
+		if (value.equals("ASCII")) { //$NON-NLS-1$
+			entry.setInputMode(PandaEntry.ASCII);
+		} else if (value.equals("KANA")) { //$NON-NLS-1$
+			entry.setInputMode(PandaEntry.KANA);
+		} else if (value.equals("XIM")) { //$NON-NLS-1$
+			entry.setInputMode(PandaEntry.XIM);
+		} else {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.invalide_input_mode")); //$NON-NLS-1$
+		}
+	}
+
+	static void setPandaEntryXIMEnabled(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof PandaEntry)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaEntry_widget")); //$NON-NLS-1$
+		}
+		PandaEntry entry = (PandaEntry)widget;
+		boolean enabled = ParameterConverter.toBoolean(value);
+		entry.setXIMEnabled(enabled);
+	}
+}
