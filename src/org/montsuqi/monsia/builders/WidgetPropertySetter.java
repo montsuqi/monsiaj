@@ -308,10 +308,10 @@ abstract class WidgetPropertySetter {
 
 		registerProperty(JLabel.class, "wrap", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
-				JLabel text = (JLabel)widget;
+				JLabel label = (JLabel)widget;
 				// wrap=true is converted to left alighnemt
 				if (ParameterConverter.toBoolean(value)) {
-					text.setHorizontalAlignment(SwingConstants.LEFT);
+					label.setHorizontalAlignment(SwingConstants.LEFT);
 				}
 			}
 		});
