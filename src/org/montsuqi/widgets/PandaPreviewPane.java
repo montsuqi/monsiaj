@@ -29,7 +29,6 @@ import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
@@ -94,14 +93,5 @@ public class PandaPreviewPane extends JPanel {
 
 	public void load(String fileName) throws IOException {
 		preview.load(fileName);
-	}
-
-	public static void main(String[] args) throws IOException {
-		JFrame f = new JFrame();
-		PandaPreviewPane prev = new PandaPreviewPane();
-		f.add(prev);
-		f.setSize(400, 300);
-		f.setVisible(true);
-		prev.load("C:\\Documents and Settings\\crouton\\My Documents\\My Pictures\\fmo-wall-ex1024.jpg"); //$NON-NLS-1$
 	}
 }
