@@ -154,6 +154,10 @@ abstract class Connector {
 					combo.addItemListener(new ItemListener() {
 						public void itemStateChanged(ItemEvent e) {
 							invoke(con, handler, target, other);
+							if (target instanceof JTextField) {
+								JTextField text = (JTextField)target;
+								text.postActionEvent();
+							}
 						}
 					});
 				} else if (target instanceof JTextComponent) {
