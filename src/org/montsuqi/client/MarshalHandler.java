@@ -65,12 +65,19 @@ class MarshalHandler {
 		}
 		
 		Object[] args = new Object[] { widget };
+		Boolean result;
 		try {
-			Boolean result = (Boolean)receiver.invoke(marshal, args);
-			return result.booleanValue();
-		} catch (Exception e) {
+			result = (Boolean)receiver.invoke(marshal, args);
+		} catch (IllegalArgumentException e) {
 			logger.fatal(e);
 			return false;
+		} catch (IllegalAccessException e) {
+			logger.fatal(e);
+			return false;
+		} catch (InvocationTargetException e) {
+			logger.fatal(e.getTargetException()); // should use getCause() [J2SE 1.4+]
+			return false;
 		}
+		return result.booleanValue();
 	}
 }
