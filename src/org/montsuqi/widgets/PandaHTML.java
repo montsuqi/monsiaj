@@ -24,6 +24,8 @@ package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
@@ -31,9 +33,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -77,10 +82,10 @@ public class PandaHTML extends JScrollPane {
 	}
 
 	public static void main(String[] args) throws MalformedURLException {
-		JFrame frame = new JFrame();
+		final JFrame frame = new JFrame();
 		Container container = frame.getContentPane();
 		container.setLayout(new BorderLayout());
-		PandaHTML html = new PandaHTML();
+		final PandaHTML html = new PandaHTML();
 		html.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
 				logger.debug("change: {0}: {1} => {2}", //$NON-NLS-1$
@@ -92,8 +97,31 @@ public class PandaHTML extends JScrollPane {
 			}
 		});
 		JScrollPane scroll = new JScrollPane();
-		container.add(scroll, BorderLayout.CENTER);
 		scroll.setViewportView(html);
+		container.add(scroll, BorderLayout.CENTER);
+
+		JToolBar toolBar = new JToolBar();
+		container.add(toolBar, BorderLayout.PAGE_START);
+		JButton quit = new JButton("Quit"); //$NON-NLS-1$
+		quit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
+		});
+		toolBar.add(quit);
+
+		final JTextField location = new JTextField();
+		location.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					html.setURI(new URL(location.getText()));
+				} catch (MalformedURLException ex) {
+					logger.warn(ex);				}
+			}
+			
+		});
+		toolBar.add(location);
+		
 		frame.setSize(640, 480);
 		frame.setVisible(true);
 		if (args.length > 0) {
