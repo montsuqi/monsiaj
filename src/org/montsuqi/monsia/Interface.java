@@ -183,7 +183,9 @@ public class Interface {
 		if (target instanceof JButton || target instanceof JRadioButton) {
 			((AbstractButton)target).addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent event) {
+					logger.debug("invoking {0}", handler.getName());
 					invoke(handler, target, other);
+					logger.debug("invoking done");
 				}
 			});
 		}
