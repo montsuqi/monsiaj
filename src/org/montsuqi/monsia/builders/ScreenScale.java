@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.monsia.builders;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -30,6 +31,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.geom.AffineTransform;
 
 final class ScreenScale {
 	private static double widthScale;
@@ -52,8 +54,15 @@ final class ScreenScale {
 	static Dimension scale(Dimension size) {
 		return new Dimension((int)(size.width * widthScale), (int)(size.height * heightScale));
 	}
+
 	static Point scale(Point pos) {
 		return new Point((int)(pos.x * widthScale), (int)(pos.y * heightScale));
+	}
+
+	static Font scale(Font font) {
+		AffineTransform t = new AffineTransform();
+		t.setToScale(widthScale, heightScale);
+		return font.deriveFont(font.getStyle(), t);
 	}
 
 	static void centerWindow(Window window) {
