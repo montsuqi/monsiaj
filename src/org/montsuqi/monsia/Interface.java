@@ -48,7 +48,8 @@ import org.xml.sax.SAXException;
 public class Interface {
 	String fileName;
     List topLevels;
-    Map names;
+    Map infos;
+    Map widgets;
     Map longNames;
 	Map buttonGroups;
 	Protocol protocol;
@@ -86,7 +87,8 @@ public class Interface {
 	Interface(String fileName, Map widgets, List roots, Protocol protocol) {
 		logger = Logger.getLogger(Interface.class);
 		this.fileName = fileName;
-		names = widgets;
+		infos = widgets;
+		widgets = new HashMap();
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
@@ -111,7 +113,7 @@ public class Interface {
 					SignalData data = (SignalData)i.next();
 					Container target = (Container)data.getSignalObject();
 					String signalName = data.getName();
-					Object other = names.get(data.getConnectObject());
+					Object other = infos.get(data.getConnectObject());
 					if (data.isAfter()) {
 						connectAfter(target, signalName, handler, other);
 					} else {
@@ -146,7 +148,8 @@ public class Interface {
 	private void connect(Container target, String signalName, Method handler, Object other) {
 		try {
 			Class[] argTypes = new Class[] { Container.class, Method.class, Object.class };
-			Method method = Interface.class.getMethod(connectMethodName(signalName), argTypes);
+			Method method = Interface.class.getDeclaredMethod(connectMethodName(signalName), argTypes);
+			method.setAccessible(true);
 			method.invoke(this, new Object[] { target, handler, other });
 		} catch (Exception e) {
 			logger.warn(e);
@@ -277,7 +280,8 @@ public class Interface {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
-		return (Container)names.get(name);
+		Object container = widgets.get(name);
+		return (Container)container;
 	}
 
 	public Container getWidgetByLongName(String longName) {
@@ -305,7 +309,7 @@ public class Interface {
 		if (widget == null) {
 			throw new IllegalArgumentException();
 		}
-		Iterator entries = names.entrySet().iterator();
+		Iterator entries = widgets.entrySet().iterator();
 		while (entries.hasNext()) {
 			Map.Entry e = (Map.Entry)entries.next();
 			Container value = (Container)e.getValue();
@@ -410,7 +414,8 @@ public class Interface {
 		Iterator i = roots.iterator();
 		while (i.hasNext()) {
 			WidgetInfo info = (WidgetInfo)i.next();
-			builder.buildWidget(info);
+			Container widget = builder.buildWidget(info);
+			widgets.put(info.getName(), widget);
 		}
 	}
 }
