@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.3 2003-09-17 08:11:12 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.4 2003-10-01 08:33:51 ozawa Exp $ -->
 <project name="panda-client" default="compile" basedir=".">
 
   <!-- properties -->
@@ -10,7 +10,7 @@
   <property name="clean.verbose"       value="no"/>
 
   <property name="src.dir"             value="src"/>
-  <property name="build.dir"           value="build"/>
+  <property name="build.dir"           value="bin"/>
   <property name="dist.dir"            value="dist"/>
   <property name="resources.dir"       value="resources"/>
 
