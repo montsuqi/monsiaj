@@ -136,7 +136,6 @@ public class Interface {
 		this.infos = infos;
 		widgets = new HashMap();
 		longNames = new HashMap();
-		columnMap = new HashMap();
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
