@@ -40,7 +40,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
-import org.montsuqi.client.Client;
 import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationDialog;
 
@@ -53,16 +52,20 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 	private JTextField userEntry;
 
 	protected void updateConfiguration() {
-		conf.setString("user", userEntry.getText()); //$NON-NLS-1$
-		conf.setPass(passwordEntry.getPassword());
-		conf.setString("host", hostEntry.getText()); //$NON-NLS-1$
-		conf.setInt("port", Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
-		conf.setString("application", "orca00"); //$NON-NLS-1$ //$NON-NLS-2$
-		conf.setString("style", styleEntry.getText()); //$NON-NLS-1$
+		conf.setUser(userEntry.getText()); //$NON-NLS-1$
+		conf.setPass(new String(passwordEntry.getPassword()));
+		conf.setHost(hostEntry.getText()); //$NON-NLS-1$
+		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
+		conf.setApplication("orca00"); //$NON-NLS-1$ //$NON-NLS-2$
+		conf.setEncoding("EUC-JP"); //$NON-NLS-1$ //$NON-NLS-2$
+		conf.setStyles(styleEntry.getText()); //$NON-NLS-1$
+		conf.setProtocolVersion(1);
+		conf.setUseSSL(false);
+		conf.setVerify(false);
 	}
 
-	JMAReceiptConfigurationDialog(Configuration conf) {
-		super(conf);
+	JMAReceiptConfigurationDialog(String title, Configuration conf) {
+		super(title, conf);
 		initComponents();
 		setSize(320,240);
 	}
@@ -72,8 +75,6 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
-
-		setTitle(conf.getTitle());
 
 		JLabel logo = new JLabel();
 		URL iconURL = getClass().getResource("/orca2.jpg"); //$NON-NLS-1$
@@ -111,7 +112,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		panel.add(passwordLabel, gridBagConstraints);
 
 		userEntry = new JTextField();
-		userEntry.setText(conf.getString("user", System.getProperty("user.name"))); //$NON-NLS-1$ //$NON-NLS-2$
+		userEntry.setText(conf.getUser());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
@@ -143,7 +144,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
 		hostEntry = new JTextField();
 		hostEntry.setHorizontalAlignment(SwingConstants.LEFT);
-		hostEntry.setText(conf.getString("host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
+		hostEntry.setText(conf.getHost());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
@@ -164,7 +165,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
 		portEntry = new JTextField();
 		portEntry.setHorizontalAlignment(SwingConstants.RIGHT);
-		portEntry.setText(String.valueOf(conf.getInt("port", Client.PORT_GLTERM))); //$NON-NLS-1$
+		portEntry.setText(String.valueOf(conf.getPort()));
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 3;
@@ -185,7 +186,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
 		styleEntry = new JTextField();
 		styleEntry.setHorizontalAlignment(SwingConstants.LEFT);
-		styleEntry.setText(String.valueOf(conf.getString("style", ""))); //$NON-NLS-1$ //$NON-NLS-2$
+		styleEntry.setText(conf.getStyles());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 4;
