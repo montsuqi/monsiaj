@@ -342,6 +342,23 @@ public class Interface {
 		connectSelectRow(target, handler, other);
 	}
 
+	private void connectSelectionChanged(Container target, Method handler, Object other) {
+		// TODO implement this.
+	}
+
+	private void connectClickColumn(Container target, Method handler, Object other) {
+		// TODO implement this.
+	}
+
+	private void connectSwitchPage(Container target, Method handler, Object other) {
+		// TODO implement this.
+	}
+
+	private void connectToggled(Container target, Method handler, Object other) {
+		// TODO implement this.
+		logger.debug("connecttToggled stab");
+	}
+
 	public Container getWidget(String name) {
 		if (name == null) {
 			throw new IllegalArgumentException();
