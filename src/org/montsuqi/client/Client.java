@@ -128,9 +128,14 @@ public class Client implements Runnable {
 		try {
 			protocol.sendConnect(user, pass, currentApplication);
 			connected = true;
+			protocol.checkScreens(true);
+			protocol.getScreenData();
 			while (connected) {
-				protocol.checkScreens(true);
-				protocol.getScreenData();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// ignore
+				}
 			}
 			protocol.close();
 		} catch (IOException e) {
