@@ -31,6 +31,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -49,6 +51,7 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
@@ -84,6 +87,7 @@ import org.montsuqi.widgets.TimerListener;
 import org.xml.sax.SAXException;
 
 public class Interface {
+	private Map comboMap;
 	private List topLevels;
     private Map infos;
     private Map widgets;
@@ -175,6 +179,7 @@ public class Interface {
 		this.infos = infos;
 		widgets = new HashMap();
 		longNames = new HashMap();
+		comboMap = new HashMap();
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
@@ -283,33 +288,45 @@ public class Interface {
 	}
 
 	private void connectChanged(final Component target, final Method handler, final Object other) {
-		if ( ! (target instanceof JTextComponent)) {
-			return;
+		if (target instanceof JTextComponent) {
+			JTextComponent text = (JTextComponent)target;
+			text.getDocument().addDocumentListener(new DocumentListener() {
+				public void insertUpdate(DocumentEvent event) {
+					invoke(handler, target, other);
+				}
+				public void removeUpdate(DocumentEvent event) {
+					invoke(handler, target, other);
+				}
+				public void changedUpdate(DocumentEvent event) {
+					invoke(handler, target, other);
+				}
+			});
+		} else if (target instanceof JComboBox) {
+			JComboBox combo = (JComboBox)target;
+			combo.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					invoke(handler, target, other);
+				}
+			});
 		}
-		JTextComponent text = (JTextComponent)target;
-		text.getDocument().addDocumentListener(new DocumentListener() {
-			public void insertUpdate(DocumentEvent event) {
-				invoke(handler, target, other);
-			}
-			public void removeUpdate(DocumentEvent event) {
-				invoke(handler, target, other);
-			}
-			public void changedUpdate(DocumentEvent event) {
-				invoke(handler, target, other);
-			}
-		});
 	}
 
 	private void connectActivate(final Component target, final Method handler, final Object other) {
-		if ( ! (target instanceof JTextField)) {
-			return;
+		if (target instanceof JTextField) {
+			JTextField textField = (JTextField)target;
+			textField.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+					invoke(handler, target, other);
+				}
+			});
+		} else if (target instanceof JComboBox) {
+			JComboBox combo = (JComboBox)target;
+			combo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+					invoke(handler, target, other);
+				}
+			});
 		}
-		JTextField textField = (JTextField)target;
-		textField.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				invoke(handler, target, other);
-			}
-		});
 	}
 	
 	private void connectEnter(final Component target, final Method handler, final Object other) {
@@ -624,5 +641,17 @@ public class Interface {
 		}
 		AccelHandler handler = (AccelHandler)accelHandlers.get(c);
 		return handler;
+	}
+
+	public void setComboMap(JComboBox combo, Component editor) {
+		comboMap.put(combo, editor);
+	}
+
+	public JTextField getComboEditor(JComboBox combo) {
+		if (comboMap.containsKey(combo)) {
+			return (JTextField)comboMap.get(combo);
+		} else {
+			throw new IllegalArgumentException("no such combo");
+		}
 	}
 }
