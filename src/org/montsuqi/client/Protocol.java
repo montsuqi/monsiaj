@@ -656,7 +656,6 @@ public class Protocol extends Connection {
 	public void keypress_filter(Component widget, Object userData) {
 		Component next = xml.getWidget((String)userData);
 		next.requestFocus();
-		// TODO: implement this
 	}
 
 	public void press_filter(Component widget, Object userData) {

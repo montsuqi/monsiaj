@@ -282,7 +282,10 @@ public class Interface {
 	private void connectKeyPressEvent(final Component target, final Method handler, final Object other) {
 		target.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				invoke(handler, target, other);
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					invoke(handler, target, other);
+				}
+				e.consume();
 			}
 		});
 	}
