@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -35,6 +34,7 @@ import javax.swing.table.TableColumnModel;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
+import org.montsuqi.widgets.CListDummyLabel;
 
 class CListBuilder extends ContainerBuilder {
 
@@ -74,8 +74,9 @@ class CListBuilder extends ContainerBuilder {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			TableColumn column = columnModel.getColumn(i);
-			JLabel dummy = new JLabel((String)column.getHeaderValue());
-			xml.setLongName(wInfo.getLongName(), dummy);
+			String label = (String)column.getHeaderValue();
+			Component dummy = new CListDummyLabel(label, i, table);
+			setCommonParameters(xml, dummy, wInfo);
 		}
 	}
 }
