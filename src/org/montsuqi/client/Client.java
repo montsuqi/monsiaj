@@ -40,6 +40,7 @@ import javax.net.ssl.SSLSocketFactory;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
+import org.montsuqi.util.SystemEnvironment;
 
 public class Client implements Runnable {
 
@@ -48,32 +49,6 @@ public class Client implements Runnable {
 
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 	private static final Logger logger = Logger.getLogger(Client.class);
-
-	static {
-		String[] pathElements = new String[] {
-			System.getProperty("user.home"), //$NON-NLS-1$
-			".jma-receipt", //$NON-NLS-1$
-			"ssl", //$NON-NLS-1$
-			"keystore" //$NON-NLS-1$
-		};
-		String trustStore = createPath(pathElements);
-		File f = new File(trustStore);
-		if (f.exists()) {
-			logger.info("setting trust store explicitly: {0}", trustStore); //$NON-NLS-1$
-			System.setProperty("javax.net.ssl.trustStore", trustStore.toString()); //$NON-NLS-1$
-		}
-	}
-
-	private static String createPath(String[] elements) {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < elements.length; i++) {
-			if (i > 0) {
-				buf.append(File.separator);
-			}
-			buf.append(elements[i]);
-		}
-		return buf.toString();
-	}
 
 	public Client(Configuration conf) {
 		this.conf = conf;
@@ -132,7 +107,7 @@ public class Client implements Runnable {
 			conf.getHost(),
 			String.valueOf(conf.getPort())
 		};
-		String cacheRoot = createPath(pathElements);
+		File cacheRoot = SystemEnvironment.createFilePath(pathElements);
 		int protocolVersion = conf.getProtocolVersion();
 		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion);
 

@@ -48,7 +48,7 @@ import org.montsuqi.widgets.Window;
 public class Protocol extends Connection {
 
 	private Client client;
-	private String cacheRoot;
+	private File cacheRoot;
 	private boolean protocol1;
 	private boolean protocol2;
 	private boolean isReceiving;
@@ -61,7 +61,7 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, String encoding, Map styleMap, String cacheRoot, int protocolVersion) throws IOException {
+	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		this.cacheRoot = cacheRoot;
@@ -97,7 +97,7 @@ public class Protocol extends Connection {
 		return xml;
 	}
 
-	private boolean receiveFile(String name, String fName) throws IOException {
+	private boolean receiveFile(String name, File file) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
@@ -107,13 +107,13 @@ public class Protocol extends Connection {
 			return false;
 		}
 
-		OutputStream file = new FileOutputStream(fName);
+		OutputStream cache = new FileOutputStream(file);
 		int size = receiveLength();
 		byte[] bytes = new byte[size];
 		in.readFully(bytes);
-		file.write(bytes);
-		file.flush();
-		file.close();
+		cache.write(bytes);
+		cache.flush();
+		cache.close();
 		return true;
 	}
 
@@ -146,16 +146,12 @@ public class Protocol extends Connection {
 		return null;
 	}
 
-	private String getCacheFileName(String name) {
-		File cacheFile = new File(cacheRoot, name);
-		return cacheFile.getAbsolutePath();
-	}
-
 	private Node createNode(String name) {
 		Object[] args = { name };
 		logger.info("creating node: {0}", args); //$NON-NLS-1$
 		try {
-			InputStream input = new FileInputStream(getCacheFileName(name));
+			File cacheFile = new File(cacheRoot, name);
+			InputStream input = new FileInputStream(cacheFile);
 			Node node = new Node(Interface.parseInput(input, this), name);
 			input.close();
 			nodeTable.put(name, node);
@@ -189,26 +185,27 @@ public class Protocol extends Connection {
 
 	private String checkScreen1() throws IOException {
 		String name = receiveString();
-		String cacheFileName = getCacheFileName(name);
+		File cacheFile = new File(cacheRoot, name);
 		int size = receiveLong();
 		int mtime = receiveLong();
 		/* int ctime = */ receiveLong();
 
-		if (isCacheOld(size, mtime, cacheFileName)) {
-			receiveFile(name, cacheFileName);
+		if (isCacheFileOld(size, mtime, cacheFile)) {
+			logger.info("receiving file: {0}", cacheFile); //$NON-NLS-1$
+			receiveFile(name, cacheFile);
 			destroyNode(name);
 		} else {
+			logger.info("cache is up to date: {0}", cacheFile); //$NON-NLS-1$
 			sendPacketClass(PacketClass.NOT);
 		}
 		return name;
 	}
 
-	private boolean isCacheOld(int size, int mtime, String cacheFileName) throws IOException {
-		File file = new File(cacheFileName);
-		File parent = file.getParentFile();
+	private boolean isCacheFileOld(int size, int mtime, File cacheFile) throws IOException {
+		File parent = cacheFile.getParentFile();
 		parent.mkdirs();
-		file.createNewFile();
-		return file.lastModified() < mtime * 1000L || file.length() != size;
+		cacheFile.createNewFile();
+		return cacheFile.lastModified() < mtime * 1000L || cacheFile.length() != size;
 	}
 
 	boolean receiveWidgetData(Component widget) throws IOException {

@@ -22,6 +22,8 @@ copies.
 
 package org.montsuqi.util;
 
+import java.io.File;
+
 public class SystemEnvironment {
 
 	private SystemEnvironment() {
@@ -33,8 +35,16 @@ public class SystemEnvironment {
 	}
 
 	public static void setMacMenuTitle(String title) {
-		if (title != null && SystemEnvironment.isMacOSX()) {
+		if (title != null && isMacOSX()) {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
 		}
+	}
+
+	public static File createFilePath(String[] elements) {
+		File path = new File(elements[0]);
+		for (int i = 1; i < elements.length; i++) {
+			path = new File(path, elements[i]);
+		}
+		return path;
 	}
 }

@@ -22,10 +22,23 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import java.io.File;
+
 import javax.swing.JDialog;
 import org.montsuqi.client.Launcher;
+import org.montsuqi.util.SystemEnvironment;
 
 public class JMAReceiptLauncher extends Launcher {
+
+	protected File getKeyStoreFile() {
+		String[] pathElements = new String[] {
+			System.getProperty("user.home"), //$NON-NLS-1$
+			".jma-receipt", //$NON-NLS-1$
+			"ssl", //$NON-NLS-1$
+			"keystore" //$NON-NLS-1$
+		};
+		return SystemEnvironment.createFilePath(pathElements);
+	}
 
 	protected JMAReceiptLauncher(String title) {
 		super(title);

@@ -51,6 +51,16 @@ public class Launcher {
 	protected Configuration conf;
 	protected String title;
 
+	protected File getKeyStoreFile() {
+		String[] pathElements = new String[] {
+			System.getProperty("user.home"), //$NON-NLS-1$
+			".glclient", //$NON-NLS-1$
+			"ssl", //$NON-NLS-1$
+			"keystore" //$NON-NLS-1$
+		};
+		return SystemEnvironment.createFilePath(pathElements);
+	}
+
 	static {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
 			System.setProperty("monsia.logger.factory", "org.montsuqi.util.StdErrLogger"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -65,6 +75,11 @@ public class Launcher {
 	public Launcher(String title) {
 		this.title = title;
 		SystemEnvironment.setMacMenuTitle(title);
+		File keyStore = getKeyStoreFile();
+		if (keyStore.exists()) {
+			logger.info("setting trust store explicitly: {0}", keyStore); //$NON-NLS-1$
+			System.setProperty("javax.net.ssl.trustStore", keyStore.toString()); //$NON-NLS-1$
+		}
 		conf = new Configuration(this.getClass());
 		client = new Client(conf);
 	}
