@@ -28,14 +28,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 
-import javax.swing.SwingUtilities;
-
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 
 public class Client implements Runnable {
 
-	private boolean connected;
 	public static final int PORT_GLTERM = 8000;
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
@@ -79,7 +76,6 @@ public class Client implements Runnable {
 
 	public void connect() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnknownHostException, IOException {
 		Socket s = null;
-		connected = false;
 		String factoryName;
 		Object[] options;
 		if (useSSL) {
@@ -94,7 +90,6 @@ public class Client implements Runnable {
 		s = creator.create(host, portNumber, options);
 		protocol = new Protocol(this, s);
 		protocol.sendConnect(user, pass, currentApplication);
-		connected = true;
 	}
 
 	public void run() {
@@ -106,19 +101,10 @@ public class Client implements Runnable {
 		}
 	}
 
-	public void loop() throws IOException, InterruptedException {
-		while (connected) {
-			SwingUtilities.invokeLater(this);
-			Thread.sleep(100);
-		}
-		protocol.close();
-	}
-
 	void exitSystem() {
 		try {
 			synchronized (this) {
 				protocol.sendPacketClass(PacketClass.END);
-				connected = false;
 			}
 		} catch (Exception e) {
 			logger.warn(e);
@@ -253,7 +239,8 @@ public class Client implements Runnable {
 			Client client = Client.parseCommandLine(args);
 			try {
 				client.connect();
-				client.loop();
+				Thread t = new Thread(client);
+				t.start();
 			} catch (Exception e) {
 				throw new Error(e);
 			}
