@@ -33,6 +33,7 @@ import org.montsuqi.widgets.PandaEntry;
 
 public class Protocol extends Connection {
 
+	private WidgetMarshal marshal;
 	Map classTable;
 	Map windowTable;
 	Logger logger;
@@ -66,6 +67,7 @@ public class Protocol extends Connection {
 		ignoreEvent = false;
 		logger = Logger.getLogger(Connection.class);
 		initWidgetOperations();
+		marshal = new WidgetMarshal(this);
 	}
 
 	protected void initWidgetOperations() {
@@ -304,15 +306,19 @@ public class Protocol extends Connection {
 	public boolean receiveWidgetData(Container widget) throws IOException {
 		Handler handler = (Handler)(classTable.get(widget.getClass()));
 		if (handler != null) {
-			return handler.receiveWidget(widget, this);
+			return handler.receiveWidget(getMarshal(), widget);
 		}
 		return false;
+	}
+
+	private WidgetMarshal getMarshal() {
+		return marshal;
 	}
 
 	public boolean sendWidgetData(String name, Container widget) throws IOException {
 		Handler handler = (Handler)(classTable.get(widget.getClass()));
 		if (handler != null) {
-			return handler.sendWidget(name, widget, this);
+			return handler.sendWidget(getMarshal(), name, widget);
 		}
 		return false;
 	}
@@ -354,13 +360,17 @@ public class Protocol extends Connection {
 	}
 
 	public void receiveValue(int offset) throws IOException {
-		boolean fTrace;
-
+		boolean fTrace = true;
+		boolean fDone = false;
 		Container widget = xml.getWidget(widgetName.toString());
 		if (widget != null) {
-			fTrace = receiveWidgetData(widget);
+			if (receiveWidgetData(widget)) {
+				fTrace = false;
+			}
+			fDone = true;
 		} else {
 			fTrace = false; /* fatal error */
+			fDone = true;
 			receiveValueSkip();
 		}
 
@@ -376,7 +386,16 @@ public class Protocol extends Connection {
 					receiveValue(offset);
 				}
 				break;
+			case Type.ARRAY:
+				count = receiveInt();
+				for (int i = 0; i < count; i++) {
+					int end = widgetName.length();
+					widgetName.replace(offset, end, "[" + i + "]");
+					receiveValue(offset);	
+				}
+				break;
 			default:
+				receiveValueSkip();
 				break;
 			}
 		}
@@ -408,7 +427,8 @@ public class Protocol extends Connection {
 		Node node;
 		Container widget;
 		int type;
-		
+
+		logger.enter("getScreenData");		
 		inReceive = true;
 		checkScreens(false);
 		sendPacketClass(PacketClass.GetData);
@@ -476,6 +496,7 @@ public class Protocol extends Connection {
 			resetTimer(node.window);
 		}
 		inReceive = false;
+		logger.leave("getScreenData");
 		return fCancel;
 	}
 
@@ -541,7 +562,7 @@ public class Protocol extends Connection {
 
 	void addClass(Class clazz, String receiverName, String senderName) {
 		try {
-			Handler handler = WidgetOperations.getHandler(receiverName, senderName);
+			Handler handler = WidgetMarshal.getHandler(receiverName, senderName);
 			classTable.put(clazz, handler);
 		} catch (NoSuchMethodException e) {
 			logger.fatal(e);
