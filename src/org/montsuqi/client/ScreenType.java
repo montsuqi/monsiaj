@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.client;
 
-interface ScreenType {
+public interface ScreenType {
 	static final int NULL = 0;
 	static final int CURRENT_WINDOW = 1;
 	static final int NEW_WINDOW = 2;
