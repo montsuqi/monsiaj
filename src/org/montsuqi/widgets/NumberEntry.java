@@ -139,15 +139,11 @@ class NumberDocument extends PlainDocument {
 	}
 
 	synchronized void setValue(BigDecimal v) {
-		logger.debug("setting value to {0}", v);
 		if (value.equals(v)) {
 			return;
 		}
 		PrecisionScale ps = new PrecisionScale(originalFormat);
 		String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
-		logger.debug("\tformat is \"{0}\"", getFormat());
-		Object[] params = { v, t };
-		logger.debug("\tformatted \"{0}\" -> \"{1}\"", params);
 		value = ZERO;
 		try {
 			expo = 0;
@@ -158,7 +154,6 @@ class NumberDocument extends PlainDocument {
 		}
 		expo = 0;
 		scale = 0;
-		logger.debug("\tdone");
 	}
 
 	BigDecimal getValue() {
@@ -214,8 +209,6 @@ class NumberDocument extends PlainDocument {
 			tmp.append('-');
 			tmp.append(buf);
 		}
-		Object[] params = { originalFormat, tmp.toString() };
-		logger.debug("translated format: \"{0}\" -> \"{1}\"", params);
 		return new DecimalFormat(tmp.toString());
 	}
 

@@ -32,11 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.text.MessageFormat;
-
-import org.montsuqi.util.Logger;
 
 class Connection {
 
@@ -45,7 +42,6 @@ class Connection {
 	protected DataInput in;
 	protected DataOutput out;
 	private int dataType;
-	private static final Logger logger = Logger.getLogger(Connection.class);
 
 	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
 		this.socket = s;
@@ -193,26 +189,27 @@ class Connection {
 		/* int flen = */ receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
-		BigInteger i = BigInteger.ZERO;
-		boolean negative = false;
 		if (value == null || value.length() == 0) {
-			logger.warn("empty Fixed value"); //$NON-NLS-1$
-		} else {
-			char c = value.charAt(0);
-			if ((c & NEGATIVE_FIXED_MASK) != 0) {
-				value = (char)(c & ~NEGATIVE_FIXED_MASK) + value.substring(1);
-				negative = true;
-			}
-			try {
-				i =  new BigInteger(value);
-			} catch (NumberFormatException e) {
-				logger.warn(e);
-			}
+			throw new IllegalArgumentException("empty Fixed value"); //$NON-NLS-1$
 		}
-		if (negative) {
-			i = i.negate();
+		// negative values are represented by masking the first
+		// character with NEGATIVE_FIXED_MASK(0x40),
+		// '0'(0x30) -> 'p'(0x70) for instance.
+		char c = value.charAt(0);
+		boolean negative = false;
+		if ((c & NEGATIVE_FIXED_MASK) != 0) {
+			value = (char)(c & ~NEGATIVE_FIXED_MASK) + value.substring(1);
+			negative = true;
 		}
-		return (new BigDecimal(i)).movePointLeft(slen);
+		try {
+			BigDecimal v =  new BigDecimal(value);
+			if (negative) {
+				v = v.negate();
+			}
+			return v.movePointLeft(slen);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	public BigDecimal receiveFixedData() throws IOException {
