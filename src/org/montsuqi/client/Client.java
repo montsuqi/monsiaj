@@ -27,6 +27,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 
+import javax.swing.SwingUtilities;
+
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 
@@ -54,8 +56,8 @@ public class Client implements Runnable {
 	//private String CApath;
 	//private String CAfile;
 
-	private Protocol protocol;
-	private Logger logger;
+	Protocol protocol;
+	Logger logger;
 
 	public Client() {
 		logger = Logger.getLogger(Client.class);
@@ -248,8 +250,7 @@ public class Client implements Runnable {
 
 			Client client = Client.parseCommandLine(args);
 			client.connect();
-			Thread t = new Thread(client);
-			t.start();
+			SwingUtilities.invokeLater(client);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

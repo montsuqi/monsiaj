@@ -267,7 +267,7 @@ public class Interface {
 		if ( ! signals.containsKey(handler)) {
 			signals.put(handler, new ArrayList());
 		}
-		List signalsForHandle = (List)this.signals.get(handler);
+		List signalsForHandle = (List)signals.get(handler);
 		signalsForHandle.add(0, sData);
 	}
 

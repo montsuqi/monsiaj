@@ -24,7 +24,6 @@ package org.montsuqi.client;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -136,37 +135,34 @@ public class Protocol extends Connection {
 
 	private Node showWindow(String name, int type) {
 		Node node = getNode(name);
+		if (node == null && (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW)) {
+			node = createNode(name);
+		}
 		if (node == null) {
-			switch (type) {
-			case ScreenType.NEW_WINDOW:
-			case ScreenType.CURRENT_WINDOW:
-				try {
-					InputStream input = new FileInputStream(client.getCacheFileName(name));
-					node = new Node(Interface.parseInput(input, this), name);
-					input.close();
-					windowTable.put(name, node);
-				} catch (IOException e) {
-					throw new InterfaceBuildingException(e);
-				}
-			}
+			return null;
 		}
-		if (node != null) {
-			JFrame w = node.getWindow();
-			switch (type) {
-			case ScreenType.NEW_WINDOW:
-			case ScreenType.CURRENT_WINDOW:
-				w.pack();
-				w.setVisible(true);
-				break;
-			case ScreenType.CLOSE_WINDOW:
-				w.setVisible(false);
-				// fall through
-			default:
-				node = null;
-				break;
-			}
+		JFrame w = node.getWindow();
+		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
+			w.pack();
+			w.setVisible(true);
+			return node;
 		}
-		return node;
+		if (type == ScreenType.CLOSE_WINDOW){
+			w.setVisible(false);
+		}
+		return null;
+	}
+
+	private Node createNode(String name) {
+		try {
+			InputStream input = new FileInputStream(client.getCacheFileName(name));
+			Node node = new Node(Interface.parseInput(input, this), name);
+			input.close();
+			windowTable.put(name, node);
+			return node;
+		} catch (IOException e) {
+			throw new InterfaceBuildingException(e);
+		}
 	}
 
 	private void destroyWindow(String name) {
@@ -177,28 +173,32 @@ public class Protocol extends Connection {
 
 	void checkScreens(boolean init) throws IOException {
 		while (receivePacketClass() == PacketClass.QueryScreen) {
-			String sName = receiveString();
-			int size = receiveLong();
-			int mtime = receiveLong();
-			/* int ctime = */ receiveLong();
-			String fName = client.getCacheFileName(sName);
-
-			File file = new File(fName);
-			File parent = file.getParentFile();
-			parent.mkdirs();
-			file.createNewFile();
-			if (file.lastModified() < mtime * 1000 ||
-				file.length() != size) {
-				receiveFile(sName, fName);
-				destroyWindow(sName);
-			} else {
-				sendPacketClass(PacketClass.NOT);
-			}
+			String name = checkScreen1();
 			if (init) {
-				showWindow(sName, ScreenType.NEW_WINDOW);
+				showWindow(name, ScreenType.NEW_WINDOW);
 				init = false;
 			}
 		}
+	}
+
+	private String checkScreen1() throws IOException {
+		String name = receiveString();
+		int size = receiveLong();
+		int mtime = receiveLong();
+		/* int ctime = */ receiveLong();
+		String cachFileName = client.getCacheFileName(name);
+
+		File file = new File(cachFileName);
+		File parent = file.getParentFile();
+		parent.mkdirs();
+		file.createNewFile();
+		if (file.lastModified() < mtime * 1000 || file.length() != size) {
+			receiveFile(name, cachFileName);
+			destroyWindow(name);
+		} else {
+			sendPacketClass(PacketClass.NOT);
+		}
+		return name;
 	}
 
 	boolean receiveWidgetData(Component widget) throws IOException {
@@ -255,18 +255,19 @@ public class Protocol extends Connection {
 	}
 
 	public void receiveValue(StringBuffer longName, int offset) throws IOException {
-		if (receiveValueStep1(longName)) {
-			switch (receiveDataType()) {
-			case Type.RECORD:
-				receiveRecordValue(longName, offset);
-				break;
-			case Type.ARRAY:
-				receiveArrayValue(longName, offset);
-				break;
-			default:
-				receiveValueSkip();
-				break;
-			}
+		if ( ! receiveValueNeedTrace(longName)) {
+			return;
+		}
+		switch (receiveDataType()) {
+		case Type.RECORD:
+			receiveRecordValue(longName, offset);
+			break;
+		case Type.ARRAY:
+			receiveArrayValue(longName, offset);
+			break;
+		default:
+			receiveValueSkip();
+			break;
 		}
 	}
 
@@ -286,7 +287,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private boolean receiveValueStep1(StringBuffer longName) throws IOException {
+	private boolean receiveValueNeedTrace(StringBuffer longName) throws IOException {
 		boolean done = false;
 		boolean needTrace = true;
 		if (protocol1) {
@@ -353,8 +354,6 @@ public class Protocol extends Connection {
 	boolean getScreenData() throws IOException {
 		String window = null;
 		Node node;
-		Component widget;
-		int type;
 
 		setReceiving(true);
 		checkScreens(false);
@@ -364,7 +363,7 @@ public class Protocol extends Connection {
 		byte c;
 		while ((c = receivePacketClass()) == PacketClass.WindowName) {
 			window = receiveString();
-			type = receiveInt();
+			int type = receiveInt();
 			switch (type) {
 			case ScreenType.END_SESSION:
 				client.exitSystem();
@@ -410,7 +409,7 @@ public class Protocol extends Connection {
 			String wName = receiveString();
 			node = getNode(window);
 			if (node != null && node.getInterface() != null) {
-				widget = xml.getWidget(wName);
+				Component widget = xml.getWidget(wName);
 				if (widget != null) {
 					widget.requestFocus();
 				}
@@ -476,21 +475,22 @@ public class Protocol extends Connection {
 	void sendWindowData() throws IOException {
 		Iterator i = windowTable.keySet().iterator();
 		while (i.hasNext()) {
-			sendPacketClass(PacketClass.WindowName);
-			String wName = (String)(i.next());
-			sendString(wName);
-			Node node = getNode(wName);
-			Iterator j = node.getChangedWidgets().entrySet().iterator();
-			while (j.hasNext()) {
-				Map.Entry e = (Map.Entry)j.next();
-				String name = (String)e.getKey();
-				Component widget = (Component)e.getValue();
-				sendWidgetData(name, widget);
-			}
-			sendPacketClass(PacketClass.END);
+			sendWndowData1((String)i.next());
 		}
 		sendPacketClass(PacketClass.END);
 		clearWindowTable();
+	}
+
+	private void sendWndowData1(String windowName) throws IOException {
+		sendPacketClass(PacketClass.WindowName);
+		sendString(windowName);
+		Node node = getNode(windowName);
+		Iterator i = node.getChangedWidgets().entrySet().iterator();
+		while (i.hasNext()) {
+			Map.Entry e = (Map.Entry)i.next();
+			sendWidgetData((String)e.getKey(), (Component)e.getValue());
+		}
+		sendPacketClass(PacketClass.END);
 	}
 
 	void clearWindowTable() {
@@ -505,11 +505,9 @@ public class Protocol extends Connection {
 		if (isReceiving()) {
 			return;
 		}
-		Window window = SwingUtilities.windowForComponent(widget);
-		String name = xml.getLongName(widget);
-		Node node = getNode(window.getName());
+		Node node = getNode(widget);
 		if (node != null) {
-			node.addChangedWidget(name, widget);
+			node.addChangedWidget(xml.getLongName(widget), widget);
 		}
 	}
 
@@ -530,8 +528,7 @@ public class Protocol extends Connection {
 	}
 
 	Node getNode(Component component) {
-		Window window = SwingUtilities.windowForComponent(component);
-		return getNode(window.getName());
+		return getNode(SwingUtilities.windowForComponent(component).getName());
 	}
 
 	void closeWindow(Component widget) {
@@ -561,4 +558,3 @@ public class Protocol extends Connection {
 		return widgetName;
 	}
 }
-
