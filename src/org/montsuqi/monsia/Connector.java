@@ -45,7 +45,7 @@ import java.util.Map;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
+import javax.swing.ComboBoxModel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
@@ -58,6 +58,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -69,6 +71,7 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.PandaCombo;
 import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TimerEvent;
@@ -144,11 +147,24 @@ abstract class Connector {
 
 		registerConnector("changed", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
-				if (target.getParent() instanceof JComboBox) {
-					JComboBox combo = (JComboBox)target.getParent();
+				if (target instanceof PandaCombo) {
+					final PandaCombo combo = (PandaCombo)target;
+					ComboBoxModel model = combo.getModel();
+					final JTextField editor = combo.getEditorComponent();
+					model.addListDataListener(new ListDataListener() {
+						public void contentsChanged(ListDataEvent e) {
+							invoke(con, handler, editor, other);
+						}
+						public void intervalAdded(ListDataEvent e) {
+							// do nothing
+						}
+						public void intervalRemoved(ListDataEvent e) {
+							// do nothing
+						}
+					});
 					combo.addItemListener(new ItemListener() {
 						public void itemStateChanged(ItemEvent e) {
-							invoke(con, handler, target, other);
+							invoke(con, handler, editor, other);
 						}
 					});
 				} else if (target instanceof JTextComponent) {
@@ -170,16 +186,13 @@ abstract class Connector {
 
 		registerConnector("activate", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
-				if (target instanceof JTextField) {
-					JTextField textField = (JTextField)target;
+				if (target instanceof PandaCombo) {
+					final PandaCombo combo = (PandaCombo)target;
+					JTextField editor = combo.getEditorComponent();
+					connect(con, editor, handler, other);
+				} else if (target instanceof JTextField) {
+					final JTextField textField = (JTextField)target;
 					textField.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent event) {
-							invoke(con, handler, target, other);
-						}
-					});
-				} else if (target instanceof JComboBox) {
-					JComboBox combo = (JComboBox)target;
-					combo.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent event) {
 							invoke(con, handler, target, other);
 						}

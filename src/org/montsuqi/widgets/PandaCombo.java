@@ -22,31 +22,107 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 public class PandaCombo extends JComboBox {
+
+	class MoveSelectionAction extends AbstractAction {
+
+		private int move;
+
+		MoveSelectionAction(int move) {
+			this.move = move;
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			int selected = getSelectedIndex();
+			int newSelected = selected + move;
+			int items = getItemCount();
+			newSelected = newSelected < 0 ? 0 : items <= newSelected ? items - 1 : newSelected;
+			setSelectedIndex(newSelected);
+			JTextField editor = getEditorComponent();
+			String item = getSelectedItem().toString();
+			editor.setText(getSelectedItem().toString());
+		}
+	}
+
 	public PandaCombo() {
 		super();
-		setEditor(new PandaComboBoxEditor());
+		setEditor(new PandaComboBoxEditor(this));
+		initActions();
+	}
+
+	private void initActions() {
+		ActionMap actionMap = getActionMap();
+		InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+		KeyStroke upKey = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0);
+		KeyStroke downKey = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0);
+		KeyStroke enterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+
+		for (InputMap parent = inputMap; parent !=  null; parent = parent.getParent()) {
+			parent.remove(upKey);
+			parent.remove(downKey);
+			parent.remove(enterKey);
+		}
+		actionMap.put("moveSelectionUp", new MoveSelectionAction(-1)); //$NON-NLS-1$
+		actionMap.put("moveSelectionDown", new MoveSelectionAction(1)); //$NON-NLS-1$
+
+		inputMap.put(upKey, "moveSelectionUp"); //$NON-NLS-1$
+		inputMap.put(downKey, "moveSelectionDown"); //$NON-NLS-1$
+		
+		addPopupMenuListener(new PopupMenuListener() {
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// do nothing
+			}
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				JTextField text = getEditorComponent();
+				text.postActionEvent();
+			}
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// do nothing
+			}
+		});
+	}
+
+	public JTextField getEditorComponent() {
+		Object prop = getClientProperty("editor"); //$NON-NLS-1$
+		assert prop != null && prop instanceof JTextField;
+		return (JTextField)prop;
 	}
 }
 
 class PandaComboBoxEditor extends BasicComboBoxEditor {
 
-	public PandaComboBoxEditor() {
+	public PandaComboBoxEditor(final PandaCombo combo) {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
-		editor.setBorder(null);
+		editor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = e.getActionCommand();
+				combo.setSelectedItem(s);
+				editor.setText(s);
+			}
+		});
 	}
 
 	static class BorderlessPandaEntry extends PandaEntry {
-		public BorderlessPandaEntry(String value,int n) {
+		public BorderlessPandaEntry(String value, int n) {
 			super(value,n);
+			setBorder(null);
 			InputMap inputMap = getInputMap();
 			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
 			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
@@ -61,8 +137,7 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 		}
 
 		public void setBorder(Border b) {
-			// inhibit instantiation
+			//
 		}
 	}
-
 }

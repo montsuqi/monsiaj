@@ -29,7 +29,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -163,14 +162,10 @@ public class Interface {
 
 	private void connect(SignalHandler handler, SignalData data) {
 		Component target = data.getTarget();
-		if (target instanceof JComboBox && ! (target instanceof OptionMenu)) {
-			JComboBox combo = (JComboBox)target;
-			Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
-			if (prop != null) {
-				target = (JTextField)prop;
-			} else {
-				Object[] args = { combo.getName() };
-				throw new IllegalArgumentException(MessageFormat.format("no such combo: {0}", args)); //$NON-NLS-1$
+		if (target instanceof JTextField) {
+			Component parent = target.getParent();
+			if (parent instanceof JComboBox && ! (parent instanceof OptionMenu)) {
+				target = parent;
 			}
 		}
 		Connector connector = Connector.getConnector(data.getName());
