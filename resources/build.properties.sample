@@ -6,5 +6,4 @@
 
 deploy.dir=/path/to/the/directory/where/jars/will/go
 alias=whatever
-storepass=whatever
 keystore=path/to/keystore

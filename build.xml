@@ -111,7 +111,6 @@
 <!--
 deploy.dir=/path/to/the/directory/where/jars/will/go
 alias=whatever
-storepass=whatever
 keystore=path/to/keystore
 -->
 	<target name="sign" depends="jars">
@@ -119,6 +118,7 @@ keystore=path/to/keystore
 			<fileset dir="${build.dir}" includes="*.jar"/>
 			<fileset dir="${libs.dir}" includes="*.jar"/>
 		</copy>
+		<input message="Input the store password" addproperty="storepass"/>
 		<signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
 			<fileset dir="${deploy.dir}" includes="*.jar"/>
 		</signjar>
