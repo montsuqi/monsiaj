@@ -53,6 +53,7 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
@@ -259,7 +260,7 @@ public class Interface {
 	}
 		 
 	private void connectClicked(final Component target, final Method handler, final Object other) {
-		if ( ! (target instanceof JButton) && ! (target instanceof JRadioButton)) {
+		if ( ! (target instanceof AbstractButton)) {
 			return;
 		}
 		AbstractButton button = (AbstractButton)target;
