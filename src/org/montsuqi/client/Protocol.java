@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.BitSet;
 import java.util.Iterator;
@@ -42,14 +41,16 @@ public class Protocol extends Connection {
 	private boolean ignoreEvent = false;
 	private boolean inReceive = false;
 
-	private static final int SCREEN_NULL = 0;
-	private static final int SCREEN_CURRENT_WINDOW = 1;
-	private static final int SCREEN_NEW_WINDOW = 2;
-	private static final int SCREEN_CLOSE_WINDOW = 3;
-	private static final int SCREEN_CHANGE_WINDOW = 4;
-	private static final int SCREEN_JOIN_WINDOW = 5;
-	private static final int SCREEN_FORK_WINDOW = 6;
-	private static final int SCREEN_END_SESSION = 7;
+	class ScreenType {
+		static final int NULL = 0;
+		static final int CURRENT_WINDOW = 1;
+		static final int NEW_WINDOW = 2;
+		static final int CLOSE_WINDOW = 3;
+		static final int CHANGE_WINDOW = 4;
+		static final int JOIN_WINDOW = 5;
+		static final int FORK_WINDOW = 6;
+		static final int END_SESSION = 7;
+	}
 
 	private static final String VERSION = "1.1.2"; //$NON-NLS-1$
 	
@@ -115,39 +116,6 @@ public class Protocol extends Connection {
 		//NOENCODE.set('A', 'Z', true);
 		//NOENCODE.set('0', '9', true);
 	}
-
-	private static String encode(String s) {
-		String enc = System.getProperty("file.encoding"); //$NON-NLS-1$
-		char[] chars = s.toCharArray();
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < chars.length; i++) {
-			char c = chars[i];
-			if (c == ' ') {
-				buf.append('+');
-			} else if (NOENCODE.get(c)) {
-				buf.append(c);
-			} else {
-				buf.append('%');
-				byte[] bytes = null;
-				try {
-					bytes = String.valueOf(c).getBytes(enc);
-				} catch (UnsupportedEncodingException e) {
-					// should not happen
-					Logger.getLogger(Protocol.class).fatal(e);
-					bytes = new byte[0];
-				}
-				for (int j = 0; j < bytes.length; j++) {
-					String hex = Integer.toHexString(bytes[j] & 0xff);
-					if (hex.length() == 1) {
-						buf.append('0');
-					}
-					buf.append(hex);
-				}
-			}
-		}
-		return buf.toString();
-	}
-
 	private boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
@@ -159,16 +127,16 @@ public class Protocol extends Connection {
 			final int SIZE_BUFF = 4096;
 			byte[] buff = new byte[SIZE_BUFF];
 			do {
-					if (left > SIZE_BUFF) {
-						size = SIZE_BUFF;
-					} else {
-						size = left;
-					}
-					size = in.read(buff, 0, size);
-					if (size > 0) {
-						fileOut.write(buff, 0, size);
-						left -= size;
-					}
+				if (left > SIZE_BUFF) {
+					size = SIZE_BUFF;
+				} else {
+					size = left;
+				}
+				size = in.read(buff, 0, size);
+				if (size > 0) {
+					fileOut.write(buff, 0, size);
+					left -= size;
+				}
 			} while (left > 0);
 			fileOut.flush();
 			fileOut.close();
@@ -187,8 +155,8 @@ public class Protocol extends Connection {
 		} else {
 			/* Create new node */
 			switch (type) {
-			case SCREEN_NEW_WINDOW:
-			case SCREEN_CURRENT_WINDOW:
+			case ScreenType.NEW_WINDOW:
+			case ScreenType.CURRENT_WINDOW:
 				Interface xml = Interface.parseFile(fName, this);
 				node = new Node(xml, wName);
 				windowTable.put(node.getName(), node);
@@ -198,12 +166,12 @@ public class Protocol extends Connection {
 		if (node != null) {
 			JFrame w = node.getWindow();
 			switch (type) {
-			case SCREEN_NEW_WINDOW:
-			case SCREEN_CURRENT_WINDOW:
+			case ScreenType.NEW_WINDOW:
+			case ScreenType.CURRENT_WINDOW:
 				w.pack();
 				w.setVisible(true);
 				break;
-			case SCREEN_CLOSE_WINDOW:
+			case ScreenType.CLOSE_WINDOW:
 				w.setVisible(false);
 				/* fall through */
 			default:
@@ -243,7 +211,7 @@ public class Protocol extends Connection {
 				sendPacketClass(PacketClass.NOT);
 			}
 			if (init) {
-				showWindow(sName, SCREEN_NEW_WINDOW);
+				showWindow(sName, ScreenType.NEW_WINDOW);
 				init = false;
 			}
 		}
@@ -386,17 +354,17 @@ public class Protocol extends Connection {
 			window = receiveString();
 			type = receiveInt();
 			switch (type) {
-			case SCREEN_END_SESSION:
+			case ScreenType.END_SESSION:
 				client.exitSystem();
 				fCancel= true;
 				break;
-			case SCREEN_CLOSE_WINDOW:
-			case SCREEN_JOIN_WINDOW:
-			case SCREEN_NEW_WINDOW:
-			case SCREEN_CHANGE_WINDOW:
+			case ScreenType.CLOSE_WINDOW:
+			case ScreenType.JOIN_WINDOW:
+			case ScreenType.NEW_WINDOW:
+			case ScreenType.CHANGE_WINDOW:
 				fCancel = true;
 				break;
-			case SCREEN_CURRENT_WINDOW:
+			case ScreenType.CURRENT_WINDOW:
 				break;
 			default:
 				break;
@@ -406,9 +374,9 @@ public class Protocol extends Connection {
 				xml = node.getInterface();
 			}
 			switch (type) {
-			case SCREEN_CURRENT_WINDOW:
-			case SCREEN_NEW_WINDOW:
-			case SCREEN_CHANGE_WINDOW:
+			case ScreenType.CURRENT_WINDOW:
+			case ScreenType.NEW_WINDOW:
+			case ScreenType.CHANGE_WINDOW:
 				widgetName = new StringBuffer(window);
 				c = receivePacketClass();
 				if (c == PacketClass.ScreenData) {
