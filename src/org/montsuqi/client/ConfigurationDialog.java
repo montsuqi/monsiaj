@@ -214,8 +214,9 @@ public abstract class ConfigurationDialog extends JDialog {
 		return combo;
 	}
 
-	protected ButtonGroup addRadioGroupRow(JPanel container, int y, String text, String[] selections, String selected) {
+	protected JRadioButton[] addRadioGroupRow(JPanel container, int y, String text, String[] selections, String selected) {
 		ButtonGroup group = new ButtonGroup();
+		JRadioButton[] radios = new JRadioButton[selections.length];
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(1, selections.length));
 		for (int i = 0; i < selections.length; i++) {
@@ -223,8 +224,9 @@ public abstract class ConfigurationDialog extends JDialog {
 			radio.setSelected(selections[i].equals(selected));
 			group.add(radio);
 			panel.add(radio);
+			radios[i] = radio;
 		}
 		addRow(container, y, text, panel);
-		return group;
+		return radios;
 	}
 }

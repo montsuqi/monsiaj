@@ -27,12 +27,12 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -50,7 +50,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 	private JTextField appEntry;
 	private JTextField encodingEntry;
 	private JComboBox lookAndFeelCombo;
-	private ButtonGroup protocolVersionRadioGroup;
+	private JRadioButton[] protocolVersionRadios;
 	UIManager.LookAndFeelInfo[] lafs;
 
 	public DefaultConfigurationDialog(String title, Configuration conf) {
@@ -69,10 +69,11 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		// advanced settings
 		conf.setEncoding(encodingEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setLookAndFeelClassName(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
-		Object[] selected = protocolVersionRadioGroup.getSelection().getSelectedObjects();
-		if (selected != null) {
-			for (int i = 0; i < selected.length; i++) {
-				conf.setProtocolVersion(Integer.parseInt((String)selected[i]));
+
+		for (int i = 0; i < protocolVersionRadios.length; i++) {
+			if (protocolVersionRadios[i].isSelected()) {
+				conf.setProtocolVersion(Integer.parseInt(protocolVersionRadios[i].getText()));
+				break;
 			}
 		}
 		conf.setUseSSL(false);
@@ -153,7 +154,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		});
 
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
-		protocolVersionRadioGroup = addRadioGroupRow(controls, y++, Messages.getString("DefaultConfigurationDialog.protocol_version"), versions, String.valueOf(conf.getProtocolVersion())); //$NON-NLS-1$
+		protocolVersionRadios = addRadioGroupRow(controls, y++, Messages.getString("DefaultConfigurationDialog.protocol_version"), versions, String.valueOf(conf.getProtocolVersion())); //$NON-NLS-1$
 		return controls;
 	}
 }
