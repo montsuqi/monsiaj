@@ -24,7 +24,7 @@ public class MonsiaHandler extends DefaultHandler {
 	String fileName;
 	ParserState state;
     int unknownDepth;    /* handle recursive unrecognised tags */
-    ParserState prevState; /* the last `known' state we were in */
+    ParserState prevState; /* the lastg `known' state we were in */
     int widgetDepth;
 
     final StringBuffer content;
@@ -141,18 +141,11 @@ public class MonsiaHandler extends DefaultHandler {
 
 	public void startElement(String uri, String localName, String qName, Attributes attrs)
 		throws SAXException {
-
-		logger.debug(Messages.getString("MonsiaHandler.begin_state"), new Object[] { localName, state.getName() }); //$NON-NLS-1$
 		state.startElement(uri, localName, qName, attrs);
-
-		/* truncate the content string ... */
 		content.delete(0, content.length());
 	}
 
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-
-		logger.debug(Messages.getString("MonsiaHandler.end_state"), new Object[] { localName, state.getName() }); //$NON-NLS-1$
-
 		state.endElement(uri, localName, qName);
 	}
 
@@ -176,7 +169,7 @@ public class MonsiaHandler extends DefaultHandler {
     final ParserState MONSIA_INTERFACE = new ParserState("MONSIA_INTERFACE") { //$NON-NLS-1$
 		public void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("requires")) { //$NON-NLS-1$
-				for (int i = 0; i < attrs.getLength(); i++) {
+				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
 					if (attrName.equals("lib")) { //$NON-NLS-1$
@@ -235,7 +228,7 @@ public class MonsiaHandler extends DefaultHandler {
 				if (propertyType != null && ! propertyType.equals("WIDGET")) { //$NON-NLS-1$
 					warnInvalidPropertiesDefinedHere("widget"); //$NON-NLS-1$
 				}
-				for (int i = 0; i < attrs.getLength(); i++) {
+				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
 					if (attrName.equals("name")) { //$NON-NLS-1$
@@ -326,7 +319,7 @@ public class MonsiaHandler extends DefaultHandler {
 					warnInvalidPropertiesDefinedHere("atk"); //$NON-NLS-1$
 				}
 				propertyType = "ATK"; //$NON-NLS-1$
-				for (int i = 0; i < attrs.getLength(); i++) {
+				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
 					if (attrName.equals("name")) { //$NON-NLS-1$
@@ -626,7 +619,7 @@ public class MonsiaHandler extends DefaultHandler {
 				if (propertyType != null && ! propertyType.equals("CHILD")) { //$NON-NLS-1$
 					warnInvalidPropertiesDefinedHere("child"); //$NON-NLS-1$
 				}
-				for (int i = 0; i < attrs.getLength(); i++) {
+				for (int i = 0, n = attrs.getLength(); i < n; i++) {
 					String attrName = attrs.getLocalName(i);
 					String value = attrs.getValue(i);
 					if (attrName.equals("name")) { //$NON-NLS-1$
@@ -822,7 +815,7 @@ public class MonsiaHandler extends DefaultHandler {
 
 		String className = null;
 		String name = null;
-		for (int i = 0; i < attrs.getLength(); i++) {
+		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("class")) { //$NON-NLS-1$
@@ -848,7 +841,7 @@ public class MonsiaHandler extends DefaultHandler {
 		String actionName = null;
 		String description = null;
 
-		for (int i = 0; i < attrs.getLength(); i++) {
+		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("action_name")) { //$NON-NLS-1$
@@ -875,7 +868,7 @@ public class MonsiaHandler extends DefaultHandler {
 		String target = null;
 		String type = null;
 
-		for (int i = 0; i < attrs.getLength(); i++) {
+		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("target")) { //$NON-NLS-1$
@@ -902,7 +895,7 @@ public class MonsiaHandler extends DefaultHandler {
 		String object = null;
 		boolean after = false;
 
-		for (int i = 0; i < attrs.getLength(); i++) {  
+		for (int i = 0, n = attrs.getLength(); i < n; i++) {  
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("name")) { //$NON-NLS-1$
@@ -961,17 +954,13 @@ public class MonsiaHandler extends DefaultHandler {
 		int key = 0;
 		int modifiers = 0;
 		String signal = null;
-		for (int i = 0; i < attrs.getLength(); i++) {  
+		for (int i = 0, n = attrs.getLength(); i < n; i++) {  
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("key")) { //$NON-NLS-1$
 				key = keyCode(value);
 			} else if (attrName.equals("modifiers")) { //$NON-NLS-1$
-				try {
-					modifiers = parseModifiers(value);
-				} catch (IOException e) {
-					logger.warn(e);
-				}
+				modifiers = parseModifiers(value);
 			} else if (attrName.equals("signal")) { //$NON-NLS-1$
 				signal = value;
 			} else {
@@ -985,7 +974,7 @@ public class MonsiaHandler extends DefaultHandler {
 		accels.add(new AccelInfo(key, modifiers, signal));
 	}
 
-	private int parseModifiers(String modifierValue) throws IOException {
+	private int parseModifiers(String modifierValue) {
 		Reader reader = new StringReader(modifierValue);
 		StreamTokenizer tokens = new StreamTokenizer(reader);
 		tokens.ordinaryChars('\u0000', '\uffff');
@@ -993,21 +982,25 @@ public class MonsiaHandler extends DefaultHandler {
 		tokens.whitespaceChars(' ', ' ');
 
 		int modifiers = 0;
-		while (tokens.nextToken() != StreamTokenizer.TT_EOF) {
-			String modifier = tokens.sval;
-			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
-				modifiers |= KeyEvent.SHIFT_MASK;
-			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$
-			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
-				modifiers |= KeyEvent.CTRL_MASK;
-			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$
-			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
-				modifiers |= parseButtonMask(modifier.substring(6));
-			} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+		try {
+			while (tokens.nextToken() != StreamTokenizer.TT_EOF) {
+				String modifier = tokens.sval;
+				if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
+					modifiers |= KeyEvent.SHIFT_MASK;
+				} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
+					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+				} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
+					modifiers |= KeyEvent.CTRL_MASK;
+				} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
+					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+				} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
+					modifiers |= parseButtonMask(modifier.substring(6));
+				} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
+					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$
+				}
 			}
+		} catch (IOException e) {
+			logger.warn(e); // no recovery
 		}
 		return modifiers;
 	}
@@ -1041,7 +1034,7 @@ public class MonsiaHandler extends DefaultHandler {
 
 		ChildInfo info = new ChildInfo();
 		widget.addChild(info);
-		for (int i = 0; i < attrs.getLength(); i++) {
+		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
 			if (attrName.equals("internal-child")) { //$NON-NLS-1$
