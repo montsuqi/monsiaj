@@ -45,6 +45,7 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -346,13 +347,22 @@ abstract class Connector {
 				if ( ! (target instanceof JToggleButton)) {
 					return;
 				}
-				final JToggleButton toggleButton = (JToggleButton)target;
-				toggleButton.addMouseListener(new MouseAdapter() {
-					public void mouseClicked(MouseEvent e) {
-						toggleButton.setSelected( ! toggleButton.isSelected());
-						invoke(con, handler, target, other);
-					}
-				});
+				
+				final JToggleButton toggle = (JToggleButton)target;
+				if (target instanceof JRadioButton) {
+					toggle.addMouseListener(new MouseAdapter() {
+						public void mouseClicked(MouseEvent e) {
+							toggle.setSelected( ! toggle.isSelected());
+							invoke(con, handler, target, other);
+						}
+					});
+				} else {
+					toggle.addChangeListener(new ChangeListener() {
+						public void stateChanged(ChangeEvent e) {
+							invoke(con, handler, target, other);
+						}
+					});
+				}
 			}
 		});
 
