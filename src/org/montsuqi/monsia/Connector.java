@@ -150,10 +150,10 @@ abstract class Connector {
 				if (target instanceof PandaCombo) {
 					final PandaCombo combo = (PandaCombo)target;
 					ComboBoxModel model = combo.getModel();
-					final JTextField editor = combo.getEditorComponent();
+					final Component c = combo.getEditor().getEditorComponent();
 					model.addListDataListener(new ListDataListener() {
 						public void contentsChanged(ListDataEvent e) {
-							invoke(con, handler, editor, other);
+							invoke(con, handler, c, other);
 						}
 						public void intervalAdded(ListDataEvent e) {
 							// do nothing
@@ -164,7 +164,7 @@ abstract class Connector {
 					});
 					combo.addItemListener(new ItemListener() {
 						public void itemStateChanged(ItemEvent e) {
-							invoke(con, handler, editor, other);
+							invoke(con, handler, c, other);
 						}
 					});
 				} else if (target instanceof JTextComponent) {
@@ -187,9 +187,9 @@ abstract class Connector {
 		registerConnector("activate", new Connector() { //$NON-NLS-1$
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
 				if (target instanceof PandaCombo) {
-					final PandaCombo combo = (PandaCombo)target;
-					JTextField editor = combo.getEditorComponent();
-					connect(con, editor, handler, other);
+					PandaCombo combo = (PandaCombo)target;
+					Component c = combo.getEditor().getEditorComponent();
+					connect(con, c, handler, other);
 				} else if (target instanceof JTextField) {
 					final JTextField textField = (JTextField)target;
 					textField.addActionListener(new ActionListener() {

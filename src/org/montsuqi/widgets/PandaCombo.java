@@ -54,7 +54,7 @@ public class PandaCombo extends JComboBox {
 			int items = getItemCount();
 			newSelected = newSelected < 0 ? 0 : items <= newSelected ? items - 1 : newSelected;
 			setSelectedIndex(newSelected);
-			JTextField editor = getEditorComponent();
+			JTextField editor = (JTextField)getEditor().getEditorComponent();
 			String item = getSelectedItem().toString();
 			editor.setText(getSelectedItem().toString());
 		}
@@ -90,19 +90,13 @@ public class PandaCombo extends JComboBox {
 				// do nothing
 			}
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-				JTextField text = getEditorComponent();
+				JTextField text = (JTextField)getEditor().getEditorComponent();
 				text.postActionEvent();
 			}
 			public void popupMenuCanceled(PopupMenuEvent arg0) {
 				// do nothing
 			}
 		});
-	}
-
-	public JTextField getEditorComponent() {
-		Object prop = getClientProperty("editor"); //$NON-NLS-1$
-		assert prop != null && prop instanceof JTextField;
-		return (JTextField)prop;
 	}
 }
 
