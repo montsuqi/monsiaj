@@ -21,23 +21,12 @@ copies.
 */
 package org.montsuqi.monsia.builders;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Insets;
 
-import javax.swing.AbstractButton;
-
-import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.WidgetInfo;
+import javax.swing.UIManager;
 
 class ButtonBuilder extends WidgetBuilder {
-
-	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
-		Insets margin = new Insets(0, 0, 0, 0);
-		Component widget = super.buildSelf(xml, parent, info);
-		AbstractButton button = (AbstractButton)widget;
-		button.setMargin(margin);
-		return widget;
+	static {
+		UIManager.put("Button.margin", new Insets(0, 0, 0, 0)); //$NON-NLS-1$
 	}
-
 }
