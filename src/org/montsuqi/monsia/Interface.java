@@ -72,6 +72,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
+import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.CalendarEvent;
@@ -99,11 +100,11 @@ public class Interface {
 	private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; //$NON-NLS-1$
 	private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; //$NON-NLS-1$
 
-	void setDefaultWidget(Component widget) {
+	public void setDefaultWidget(Component widget) {
 		defaultWidget = widget;
 	}
 
-	void setFocusWidget(Component widget) {
+	public void setFocusWidget(Component widget) {
 		focusWidget = widget;
 	}
 
@@ -177,7 +178,7 @@ public class Interface {
 		defaultWidget = null;
 		focusWidget = null;
 		this.protocol = protocol;
-		buildInterface(roots);
+		buildWidgetTree(roots);
 		signalAutoConnect();
 	}
 
@@ -541,14 +542,14 @@ public class Interface {
 		return null;
 	}
 
-	ButtonGroup getButtonGroup(String name) {
+	public ButtonGroup getButtonGroup(String name) {
 		if ( ! buttonGroups.containsKey(name)) {
 			buttonGroups.put(name, new ButtonGroup());
 		}
 		return (ButtonGroup)buttonGroups.get(name);
 	}
 	
-	void setTopLevel(JWindow window) {
+	public void setTopLevel(JWindow window) {
 		if (focusWidget != null) {
 			focusWidget.requestFocus();
 		}
@@ -577,7 +578,7 @@ public class Interface {
 		return accelGroup;
 	}
 
-	void addSignal(String handler, SignalData sData) {
+	public void addSignal(String handler, SignalData sData) {
 		if ( ! signals.containsKey(handler)) {
 			signals.put(handler, new ArrayList());
 		}
@@ -585,15 +586,14 @@ public class Interface {
 		signals.add(0, sData);
 	}
 
-	void buildInterface(List roots) {
+	void buildWidgetTree(List roots) {
 		if (roots == null || roots.isEmpty()) {
 			return;
 		}
-		WidgetBuilder builder = new WidgetBuilder(this);
 		Iterator i = roots.iterator();
 		while (i.hasNext()) {
 			WidgetInfo info = (WidgetInfo)i.next();
-			Component widget = builder.buildWidget(info);
+			Component widget = WidgetBuilder.buildWidget(this, info);
 			widgets.put(info.getName(), widget);
 		}
 	}
@@ -609,7 +609,7 @@ public class Interface {
 		return null;
 	}
 
-	void setLongName(String longName, Component widget) {
+	public void setLongName(String longName, Component widget) {
 		longNames.put(longName, widget);
 	}
 }

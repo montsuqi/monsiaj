@@ -20,26 +20,27 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.monsia;
+package org.montsuqi.monsia.builders;
 
-import org.montsuqi.util.ChainedRuntimeException;
+import java.awt.Component;
+import java.awt.Container;
 
-class WidgetOperationException extends ChainedRuntimeException {
+import javax.swing.JViewport;
 
-	WidgetOperationException() {
-		super();
+import org.montsuqi.monsia.ChildInfo;
+import org.montsuqi.monsia.Interface;
+import org.montsuqi.monsia.WidgetInfo;
+
+class ViewportBuilder extends ContainerBuilder {
+	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
+		int cCount = info.getChildrenCount();
+		if (cCount != 1) {
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_a_scrolled_window")); //$NON-NLS-1$
+		}
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		Component child = buildWidget(xml, wInfo);
+		JViewport viewport = (JViewport)parent;
+		viewport.setView(child);
 	}
-
-	WidgetOperationException(String message) {
-		super(message);
-	}
-
-	WidgetOperationException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	WidgetOperationException(Throwable cause) {
-		super(cause);
-	}
-
 }

@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-class WidgetInfo {
+public class WidgetInfo {
 
 	WidgetInfo() {
 		parent = null;
@@ -54,7 +54,7 @@ class WidgetInfo {
 		this.parent = parent;
 	}
 
-	String getLongName() {
+	public String getLongName() {
 		if (parent == null) {
 			return getName();
 		} else {
@@ -62,11 +62,11 @@ class WidgetInfo {
 		}
 	}
 
-	String getClassName() {
+	public String getClassName() {
 		return className;
 	}
 
-	String getName() {
+	public String getName() {
 		return name;
 	}
 
@@ -78,7 +78,7 @@ class WidgetInfo {
 		this.name = name;
 	}
 
-	int getPropertiesCount() {
+	public int getPropertiesCount() {
 		return properties.size();
 	}
 
@@ -86,7 +86,7 @@ class WidgetInfo {
 		return Collections.unmodifiableList(properties);
 	}
 
-	Property getProperty(int i) {
+	public Property getProperty(int i) {
 		return (Property)properties.get(i);
 	}
 
@@ -104,7 +104,7 @@ class WidgetInfo {
 		this.atkProperties.addAll(properties);
 	}
 
-	List getSignals() {
+	public List getSignals() {
 		return Collections.unmodifiableList(signals);
 	}
 
@@ -127,7 +127,7 @@ class WidgetInfo {
 		return accels.size();
 	}
 
-	List getAccels() {
+	public List getAccels() {
 		return Collections.unmodifiableList(accels);
 	}
 
@@ -136,7 +136,7 @@ class WidgetInfo {
 		this.accels.addAll(accels);
 	}
 
-	int getChildrenCount() {
+	public int getChildrenCount() {
 		return children.size();
 	}
 	
@@ -148,7 +148,7 @@ class WidgetInfo {
 		children.addLast(info);
 	}
 
-	ChildInfo getChild(int i) {
+	public ChildInfo getChild(int i) {
 		return (ChildInfo)children.get(i);
 	}
 
@@ -156,7 +156,7 @@ class WidgetInfo {
 		return (ChildInfo)children.getLast();
 	}
 	
-	List getChildren() {
+	public List getChildren() {
 		return Collections.unmodifiableList(children);
 	}
 

@@ -20,25 +20,28 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.monsia;
+package org.montsuqi.monsia.builders;
 
-import org.montsuqi.util.ChainedRuntimeException;
+import java.awt.Component;
+import java.awt.Container;
 
-class WidgetBuildingException extends ChainedRuntimeException {
+import javax.swing.JScrollPane;
 
-	WidgetBuildingException() {
-		super();
-	}
+import org.montsuqi.monsia.ChildInfo;
+import org.montsuqi.monsia.Interface;
+import org.montsuqi.monsia.WidgetInfo;
 
-	WidgetBuildingException(String message) {
-		super(message);
-	}
-
-	WidgetBuildingException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	WidgetBuildingException(Throwable cause) {
-		super(cause);
+class ScrolledWindowBuilder extends ContainerBuilder {
+	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
+		int cCount = info.getChildrenCount();
+		if (cCount != 1) {
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_a_scrolled_window")); //$NON-NLS-1$
+		}
+		JScrollPane scroll = (JScrollPane)parent;
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		Component child = buildWidget(xml, wInfo);
+		scroll.setViewportView(child);
 	}
 }
+
