@@ -24,7 +24,8 @@ package org.montsuqi.widgets;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,8 +48,14 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 
 	private int[] positions;
 
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		g.setColor(getBackground());
+		g.fillRect(0, 0, getWidth(), getHeight());
+	}
 	public CListFixedCellRenderer(Fixed fixed) {
 		super();
+		setOpaque(true);
 
 		int nLabels = fixed.getComponentCount();
 		positions = new int[nLabels];
@@ -59,9 +66,33 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 	}
 
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		JLabel[] labels = createLabels(table, row, column);
-		fillLabels(value.toString(), labels);
+		Rectangle cellRect = table.getCellRect(row, column, false);
+		setSize(cellRect.width, cellRect.height);
 
+		removeAll();
+		JLabel[] labels = new JLabel[positions.length];
+		for (int i = 0, n = labels.length; i < n; i++) {
+			JLabel label = new JLabel(""); //$NON-NLS-1$
+			label.setFont(table.getFont());
+			label.setOpaque(false);
+			label.setLocation(positions[i], 0);
+			label.setSize(cellRect.width - positions[i], cellRect.height);
+			labels[i] = label;
+			add(labels[i]);
+		}
+
+		String s = value.toString();
+		for (int i = labels.length - 1; i >= 1; i--) {
+			Matcher match = EXPRESSION_PATTERN.matcher(s);
+			if ( ! match.find(0)) {
+				break;
+			}
+			labels[i].setText(match.group(1));
+			s = match.replaceAll(""); //$NON-NLS-1$
+		}
+		labels[0].setText(s);
+
+		setOpaque(true);
 		if (isSelected) {
 			setForeground(table.getSelectionForeground());
 			setBackground(table.getSelectionBackground());
@@ -86,34 +117,5 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 		}
 
 		return this;
-	}
-
-	private void fillLabels(String value, JLabel[] labels) {
-		for (int i = labels.length - 1; i >= 1; i--) {
-			Matcher match = EXPRESSION_PATTERN.matcher(value);
-			if ( ! match.find(0)) {
-				break;
-			}
-			labels[i].setText(match.group(1));
-			value = match.replaceAll(""); //$NON-NLS-1$
-		}
-		labels[0].setText(value);
-	}
-
-	private JLabel[] createLabels(JTable table, int row, int column) {
-		removeAll();
-		Font font = table.getFont();
-		int tableWidth = table.getWidth();
-		JLabel[] labels = new JLabel[positions.length];
-		for (int i = 0, n = labels.length; i < n; i++) {
-			JLabel label = new JLabel(""); //$NON-NLS-1$
-			label.setFont(font);
-			label.setOpaque(false);
-			label.setLocation(positions[i], 0);
-			label.setSize(tableWidth, table.getCellRect(row, column, false).height);
-			labels[i] = label;
-			add(label);
-		}
-		return labels;
 	}
 }
