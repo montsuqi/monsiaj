@@ -229,7 +229,7 @@ public class Configuration {
 		}
 	}
 
-	public void setClientCertifivatePass(String pass) {
+	public void setClientCertificatePass(String pass) {
 		this.clientCertificatePass = pass;
 		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
 			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, pass);
