@@ -40,6 +40,8 @@ import javax.swing.JTextField;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.CListDummyLabel;
+import org.montsuqi.widgets.NotebookDummyButton;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaPreviewPane;
 
@@ -63,6 +65,10 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(Calendar.class, new CalendarMarshaller());
 		registerMarshaller(JProgressBar.class, new ProgressBarMarshaller());
 		registerMarshaller(PandaPreviewPane.class, new PreviewMarshaller());
+
+		// special marshallers for dummy widgets
+		registerMarshaller(CListDummyLabel.class, new DummyLabelMarshaller());
+		registerMarshaller(NotebookDummyButton.class, new DummyButtonMarshaller());
 	}
 
 	WidgetMarshaller() {
