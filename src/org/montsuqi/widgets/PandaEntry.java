@@ -32,7 +32,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.im.InputContext;
 import java.awt.im.InputSubset;
+import java.util.Locale;
 
 import javax.swing.AbstractButton;
 import javax.swing.JFrame;
@@ -68,11 +70,16 @@ public class PandaEntry extends Entry {
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
 			public void focusGained(FocusEvent e) {
 				if (ximEnabled) {
-					getInputContext().setCharacterSubsets(new Character.Subset[] {InputSubset.KANJI});
+					InputContext ic = getInputContext();
+					ic.setCharacterSubsets(new Character.Subset[] {InputSubset.KANJI});
+					ic.selectInputMethod(Locale.JAPANESE);
 				}
 			}
 			public void focusLost(FocusEvent e) {
-				getInputContext().setCharacterSubsets(null);
+				InputContext ic = getInputContext();
+				ic.setCharacterSubsets(null);
+				ic.endComposition();
+				ic.selectInputMethod(Locale.ENGLISH);
 			}
 		});
 		addMouseListener(new MouseAdapter() {
