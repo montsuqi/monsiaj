@@ -1,6 +1,8 @@
 package org.montsuqi.monsia;
 
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
@@ -53,6 +55,43 @@ public class WidgetOperation {
 
 	public static void setWindowTitle(Interface xml, Container widget, String name, String value) {
 		((Frame)widget).setTitle(value);
+	}
+
+	public static void setWidth(Interface xml, Container widget, String name, String value) {
+		Logger logger = Logger.getLogger(WidgetOperation.class);
+		logger.enter("setWidth");
+		if ( ! (widget instanceof Component)) {
+			logger.warn("Attempt to set width to non-Component.");
+		}
+		Component c = (Component)widget;
+		Dimension size = c.getSize();
+		try {
+			size.width = Integer.parseInt(value);
+			c.setSize(size);
+			
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Not a number.");
+		} finally {
+			logger.leave("setWidth");
+		}
+	}
+
+	public static void setHeight(Interface xml, Container widget, String name, String value) {
+		Logger logger = Logger.getLogger(WidgetOperation.class);
+		logger.enter("setHeight");
+		if ( ! (widget instanceof Component)) {
+			logger.warn("Attempt to set width to non-Component.");
+		}
+		Component c = (Component)widget;
+		Dimension size = c.getSize();
+		try {
+			size.height = Integer.parseInt(value);
+			c.setSize(size);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Not a number.");
+		} finally {
+			logger.leave("setHeight");
+		}
 	}
 
 	public static void setJustify(Interface xml, Container widget, String name, String value) {

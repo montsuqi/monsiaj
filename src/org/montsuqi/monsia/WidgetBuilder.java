@@ -109,6 +109,9 @@ public class WidgetBuilder {
 		registerProperty(javax.swing.JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JLabel.class, "justify", "setJustify");
 		registerProperty(javax.swing.JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(java.awt.Component.class, "width_request", "setWidth");
+		registerProperty(java.awt.Component.class, "height_request", "setHeight");
+		
 
 /*
 		registerProperty("selectable", null);
@@ -747,6 +750,7 @@ public class WidgetBuilder {
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Container child = null;
 			int x = 0, y = 0;
+			int w = 0, h = 0;
 
 			String internalChild = cInfo.getInternalChild();
 			if (internalChild != null) {
@@ -755,14 +759,14 @@ public class WidgetBuilder {
 			}
 
 			child = buildWidget(wInfo);
-			int pCount = wInfo.getPropertiesCount();
+			int pCount = cInfo.getPropertiesCount();
 			for (int j = 0; j < pCount; j++) {
-				Property p = wInfo.getProperty(j);
+				Property p = cInfo.getProperty(j);
 				String name = p.getName();
 				String value = p.getValue();
 				if ("x".equals(name)) { //$NON-NLS-1$
 					x = ParameterConverter.toInteger(value);
-				} else if ("y".equals(value)) { //$NON-NLS-1$
+				} else if ("y".equals(name)) { //$NON-NLS-1$
 					y = ParameterConverter.toInteger(value);
 				} else {
 					logger.warn(Messages.getString("WidgetBuilder.unknown_child_packing_property_{0}_for_Layout_8"), name); //$NON-NLS-1$
