@@ -32,15 +32,15 @@ import java.net.URL;
 public class PandaHTMLWebKit extends PandaHTML {
 
 	private static Class WebKitJava;
-	private static Method sendMessage;
-	private static Field loadURLField;
-	private static Integer loadURL;
+	static Method sendMessage;
+	static Integer loadURL;
+
 	static {
 		try {
-			WebKitJava = Class.forName("org.dm.webkit.WebKitJava");
+			WebKitJava = Class.forName("org.dm.webkit.WebKitJava"); //$NON-NLS-1$
 			Class[] types = { Integer.TYPE, Object.class };
-			sendMessage = WebKitJava.getMethod("sendMessage", types);
-			loadURLField = WebKitJava.getField("loadURL");
+			sendMessage = WebKitJava.getMethod("sendMessage", types); //$NON-NLS-1$
+			Field loadURLField = WebKitJava.getField("loadURL"); //$NON-NLS-1$
 			loadURL = new Integer(loadURLField.getInt(null));
 		} catch (ClassNotFoundException e) {
 			throw new ExceptionInInitializerError(e);
