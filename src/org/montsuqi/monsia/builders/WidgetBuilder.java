@@ -42,6 +42,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JViewport;
+import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.InsetsUIResource;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
@@ -76,6 +79,7 @@ public class WidgetBuilder {
 		builderMap.put(genericClassName, builder);
 	}
 
+	// set up the widget builder map
 	static {
 		builderMap = new HashMap();
 		classMap = new HashMap();
@@ -83,7 +87,7 @@ public class WidgetBuilder {
 		WidgetBuilder defaultWidgetBuilder= new WidgetBuilder();
 		WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
 
-		registerWidgetClass("Button",         JButton.class,       new ButtonBuilder()); //$NON-NLS-1$
+		registerWidgetClass("Button",         JButton.class,       defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Calendar",       Calendar.class,      defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("CheckButton",    JCheckBox.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
@@ -113,6 +117,21 @@ public class WidgetBuilder {
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
+	}
+
+	// set up UI resources
+	static {
+		FontUIResource font;
+
+		font = (FontUIResource)UIManager.get("Button.font"); //$NON-NLS-1$
+		font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN, font.getSize2D() * 0.9f));
+		UIManager.put("Button.font", font); //$NON-NLS-1$
+
+		font = (FontUIResource)UIManager.get("ComboBox.font"); //$NON-NLS-1$
+		font = new FontUIResource(font.deriveFont(FontUIResource.PLAIN));
+		UIManager.put("ComboBox.font", font); //$NON-NLS-1$
+
+		UIManager.put("Button.margin", new InsetsUIResource(0, 0, 0, 0)); //$NON-NLS-1$
 	}
 
 	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {
