@@ -2,6 +2,7 @@ package org.montsuqi.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.text.MessageFormat;
 
 import javax.net.ssl.SSLSocket;
@@ -11,6 +12,7 @@ import org.montsuqi.util.OptionParser;
 
 public class Client implements Runnable {
 
+	private boolean connected;
 	static final int PORT_GLTERM = 8000;
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 
@@ -111,6 +113,7 @@ public class Client implements Runnable {
 			}
 			
 			protocol = new Protocol(this, s);
+			connected = true;
 		} catch (IOException e) {
 			logger.fatal(e);
 			System.exit(0);
@@ -124,10 +127,12 @@ public class Client implements Runnable {
 	public void run() {
 		try {
 			protocol.sendConnect(user, pass, currentApplication);
-			while (true) {
+			connected = true;
+			while (connected) {
 				protocol.checkScreens(true);
 				protocol.getScreenData();
 			}
+			protocol.close();
 		} catch (IOException e) {
 			logger.fatal(e);
 		}
@@ -148,11 +153,16 @@ public class Client implements Runnable {
 	
 	public void exitSystem() {
 		try {
-			protocol.sendPacketClass(PacketClass.END);
-			protocol.close();
-			System.exit(0);
+			synchronized (this) {
+				protocol.sendPacketClass(PacketClass.END);
+				connected = false;
+			}
+		} catch (SocketException e) {
+			logger.warn(e);
 		} catch (IOException e) {
-			logger.fatal(e);
+			logger.warn(e);
+		} finally {
+			System.exit(0);
 		}
 	}
 

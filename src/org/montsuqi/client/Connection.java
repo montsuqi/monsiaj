@@ -8,14 +8,16 @@ import org.montsuqi.util.Logger;
 
 public class Connection {
 
+	private Socket socket;
 	protected LittleEndianDataInputStream in;
 	protected LittleEndianDataOutputStream out;
 	int dataType;
 	Logger logger;
 
 	public Connection(Socket s) throws IOException {
-		in = new LittleEndianDataInputStream(s.getInputStream());
-		out = new LittleEndianDataOutputStream(s.getOutputStream());
+		this.socket = s;
+		in = new LittleEndianDataInputStream(socket.getInputStream());
+		out = new LittleEndianDataOutputStream(socket.getOutputStream());
 		logger = Logger.getLogger(Connection.class);
 	}
 
@@ -479,8 +481,13 @@ public class Connection {
 	}
 
 	public void close() throws IOException {
+		socket.shutdownInput(); 
+		socket.shutdownOutput();
 		in.close();
 		out.close();
+		if (socket.isConnected()) {
+			socket.close();
+		}
 	}
 }
 
