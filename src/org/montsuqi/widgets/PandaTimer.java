@@ -26,7 +26,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.JComponent;
@@ -61,7 +60,8 @@ public class PandaTimer extends JComponent {
 	}
 
 	protected void fireTimeEvent(TimerEvent e) {
-		if ( ! isActive()) {
+		java.awt.Window w = SwingUtilities.windowForComponent(this);
+		if (w instanceof Window && ! ((Window)w).isActive()) {
 			return;
 		}
 		TimerListener[] listeners = (TimerListener[])listenerList.getListeners(TimerListener.class);
@@ -71,14 +71,6 @@ public class PandaTimer extends JComponent {
 		}
 		Object[] args = { getName(), new Date(), Thread.currentThread(), SwingUtilities.windowForComponent(this).getName() };
 		logger.debug("timer {0} of {3} ring at {1,time} in {2}", args); //$NON-NLS-1$
-	}
-
-	private boolean isActive() {
-		java.awt.Window w = SwingUtilities.windowForComponent(this);
-		if (w instanceof JFrame) {
-			return ! ((JFrame)w).getGlassPane().isVisible();
-		}
-		return true;
 	}
 
 	public void setDuration(int duration) {

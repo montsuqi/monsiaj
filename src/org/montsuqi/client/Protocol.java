@@ -24,7 +24,6 @@ package org.montsuqi.client;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Frame;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -129,18 +128,16 @@ public class Protocol extends Connection {
 		}
 		Window window = node.getWindow();
 		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
-			Frame[] frames = Frame.getFrames();
-			for (int i = 0; i < frames.length; i++) {
-				 if (frames[i] instanceof Window) {
-					Window w = (Window)frames[i];
-					 if (w != window) {
-						w.showBusyCursor();
-					} else {
-						w.pack();
-						w.hideBusyCursor();
-						w.setVisible(true);
-					}
-				 }
+			Window[] windows = Window.getWindows();
+			for (int i = 0; i < windows.length; i++) {
+				Window w = windows[i];
+				 if (w != window) {
+					w.showBusyCursor();
+				} else {
+					w.pack();
+					w.hideBusyCursor();
+					w.setVisible(true);
+				}
 			}
 			return node;
 		}

@@ -22,13 +22,17 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Window extends JFrame {
+
 	public Window() {
 		super();
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -53,5 +57,21 @@ public class Window extends JFrame {
 
 	public void hideBusyCursor() {
 		getGlassPane().setVisible(false);
+	}
+
+	public boolean isActive() {
+		return ! getGlassPane().isVisible();
+	}
+
+	public static Window[] getWindows() {
+		Frame[] frames = Frame.getFrames();
+		List list = new ArrayList();
+		for (int i = 0; i < frames.length; i++) {
+			Frame f = frames[i];
+			if (f instanceof Window) {
+				list.add(f);
+			}
+		}
+		return (Window[])list.toArray(new Window[list.size()]);
 	}
 }

@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 import javax.swing.DefaultFocusManager;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.montsuqi.monsia.Interface;
@@ -35,11 +34,8 @@ public class PandaFocusManager extends DefaultFocusManager {
 
 	public void processKeyEvent(Component focusedComponent, KeyEvent e) {
 		java.awt.Window w = SwingUtilities.windowForComponent(focusedComponent);
-		if (w instanceof JFrame) {
-			JFrame f = (JFrame)w;
-			if (f.getGlassPane().isVisible()) {
-				return;
-			}
+		if (w instanceof Window && ! ((Window)w).isActive()) {
+			return;
 		}
 		if (Interface.handleAccels(e)) {
 			e.consume();
