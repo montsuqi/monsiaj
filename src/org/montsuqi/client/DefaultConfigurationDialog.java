@@ -161,9 +161,17 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 	protected void changeLookAndFeel(String className) {
 		try {
 			UIManager.setLookAndFeel(className);
-			SwingUtilities.updateComponentTreeUI(this);
 		} catch (Exception e) {
 			logger.warn(e);
 		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					SwingUtilities.updateComponentTreeUI(DefaultConfigurationDialog.this);
+				} catch (Exception e) {
+					logger.warn(e);
+				}
+			}
+		});
 	}
 }
