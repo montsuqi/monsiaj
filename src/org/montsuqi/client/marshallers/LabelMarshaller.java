@@ -43,7 +43,7 @@ class LabelMarshaller extends WidgetMarshaller {
 			}
 			manager.registerValue(widget, name, null);
 			String text = con.receiveStringData();
-			label.setText(text.replaceFirst("\\s+$", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			label.setText(text);
 		}
 	}
 
