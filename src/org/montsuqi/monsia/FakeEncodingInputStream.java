@@ -44,7 +44,6 @@ final class FakeEncodingInputStream extends InputStream {
 			headerBytes = FAKE_HEADER.getBytes("euc-jp"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException e) {
 			logger.fatal(e);
-			e.printStackTrace();
 		}
 		index = 0;
 	}

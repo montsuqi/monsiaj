@@ -37,6 +37,8 @@ import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+
+import org.montsuqi.util.Logger;
 import org.montsuqi.util.PrecisionScale;
 
 public class NumberEntry extends JTextField {
@@ -128,6 +130,7 @@ class NumberDocument extends PlainDocument {
 	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
 	static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
 	static final BigDecimal ONE = new BigDecimal(BigInteger.ONE);
+	private Logger logger;
 
 	NumberDocument() {
 		setFormat(DEFAULT_FORMAT);
@@ -144,7 +147,7 @@ class NumberDocument extends PlainDocument {
 			try {
 				insertString(0, t, null);
 			} catch (BadLocationException e) {	
-				e.printStackTrace();
+				logger.warn(e);
 			}
 			expo = 0;
 			scale = 0;
