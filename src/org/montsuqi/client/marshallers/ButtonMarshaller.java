@@ -24,8 +24,8 @@ package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
-
 import javax.swing.AbstractButton;
+
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
@@ -48,6 +48,7 @@ class ButtonMarshaller extends WidgetMarshaller {
 				boolean selected = con.receiveBooleanData();
 				manager.registerValue(button, name, null);
 				button.setSelected(selected);
+				System.out.println("---RECV: " + button.getName() + "<-" + selected); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -60,6 +61,7 @@ class ButtonMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getValue(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		boolean selected = button.isSelected();
+		System.out.println("---SEND: " + button.getName() + "->" + button.isSelected()); //$NON-NLS-1$ //$NON-NLS-2$
 		con.sendBooleanData(va.getType(), selected);
 	}
 }

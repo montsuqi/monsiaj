@@ -114,6 +114,7 @@ abstract class Connector {
 				AbstractButton button = (AbstractButton)target;
 				button.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent event) {
+						System.out.println("invoking clicked for " + target.getName());
 						invoke(con, handler, target, other);
 					}
 				});
@@ -347,9 +348,10 @@ abstract class Connector {
 				if ( ! (target instanceof JToggleButton)) {
 					return;
 				}
-				JToggleButton toggleButton = (JToggleButton)target;
+				final JToggleButton toggleButton = (JToggleButton)target;
 				toggleButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent event) {
+					public void actionPerformed(ActionEvent e) {
+						System.out.println("invoking toggled for " + target.getName() + " -> " + toggleButton.isSelected());
 						invoke(con, handler, target, other);
 					}
 				});
