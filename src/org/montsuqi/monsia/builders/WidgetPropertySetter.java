@@ -28,9 +28,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -58,7 +56,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.NumberEntry;
@@ -72,27 +69,6 @@ abstract class WidgetPropertySetter {
 
 	static Logger logger;
 	private static Map propertyMap;
-
-	static void setProperties(Interface xml, Container parent, Component widget, WidgetInfo info) {
-		Iterator i = info.getProperties().entrySet().iterator();
-		while (i.hasNext()) {
-			Map.Entry ent = (Map.Entry)i.next();
-			String name = (String)ent.getKey();
-			Class clazz = widget.getClass();
-			try {
-				WidgetPropertySetter setter = getSetter(clazz, name);
-				if (setter == null) {
-					//logger.debug("setter not found");
-					continue;
-				}
-				setter.set(xml, parent, widget, (String)ent.getValue());
-			} catch (ClassCastException e) {
-				String message = Messages.getString("WidgetPropertySetter.invalid_widget_type"); //$NON-NLS-1$
-				message = MessageFormat.format(message, new Object[] { clazz });	
-				throw new IllegalArgumentException(message);
-			}
-		}
-	}
 
 	static WidgetPropertySetter getSetter(Class clazz, String name) {
 		for (/**/; clazz != null; clazz = clazz.getSuperclass()) {

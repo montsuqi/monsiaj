@@ -27,9 +27,10 @@ import java.awt.Container;
 import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 import java.util.Iterator;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -144,31 +145,29 @@ public class WidgetBuilder {
 	}
 
 	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {
-		Component widget;
 		String genericClassName = info.getClassName();
 		WidgetBuilder builder = (WidgetBuilder)builderMap.get(genericClassName);
 		Logger logger = Logger.getLogger(WidgetBuilder.class);
 		if (builder == null) {
 			logger.warn(Messages.getString("WidgetBuilder.Unknown_widget_class"), genericClassName); //$NON-NLS-1$
 			String labelString = MessageFormat.format("[a {0}]", new Object[] { genericClassName }); //$NON-NLS-1$
-			widget = new JLabel(labelString);
+			return new JLabel(labelString);
 		} else {
 			try {
-				widget = builder.buildSelf(xml, parent, info);
+				Component widget = builder.buildSelf(xml, parent, info);
+				if (widget instanceof Window) {
+					xml.setTopLevel(widget);
+				}
+				if (widget instanceof Container) {
+					builder.buildChildren(xml, (Container)widget, info);
+				}
+				builder.setCommonParameters(xml, widget, info);
+				return widget;
 			} catch (Exception e) {
 				logger.warn(e);
-				widget = new JLabel('[' + e.toString() + ']');
+				return new JLabel('[' + e.toString() + ']');
 			}
 		}
-		if (widget instanceof Window) {
-			xml.setTopLevel(widget);
-		}
-		if (widget instanceof Container) {
-			builder.buildChildren(xml, (Container)widget, info);
-		}
-		builder.setCommonParameters(xml, widget, info);
-		return widget;
-		
 	}
 
 	protected Logger logger;
@@ -183,10 +182,9 @@ public class WidgetBuilder {
 		if (clazz == null) {
 			throw new IllegalArgumentException(genericClassName);
 		}
-		Component widget = null;
 		try {
-			widget = (Component)clazz.newInstance();
-			WidgetPropertySetter.setProperties(xml, parent, widget, info);
+			Component widget = (Component)clazz.newInstance();
+			setProperties(xml, parent, widget, info.getProperties());
 			xml.addAccels(widget, info);
 			return widget;
 		} catch (InstantiationException e) {
@@ -203,17 +201,31 @@ public class WidgetBuilder {
 	}
 
 	private void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
-		addSignals(xml, widget, info);
+		addSignals(xml, widget, info.getSignals());
 		widget.setName(info.getName());
 		xml.setName(info.getName(), widget);
 		xml.setLongName(info.getLongName(), widget);
 	}	
 
-	private void addSignals(Interface xml, Component widget, WidgetInfo info) {
-		Iterator i = info.getSignals().iterator();
+	private void addSignals(Interface xml, Component widget, List signals) {
+		Iterator i = signals.iterator();
 		while (i.hasNext()) {
 			SignalInfo sInfo = (SignalInfo)i.next();
 			xml.addSignal(sInfo.getHandler(), new SignalData(widget, sInfo));
+		}
+	}
+
+	void setProperties(Interface xml, Container parent, Component widget, Map properties) {
+		Iterator i = properties.entrySet().iterator();
+		Class clazz = widget.getClass();
+		while (i.hasNext()) {
+			Map.Entry ent = (Map.Entry)i.next();
+			WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, (String)ent.getKey());
+			if (setter == null) {
+				//logger.debug("setter not found");
+				continue;
+			}
+			setter.set(xml, parent, widget, (String)ent.getValue());
 		}
 	}
 }
