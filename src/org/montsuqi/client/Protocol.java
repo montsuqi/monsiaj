@@ -52,7 +52,7 @@ public class Protocol extends Connection {
 	public static final int SCREEN_FORK_WINDOW = 6;
 	public static final int SCREEN_END_SESSION = 7;
 
-	static final String VERSION = "1.2.0";
+	static final String VERSION = "1.2.0"; //$NON-NLS-1$
 	
 	public String getVersion() {
 		return VERSION;
@@ -70,24 +70,24 @@ public class Protocol extends Connection {
 	}
 
 	protected void initWidgetOperations() {
-		addClass(JTextField.class,       "receiveEntry",       "sendEntry");
-		addClass(NumberEntry.class,      "receiveNumberEntry", "sendNumberEntry");
-		addClass(JTextArea.class, "receiveText",        "sendText");
+		addClass(JTextField.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(NumberEntry.class,      "receiveNumberEntry", "sendNumberEntry"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JTextArea.class, "receiveText",        "sendText"); //$NON-NLS-1$ //$NON-NLS-2$
 //		addClass(PandaCombo.class,       "receivePandaCombo",  null);
 //		addClass(PandaCList.class,       "receivePandaCList",  "sendPandaCList");
-		addClass(PandaEntry.class,       "receiveEntry",       "sendEntry");
+		addClass(PandaEntry.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 //		addClass(PandaText.class,        "receiveText",        "sendText");
-		addClass(JLabel.class,           "receiveLabel",       null);
-		addClass(JComboBox.class,        "receiveCombo",       null);
-		addClass(JTable.class,           "receiveCList",       "sendCList");
-		addClass(JButton.class,          "receiveButton",      null);
-		addClass(JToggleButton.class,    "receiveButton",      "sendButton");
-		addClass(JCheckBox.class,        "receiveButton",      "sendButton");
-		addClass(JRadioButton.class,     "receiveButton",      "sendButton");
-		addClass(JList.class,            "receiveList",        "sendList");
-		addClass(Calendar.class,       "receiveCalendar",    "sendCalendar");
-		addClass(JTabbedPane.class,      "receiveNotebook",    "sendNotebook");
-		addClass(JProgressBar.class,      "receiveProgressBar", "sendProgressBar");
+		addClass(JLabel.class,           "receiveLabel",       null); //$NON-NLS-1$
+		addClass(JComboBox.class,        "receiveCombo",       null); //$NON-NLS-1$
+		addClass(JTable.class,           "receiveCList",       "sendCList"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JButton.class,          "receiveButton",      null); //$NON-NLS-1$
+		addClass(JToggleButton.class,    "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JCheckBox.class,        "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JRadioButton.class,     "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JList.class,            "receiveList",        "sendList"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(Calendar.class,       "receiveCalendar",    "sendCalendar"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JTabbedPane.class,      "receiveNotebook",    "sendNotebook"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JProgressBar.class,      "receiveProgressBar", "sendProgressBar"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public Interface getInterface() {
@@ -137,14 +137,14 @@ public class Protocol extends Connection {
 		switch (value.type) {
 		case Type.ARRAY:
 			for (int i = 0; i < value.body.ArrayData.count; i++) {
-				String name = "[" + i + "]";
+				String name = "[" + i + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 				namebuff.replace(idx, namebuff.length(), name);
 				sendValueString(value.body.ArrayData.item[i], idx + name.length(), fName);
 			}
 			break;
 		case Type.RECORD:
 			for (int i = 0; i < value.body.RecordData.count; i++) {
-				String name = "." + value.body.RecordData.names[i];
+				String name = "." + value.body.RecordData.names[i]; //$NON-NLS-1$
 				namebuff.replace(idx, namebuff.length(), name);
 				sendValueString(value.body.RecordData.item[i], idx + name.length(), fName);
 			}
@@ -152,10 +152,10 @@ public class Protocol extends Connection {
 		default:
 			if (fName) {
 				sendStringDelim(namebuff.toString());
-				sendStringDelim(": ");
+				sendStringDelim(": "); //$NON-NLS-1$
 			}
 			sendStringDelim(encode(value.toString()));
-			sendStringDelim("\n");
+			sendStringDelim("\n"); //$NON-NLS-1$
 			break;
 		}
 	}
@@ -170,7 +170,7 @@ public class Protocol extends Connection {
 	}
 
 	private static String encode(String s) {
-		String enc = System.getProperty("file.encoding");
+		String enc = System.getProperty("file.encoding"); //$NON-NLS-1$
 		char[] chars = s.toCharArray();
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < chars.length; i++) {
@@ -225,7 +225,7 @@ public class Protocol extends Connection {
 			out.close();
 			return true;
 		} else {
-			logger.warn("invalid protocol sequence");
+			logger.warn(Messages.getString("Protocol.invalid_protocol_sequence")); //$NON-NLS-1$
 			return false;
 		}
 	}
@@ -364,7 +364,7 @@ public class Protocol extends Connection {
 				while (count-- != 0) {
 					String name = receiveString();
 					int end = widgetName.length();
-					widgetName.replace(offset, end, "." + name);
+					widgetName.replace(offset, end, "." + name); //$NON-NLS-1$
 					receiveValue(offset);
 				}
 				break;
@@ -479,27 +479,27 @@ public class Protocol extends Connection {
 		sendString(pass);
 		sendString(apl);
 
-		logger.info("receivePacketClass");
+		logger.info("receivePacketClass"); //$NON-NLS-1$
 		pc = receivePacketClass();
-		logger.info("done");
+		logger.info("done"); //$NON-NLS-1$
 		if (pc == PacketClass.OK) {
 			return true;
 		} else {
 			switch (pc) {
 			case PacketClass.NOT:
-				logger.warn("can not connect server");
+				logger.warn(Messages.getString("Protocol.cannot_connect_to_server")); //$NON-NLS-1$
 				break;
 			case PacketClass.E_VERSION:
-				logger.warn("can not connect server(version not match)");
+				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_version_missmatch")); //$NON-NLS-1$
 				break;
 			case PacketClass.E_AUTH:
-				logger.warn("can not connect server(authentication error)");
+				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_authentication_error")); //$NON-NLS-1$
 				break;
 			case PacketClass.E_APPL:
-				logger.warn("can not connect server(application name invalid)");
+				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_invalid_application_name")); //$NON-NLS-1$
 				break;
 			default:
-				logger.warn("[]\ncan not connect server(other protocol error)",
+				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_other_protocol_error"), //$NON-NLS-1$
 							new Object[] { new Integer(pc) });
 				break;
 			}
@@ -592,11 +592,11 @@ public class Protocol extends Connection {
 	}
 
 	public void clist_send_event(Container widget, Object userData) throws IOException {
-		send_event(widget, "SELECT");
+		send_event(widget, "SELECT"); //$NON-NLS-1$
 	}
 
 	public void activate_widget(Container widget, Object userData) throws IOException {
-		send_event(widget, "ACTIVATE");
+		send_event(widget, "ACTIVATE"); //$NON-NLS-1$
 	}
 
 	public void entry_next_focus(Container widget, Object userData) {
@@ -718,7 +718,7 @@ public class Protocol extends Connection {
 	}
 
 	public void open_browser(Container widget, Object userData) {
-		logger.warn("NOT SUPPORTED");
+		logger.warn("NOT SUPPORTED"); //$NON-NLS-1$
 	}
 
 	/** callback placeholder which has no effect */

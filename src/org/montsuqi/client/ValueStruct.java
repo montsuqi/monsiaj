@@ -20,10 +20,10 @@ public class ValueStruct {
 		case Type.VARCHAR:
 		case Type.DBCODE:
 		case Type.TEXT:
-			body.CharData = "";
+			body.CharData = ""; //$NON-NLS-1$
 			break;
 		case Type.NUMBER:
-			body.FixedData = new BigDecimal("0.0");
+			body.FixedData = new BigDecimal("0.0"); //$NON-NLS-1$
 			break;
 		case Type.INT:
 			body.IntegerData = 0;
@@ -66,9 +66,9 @@ public class ValueStruct {
 		case Type.FLOAT:
 			return String.valueOf(body.FloatData);
 		case Type.BOOL:
-			return body.BoolData ? "TRUE" : "FALSE";
+			return body.BoolData ? "TRUE" : "FALSE"; //$NON-NLS-1$ //$NON-NLS-2$
 		default:
-			throw new IllegalStateException("Unknown value type");
+			throw new IllegalStateException(Messages.getString("ValueStruct.unknown_value_type")); //$NON-NLS-1$
 		}
 	}
 }

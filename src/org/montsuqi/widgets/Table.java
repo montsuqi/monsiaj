@@ -10,6 +10,6 @@ public class Table extends JComponent {
 		setLayout(new TableLayout());
 	}
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(VBox.class).info("ignoring Table#setLayout().");
+		Logger.getLogger(VBox.class).info(Messages.getString("Table.ignoring_Table_setLayout")); //$NON-NLS-1$
 	}
 }

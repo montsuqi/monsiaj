@@ -11,6 +11,6 @@ public class VBox extends JComponent {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	}
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(VBox.class).info("ignoring VBox#setLayout().");
+		Logger.getLogger(VBox.class).info(Messages.getString("VBox.ignoring_VBox_setLayout")); //$NON-NLS-1$
 	}
 }

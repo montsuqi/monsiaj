@@ -29,12 +29,12 @@ public class Calendar extends JComponent {
 
 	public Calendar() {
 		super();
-		df = new SimpleDateFormat("yyyy/MM");
+		df = new SimpleDateFormat("yyyy/MM"); //$NON-NLS-1$
 		setLayout(new BorderLayout());
 		caption = new JPanel();
 		add(caption, BorderLayout.NORTH);
-		prev = new JButton("<");
-		next = new JButton(">");
+		prev = new JButton("<"); //$NON-NLS-1$
+		next = new JButton(">"); //$NON-NLS-1$
 
 		prev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -154,7 +154,7 @@ public class Calendar extends JComponent {
 	}
 
 	public static void main(String[] args) {
-		JFrame f = new JFrame("CalendarTest");
+		JFrame f = new JFrame("CalendarTest"); //$NON-NLS-1$
 		f.getContentPane().add(new Calendar());
 		f.setSize(400, 300);
 		f.setVisible(true);

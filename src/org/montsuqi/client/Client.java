@@ -2,6 +2,8 @@ package org.montsuqi.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.text.MessageFormat;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import org.montsuqi.util.Logger;
@@ -56,12 +58,12 @@ public class Client implements Runnable {
 		options.add("v2", Messages.getString("Client.use_protocol_version_2"), true); //$NON-NLS-1$ //$NON-NLS-2$
 
 		options.add("useSSL", "SSL", false); //$NON-NLS-1$ //$NON-NLS-2$
-		//options.add("key", "¸°¥Õ¥¡¥¤¥?Ì¾(pem)", null);
-		//options.add("cert", "¾ÚÌÀ½ñ¥Õ¥¡¥¤¥?Ì¾(pem)", null);
-		//options.add("ssl", "SSL¤ò»È¤¦", false);
+		//options.add("key", "key file name(pem)", null);
+		//options.add("cert", "certification file name(pem)", null);
+		//options.add("ssl", "use SSL", false);
 		options.add("verifypeer", Messages.getString("Client.verify_peer"), false); //$NON-NLS-1$ //$NON-NLS-2$
-		//options.add("CApath", "CA¾ÚÌÀ½ñ¤Ø¤Î¥Ñ¥¹", null);
-		//options.add("CAfile", "CA¾ÚÌÀ½ñ¥Õ¥¡¥¤¥?", null);
+		//options.add("CApath", "path to CA", null);
+		//options.add("CAfile", "CA file", null);
 
 		String[] files = options.parse(Client.class.getName(), args);
 
@@ -107,7 +109,7 @@ public class Client implements Runnable {
 				ssl.setNeedClientAuth(verify);
 				s = ssl;
 			}
-			logger.info("socket: {0}", s);
+			logger.info("socket: {0}", s); //$NON-NLS-1$
 			
 			protocol = new Protocol(this, s);
 			logger.info(protocol.toString());
@@ -123,13 +125,13 @@ public class Client implements Runnable {
 
 	public void run() {
 		try {
-			logger.info("sendConnect({0}, {1}, {2})...", new Object[] { user, pass, currentApplication });
+			logger.info("sendConnect({0}, {1}, {2})...", new Object[] { user, pass, currentApplication }); //$NON-NLS-1$
 			protocol.sendConnect(user, pass, currentApplication);
-			logger.info("done.");
+			logger.info("done."); //$NON-NLS-1$
 			while (true) {
-				logger.info("checkScreens(true)");
+				logger.info("checkScreens(true)"); //$NON-NLS-1$
 				protocol.checkScreens(true);
-				logger.info("getScreenData()");
+				logger.info("getScreenData()"); //$NON-NLS-1$
 				protocol.getScreenData();
 			}
 		} catch (IOException e) {
@@ -161,8 +163,9 @@ public class Client implements Runnable {
 	}
 
 	protected static void showBannar() {
-		System.out.println(Messages.getString("Client.banner_1") + CLIENT_VERSION); //$NON-NLS-1$
-		System.out.println(Messages.getString("Client.banner_2")); //$NON-NLS-1$
-		System.out.println(Messages.getString("Client.banner_3")); //$NON-NLS-1$
+		String format = Messages.getString("Client.banner_format");
+		Object[] args = new Object[] { CLIENT_VERSION };
+		String banner = MessageFormat.format(format, args);
+		System.out.println(banner);
 	}
 }

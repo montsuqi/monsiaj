@@ -43,9 +43,9 @@ class Option {
 		Class type = value.getClass();
 		if (type == Boolean.class) {
 			if (((Boolean)value).booleanValue()) {
-				return "ON";
+				return "ON"; //$NON-NLS-1$
 			} else {
-				return "OFF";
+				return "OFF"; //$NON-NLS-1$
 			}
 		} else {
 			return value.toString();
@@ -84,7 +84,7 @@ class Option {
 		if (value.getClass() == Boolean.class) {
 			value = new Boolean(arg);
 		} else {
-			throw new IllegalArgumentException("type mismatch");
+			throw new IllegalArgumentException(Messages.getString("Option.type_mismatch")); //$NON-NLS-1$
 		}
 		
 	}
@@ -93,7 +93,7 @@ class Option {
 		if (this.value.getClass() == Integer.class) {
 			this.value = new Integer(value);
 		} else {
-			throw new IllegalArgumentException("type mismatch");
+			throw new IllegalArgumentException(Messages.getString("Option.type_mismatch")); //$NON-NLS-1$
 		}
 	}
 }

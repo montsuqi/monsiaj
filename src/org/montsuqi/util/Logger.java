@@ -9,13 +9,13 @@ public abstract class Logger {
 	}
 
 	public static Logger getLogger(String name) {
-		String factory = System.getProperty("monsia.logger.factory");
+		String factory = System.getProperty("monsia.logger.factory"); //$NON-NLS-1$
 		if (factory == null || factory.length() == 0) {
-			factory = "org.montsuqi.util.StdErrLogger";
+			factory = "org.montsuqi.util.StdErrLogger"; //$NON-NLS-1$
 		}
 		try {
 			Class factoryClass = Class.forName(factory);
-			Method getter = factoryClass.getMethod("getLogger", new Class[] { String.class });
+			Method getter = factoryClass.getMethod("getLogger", new Class[] { String.class }); //$NON-NLS-1$
 			return (Logger)getter.invoke(null, new Object[] { name });
 		} catch (Exception e) {
 			System.out.println(e);

@@ -10,6 +10,6 @@ public class Fixed extends JComponent {
 		setLayout(null);
 	}
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(Fixed.class).info("ignoring Fixed#setLayout().");
+		Logger.getLogger(Fixed.class).info(Messages.getString("Fixed.ignoring_Fixed__setLayout")); //$NON-NLS-1$
 	}
 }

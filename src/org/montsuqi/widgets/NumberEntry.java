@@ -78,11 +78,11 @@ public class NumberEntry extends JTextField {
 	}
 
 	public static void main(String[] args) {
-		final JFrame f = new JFrame("TestNumberEntry");
+		final JFrame f = new JFrame("TestNumberEntry"); //$NON-NLS-1$
 		final NumberEntry ne = new NumberEntry();
 		ne.setForeground(Color.red);
-		ne.setFormat("----,---.99");
-		ne.setValue(new BigDecimal("100.0"));
+		ne.setFormat("----,---.99"); //$NON-NLS-1$
+		ne.setValue(new BigDecimal("100.0")); //$NON-NLS-1$
 		f.getContentPane().setLayout(new BorderLayout());
 		f.getContentPane().add(ne, BorderLayout.CENTER);
 		f.setSize(200, 50);
@@ -102,13 +102,13 @@ class NumberDocument extends PlainDocument {
 	int scale;
 	int expo;
 
-	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9";
+	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
 
 	public NumberDocument() {
 		format = DEFAULT_FORMAT;
 		expo = 0;
 		scale = 0;
-		value = new BigDecimal("0.0");
+		value = new BigDecimal("0.0"); //$NON-NLS-1$
 	}
 	
 	public synchronized void setValue(BigDecimal v) {

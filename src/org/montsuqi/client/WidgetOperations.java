@@ -104,10 +104,10 @@ public class WidgetOperations {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
 				String name = con.receiveString();
-				if ("state".equals(name)) {
+				if ("state".equals(name)) { //$NON-NLS-1$
 					int state = con.receiveIntData();
 					setState(widget, state);
-				} else if ("style".equals(name)) {
+				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					/* setStyle(widget, getStyle(buff)); */
 				} else {
@@ -124,7 +124,7 @@ public class WidgetOperations {
 		String p = ((JTextField)widget).getText();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute v = getValue(name);
-		con.sendString(name + "." + v.valueName);
+		con.sendString(name + "." + v.valueName); //$NON-NLS-1$
 		con.sendStringData(v.type, p);
 		return true;
 	}
@@ -134,14 +134,14 @@ public class WidgetOperations {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
 				String name = con.receiveString();
-				if ("state".equals(name)) {
+				if ("state".equals(name)) { //$NON-NLS-1$
 					int state = con.receiveIntData();
 					setState(widget, state);
-				} else if ("style".equals(name)) {
+				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					/* setStyle(widget,getStyle(buff)); */
 				} else {
-					String buff = con.getWidgetName().toString() + "." + name;
+					String buff = con.getWidgetName().toString() + "." + name; //$NON-NLS-1$
 					ValueAttribute va = getValue(buff);
 					if (va != null) {
 						BigDecimal val = con.receiveFixedData();
@@ -159,7 +159,7 @@ public class WidgetOperations {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
 		va.opt = value;
-		con.sendString(name + "." + va.name);
+		con.sendString(name + "." + va.name); //$NON-NLS-1$
 		con.sendFixedData(va.type, value);
 		return true;
 	}
@@ -169,7 +169,7 @@ public class WidgetOperations {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
 				String name = con.receiveString();
-				if ("style".equals(name)) {
+				if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					/*gtk_widget_set_style(widget,GetStyle(buff));*/
 				} else {
@@ -186,7 +186,7 @@ public class WidgetOperations {
 		String p = ((JTextField)widget).getText();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
-		con.sendString(name + "." + va.valueName);
+		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
 		con.sendStringData(va.type, p);
 		return true;
 	}
@@ -196,10 +196,10 @@ public class WidgetOperations {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
 				String name= con.receiveString();
-				if ("state".equals(name)) {
+				if ("state".equals(name)) { //$NON-NLS-1$
 					int state = con.receiveIntData();
 					setState(widget,state);
-				} else if ("style".equals(name)) {
+				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					/*gtk_widget_set_style(widget,GetStyle(buff));*/
 				} else {
@@ -216,7 +216,7 @@ public class WidgetOperations {
 	public boolean sendButton(String name, Container widget, Protocol con) throws IOException {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
-		con.sendString(name + "." + va.valueName);
+		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
 		con.sendBooleanData(va.type, ((JButton)widget).isSelected());
 		return true;
 	}
@@ -239,13 +239,13 @@ public class WidgetOperations {
 			int nItem = con.receiveInt();
 			while (nItem-- != 0) {
 				String name = con.receiveString();
-				if ("state".equals(name)) {
+				if ("state".equals(name)) { //$NON-NLS-1$
 					int state = con.receiveIntData();
 					setState(widget, state);
-				} else if ("style".equals(name)) {
+				} else if ("style".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					/*setStyle(widget,getStyle(buff));*/
-				} else if ("label".equals(name)) {
+				} else if ("label".equals(name)) { //$NON-NLS-1$
 					String buff = con.receiveStringData();
 					setLabel(widget, buff, con);
 				} else {
@@ -264,17 +264,17 @@ public class WidgetOperations {
 		int count = 0;
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			if ("state".equals(name)) {
+			if ("state".equals(name)) { //$NON-NLS-1$
 				int state = con.receiveIntData();
 				setState(widget, state);
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/* gtk_widget_set_style(widget,GetStyle(buff)); */
-			} else if ("count".equals(name)) {
+			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
-			} else if ("item".equals(name)) {
+			} else if ("item".equals(name)) { //$NON-NLS-1$
 				List list = new ArrayList();
-				list.add("");
+				list.add(""); //$NON-NLS-1$
 				con.receiveDataType(Type.ARRAY); /*	Type.ARRAY	*/
 				int num = con.receiveInt();
 				for	(int j = 0; j < num ; j++) {
@@ -292,12 +292,12 @@ public class WidgetOperations {
 			} else {
 				StringBuffer label = con.getWidgetName();
 				int offset = label.length();
-				label.replace(offset, label.length(), "." + name);
+				label.replace(offset, label.length(), "." + name); //$NON-NLS-1$
 				Container sub =  xml.getWidget(label.toString());
 				if (sub != null) {
 					receiveEntry(sub, con);
 				} else {
-					logger.warn("sub widget not found\n");
+					logger.warn(Messages.getString("WidgetOperations.subwidget_not_found")); //$NON-NLS-1$
 					/*	fatal error	*/
 				}
 			}
@@ -316,7 +316,7 @@ public class WidgetOperations {
 		
 		for	(int i = 0; i < rows; i++) {
 			String iname =
-				name + "." + va.valueName + "[" + i + ((Integer)va.opt).intValue() + "]";
+				name + "." + va.valueName + "[" + i + ((Integer)va.opt).intValue() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			con.sendPacketClass(PacketClass.ScreenData);
 			con.sendString(iname);
 			con.sendDataType(Type.BOOL);
@@ -336,25 +336,25 @@ public class WidgetOperations {
 		
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			label.replace(offset, label.length(), "." + name);
+			label.replace(offset, label.length(), "." + name); //$NON-NLS-1$
 			Container subWidget = xml.getWidgetByLongName(label.toString());
 			if (subWidget != null) {
 				con.receiveWidgetData(subWidget);
-			} else if ("count".equals(name)) {
+			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
-			} else if ("from".equals(name)) {
+			} else if ("from".equals(name)) { //$NON-NLS-1$
 				from = con.receiveIntData();
-			} else if ("state".equals(name)) {
+			} else if ("state".equals(name)) { //$NON-NLS-1$
 				state = con.receiveIntData();
 				setState(widget, state);
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/* gtk_widget_set_style(widget,GetStyle(buff));*/
-			} else if ("row".equals(name)) {
+			} else if ("row".equals(name)) { //$NON-NLS-1$
 				/* NOP */
-			} else if ("column".equals(name)) {
+			} else if ("column".equals(name)) { //$NON-NLS-1$
 				/* NOP */
-			} else if ("item".equals(name)) {
+			} else if ("item".equals(name)) { //$NON-NLS-1$
 				DefaultTableModel model = new DefaultTableModel();
 				con.receiveDataType(Type.ARRAY);
 				int num = con.receiveInt();
@@ -404,7 +404,7 @@ public class WidgetOperations {
 		ListSelectionModel selections = table.getSelectionModel();
 		for	(int i = 0, rows = table.getRowCount(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(name + "." + va.valueName + "[" + i + "]" + va.opt);
+			con.sendString(name + "." + va.valueName + "[" + i + "]" + va.opt); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(selections.isSelectedIndex(i));
 		}
@@ -422,25 +422,25 @@ public class WidgetOperations {
 		int state;
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			label.replace(offset, label.length(), "." + name);
+			label.replace(offset, label.length(), "." + name); //$NON-NLS-1$
 			Container subWidget;
 			if ((subWidget = xml.getWidget(label.toString())) != null) {
 				con.receiveWidgetData(subWidget);
-			} else if ("count".equals(name)) {
+			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
-			} else if ("from".equals(name)) {
+			} else if ("from".equals(name)) { //$NON-NLS-1$
 				from = con.receiveIntData();
-			} else if ("state".equals(name)) {
+			} else if ("state".equals(name)) { //$NON-NLS-1$
 				state = con.receiveIntData();
 				setState(widget, state);
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/* gtk_widget_set_style(widget,GetStyle(buff)); */
-			} else if ("row".equals(name)) {
+			} else if ("row".equals(name)) { //$NON-NLS-1$
 				/* NOP */
-			} else if ("columns".equals(name)) {
+			} else if ("columns".equals(name)) { //$NON-NLS-1$
 				/* NOP */
-			} else if ("item".equals(name)) {
+			} else if ("item".equals(name)) { //$NON-NLS-1$
 				DefaultTableModel model = new DefaultTableModel();
 				con.receiveDataType(Type.ARRAY);
 				int num = con.receiveInt();
@@ -493,7 +493,7 @@ public class WidgetOperations {
 		for	(int i = 0, rows = list.getModel().getSize(); i < rows; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);
 			Integer iObject = (Integer)va.opt;
-			con.sendString(name + "." + va.valueName + "[" + iObject.intValue() + "]");
+			con.sendString(name + "." + va.valueName + "[" + iObject.intValue() + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			con.sendDataType(Type.BOOL);
 			con.sendBoolean(model.isSelectedIndex(i));
 		}
@@ -513,16 +513,16 @@ public class WidgetOperations {
 		while (nItem-- != 0) {
 			String name = con.receiveString();
 			int num;
-			if ("state".equals(name)) {
+			if ("state".equals(name)) { //$NON-NLS-1$
 				setState(widget,con.receiveIntData());
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/*gtk_widget_set_style(widget,GetStyle(buff));*/
-			} else if ("count".equals(name)) {
+			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
-			} else if ("from".equals(name)) {
+			} else if ("from".equals(name)) { //$NON-NLS-1$
 				from = con.receiveIntData();
-			} else if ("item".equals(name)) {
+			} else if ("item".equals(name)) { //$NON-NLS-1$
 				DefaultListModel model = new DefaultListModel();
 				con.receiveDataType(Type.ARRAY);
 				num = con.receiveInt();
@@ -568,17 +568,17 @@ public class WidgetOperations {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + ".year");
+		con.sendString(name + ".year"); //$NON-NLS-1$
 		con.sendDataType(Type.INT);
 		con.sendInt(cal.get(java.util.Calendar.YEAR));
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + ".month");
+		con.sendString(name + ".month"); //$NON-NLS-1$
 		con.sendDataType(Type.INT);
 		con.sendInt(cal.get(java.util.Calendar.MONTH) + 1);
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + ".day");
+		con.sendString(name + ".day"); //$NON-NLS-1$
 		con.sendDataType(Type.INT);
 		con.sendInt(cal.get(java.util.Calendar.DATE));
 
@@ -587,23 +587,23 @@ public class WidgetOperations {
 
 	public boolean receiveCalendar(Container widget, Protocol con) throws IOException {
 		con.receiveDataType(Type.RECORD);
-		registerValue("", null);
+		registerValue("", null); //$NON-NLS-1$
 		int nItem = con.receiveInt();
 		int year = 0;
 		int month = -1;
 		int day = 0;
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			if ("state".equals(name)) {
+			if ("state".equals(name)) { //$NON-NLS-1$
 				setState(widget, con.receiveIntData());
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/*gtk_widget_set_style(widget,GetStyle(buff));*/
-			} else if ("year".equals(name)) {
+			} else if ("year".equals(name)) { //$NON-NLS-1$
 				year = con.receiveIntData();
-			} else if ("month".equals(name)) {
+			} else if ("month".equals(name)) { //$NON-NLS-1$
 				month = con.receiveIntData();
-			} else if ("day".equals(name)) {
+			} else if ("day".equals(name)) { //$NON-NLS-1$
 				day = con.receiveIntData();
 			} else {
 				/*	fatal error	*/
@@ -623,7 +623,7 @@ public class WidgetOperations {
 		JTabbedPane tabbed = (JTabbedPane)notebook;
 		ValueAttribute va = getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + "." + va.valueName);
+		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
 		con.sendIntegerData(va.type, tabbed.getSelectedIndex());
 		return true;
 	}
@@ -638,21 +638,21 @@ public class WidgetOperations {
 		int offset = widgetName.length();
 		for	(int i = 0; i < nItem; i++) {
 			String name = con.receiveString();
-			if ("state".equals(name)) {
+			if ("state".equals(name)) { //$NON-NLS-1$
 				setState(widget, con.receiveIntData());
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/* gtk_widget_set_style(widget,GetStyle(buff)); */
-			} else if ("pageno".equals(name)) {
+			} else if ("pageno".equals(name)) { //$NON-NLS-1$
 				page = con.receiveIntData();
 				registerValue(name, null);
 			} else {
-				widgetName.replace(offset, widgetName.length(), "." + name);
+				widgetName.replace(offset, widgetName.length(), "." + name); //$NON-NLS-1$
 				con.receiveValue(offset + name.length());
 			}
 		}
 		if (page == -1) {
-			throw new IllegalStateException("page not found");
+			throw new IllegalStateException(Messages.getString("WidgetOperations.page_not_found")); //$NON-NLS-1$
 		}
 		JTabbedPane tabbed = (JTabbedPane)widget;
 		tabbed.setSelectedIndex(page);
@@ -663,7 +663,7 @@ public class WidgetOperations {
 		JProgressBar progress = (JProgressBar)widget;
 		ValueAttribute va = getValue(name);
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendString(name + "." + va.valueName);
+		con.sendString(name + "." + va.valueName); //$NON-NLS-1$
 		con.sendIntegerData(va.type, progress.getValue());
 		return true;
 	}
@@ -676,12 +676,12 @@ public class WidgetOperations {
 
 		while (nItem-- != 0) {
 			String name = con.receiveString();
-			if ("state".equals(name)) {
+			if ("state".equals(name)) { //$NON-NLS-1$
 				setState(widget, con.receiveIntData());
-			} else if ("style".equals(name)) {
+			} else if ("style".equals(name)) { //$NON-NLS-1$
 				String buff = con.receiveStringData();
 				/* gtk_widget_set_style(widget,GetStyle(buff)); */
-			} else if ("value".equals(name)) {
+			} else if ("value".equals(name)) { //$NON-NLS-1$
 				registerValue(name, null);
 				JProgressBar progress = (JProgressBar)widget;
 				progress.setValue(con.receiveIntData());
