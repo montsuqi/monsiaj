@@ -47,10 +47,12 @@ public final class Launcher {
 		Configuration conf;
 		try {
 			conf = (Configuration)clazz.newInstance();
+			conf.load();
 			ConfigurationDialog d = new ConfigurationDialog(conf);
 			d.setVisible(true);
 			if (d.needRun()) {
 				conf = d.getConfiguration();
+				conf.save();
 				client.setUser(conf.getUser());
 				String pass = new String(conf.getPass());
 				client.setPass(pass);
@@ -58,6 +60,8 @@ public final class Launcher {
 				client.setPortNumber(conf.getPort());
 				client.setCurrentApplication(conf.getApplication());
 				client.setEncoding(System.getProperty("file.encoding")); //$NON-NLS-1$
+				client.setCache("cache"); //$NON-NLS-1$
+
 				try {
 					client.connect();
 					Thread t = new Thread(client);
