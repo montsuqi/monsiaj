@@ -108,6 +108,22 @@
 		</copy>
 	</target>
 
+<!--
+deploy.dir=/path/to/the/directory/where/jars/will/go
+alias=whatever
+storepass=whatever
+keystore=path/to/keystore
+-->
+	<target name="sign" depends="jars">
+		<copy todir="${deploy.dir}">
+			<fileset dir="${build.dir}" includes="*.jar"/>
+			<fileset dir="${libs.dir}" includes="*.jar"/>
+		</copy>
+		<signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
+			<fileset dir="${deploy.dir}" includes="*.jar"/>
+		</signjar>
+	</target>
+
 	<target name="dist-bin-mac" depends="dist-bin-mac-copy-files">
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.bin.macosx.dir}.zip">
