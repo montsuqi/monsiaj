@@ -33,8 +33,9 @@ public abstract class ConfigurationDialog extends JDialog implements ActionListe
 	protected Configuration conf;
 	protected boolean needRun;
 
-	protected ConfigurationDialog(Configuration conf) {
+	protected ConfigurationDialog(String title, Configuration conf) {
 		super();
+		setTitle(title);
 		this.conf = conf;
 		needRun = false;
 		addWindowListener(new WindowAdapter() {
@@ -46,10 +47,6 @@ public abstract class ConfigurationDialog extends JDialog implements ActionListe
 	}
 
 	protected abstract void updateConfiguration();
-
-	Configuration getConfiguration() {
-		return conf;
-	}
 
 	boolean needRun() {
 		return needRun;

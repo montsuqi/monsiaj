@@ -28,6 +28,7 @@ public abstract class Launcher {
 
 	protected Client target;
 	protected Configuration conf;
+	protected String title;
 
 	static {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -36,11 +37,12 @@ public abstract class Launcher {
 	}
 
 	public Launcher(String title) {
-		target = new Client();
+		this.title = title;
 		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) { //$NON-NLS-1$ //$NON-NLS-2$
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
 		}
-		conf = Configuration.createConfiguration(title, this.getClass());
+		conf = Configuration.createConfiguration(this.getClass());
+		target = new Client(conf);
 	}
 
 	public void launch() {
@@ -48,9 +50,7 @@ public abstract class Launcher {
 		d.setLocationRelativeTo(null);
 		d.setVisible(true);
 		if (d.needRun()) {
-			conf = d.getConfiguration();
 			conf.save();
-			target.setConfiguration(conf);
 			try {
 				target.connect();
 				Thread t = new Thread(target);

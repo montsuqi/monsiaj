@@ -31,13 +31,12 @@ public class JMAReceiptLauncher extends Launcher {
 
 	protected static final Logger logger = Logger.getLogger(JMAReceiptLauncher.class);
 
-	public JMAReceiptLauncher(String title) {
+	protected JMAReceiptLauncher(String title) {
 		super(title);
 	}
 
 	public static void main(String[] args) {
-		String title = Messages.getString("application.title"); //$NON-NLS-1$
-		Launcher launcher = new JMAReceiptLauncher(title);
+		Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
 		try {
 			launcher.launch();
 		} catch (Exception e) {
@@ -46,6 +45,6 @@ public class JMAReceiptLauncher extends Launcher {
 	}
 
 	public ConfigurationDialog createDialog(Configuration newConf) {
-		return new JMAReceiptConfigurationDialog(conf);
+		return new JMAReceiptConfigurationDialog(title, conf);
 	}
 }
