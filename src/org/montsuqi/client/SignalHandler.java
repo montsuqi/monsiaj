@@ -179,7 +179,9 @@ public abstract class SignalHandler {
 					}
 
 					private boolean isKatakana(char c) {
-						return Character.UnicodeBlock.of(c) == Character.UnicodeBlock.KATAKANA;
+						Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+						return block == Character.UnicodeBlock.KATAKANA
+							|| block == Character.UnicodeBlock.HIRAGANA;
 					}
 
 					private boolean isKanji(char c) {
