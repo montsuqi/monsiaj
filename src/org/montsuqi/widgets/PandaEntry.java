@@ -53,7 +53,6 @@ public class PandaEntry extends JTextField {
 				}
 			}
 			public void focusLost(FocusEvent e) {
-				System.err.println("focusLost");
 				getInputContext().setCharacterSubsets(null);
 			}
 		});
