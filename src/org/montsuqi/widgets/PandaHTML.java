@@ -28,7 +28,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,6 +44,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;
 
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.ParameterConverter;
 
 public class PandaHTML extends JScrollPane {
 
@@ -67,7 +67,25 @@ public class PandaHTML extends JScrollPane {
 		});
 	}
 
+	static final String PROPERTY_KEY_DISABLE_HTML = "monsia.pandahtml.disabled"; //$NON-NLS-1$
+	static {
+		String disabled = System.getProperty(PROPERTY_KEY_DISABLE_HTML);
+		if (disabled == null) {
+			boolean isMacOS = System.getProperty("os.name").toLowerCase().startsWith("mac os x"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty(PROPERTY_KEY_DISABLE_HTML, String.valueOf(isMacOS));
+		}
+	}
+
+	private boolean isLoadingDisabled() {
+		String disabled = System.getProperty(PROPERTY_KEY_DISABLE_HTML);
+		return ParameterConverter.toBoolean(disabled);
+	}
+
 	public void setURI(final URL uri) {
+		if (isLoadingDisabled()) {
+			setText(Messages.getString("PandaHTML.loading_is_disabled")); //$NON-NLS-1$
+			return;
+		}
 		setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
 		Runnable loader = new HTMLLoader(uri);
 		SwingUtilities.invokeLater(loader);
@@ -114,7 +132,6 @@ public class PandaHTML extends JScrollPane {
 				} catch (MalformedURLException ex) {
 					logger.warn(ex);				}
 			}
-
 		});
 		toolBar.add(location);
 
@@ -138,9 +155,8 @@ public class PandaHTML extends JScrollPane {
 			try {
 				logger.debug("loading {0}", uri); //$NON-NLS-1$
 				pane.setPage(uri);
-			} catch (FileNotFoundException e) {
-				setText(e.toString());
 			} catch (IOException e) {
+				setText(e.toString());
 				logger.warn(e);
 			}
 		}
