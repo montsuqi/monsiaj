@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.12 2004-01-23 10:58:25 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.13 2004-02-02 01:52:45 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -71,7 +71,7 @@
   </target>
 
   <target name="dist" depends="compile,resources"
-          description="Build jars">
+          description="Build files to be distributed.">
     <!-- ant 1.5.x should use destfile instead of jarfile-->
     <jar jarfile="${dist.dir}/pandaclient.jar"
          basedir="${build.dir}"
@@ -84,6 +84,10 @@
     <copy todir="${dist.dir}">
       <fileset dir="${libs.dir}" includes="*.jar"/>
     </copy>
+    <!-- ant 1.5.x should use destfile instead of zipfile-->
+    <zip zipfile="${dist.dir}/monsiaj.zip">
+      <fileset dir="${dist.dir}" includes="*.jar"/>
+    </zip>
   </target>
 
   <target name="buildclean"
@@ -111,4 +115,5 @@
     <echo message="Taret 'jars' is obsolete. Use 'dist' instead."/>
     <antcall target="dist"/>
   </target>
+
 </project>
