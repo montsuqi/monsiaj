@@ -28,7 +28,6 @@ import java.io.IOException;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -41,14 +40,9 @@ import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.widgets.CListDummyLabel;
 
 class CListMarshaller extends WidgetMarshaller {
-
-	private WidgetMarshaller labelMarshaller;
-
-	CListMarshaller() {
-		labelMarshaller = new LabelMarshaller();
-	}
 
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
@@ -61,7 +55,6 @@ class CListMarshaller extends WidgetMarshaller {
 		for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
 			labels[i] = (String)columnModel.getColumn(i).getHeaderValue();
 		}
-
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		StringBuffer widgetName = con.getWidgetNameBuffer();
 		StringBuffer label = new StringBuffer(widgetName.toString());
@@ -69,19 +62,17 @@ class CListMarshaller extends WidgetMarshaller {
 		Interface xml = con.getInterface();
 		int row = 0;
 		double rowattrw = 0.0;
-		int col = 0;
 		int count = -1;
 		int from = 0;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
 			label.replace(offset, label.length(), '.' + name);
-			logger.debug("receiving: {0}", label.toString());
 			Component sub = xml.getWidgetByLongName(label.toString());
-			if (sub != null) {
-				JLabel dummy = (JLabel)sub;
-				labelMarshaller.receive(manager, dummy);
-				logger.debug("label[{0}]=\"{1}\"", new Object[]{ new Integer(col), dummy.getText()});
-				labels[col++] = dummy.getText();
+			if (sub != null && sub instanceof CListDummyLabel) {
+				CListDummyLabel dummy = (CListDummyLabel)sub;
+				assert table == dummy.getTable();
+				con.receiveValue(widgetName, offset + name.length());
+				labels[dummy.getIndex()] = dummy.getText();
 			} else if (handleStateStyle(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
