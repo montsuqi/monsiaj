@@ -13,6 +13,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class Interface {
@@ -72,11 +75,42 @@ public class Interface {
 	public static Interface parseInput(InputStream input, Protocol protocol) {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setNamespaceAware(true);
+		String oldHandler = "org.montsuqi.monsia.Glade1Handler";
+		String newHandler = "org.montsuqi.monsia.MonsiaHandler";
 		try {
 			SAXParser parser = factory.newSAXParser();
-			MonsiaHandler handler = new MonsiaHandler();
-			parser.parse(input, handler);
+			
+			AbstractDocumentHandler handler;
+			String type = System.getProperty("monsia.document.handler");
+			if (type == null) {
+				type = oldHandler;
+			}
+			if ( ! type.equals(oldHandler) && ! type.equals(newHandler)) {
+				throw new InterfaceBuildingException("unknown handler type: " + type);
+			}
+			Class handlerClass;
+			handlerClass = Class.forName(type);
+			handler = (AbstractDocumentHandler)handlerClass.newInstance();
+
+			InputSource source;
+			if (type.equals(oldHandler)) {
+				Reader reader = new InputStreamReader(input, "EUC-JP");
+				source = new InputSource(reader);
+			} else {
+				source = new InputSource(input);	
+			}
+
+			parser.parse(source, handler);
 			return handler.getInterface(protocol);
+		} catch (ClassNotFoundException e) {
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new InterfaceBuildingException(e);
+		} catch (IllegalAccessException e) {
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new InterfaceBuildingException(e);
+		} catch (InstantiationException e) {
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new InterfaceBuildingException(e);
 		} catch (IOException e) {
 			Logger.getLogger(Interface.class).fatal(e);
 			throw new InterfaceBuildingException(e);
