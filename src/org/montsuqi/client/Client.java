@@ -24,7 +24,6 @@ package org.montsuqi.client;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.text.MessageFormat;
 
 import org.montsuqi.util.Logger;
@@ -33,8 +32,9 @@ import org.montsuqi.util.OptionParser;
 public class Client implements Runnable {
 
 	private boolean connected;
-	private static final int PORT_GLTERM = 8000;
+	public static final int PORT_GLTERM = 8000;
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
+	private static final String PANDA_SCHEME = "panda:";
 
 	private int portNumber;
 	private String host;
@@ -56,19 +56,78 @@ public class Client implements Runnable {
 	private Protocol protocol;
 	private Logger logger;
 
-	String getCacheFileName(String name) {
-		String sep = System.getProperty("file.separator"); //$NON-NLS-1$
-		StringBuffer buf = new StringBuffer();
-		buf.append(cache);
-		buf.append(sep);
-		buf.append(host);
-		buf.append(sep);
-		buf.append(portNumber);
-		buf.append(sep);
-		buf.append(name);
-		return buf.toString();
+	public Client() {
+		logger = Logger.getLogger(Client.class);
 	}
-	
+
+	private static Client parseCommandLine(String[] args) {
+		Client client = new Client();
+
+		String[] files = client.parseOptions(args);
+
+		if (files.length > 0) {
+			client.setCurrentApplication(files[0]);
+		} else {
+			client.setCurrentApplication("demo"); //$NON-NLS-1$
+		}
+		return client;
+	}
+
+	public void connect() {
+		Socket s = null;
+		try {
+			String factoryName;
+			Object[] options;
+			if (useSSL) {
+				factoryName = "org.montsuqi.client.SSLSocketCreator"; //$NON-NLS-1$
+				options = new Object[] { new Boolean(verify) };
+			} else {
+				factoryName = "org.montsuqi.client.SocketCreator"; //$NON-NLS-1$
+				options = null;
+			}
+			Class clazz = Class.forName(factoryName);
+			SocketCreator creator = (SocketCreator)clazz.newInstance();
+			s = creator.create(host, portNumber, options);
+			protocol = new Protocol(this, s);
+			protocol.sendConnect(user, pass, currentApplication);
+			connected = true;
+		} catch (Exception e) {
+			logger.fatal(e);
+			logger.fatal(Messages.getString("Client.cannot_connect")); //$NON-NLS-1$
+		}
+	}
+
+	public void run() {
+		try {
+			protocol.checkScreens(true);
+			protocol.getScreenData();
+			while (connected) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// ignore
+				}
+			}
+			protocol.close();
+			exitSystem();
+		} catch (IOException e) {
+			logger.fatal(e);
+		}
+	}
+		
+	void exitSystem() {
+		try {
+			synchronized (this) {
+				protocol.sendPacketClass(PacketClass.END);
+				connected = false;
+			}
+		} catch (Exception e) {
+			logger.warn(e);
+		} finally {
+			System.exit(0);
+		}
+	}
+
 	private String[] parseOptions(String[] args) {
 		OptionParser options = new OptionParser();
 
@@ -91,92 +150,88 @@ public class Client implements Runnable {
 
 		String[] files = options.parse(Client.class.getName(), args);
 
-		portNumber = ((Integer)options.getValue("port")).intValue(); //$NON-NLS-1$
-		host = (String)options.getValue("host"); //$NON-NLS-1$
-		cache = (String)options.getValue("cache"); //$NON-NLS-1$
-		user = (String)options.getValue("user"); //$NON-NLS-1$
-		pass = (String)options.getValue("pass"); //$NON-NLS-1$
-		encoding = (String)options.getValue("encoding"); //$NON-NLS-1$
-		styles = (String)options.getValue("style"); //$NON-NLS-1$
-		useSSL = ((Boolean)options.getValue("useSSL")).booleanValue(); //$NON-NLS-1$
+		setPortNumber(((Integer)options.getValue("port")).intValue()); //$NON-NLS-1$
+		setHost((String)options.getValue("host")); //$NON-NLS-1$
+		setCache((String)options.getValue("cache")); //$NON-NLS-1$
+		setUser((String)options.getValue("user")); //$NON-NLS-1$
+		setPass((String)options.getValue("pass")); //$NON-NLS-1$
+		setEncoding((String)options.getValue("encoding")); //$NON-NLS-1$
+		setStyles((String)options.getValue("style")); //$NON-NLS-1$
+		setUseSSL(((Boolean)options.getValue("useSSL")).booleanValue()); //$NON-NLS-1$
 
 		if (useSSL) {
 			//key = (String)options.getValue("key");
 			//cert = (String)options.getValue("cert");
 			//useSSL = ((Boolean)options.getValue("ssl")).booleanValue();
-			verify = ((Boolean)options.getValue("verifypeer")).booleanValue(); //$NON-NLS-1$
+			setVerify(((Boolean)options.getValue("verifypeer")).booleanValue()); //$NON-NLS-1$
 			//CApath = options.getValue("CApath");
 			//CAfile = options.getValue("CAfile");
 		}
-
 		return files;
 	}
 
-	private Client(String[] args) {
-		logger = Logger.getLogger(Client.class);
-
-		String[] files = parseOptions(args);
-
-		if (files.length > 0) {
-			currentApplication = files[0];
-		} else {
-			currentApplication = "demo"; //$NON-NLS-1$
-		}
-		
-		Socket s = null;
-		try {
-			String factoryName;
-			Object[] options;
-			if (useSSL) {
-				factoryName = "org.montsuqi.client.SSLSocketCreator"; //$NON-NLS-1$
-				options = new Object[] { new Boolean(verify) };
-			} else {
-				factoryName = "org.montsuqi.client.SocketCreator"; //$NON-NLS-1$
-				options = null;
-			}
-			Class clazz = Class.forName(factoryName);
-			SocketCreator creator = (SocketCreator)clazz.newInstance();
-			s = creator.create(host, portNumber, options);
-			protocol = new Protocol(this, s);
-			connected = true;
-		} catch (Exception e) {
-			logger.fatal(e);
-			System.exit(0);
-		}
-		if (protocol == null) {
-			logger.fatal(Messages.getString("Client.cannot_connect")); //$NON-NLS-1$
-		}
+	public void setPortNumber(int portNumber) {
+		this.portNumber = portNumber;
 	}
-		
 
-	public void run() {
-		try {
-			protocol.sendConnect(user, pass, currentApplication);
-			connected = true;
-			protocol.checkScreens(true);
-			protocol.getScreenData();
-			while (connected) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					// ignore
-				}
-			}
-			protocol.close();
-		} catch (IOException e) {
-			logger.fatal(e);
-		}
+	public void setHost(String host) {
+		this.host = host;
 	}
-		
-	public static void main(String[] args) {
-		try {
-			Client client = new Client(args);
-			client.showBannar();
-			client.run();
-			client.exitSystem();
-		} catch (Throwable e) {
-			e.printStackTrace();
+
+	public void setCache(String cache) {
+		this.cache = cache;
+	}
+
+	String getCacheFileName(String name) {
+		String sep = System.getProperty("file.separator"); //$NON-NLS-1$
+		StringBuffer buf = new StringBuffer();
+		buf.append(cache);
+		buf.append(sep);
+		buf.append(host);
+		buf.append(sep);
+		buf.append(portNumber);
+		buf.append(sep);
+		buf.append(name);
+		return buf.toString();
+	}
+	
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	public String getEncoding() {
+		return encoding;
+	}
+
+	public void setStyles(String styles) {
+		this.styles = styles;
+	}
+
+	public String getStyles() {
+		return styles;
+	}
+
+	public void setUseSSL(boolean useSSL) {
+		this.useSSL = useSSL;
+	}
+
+	public void setVerify(boolean verify) {
+		this.verify = verify;
+	}
+
+	public void setCurrentApplication(String application) {
+		if ( ! application.startsWith(PANDA_SCHEME)) {
+			application = PANDA_SCHEME + application;
 		}
+		currentApplication = application;
 	}
 
 	public void finalize() {
@@ -185,33 +240,19 @@ public class Client implements Runnable {
 		}
 	}
 	
-	void exitSystem() {
+	public static void main(String[] args) {
 		try {
-			synchronized (this) {
-				protocol.sendPacketClass(PacketClass.END);
-				connected = false;
-			}
-		} catch (SocketException e) {
-			logger.warn(e);
-		} catch (IOException e) {
-			logger.warn(e);
-		} finally {
-			System.exit(0);
+			String format = Messages.getString("Client.banner_format"); //$NON-NLS-1$
+			Object[] bannerArgs = new Object[] { CLIENT_VERSION };
+			String banner = MessageFormat.format(format, bannerArgs);
+			System.out.println(banner);
+
+			Client client = Client.parseCommandLine(args);
+			client.connect();
+			Thread t = new Thread(client);
+			t.start();
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
-	}
-
-	private void showBannar() {
-		String format = Messages.getString("Client.banner_format"); //$NON-NLS-1$
-		Object[] args = new Object[] { CLIENT_VERSION };
-		String banner = MessageFormat.format(format, args);
-		System.out.println(banner);
-	}
-
-	public String getEncoding() {
-		return encoding;
-	}
-
-	public String getStyles() {
-		return styles;
 	}
 }
