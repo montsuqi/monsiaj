@@ -136,14 +136,15 @@ class WidgetOperation {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JLabel_widget")); //$NON-NLS-1$
 		}
 		int alignment = SwingConstants.CENTER;
-		if ("JUSTIFY_CENTER".equals(value)) { //$NON-NLS-1$
+		value = normalize(value, "JUSTIFY_");
+		if ("CENTER".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.CENTER;
-		} else if ("JUSTIFY_LEFT".equals(value)) { //$NON-NLS-1$
+		} else if ("LEFT".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.LEFT;
-		} else if ("JUSTIFY_RIGHT".equals(value)) { //$NON-NLS-1$
+		} else if ("RIGHT".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.RIGHT;
 		} else {
-			Logger.getLogger(WidgetOperation.class).warn(Messages.getString("WidgetOperation.not_supported")); //$NON-NLS-1$
+			logger.warn(Messages.getString("WidgetOperation.not_supported")); //$NON-NLS-1$
 		}
 		JLabel label = (JLabel)widget;
 		label.setHorizontalAlignment(alignment);
@@ -177,14 +178,6 @@ class WidgetOperation {
 		label.setText(value);
 	}
 
-	void setTextViewText(Interface xml, Container widget, String name, String value) {
-		if ( ! (widget instanceof JTextComponent)) {
-			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
-		}
-		JTextComponent text = (JTextComponent)widget;
-		text.setText(value);
-	}
-
 	static void setCListColumnWidth(Interface xml, Container widget, String name, String value) {
 		if ( ! (widget instanceof JTable)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
@@ -212,7 +205,7 @@ class WidgetOperation {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
 		}
 		JTable table = (JTable)widget;
-		value = normalizeSelectionMode(value);
+		value = normalize(value, "SELECTION_");
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -245,7 +238,7 @@ class WidgetOperation {
 		}
 		JTree tree = (JTree)widget;
 		TreeSelectionModel model = tree.getSelectionModel();
-		value = normalizeSelectionMode(value);
+		value = normalize(value, "SELECTION_");
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			model.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -273,7 +266,7 @@ class WidgetOperation {
 		}
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
-		value = normalizeSelectionMode(value);
+		value = normalize(value, "SELECTION_");
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -287,21 +280,19 @@ class WidgetOperation {
 		}
 	}
 
-	private static String normalizeSelectionMode(String mode) {
-		if (mode.startsWith("GTK_")) { //$NON-NLS-1$
-			mode = mode.substring("GTK_".length()); //$NON-NLS-1$
-		}
-		if (mode.startsWith("SELECTION_")) { //$NON-NLS-1$
-			mode = mode.substring("SELECTION_".length()); //$NON-NLS-1$
-		}
-		return mode;
-	}
-
 	static void setCheckMenuItemAlwaysShowToggle(Interface xml, Container widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCheckMenuItemAlwaysShowToggle_is_not_supported")); //$NON-NLS-1$
 	}
 
 	static void setTextText(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof JTextComponent)) {
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
+		}
+		JTextComponent text = (JTextComponent)widget;
+		text.setText(value);
+	}
+
+	static void setTextViewText(Interface xml, Container widget, String name, String value) {
 		if ( ! (widget instanceof JTextComponent)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
 		}
@@ -504,12 +495,7 @@ class WidgetOperation {
 			throw new IllegalArgumentException("not a ProgressBar widget");
 		}
 		JProgressBar progress = (JProgressBar)widget;
-		if (value.startsWith("GTK_")) {
-			value = value.substring("GTK_".length());
-		}
-		if (value.startsWith("PROGRESS_")) {
-			value = value.substring("PROGRESS_".length());
-		}
+		value = normalize(value, "PROGRESS_");
 		if ("LEFT_TO_RIGHT".equals(value)) {
 			progress.setOrientation(JProgressBar.HORIZONTAL);
 		} else if ("RIGHT_TO_LEFT".equals(value)) {
@@ -537,5 +523,15 @@ class WidgetOperation {
 		org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame)widget;
 		Border border = BorderFactory.createTitledBorder(value);
 		frame.setBorder(border);
+	}
+
+	private static String normalize(String value, String prefixToRemove) {
+		if (value.startsWith("GTK_")) {
+			value = value.substring("GTK_".length());
+		}
+		if (value.startsWith(prefixToRemove)) {
+			value = value.substring(prefixToRemove.length());
+		}
+		return value;
 	}
 }
