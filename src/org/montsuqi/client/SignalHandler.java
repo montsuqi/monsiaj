@@ -183,7 +183,10 @@ public abstract class SignalHandler {
 					}
 
 					private boolean isKanji(char c) {
-						return Character.UnicodeBlock.of(c) == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS;
+						Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+						return block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS 
+							|| block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+							|| block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B;
 					}
 
 					private boolean isSymbol(char c) {
