@@ -375,11 +375,14 @@ public class WidgetBuilder {
 				handleInternalChild(parent, cInfo);
 			}
 			Container child = buildWidget(cInfo.getWidgetInfo());
-			if (parent instanceof JWindow ||
-				parent instanceof JFrame ||
-				parent instanceof JDialog ||
-				parent instanceof JApplet) {
+			if (parent instanceof JWindow) {
 				parent = ((JWindow)parent).getContentPane();
+			} else if (parent instanceof JFrame) {
+				parent = ((JFrame)parent).getContentPane();
+			} else if (parent instanceof JDialog) {
+				parent = ((JDialog)parent).getContentPane();
+			} else if (parent instanceof JApplet) {
+				parent = ((JApplet)parent).getContentPane();
 			}
 			parent.add(child);
 		}
