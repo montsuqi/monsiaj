@@ -22,29 +22,41 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.im.InputSubset;
+
+import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
+import org.montsuqi.util.Logger;
+
 public class PandaEntry extends JTextField {
 
 	private boolean ximEnabled;
+	private Logger logger;
 	public static final int KANA = PandaDocument.KANA;
 	public static final int XIM = PandaDocument.XIM;
 	public static final int ASCII = PandaDocument.ASCII;
 
 	public PandaEntry(String text, int columns) {
 		super(new PandaDocument(), text, columns);
+		logger = Logger.getLogger(PandaEntry.class);
 		addFocusListener(new FocusListener() {
-			// NOTE only works in japanese environment
+			// NOTE only works in japanese environment.
+			// See
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
 			public void focusGained(FocusEvent e) {
@@ -54,6 +66,27 @@ public class PandaEntry extends JTextField {
 			}
 			public void focusLost(FocusEvent e) {
 				getInputContext().setCharacterSubsets(null);
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				Component source = (Component)e.getSource();
+				logger.debug("click on {0}", source.getName());
+				Point p = e.getPoint();
+				p.x += source.getX();
+				p.y += source.getY();
+				
+				Container parent = source.getParent();
+				for (int i = 0, n = parent.getComponentCount(); i < n; i++) {
+					Component c = parent.getComponent(i);
+					if (c instanceof AbstractButton && c.contains(p.x - c.getX(), p.y - c.getY())) {
+						AbstractButton button = (AbstractButton)c;
+						logger.debug("found button \"{0}\"", button.getName());
+						button.setVisible(false);
+						button.doClick();
+						logger.debug("selected? = {0}", new Boolean(button.isSelected()));
+					}
+				}
 			}
 		});
 	}
