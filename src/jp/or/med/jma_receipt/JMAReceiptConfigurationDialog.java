@@ -174,33 +174,12 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		gridBagConstraints.weightx = 1.0;
 		panel.add(portEntry, gridBagConstraints);
 
-		JLabel appLabel = new JLabel();
-		appLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		appLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.application")); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.weighty = 1.0;
-		panel.add(appLabel, gridBagConstraints);
-
-		appEntry = new JTextField();
-		appEntry.setHorizontalAlignment(SwingConstants.LEFT);
-		appEntry.setText("orca00"); //$NON-NLS-1$
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		panel.add(appEntry, gridBagConstraints);
-
 		JLabel styleLabel = new JLabel();
 		styleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		styleLabel.setText(Messages.getString("JMAReceiptConfigurationDialog.style")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 4;
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
 		gridBagConstraints.weighty = 1.0;
 		panel.add(styleLabel, gridBagConstraints);
@@ -210,7 +189,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		styleEntry.setText(String.valueOf(conf.getString("style", ""))); //$NON-NLS-1$ //$NON-NLS-2$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 4;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
@@ -220,7 +199,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		browseButton.setText(Messages.getString("JMAReceiptConfigurationDialog.browse")); //$NON-NLS-1$
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 4;
 		panel.add(browseButton, gridBagConstraints);
 
 		browseButton.addActionListener(new ActionListener() {
