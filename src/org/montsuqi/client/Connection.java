@@ -134,7 +134,7 @@ class Connection {
 		return receiveStringBody(receiveLength());
 	}
 
-	int receiveLong() throws IOException { /* longs: 4-byte long */
+	int receiveLong() throws IOException { // longs: 4-byte long
 		return in.readInt();
 	}
 
@@ -189,7 +189,7 @@ class Connection {
 	}
 
 	BigDecimal receiveFixed() throws IOException {
-		int flen = receiveLength();
+		/* int flen = */ receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
 		BigInteger i = BigInteger.ZERO;

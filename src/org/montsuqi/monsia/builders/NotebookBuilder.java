@@ -48,7 +48,6 @@ class NotebookBuilder extends ContainerBuilder {
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			boolean isTab = false;
 			Map properties = wInfo.getProperties();
 			if (properties.containsKey("child_name")) { //$NON-NLS-1$
 				if (properties.containsKey("label")) { //$NON-NLS-1$

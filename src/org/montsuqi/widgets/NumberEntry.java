@@ -37,7 +37,6 @@ import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-import org.montsuqi.util.Logger;
 import org.montsuqi.util.PrecisionScale;
 
 public class NumberEntry extends JTextField {
@@ -100,10 +99,10 @@ public class NumberEntry extends JTextField {
 
 	protected void processKeyEvent(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_BACK_SPACE: /*fall through*/
-		case KeyEvent.VK_DELETE: /*fall through*/
-		case KeyEvent.VK_CLEAR: /*fall through*/
-		case KeyEvent.VK_HOME: /*fall through*/
+		case KeyEvent.VK_BACK_SPACE: // fall through
+		case KeyEvent.VK_DELETE: // fall through
+		case KeyEvent.VK_CLEAR: // fall through
+		case KeyEvent.VK_HOME: // fall through
 		case KeyEvent.VK_END:
 			if (e.getID() == KeyEvent.KEY_PRESSED || e.getID() == KeyEvent.KEY_RELEASED) {
 				setValue(NumberDocument.ZERO);
@@ -121,7 +120,6 @@ class NumberDocument extends PlainDocument {
 
 	private String originalFormat;
 	private NumberFormat format;
-	private Logger logger;
 
 	private BigDecimal value;
 	private int scale;
@@ -136,7 +134,6 @@ class NumberDocument extends PlainDocument {
 		expo = 0;
 		scale = 0;
 		value = ZERO;
-		logger = Logger.getLogger(NumberDocument.class);
 	}
 	
 	synchronized void setValue(BigDecimal v) {

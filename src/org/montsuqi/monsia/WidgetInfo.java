@@ -34,20 +34,14 @@ public class WidgetInfo {
 	private String name;
 	private WidgetInfo parent;
 	private final Map properties;     // <Property>
-	private final List atkProperties;  // <Property>
 	private final List signals;        // <SignalInfo>
-	private final List actions;        // <ATKActionInfo>
-	private final List relations;      // <ATKRelationInfo>
 	private final List accels;         // <Accel>
 	private final LinkedList children; // <ChildInfo> public Object getChildren;
 
 	WidgetInfo() {
 		parent = null;
 		properties = new HashMap();
-		atkProperties = new ArrayList();
 		signals = new ArrayList();
-		actions = new ArrayList();
-		relations = new ArrayList();
 		accels = new ArrayList();
 		children = new LinkedList();
 	}
@@ -114,16 +108,6 @@ public class WidgetInfo {
 	synchronized void setSignals(List signals) {
 		this.signals.clear();
 		this.signals.addAll(signals);
-	}
-
-	synchronized void setATKActions(List actions) {
-		this.actions.clear();
-		this.actions.addAll(actions);
-	}
-
-	synchronized void setRelations(List relations) {
-		this.relations.clear();
-		this.relations.addAll(relations);
 	}
 
 	public List getAccels() {

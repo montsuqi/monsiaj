@@ -41,9 +41,6 @@ class ListMarshaller extends WidgetMarshaller {
 
 		DefaultListModel listModel = (DefaultListModel)list.getModel();
 
-		StringBuffer label = con.getWidgetNameBuffer();
-		int offset = label.length();
-
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
 		for (int i = 0, n = con.receiveInt(), count = -1, from = 0; i < n; i++) {

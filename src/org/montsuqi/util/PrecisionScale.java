@@ -23,7 +23,7 @@ copies.
 package org.montsuqi.util;
 
 public class PrecisionScale {
-	/* The hardcoded limits and defaults of the numeric data type */
+	// The hardcoded limits and defaults of the numeric data type
 	public static final int MAX_PRECISION = 1000;
 	public static final int DEFAULT_PRECISION = 30;
 	public static final int DEFAULT_SCALE = 6;

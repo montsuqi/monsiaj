@@ -63,7 +63,7 @@ class ComboMarshaller extends WidgetMarshaller {
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				List list = new ArrayList();
 				list.add(""); //$NON-NLS-1$
-				con.receiveDataTypeWithCheck(Type.ARRAY); /* Type.ARRAY */
+				con.receiveDataTypeWithCheck(Type.ARRAY);
 				for (int j = 0, num = con.receiveInt(); j < num ; j++) {
 					try {
 						String buff = con.receiveStringData();

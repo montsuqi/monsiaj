@@ -48,7 +48,7 @@ public class Calendar extends JComponent {
 	private SimpleDateFormat df;
 	private JComponent caption;
 	private JButton[][] dateCells;
-	private Date[][] cellDates;
+	Date[][] cellDates;
 	private java.util.Calendar cal;
 
 	private JButton prev;

@@ -26,15 +26,10 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import org.montsuqi.util.Logger;
-
 public class PandaCList extends JTable {
-
-	private Logger logger;
 
 	public PandaCList() {
 		super();
-		logger = Logger.getLogger(PandaCList.class);
 	}
 
 	public void createDefaultColumnsFromModel() {

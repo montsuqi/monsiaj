@@ -68,7 +68,7 @@ abstract class WidgetPropertySetter {
 
 	abstract void set(Interface xml, Container parent, Component widget, String value);
 
-	private static Logger logger;
+	static Logger logger;
 	private static Map propertyMap;
 
 	static void setProperties(Interface xml, Container parent, Component widget, WidgetInfo info) {
@@ -92,7 +92,7 @@ abstract class WidgetPropertySetter {
 		}
 	}
 
-	private static WidgetPropertySetter getSetter(Class clazz, String name) {
+	static WidgetPropertySetter getSetter(Class clazz, String name) {
 		for (/**/; clazz != null; clazz = clazz.getSuperclass()) {
 			Map map = (Map)propertyMap.get(clazz);
 			if (map == null || ! map.containsKey(name)) {
@@ -214,7 +214,6 @@ abstract class WidgetPropertySetter {
 		registerProperty(JList.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JList list = (JList)widget;
-				ListSelectionModel model = list.getSelectionModel();
 				value = normalize(value, "SELECTION_"); //$NON-NLS-1$
 				if ("SINGLE".equals(value)) { //$NON-NLS-1$
 					list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -490,7 +489,7 @@ abstract class WidgetPropertySetter {
 		});
 	}
 
-	private static String normalize(String value, String prefixToRemove) {
+	static String normalize(String value, String prefixToRemove) {
 		if (value.startsWith("GDK_")) { //$NON-NLS-1$
 			value = value.substring("GDK_".length()); //$NON-NLS-1$
 		}

@@ -30,8 +30,6 @@ import java.util.List;
 
 import javax.swing.AbstractButton;
 
-import org.montsuqi.util.Logger;
-
 public class AccelHandler {
 	class Pair {
 		Component widget;
@@ -42,12 +40,10 @@ public class AccelHandler {
 		}
 	}
 
-	private Logger logger;
 	private List list;
 
 	AccelHandler() {
 		list = new ArrayList();
-		logger = Logger.getLogger(AccelHandler.class);
 	}
 
 	public void addAccels(Component widget, List accels) {

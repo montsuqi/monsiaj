@@ -34,8 +34,8 @@ import org.montsuqi.util.Logger;
 
 public class PandaHTML extends JScrollPane {
 
-	private Logger logger;
-	private JTextPane pane;
+	Logger logger;
+	JTextPane pane;
 
 	public PandaHTML() {
 		super();

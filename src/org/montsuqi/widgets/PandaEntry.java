@@ -42,19 +42,15 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
-import org.montsuqi.util.Logger;
-
 public class PandaEntry extends JTextField {
 
-	private boolean ximEnabled;
-	private Logger logger;
+	boolean ximEnabled;
 	public static final int KANA = PandaDocument.KANA;
 	public static final int XIM = PandaDocument.XIM;
 	public static final int ASCII = PandaDocument.ASCII;
 
 	public PandaEntry(String text, int columns) {
 		super(new PandaDocument(), text, columns);
-		logger = Logger.getLogger(PandaEntry.class);
 		addFocusListener(new FocusListener() {
 			// NOTE only works in japanese environment.
 			// See

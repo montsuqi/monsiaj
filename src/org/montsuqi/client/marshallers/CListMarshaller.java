@@ -66,7 +66,6 @@ class CListMarshaller extends WidgetMarshaller {
 		int offset = label.length();
 		Interface xml = con.getInterface();
 		int row = 0;
-		int column = 0;
 		double rowattrw = 0.0;
 		for (int i = 0, n = con.receiveInt(), col = 0, count = -1, from = 0; i < n; i++) {
 			String name = con.receiveName();
@@ -98,7 +97,7 @@ class CListMarshaller extends WidgetMarshaller {
 					break;
 				}
 			} else if ("column".equals(name)) { //$NON-NLS-1$
-				column = con.receiveIntData();
+				/* int dummy = */ con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				while (tableModel.getRowCount() > 0) {
 					tableModel.removeRow(0);
@@ -113,7 +112,7 @@ class CListMarshaller extends WidgetMarshaller {
 					int rNum = con.receiveInt();
 					Object[] rdata = new String[rNum];
 					for (int k = 0; k < rNum; k++) {
-						String dummy = con.receiveString();
+						/* String dummy = */ con.receiveString();
 						rdata[k] = con.receiveStringData();
 					}
 					if (j >= from && j - from < count) {

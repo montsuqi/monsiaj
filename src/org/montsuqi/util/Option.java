@@ -86,11 +86,11 @@ class Option {
 					if (arg.charAt(0) == '-') {
 						setValue(true);
 					} else {
-						setValue(!((Boolean)value).booleanValue()); /* toggle */
+						setValue(!((Boolean)value).booleanValue()); // toggle
 					}
 				}
 			} else {
-				setValue(!((Boolean)value).booleanValue()); /* toggle */
+				setValue(!((Boolean)value).booleanValue()); // toggle
 			}
 		} else if (type == Integer.class) {
 			setValue(Integer.parseInt(arg));

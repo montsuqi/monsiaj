@@ -193,7 +193,7 @@ public class WidgetBuilder {
 	}
 
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		/* do nothing */
+		// do nothing
 	}
 
 	private void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {

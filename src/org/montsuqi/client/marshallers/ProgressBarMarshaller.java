@@ -38,8 +38,6 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		JProgressBar progress = (JProgressBar)widget;
 
-		StringBuffer longName = con.getWidgetNameBuffer();
-		int offset = longName.length();
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {

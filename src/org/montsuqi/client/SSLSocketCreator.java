@@ -34,7 +34,7 @@ class SSLSocketCreator extends SocketCreator {
 		Socket s = super.create(host, port, null);
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		SSLSocket ssl = (SSLSocket)factory.createSocket(s, host, port, true);
-		/* key, cert, capath, cafile */
+		// key, cert, capath, cafile
 		boolean verify = ((Boolean)options[0]).booleanValue();
 		ssl.setNeedClientAuth(verify);
 		return ssl;
