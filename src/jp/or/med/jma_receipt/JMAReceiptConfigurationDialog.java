@@ -60,7 +60,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
 		conf.setApplication("orca00"); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setEncoding("EUC-JP"); //$NON-NLS-1$ //$NON-NLS-2$
-		conf.setStyles(styleEntry.getText()); //$NON-NLS-1$
+		conf.setStyleFileName(styleEntry.getText()); //$NON-NLS-1$
 		conf.setProtocolVersion(1);
 		conf.setUseSSL(false);
 		conf.setVerify(false);
@@ -97,7 +97,7 @@ public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 		passwordEntry = addPasswordRow(controls, y++, Messages.getString("DefaultConfigurationDialog.password")); //$NON-NLS-1$
 		hostEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.host"), conf.getHost()); //$NON-NLS-1$
 		portEntry = addIntRow(controls, y++, Messages.getString("DefaultConfigurationDialog.port"), conf.getPort()); //$NON-NLS-1$
-		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyles()); //$NON-NLS-1$
+		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyleFileName()); //$NON-NLS-1$
 
 		final JTextComponent entry = styleEntry; // to tunnel access control
 		addButtonFor(controls, styleEntry, Messages.getString("DefaultConfigurationDialog.browse"), new ActionListener() { //$NON-NLS-1$

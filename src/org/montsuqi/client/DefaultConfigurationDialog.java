@@ -66,7 +66,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		conf.setHost(hostEntry.getText()); //$NON-NLS-1$
 		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
 		conf.setApplication(appEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
-		conf.setStyles(styleEntry.getText()); //$NON-NLS-1$
+		conf.setStyleFileName(styleEntry.getText()); //$NON-NLS-1$
 
 		// advanced settings
 		conf.setEncoding(encodingEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -102,7 +102,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		hostEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.host"), conf.getHost()); //$NON-NLS-1$
 		portEntry = addIntRow(controls, y++, Messages.getString("DefaultConfigurationDialog.port"), conf.getPort()); //$NON-NLS-1$
 		appEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.application"), conf.getApplication()); //$NON-NLS-1$
-		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyles()); //$NON-NLS-1$
+		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyleFileName()); //$NON-NLS-1$
 
 		final JTextComponent entry = styleEntry;
 		addButtonFor(controls, styleEntry, Messages.getString("DefaultConfigurationDialog.browse"), new ActionListener() { //$NON-NLS-1$

@@ -42,7 +42,6 @@ import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
-import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
 
@@ -62,7 +61,7 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, String encoding, String styles, String cacheRoot, int protocolVersion) throws IOException {
+	Protocol(Client client, String encoding, Map styleMap, String cacheRoot, int protocolVersion) throws IOException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		this.cacheRoot = cacheRoot;
@@ -81,7 +80,7 @@ public class Protocol extends Connection {
 		assert protocol1 ^ protocol2;
 		isReceiving = false;
 		nodeTable = new HashMap();
-		valueManager = new WidgetValueManager(this, Style.load(styles));
+		valueManager = new WidgetValueManager(this, styleMap);
 	}
 
 	private static boolean isNetworkByteOrder() {

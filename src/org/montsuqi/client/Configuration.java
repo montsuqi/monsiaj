@@ -23,6 +23,8 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.UIManager;
@@ -56,6 +58,7 @@ public class Configuration {
 	static final String DEFAULT_ENCODING = "EUC-JP"; //$NON-NLS-1$
 	static final String DEFAULT_CACHE_PATH = System.getProperty("user.home") + File.separator + "cache";  //$NON-NLS-1$//$NON-NLS-2$
 	static final String DEFAULT_STYLES = ""; //$NON-NLS-1$
+	static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties"; //$NON-NLS-1$
 	static final boolean DEFAULT_USE_SSL = false;
 	static final boolean DEFAULT_VERIFY = false;
 	static final int DEFAULT_PROTOCOL_VERSION = 1;
@@ -132,11 +135,30 @@ public class Configuration {
 		setString(ENCODING_KEY, encoding);
 	}
 
-	public String getStyles() {
+	public URL getStyleURL() {
+		String styleFileName = getStyleFileName();
+		if (styleFileName != null && styleFileName.length() > 0) {
+			File file = new File(styleFileName);
+			try {
+				return file.toURL();
+			} catch (MalformedURLException e) {
+				logger.debug(e);
+				return defaultStyleURL();
+			}
+		} else {
+			return defaultStyleURL();
+		}
+	}
+
+	private URL defaultStyleURL() {
+		return Configuration.class.getResource(DEFAULT_STYLE_RESOURCE_NAME);
+	}
+
+	public String getStyleFileName() {
 		return getString(STYLES_KEY, DEFAULT_STYLES);
 	}
 
-	public void setStyles(String styles) {
+	public void setStyleFileName(String styles) {
 		setString(STYLES_KEY, styles);
 	}
 

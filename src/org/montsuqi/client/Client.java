@@ -23,14 +23,22 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Map;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 
@@ -70,7 +78,7 @@ public class Client implements Runnable {
 		conf.setUser(options.getString("user")); //$NON-NLS-1$
 		conf.setPass(options.getString("pass")); //$NON-NLS-1$
 		conf.setEncoding(options.getString("encoding")); //$NON-NLS-1$
-		conf.setStyles(options.getString("style")); //$NON-NLS-1$
+		conf.setStyleFileName(options.getString("style")); //$NON-NLS-1$
 
 		boolean v1 = options.getBoolean("v1"); //$NON-NLS-1$
 		boolean v2 = options.getBoolean("v2"); //$NON-NLS-1$
@@ -113,8 +121,24 @@ public class Client implements Runnable {
 		cacheRoot.append(File.separator);
 		cacheRoot.append(conf.getPort());
 
-		protocol = new Protocol(this, conf.getEncoding(), conf.getStyles(), cacheRoot.toString(), conf.getProtocolVersion());
+		protocol = new Protocol(this, conf.getEncoding(), loadStyles(conf.getStyleURL()), cacheRoot.toString(), conf.getProtocolVersion());
 		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
+	}
+
+	private Map loadStyles(URL url) throws IOException {
+		try {
+			logger.debug("loading styles from URL: {0}", url); //$NON-NLS-1$
+			InputStream in = url.openStream();
+			return Style.load(in);
+		} catch (MalformedURLException e) {
+			logger.debug(e);
+			logger.debug("using empty style set"); //$NON-NLS-1$
+			return Collections.EMPTY_MAP;
+		} catch (FileNotFoundException e) {
+			logger.debug(e);
+			logger.debug("using empty style set"); //$NON-NLS-1$
+			return Collections.EMPTY_MAP;
+		}
 	}
 
 	Socket createSocket() throws IOException {

@@ -25,7 +25,6 @@ package org.montsuqi.monsia;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -56,13 +55,9 @@ public class Style {
 		}
 	}
 
-	public static Map load(String styleFileName) throws IOException {
+	public static Map load(InputStream in) throws IOException {
 		Map styles = new HashMap();
-		if (styleFileName == null || styleFileName.length() == 0) {
-			return styles;
-		}
 		Properties props = new Properties();
-		InputStream in = new FileInputStream(styleFileName);
 		props.load(in);
 		Iterator i = props.entrySet().iterator();
 		while (i.hasNext()) {
