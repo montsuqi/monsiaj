@@ -75,11 +75,17 @@ public abstract class WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		if ("state".equals(name)) { //$NON-NLS-1$
 			int state = con.receiveIntData();
-			if (state != 3) { // #define GTK_STATE_INSENSITIVE 3
-				widget.setEnabled(true);
-			} else {
-				widget.setEnabled(false);
-			}
+			/* Widget states from gtkenums.h
+			typedef enum
+			{
+			  GTK_STATE_NORMAL,     => 0
+			  GTK_STATE_ACTIVE,     => 1
+			  GTK_STATE_PRELIGHT,   => 2
+			  GTK_STATE_SELECTED,   => 3
+			  GTK_STATE_INSENSITIVE => 4
+			} GtkStateType;
+			*/
+			widget.setEnabled(state != 4);
 			return true;
 		} else if ("style".equals(name)) { //$NON-NLS-1$
 			String buff = con.receiveStringData();
