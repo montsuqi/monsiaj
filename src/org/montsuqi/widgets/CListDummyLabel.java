@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Container;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 
@@ -47,5 +48,9 @@ public class CListDummyLabel extends JLabel {
 
 	public int getIndex() {
 		return index;
+	}
+
+	public Container getParent() {
+		return table;
 	}
 }
