@@ -43,8 +43,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import org.montsuqi.util.Logger;
-import org.montsuqi.client.marshallers.*;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
+import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.Calendar;
