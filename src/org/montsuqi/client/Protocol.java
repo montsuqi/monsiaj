@@ -14,6 +14,7 @@ import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JProgressBar;
@@ -23,10 +24,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
-import javax.swing.JWindow;
-
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.monsia.Node;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
@@ -185,7 +185,9 @@ public class Protocol extends Connection {
 				try {
 					bytes = String.valueOf(c).getBytes(enc);
 				} catch (UnsupportedEncodingException e) {
-					throw new InternalError(); // should not happen
+					// should not happen
+					Logger.getLogger(Protocol.class).fatal(e);
+					bytes = new byte[0];
 				}
 				for (int j = 0; j < bytes.length; j++) {
 					String hex = Integer.toHexString(bytes[j] & 0xff);
@@ -244,8 +246,11 @@ public class Protocol extends Connection {
 					Interface xml = Interface.parseFile(fName, this);
 					node = new Node(xml, wName);
 					windowTable.put(node.name, node);
-				} catch (Exception e) {
-					logger.warn(e);
+				} catch (InterfaceBuildingException e) {
+					logger.fatal(e);
+					Error error = new InternalError();
+					error.initCause(e);
+					throw error;
 				}
 			}
 		}
@@ -395,7 +400,7 @@ public class Protocol extends Connection {
 		//}
 	}
 
-	public void resetTimer(JWindow window) {
+	public void resetTimer(JFrame window) {
 		//gtk_container_forall (GTK_CONTAINER (window), _ResetTimer, NULL);
 	}
 

@@ -36,9 +36,12 @@ public class WidgetOperation {
 											 String.class,
 											 String.class };
 			return WidgetOperation.class.getMethod(name, argTypes);
-		} catch (Exception e) {
-			Logger.getLogger(WidgetOperation.class).info(e);
-			return null;
+		} catch (SecurityException e) {
+			Logger.getLogger(WidgetOperation.class).fatal(e);
+			throw new WidgetOperationException(e);
+		} catch (NoSuchMethodException e) {
+			Logger.getLogger(WidgetOperation.class).fatal(e);
+			throw new WidgetOperationException(e);
 		}
 	}
 

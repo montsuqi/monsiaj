@@ -7,7 +7,9 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -277,14 +279,16 @@ public class WidgetBuilder {
 		Map map = (Map)propertyMap.get(clazz);
 		Method setter = null;
 		if (setterName != null) {
-			try {
-				if (setterName.startsWith("set")) { //$NON-NLS-1$
-					setter = WidgetOperation.findMethod(setterName);
-				} else { // assume that the setter name is field name.
+			if (setterName.startsWith("set")) { //$NON-NLS-1$
+				setter = WidgetOperation.findMethod(setterName);
+			} else { // assume that the setter name is field name.
+				try {
 					setter = findSetterByFieldName(clazz, setterName);
+				} catch (IllegalAccessException e) {
+					logger.fatal(e);
+				} catch (NoSuchFieldException e) {
+					logger.fatal(e);
 				}
-			} catch (Exception e) {
-				logger.warn(e);
 			}
 			map.put(propertyName, setter);
 		}
@@ -313,7 +317,10 @@ public class WidgetBuilder {
 				return getBuildData((String)e.getKey());
 			}
 		}
-		throw new IllegalArgumentException();
+		Object[] args = new Object[] { clazz };
+		String format = Messages.getString("WidgetBuilder.Unknown_widget_class");
+		String message = MessageFormat.format(format, args);
+		throw new WidgetBuildingException(message);
 	}
 	
 	//--------------------------------------------------------------------
@@ -323,7 +330,7 @@ public class WidgetBuilder {
 		String genericClassName = info.getClassName();
 		WidgetBuildData data = getBuildData(genericClassName);
 		if (data == null) {
-			logger.warn(Messages.getString("WidgetBuilder.Unknown_widget_class_{0}_1"), genericClassName); //$NON-NLS-1$
+			logger.warn(Messages.getString("WidgetBuilder.Unknown_widget_class"), genericClassName); //$NON-NLS-1$
 			widget = new JLabel("[a " + genericClassName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			try {
@@ -354,9 +361,12 @@ public class WidgetBuilder {
 			widget = (Container)clazz.newInstance();
 			setProperties(widget, info);
 			return widget;
-		} catch (Exception e) {
-			logger.warn(e);
-			return null;
+		} catch (InstantiationException e) {
+			logger.fatal(e);
+			throw new InterfaceBuildingException(e);
+		} catch (IllegalAccessException e) {
+			logger.fatal(e);
+			throw new InterfaceBuildingException(e);
 		}
 	}
 
@@ -939,8 +949,12 @@ public class WidgetBuilder {
 				if ( ! set) {
 					logger.info(Messages.getString("WidgetBuilder.ignored_in_Java"), pName); //$NON-NLS-1$
 				}
-			} catch (Exception e) {
-				logger.warn(e);
+			} catch (IllegalArgumentException e) {
+				throw new InterfaceBuildingException(e);
+			} catch (IllegalAccessException e) {
+				throw new InterfaceBuildingException(e);
+			} catch (InvocationTargetException e) {
+				throw new InterfaceBuildingException(e);
 			}
 		}
 	}
@@ -951,7 +965,8 @@ public class WidgetBuilder {
 		try {
 			bInfo = Introspector.getBeanInfo(clazz, Introspector.USE_ALL_BEANINFO);
 		} catch (IntrospectionException e) {
-			logger.warn(e);
+			logger.fatal(e);
+			throw new WidgetBuildingException(e);
 		}
 		PropertyDescriptor[] pDescs = bInfo.getPropertyDescriptors();
 		PropertyDescriptor pDesc = null;
@@ -962,11 +977,17 @@ public class WidgetBuilder {
 			}
 		}
 		if (pDesc == null) {
-			throw new NoSuchFieldException(Messages.getString("WidgetBuilder.unknown_property__11") + field + Messages.getString("WidgetBuilder._for__12") + clazz); //$NON-NLS-1$ //$NON-NLS-2$
+			Object[] args = new Object[] { field, clazz };
+			String format = Messages.getString("WidgetBuilder.Unknown_property");
+			String message = MessageFormat.format(format, args);
+			throw new WidgetBuildingException(message);
 		}
 		Method setter = pDesc.getWriteMethod();
 		if (setter == null) {
-			throw new IllegalAccessException(field + Messages.getString("WidgetBuilder._of__13") + clazz + Messages.getString("WidgetBuilder._is_read_only._14")); //$NON-NLS-1$ //$NON-NLS-2$
+			Object[] args = new Object[] { field, clazz };
+			String format = Messages.getString("WidgetBuilder.Field_is_read_only");
+			String message = MessageFormat.format(format, args);
+			throw new WidgetBuildingException(message);
 		}
 		return setter;
 	}

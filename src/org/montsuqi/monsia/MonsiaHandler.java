@@ -1000,7 +1000,7 @@ public class MonsiaHandler extends DefaultHandler {
 				}
 			}
 		} catch (IOException e) {
-			logger.warn(e); // no recovery
+			logger.warn(e); // no recovery action is needed.
 		}
 		return modifiers;
 	}

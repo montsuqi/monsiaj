@@ -69,7 +69,7 @@ public class Interface {
 		focusWidget = widget;
 	}
 
-	public static Interface parseFile(String fileName, Protocol protocol) throws IOException, SAXException {
+	public static Interface parseFile(String fileName, Protocol protocol) {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setNamespaceAware(true);
 		try {
@@ -78,13 +78,20 @@ public class Interface {
 			MonsiaHandler handler = new MonsiaHandler(fileName);
 			parser.parse(file, handler);
 			return handler.getInterface(protocol);
+		} catch (IOException e) {
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new InterfaceBuildingException(e);
+		} catch (SAXException e) {
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new InterfaceBuildingException(e);
 		} catch (ParserConfigurationException e) {
-			Logger.getLogger(Interface.class).warn(e);
-			return null;
+			Logger.getLogger(Interface.class).fatal(e);
+			throw new InterfaceBuildingException(e);
 		}
 	}
 
-	Interface(String fileName, Map infos, List roots, Protocol protocol) {
+	Interface(String fileName, Map infos, List roots, Protocol protocol)
+	{
 		logger = Logger.getLogger(Interface.class);
 		this.fileName = fileName;
 		this.infos = infos;
@@ -121,7 +128,8 @@ public class Interface {
 					}
 				}
 			} catch (Exception e) {
-				logger.warn(e);
+				logger.fatal(e);
+				throw new InterfaceBuildingException(e);
 			}
 		}
 	}
@@ -145,18 +153,16 @@ public class Interface {
 		return methodName.toString();
 	}
 	
-	private void connect(Container target, String signalName, Method handler, Object other) {
-		try {
-			Class[] argTypes = new Class[] { Container.class, Method.class, Object.class };
-			Method method = Interface.class.getDeclaredMethod(connectMethodName(signalName), argTypes);
-			method.setAccessible(true);
-			method.invoke(this, new Object[] { target, handler, other });
-		} catch (Exception e) {
-			logger.warn(e);
-		}
+	private void connect(Container target, String signalName, Method handler, Object other)
+		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		Class[] argTypes = new Class[] { Container.class, Method.class, Object.class };
+		Method method = Interface.class.getDeclaredMethod(connectMethodName(signalName), argTypes);
+		method.setAccessible(true);
+		method.invoke(this, new Object[] { target, handler, other });
 	}
 
-	private void connectAfter(Container target, String signalName, Method handler, Object other) {
+	private void connectAfter(Container target, String signalName, Method handler, Object other)
+		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		connect(target, signalName, handler, other);
 	}
 
@@ -164,9 +170,12 @@ public class Interface {
 		try {
 			handler.invoke(protocol, new Object[] { target, other });
 		} catch (IllegalAccessException e) {
-			logger.warn(e);
+			logger.fatal(e);
+			throw new HandlerInvocationException(e);
 		} catch (InvocationTargetException e) {
-			logger.warn(e);
+			Throwable cause = e.getCause();
+			logger.fatal(cause);
+			throw new HandlerInvocationException(e);
 		}
 	}
 		 

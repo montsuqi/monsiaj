@@ -59,26 +59,22 @@ public class WidgetBuildData {
 		}
 		try {
 			return WidgetBuilder.class.getMethod(methodName, argTypes);
-		} catch (Exception e) {
-			Logger.getLogger(WidgetBuilder.class).warn(e);
-			return null;
+		} catch (NoSuchMethodException e) {
+			Logger.getLogger(WidgetBuilder.class).fatal(e);
+			throw new WidgetBuildingException(e);
 		}
 	}
 
 	protected Object invoke(WidgetBuilder builder, Method method, Object[] args) {
-		logger.enter("WidgetBuildData.invoke");
 		try {
-			logger.debug("method={0}", method);
 			return method.invoke(builder, args);
 		} catch (IllegalAccessException e) {
-			logger.warn(e);
-			return null;
+			logger.fatal(e);
+			throw new WidgetBuildingException(e);
 		} catch (InvocationTargetException e) {
-			logger.warn(e.getCause().getMessage());
-			logger.warn(e.getCause());
-			return null;
-		} finally {
-			logger.leave("WidgetBuildData.invoke");
+			Throwable cause = e.getCause();
+			logger.fatal(cause);
+			throw new WidgetBuildingException(cause);
 		}
 		
 	}
