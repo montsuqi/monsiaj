@@ -218,14 +218,24 @@ public class Interface {
 		throw new IllegalArgumentException("no long name found: " + widget.getName()); //$NON-NLS-1$
 	}
 
-	public ButtonGroup getButtonGroup(String name) {
-		if ( ! buttonGroups.containsKey(name)) {
-			ButtonGroup group = new ButtonGroup();
-			JRadioButton dummy = new JRadioButton();
-			group.add(dummy);
-			buttonGroups.put(name, new ButtonGroup());
+	public void setButtonGroup(JRadioButton button, String groupName) {
+		JRadioButton none;
+		ButtonGroup group;
+		if ( ! buttonGroups.containsKey(groupName)) {
+			group = new ButtonGroup();
+			buttonGroups.put(groupName, group);
+			none = new JRadioButton();
+			none.putClientProperty("none", none); //$NON-NLS-1$
+			group.add(none);
+		} else {
+			group = (ButtonGroup)buttonGroups.get(groupName);
+			assert group.getButtonCount() > 0;
+			JRadioButton first = (JRadioButton)group.getElements().nextElement();
+			none = (JRadioButton)first.getClientProperty("none"); //$NON-NLS-1$
 		}
-		return (ButtonGroup)buttonGroups.get(name);
+		group.add(button);
+		button.putClientProperty("group", group); //$NON-NLS-1$
+		button.putClientProperty("none", none); //$NON-NLS-1$
 	}
 
 	public void setTopLevel(Component widget) {

@@ -26,8 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
@@ -35,14 +34,12 @@ import org.montsuqi.monsia.WidgetInfo;
 class RadioButtonBuilder extends ContainerBuilder {
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
-		AbstractButton button = (AbstractButton)widget;
+		JRadioButton radio = (JRadioButton)widget;
 		Map properties = info.getProperties();
 		if (properties.containsKey("group")) { //$NON-NLS-1$
-			ButtonGroup group = xml.getButtonGroup((String)properties.get("group")); //$NON-NLS-1$
-			group.add(button);
-			button.putClientProperty("group", group); //$NON-NLS-1$
+			xml.setButtonGroup(radio, (String)properties.get("group")); //$NON-NLS-1$
 		} else {
-			logger.warn("RadioButton {0} has no group", widget.getName()); //$NON-NLS-1$
+			logger.warn("RadioButton {0} has no group", properties.get("name")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return widget;
 	}
