@@ -31,6 +31,7 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import org.montsuqi.util.Logger;
@@ -67,9 +68,9 @@ class WidgetBuilder {
 	private void initClassMap() {
 		classMap = new HashMap();
 		registerClass("Button", javax.swing.JButton.class); //$NON-NLS-1$
-		//regsiterClass("Calendar", null);
+		registerClass("Calendar", org.montsuqi.widgets.Calendar.class);
 		registerClass("CList", javax.swing.JTable.class); //$NON-NLS-1$
-		registerClass("CheckButton", javax.swing.JTable.class); //$NON-NLS-1$
+		registerClass("CheckButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
 		registerClass("Combo", javax.swing.JComboBox.class); //$NON-NLS-1$
 		registerClass("Entry", javax.swing.JTextField.class); //$NON-NLS-1$
 		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
@@ -100,7 +101,7 @@ class WidgetBuilder {
 		registerClass("Toolbar", javax.swing.JToolBar.class); //$NON-NLS-1$
 		registerClass("VBox", org.montsuqi.widgets.VBox.class); //$NON-NLS-1$
 		//registerClass("VSeparator", null);
-		registerClass("Viewport", javax.swing.JViewport.class); //$NON-NLS-1$
+		registerClass("Viewport", javax.swing.JScrollPane.class); //$NON-NLS-1$
 		registerClass("Window", javax.swing.JFrame.class); //$NON-NLS-1$
 	}
 
@@ -154,11 +155,12 @@ class WidgetBuilder {
 //		registerProperty(RULER, "metric", ruler_set_metric);
 		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat");
 	}
 	
 	private void initWidgetBuildData() {
 		registerWidgetBuildData("Button", defaultBuildWidgetData); //$NON-NLS-1$
-		//registerWidgetBuildData("Calendar", defaultBuildWidgetData);
+		registerWidgetBuildData("Calendar", defaultBuildWidgetData);
 		registerWidgetBuildData("CheckButton", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("CheckMenuItem", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
@@ -245,7 +247,7 @@ class WidgetBuilder {
 								null);
 		registerWidgetBuildData("ScrolledWindow", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
-								"standardBuildChildren", //$NON-NLS-1$
+								"buildScrolledWindowChildren", //$NON-NLS-1$
 								"scrolledWindowFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("SeparatorMenuItem", defaultBuildWidgetData); //$NON-NLS-1$
 		registerWidgetBuildData("SpinButton", defaultBuildWidgetData); //$NON-NLS-1$
@@ -334,7 +336,7 @@ class WidgetBuilder {
 	
 	//--------------------------------------------------------------------
 
-	Container buildWidget(WidgetInfo info) {
+	synchronized Container buildWidget(WidgetInfo info) {
 		Container widget;
 		String genericClassName = info.getClassName();
 		WidgetBuildData data = getBuildData(genericClassName);
@@ -467,36 +469,49 @@ class WidgetBuilder {
 
 	void buildNotebookChildren(Container parent, WidgetInfo info) {
 		// create tabs first
-		int cCount = info.getChildrenCount();
-		String tabLabel = null;
-		Component body = null;
 		JTabbedPane tabbed = (JTabbedPane)parent;
+		int cCount = info.getChildrenCount();
+		if (cCount % 2 != 0) {
+			throw new WidgetBuildingException("odd number of notebook childrens");
+		}
+		int tabCount = cCount / 2;
+		String[] labels = new String[tabCount];
+		Component[] bodies = new Component[tabCount];
+		int currentLabel = 0;
+		int currentBody = 0;
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			String name = null;
 			boolean isTab = false;
+			String label = null;
 			for (int j = 0, n = wInfo.getPropertiesCount(); j < n; j++) {
 				Property p = wInfo.getProperty(j);
 				String pName = p.getName();
 				String pValue = p.getValue();
-				if (pName.equals("name")) {
-					name = pValue;
-				}
 				if (pName.equals("child_name")) {
 					isTab = true;
 				}
+				if (pName.equals("label")) {
+					label = pValue;
+				}
 			}
 			if (isTab) {
-				tabLabel = name;
+				if (label == null) {
+					throw new WidgetBuildingException("no label for a tab");
+				}
+				labels[currentLabel] = label;
+				currentLabel++;
 			} else {
-				body = buildWidget(wInfo);
+				Component body = buildWidget(wInfo);
+				bodies[currentBody] = body;
+				currentBody++;
 			}
-			if (tabLabel != null && body != null) {
-				tabbed.add(tabLabel, body);
-				tabLabel = null;
-				body = null;
-			}
+		}
+		if (currentBody != bodies.length || currentLabel != labels.length) {
+			throw new WidgetBuildingException("tab/label count mismatch");
+		}
+		for (int i = 0; i < tabCount; i++) {
+			tabbed.add(labels[i], bodies[i]);
 		}
 	}
 
@@ -519,43 +534,50 @@ class WidgetBuilder {
 		}
 	}
 
+	void buildScrolledWindowChildren(Container parent, WidgetInfo info) {
+		int cCount = info.getChildrenCount();
+		if (cCount != 1) {
+			throw new WidgetBuildingException("only one child is allowed in a ScrolledWindow");
+		}
+		JScrollPane scroll = (JScrollPane)parent;
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		Container child = buildWidget(wInfo);
+		scroll.setViewportView(child);
+	}
+
 	void buildCListChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
+
+		String[] columnNames = new String[cCount];
+		for (int i = 0; i < cCount; i++) {
+			columnNames[i] = "?";
+			ChildInfo cInfo = info.getChild(i);
+			WidgetInfo wInfo = cInfo.getWidgetInfo();
+			if ( ! "Label".equals(wInfo.getClassName())) { //$NON-NLS-1$
+				continue;
+			}
+			int pCount = wInfo.getPropertiesCount();
+			for (int j = 0; j < pCount; j++) {
+				Property p = wInfo.getProperty(j);
+				if ("label".equals(p.getName())) { //$NON-NLS-1$
+					columnNames[i] = p.getValue();
+					break;
+				}
+			}
+		}
+		JTable table = (JTable)parent;
+		DefaultTableModel tableModel = new DefaultTableModel(0, cCount);
+		tableModel.setColumnIdentifiers(columnNames);
+		table.setModel(tableModel);
+
+		TableColumnModel columnModel = table.getColumnModel();
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Container child = null;
-
-			/* treat Labels specially */
-			if ("Label".equals(wInfo.getClassName())) { //$NON-NLS-1$
-				String label = null;
-				int pCount = wInfo.getPropertiesCount();
-				for (int j = 0; j < pCount; j++) {
-					Property p = wInfo.getProperty(j);
-					if ("label".equals(p.getName())) { //$NON-NLS-1$
-						label = p.getValue();
-						break;
-					} else {
-						logger.warn(Messages.getString("WidgetBuilder.Unknown_CList_child_property__{0}_3"), p.getName()); //$NON-NLS-1$
-					}
-				}
-				
-				if (label != null) {
-					/* FIXME: translate ? */
-					JTable table = (JTable)parent;
-					TableColumnModel model = table.getColumnModel();
-					TableColumn column = model.getColumn(i);
-					column.setHeaderValue(label);
-//					child = gtk_clist_get_column_widget (GTK_CLIST (parent), i);
-//					child = GTK_BIN(child)->child;
-//					glade_xml_set_common_params(self, child, childinfo);
-				}
-			}
-
-//			if (!child) {
-//				child = glade_xml_build_widget (self, childinfo);
-//				gtk_clist_set_column_widget (GTK_CLIST (parent), i, child);
-//			}
+			TableColumn column = columnModel.getColumn(i);
+			JLabel dummy = new JLabel((String)column.getHeaderValue());
+			xml.setLongName(wInfo.getLongName(), dummy);
 		}
 	}
 
@@ -947,14 +969,11 @@ class WidgetBuilder {
 	}
 
 	private void setProperties(Container widget, WidgetInfo info) {
-		logger.enter("setProperties()");
-		logger.debug("widget={0}", widget);
 		for (int i = 0, pCount = info.getPropertiesCount(); i < pCount; i++) {
 			try {
 				Property p = info.getProperty(i);
 				String pName = p.getName();
 				String pValue = p.getValue();
-				logger.debug("name={0}, value={1}", new Object[]{pName, pValue});
 				boolean set = false;
 				for (Class clazz = widget.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
 					Map map = (Map)propertyMap.get(clazz);
@@ -962,15 +981,10 @@ class WidgetBuilder {
 						continue;
 					}
 					Method setter = (Method)map.get(pName);
-					logger.debug("setter={0}", setter);
 					if (setter.getDeclaringClass() == WidgetOperation.class) {
-						logger.debug("invoking WidgetOperation\'s");
 						setter.invoke(null, new Object[] { xml, widget, pName, pValue });
-						logger.debug("seter invocation done");
 					} else {
-						logger.debug("invoking widget\'s");
 						setter.invoke(widget, new Object[] { pValue });
-						logger.debug("seter invocation done");
 					}
 					set = true;
 				}

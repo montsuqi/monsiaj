@@ -47,7 +47,7 @@ import org.montsuqi.util.Logger;
 import org.xml.sax.SAXException;
 
 public class Interface {
-    private List topLevels;
+	private List topLevels;
     private Map infos;
     private Map widgets;
     private Map longNames;
@@ -136,6 +136,7 @@ public class Interface {
 		this.infos = infos;
 		widgets = new HashMap();
 		longNames = new HashMap();
+		columnMap = new HashMap();
 		signals = new HashMap();
 		buttonGroups = new HashMap();
 		topLevel = null;
@@ -356,7 +357,7 @@ public class Interface {
 
 	private void connectToggled(Container target, Method handler, Object other) {
 		// TODO implement this.
-		logger.debug("connecttToggled stab");
+		logger.debug("connectToggled stab");
 	}
 
 	public Container getWidget(String name) {

@@ -147,10 +147,14 @@ public class Client implements Runnable {
 	}
 		
 	public static void main(String[] args) {
-		Client client = new Client(args);
-		client.showBannar();
-		client.run();
-		client.exitSystem();
+		try {
+			Client client = new Client(args);
+			client.showBannar();
+			client.run();
+			client.exitSystem();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void finalize() {

@@ -25,6 +25,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
+
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.Calendar;
@@ -76,10 +77,7 @@ public class Protocol extends Connection {
 		addClass(JTextField.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(NumberEntry.class,      "receiveNumberEntry", "sendNumberEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JTextArea.class, "receiveText",        "sendText"); //$NON-NLS-1$ //$NON-NLS-2$
-//		addClass(PandaCombo.class,       "receivePandaCombo",  null);
-//		addClass(PandaCList.class,       "receivePandaCList",  "sendPandaCList");
 		addClass(PandaEntry.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
-//		addClass(PandaText.class,        "receiveText",        "sendText");
 		addClass(JLabel.class,           "receiveLabel",       null); //$NON-NLS-1$
 		addClass(JComboBox.class,        "receiveCombo",       null); //$NON-NLS-1$
 		addClass(JTable.class,           "receiveCList",       "sendCList"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -122,9 +120,6 @@ public class Protocol extends Connection {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
-		String expected = Integer.toHexString(0x000000ff&PacketClass.ScreenDefine);
-		String actual   = Integer.toHexString(0x000000ff&pc);
-		logger.debug("receiveFile: expected 0x{0}, actual 0x{1}", new Object[] { expected, actual });
 		if (pc == PacketClass.ScreenDefine) {
 			OutputStream fileOut = new FileOutputStream(fName);
 			int left = receiveLength();
@@ -174,7 +169,6 @@ public class Protocol extends Connection {
 				}
 			}
 		}
-
 		if (node != null) {
 			JFrame w = node.getWindow();
 			switch (type) {
@@ -191,7 +185,6 @@ public class Protocol extends Connection {
 				break;
 			}
 		}
-
 		return node;
 	}
 
@@ -208,12 +201,10 @@ public class Protocol extends Connection {
 			int size = receiveLong();
 			int mtime = receiveLong();
 			int ctime = receiveLong();
-			
 			String fName = client.getCacheFileName(sName);
 
 			File file = new File(fName);
 			File parent = file.getParentFile();
-			logger.debug("createNewFile:{0}", parent.getAbsolutePath());
 			parent.mkdirs();
 			file.createNewFile();
 			if (file.lastModified() < mtime * 1000 ||
@@ -434,7 +425,6 @@ public class Protocol extends Connection {
 		sendString(user);
 		sendString(pass);
 		sendString(apl);
-		logger.debug("user={0}, apl={1}", new Object[] {user, apl});
 		pc = receivePacketClass();
 		if (pc == PacketClass.OK) {
 			return true;

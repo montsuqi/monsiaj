@@ -29,9 +29,7 @@ class Connection {
 	}
 
 	byte receivePacketClass() throws IOException {
-		byte b = in.readByte();
-		logger.debug("*** receivePacketClass = 0x{0}", Integer.toHexString(0x000000ff&b));
-		return b;
+		return in.readByte();
 	}
 
 	void sendDataType(int c) throws IOException {
@@ -47,7 +45,7 @@ class Connection {
 		return dataType;
 	}
 
-	synchronized int receiveDataType(int expected) throws IOException {
+	synchronized int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
 			throw new IOException(Messages.getString("Connection.data_type_mismatch")); //$NON-NLS-1$
@@ -138,8 +136,7 @@ class Connection {
 	private static final byte F_BYTE = 0x46;
 	
 	boolean receiveBoolean() throws IOException {
-		byte b = in.readByte();
-		return b == T_BYTE ? true : false;
+		return in.readByte() == T_BYTE ? true : false;
 	}
 
 	void sendBoolean(boolean data) throws IOException {
@@ -157,8 +154,10 @@ class Connection {
 	BigDecimal receiveFixed() throws IOException {
 		int flen = receiveLength();
 		int slen = receiveLength();
-		BigInteger i =  new BigInteger(receiveString());
-		return (new BigDecimal(i)).movePointLeft(slen);
+		String value = receiveString();
+		BigInteger i =  new BigInteger(value);
+		BigDecimal result = (new BigDecimal(i)).movePointLeft(slen);
+		return result;
 	}
 
 	BigDecimal receiveFixedData() throws IOException {
@@ -253,10 +252,10 @@ class Connection {
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt();
-		case	Type.CHAR:
-		case	Type.VARCHAR:
-		case	Type.DBCODE:
-		case	Type.TEXT:
+		case Type.CHAR:
+		case Type.VARCHAR:
+		case Type.DBCODE:
+		case Type.TEXT:
 			return Integer.parseInt(receiveString());
 		default:
 			throw new IllegalArgumentException();

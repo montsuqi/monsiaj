@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.AbstractButton;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -127,11 +129,9 @@ class WidgetMarshal {
 				} else {
 					String buff = con.getWidgetNameBuffer().toString() + '.' + name;
 					ValueAttribute va = getValue(buff);
-					if (va != null) {
-						BigDecimal val = con.receiveFixedData();
-						registerValue(widget, name, val);
-						((NumberEntry)widget).setValue(val);
-					}
+					BigDecimal val = con.receiveFixedData();
+					registerValue(widget, name, val);
+					((NumberEntry)widget).setValue(val);
 				}
 			}
 		}
@@ -235,7 +235,7 @@ class WidgetMarshal {
 				} else {
 					boolean fActive = con.receiveBooleanData();
 					registerValue(widget, name, null);
-					((JButton)widget).setSelected(fActive);
+					((AbstractButton)widget).setSelected(fActive);
 				}
 			}
 		}
@@ -243,7 +243,7 @@ class WidgetMarshal {
 	}
 
 	boolean receiveCombo(Container widget) throws IOException {
-		con.receiveDataType(Type.RECORD);
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		int count = 0;
 		while (nItem-- != 0) {
@@ -259,7 +259,7 @@ class WidgetMarshal {
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				List list = new ArrayList();
 				list.add(""); //$NON-NLS-1$
-				con.receiveDataType(Type.ARRAY); /*	Type.ARRAY	*/
+				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
 				int num = con.receiveInt();
 				for	(int j = 0; j < num ; j++) {
 					String buff = con.receiveStringData();
@@ -293,93 +293,6 @@ class WidgetMarshal {
 		return receiveCombo(widget);
 	}
 
-	boolean sendPandaCList(String name, Container widget) throws IOException {
-		ValueAttribute va = getValue(name);
-		JTable table = (JTable)widget;
-		
-		for (int i = 0, rows = table.getRowCount(); i < rows; i++) {
-			String iname = name + '.' + va.getValueName() + '[' + i + (Integer)va.getOpt() + ']';
-			con.sendPacketClass(PacketClass.ScreenData);
-			con.sendString(iname);
-			con.sendDataType(Type.BOOL);
-			con.sendBoolean(table.isRowSelected(i));
-		}
-		return true;
-	}
-
-	boolean receivePandaCList(Container widget) throws IOException {
-		con.receiveDataType(Type.RECORD);
-		StringBuffer widgetName = con.getWidgetNameBuffer();
-		int offset = widgetName.length();
-		int nItem = con.receiveInt();
-		int count = -1;
-		int from = 0;
-		int state;
-		
-		while (nItem-- != 0) {
-			String name = con.receiveString();
-			widgetName.replace(offset, widgetName.length(), '.' + name);
-			Container subWidget = con.getInterface().getWidgetByLongName(widgetName.toString());
-			if (subWidget != null) {
-				con.receiveWidgetData(subWidget);
-			} else if ("count".equals(name)) { //$NON-NLS-1$
-				count = con.receiveIntData();
-			} else if ("from".equals(name)) { //$NON-NLS-1$
-				from = con.receiveIntData();
-			} else if ("state".equals(name)) { //$NON-NLS-1$
-				state = con.receiveIntData();
-				setState(widget, state);
-			} else if ("style".equals(name)) { //$NON-NLS-1$
-				String buff = con.receiveStringData();
-				/* gtk_widget_set_style(widget,GetStyle(buff));*/
-			} else if ("row".equals(name)) { //$NON-NLS-1$
-				/* NOP */
-			} else if ("column".equals(name)) { //$NON-NLS-1$
-				/* NOP */
-			} else if ("item".equals(name)) { //$NON-NLS-1$
-				DefaultTableModel model = new DefaultTableModel();
-				con.receiveDataType(Type.ARRAY);
-				int num = con.receiveInt();
-				if (count < 0) {
-					count = num;
-				}
-				for	(int j = 0; j < num; j++) {
-					con.receiveDataType(Type.RECORD);
-					int rnum = con.receiveInt();
-					String[] rdata = new String[rnum];
-					for (int k = 0; k < rnum; k++) {
-						String iname = con.receiveString();
-						String buff = con.receiveString();
-						rdata[k] = buff;
-					}
-					if ((j >= from) && ((j - from) < count)) {
-						model.addRow(rdata);
-					}
-				}
-				((JTable)widget).setModel(model);
-			} else {
-				con.receiveDataType(Type.ARRAY);
-				registerValue(widget, name, new Integer(from));
-				int num = con.receiveInt();
-				if (count < 0) {
-					count = num;
-				}
-				ListSelectionModel model = ((JTable)widget).getSelectionModel();
-				for	(int j = 0; j < num; j++) {
-					boolean fActive = con.receiveBooleanData();
-					if ((j >= from) && ((j - from) < count)) {
-						if (fActive) {
-							model.addSelectionInterval(j, j);
-						} else {
-							model.removeSelectionInterval(j, j);
-						}
-					}
-				}
-			}
-		}
-		return true;
-	}
-
 	boolean sendCList(String name, Container widget) throws IOException {
 		ValueAttribute va = getValue(name);
 		JTable table = (JTable)widget;
@@ -395,19 +308,25 @@ class WidgetMarshal {
 
 	boolean receiveCList(Container widget) throws IOException {
 		JTable table = (JTable)widget;
-		con.receiveDataType(Type.RECORD);
+		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		StringBuffer widgetName = con.getWidgetNameBuffer();
 		int offset = widgetName.length();
 		int nItem = con.receiveInt();
 		int count = -1;
 		int from = 0;
 		int state;
+		String[] labels = new String[tableModel.getColumnCount()];
+		int labelNumber = 0;
+
 		while (nItem-- != 0) {
 			String name = con.receiveString();
 			widgetName.replace(offset, widgetName.length(), '.' + name);
 			Container subWidget;
 			if ((subWidget = con.getInterface().getWidgetByLongName(widgetName.toString())) != null) {
-				con.receiveWidgetData(subWidget);
+				JLabel dummyLabel = (JLabel)subWidget;
+				receiveLabel(dummyLabel);
+				labels[labelNumber++] = dummyLabel.getText();
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
 			} else if ("from".equals(name)) { //$NON-NLS-1$
@@ -423,27 +342,25 @@ class WidgetMarshal {
 			} else if ("columns".equals(name)) { //$NON-NLS-1$
 				/* NOP */
 			} else if ("item".equals(name)) { //$NON-NLS-1$
-				DefaultTableModel model = new DefaultTableModel();
-				con.receiveDataType(Type.ARRAY);
+				con.receiveDataTypeWithCheck(Type.ARRAY);
 				int num = con.receiveInt();
 				if (count < 0) {
 					count = num;
 				}
 				for (int j = 0; j < num; j++) {
-					con.receiveDataType(Type.RECORD);
+					con.receiveDataTypeWithCheck(Type.RECORD);
 					int rNum = con.receiveInt();
 					Object[] rdata = new String[rNum];
-					for	(int k = 0; k < rNum; k++) {
+					for (int k = 0; k < rNum; k++) {
 						String iName = con.receiveString();
-						rdata[k] = con.receiveString();
+						rdata[k] = con.receiveStringData();
 					}
 					if ((j >= from) && ((j - from) < count)) {
-						model.addRow(rdata);
+						tableModel.addRow(rdata);
 					}
 				}
-				table.setModel(model);
 			} else {
-				con.receiveDataType(Type.ARRAY);
+				con.receiveDataTypeWithCheck(Type.ARRAY);
 				registerValue(widget, name, new Integer(from));
 				int num = con.receiveInt();
 				if (count < 0) {
@@ -463,6 +380,7 @@ class WidgetMarshal {
 					}
 				}
 			}
+			tableModel.setColumnIdentifiers(labels);
 		}
 		return true;
 	}
@@ -485,7 +403,7 @@ class WidgetMarshal {
 		Container item;
 		int state;
 		
-		con.receiveDataType(Type.RECORD);
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		StringBuffer label = con.getWidgetNameBuffer();
 		int offset = label.length();
 		int nItem = con.receiveInt();
@@ -505,7 +423,7 @@ class WidgetMarshal {
 				from = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				DefaultListModel model = new DefaultListModel();
-				con.receiveDataType(Type.ARRAY);
+				con.receiveDataTypeWithCheck(Type.ARRAY);
 				num = con.receiveInt();
 				if (count < 0) {
 					count = num;
@@ -520,7 +438,7 @@ class WidgetMarshal {
 				}
 				((JList)widget).setModel(model);
 			} else {
-				con.receiveDataType(Type.ARRAY);
+				con.receiveDataTypeWithCheck(Type.ARRAY);
 				registerValue(widget, name, new Integer(from));
 				num = con.receiveInt();
 				if (count < 0) {
@@ -567,7 +485,7 @@ class WidgetMarshal {
 	}
 
 	boolean receiveCalendar(Container widget) throws IOException {
-		con.receiveDataType(Type.RECORD);
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		registerValue(widget, "", null); //$NON-NLS-1$
 		int nItem = con.receiveInt();
 		int year = 0;
@@ -613,7 +531,7 @@ class WidgetMarshal {
 		int page = -1;
 		int state;
 
-		con.receiveDataType(Type.RECORD);
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		StringBuffer widgetName = con.getWidgetNameBuffer();
 		int offset = widgetName.length();
@@ -650,7 +568,7 @@ class WidgetMarshal {
 	}
 
 	boolean receiveProgressBar(Container widget) throws IOException {
-		con.receiveDataType(Type.RECORD);
+		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		StringBuffer longName = con.getWidgetNameBuffer();
 		int offset = longName.length();

@@ -26,6 +26,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeSelectionModel;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
+import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
@@ -152,12 +153,8 @@ class WidgetOperation {
 	}
 
 	static void setCListSelectionMode(Interface xml, Container widget, String name, String value) {
-		logger.enter("setCListSelectionMode");
-		logger.debug("widget={0}", widget);
-		logger.debug("name={0}, value={1}", new Object[]{name, value});
 		JTable table = (JTable)widget;
 		value = normalizeSelectionMode(value);
-		logger.debug("***name={0}, value={1}", new Object[]{name, value});
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -169,7 +166,6 @@ class WidgetOperation {
 		} else {
 			throw new IllegalArgumentException(value);
 		}
-		logger.leave("setCListSelectionMode");
 	}
 
 	static void setCListShadowType(Interface xml, Container widget, String name, String value) {
@@ -354,6 +350,11 @@ class WidgetOperation {
 		TableConstraints tc = new TableConstraints(layout.getConstraints(widget));
 		tc.bottomAttach = ParameterConverter.toInteger(value);
 		layout.setConstraints(widget, tc);
+	}
+
+	static void setNumberEntryFormat(Interface xml, Container widget, String name, String value) {
+		NumberEntry entry = (NumberEntry)widget;
+		entry.setFormat(value);		
 	}
 }
 
