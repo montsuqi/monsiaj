@@ -130,7 +130,7 @@ class NumberDocument extends PlainDocument {
 	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
 	static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
 	static final BigDecimal ONE = new BigDecimal(BigInteger.ONE);
-	private Logger logger;
+	protected static final Logger logger = Logger.getLogger(NumberDocument.class);
 
 	NumberDocument() {
 		setFormat(DEFAULT_FORMAT);
@@ -145,6 +145,9 @@ class NumberDocument extends PlainDocument {
 			String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
 			value = ZERO;
 			try {
+				remove(0, getLength());
+				expo = 0;
+				scale = 0;
 				insertString(0, t, null);
 			} catch (BadLocationException e) {	
 				logger.warn(e);
@@ -212,8 +215,7 @@ class NumberDocument extends PlainDocument {
 		return originalFormat;
 	}
 
-	public void insertString(int offs, String str, AttributeSet a)
-		throws BadLocationException {
+	public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
 		if (str.length() <= 0) {
 			return;
 		}
