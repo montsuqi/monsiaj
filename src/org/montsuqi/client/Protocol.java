@@ -52,21 +52,22 @@ import org.montsuqi.widgets.PandaTimer;
 public class Protocol extends Connection {
 
 	private WidgetValueManager valueManager;
-	private Map windowTable;
-	private static final Logger logger = Logger.getLogger(Connection.class);
+	private Map nodeTable;
 	private Client client;
 	private StringBuffer widgetName;
 	private Interface xml;
 	private boolean isReceiving;
 	private boolean protocol1;
 	private boolean protocol2;
+	private Window activeWindow;
 
+	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 
 	Protocol(Client client, Socket s, int protocolVersion) throws IOException {
 		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
-		windowTable = new HashMap();
+		nodeTable = new HashMap();
 		isReceiving = false;
 		switch (protocolVersion) {
 		case 1:
@@ -95,8 +96,6 @@ public class Protocol extends Connection {
 	public Interface getInterface() {
 		return xml;
 	}
-
-	private Window activeWindow;
 
 	private boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
@@ -133,27 +132,35 @@ public class Protocol extends Connection {
 			w.setVisible(true);
 			return node;
 		}
-		if (type == ScreenType.CLOSE_WINDOW){
+		if (type == ScreenType.CLOSE_WINDOW) {
 			w.setVisible(false);
 		}
 		return null;
 	}
 
 	private Node createNode(String name) {
+		Object[] args = { name };
+		logger.debug("creating node: {0}", args); //$NON-NLS-1$
 		try {
 			InputStream input = new FileInputStream(client.getCacheFileName(name));
 			Node node = new Node(Interface.parseInput(input, this), name);
 			input.close();
-			windowTable.put(name, node);
+			nodeTable.put(name, node);
 			return node;
 		} catch (IOException e) {
 			throw new InterfaceBuildingException(e);
 		}
 	}
 
-	private void destroyWindow(String name) {
-		if (windowTable.containsKey(name)) {
-			windowTable.remove(name);
+	private void destroyNode(String name) {
+		if (nodeTable.containsKey(name)) {
+			Node node = (Node)nodeTable.get(name);
+			Window window = node.getWindow();
+			if (window != null) {
+				window.dispose();
+			}
+			node.clearChangedWidgets();
+			nodeTable.remove(name);
 		}
 	}
 
@@ -178,9 +185,9 @@ public class Protocol extends Connection {
 		File parent = file.getParentFile();
 		parent.mkdirs();
 		file.createNewFile();
-		if (file.lastModified() < mtime * 1000 || file.length() != size) {
+		if (file.lastModified() < mtime * 1000L || file.length() != size) {
 			receiveFile(name, cachFileName);
-			destroyWindow(name);
+			destroyNode(name);
 		} else {
 			sendPacketClass(PacketClass.NOT);
 		}
@@ -452,7 +459,7 @@ public class Protocol extends Connection {
 	}
 
 	void sendWindowData() throws IOException {
-		Iterator i = windowTable.keySet().iterator();
+		Iterator i = nodeTable.keySet().iterator();
 		while (i.hasNext()) {
 			sendWndowData1((String)i.next());
 		}
@@ -473,7 +480,7 @@ public class Protocol extends Connection {
 	}
 
 	void clearWindowTable() {
-		Iterator i = windowTable.values().iterator();
+		Iterator i = nodeTable.values().iterator();
 		while (i.hasNext()) {
 			Node node = (Node)i.next();
 			node.clearChangedWidgets();
@@ -484,6 +491,7 @@ public class Protocol extends Connection {
 		if (isReceiving) {
 			return;
 		}
+		resetTimer(SwingUtilities.windowForComponent(widget));
 		Node node = getNode(widget);
 		if (node != null) {
 			node.addChangedWidget(xml.getLongName(widget), widget);
@@ -495,7 +503,7 @@ public class Protocol extends Connection {
 	}
 
 	Node getNode(String name) {
-		return (Node)windowTable.get(name);
+		return (Node)nodeTable.get(name);
 	}
 
 	Node getNode(Component component) {
@@ -511,7 +519,7 @@ public class Protocol extends Connection {
 		if (isReceiving()) {
 			return;
 		}
-		Iterator i = windowTable.values().iterator();
+		Iterator i = nodeTable.values().iterator();
 		while (i.hasNext()) {
 			if (((Node)i.next()).getWindow() != null) {
 				return;
