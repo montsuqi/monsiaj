@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.montsuqi.client.Client;
+
 class PropertyFileBasedConfiguration extends Configuration {
 
 	static final String CONFIGURATION_FILE = "jma-receipt.properties"; //$NON-NLS-1$
@@ -54,15 +56,29 @@ class PropertyFileBasedConfiguration extends Configuration {
 	}
 
 	String getUser() {
-		return props.getProperty("user"); //$NON-NLS-1$
+		String user = props.getProperty("user"); //$NON-NLS-1$
+		if (user == null) {
+			return System.getProperty("user.name"); //$NON-NLS-1$
+		} else {
+			return user;
+		}
 	}
-
 	String getHost() {
-		return props.getProperty("host"); //$NON-NLS-1$
+		String host = props.getProperty("host"); //$NON-NLS-1$
+		if (host == null) {
+			return "localhost"; //$NON-NLS-1$
+		} else {
+			return host;
+		}
 	}
 
 	int getPort() {
-		return Integer.parseInt(props.getProperty("port")); //$NON-NLS-1$
+		String port = props.getProperty("port"); //$NON-NLS-1$
+		if (port == null) {
+			return Client.PORT_GLTERM;
+		} else {
+			return Integer.parseInt(port);
+		}
 	}
 
 	String getStyleFile() {
