@@ -30,8 +30,8 @@ import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.ParameterConverter;
-import org.montsuqi.widgets.LatticeConstraints;
-import org.montsuqi.widgets.LatticeLayout;
+import org.montsuqi.widgets.TableConstraints;
+import org.montsuqi.widgets.TableLayout;
 
 class TableBuilder extends ContainerBuilder {
 
@@ -49,25 +49,25 @@ class TableBuilder extends ContainerBuilder {
 	private static final String Y_KEY = "y"; //$NON-NLS-1$
 
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		LatticeLayout layout = (LatticeLayout)parent.getLayout();
+		TableLayout layout = (TableLayout)parent.getLayout();
 		for (int i = 0, n = info.getChildren().size(); i < n; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
 			Component child = null;
-			LatticeConstraints lc = new LatticeConstraints();
+			TableConstraints tc = new TableConstraints();
 			child = buildWidget(xml, wInfo, parent);
 			Map properties = cInfo.getProperties();
 			if (properties.containsKey(LEFT_ATTACH_KEY)) {
-				lc.x = ParameterConverter.toInteger((String)properties.get(LEFT_ATTACH_KEY));
+				tc.leftAttach = ParameterConverter.toInteger((String)properties.get(LEFT_ATTACH_KEY));
 			}
 			if (properties.containsKey(RIGHT_ATTACH_KEY)) {
-				lc.width = ParameterConverter.toInteger((String)properties.get(RIGHT_ATTACH_KEY)) - lc.x;
+				tc.rightAttach = ParameterConverter.toInteger((String)properties.get(RIGHT_ATTACH_KEY));
 			}
 			if (properties.containsKey(TOP_ATTACH_KEY)) {
-				lc.y = ParameterConverter.toInteger((String)properties.get(TOP_ATTACH_KEY));
+				tc.topAttach = ParameterConverter.toInteger((String)properties.get(TOP_ATTACH_KEY));
 			}
 			if (properties.containsKey(BOTTOM_ATTACH_KEY)) {
-				lc.height = ParameterConverter.toInteger((String)properties.get(BOTTOM_ATTACH_KEY)) - lc.y;
+				tc.bottomAttach = ParameterConverter.toInteger((String)properties.get(BOTTOM_ATTACH_KEY));
 			}
 			if (properties.containsKey(X_KEY)) {
 				// x_options = ParameterConverter.toInteger(value);
@@ -76,41 +76,25 @@ class TableBuilder extends ContainerBuilder {
 				// y_options = ParameterConverter.toInteger(value);
 			}
 			if (properties.containsKey(XEXPAND_KEY)) {
-				if (ParameterConverter.toBoolean((String)properties.get(XEXPAND_KEY))) {
-					lc.fill |= LatticeConstraints.HORIZONTAL;
-				} else {
-					lc.fill &= ~LatticeConstraints.HORIZONTAL;
-				}
+				tc.xExpand = ParameterConverter.toBoolean((String)properties.get(XEXPAND_KEY));
 			}
 			if (properties.containsKey(YEXPAND_KEY)) {
-				if (ParameterConverter.toBoolean((String)properties.get(YEXPAND_KEY))) {
-					lc.fill |= LatticeConstraints.VERTICAL;
-				} else {
-					lc.fill &= ~LatticeConstraints.VERTICAL;
-				}
+				tc.yExpand = ParameterConverter.toBoolean((String)properties.get(YEXPAND_KEY));
 			}
 			if (properties.containsKey(XSHRINK_KEY)) {
-				if (ParameterConverter.toBoolean((String)properties.get(XSHRINK_KEY))) {
-					lc.shrink |= LatticeConstraints.HORIZONTAL;
-				} else {
-					lc.shrink &= ~LatticeConstraints.HORIZONTAL;
-				}
+				tc.xShrink = ParameterConverter.toBoolean((String)properties.get(XSHRINK_KEY));
 			}
 			if (properties.containsKey(YSHRINK_KEY)) {
-				if (ParameterConverter.toBoolean((String)properties.get(YSHRINK_KEY))) {
-					lc.shrink |= LatticeConstraints.VERTICAL;
-				} else {
-					lc.shrink &= ~LatticeConstraints.VERTICAL;
-				}
+				tc.yShrink = ParameterConverter.toBoolean((String)properties.get(YSHRINK_KEY));
 			}
 			if (properties.containsKey(XPAD_KEY)) {
-				lc.left = lc.right = ParameterConverter.toInteger((String)properties.get(XPAD_KEY));
+				tc.xPadding = ParameterConverter.toInteger((String)properties.get(XPAD_KEY));
 			}
 			if (properties.containsKey(YPAD_KEY)) {
-				lc.top = lc.bottom = ParameterConverter.toInteger((String)properties.get(YPAD_KEY));
+				tc.yPadding = ParameterConverter.toInteger((String)properties.get(YPAD_KEY));
 			}
 			parent.add(child);
-			layout.setConstraints(child, lc);
+			layout.setConstraints(child, tc);
 		}
 	}
 }
