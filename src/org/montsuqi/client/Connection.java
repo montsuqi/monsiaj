@@ -305,9 +305,7 @@ class Connection {
 		socket.shutdownOutput();
 		in.close();
 		out.close();
-		if (socket.isConnected()) {
-			socket.close();
-		}
+		socket.close();
 	}
 }
 
