@@ -33,14 +33,11 @@ class Node {
 
 	private Interface xml;
 	private String name;
-	private JFrame window;
 	private Map changedWidgets;
 
-	Node(Interface xml, String wName) {
+	Node(Interface xml, String name) {
 		this.xml = xml;
-		this.name = wName;
-		Component widget = xml.getWidget(wName);
-		this.window = (JFrame)widget;
+		this.name = name;
 		this.changedWidgets = new HashMap();
 	}
 
@@ -53,7 +50,7 @@ class Node {
 	}
 
 	JFrame getWindow() {
-		return window;
+		return (JFrame)xml.getWidget(name);
 	}
 
 	void clearChangedWidgets() {

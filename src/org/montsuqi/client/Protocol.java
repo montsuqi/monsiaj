@@ -50,6 +50,7 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.PandaTimer;
 
@@ -65,17 +66,6 @@ public class Protocol extends Connection {
 	private boolean receiving;
 	private boolean protocol1;
 	private boolean protocol2;
-
-	class ScreenType {
-		static final int NULL = 0;
-		static final int CURRENT_WINDOW = 1;
-		static final int NEW_WINDOW = 2;
-		static final int CLOSE_WINDOW = 3;
-		static final int CHANGE_WINDOW = 4;
-		static final int JOIN_WINDOW = 5;
-		static final int FORK_WINDOW = 6;
-		static final int END_SESSION = 7;
-	}
 
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 	
@@ -147,23 +137,22 @@ public class Protocol extends Connection {
 		return true;
 	}
 
-	private Node showWindow(String wName, int type) {
+	private Node showWindow(String name, int type) {
 		Node node = null;
-		if (windowTable.containsKey(wName)) {
-			node = (Node)windowTable.get(wName);
+		if (windowTable.containsKey(name)) {
+			node = (Node)windowTable.get(name);
 		} else {
-			// Create new node
 			switch (type) {
 			case ScreenType.NEW_WINDOW:
 			case ScreenType.CURRENT_WINDOW:
 				try {
-					InputStream input = new FileInputStream(client.getCacheFileName(wName));
+					InputStream input = new FileInputStream(client.getCacheFileName(name));
 					Interface xml = Interface.parseInput(input, this);
 					input.close();
-					node = new Node(xml, wName);
-					windowTable.put(node.getName(), node);
+					node = new Node(xml, name);
+					windowTable.put(name, node);
 				} catch (IOException e) {
-					logger.warn(e);
+					throw new InterfaceBuildingException(e);
 				}
 			}
 		}
@@ -275,23 +264,31 @@ public class Protocol extends Connection {
 		if (receiveValueStep1(longName)) {
 			switch (receiveDataType()) {
 			case Type.RECORD:
-				for (int i = 0, n = receiveInt(); i < n; i++) {
-					String name = receiveString();
-					longName.replace(offset, longName.length(), '.' + name);
-					receiveValue(longName, offset + name.length() + 1);
-				}
+				receiveRecordValue(longName, offset);
 				break;
 			case Type.ARRAY:
-				for (int i = 0, n = receiveInt(); i < n; i++) {
-					String name = '[' + String.valueOf(i) + ']';
-					longName.replace(offset, longName.length(), name);
-					receiveValue(longName, offset + name.length());
-				}
+				receiveArrayValue(longName, offset);
 				break;
 			default:
 				receiveValueSkip();
 				break;
 			}
+		}
+	}
+
+	private void receiveRecordValue(StringBuffer longName, int offset) throws IOException {
+		for (int i = 0, n = receiveInt(); i < n; i++) {
+			String name = receiveString();
+			longName.replace(offset, longName.length(), '.' + name);
+			receiveValue(longName, offset + name.length() + 1);
+		}
+	}
+
+	private void receiveArrayValue(StringBuffer longName, int offset) throws IOException {
+		for (int i = 0, n = receiveInt(); i < n; i++) {
+			String name = '[' + String.valueOf(i) + ']';
+			longName.replace(offset, longName.length(), name);
+			receiveValue(longName, offset + name.length());
 		}
 	}
 
@@ -439,12 +436,12 @@ public class Protocol extends Connection {
 		return this.receiving = receiving;
 	}
 
-	void sendConnect(String user, String pass, String apl) throws IOException {
+	void sendConnect(String user, String pass, String app) throws IOException {
 		sendPacketClass(PacketClass.Connect);
 		sendVersionString();
 		sendString(user);
 		sendString(pass);
-		sendString(apl);
+		sendString(app);
 		byte pc = receivePacketClass();
 		switch (pc) {
 		case PacketClass.OK:
