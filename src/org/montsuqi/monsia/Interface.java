@@ -60,6 +60,10 @@ public class Interface {
     private Container focusWidget;
 	private Container defaultWidget;
 	private Logger logger;
+
+	public static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler";
+
+	public static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler";
 	
 	void setDefaultWidget(Container widget) {
 		defaultWidget = widget;
@@ -72,27 +76,37 @@ public class Interface {
 	public static Interface parseInput(InputStream input, Protocol protocol) {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setNamespaceAware(true);
-		String oldHandler = "org.montsuqi.monsia.Glade1Handler";
-		String newHandler = "org.montsuqi.monsia.MonsiaHandler";
 		try {
-			SAXParser parser = factory.newSAXParser();
-			
+			String handlerClassName = null;
+
+			handlerClassName = System.getProperty("monsia.document.handler");
+
+			if (handlerClassName == null) {
+				input = new java.io.BufferedInputStream(input);
+				String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n";
+				int oldPrologueLength = oldPrologue.getBytes().length;
+				input.mark(oldPrologueLength);
+				byte[] bytes = new byte[oldPrologueLength];
+				input.read(bytes);
+				String head = new String(bytes);
+				input.reset();
+				if (head.indexOf("GTK-Interface") < 0) {
+					handlerClassName = NEW_HANDLER;
+				}
+			}
+			if (handlerClassName == null) {
+				handlerClassName = OLD_HANDLER;
+			}
+
+			Class handlerClass = Class.forName(handlerClassName);
 			AbstractDocumentHandler handler;
-			String type = System.getProperty("monsia.document.handler");
-			if (type == null) {
-				type = oldHandler;
-			}
-			if ( ! type.equals(oldHandler) && ! type.equals(newHandler)) {
-				throw new InterfaceBuildingException("unknown handler type: " + type);
-			}
-			Class handlerClass;
-			handlerClass = Class.forName(type);
 			handler = (AbstractDocumentHandler)handlerClass.newInstance();
 
-			if (type.equals(oldHandler)) {
+			if (handlerClassName.equals(OLD_HANDLER)) {
 				input = new FakeEncodingInputStream(input);
 			}
 
+			SAXParser parser = factory.newSAXParser();
 			parser.parse(input, handler);
 			return handler.getInterface(protocol);
 		} catch (ClassNotFoundException e) {
@@ -133,6 +147,7 @@ public class Interface {
 		signalAutoConnect();
 	}
 
+	/* FIXME: signal with accels */
 	private void signalAutoConnect() {
 		Class[] argTypes = { Container.class, Object.class };
 		Iterator entries = signals.entrySet().iterator();
@@ -459,7 +474,6 @@ public class Interface {
 	}
 
 	void setLongName(String longName, Container widget) {
-		logger.debug("longName: {0}", longName);
 		longNames.put(longName, widget);
 	}
 }
