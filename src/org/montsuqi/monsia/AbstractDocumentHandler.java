@@ -251,7 +251,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	}
 
 	protected int parseModifiers(String modifierValue) {
-		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|");  //$NON-NLS-1$
+		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|"); //$NON-NLS-1$
 		int modifiers = 0;
 		while (tokens.hasMoreTokens()) {
 			String modifier = tokens.nextToken();

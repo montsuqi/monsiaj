@@ -29,7 +29,6 @@ import javax.swing.JLabel;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 
-
 class LabelMarshaller extends WidgetMarshaller {
 
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
