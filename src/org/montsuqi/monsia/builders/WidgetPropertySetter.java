@@ -25,6 +25,7 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.table.JTableHeader;
@@ -381,11 +383,17 @@ abstract class WidgetPropertySetter {
 				if (parent instanceof JScrollPane) {
 					JScrollPane scroll = (JScrollPane)parent;
 					int parentWidth = scroll.getWidth();
+					Insets insets = scroll.getInsets();
+					parentWidth -= insets.left + insets.right;
 					JScrollBar vScrollBar = scroll.getVerticalScrollBar();
 					if (vScrollBar != null) {
 						ComponentUI ui = vScrollBar.getUI();
 						parentWidth -= ui.getPreferredSize(vScrollBar).getWidth();
-						parentWidth -= 2; /* FIXME magic number */
+					}
+					JViewport columnHeader = scroll.getColumnHeader();
+					if (columnHeader != null) {
+						ComponentUI ui = columnHeader.getUI();
+						parentWidth -= ui.getPreferredSize(columnHeader).getWidth();
 					}
 					if (totalWidth < parentWidth) {
 						int diff = parentWidth - totalWidth;
