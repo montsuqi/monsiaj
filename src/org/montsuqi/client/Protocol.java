@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
-import java.net.URLEncoder;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
