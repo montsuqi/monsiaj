@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.montsuqi.util.Logger;
-import org.montsuqi.client.Messages;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.monsia.Style;
 
