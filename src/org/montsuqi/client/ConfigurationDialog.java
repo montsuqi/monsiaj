@@ -38,6 +38,7 @@ import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -228,5 +229,12 @@ public abstract class ConfigurationDialog extends JDialog {
 		}
 		addRow(container, y, text, panel);
 		return radios;
+	}
+
+	protected JCheckBox addCheckRow(JPanel container, int y, String text, boolean flag) {
+		JCheckBox check = new JCheckBox();
+		check.setSelected(flag);
+		addRow(container, y, text, check);
+		return check;
 	}
 }

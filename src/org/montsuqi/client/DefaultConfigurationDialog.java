@@ -27,6 +27,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -52,6 +53,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 	private JComboBox lookAndFeelCombo;
 	private JRadioButton[] protocolVersionRadios;
 	UIManager.LookAndFeelInfo[] lafs;
+	private JCheckBox useLogViewerCheck;
 
 	public DefaultConfigurationDialog(String title, Configuration conf) {
 		super(title, conf);
@@ -78,6 +80,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		}
 		conf.setUseSSL(false);
 		conf.setVerify(false);
+		conf.setUseLogViewer(useLogViewerCheck.isSelected());
 	}
 
 	protected JComponent createControls() {
@@ -155,6 +158,8 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = addRadioGroupRow(controls, y++, Messages.getString("DefaultConfigurationDialog.protocol_version"), versions, String.valueOf(conf.getProtocolVersion())); //$NON-NLS-1$
+
+		useLogViewerCheck = addCheckRow(controls, y, Messages.getString("DefaultConfigurationDialog.use_log_viewer"), conf.getUseLogViewer()); //$NON-NLS-1$
 		return controls;
 	}
 }

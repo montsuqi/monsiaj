@@ -76,8 +76,10 @@ public class Launcher {
 		conf.setConfigured(false);
 		d.setVisible(true);
 		if (conf.isConfigured()) {
-			createLogFrame();
 			conf.save();
+			if (conf.getUseLogViewer()) {
+				createLogFrame();
+			}
 			try {
 				target.connect();
 				Thread t = new Thread(target);

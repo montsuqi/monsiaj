@@ -43,6 +43,7 @@ public abstract class Configuration {
 	private static final String VERIFY_KEY = "verify"; //$NON-NLS-1$
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
+	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
 
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
 	static final int DEFAULT_PORT = 8000;
@@ -56,6 +57,7 @@ public abstract class Configuration {
 	static final boolean DEFAULT_VERIFY = false;
 	static final int DEFAULT_PROTOCOL_VERSION = 1;
 	static final String DEFAULT_LOOK_AND_FEEL_CLASS_NAME = UIManager.getSystemLookAndFeelClassName();
+	static final boolean DEFAULT_USE_LOG_VIEWER = false;
 
 	protected static final Logger logger = Logger.getLogger(Configuration.class);
 
@@ -209,6 +211,14 @@ public abstract class Configuration {
 
 	public void setLookAndFeelClassName(String className) {
 		setString(LOOK_AND_FEEL_KEY, className);
+	}
+
+	public boolean getUseLogViewer() {
+		return getBoolean(USE_LOG_VIEWER_KEY, DEFAULT_USE_LOG_VIEWER);
+	}
+
+	public void setUseLogViewer(boolean flag) {
+		setBoolean(USE_LOG_VIEWER_KEY, flag);
 	}
 
 	// logger class, debug mode
