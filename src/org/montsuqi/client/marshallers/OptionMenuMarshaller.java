@@ -85,7 +85,9 @@ public class OptionMenuMarshaller extends WidgetMarshaller {
 				con.receiveValue(widgetName, offset);
 			}
 		}
-		optionMenu.setSelectedIndex(choice);
+		if (0 <= choice && choice < optionMenu.getItemCount()) {
+			optionMenu.setSelectedIndex(choice);
+		}
 	}
 
 	public void send(WidgetValueManager manager, String name, Component widget) throws IOException {
