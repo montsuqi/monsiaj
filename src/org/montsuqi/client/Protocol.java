@@ -32,15 +32,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
 import javax.swing.SwingUtilities;
-
 import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
@@ -51,25 +48,27 @@ import org.montsuqi.widgets.PandaTimer;
 
 public class Protocol extends Connection {
 
-	private WidgetValueManager valueManager;
-	private Map nodeTable;
 	private Client client;
-	private StringBuffer widgetName;
-	private Interface xml;
-	private boolean isReceiving;
+	private String cacheRoot;
 	private boolean protocol1;
 	private boolean protocol2;
+	private boolean isReceiving;
+	private Map nodeTable;
+	private WidgetValueManager valueManager;
+
+	private StringBuffer widgetName;
+	private Interface xml;
+
 	private Window activeWindow;
 
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, Socket s, int protocolVersion) throws IOException {
-		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
+	Protocol(Client client) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		super(client.createSocket(), client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
-		nodeTable = new HashMap();
-		isReceiving = false;
-		switch (protocolVersion) {
+		cacheRoot = client.getCacheRoot();
+		switch (client.getProtocolVersion()) {
 		case 1:
 			protocol1 = true;
 			protocol2 = false;
@@ -78,8 +77,11 @@ public class Protocol extends Connection {
 			protocol1 = false;
 			protocol2 = true;
 		default:
-			throw new IllegalArgumentException("invalid protocol version: " + protocolVersion); //$NON-NLS-1$
+			throw new IllegalArgumentException("invalid protocol version: " + client.getProtocolVersion()); //$NON-NLS-1$
 		}
+		assert protocol1 ^ protocol2;
+		isReceiving = false;
+		nodeTable = new HashMap();
 		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
 	}
 
@@ -138,11 +140,16 @@ public class Protocol extends Connection {
 		return null;
 	}
 
+	private String getCacheFileName(String name) {
+		File cacheFile = new File(cacheRoot, name);
+		return cacheFile.getAbsolutePath();
+	}
+
 	private Node createNode(String name) {
 		Object[] args = { name };
 		logger.debug("creating node: {0}", args); //$NON-NLS-1$
 		try {
-			InputStream input = new FileInputStream(client.getCacheFileName(name));
+			InputStream input = new FileInputStream(getCacheFileName(name));
 			Node node = new Node(Interface.parseInput(input, this), name);
 			input.close();
 			nodeTable.put(name, node);
@@ -179,7 +186,7 @@ public class Protocol extends Connection {
 		int size = receiveLong();
 		int mtime = receiveLong();
 		/* int ctime = */ receiveLong();
-		String cachFileName = client.getCacheFileName(name);
+		String cachFileName = getCacheFileName(name);
 
 		File file = new File(cachFileName);
 		File parent = file.getParentFile();
