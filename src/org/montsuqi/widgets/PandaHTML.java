@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;
@@ -67,13 +69,8 @@ public class PandaHTML extends JScrollPane {
 	}
 
 	public void setURI(final URL uri) {
-		setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
-		try {
-			logger.debug("loading {0}", uri); //$NON-NLS-1$
-			pane.setPage(uri);
-		} catch (IOException e) {
-			setText(e.toString());
-		}
+		Runnable loader = new HTMLLoader(uri);
+		SwingUtilities.invokeLater(loader);
 	}
 
 	public URL getURI() {
@@ -130,6 +127,27 @@ public class PandaHTML extends JScrollPane {
 		if (args.length > 0) {
 			URL uri = new URL(args[0]);
 			html.setURI(uri);
+		}
+	}
+
+	class HTMLLoader implements Runnable {
+
+		URL uri;
+
+		HTMLLoader(URL uri) {
+			this.uri = uri;
+		}
+
+		public void run() {
+			setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
+			try {
+				logger.debug("loading {0}", uri); //$NON-NLS-1$
+				pane.setPage(uri);
+			} catch (FileNotFoundException e) {
+				setText(e.toString());
+			} catch (IOException e) {
+				logger.warn(e);
+			}
 		}
 	}
 }
