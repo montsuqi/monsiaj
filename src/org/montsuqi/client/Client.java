@@ -56,9 +56,11 @@ public class Client implements Runnable {
 
 	Protocol protocol;
 	Logger logger;
+	private int protocolVersion;
 
 	public Client() {
 		logger = Logger.getLogger(Client.class);
+		protocolVersion = 1;
 	}
 
 	private static Client parseCommandLine(String[] args) {
@@ -88,7 +90,7 @@ public class Client implements Runnable {
 		Class clazz = Class.forName(factoryName);
 		SocketCreator creator = (SocketCreator)clazz.newInstance();
 		s = creator.create(host, portNumber, options);
-		protocol = new Protocol(this, s);
+		protocol = new Protocol(this, s, protocolVersion);
 		protocol.sendConnect(user, pass, currentApplication);
 	}
 
@@ -126,7 +128,7 @@ public class Client implements Runnable {
 		options.add("encoding", Messages.getString("Client.server_character_encoding"), "EUC-JP"); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("style", Messages.getString("Client.styles"), ""); //$NON-LNS-1$ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		options.add("v1", Messages.getString("Client.use_protocol_version_1"), true); //$NON-NLS-1$ //$NON-NLS-2$
-		options.add("v2", Messages.getString("Client.use_protocol_version_2"), true); //$NON-NLS-1$ //$NON-NLS-2$
+		options.add("v2", Messages.getString("Client.use_protocol_version_2"), false); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("useSSL", "SSL", false); //$NON-NLS-1$ //$NON-NLS-2$
 		//options.add("key", "key file name(pem)", null);
 		//options.add("cert", "certification file name(pem)", null);
@@ -146,6 +148,16 @@ public class Client implements Runnable {
 		setStyles(options.getString("style")); //$NON-NLS-1$
 		setUseSSL(options.getBoolean("useSSL")); //$NON-NLS-1$
 
+		boolean v1 = options.getBoolean("v1"); //$NON-NLS-1$
+		boolean v2 = options.getBoolean("v2"); //$NON-NLS-1$
+
+		if (v1 && ! v2) {
+			setProtocolVersion(1);
+		} else if ( ! v1 && v2) {
+			setProtocolVersion(2);
+		} else {
+			throw new IllegalArgumentException("specify one of -v1 or -v2"); //$NON-NLS-1$
+		}
 		if (useSSL) {
 			//key = options.getString("key");
 			//cert = options.getString("cert");
@@ -155,6 +167,10 @@ public class Client implements Runnable {
 			//CAfile = options.getString("CAfile");
 		}
 		return files;
+	}
+
+	private void setProtocolVersion(int version) {
+		protocolVersion = version;
 	}
 
 	public void setPortNumber(int portNumber) {

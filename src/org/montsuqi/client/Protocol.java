@@ -63,13 +63,22 @@ public class Protocol extends Connection {
 
 	private static final String VERSION = "symbolic:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, Socket s) throws IOException {
+	Protocol(Client client, Socket s, int protocolVersion) throws IOException {
 		super(s, client.getEncoding(), isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		windowTable = new HashMap();
 		isReceiving = false;
-		protocol1 = true;
-		protocol2 = false;
+		switch (protocolVersion) {
+		case 1:
+			protocol1 = true;
+			protocol2 = false;
+			break;
+		case 2:
+			protocol1 = false;
+			protocol2 = true;
+		default:
+			throw new IllegalArgumentException("invalid protocol version: " + protocolVersion); //$NON-NLS-1$
+		}
 		logger = Logger.getLogger(Connection.class);
 		valueManager = new WidgetValueManager(this, Style.load(client.getStyles()));
 	}
