@@ -32,10 +32,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
@@ -54,7 +56,7 @@ public class Launcher {
 	protected File getKeyStoreFile() {
 		String[] pathElements = new String[] {
 			System.getProperty("user.home"), //$NON-NLS-1$
-			".glclient", //$NON-NLS-1$
+			".monsiaj", //$NON-NLS-1$
 			"ssl", //$NON-NLS-1$
 			"keystore" //$NON-NLS-1$
 		};
@@ -85,11 +87,11 @@ public class Launcher {
 	}
 
 	public void launch() {
-		JDialog d = createConfigurationDialog();
-		d.setLocationRelativeTo(null);
-		conf.setConfigured(false);
-		d.setVisible(true);
-		if (conf.isConfigured()) {
+		ConfigurationPanel panel = createConfigurationPanel();
+		Icon icon = createIcon();
+		int result = configure(panel, icon);
+		if (result == JOptionPane.OK_OPTION) {
+			panel.updateConfiguration();
 			conf.save();
 			if (conf.getUseLogViewer()) {
 				createLogFrame();
@@ -106,8 +108,18 @@ public class Launcher {
 		}
 	}
 
-	public JDialog createConfigurationDialog() {
-		return new DefaultConfigurationDialog(title, conf);
+	protected ConfigurationPanel createConfigurationPanel() {
+		return new ConfigurationPanel(conf); 
+	}
+
+	protected Icon createIcon() {
+		return null;
+	}
+
+	private int configure(ConfigurationPanel panel, Icon icon) {
+		Object[] options = { Messages.getString("Launcher.run_label"), Messages.getString("Launcher.cancel_label") }; //$NON-NLS-1$ //$NON-NLS-2$
+		Object initial = options[0];
+		return JOptionPane.showOptionDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, icon, options, initial);
 	}
 
 	private void createLogFrame() {

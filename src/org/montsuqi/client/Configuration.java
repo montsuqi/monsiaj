@@ -33,14 +33,14 @@ import org.montsuqi.util.Logger;
 public class Configuration {
 
 	private String pass;
-	private boolean configured;
 	private Preferences prefs;
-
 
 	private static final String PORT_KEY = "port"; //$NON-NLS-1$
 	private static final String HOST_KEY = "host"; //$NON-NLS-1$
 	private static final String USER_KEY = "user"; //$NON-NLS-1$
 	private static final String CACHE_KEY = "cache"; //$NON-NLS-1$
+	private static final String SAVE_PASSWORD_KEY = "save pass"; //$NON-NLS-1$
+	private static final String PASSWORD_KEY = "password"; //$NON-NLS-1$
 	private static final String ENCODING_KEY = "encoding"; //$NON-NLS-1$
 	private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
 	private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
@@ -53,6 +53,8 @@ public class Configuration {
 	static final int DEFAULT_PORT = 8000;
 	static final String DEFAULT_HOST = "localhost"; //$NON-NLS-1$
 	static final String DEFAULT_USER = System.getProperty("user.name"); //$NON-NLS-1$
+	static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
+	static final boolean DEFAULT_SAVE_PASSWORD = false;
 	static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
 	static final String DEFAULT_ENCODING = "EUC-JP"; //$NON-NLS-1$
 	static final String DEFAULT_CACHE_PATH = System.getProperty("user.home") + File.separator + "cache";  //$NON-NLS-1$//$NON-NLS-2$
@@ -78,20 +80,29 @@ public class Configuration {
 		}
 	}
 
-	boolean isConfigured() {
-		return configured;
-	}
-
-	void setConfigured(boolean flag) {
-		configured = flag;
-	}
-
 	public String getPass() {
-		return pass;
+		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
+			return getString(PASSWORD_KEY, DEFAULT_PASSWORD);
+		} else {
+			return pass;
+		}
 	}
 
 	public void setPass(String pass) {
 		this.pass = pass;
+		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
+			setString(PASSWORD_KEY, pass);
+		} else {
+			setString(PASSWORD_KEY, DEFAULT_PASSWORD);
+		}
+	}
+
+	public boolean getSavePassword() {
+		return getBoolean(SAVE_PASSWORD_KEY, DEFAULT_SAVE_PASSWORD);
+	}
+
+	public void setSavePassword(boolean flag) {
+		setBoolean(SAVE_PASSWORD_KEY, flag);
 	}
 
 	public int getPort() {
@@ -161,7 +172,7 @@ public class Configuration {
 
 	public void setApplication(String app) {
 		if (app == null || app.length() == 0) {
-			app = DEFAULT_APPLICATION; //$NON-NLS-1$
+			app = DEFAULT_APPLICATION;
 		} else if ( ! app.startsWith(PANDA_SCHEME)) {
 			app = PANDA_SCHEME + app;
 		}

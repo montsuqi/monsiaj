@@ -22,34 +22,28 @@ copies.
 
 package jp.or.med.jma_receipt;
 
-import java.net.URL;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
+import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationPanel;
-import org.montsuqi.client.Launcher;
 
-public class JMAReceiptLauncher extends Launcher {
+public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 
-	protected JMAReceiptLauncher(String title) {
-		super(title);
+	JMAReceiptConfigurationPanel(Configuration conf) {
+		super(conf);
 	}
 
-	public static void main(String[] args) {
-		Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
-		launcher.launch();
-	}
-
-	protected ConfigurationPanel createConfigurationPanel() {
-		return new JMAReceiptConfigurationPanel(conf);
-	}
-
-	protected Icon createIcon() {
-		URL iconURL = getClass().getResource("/jp/or/med/jma_receipt/standard60.png"); //$NON-NLS-1$
-		if (iconURL != null) {
-			return new ImageIcon(iconURL);
+	protected void initComponents() {
+		super.initComponents();
+		appEntry.setEditable(false);
+		encodingEntry.setEditable(false);
+		for (int i = 0; i < protocolVersionRadios.length; i++) {
+			protocolVersionRadios[i].setEnabled(false);
 		}
-		return super.createIcon();
+	}
+
+	protected void updateConfiguration() {
+		super.updateConfiguration();
+		conf.setApplication("orca00"); //$NON-NLS-1$
+		conf.setEncoding("EUC-JP"); //$NON-NLS-1$
+		conf.setProtocolVersion(1);
 	}
 }
