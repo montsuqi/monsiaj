@@ -30,14 +30,10 @@ import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.JTextComponent;
@@ -48,34 +44,17 @@ import org.montsuqi.util.ExtensionFileFilter;
 
 public class JMAReceiptConfigurationDialog extends ConfigurationDialog {
 
-	private JTextField hostEntry;
-	private JPasswordField passwordEntry;
-	private JTextField portEntry;
-	private JTextField styleEntry;
-	private JTextField userEntry;
-	private JCheckBox useSSLCheckbox;
-
 	protected void updateConfiguration() {
-		conf.setUser(userEntry.getText()); //$NON-NLS-1$
-		conf.setPass(new String(passwordEntry.getPassword()));
-		conf.setHost(hostEntry.getText()); //$NON-NLS-1$
-		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
+		super.updateConfiguration();
 		conf.setApplication("orca00"); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setEncoding("EUC-JP"); //$NON-NLS-1$ //$NON-NLS-2$
-		conf.setStyleFileName(styleEntry.getText()); //$NON-NLS-1$
 		conf.setProtocolVersion(1);
-		conf.setUseSSL(useSSLCheckbox.isSelected());
 	}
 
 	JMAReceiptConfigurationDialog(String title, Configuration conf) {
 		super(title, conf);
 		String className = UIManager.getSystemLookAndFeelClassName();
-		try {
-			UIManager.setLookAndFeel(className);
-		} catch (Exception e) {
-			logger.warn(e);
-		}
-		SwingUtilities.updateComponentTreeUI(this);
+		changeLookAndFeel(className);
 		setSize(480, 240);
 	}
 

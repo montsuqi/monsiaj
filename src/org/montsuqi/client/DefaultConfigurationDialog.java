@@ -31,22 +31,15 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.montsuqi.util.ExtensionFileFilter;
 
 class DefaultConfigurationDialog extends ConfigurationDialog {
 
-	private JTextField hostEntry;
-	private JPasswordField passwordEntry;
-	private JTextField portEntry;
-	private JTextField styleEntry;
-	private JTextField userEntry;
 	private JTextField appEntry;
 	private JTextField encodingEntry;
 	private JComboBox lookAndFeelCombo;
@@ -56,22 +49,16 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 
 	public DefaultConfigurationDialog(String title, Configuration conf) {
 		super(title, conf);
-		changeLookAndFeel(conf.getLookAndFeelClassName());
 	}
 
 	protected void updateConfiguration() {
 		// basic settings
-		conf.setUser(userEntry.getText()); //$NON-NLS-1$
-		conf.setPass(new String(passwordEntry.getPassword()));
-		conf.setHost(hostEntry.getText()); //$NON-NLS-1$
-		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
+		super.updateConfiguration();
 		conf.setApplication(appEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
-		conf.setStyleFileName(styleEntry.getText()); //$NON-NLS-1$
 
 		// advanced settings
 		conf.setEncoding(encodingEntry.getText()); //$NON-NLS-1$ //$NON-NLS-2$
 		conf.setLookAndFeelClassName(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
-
 		for (int i = 0; i < protocolVersionRadios.length; i++) {
 			if (protocolVersionRadios[i].isSelected()) {
 				conf.setProtocolVersion(Integer.parseInt(protocolVersionRadios[i].getText()));
@@ -99,6 +86,7 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 		passwordEntry = addPasswordRow(controls, y++, Messages.getString("DefaultConfigurationDialog.password")); //$NON-NLS-1$
 		hostEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.host"), conf.getHost()); //$NON-NLS-1$
 		portEntry = addIntRow(controls, y++, Messages.getString("DefaultConfigurationDialog.port"), conf.getPort()); //$NON-NLS-1$
+		useSSLCheckbox = addCheckRow(controls, y++, Messages.getString("DefaultConfigurationDialog.use_ssl"), conf.getUseSSL()); //$NON-NLS-1$
 		appEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.application"), conf.getApplication()); //$NON-NLS-1$
 		styleEntry = addTextRow(controls, y++, Messages.getString("DefaultConfigurationDialog.style"), conf.getStyleFileName()); //$NON-NLS-1$
 
@@ -153,23 +141,5 @@ class DefaultConfigurationDialog extends ConfigurationDialog {
 
 		useLogViewerCheck = addCheckRow(controls, y, Messages.getString("DefaultConfigurationDialog.use_log_viewer"), conf.getUseLogViewer()); //$NON-NLS-1$
 		return controls;
-	}
-
-
-	protected void changeLookAndFeel(String className) {
-		try {
-			UIManager.setLookAndFeel(className);
-		} catch (Exception e) {
-			logger.warn(e);
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					SwingUtilities.updateComponentTreeUI(DefaultConfigurationDialog.this);
-				} catch (Exception e) {
-					logger.warn(e);
-				}
-			}
-		});
 	}
 }

@@ -50,6 +50,9 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import org.montsuqi.util.Logger;
 
 public abstract class ConfigurationDialog extends JDialog {
@@ -58,9 +61,17 @@ public abstract class ConfigurationDialog extends JDialog {
 
 	protected Configuration conf;
 
+	protected JTextField userEntry;
+	protected JPasswordField passwordEntry;
+	protected JTextField hostEntry;
+	protected JTextField portEntry;
+	protected JCheckBox useSSLCheckbox;
+	protected JTextField styleEntry;
+
 	protected ConfigurationDialog(String title, Configuration conf) {
 		super();
 		setTitle(title);
+		changeLookAndFeel(conf.getLookAndFeelClassName());
 		this.conf = conf;
 		initComponents();
 		addWindowListener(new WindowAdapter() {
@@ -82,7 +93,14 @@ public abstract class ConfigurationDialog extends JDialog {
 		setSize(320, 240);
 	}
 
-	protected abstract void updateConfiguration();
+	protected void updateConfiguration() {
+		conf.setUser(userEntry.getText()); //$NON-NLS-1$
+		conf.setPass(new String(passwordEntry.getPassword()));
+		conf.setHost(hostEntry.getText()); //$NON-NLS-1$
+		conf.setPort(Integer.parseInt(portEntry.getText())); //$NON-NLS-1$
+		conf.setUseSSL(useSSLCheckbox.isSelected());
+		conf.setStyleFileName(styleEntry.getText()); //$NON-NLS-1$
+	}
 
 	protected void initComponents() {
 		Container content = getContentPane();
@@ -236,5 +254,22 @@ public abstract class ConfigurationDialog extends JDialog {
 		check.setSelected(flag);
 		addRow(container, y, text, check);
 		return check;
+	}
+
+	protected void changeLookAndFeel(String className) {
+		try {
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e) {
+			logger.warn(e);
+		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					SwingUtilities.updateComponentTreeUI(ConfigurationDialog.this);
+				} catch (Exception e) {
+					logger.warn(e);
+				}
+			}
+		});
 	}
 }
