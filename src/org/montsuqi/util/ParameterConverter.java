@@ -2,9 +2,7 @@ package org.montsuqi.util;
 
 public class ParameterConverter {
 	// inhibit instantiation
-	private ParameterConverter() {
-		throw new InternalError();
-	}
+	private ParameterConverter() {}
 
 	public static int toInteger(String s) {
 		return Integer.parseInt(s);
