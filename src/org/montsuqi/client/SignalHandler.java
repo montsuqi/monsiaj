@@ -1,6 +1,7 @@
 package org.montsuqi.client;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -14,6 +15,11 @@ import javax.swing.SwingUtilities;
 public abstract class SignalHandler {
 
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
+
+	protected boolean isWindowActive(Protocol con, Component widget) {
+		Window window = SwingUtilities.windowForComponent(widget);
+		return window == con.getActiveWindow();
+	}
 
 	public static SignalHandler getSignalHandler(String handlerName) throws NoSuchMethodException {
 		if (handlers.containsKey(handlerName)) {
@@ -52,19 +58,23 @@ public abstract class SignalHandler {
 		final SignalHandler sendEvent = new SignalHandler() {
 			boolean ignoreEvent = false;
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if ( ! con.isReceiving() && ! ignoreEvent) {
-					con.sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
-					con.sendWindowData();
-//					blockChangedHanders();
-					if (con.getScreenData()) {
-						ignoreEvent = true;
-//						while (gtk_events_pending()) {
-//							gtk_main_iteration();
-//						}
-						ignoreEvent = false;
-					}
-//					unblockChangedHanders();
+				if (con.isReceiving() || ignoreEvent) {
+					return;
 				}
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
+				con.sendEvent(SwingUtilities.windowForComponent(widget).getName(), widget.getName(), userData == null ? "" : userData.toString()); //$NON-NLS-1$
+				con.sendWindowData();
+//				blockChangedHanders();
+				if (con.getScreenData()) {
+					ignoreEvent = true;
+//					while (gtk_events_pending()) {
+//						gtk_main_iteration();
+//					}
+					ignoreEvent = false;
+				}
+//				unblockChangedHanders();
 			}
 		};
 
@@ -74,6 +84,9 @@ public abstract class SignalHandler {
 
 		registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
 				con.addChangedWidget(widget);
 				sendEvent.handle(con, widget, "SELECT"); //$NON-NLS-1$
 			}
@@ -99,6 +112,9 @@ public abstract class SignalHandler {
 
 		SignalHandler changed = new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) {
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
 				con.addChangedWidget(widget);
 			}
 		};
@@ -133,12 +149,18 @@ public abstract class SignalHandler {
 
 		registerHandler("window_close", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
 				con.closeWindow(widget);
 			}
 		});
 
 		registerHandler("window_destroy", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
 				con.exit();
 			}
 		});
@@ -146,6 +168,9 @@ public abstract class SignalHandler {
 		registerHandler("open_browser", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				if ( ! (widget instanceof JTextPane)) {
+					return;
+				}
+				if ( ! isWindowActive(con, widget)) {
 					return;
 				}
 				JTextPane pane = (JTextPane)widget;
@@ -157,6 +182,9 @@ public abstract class SignalHandler {
 
 		registerHandler("keypress_filter", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
 				Component next = con.getInterface().getWidget((String)userData);
 				next.requestFocus();
 			}
