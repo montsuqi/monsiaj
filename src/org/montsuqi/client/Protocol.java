@@ -164,10 +164,23 @@ public class Protocol extends Connection {
 	private static final BitSet NOENCODE;
 	static {
 		NOENCODE = new BitSet(256);
-		NOENCODE.set(0, NOENCODE.length(), false);
-		NOENCODE.set('a', 'z', true);
-		NOENCODE.set('A', 'Z', true);
-		NOENCODE.set('0', '9', true);
+		for (int i = 0; i < NOENCODE.length(); i++) {
+			NOENCODE.set(i, false);
+		}
+		for (int i = 'a'; i < 'z'; i++) {
+			NOENCODE.set(i, true);
+		}
+		for (int i = 'A'; i < 'Z'; i++) {
+			NOENCODE.set(i, true);
+		}
+		for (int i = '0'; i < '9'; i++) {
+			NOENCODE.set(i, true);
+		}
+		// 1.4 feature
+		//NOENCODE.set(0, NOENCODE.length(), false);
+		//NOENCODE.set('a', 'z', true);
+		//NOENCODE.set('A', 'Z', true);
+		//NOENCODE.set('0', '9', true);
 	}
 
 	private static String encode(String s) {
