@@ -29,11 +29,10 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.InputMap;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -51,23 +50,19 @@ public class PandaCList extends JTable {
 
 		public void actionPerformed(final ActionEvent e) {
 			JTable table = (JTable)e.getSource();
-			moveIndex((DefaultListSelectionModel)table.getSelectionModel(), rowMove, table.getRowCount() - 1);
-			moveIndex((DefaultListSelectionModel)table.getColumnModel().getSelectionModel(), columnMove, table.getColumnCount() - 1);
+			moveIndex((PandaCListSelectionModel)table.getSelectionModel(), rowMove, table.getRowCount() - 1);
+			moveIndex((PandaCListSelectionModel)table.getColumnModel().getSelectionModel(), columnMove, table.getColumnCount() - 1);
 			table.repaint();
 		}
 
-		private void moveIndex(DefaultListSelectionModel selections, int move, int max) {
-			ListSelectionListener[] listeners = (ListSelectionListener[])selections.getListeners(ListSelectionListener.class);
-			for (int i = 0, n = listeners.length; i < n; i++) {
-				selections.removeListSelectionListener(listeners[i]);
-			}
+		private void moveIndex(PandaCListSelectionModel selections, int move, int max) {
+			boolean notify = selections.isNotifySelectionChange();
+			selections.setNotifySelectionChange(false);
 			int lead = selections.getLeadSelectionIndex() + move;
 			lead = lead < 0 ? 0 : max < lead ? max : lead;
 			selections.setLeadSelectionIndex(lead);
 			selections.setAnchorSelectionIndex(lead);
-			for (int i = 0, n = listeners.length; i < n; i++) {
-				selections.addListSelectionListener(listeners[i]);
-			}
+			selections.setNotifySelectionChange(notify);
 		}
 	}
 
@@ -122,6 +117,16 @@ public class PandaCList extends JTable {
 			column.setPreferredWidth(widths[i]);
 			column.setMinWidth(widths[i]);
 		}
+	}
+
+	protected TableColumnModel createDefaultColumnModel() {
+		TableColumnModel model = super.createDefaultColumnModel();
+		model.setSelectionModel(createDefaultSelectionModel());
+		return model;
+	}
+
+	protected ListSelectionModel createDefaultSelectionModel() {
+		return new PandaCListSelectionModel();
 	}
 
 	public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
