@@ -39,11 +39,11 @@ public class SignalInfo {
 		return handler;
 	}
 
-	String getObject() {
+	public String getObject() {
 		return object;
 	}
 
-	boolean isAfter() {
+	public boolean isAfter() {
 		return after;
 	}
 	

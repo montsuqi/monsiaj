@@ -24,53 +24,27 @@ package org.montsuqi.monsia;
 
 public class SignalData {
 
-	public SignalData(Object signalObject, SignalInfo sInfo, AccelInfo accel) {
-		this(signalObject, sInfo);
-		this.accel = accel;
+	private final Object target;
+	private final SignalInfo sInfo;
+
+	public SignalData(Object target, SignalInfo sInfo) {
+		this.target = target;
+		this.sInfo = sInfo;
 	}
 
-	public SignalData(Object signalObject, SignalInfo sInfo) {
-		this(signalObject, sInfo.getName(), sInfo.getObject(), sInfo.isAfter());
-	}
-	
-	public SignalData(Object signalObject, String name, String connectObject, boolean after) {
-		this.signalObject = signalObject;
-		this.name = name;
-		this.connectObject = connectObject;
-		this.after = after;
-		this.accel = null;
-	}
-
-	Object getSignalObject() {
-		return signalObject;
+	Object getTarget() {
+		return target;
 	}
 
 	String getName() {
-		return name;
+		return sInfo.getName();
 	}
 
-	String getConnectObject() {
-		return connectObject;
+	String getObject() {
+		return sInfo.getObject();
 	}
 
 	boolean isAfter() {
-		return after;
+		return sInfo.isAfter();
 	}
-
-	boolean hasAccel() {
-		return accel != null;
-	}
-
-	AccelInfo getAccel() {
-		if ( ! hasAccel()) {
-			throw new IllegalStateException();
-		}
-		return accel;
-	}
-
-	private final Object signalObject;
-	private final String name;
-	private final String connectObject;
-	private final boolean after;
-	private AccelInfo accel;
 }

@@ -211,7 +211,9 @@ public class WidgetBuilder {
 		Iterator i = signals.iterator();
 		while (i.hasNext()) {
 			SignalInfo sInfo = (SignalInfo)i.next();
-			xml.addSignal(sInfo.getHandler(), new SignalData(widget, sInfo));
+			SignalData data = new SignalData(widget, sInfo);
+
+			xml.addSignal(sInfo.getHandler(), data);
 		}
 	}
 

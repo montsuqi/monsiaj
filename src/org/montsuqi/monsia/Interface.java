@@ -154,9 +154,9 @@ public class Interface {
 				SignalHandler handler = SignalHandler.getSignalHandler(handlerName);
 				while (i.hasNext()) {
 					SignalData data = (SignalData)i.next();
-					Component target = (Component)data.getSignalObject();
+					Component target = (Component)data.getTarget();
 					String signalName = data.getName();
-					Object other = data.getConnectObject();
+					Object other = data.getObject();
 					if (data.isAfter()) {
 						connectAfter(target, signalName, handler, other);
 					} else {
