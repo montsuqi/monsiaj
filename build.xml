@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.13 2004-02-02 01:52:45 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.14 2004-03-03 09:10:51 ozawa Exp $ -->
 <project name="panda-client" default="dist" basedir=".">
 
   <!-- properties -->
@@ -83,6 +83,7 @@
          manifest="${resources.dir}/jmareceipt.mf"/>
     <copy todir="${dist.dir}">
       <fileset dir="${libs.dir}" includes="*.jar"/>
+      <fileset dir="${resources.dir}" includes="*.jnlp"/>
     </copy>
     <!-- ant 1.5.x should use destfile instead of zipfile-->
     <zip zipfile="${dist.dir}/monsiaj.zip">
