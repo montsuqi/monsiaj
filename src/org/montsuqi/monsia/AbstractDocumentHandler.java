@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
@@ -222,35 +223,26 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	}
 
 	protected int parseModifiers(String modifierValue) {
-		Reader reader = new StringReader(modifierValue);
-		StreamTokenizer tokens = new StreamTokenizer(reader);
-		tokens.ordinaryChars('\u0000', '\uffff');
-		tokens.whitespaceChars('|', '|');
-		tokens.whitespaceChars(' ', ' ');
-	
+		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|"); 
 		int modifiers = 0;
-		try {
-			while (tokens.nextToken() != StreamTokenizer.TT_EOF) {
-				String modifier = tokens.sval;
-				if (modifier.startsWith("GTK_")) { //$NON-NLS-1$
-					modifier = modifier.substring(4);
-				}
-				if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
-					modifiers |= KeyEvent.SHIFT_MASK;
-				} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
-				} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
-					modifiers |= KeyEvent.CTRL_MASK;
-				} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
-				} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
-					modifiers |= parseButtonMask(modifier.substring(6));
-				} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-					logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
-				}
+		while (tokens.hasMoreTokens()) {
+			String modifier = tokens.nextToken();
+			if (modifier.startsWith("GTK_")) { //$NON-NLS-1$
+				modifier = modifier.substring(4);
 			}
-		} catch (IOException e) {
-			logger.warn(e); // no recovery action is needed.
+			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
+				modifiers |= KeyEvent.SHIFT_MASK;
+			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
+				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "LOCK_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
+				modifiers |= KeyEvent.CTRL_MASK;
+			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
+				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "MOD_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
+				modifiers |= parseButtonMask(modifier.substring(6));
+			} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
+				logger.warn(Messages.getString("MonsiaHandler.not_supported_in_Java"), "RELEASE_MASK"); //$NON-NLS-1$ $NON-NLS-2$ //$NON-NLS-2$
+			}
 		}
 		return modifiers;
 	}
