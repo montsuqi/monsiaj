@@ -36,6 +36,8 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.text.MessageFormat;
 
+import org.montsuqi.util.SystemEnvironment;
+
 class Connection {
 
 	private String encoding;
@@ -112,10 +114,67 @@ class Connection {
 	}
 
 	public void sendString(String s) throws IOException {
+		if (SystemEnvironment.isMS932()) {
+			s = fromMS932(s);
+		}
 		byte[] bytes = s.getBytes(encoding);
 		sendLength(bytes.length);
 		out.write(bytes);
 		((OutputStream)out).flush();
+	}
+
+	private String fromMS932(String s) {
+		char[] chars = s.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			switch (chars[i]) {
+			case 0xFF0D: // FULLWIDTH HYPHEN-MINUS
+				chars[i] = 0x2212; // MINUS SIGN
+				break;
+			case 0xFF5E: // FULLWIDTH TILDE
+				chars[i] = 0x301C; // WAVE DASH
+				break;
+			case 0x2225: // PARALLEL TO
+				chars[i] = 0x2016; // DOUBLE VERTICAL LINE
+				break;
+			case 0xFFE0: // FULLWIDTH CENT SIGN
+				chars[i] = 0x00A2; // CENT SIGN
+				break;
+			case 0xFFE1: // FULLWIDTH POUND SIGN
+				chars[i] = 0x00A3; // POUND SIGN
+				break;
+			case 0xFFE2: // FULLWIDTH NOT SIGN
+				chars[i] = 0x00AC; // NOT SIGN
+				break;
+			}
+		}
+		return new String(chars);
+	}
+
+	private String toMS932(String s) {
+		char[] chars = s.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			switch (chars[i]) {
+			case 0x2212: // MINUS SIGN
+				chars[i] = 0xFF0D; // FULLWIDTH HYPHEN-MINUS
+				break;
+			case 0x301C: // WAVE DASH
+				chars[i] = 0xFF5E; // FULLWIDTH TILDE
+				break;
+			case 0x2016: // DOUBLE VERTICAL LINE
+				chars[i] = 0x2225; // PARALLEL TO
+				break;
+			case 0x00A2: // CENT SIGN
+				chars[i] = 0xFFE0; // FULLWIDTH CENT SIGN
+				break;
+			case 0x00A3: // POUND SIGN
+				chars[i] = 0xFFE1; // FULLWIDTH POUND SIGN
+				break;
+			case 0x00AC: // NOT SIGN
+				chars[i] = 0xFFE2; // FULLWIDTH NOT SIGN
+				break;
+			}
+		}
+		return new String(chars);
 	}
 
 	void sendFixedString(String s) throws IOException {
@@ -125,7 +184,8 @@ class Connection {
 	String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
 		in.readFully(bytes);
-		return new String(bytes, encoding);
+		final String s = new String(bytes, encoding);
+		return SystemEnvironment.isMS932() ? toMS932(s) : s;
 	}
 
 	public String receiveString() throws IOException {
