@@ -54,9 +54,8 @@ public class PandaCombo extends JComboBox {
 			int items = getItemCount();
 			newSelected = newSelected < 0 ? 0 : items <= newSelected ? items - 1 : newSelected;
 			setSelectedIndex(newSelected);
-			JTextField editor = (JTextField)getEditor().getEditorComponent();
-			String item = getSelectedItem().toString();
-			editor.setText(getSelectedItem().toString());
+			JTextField edit = (JTextField)getEditor().getEditorComponent();
+			edit.setText(getSelectedItem().toString());
 		}
 	}
 
@@ -104,19 +103,20 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 
 	public PandaComboBoxEditor(final PandaCombo combo) {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
+		editor.setBorder(null);
 		editor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String s = e.getActionCommand();
 				combo.setSelectedItem(s);
-				editor.setText(s);
+				JTextField edit = (JTextField)getEditorComponent();
+				edit.setText(s);
 			}
 		});
 	}
 
 	static class BorderlessPandaEntry extends PandaEntry {
 		public BorderlessPandaEntry(String value, int n) {
-			super(value,n);
-			setBorder(null);
+			super(value, n);
 			InputMap inputMap = getInputMap();
 			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
 			inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
