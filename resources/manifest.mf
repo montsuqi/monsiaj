@@ -1,1 +1,1 @@
-Main-Class: org.montsuqi.client.Client
+Main-Class: org.montsuqi.client.Launcher
