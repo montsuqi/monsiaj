@@ -36,7 +36,6 @@ import java.util.Map;
 
 import javax.swing.AbstractButton;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -227,7 +226,7 @@ class WidgetMarshal {
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
 		con.sendString(name + '.' + va.getValueName());
-		con.sendBooleanData(va.getType(), ((JButton)widget).isSelected());
+		con.sendBooleanData(va.getType(), ((AbstractButton)widget).isSelected());
 		return true;
 	}
 
@@ -284,7 +283,7 @@ class WidgetMarshal {
 				count = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				List list = new ArrayList();
-				list.add(""); //$NON-NLS-1$
+				//list.add(""); //$NON-NLS-1$
 				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
 				int num = con.receiveInt();
 				for (int j = 0; j < num ; j++) {
