@@ -34,7 +34,6 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.text.MessageFormat;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -89,28 +88,7 @@ public class Protocol extends Connection {
 		return xml;
 	}
 
-	private static final BitSet NOENCODE;
 	private Window activeWindow;
-	static {
-		NOENCODE = new BitSet(256);
-		for (int i = 0, n = NOENCODE.length(); i < n; i++) {
-			NOENCODE.clear(i);
-		}
-		for (int i = 'a'; i < 'z'; i++) {
-			NOENCODE.set(i);
-		}
-		for (int i = 'A'; i < 'Z'; i++) {
-			NOENCODE.set(i);
-		}
-		for (int i = '0'; i < '9'; i++) {
-			NOENCODE.set(i);
-		}
-		// 1.4 feature
-		//NOENCODE.set(0, NOENCODE.length(), false);
-		//NOENCODE.set('a', 'z', true);
-		//NOENCODE.set('A', 'Z', true);
-		//NOENCODE.set('0', '9', true);
-	}
 
 	private boolean receiveFile(String name, String fName) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
@@ -144,11 +122,11 @@ public class Protocol extends Connection {
 		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
 			activeWindow = w;
 			w.pack();
-			w.show();
+			w.setVisible(true);
 			return node;
 		}
 		if (type == ScreenType.CLOSE_WINDOW){
-			w.hide();
+			w.setVisible(false);
 		}
 		return null;
 	}
