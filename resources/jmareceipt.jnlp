@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp spec="1.0+" codebase="@webstarturl@" href="jmareceipt.jnlp">
   <information>
-    <title>Æü°åÉ¸½à¥ì¥»¥×¥È¥½¥Õ¥È</title>
+    <title>æ—¥åŒ»æ¨™æº–ãƒ¬ã‚»ãƒ—ãƒˆã‚½ãƒ•ãƒˆ</title>
     <vendor>NaCl</vendor>
     <description>demo</description>
     <offline-allowed/>
@@ -14,5 +14,9 @@
     <jar href="jmareceipt.jar"/>
     <jar href="pandaclient.jar"/>
   </resources>
-  <application-desc main-class="jp.or.med.jma_receipt.Launcher"/>
+  <resources os="Mac OS X">
+    <jar href="WebKit.jar"/>
+    <nativelib href="libwebkitsample.jnilib.jar"/>
+  </resources>
+  <application-desc main-class="jp.or.med.jma_receipt.JMAReceiptLauncher"/>
 </jnlp>
