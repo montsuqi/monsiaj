@@ -60,18 +60,12 @@ public class TableConstraints {
 	public GridBagConstraints toGridBagConstraints() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.NONE;
 		if (xFill) {
-			if (yFill) {
-				gbc.fill = GridBagConstraints.BOTH;
-			} else {
-				gbc.fill = GridBagConstraints.HORIZONTAL;
-			}
-		} else {
-			if (yFill) {
-				gbc.fill = GridBagConstraints.VERTICAL;
-			} else {
-				gbc.fill = GridBagConstraints.NONE;
-			}
+			gbc.fill |= GridBagConstraints.HORIZONTAL;
+		}
+		if (yFill) {
+			gbc.fill |= GridBagConstraints.VERTICAL;
 		}
 		gbc.gridheight = bottomAttach - topAttach;
 		gbc.gridwidth = rightAttach - leftAttach;

@@ -872,10 +872,9 @@ class WidgetBuilder {
 			child = buildWidget(wInfo);
 			int pCount = wInfo.getPropertiesCount();
 			for (int j = 0; j < pCount; j++) {
-				Property p = wInfo.getProperty(j);
+				Property p = cInfo.getProperty(j);
 				String name = p.getName();
 				String value = p.getValue();
-
 				if ("left_attach".equals(name)) { //$NON-NLS-1$
 					tc.leftAttach = ParameterConverter.toInteger(value);
 				} else if ("right_attach".equals(name)) { //$NON-NLS-1$

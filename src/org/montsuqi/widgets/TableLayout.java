@@ -43,12 +43,6 @@ public class TableLayout extends GridBagLayout {
 	}
 	
 	public void setConstraints(Component comp, TableConstraints constraints) {
-		if (constraints.leftAttach >= constraints.rightAttach) {
-			throw new IllegalArgumentException(Messages.getString("TableLayout.wrong_constraints")); //$NON-NLS-1$
-		}
-		if (constraints.topAttach >= constraints.bottomAttach) {
-			throw new IllegalArgumentException(Messages.getString("TableLayout.wrong_constraints")); //$NON-NLS-1$
-		}
 		super.setConstraints(comp, constraints.toGridBagConstraints());
 	}
 
