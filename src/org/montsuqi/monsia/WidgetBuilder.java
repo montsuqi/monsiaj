@@ -14,8 +14,10 @@ import java.util.HashMap;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JApplet;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JRadioButton;
@@ -373,7 +375,10 @@ public class WidgetBuilder {
 				handleInternalChild(parent, cInfo);
 			}
 			Container child = buildWidget(cInfo.getWidgetInfo());
-			if (parent instanceof JWindow) {
+			if (parent instanceof JWindow ||
+				parent instanceof JFrame ||
+				parent instanceof JDialog ||
+				parent instanceof JApplet) {
 				parent = ((JWindow)parent).getContentPane();
 			}
 			parent.add(child);
