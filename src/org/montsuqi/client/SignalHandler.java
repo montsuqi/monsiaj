@@ -130,6 +130,7 @@ public abstract class SignalHandler {
 					if (prop != null && prop instanceof JTextField) {
 						JTextField text = (JTextField)prop;
 						con.addChangedWidget(text);
+						widget = text;
 					}
 				}
 				java.awt.Window window = SwingUtilities.windowForComponent(widget);
