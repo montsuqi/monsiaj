@@ -686,6 +686,10 @@ public class Protocol extends Connection {
 		}
 	}
 
+	public void press_filter(Container widget, Object userData) {
+		logger.warn("press_filter is not impremented yet");
+	}
+
 	/** callback placeholder which has no effect */
 	public void gtk_true(Container widget, Object userData) {
 		/* DO NOTHING */
