@@ -39,6 +39,7 @@ import java.util.Map;
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
 import javax.swing.JComboBox;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -50,14 +51,13 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.PandaFocusManager;
 
 public class Interface {
-	private Map comboMap;
-    private Map widgets;
+	private Map widgets;
     private Map longNames;
 	private Map buttonGroups;
 	private Protocol protocol;
 
 	private Component topLevel;
-	private Map signals;
+	private List signals;
     private Component focusWidget;
 	private Component defaultWidget;
 
@@ -132,8 +132,7 @@ public class Interface {
 	Interface(List roots, Protocol protocol) {
 		widgets = new HashMap();
 		longNames = new HashMap();
-		comboMap = new HashMap();
-		signals = new HashMap();
+		signals = new ArrayList();
 		buttonGroups = new HashMap();
 		topLevel = null;
 		defaultWidget = null;
@@ -144,24 +143,16 @@ public class Interface {
 	}
 
 	private void signalAutoConnect() {
-		Iterator entries = signals.entrySet().iterator();
+		Iterator entries = signals.iterator();
 		while (entries.hasNext()) {
-			Map.Entry entry = (Map.Entry)entries.next();
-			String handlerName = (String)entry.getKey();
-			handlerName = handlerName.toLowerCase();
-			Iterator i = ((List)entry.getValue()).iterator();
+			SignalData data = (SignalData)entries.next();
+			String handlerName = data.getHandler().toLowerCase();
 			try {
 				SignalHandler handler = SignalHandler.getSignalHandler(handlerName);
-				while (i.hasNext()) {
-					SignalData data = (SignalData)i.next();
-					Component target = (Component)data.getTarget();
-					String signalName = data.getName();
-					Object other = data.getObject();
-					if (data.isAfter()) {
-						connectAfter(target, signalName, handler, other);
-					} else {
-						connect(target, signalName, handler, other);
-					}
+				if (data.isAfter()) {
+					connectAfter(handler, data);
+				} else {
+					connect(handler, data);
 				}
 			} catch (NoSuchMethodException e) {
 				throw new InterfaceBuildingException(e);
@@ -169,20 +160,29 @@ public class Interface {
 		}
 	}
 
-	private void connect(Component target, String signalName, SignalHandler handler, Object other) {
+	private void connect(SignalHandler handler, SignalData data) {
+		Component target = data.getTarget();
 		if (target instanceof JComboBox) {
-			target = getComboEditor((JComboBox)target);
+			JComboBox combo = (JComboBox)target;
+			Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
+			if (prop != null) {
+				target = (JTextField)prop;
+			} else {
+				String message = Messages.getString("Interface.no_such_combo"); //$NON-NLS-1$
+				message = MessageFormat.format(message, new Object[] { combo.getName() });
+				throw new IllegalArgumentException(message);
+			}
 		}
 		try {
-			Connector connector = Connector.getConnector(signalName);
-			connector.connect(protocol, target, handler, other);
+			Connector connector = Connector.getConnector(data.getName());
+			connector.connect(protocol, target, handler, data.getObject());
 		} catch (NoSuchMethodException e) {
 			throw new InterfaceBuildingException(e);
 		}
 	}
 
-	private void connectAfter(Component target, String signalName, SignalHandler handler, Object other) {
-		connect(target, signalName, handler, other);
+	private void connectAfter(SignalHandler handler, SignalData data) {
+		connect(handler, data);
 	}
 
 	public Component getWidget(String name) {
@@ -245,6 +245,9 @@ public class Interface {
 
 	public ButtonGroup getButtonGroup(String name) {
 		if ( ! buttonGroups.containsKey(name)) {
+			ButtonGroup group = new ButtonGroup();
+			JRadioButton dummy = new JRadioButton();
+			group.add(dummy);
 			buttonGroups.put(name, new ButtonGroup());
 		}
 		return (ButtonGroup)buttonGroups.get(name);
@@ -263,12 +266,8 @@ public class Interface {
 		topLevel = widget;
 	}
 
-	public void addSignal(String handler, SignalData sData) {
-		if ( ! signals.containsKey(handler)) {
-			signals.put(handler, new ArrayList());
-		}
-		List signalsForHandle = (List)signals.get(handler);
-		signalsForHandle.add(0, sData);
+	public void addSignal(SignalData sData) {
+		signals.add(0, sData);
 	}
 
 	public void addAccels(Component widget, WidgetInfo info) {
@@ -325,19 +324,5 @@ public class Interface {
 		}
 		AccelHandler handler = (AccelHandler)accelHandlers.get(c);
 		return handler;
-	}
-
-	public void setComboMap(JComboBox combo, Component editor) {
-		comboMap.put(combo, editor);
-	}
-
-	public JTextField getComboEditor(JComboBox combo) {
-		if (comboMap.containsKey(combo)) {
-			return (JTextField)comboMap.get(combo);
-		} else {
-			String message = Messages.getString("Interface.no_such_combo"); //$NON-NLS-1$
-			message = MessageFormat.format(message, new Object[] { combo.getName() });
-			throw new IllegalArgumentException(message);
-		}
 	}
 }

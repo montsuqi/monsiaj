@@ -27,7 +27,6 @@ import java.awt.Container;
 import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -201,21 +200,14 @@ public class WidgetBuilder {
 	}
 
 	private void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
-		addSignals(xml, widget, info.getSignals());
 		widget.setName(info.getName());
 		xml.setName(info.getName(), widget);
 		xml.setLongName(info.getLongName(), widget);
-	}	
-
-	private void addSignals(Interface xml, Component widget, List signals) {
-		Iterator i = signals.iterator();
+		Iterator i = info.getSignals().iterator();
 		while (i.hasNext()) {
-			SignalInfo sInfo = (SignalInfo)i.next();
-			SignalData data = new SignalData(widget, sInfo);
-
-			xml.addSignal(sInfo.getHandler(), data);
+			xml.addSignal(new SignalData(widget, ((SignalInfo)i.next())));
 		}
-	}
+	}	
 
 	void setProperties(Interface xml, Container parent, Component widget, Map properties) {
 		Iterator i = properties.entrySet().iterator();

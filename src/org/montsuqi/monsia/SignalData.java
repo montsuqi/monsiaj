@@ -22,22 +22,28 @@ copies.
 
 package org.montsuqi.monsia;
 
+import java.awt.Component;
+
 public class SignalData {
 
-	private final Object target;
+	private final Component target;
 	private final SignalInfo sInfo;
 
-	public SignalData(Object target, SignalInfo sInfo) {
+	public SignalData(Component target, SignalInfo sInfo) {
 		this.target = target;
 		this.sInfo = sInfo;
 	}
 
-	Object getTarget() {
+	Component getTarget() {
 		return target;
 	}
 
 	String getName() {
 		return sInfo.getName();
+	}
+
+	String getHandler() {
+		return sInfo.getHandler();
 	}
 
 	String getObject() {
