@@ -18,7 +18,9 @@
 
 	<property name="webstart.url"        value="http://localhost/java-client/"/>
 
-	<property name="application.name"    value="JMAReceipt"/>
+	<property name="macosx.application.name"    value="JMAReceipt"/>
+	<property name="macosx.system.resources.dir" value="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS"/>
+	<property name="macosx.application.stub" value="JavaApplicationStub"/>
 
 	<path id="project.class.path">
 		<pathelement path="${build.dir}"/>
@@ -26,11 +28,6 @@
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
-
-	<!-- non standard task definitions -->
-	<taskdef name="jarbundler"
-		classpath="${libs.dir}/jarbundler.jar"
-		classname="com.loomcom.ant.tasks.jarbundler.JarBundler"/>
 
 	<!-- targets -->
 
@@ -43,9 +40,12 @@
 		<property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
 		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 		<property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
-		<mkdir dir="${dist.dir}/${bin.name}"/>
-		<mkdir dir="${dist.dir}/${src.name}"/>
-		<mkdir dir="${dist.dir}/${replay.name}"/>
+		<property name="dist.bin.dir" value="${dist.dir}/${bin.name}"/>
+		<property name="dist.src.dir" value="${dist.dir}/${src.name}"/>
+		<property name="dist.replay.dir" value="${dist.dir}/${replay.name}"/>
+		<mkdir dir="${dist.bin.dir}"/>
+		<mkdir dir="${dist.src.dir}"/>
+		<mkdir dir="${dist.replay.dir}"/>
 		<mkdir dir="${report.dir}"/>
 
 		<condition property="on.macosx">
@@ -54,6 +54,7 @@
 				<os family="unix"/>
 			</and>
 		</condition>
+		<property name="macosx.app.dir" value="${dist.bin.dir}/JMAReceipt.app"/>
 	</target>
 
 	<target name="compile" depends="prepare"
@@ -75,8 +76,6 @@
 	<target name="resources-copy-files" depends="prepare">
 		<copy todir="${build.dir}">
 			<fileset dir="${src.dir}" includes="**/*.properties,**/*.jpg,**/*.png"/>
-		</copy>
-		<copy todir="${build.dir}">
 			<fileset dir="${resources.dir}" includes="style.properties"/>
 		</copy>
 	</target>
@@ -101,45 +100,47 @@
 	<target name="dist-bin" depends="dist-bin-copy-files">
 		<antcall target="dist-bin-mac-bundle"/>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.dir}/${bin.name}.zip">
+		<zip zipfile="${dist.bin.dir}.zip">
 			<fileset dir="${dist.dir}" includes="${bin.name}/**"/>
 		</zip>
 	</target>
 
 	<target name="dist-bin-copy-files" depends="jars">
 		<!-- ant 1.5.x should use destfile instead of jarfile-->
-		<copy todir="${dist.dir}/${bin.name}">
+		<copy todir="${dist.bin.dir}">
 			<fileset dir="${dist.dir}" includes="jmareceipt.jar, pandaclient.jar"/>
-		</copy>
-		<copy todir="${dist.dir}/${bin.name}">
 			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, *.jnilib"/>
-		</copy>
-		<copy todir="${dist.dir}/${bin.name}">
 			<fileset dir="${build.dir}" includes="*.jnlp"/>
 		</copy>
 	</target>
 
 	<target name="dist-bin-mac-bundle" if="on.macosx" depends="dist-bin-copy-files">
-		<jarbundler dir="${dist.dir}/${bin.name}"
-			name="${application.name}"
-			mainclass="jp.or.med.jma_receipt.JMAReceiptLauncher"
-			aboutmenuname="${application.name}">
-			<jarfileset dir="${dist.dir}/${bin.name}">
-				<include name="*.jar"/>
-				<include name="*.jnilib"/>
-			</jarfileset>
-		</jarbundler>
+		<mkdir dir="${macosx.app.dir}"/>
+		<mkdir dir="${macosx.app.dir}/Contents"/>
+		<mkdir dir="${macosx.app.dir}/Contents/MacOS"/>
+		<mkdir dir="${macosx.app.dir}/Contents/Resources"/>
+		<mkdir dir="${macosx.app.dir}/Contents/Resources/Java"/>
+		<copy todir="${macosx.app.dir}/Contents">
+			<fileset dir="${resources.dir}" includes="Info.plist, PkgInfo"/>
+		</copy>
+		<copy todir="${macosx.app.dir}/Contents/MacOS">
+			<fileset dir="${macosx.system.resources.dir}" includes="${macosx.application.stub}"/>
+		</copy>
+		<copy todir="${macosx.app.dir}/Contents/Resources/Java">
+			<fileset dir="${dist.bin.dir}" includes="*.jar, *.jnilib"/>
+		</copy>
+		<chmod perm="755" file="${macosx.app.dir}/Contents/MacOS/${macosx.application.stub}"/>
 	</target>
-
+		
 	<target name="dist-src" depends="dist-src-copy-files">
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.dir}/${src.name}.zip">
+		<zip zipfile="${dist.src.dir}.zip">
 			<fileset dir="${dist.dir}" includes="${src.name}/**"/>
 		</zip>
 	</target>
 
 	<target name="dist-src-copy-files" depends="prepare">
-		<copy todir="${dist.dir}/${src.name}">
+		<copy todir="${dist.src.dir}">
 			<fileset dir="." includes="src/**,resources/**,libs/**,docs/**,build.xml,Makefile"
 	excludes="**/CVS"/>
 		</copy>
@@ -240,14 +241,14 @@
 	</target>
 
 	<target name="dist.replay" depends="dist, jar.replay, resources">
-		<copy todir="${dist.dir}/${replay.name}">
+		<copy todir="${dist.replay.dir}">
 			<fileset dir="${libs.dir}" includes="*.jar"/>
 		</copy>
-		<copy todir="${dist.dir}/${replay.name}">
+		<copy todir="${dist.replay.dir}">
 			<fileset dir="${dist.dir}" includes="*.jar"/>
 		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.dir}/monsiaj-replay-${DSTAMP}.zip">
+		<zip zipfile="${dist.replay.dir}.zip">
 			<fileset dir="${dist.dir}" includes="${replay.name}/**"/>
 		</zip>
 	</target>
