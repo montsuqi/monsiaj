@@ -30,7 +30,7 @@ import java.util.List;
 
 import javax.swing.AbstractButton;
 
-public class AccelHandler {
+class AccelHandler {
 	class Pair {
 		Component widget;
 		AccelInfo accel;
@@ -46,7 +46,7 @@ public class AccelHandler {
 		list = new ArrayList();
 	}
 
-	public void addAccels(Component widget, List accels) {
+	void addAccels(Component widget, List accels) {
 		Iterator i = accels.iterator();
 		while (i.hasNext()) {
 			AccelInfo accel = (AccelInfo)i.next();
@@ -54,7 +54,7 @@ public class AccelHandler {
 		}
 	}
 
-	public boolean handleAccel(KeyEvent e) {
+	boolean handleAccel(KeyEvent e) {
 		if (e.getID() != KeyEvent.KEY_PRESSED) {
 			return false;
 		}

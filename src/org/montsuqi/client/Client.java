@@ -103,7 +103,7 @@ public class Client implements Runnable {
 		return new Client(conf);
 	}
 
-	public void connect() throws IOException {
+	void connect() throws IOException {
 		protocol = new Protocol(this);
 		protocol.sendConnect(conf.getUser(), conf.getPass(), conf.getApplication());
 	}

@@ -336,7 +336,7 @@ public class Protocol extends Connection {
 		sendString(name);
 	}
 
-	void resetTimer(Component widget) {
+	private void resetTimer(Component widget) {
 		if (widget instanceof PandaTimer) {
 			((PandaTimer)widget).reset();
 		} else if (widget instanceof Container) {
@@ -509,7 +509,7 @@ public class Protocol extends Connection {
 		return isReceiving;
 	}
 
-	Node getNode(String name) {
+	private Node getNode(String name) {
 		return (Node)nodeTable.get(name);
 	}
 
@@ -544,7 +544,7 @@ public class Protocol extends Connection {
 		return widgetName;
 	}
 
-	public Window getActiveWindow() {
+	Window getActiveWindow() {
 		return activeWindow;
 	}
 }
