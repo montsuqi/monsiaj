@@ -14,7 +14,7 @@ public class StdErrLogger extends Logger {
 	public static synchronized Logger getLogger(String name) {
 		Logger logger = null;
 		if ( ! loggers.containsKey(name)) {
-			synchronized (Log4JLogger.class) {
+			synchronized (StdErrLogger.class) {
 				if ( ! loggers.containsKey(name)) {
 					logger = new StdErrLogger();
 					loggers.put(name, logger);
