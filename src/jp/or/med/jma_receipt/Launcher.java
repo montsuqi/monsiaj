@@ -74,6 +74,7 @@ public final class Launcher {
 				client.setPortNumber(conf.getPort());
 				client.setCurrentApplication(conf.getApplication());
 				client.setEncoding("EUC-JP"); //$NON-NLS-1$
+				client.setStyles(conf.getStyleFile());
 				client.setCache(System.getProperty("user.home") + File.separator + "cache"); //$NON-NLS-1$ //$NON-NLS-2$
 				try {
 					client.connect();
