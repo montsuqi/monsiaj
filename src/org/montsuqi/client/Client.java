@@ -245,17 +245,17 @@ public class Client implements Runnable {
 	}
 	
 	public static void main(String[] args) {
-		try {
 			String format = Messages.getString("Client.banner_format"); //$NON-NLS-1$
 			Object[] bannerArgs = new Object[] { CLIENT_VERSION };
 			String banner = MessageFormat.format(format, bannerArgs);
 			System.out.println(banner);
 
 			Client client = Client.parseCommandLine(args);
-			client.connect();
-			client.loop();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
+			try {
+				client.connect();
+				client.loop();
+			} catch (Exception e) {
+				throw new Error(e);
+			}
 	}
 }
