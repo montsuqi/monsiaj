@@ -140,7 +140,7 @@ public class WidgetBuilder {
 		};
 		for (int i = 0; i < classes.length; i++) {
 			String key = classes[i] + ".font"; //$NON-NLS-1$
-			FontUIResource font = (FontUIResource)UIManager.get(key);
+			Font font = (Font)UIManager.get(key);
 			if (font != null) {
 				UIManager.put(key, new FontUIResource(font.deriveFont(font.getStyle() & ~Font.BOLD,font.getSize() * 0.9f)));
 			}

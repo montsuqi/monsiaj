@@ -169,7 +169,7 @@ public class Interface {
 				throw new IllegalArgumentException(MessageFormat.format("no such combo: {0}", args)); //$NON-NLS-1$
 			}
 		}
-			try {
+		try {
 			Connector connector = Connector.getConnector(data.getName());
 			connector.connect(protocol, target, handler, data.getObject());
 		} catch (NoSuchMethodException e) {
