@@ -124,7 +124,7 @@
 			<fileset dir="${resources.dir}" includes="Info.plist, PkgInfo"/>
 		</copy>
 		<copy todir="${macosx.app.dir}/Contents/Resources">
-			<fileset dir="${resources.dir}" includes="*.lproj/**"/>
+			<fileset dir="${resources.dir}" includes="*.lproj/**,*.icns"/>
 		</copy>
 		<copy todir="${macosx.app.dir}/Contents/Resources/Java">
 			<fileset dir="${dist.bin.dir}" includes="*.jar, *.jnilib"/>

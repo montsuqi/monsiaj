@@ -12,6 +12,8 @@
     <string>6.0</string>
     <key>CFBundleExecutable</key>
     <string>JMAReceipt</string>
+    <key>CFBundleIconFile</key>
+    <string>jma-logo.icns</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundlePackageType</key>

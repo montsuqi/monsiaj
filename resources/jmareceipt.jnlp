@@ -3,8 +3,12 @@
   <information>
     <title>日医標準レセプトソフト</title>
     <vendor>NaCl</vendor>
+    <icon href="jma-receipt.png"/>
     <description>demo</description>
     <offline-allowed/>
+    <shortcut online="false">
+      <desktop/>
+    </shortcut>
   </information>
   <security>
     <all-permissions/>
