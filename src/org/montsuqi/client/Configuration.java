@@ -29,6 +29,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.UIManager;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.SystemEnvironment;
 
 public class Configuration {
 
@@ -65,7 +66,15 @@ public class Configuration {
 	static final boolean DEFAULT_SAVE_PASSWORD = false;
 	static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
 	static final String DEFAULT_ENCODING = "EUC-JP"; //$NON-NLS-1$
-	static final String DEFAULT_CACHE_PATH = System.getProperty("user.home") + File.separator + "cache";  //$NON-NLS-1$//$NON-NLS-2$
+	static final String DEFAULT_CACHE_PATH;
+	static {
+		String[] pathElements = {
+			System.getProperty("user.home"), //$NON-NLS-1$
+			".monsiaj", //$NON-NLS-1$
+			"cache" //$NON-NLS-1$
+		};
+		DEFAULT_CACHE_PATH = SystemEnvironment.createFilePath(pathElements).getAbsolutePath();
+	}
 	static final String DEFAULT_STYLES = ""; //$NON-NLS-1$
 	static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties"; //$NON-NLS-1$
 	static final boolean DEFAULT_USE_SSL = false;
