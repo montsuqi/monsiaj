@@ -141,7 +141,7 @@ public abstract class Preview extends JPanel {
 		if ( ! isValidScale(newScale)) {
 			throw new IllegalArgumentException("non-positive scale"); //$NON-NLS-1$
 		}
-		this.scale = newScale;
+		scale = newScale;
 		updatePreferredSize(newScale, rotationStep);
 		revalidate();
 		repaint();
@@ -170,9 +170,20 @@ public abstract class Preview extends JPanel {
 	}
 
 	private void setRotationStep(int newRotationStep) {
-		this.rotationStep = newRotationStep % 4;
+		if (newRotationStep < 0) {
+			newRotationStep += 4 * ((-newRotationStep) / 4 + 1);
+		}
+		newRotationStep %= 4;
+		if ( ! isValidRotationStep(newRotationStep)) {
+			throw new IllegalArgumentException("invalid rotation"); //$NON-NLS-1$
+		}
+		rotationStep = newRotationStep;
 		updatePreferredSize(scale, newRotationStep);
 		revalidate();
 		repaint();
+	}
+
+	private boolean isValidRotationStep(int newRotationStep) {
+		return 0 <= newRotationStep && newRotationStep < 4;
 	}
 }
