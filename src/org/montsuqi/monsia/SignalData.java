@@ -2,6 +2,10 @@ package org.montsuqi.monsia;
 
 class SignalData {
 
+	SignalData(Object signalObject, SignalInfo sInfo, AccelInfo accel) {
+		this(signalObject, sInfo);
+		this.accel = accel;
+	}
 	SignalData(Object signalObject, SignalInfo sInfo) {
 		this(signalObject, sInfo.getName(), sInfo.getObject(), sInfo.isAfter());
 	}
@@ -11,6 +15,7 @@ class SignalData {
 		this.name = name;
 		this.connectObject = connectObject;
 		this.after = after;
+		this.accel = null;
 	}
 
 	Object getSignalObject() {
@@ -29,8 +34,20 @@ class SignalData {
 		return after;
 	}
 
+	boolean hasAccel() {
+		return accel != null;
+	}
+
+	AccelInfo getAccel() {
+		if ( ! hasAccel()) {
+			throw new IllegalStateException();
+		}
+		return accel;
+	}
+
 	private final Object signalObject;
 	private final String name;
 	private final String connectObject;
 	private final boolean after;
+	private AccelInfo accel;
 }
