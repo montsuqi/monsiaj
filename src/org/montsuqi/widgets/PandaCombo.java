@@ -101,10 +101,12 @@ public class PandaCombo extends JComboBox {
 class PandaComboBoxEditor extends BasicComboBoxEditor {
 
 	JComboBox combo;
+	String prefix;
 
 	public PandaComboBoxEditor(final JComboBox combo) {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
 		this.combo = combo;
+		prefix = ""; //$NON-NLS-1$
 		editor.putClientProperty("panda combo editor", Boolean.TRUE); //$NON-NLS-1$
 	}
 
@@ -117,31 +119,36 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 		}
 
 		protected void processKeyEvent(KeyEvent e) {
-			if (e.getID() == KeyEvent.KEY_TYPED) {
-				if (selectWithKey(e.getKeyChar())) {
-					return;
-				}
-			} else {
-				int code = e.getKeyCode();
-				if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN) {
-					super.processKeyEvent(e);
-				}
+			if ( ! selectWithKey(e)) {
+				super.processKeyEvent(e);
 			}
 		}
 
-		private boolean selectWithKey(char c) {
+		private boolean selectWithKey(KeyEvent e) {
+			if (e.getID() == KeyEvent.KEY_TYPED) {
+				char c = e.getKeyChar();
+				if (selectWithPrefix(prefix + c) || selectWithPrefix(String.valueOf(c))) {
+					return true;
+				}
+				prefix = ""; //$NON-NLS-1$
+			}
+			return false;
+		}
+
+		private boolean selectWithPrefix(String key) {
 			ComboBoxModel model = combo.getModel();
-			String s = String.valueOf(c);
 			for (int i = 0, n = model.getSize(); i < n; i++) {
 				Object o = model.getElementAt(i);
-				if (o.toString().startsWith(s)) {
+				if (o.toString().startsWith(key)) {
 					combo.setSelectedIndex(i);
 					setText(o.toString());
+					prefix = key;
 					return true;
 				}
 			}
 			return false;
 		}
+
 		// workaround for 4530952
 		public void setText(String s) {
 			if (getText().equals(s)) {
