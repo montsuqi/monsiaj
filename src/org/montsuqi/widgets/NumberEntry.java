@@ -145,7 +145,6 @@ class NumberDocument extends PlainDocument {
 			String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
 			value = ZERO;
 			try {
-				remove(0, getLength());
 				expo = 0;
 				scale = 0;
 				insertString(0, t, null);
