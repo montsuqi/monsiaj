@@ -50,12 +50,12 @@ import javax.swing.JTextField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
-
 import org.montsuqi.util.Logger;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
+import org.montsuqi.widgets.PandaCombo;
 
 public class Protocol extends Connection {
 
@@ -101,19 +101,20 @@ public class Protocol extends Connection {
 	private void initWidgetOperations() {
 		addClass(JTextField.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(NumberEntry.class,      "receiveNumberEntry", "sendNumberEntry"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JTextArea.class, "receiveText",        "sendText"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JTextArea.class,        "receiveText",        "sendText"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(PandaEntry.class,       "receiveEntry",       "sendEntry"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JLabel.class,           "receiveLabel",       null); //$NON-NLS-1$
 		addClass(JComboBox.class,        "receiveCombo",       null); //$NON-NLS-1$
+		addClass(PandaCombo.class,       "receiveCombo",       null); //$NON-NLS-1$
 		addClass(JTable.class,           "receiveCList",       "sendCList"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JButton.class,          "receiveButton",      null); //$NON-NLS-1$
 		addClass(JToggleButton.class,    "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JCheckBox.class,        "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JRadioButton.class,     "receiveButton",      "sendButton"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JList.class,            "receiveList",        "sendList"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(Calendar.class,       "receiveCalendar",    "sendCalendar"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(Calendar.class,         "receiveCalendar",    "sendCalendar"); //$NON-NLS-1$ //$NON-NLS-2$
 		addClass(JTabbedPane.class,      "receiveNotebook",    "sendNotebook"); //$NON-NLS-1$ //$NON-NLS-2$
-		addClass(JProgressBar.class,      "receiveProgressBar", "sendProgressBar"); //$NON-NLS-1$ //$NON-NLS-2$
+		addClass(JProgressBar.class,     "receiveProgressBar", "sendProgressBar"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	Interface getInterface() {
@@ -262,6 +263,7 @@ public class Protocol extends Connection {
 	private boolean sendWidgetData(String name, Container widget) throws IOException {
 		MarshalHandler handler = (MarshalHandler)(classTable.get(widget.getClass()));
 		if (handler != null) {
+			// TODO: need special handling for combo
 			return handler.sendWidget(getMarshal(), name, widget);
 		} else {
 			return false;
@@ -630,7 +632,7 @@ public class Protocol extends Connection {
 
 	public void set_focus(Container widget, Object userData) {
 		String name = widget.getName();
-		Node node = (Node)(windowTable.get(name));
+		Node node = (Node)windowTable.get(name);
 		if(node != null) {
 			/*FocusedScreen = node;*/ // this variable is referred from nowhere.
 		}
@@ -651,7 +653,7 @@ public class Protocol extends Connection {
 
 	public void window_close(Container widget, Object userData) {
 		String name = widget.getName();
-		Node node = (Node)(windowTable.get(name));
+		Node node = (Node)windowTable.get(name);
 		if (node != null) {
 			node.getWindow().setVisible(false);
 			if ( ! inReceive) {
@@ -674,6 +676,9 @@ public class Protocol extends Connection {
 	}
 
 	public void open_browser(Container widget, Object userData) {
+		if ( ! (widget instanceof JTextPane)) {
+			logger.warn("not a JTextPane widget");
+		}
 		JTextPane pane = (JTextPane)widget;
 		URL uri;
 		try {

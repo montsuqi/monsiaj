@@ -41,6 +41,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JApplet;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -62,6 +63,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
+import org.montsuqi.widgets.PandaCombo;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
 
@@ -113,7 +115,7 @@ class WidgetBuilder {
 		registerClass("NumberEntry", org.montsuqi.widgets.NumberEntry.class); //$NON-NLS-1$
 		registerClass("OptionMenu", javax.swing.JMenu.class); //$NON-NLS-1$
 		registerClass("PandaCList", javax.swing.JTable.class); //$NON-NLS-1$
-		registerClass("PandaCombo", javax.swing.JComboBox.class); //$NON-NLS-1$
+		registerClass("PandaCombo", org.montsuqi.widgets.PandaCombo.class); //$NON-NLS-1$
 		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class); //$NON-NLS-1$
 		registerClass("PandaHTML", org.montsuqi.widgets.PandaHTML.class); //$NON-NLS-1$
 		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
@@ -215,7 +217,7 @@ class WidgetBuilder {
 								"colorSelectionDialogFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("Combo", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
-								"standardBuildChildren", //$NON-NLS-1$
+								"buildComboChildren", //$NON-NLS-1$
 								"comboFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("CTree", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
@@ -278,7 +280,7 @@ class WidgetBuilder {
 								null);
 		registerWidgetBuildData("PandaCombo", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
-								"standardBuildChildren", //$NON-NLS-1$
+								"buildPandaComboChildren", //$NON-NLS-1$
 								"comboFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("PandaCList", //$NON-NLS-1$
 								"standardBuildWidget", //$NON-NLS-1$
@@ -643,6 +645,36 @@ class WidgetBuilder {
 		Container child = buildWidget(wInfo);
 		JViewport viewport = (JViewport)parent;
 		viewport.setView(child);
+	}
+
+	void buildComboChildren(Container parent, WidgetInfo info) {
+		JComboBox combo = (JComboBox)parent;
+		int cCount = info.getChildrenCount();
+		if (cCount != 1) {
+			throw new WidgetBuildingException("only one child is allowed in Combo");
+		}
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		if ( ! "Entry".equals(wInfo.getClassName())) { //$NON-NLS-1$
+			throw new WidgetBuildingException("not a Entry widget");
+		}
+		Container editor = (Container)combo.getEditor().getEditorComponent();
+		xml.setLongName(wInfo.getLongName(), editor);
+	}
+
+	void buildPandaComboChildren(Container parent, WidgetInfo info) {
+		PandaCombo combo = (PandaCombo)parent;
+		int cCount = info.getChildrenCount();
+		if (cCount != 1) {
+			throw new WidgetBuildingException("only one child is allowed in PandaCombo");
+		}
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		if ( ! "PandaEntry".equals(wInfo.getClassName())) { //$NON-NLS-1$
+			throw new WidgetBuildingException("not a PandaEntry widget");
+		}
+		Container editor = (Container)combo.getEditor().getEditorComponent();
+		xml.setLongName(wInfo.getLongName(), editor);
 	}
 
 	void buildCListChildren(Container parent, WidgetInfo info) {

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -157,7 +158,8 @@ class WidgetMarshal {
 					ValueAttribute va = getValue(buff);
 					BigDecimal val = con.receiveFixedData();
 					registerValue(widget, name, val);
-					((NumberEntry)widget).setValue(val);
+					NumberEntry entry = (NumberEntry)widget;
+					entry.setValue(val);
 				}
 			}
 		}
@@ -165,11 +167,12 @@ class WidgetMarshal {
 	}
 
 	boolean sendNumberEntry(String name, Container widget) throws IOException {
-		BigDecimal value = ((NumberEntry)widget).getValue();
+		NumberEntry entry = (NumberEntry)widget;
+		BigDecimal value = entry.getValue();
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = getValue(name);
-		va.setOpt(value);
 		con.sendString(name + '.' + va.getKey());
+		//va.setOpt(value);
 		con.sendFixedData(va.getType(), value);
 		return true;
 	}
@@ -269,6 +272,9 @@ class WidgetMarshal {
 	}
 
 	boolean receiveCombo(Container widget) throws IOException {
+		String selected = null;
+		JComboBox combo = (JComboBox)widget;
+		DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		int nItem = con.receiveInt();
 		int count = 0;
@@ -284,7 +290,7 @@ class WidgetMarshal {
 				count = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				List list = new ArrayList();
-				//list.add(""); //$NON-NLS-1$
+				list.add(""); //$NON-NLS-1$
 				con.receiveDataTypeWithCheck(Type.ARRAY); /*	Type.ARRAY	*/
 				int num = con.receiveInt();
 				for (int j = 0; j < num ; j++) {
@@ -293,11 +299,10 @@ class WidgetMarshal {
 						list.add(buff);
 					}
 				}
-				JComboBox combo = (JComboBox)widget;
-				combo.removeAllItems();
+				model.removeAllElements();
 				Iterator i = list.iterator();
 				while (i.hasNext()) {
-					combo.addItem(i.next());
+					model.addElement(i.next());
 				}
 			} else {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
@@ -305,12 +310,17 @@ class WidgetMarshal {
 				widgetName.replace(offset, widgetName.length(), '.' + name);
 				Container sub =  con.getInterface().getWidgetByLongName(widgetName.toString());
 				if (sub != null) {
-					receiveEntry(sub);
+					JTextField dummyEntry = (JTextField)sub;
+					receiveEntry(dummyEntry);
+					selected = dummyEntry.getText();
 				} else {
 					logger.warn(Messages.getString("WidgetMarshal.subwidget_not_found")); //$NON-NLS-1$
 					/*	fatal error	*/
 				}
 			}
+		}
+		if (selected != null) {
+			combo.setSelectedItem(selected);
 		}
 		return true;
 	}
