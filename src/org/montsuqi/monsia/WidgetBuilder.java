@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
@@ -37,12 +38,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JApplet;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,7 +56,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -102,7 +100,7 @@ class WidgetBuilder {
 		registerClass("Combo", javax.swing.JComboBox.class); //$NON-NLS-1$
 		registerClass("Entry", javax.swing.JTextField.class); //$NON-NLS-1$
 		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
-		registerClass("Frame", javax.swing.JLabel.class); //$NON-NLS-1$
+		registerClass("Frame", org.montsuqi.widgets.Frame.class); //$NON-NLS-1$
 		registerClass("HBox", org.montsuqi.widgets.HBox.class); //$NON-NLS-1$
 		registerClass("HSeparator", org.montsuqi.widgets.HSeparator.class); //$NON-NLS-1$
 		registerClass("ImageMenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
@@ -196,6 +194,7 @@ class WidgetBuilder {
 		registerProperty(javax.swing.JProgressBar.class, "value", "setProgressBarValue");
 		registerProperty(javax.swing.JProgressBar.class, "orientation", "setProgressBarOrientation");
 		registerProperty(javax.swing.JProgressBar.class, "show_text", "setProgressBarShowText");
+		registerProperty(org.montsuqi.widgets.Frame.class, "label", "setFrameLabel");
 	}
 	
 	private void initWidgetBuildData() {
@@ -513,47 +512,15 @@ class WidgetBuilder {
 	}
 
 	void buildFrameChildren(Container parent, WidgetInfo info) {
-		logger.enter("buildFrameChildren");
 		int cCount = info.getChildrenCount();
-		if (cCount != 2) {
-			throw new IllegalStateException(Messages.getString("WidgetBuilder.there_should_really_only_be_2_children")); //$NON-NLS-1$
+		if (cCount  != 1) {
+			throw new WidgetBuildingException("only one child for a Frame");
 		}
-
-		Border border = null;
-		JComponent widget = null;
-		boolean isLabel = false;
-		for (int i = 0; i < cCount; i++) {
-			String label = null;
-			ChildInfo cInfo = info.getChild(i);
-			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			isLabel = false;
-			int pCount = cInfo.getPropertiesCount();
-			for (int j = 0; j < pCount; j++) {
-				logger.debug("property={0}", cInfo.getProperty(j));
-				String pName = cInfo.getProperty(j).getName();
-				String pValue = cInfo.getProperty(j).getValue();
-				if ("type".equals(pName) && "label_item".equals(pValue)) { //$NON-NLS-1$ //$NON-NLS-2$
-					isLabel = true;
-				} else if ("label".equals(pName)) { //$NON-NLS-1$
-					label = pValue;
-				}
-			}
-
-			if (isLabel == true || label != null) {
-				border = BorderFactory.createTitledBorder(label);
-			} else {
-				widget = (JComponent)buildWidget(cInfo.getWidgetInfo());
-			}
-		}
-		logger.debug("Frame/widget={0}", widget);
-		logger.debug("Frame/border={0}", border);
-		if (widget != null) {
-			if (border != null) {
-				widget.setBorder(border);
-			}
-			parent.add(widget);
-		}
-		logger.leave("buildFrameChildren");
+		parent.setLayout(new BorderLayout());
+		ChildInfo cInfo = info.getChild(0);
+		WidgetInfo wInfo = cInfo.getWidgetInfo();
+		Container child = buildWidget(wInfo);
+		parent.add(child);
 	}
 
 	void buildNotebookChildren(Container parent, WidgetInfo info) {
@@ -904,7 +871,7 @@ class WidgetBuilder {
 			tl.setConstraints(child, tc);
 		}
 	}
-	
+
 	void buildLayoutChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		for (int i = 0; i < cCount; i++) {

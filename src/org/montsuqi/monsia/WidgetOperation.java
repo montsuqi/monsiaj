@@ -29,6 +29,7 @@ import java.awt.Frame;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
@@ -43,6 +44,7 @@ import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
+import javax.swing.border.Border;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -526,5 +528,14 @@ class WidgetOperation {
 		JProgressBar progress = (JProgressBar)widget;
 		boolean showText = ParameterConverter.toBoolean(value);
 		progress.setStringPainted(showText);
+	}
+
+	static void setFrameLabel(Interface xml, Container widget, String name, String value) {
+		if ( ! (widget instanceof org.montsuqi.widgets.Frame)) {
+			throw new IllegalArgumentException("not a Frame widget");
+		}
+		org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame)widget;
+		Border border = BorderFactory.createTitledBorder(value);
+		frame.setBorder(border);
 	}
 }
