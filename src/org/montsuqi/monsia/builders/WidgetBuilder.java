@@ -216,10 +216,6 @@ public class WidgetBuilder {
 		while (i.hasNext()) {
 			Map.Entry ent = (Map.Entry)i.next();
 			WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, (String)ent.getKey());
-			if (setter == null) {
-				//logger.debug("setter not found");
-				continue;
-			}
 			setter.set(xml, parent, widget, (String)ent.getValue());
 		}
 	}

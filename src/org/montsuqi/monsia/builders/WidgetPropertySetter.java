@@ -73,6 +73,8 @@ abstract class WidgetPropertySetter {
 
 	private static Map propertyMap;
 
+	private static final WidgetPropertySetter nullWidgetPropertySetter;
+	
 	static WidgetPropertySetter getSetter(Class clazz, String name) {
 		for (/**/; clazz != null; clazz = clazz.getSuperclass()) {
 			Map map = (Map)propertyMap.get(clazz);
@@ -84,7 +86,7 @@ abstract class WidgetPropertySetter {
 				return setter;
 			}
 		}
-		return null;
+		return nullWidgetPropertySetter;
 	}
 
 	private static void registerProperty(Class clazz, String propertyName, WidgetPropertySetter setter) {
@@ -97,6 +99,12 @@ abstract class WidgetPropertySetter {
 
 	static {
 		propertyMap = new HashMap();
+
+		nullWidgetPropertySetter = new WidgetPropertySetter() {
+			void set(Interface xml, Container parent, Component widget, String value) {
+				// do nothing
+			}
+		};
 
 		registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
