@@ -29,6 +29,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -376,12 +377,19 @@ public class ConfigurationPanel extends JPanel {
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				Component root = SwingUtilities.windowForComponent(ConfigurationPanel.this);
-				if (root == null) {
+				Window window = SwingUtilities.windowForComponent(ConfigurationPanel.this);
+				Component root;
+				if (window != null) {
+					root = window;
+				} else {
 					root = ConfigurationPanel.this;
 				}
 				try {
 					SwingUtilities.updateComponentTreeUI(root);
+					if (window != null) {
+						window.pack();
+					}
+					
 				} catch (Exception e) {
 					logger.warn(e);
 				}
