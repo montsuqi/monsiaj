@@ -150,7 +150,8 @@ public class WidgetBuilder {
 			String key = classes[i] + ".font"; //$NON-NLS-1$
 			Font font = (Font)UIManager.get(key);
 			if (font != null) {
-				font = ScreenScale.scale(font.deriveFont(font.getStyle() & ~Font.BOLD));
+				font = font.deriveFont(font.getStyle() & ~Font.BOLD);
+				font = ScreenScale.scale(font);
 				UIManager.put(key, new FontUIResource(font));
 			}
 		}
