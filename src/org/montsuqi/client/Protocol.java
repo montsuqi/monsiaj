@@ -205,25 +205,25 @@ public class Protocol extends Connection {
 		sendString(name);
 		byte pc = receivePacketClass();
 		if (pc == PacketClass.ScreenDefine) {
-			OutputStream out = new FileOutputStream(fName);
-			int left = receiveLong();
+			OutputStream fileOut = new FileOutputStream(fName);
+			int left = receiveLength();
 			int size;
 			final int SIZE_BUFF = 4096;
 			byte[] buff = new byte[SIZE_BUFF];
 			do {
-				if (left > SIZE_BUFF) {
-					size = SIZE_BUFF;
-				} else {
-					size = left;
-				}
-				size = in.read(buff, 0, size);
-				if (size > 0) {
-					out.write(buff);
-					left -= size;
-				}
+					if (left > SIZE_BUFF) {
+						size = SIZE_BUFF;
+					} else {
+						size = left;
+					}
+					size = in.read(buff, 0, size);
+					if (size > 0) {
+						fileOut.write(buff, 0, size);
+						left -= size;
+					}
 			} while (left > 0);
-			out.flush();
-			out.close();
+			fileOut.flush();
+			fileOut.close();
 			return true;
 		} else {
 			logger.warn(Messages.getString("Protocol.invalid_protocol_sequence")); //$NON-NLS-1$
@@ -279,9 +279,14 @@ public class Protocol extends Connection {
 			String sName = receiveString();
 			int size = receiveLong();
 			int mtime = receiveLong();
+			int ctime = receiveLong();
+			
 			String fName = client.getCacheFileName(sName);
 
 			File file = new File(fName);
+			File parent = file.getParentFile();
+			parent.mkdirs();
+			file.createNewFile();
 			if (file.lastModified() < mtime * 1000 ||
 				file.length() != size) {
 				receiveFile(sName, fName);
