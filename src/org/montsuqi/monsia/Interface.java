@@ -86,7 +86,7 @@ public class Interface {
 		try {
 			saxParser = parserFactory.newSAXParser();
 		} catch (Exception e) {
-			throw new ExceptionInInitializerError(e);
+			throw new InterfaceBuildingException(e);
 		}
 	}
 
