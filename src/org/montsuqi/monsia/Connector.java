@@ -337,17 +337,12 @@ abstract class Connector {
 			public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
 				// XxxSelectionModels don't care selection/unselection so use connectSelectRow
 				// Object[] args = { target, handler, other};
-				// logger.debug("selection_change: target={0}, handler={1}, other={2}", args);
+				// logger.debug("unselect_row: target={0}, handler={1}, other={2}", args);
 				// connectSelectRow(target, handler, other);
 			}
 		});
 
-		registerConnector("selection_changed", new Connector() { //$NON-NLS-1$
-			public void connect(Protocol con, final Component target, final SignalHandler handler, final Object other) {
-				Object[] args = { target, handler, other };
-				logger.debug("selection_change: target={0}, handler={1}, other={2}", args); //$NON-NLS-1$
-			}
-		});
+		registerConnector("selection_changed", getConnector("select_row")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		registerConnector("click_column", new Connector() { //$NON-NLS-1$
 			public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
