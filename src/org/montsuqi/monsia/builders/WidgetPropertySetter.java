@@ -36,11 +36,11 @@ import java.util.StringTokenizer;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
@@ -544,25 +544,19 @@ abstract class WidgetPropertySetter {
 				JMenuItem item = (JMenuItem)widget;
 				value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
 				UIStock stock = UIStock.get(value);
-				if (stock != null) {
-					String text = stock.getText();
-					if (text != null) {
-						item.setText(text);
-					}
+				if (stock == null) {
+					return;
 				}
-			}
-		});
-
-		registerProperty(JMenu.class, "stock_item", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				JMenu item = (JMenu)widget;
-				value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
-				UIStock stock = UIStock.get(value);
-				if (stock != null) {
-					String oldText = item.getText();
-					if (oldText == null || oldText.length() == 0) {
-						item.setText(stock.getText());
-					}
+				String oldText = item.getText();
+				String newText = stock.getText();
+				assert newText != null;
+				if (oldText == null || oldText.length() == 0) {
+					item.setText(newText);
+				}
+				Icon oldIcon = item.getIcon();
+				Icon newIcon = stock.getIcon();
+				if (oldIcon == null && newIcon != null) {
+					item.setIcon(newIcon);
 				}
 			}
 		});
