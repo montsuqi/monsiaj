@@ -1,6 +1,8 @@
 package org.montsuqi.monsia;
 
 import java.awt.Container;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
@@ -27,5 +29,12 @@ public class Node {
 		return xml;
 	}
 
-	
+	public String toString() {
+		StringWriter s = new StringWriter();
+		PrintWriter p = new PrintWriter(s);
+		window.list(p);
+		return s.toString();
+	}
+
+
 }
