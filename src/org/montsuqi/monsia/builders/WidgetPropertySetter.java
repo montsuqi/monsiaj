@@ -61,12 +61,10 @@ import javax.swing.text.JTextComponent;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
-import org.montsuqi.widgets.LatticeLayout;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.UIStock;
 import org.montsuqi.widgets.Window;
 
@@ -560,22 +558,21 @@ abstract class WidgetPropertySetter {
 			}
 		});
 
-		registerProperty(Table.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				Table table = (Table)widget;
-				LatticeLayout layout = (LatticeLayout)table.getLayout();
-				layout.setVerticalLattices(ParameterConverter.toInteger(value));
-			}
-		});
-
-		registerProperty(Table.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				Table table = (Table)widget;
-				LatticeLayout layout = (LatticeLayout)table.getLayout();
-				layout.setHorizontalLattices(ParameterConverter.toInteger(value));
-			}
-		});
+//		registerProperty(Table.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
+//			void set(Interface xml, Container parent, Component widget, String value) {
+//				Table table = (Table)widget;
+//				TableLayout layout = (TableLayout)table.getLayout();
+//				layout.setRows(ParameterConverter.toInteger(value));
+//			}
+//		});
 //
+//		registerProperty(Table.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
+//			void set(Interface xml, Container parent, Component widget, String value) {
+//				Table table = (Table)widget;
+//				TableLayout layout = (TableLayout)table.getLayout();
+//				layout.setColumns(ParameterConverter.toInteger(value));
+//			}
+//		});
 //		registerProperty(Table.class, "homogeneous", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
 //				Table table = (Table)widget;
@@ -599,7 +596,7 @@ abstract class WidgetPropertySetter {
 //				tl.setRowSpacing(ParameterConverter.toInteger(value));
 //			}
 //		});
-//
+
 		registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1$
 			void set(Interface xml, Container parent, Component widget, String value) {
 				Window window = (Window)widget;
