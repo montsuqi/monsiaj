@@ -83,7 +83,7 @@ public class PandaCList extends JTable {
 	}
 
 	public PandaCList() {
-		setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
+		setAutoResizeMode(AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		ActionMap actions = getActionMap();
 		InputMap inputs = getInputMap();
 
@@ -110,14 +110,18 @@ public class PandaCList extends JTable {
 		TableColumnModel model = getColumnModel();
 		int n = getColumnCount();
 		TableCellRenderer[] renderers = new TableCellRenderer[n];
+		int[] width = new int[n];
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
 			renderers[i] = column.getHeaderRenderer();
+			width[i] = column.getWidth();
 		}
 		super.createDefaultColumnsFromModel();
 		for (int i = 0; i < n; i++) {
 			TableColumn column = model.getColumn(i);
 			column.setHeaderRenderer(renderers[i]);
+			column.setPreferredWidth(width[i]);
+			column.setWidth(width[i]);
 		}
 	}
 
@@ -144,21 +148,5 @@ public class PandaCList extends JTable {
 			column.setPreferredWidth(headerWidth);
 			column.setWidth(headerWidth);
 		}
-	}
-
-	public void doLayout() {
-		int columnCount = columnModel.getColumnCount();
-		if (columnCount == 0) {
-			return;
-		}
-		int widgetWidth = getPreferredSize().width;
-		int diff = (widgetWidth - columnModel.getTotalColumnWidth()) / columnCount;
-		for (int i = 0; i < columnCount; i++) {
-			TableColumn column = columnModel.getColumn(i);
-			int width = column.getPreferredWidth() + diff;
-			column.setPreferredWidth(width);
-			column.setWidth(width);
-		}
-		super.doLayout();
 	}
 }
