@@ -686,6 +686,10 @@ public class Protocol extends Connection {
 		}
 	}
 
+	public void keypress_filter(Container widget, Object userData) {
+		logger.warn("keypress_filter is not impremented yet");
+	}
+
 	public void press_filter(Container widget, Object userData) {
 		logger.warn("press_filter is not impremented yet");
 	}
