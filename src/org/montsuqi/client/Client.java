@@ -109,7 +109,6 @@ public class Client implements Runnable {
 				}
 			}
 			protocol.close();
-			exitSystem();
 		} catch (IOException e) {
 			logger.fatal(e);
 		}
