@@ -68,11 +68,6 @@ import org.montsuqi.widgets.Window;
 
 public class WidgetBuilder {
 
-	private static WidgetPropertySetter propertySetter;
-	static {
-		propertySetter = WidgetPropertySetter.getInstance();
-	}
-	
 	private static Map classMap;
 	private static Map builderMap;
 
@@ -163,7 +158,7 @@ public class WidgetBuilder {
 		Component widget = null;
 		try {
 			widget = (Component)clazz.newInstance();
-			propertySetter.setProperties(xml, widget, info);
+			WidgetPropertySetter.setProperties(xml, widget, info);
 			xml.addAccels(widget, info);
 			return widget;
 		} catch (InstantiationException e) {
