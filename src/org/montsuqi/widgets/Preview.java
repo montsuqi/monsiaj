@@ -96,6 +96,7 @@ public abstract class Preview extends JPanel {
 	protected void setScale(double scale) {
 		if ( ! Double.isNaN(scale) && 0 < scale && scale < Double.MAX_VALUE) {
 			this.scale = scale;
+			revalidate();
 			repaint();
 		} else {
 			throw new IllegalArgumentException(Messages.getString("ImagePreview.non_positive_scale_factor")); //$NON-NLS-1$

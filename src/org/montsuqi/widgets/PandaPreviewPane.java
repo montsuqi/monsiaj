@@ -34,7 +34,7 @@ import javax.swing.ScrollPaneConstants;
 public class PandaPreviewPane extends JPanel {
 
 	private JToolBar toolbar;
-	Preview preview;
+	private Preview preview;
 
 	public PandaPreviewPane() {
 		super();
