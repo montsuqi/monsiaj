@@ -52,7 +52,7 @@ public class TestPandaEntry extends JFCTestCase {
 		m_helper.sendString(new StringEventData(this,
 						m_pandaEntry, "aiueo"));
 		text = m_pandaEntry.getText();
-//		assertEquals("KANA input ", "", text);
+		assertEquals("KANA input ", "\u30a2\u30a4\u30a6\u30a8\u30aa", text);
 	}
 
 	public void testASCIIentry() throws Exception {
