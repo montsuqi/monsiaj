@@ -15,9 +15,11 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -127,7 +129,7 @@ public class WidgetBuilder {
 		registerProperty(javax.swing.JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTable.class, "show_titles", "setCListSetShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(javax.swing.JTable.class, "show_titles", "setCListShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTree.class, "selection_mode", "setTreeSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTree.class, "view_mode", "setTreeViewMode"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(javax.swing.JTree.class, "view_line", "setTreeViewLine"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -530,7 +532,7 @@ public class WidgetBuilder {
 		}
 	}
 
-	public void buildToolbarChildren(Container parent, WidgetInfo info) {
+	public void buildToolBarChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		JToolBar toolBar = (JToolBar)parent;
 		for (int i = 0; i < cCount; i++) {
@@ -751,6 +753,121 @@ public class WidgetBuilder {
 			parent.add(child);
 			child.setLocation(x, y);
 		}
+	}
+
+	//--------------------------------------------------------------------
+
+	public Container dialogFindInternalChild(Container parent, String childName) {
+		JDialog dialog = (JDialog)parent;
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		return null;
+	}
+
+	public Container imageMenuFindInternalChild(Container parent, String childName) {
+		if ("image".equals(childName)) { //$NON-NLS-1$
+			return parent; // MenuItem itself is an AbstractButton and hase an icon with it.
+		} else {
+			return null;
+		}
+	}
+
+	public Container scrolledWindowFindInternalChild(Container parent, String childName) {
+		JScrollPane scroll = (JScrollPane)parent;
+		if ("vscrollbar".equals(childName)) { //$NON-NLS-1$
+			return scroll.getVerticalScrollBar();
+		}
+		if ("hscrollbar".equals(childName)) { //$NON-NLS-1$
+			return scroll.getHorizontalScrollBar();
+		}
+		
+		return null;
+	}
+
+	public Container fileSelectionDialogFindInternalChild(Container parent, String childName) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("ok_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("help_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		return null;
+	}
+
+	public Container colorSelectionDialogFindInternalChild(Container parent, String childName) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("ok_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("help_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("color_selection".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		return null;
+	}
+
+	public Container fontSelectionDialogFindInternalChild(Container parent, String childName) {
+		if ("vbox".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("action_area".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("ok_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("apply_button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("font_selection".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		return null;
+	}
+
+	public Container comboFindInternalChild(Container parent, String childName) {
+		if ("entry".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("button".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("popup".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("popwin".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		if ("list".equals(childName)) { //$NON-NLS-1$
+			return parent;
+		}
+		return null;
 	}
 
 	//--------------------------------------------------------------------

@@ -6,12 +6,10 @@ import java.util.StringTokenizer;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
@@ -227,119 +225,6 @@ public class WidgetOperation {
 		}
 		JPasswordField password = (JPasswordField)widget;
 		password.setEchoChar(value.charAt(0));
-	}
-
-	public Container dialogFindInternalChild(Container parent, String childName) {
-		JDialog dialog = (JDialog)parent;
-		if ("vbox".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("action_area".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		return null;
-	}
-
-	public Container imageMenuFindInternalChild(Container parent, String childName) {
-		if ("image".equals(childName)) { //$NON-NLS-1$
-			return parent; // MenuItem itself is an AbstractButton and hase an icon with it.
-		} else {
-			return null;
-		}
-	}
-
-	public Container scrolledWindowFindInternalChild(Container parent, String childName) {
-		JScrollPane scroll = (JScrollPane)parent;
-		if ("vscrollbar".equals(childName)) { //$NON-NLS-1$
-			return scroll.getVerticalScrollBar();
-		}
-		if ("hscrollbar".equals(childName)) { //$NON-NLS-1$
-			return scroll.getHorizontalScrollBar();
-		}
-		
-		return null;
-	}
-
-	public Container fileSelectionDialogFindInternalChild(Container parent, String childName) {
-		if ("vbox".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("action_area".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("ok_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("help_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		return null;
-	}
-
-	public Container colorSelectionDialogFindInternalChild(Container parent, String childName) {
-		if ("vbox".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("action_area".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("ok_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("help_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("color_selection".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		return null;
-	}
-
-	public Container fontSelectionDialogFindInternalChild(Container parent, String childName) {
-		if ("vbox".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("action_area".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("ok_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("cancel_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("apply_button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("font_selection".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		return null;
-	}
-
-	public Container comboFindInternalChild(Container parent, String childName) {
-		if ("entry".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("button".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("popup".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("popwin".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		if ("list".equals(childName)) { //$NON-NLS-1$
-			return parent;
-		}
-		return null;
 	}
 
 	public static void setTableLeftAttach(Interface xml, Container widget, String name, String value) {
