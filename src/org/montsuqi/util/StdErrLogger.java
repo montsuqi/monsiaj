@@ -27,6 +27,14 @@ public class StdErrLogger extends Logger {
 	private StdErrLogger() {
 	}
 
+	public void trace(String message) {
+		System.err.println("TRACE:" + message);
+	}
+
+	public void debug(String message) {
+		System.err.println("DEBUG:" + message);
+	}
+
 	public void info(String message) {
 		System.err.println("INFO:" + message);
 	}
@@ -37,5 +45,15 @@ public class StdErrLogger extends Logger {
 
 	public void fatal(String message) {
 		System.err.println("FATAL: " + message);
+	}
+
+	public void warn(Throwable e) {
+		warn(e.toString());
+		e.printStackTrace();
+	}
+
+	public void fatal(Throwable e) {
+		fatal(e.toString());
+		e.printStackTrace();
 	}
 }

@@ -11,6 +11,14 @@ public class NullLogger extends Logger {
 	private NullLogger() {
 	}
 
+	public void trace(String message) {
+		// do nothing 
+	}
+
+	public void debug(String message) {
+		// do nothing 
+	}
+
 	public void info(String message) {
 		// do nothing 
 	}

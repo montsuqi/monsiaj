@@ -28,6 +28,14 @@ public class Log4JLogger extends Logger {
 		this.logger = logger;
 	}
 
+	public void trace(String message) {
+		logger.debug(message);
+	}
+
+	public void debug(String message) {
+		logger.debug(message);
+	}
+
 	public void info(String message) {
 		logger.info(message);
 	}

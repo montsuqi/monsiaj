@@ -27,8 +27,15 @@ public class J2SELogger extends Logger {
 		this.logger = logger;
 	}
 
-	public void info(String message) {
+	public void trace(String message) {
+		logger.finest(message);
+	}
+	public void debug(String message) {
 		logger.finer(message);
+	}
+	
+	public void info(String message) {
+		logger.fine(message);
 	}
 
 	public void warn(String message) {
