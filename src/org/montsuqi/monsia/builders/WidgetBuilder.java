@@ -123,17 +123,22 @@ public class WidgetBuilder {
 
 	// set up UI resources
 	static {
-		FontUIResource font;
-
-		font = (FontUIResource)UIManager.get("Button.font"); //$NON-NLS-1$
-		if (font != null) {
-			font = new FontUIResource(font.deriveFont(Font.PLAIN, font.getSize2D() * 0.9f));
-			UIManager.put("Button.font", font); //$NON-NLS-1$
-		}
-		font = (FontUIResource)UIManager.get("ComboBox.font"); //$NON-NLS-1$
-		if (font != null) {
-			font = new FontUIResource(font.deriveFont(Font.PLAIN));
-			UIManager.put("ComboBox.font", font); //$NON-NLS-1$
+		String[] classes = {
+			"Button", //$NON-NLS-1$
+			"ToggleButton", //$NON-NLS-1$
+			"RadioButton", //$NON-NLS-1$
+			"ComboBox", //$NON-NLS-1$
+			"CheckBox", //$NON-NLS-1$
+			"RadioButton", //$NON-NLS-1$
+			"TabbedPane", //$NON-NLS-1$
+			"Label" //$NON-NLS-1$
+		};
+		for (int i = 0; i < classes.length; i++) {
+			String key = classes[i] + ".font"; //$NON-NLS-1$
+			FontUIResource font = (FontUIResource)UIManager.get(key);
+			if (font != null) {
+				UIManager.put(key, new FontUIResource(font.deriveFont(font.getStyle() & ~Font.BOLD)));
+			}
 		}
 		UIManager.put("Button.margin", new InsetsUIResource(0, 0, 0, 0)); //$NON-NLS-1$
 	}
