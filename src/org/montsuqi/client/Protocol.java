@@ -31,8 +31,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -437,36 +439,29 @@ public class Protocol extends Connection {
 		return this.receiving = receiving;
 	}
 
-	boolean sendConnect(String user, String pass, String apl) throws IOException {
-		byte pc;
+	void sendConnect(String user, String pass, String apl) throws IOException {
 		sendPacketClass(PacketClass.Connect);
 		sendVersionString();
 		sendString(user);
 		sendString(pass);
 		sendString(apl);
-		pc = receivePacketClass();
-		if (pc == PacketClass.OK) {
-			return true;
-		} else {
-			switch (pc) {
-			case PacketClass.NOT:
-				logger.warn(Messages.getString("Protocol.cannot_connect_to_server")); //$NON-NLS-1$
-				break;
-			case PacketClass.E_VERSION:
-				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_version_mismatch")); //$NON-NLS-1$
-				break;
-			case PacketClass.E_AUTH:
-				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_authentication_error")); //$NON-NLS-1$
-				break;
-			case PacketClass.E_APPL:
-				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_invalid_application_name")); //$NON-NLS-1$
-				break;
-			default:
-				logger.warn(Messages.getString("Protocol.cannot_connect_to_server_other_protocol_error"), //$NON-NLS-1$
-							Integer.toHexString(pc));
-				break;
-			}
-			return false;
+		byte pc = receivePacketClass();
+		switch (pc) {
+		case PacketClass.OK:
+			// throw nothing
+			break;
+		case PacketClass.NOT:
+			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server")); //$NON-NLS-1$
+		case PacketClass.E_VERSION:
+			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server_version_mismatch")); //$NON-NLS-1$
+		case PacketClass.E_AUTH:
+			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server_authentication_error")); //$NON-NLS-1$
+		case PacketClass.E_APPL:
+			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server_invalid_application_name")); //$NON-NLS-1$
+		default:
+			String message = Messages.getString("Protocol.cannot_connect_to_server_other_protocol_error"); //$NON-NLS-1$
+			message = MessageFormat.format(message, new Object[] { Integer.toHexString(pc) });
+			throw new ConnectException(message);
 		}
 	}
 

@@ -68,6 +68,7 @@ public final class Launcher {
 					t.start();
 				} catch (Exception e2) {
 					JOptionPane.showMessageDialog(null, e2.getMessage());
+					System.exit(0);
 				}
 			} else {
 				System.exit(0);

@@ -24,6 +24,7 @@ package org.montsuqi.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
 
 import org.montsuqi.util.Logger;
@@ -73,28 +74,24 @@ public class Client implements Runnable {
 		return client;
 	}
 
-	public void connect() {
+	public void connect() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnknownHostException, IOException {
 		Socket s = null;
-		try {
-			String factoryName;
-			Object[] options;
-			if (useSSL) {
-				factoryName = "org.montsuqi.client.SSLSocketCreator"; //$NON-NLS-1$
-				options = new Object[] { new Boolean(verify) };
-			} else {
-				factoryName = "org.montsuqi.client.SocketCreator"; //$NON-NLS-1$
-				options = null;
-			}
-			Class clazz = Class.forName(factoryName);
-			SocketCreator creator = (SocketCreator)clazz.newInstance();
-			s = creator.create(host, portNumber, options);
-			protocol = new Protocol(this, s);
-			protocol.sendConnect(user, pass, currentApplication);
-			connected = true;
-		} catch (Exception e) {
-			logger.fatal(e);
-			logger.fatal(Messages.getString("Client.cannot_connect")); //$NON-NLS-1$
+		connected = false;
+		String factoryName;
+		Object[] options;
+		if (useSSL) {
+			factoryName = "org.montsuqi.client.SSLSocketCreator"; //$NON-NLS-1$
+			options = new Object[] { new Boolean(verify) };
+		} else {
+			factoryName = "org.montsuqi.client.SocketCreator"; //$NON-NLS-1$
+			options = null;
 		}
+		Class clazz = Class.forName(factoryName);
+		SocketCreator creator = (SocketCreator)clazz.newInstance();
+		s = creator.create(host, portNumber, options);
+		protocol = new Protocol(this, s);
+		protocol.sendConnect(user, pass, currentApplication);
+		connected = true;
 	}
 
 	public void run() {
