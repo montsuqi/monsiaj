@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 import org.montsuqi.client.Client;
@@ -42,10 +43,11 @@ class PropertyFileBasedConfiguration extends Configuration {
 		try {
 			props.load(new FileInputStream(CONFIGURATION_FILE));
 		} catch (FileNotFoundException e) {
-			System.err.println(e.getMessage());
+			Object[] args = new Object[] { CONFIGURATION_FILE };
+			String message = MessageFormat.format(Messages.getString("PropertyFileBasedConfiguration.configuration_file_not_found"), args); //$NON-NLS-1$
+			logger.warn(message);
 		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+			logger.warn(e);
 		}
 	}
 
@@ -53,8 +55,7 @@ class PropertyFileBasedConfiguration extends Configuration {
 		try {
 			props.store(new FileOutputStream(CONFIGURATION_FILE), null);
 		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+			logger.warn(e);
 		}
 	}
 
@@ -87,7 +88,7 @@ class PropertyFileBasedConfiguration extends Configuration {
 	String getStyleFile() {
 		String style = props.getProperty("style"); //$NON-NLS-1$
 		if (style == null) {
-			return "";
+			return ""; //$NON-NLS-1$
 		} else {
 			return style;
 		}

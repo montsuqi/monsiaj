@@ -22,8 +22,15 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import org.montsuqi.util.Logger;
+
 abstract class Configuration {
+	protected Logger logger;
 	private char[] pass;
+	public Configuration() {
+		logger = Logger.getLogger(Configuration.class);
+	}
+
 	abstract void load();
 	abstract void save();
 

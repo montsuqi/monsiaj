@@ -43,8 +43,7 @@ class PreferenceBasedConfiguration extends Configuration {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
-			e.printStackTrace();
+			logger.warn(e);
 		}
 	}
 
