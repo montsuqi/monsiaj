@@ -24,6 +24,7 @@ package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -104,8 +105,15 @@ class ComboMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
 		Interface xml = con.getInterface();
-		JTextField editor = xml.getComboEditor(combo);
-		entryMarshaller.send(manager, xml.getWidgetLongName(editor), editor);
+		Object prop = combo.getClientProperty("editor"); //$NON-NLS-1$
+		if (prop != null) {
+			JTextField editor = (JTextField)prop;
+			entryMarshaller.send(manager, xml.getWidgetLongName(editor), editor);
+		} else {
+			String message = Messages.getString("Interface.no_such_combo"); //$NON-NLS-1$
+			message = MessageFormat.format(message, new Object[] { combo.getName() });
+			throw new IllegalArgumentException(message);
+		}
 	}
 }
 

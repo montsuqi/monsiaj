@@ -53,7 +53,7 @@ class PandaComboBuilder extends ContainerBuilder {
 		}
 		Component editor = combo.getEditor().getEditorComponent();
 		xml.setLongName(wInfo.getLongName(), editor);
-		xml.setComboMap(combo, editor);
+		combo.putClientProperty("editor", editor); //$NON-NLS-1$
 		List signals = wInfo.getSignals();
 		Iterator i = signals.iterator();
 		while (i.hasNext()) {
