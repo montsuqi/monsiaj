@@ -20,26 +20,30 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.monsia.builders;
+package org.montsuqi.widgets;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 
-import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.WidgetInfo;
+public class RadioButton extends JRadioButton {
 
-class ButtonBuilder extends ContainerBuilder {
-	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
-		Component widget = super.buildSelf(xml, parent, info);
-		JButton button = (JButton)widget;
-		InputMap inputs = button.getInputMap(JComponent.WHEN_FOCUSED);
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "pressed"); //$NON-NLS-1$
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), "released"); //$NON-NLS-1$
-		return widget;
+	public RadioButton() {
+		super();
+		initActions();
+	}
+
+	private void initActions() {
+		ActionMap actions = getActionMap();
+		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
+		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
+
+		InputMap inputs = getInputMap(JComponent.WHEN_FOCUSED);
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
 	}
 }

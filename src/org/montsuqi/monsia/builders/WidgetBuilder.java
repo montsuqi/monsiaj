@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -40,11 +38,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.JViewport;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
@@ -56,6 +51,9 @@ import org.montsuqi.monsia.SignalData;
 import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.Button;
+import org.montsuqi.widgets.CheckBox;
+import org.montsuqi.widgets.Entry;
 import org.montsuqi.widgets.Notebook;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaCList;
@@ -70,7 +68,9 @@ import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.RadioButton;
 import org.montsuqi.widgets.Table;
+import org.montsuqi.widgets.ToggleButton;
 import org.montsuqi.widgets.VBox;
 import org.montsuqi.widgets.VSeparator;
 import org.montsuqi.widgets.Window;
@@ -95,13 +95,13 @@ public class WidgetBuilder {
 		WidgetBuilder defaultWidgetBuilder= new WidgetBuilder();
 		WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
 
-		registerWidgetClass("Button",         JButton.class,       new ButtonBuilder()); //$NON-NLS-1$
+		registerWidgetClass("Button",         Button.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Calendar",       Calendar.class,      defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("CheckButton",    JCheckBox.class,     defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("CheckButton",    CheckBox.class,      defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
 		registerWidgetClass("CList",          PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Dialog",         Window.class,       defaultContainerBuilder); //$NON-NLS-1$
-		registerWidgetClass("Entry",          JTextField.class,    defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Dialog",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("Entry",          Entry.class,         defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
 		registerWidgetClass("HBox",           HBox.class,          defaultContainerBuilder); //$NON-NLS-1$
@@ -124,11 +124,11 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Placeholder",    JPanel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("RadioButton",    JRadioButton.class,  new RadioButtonBuilder()); //$NON-NLS-1$
+		registerWidgetClass("RadioButton",    RadioButton.class,   new RadioButtonBuilder()); //$NON-NLS-1$
 		registerWidgetClass("ScrolledWindow", JScrollPane.class,   new ScrolledWindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Table",          Table.class,         new TableBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Text",           JTextArea.class,     defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("ToggleButton",   JToggleButton.class, defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("ToggleButton",   ToggleButton.class, defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VBox",           VBox.class,          defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$

@@ -36,21 +36,31 @@ import java.awt.im.InputSubset;
 
 import javax.swing.AbstractButton;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
-public class PandaEntry extends JTextField {
+public class PandaEntry extends Entry {
 
 	boolean ximEnabled;
 	public static final int KANA = PandaDocument.KANA;
 	public static final int XIM = PandaDocument.XIM;
 	public static final int ASCII = PandaDocument.ASCII;
 
-	public PandaEntry(String text, int columns) {
-		super(new PandaDocument(), text, columns);
+	public PandaEntry() {
+		super();
+		setDocument(new PandaDocument());
+		initListeners();
+	}
+
+	public PandaEntry(String value, int n) {
+		super(value, n);
+		setDocument(new PandaDocument());
+		initListeners();
+	}
+
+	private void initListeners() {
 		addFocusListener(new FocusListener() {
 			// NOTE only works in japanese environment.
 			// See
@@ -81,19 +91,6 @@ public class PandaEntry extends JTextField {
 			}
 		});
 	}
-
-	public PandaEntry(int columns) {
-		this(null, columns);
-	}
-
-	public PandaEntry(String text) {
-		this(text, 0);
-	}
-
-	public PandaEntry() {
-		this(null, 0);
-	}	
-
 	public void setInputMode(int mode) {
 		PandaDocument doc = (PandaDocument)getDocument();
 		doc.setInputMode(mode);

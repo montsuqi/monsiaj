@@ -22,7 +22,6 @@ copies.
 
 package org.montsuqi.widgets;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -65,20 +64,6 @@ public class PandaCList extends JTable {
 			selections.setLeadSelectionIndex(lead);
 			selections.setAnchorSelectionIndex(lead);
 			selections.setNotifySelectionChange(notify);
-		}
-	}
-
-	public class FocusOutNextAction extends AbstractAction {
-		public void actionPerformed(ActionEvent e) {
-			Component c = (Component)e.getSource();
-			c.transferFocus();
-		}
-	}
-
-	public class FocusOutPreviousAction extends AbstractAction {
-		public void actionPerformed(ActionEvent e) {
-			Component c = (Component)e.getSource();
-			c.transferFocusBackward();
 		}
 	}
 
