@@ -66,7 +66,7 @@ public class Client implements Runnable {
 
 	private static String createPath(String[] elements) {
 		StringBuffer buf = new StringBuffer();
-		for (int i = 1; i < elements.length; i++) {
+		for (int i = 0; i < elements.length; i++) {
 			if (i > 0) {
 				buf.append(File.separator);
 			}
