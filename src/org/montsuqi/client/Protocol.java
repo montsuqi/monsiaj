@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -290,7 +290,7 @@ public class Protocol extends Connection {
 				}
 			}
 		}
-		
+
 		if (protocol2) {
 			if ( ! done) {
 				String dataName = longName.toString();
@@ -422,15 +422,15 @@ public class Protocol extends Connection {
 			// throw nothing
 			break;
 		case PacketClass.NOT:
-			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server")); //$NON-NLS-1$
+			throw new ConnectException("cannot connect server"); //$NON-NLS-1$
 		case PacketClass.E_VERSION:
-			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server_version_mismatch")); //$NON-NLS-1$
+			throw new ConnectException("cannot connect to server(version mismatch)"); //$NON-NLS-1$
 		case PacketClass.E_AUTH:
-			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server_authentication_error")); //$NON-NLS-1$
+			throw new ConnectException("cannot connect to server(authentication error)"); //$NON-NLS-1$
 		case PacketClass.E_APPL:
-			throw new ConnectException(Messages.getString("Protocol.cannot_connect_to_server_invalid_application_name")); //$NON-NLS-1$
+			throw new ConnectException("cannot connect to server(application name invalid)"); //$NON-NLS-1$
 		default:
-			String message = Messages.getString("Protocol.cannot_connect_to_server_other_protocol_error"); //$NON-NLS-1$
+			String message = "cannot connect to server(other protocol error {0})"; //$NON-NLS-1$
 			message = MessageFormat.format(message, new Object[] { Integer.toHexString(pc) });
 			throw new ConnectException(message);
 		}

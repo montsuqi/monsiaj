@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -48,7 +48,7 @@ public class LittleEndianDataInputStream extends InputStream implements DataInpu
 	public int read(byte[] b, int off, int len) throws IOException {
 		return dis.read(b, off, len);
 	}
-	
+
 	public boolean readBoolean() throws IOException {
 		return dis.readBoolean();
 	}
@@ -56,11 +56,11 @@ public class LittleEndianDataInputStream extends InputStream implements DataInpu
 	public byte readByte() throws IOException {
 		return dis.readByte();
 	}
-	
+
 	public char readChar() throws IOException {
 		return ByteOrder.reverse(dis.readChar());
 	}
-		
+
 	public double readDouble() throws IOException {
 		return ByteOrder.reverse(dis.readDouble());
 	}
@@ -76,15 +76,15 @@ public class LittleEndianDataInputStream extends InputStream implements DataInpu
 	public void readFully(byte[] b, int off, int len) throws IOException {
 		dis.readFully(b, off, len);
 	}
-	
+
 	public int readInt() throws IOException {
 		return ByteOrder.reverse(dis.readInt());
 	}
 
 	public String readLine() throws IOException {
-		throw new UnsupportedOperationException(Messages.getString("LittleEndianDataInputStream.warn_deprecated")); //$NON-NLS-1$
+		throw new UnsupportedOperationException("deprecated DataInput#readLine() is not impremented"); //$NON-NLS-1$
 	}
-	
+
 	public long readLong() throws IOException {
 		return ByteOrder.reverse(dis.readLong());
 	}

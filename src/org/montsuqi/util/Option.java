@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -27,13 +27,13 @@ class Option {
 	private String name;
 	private String message;
 	private Object value;
-	
+
 	Option(String name, String message, Object value) {
 		this.name = name;
 		this.message = message;
 		this.value = value;
 	}
-	
+
 	Option(String name, String message, boolean defaultValue) {
 		this(name, message, new Boolean(defaultValue));
 	}
@@ -102,20 +102,18 @@ class Option {
 	}
 
 	void setValue(boolean arg) {
-		if (value.getClass() == Boolean.class) {
-			value = new Boolean(arg);
-		} else {
-			throw new IllegalArgumentException(Messages.getString("Option.type_mismatch")); //$NON-NLS-1$
+		if (value.getClass() != Boolean.class) {
+			throw new IllegalArgumentException("option type mismatch"); //$NON-NLS-1$
 		}
-		
+		value = new Boolean(arg);
+
 	}
 
 	void setValue(int value) {
-		if (this.value.getClass() == Integer.class) {
-			this.value = new Integer(value);
-		} else {
-			throw new IllegalArgumentException(Messages.getString("Option.type_mismatch")); //$NON-NLS-1$
+		if (this.value.getClass() != Integer.class) {
+			throw new IllegalArgumentException("option type mismatch"); //$NON-NLS-1$
 		}
+		this.value = new Integer(value);
 	}
 }
-			
+

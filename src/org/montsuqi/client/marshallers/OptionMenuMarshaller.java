@@ -1,7 +1,7 @@
 /*      PANDA -- a simple transaction monitor
 
 Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
+              2000-2003 Ogochan & JMA (Japan Medical Association).
 
 This module is part of PANDA.
 
@@ -40,7 +40,7 @@ public class OptionMenuMarshaller extends WidgetMarshaller {
 		OptionMenu optionMenu = (OptionMenu)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		
+
 		int count = -1;
 		int choice = 0;
 

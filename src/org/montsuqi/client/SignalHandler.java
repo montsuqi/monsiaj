@@ -19,7 +19,7 @@ public abstract class SignalHandler {
 
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 	Logger logger;
-	
+
 	SignalHandler() {
 		logger = Logger.getLogger(SignalHandler.class);
 	}
@@ -122,8 +122,8 @@ public abstract class SignalHandler {
 			}
 		};
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
-		registerHandler("send_event_when_idle", sendEventWhenIdle);  //$NON-NLS-1$
-		registerHandler("send_event_on_focus_out", sendEvent);  //$NON-NLS-1$
+		registerHandler("send_event_when_idle", sendEventWhenIdle); //$NON-NLS-1$
+		registerHandler("send_event_on_focus_out", sendEvent); //$NON-NLS-1$
 
 		registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {

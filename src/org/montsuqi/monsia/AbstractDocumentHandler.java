@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                           	                     
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -67,7 +67,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		properties = new HashMap();
 		signals = new ArrayList();
 		accels = new ArrayList();
-		
+
 	}
 
 	protected abstract boolean shouldAppendCharactersToContent();
@@ -100,14 +100,14 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		if (isFinished()) {
 			return new Interface(topLevels, protocol);
 		}
-		throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.parsing_is_not_finished_yet")); //$NON-NLS-1$
+		throw new IllegalStateException("parsing is not finished yet"); //$NON-NLS-1$
 	}
 
 	public void startDocument() throws SAXException {
 		state = startState;
 		unknownDepth = 0;
 		prevState = UNKNOWN;
-	
+
 		widgetDepth = 0;
 		clearContent();
 		widget = null;
@@ -190,9 +190,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			}
 			properties.clear();
 		} else {
-			throw new IllegalStateException(Messages.getString("AbstractDocumentHandler.unknown_property_type")); //$NON-NLS-1$
+			throw new IllegalStateException("unknown property type"); //$NON-NLS-1$
 		}
-	
+
 		propertyType = PropertyType.NONE;
 		propertyName = null;
 		properties.clear();

@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -122,7 +122,7 @@ abstract class WidgetPropertySetter {
 					size.height = Integer.parseInt(value);
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
-					throw new IllegalArgumentException(Messages.getString("WidgetPropertySetter.not_a_number")); //$NON-NLS-1$
+					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
 				}
 			}
 		});
@@ -304,7 +304,7 @@ abstract class WidgetPropertySetter {
 				} else if (value.equals("XIM")) { //$NON-NLS-1$
 					entry.setInputMode(PandaEntry.XIM);
 				} else {
-					throw new IllegalArgumentException(Messages.getString("WidgetPropertySetter.invalid_input_mode")); //$NON-NLS-1$
+					throw new IllegalArgumentException("invalid input mode"); //$NON-NLS-1$
 				}
 			}
 		});

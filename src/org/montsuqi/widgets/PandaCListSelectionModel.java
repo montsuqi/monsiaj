@@ -1,7 +1,7 @@
 /*      PANDA -- a simple transaction monitor
 
 Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
+              2000-2003 Ogochan & JMA (Japan Medical Association).
 
 This module is part of PANDA.
 
@@ -27,7 +27,7 @@ import javax.swing.DefaultListSelectionModel;
 class PandaCListSelectionModel extends DefaultListSelectionModel {
 
 	private boolean notifySelectionChange;
-	
+
 	public PandaCListSelectionModel() {
 		super();
 		notifySelectionChange = true;

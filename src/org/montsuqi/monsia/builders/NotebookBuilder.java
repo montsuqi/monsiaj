@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -39,7 +39,7 @@ class NotebookBuilder extends ContainerBuilder {
 		Notebook notebook = (Notebook)parent;
 		int cCount = info.getChildren().size();
 		if (cCount % 2 != 0) {
-			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.odd_number_of_notebook_childrens")); //$NON-NLS-1$
+			throw new WidgetBuildingException("odd number of notebook childrens"); //$NON-NLS-1$
 		}
 		int tabCount = cCount / 2;
 		String[] labels = new String[tabCount];
@@ -63,7 +63,7 @@ class NotebookBuilder extends ContainerBuilder {
 					}
 					currentLabel++;
 				} else {
-					throw new WidgetBuildingException(Messages.getString("WidgetBuilder.no_label_for_a_tab")); //$NON-NLS-1$
+					throw new WidgetBuildingException("no label for a tab"); //$NON-NLS-1$
 				}
 			} else {
 				Component body = buildWidget(xml, wInfo, parent);
@@ -72,7 +72,7 @@ class NotebookBuilder extends ContainerBuilder {
 			}
 		}
 		if (currentBody != bodies.length || currentLabel != labels.length) {
-			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.tab_label_count_mismatch")); //$NON-NLS-1$
+			throw new WidgetBuildingException("tab/label count mismatch"); //$NON-NLS-1$
 		}
 		for (int i = 0; i < tabCount; i++) {
 			notebook.add(labels[i], bodies[i]);

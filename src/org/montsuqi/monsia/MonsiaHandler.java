@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -106,7 +106,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("property")) { //$NON-NLS-1$
 				boolean badAgent = false;
-				
+
 				if (propertyType != PropertyType.WIDGET) {
 					warnInvalidPropertiesDefinedHere("widget"); //$NON-NLS-1$
 				}
@@ -134,7 +134,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				}
 			} else if (localName.equals("accessibility")) { //$NON-NLS-1$
 				flushProperties();
-				
+
 				if (attrs.getLength() != 0) {
 					warnShouldHaveNoAttributes("accessibility"); //$NON-NLS-1$
 				}
@@ -166,7 +166,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			dialogHack(widget);
 			widget = widget.getParent();
 			widgetDepth--;
-			
+
 			if (widgetDepth == 0) {
 				state = MONSIA_INTERFACE;
 			} else {
@@ -228,7 +228,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if ( ! localName.equals("accessibility")) { //$NON-NLS-1$
 				warnShouldFindClosing("accessibility", localName); //$NON-NLS-1$
 			}
-			
+
 			flushProperties(); // flush the ATK properties
 			state = WIDGET_AFTER_ATK;
 		}
@@ -268,7 +268,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if (localName.equals("atkaction")) { //$NON-NLS-1$
 				warnShouldFindClosing("atkaction", localName); //$NON-NLS-1$
 			}
-			
+
 			propertyName = null;
 			state = WIDGET_ATK;
 		}
@@ -320,7 +320,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
-			
+
 			if (widgetDepth == 0) {
 				state = MONSIA_INTERFACE;
 			} else {
@@ -370,7 +370,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
-			
+
 			if (widgetDepth == 0) {
 				state = MONSIA_INTERFACE;
 			} else {
@@ -417,7 +417,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			flushAccels();
 			widget = widget.getParent();
 			widgetDepth--;
-			
+
 			if (widgetDepth == 0) {
 				state = MONSIA_INTERFACE;
 			} else {
@@ -455,10 +455,6 @@ class MonsiaHandler extends AbstractDocumentHandler {
 			if ( ! localName.equals("child")) { //$NON-NLS-1$
 				warnShouldFindClosing("child", localName); //$NON-NLS-1$
 			}
-			/* if we are ending the element in this state, then there
-			 * hasn't been a <widget> element inside this <child>
-			 * element. (If there was, then we would be in
-			 * WIDGET_CHILD_AFTER_WIDGET state. */
 			logger.warn(Messages.getString("MonsiaHandler.no_widget_element_found_inside_child_Discarding")); //$NON-NLS-1$
 			widget.removeLastChild();
 			state = WIDGET_AFTER_ACCEL;
@@ -489,7 +485,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("property")) { //$NON-NLS-1$
 				boolean badAgent = false;
-				
+
 				if (propertyType != PropertyType.CHILD) { //$NON-NLS-1$
 					warnInvalidPropertiesDefinedHere("child"); //$NON-NLS-1$
 				}
@@ -605,7 +601,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 	}
 
 	protected WidgetInfo createWidgetInfo(Attributes attrs) {
-	
+
 		String className = null;
 		String name = null;
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {
@@ -619,7 +615,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				warnUnknownAttribute("widget", attrName); //$NON-NLS-1$
 			}
 		}
-	
+
 		if (className == null || name == null) {
 			warnMissingAttribute("widget"); //$NON-NLS-1$
 		}
@@ -629,12 +625,12 @@ class MonsiaHandler extends AbstractDocumentHandler {
 	}
 
 	protected void handleATKRelation(Attributes attrs) {
-	
+
 		flushProperties();
-	
+
 		String target = null;
 		String type = null;
-	
+
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
@@ -654,12 +650,12 @@ class MonsiaHandler extends AbstractDocumentHandler {
 
 	protected void handleSignal(Attributes attrs) {
 		flushProperties();
-	
+
 		String name = null;
 		String handler = null;
 		String object = null;
 		boolean after = false;
-	
+
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {  
 			String attrName = attrs.getLocalName(i);
 			String value = attrs.getValue(i);
@@ -677,7 +673,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				warnUnknownAttribute("signal", attrName); //$NON-NLS-1$
 			}
 		}
-	
+
 		if (name == null || handler == null) {
 			warnMissingAttribute("signal"); //$NON-NLS-1$
 			return;
@@ -715,7 +711,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 		flushProperties();
 		flushSignals();
 		flushAccels();
-	
+
 		ChildInfo info = new ChildInfo();
 		widget.addChild(info);
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {
@@ -730,7 +726,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 
 	protected void handleATKAction(Attributes attrs) {
 		flushProperties();
-	
+
 		String actionName = null;
 
 		for (int i = 0, n = attrs.getLength(); i < n; i++) {
@@ -744,7 +740,7 @@ class MonsiaHandler extends AbstractDocumentHandler {
 				warnUnknownAttribute("action", attrName); //$NON-NLS-1$
 			}
 		}
-	
+
 		if (actionName == null) {
 			warnMissingAttribute("atkaction"); //$NON-NLS-1$
 			return;

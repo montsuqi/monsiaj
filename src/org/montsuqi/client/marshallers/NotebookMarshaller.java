@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import javax.swing.JTabbedPane;
 
-import org.montsuqi.client.Messages;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
@@ -56,7 +55,7 @@ class NotebookMarshaller extends WidgetMarshaller {
 			}
 		}
 		if (page == -1) {
-			throw new WidgetMarshallingException(Messages.getString("NotebookMarshaller.page_not_found")); //$NON-NLS-1$
+			throw new WidgetMarshallingException("notebook page not found"); //$NON-NLS-1$
 		}
 		tabbed.setSelectedIndex(page);
 	}

@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -150,10 +150,10 @@ class PandaDocument extends PlainDocument {
 		'\uff28', '\uff29', '\uff2a', '\uff2b', '\uff2c', '\uff2d', '\uff2e', '\uff2f',
 		'\uff30', '\uff31', '\uff32', '\uff33', '\uff34', '\uff35', '\uff36', '\uff37',
 		'\uff38', '\uff39', '\uff3a', '\uff3b', '\uffe5', '\uff3d', '\uff3e', '\uff3f',
-		'\u2018', '\u30a2',    0,    0,    0, '\u30a8',    0,    0,
-		   0, '\u30a4',    0,    0,    0,    0,    0, '\u30aa',
-		   0,    0,    0,    0,    0, '\u30a6',    0,    0,
-		   0,    0,    0, '\uff5b', '\uff5c', '\uff5d', '\uffe3',    0
+		'\u2018', '\u30a2',        0,        0,        0, '\u30a8',        0,        0,
+		       0, '\u30a4',        0,        0,        0,        0,        0, '\u30aa',
+		       0,        0,        0,        0,        0, '\u30a6',        0,        0,
+		       0,        0,        0, '\uff5b', '\uff5c', '\uff5d', '\uffe3',        0,
 	};
 
 	private static final RuleEntry[] KANA_TABLE = {
@@ -231,19 +231,18 @@ class PandaDocument extends PlainDocument {
 		// Handle kana input
 		if (mode == KANA) {
 			// Do nothing if there is no input
-			if (str.length() < 1) {
+			int length = str.length();
+			if (length < 1) {
 				return;
 			}
 
 			// Just insert for non-keyboard input
-			if (str.length() > 1) {
+			if (length > 1) {
 				super.insertString(offs, str, a);
 				return;
 			}
 
-			if (str.length() != 1) {
-				throw new IllegalStateException(Messages.getString("PandaEntry.cannot_hapen")); //$NON-NLS-1$
-			}
+			assert length == 0;
 
 			// Find the prefix
 			int prefixStart;

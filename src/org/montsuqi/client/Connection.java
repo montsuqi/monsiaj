@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -86,11 +86,11 @@ class Connection {
 	public int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
-			throw new IOException(Messages.getString("Connection.data_type_mismatch")); //$NON-NLS-1$
+			throw new IOException("data type mismatch"); //$NON-NLS-1$
 		}
 		return dataType;
 	}
-	
+
 	public int getLastDataType() {
 		return dataType;
 	}
@@ -209,7 +209,7 @@ class Connection {
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
 		}
-		throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
+		throw new IllegalArgumentException("invalid data conversion"); //$NON-NLS-1$
 	}
 
 	public void sendFixedData(int type, BigDecimal xval) throws IOException {
@@ -228,7 +228,7 @@ class Connection {
 		//	sendFixed(xval);
 		//	break;
 		default:
-			throw new IllegalArgumentException(Messages.getString("Connection.invalid_data_conversion")); //$NON-NLS-1$
+			throw new IllegalArgumentException("invalid data conversion"); //$NON-NLS-1$
 		}
 	}
 
@@ -266,7 +266,7 @@ class Connection {
 		case Type.TEXT:
 			return receiveString();
 		default:
-			String message = Messages.getString("Connection.invalid_data_type"); //$NON-NLS-1$
+			String message = "invalid data type(0x{0})"; //$NON-NLS-1$
 			message = MessageFormat.format(message, new Object[] { Integer.toHexString(type) });
 			throw new IllegalArgumentException(message);
 		}

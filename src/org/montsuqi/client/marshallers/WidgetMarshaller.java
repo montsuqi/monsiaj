@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -80,11 +80,11 @@ public abstract class WidgetMarshaller {
 			/* Widget states from gtkenums.h
 			typedef enum
 			{
-			  GTK_STATE_NORMAL,     => 0
-			  GTK_STATE_ACTIVE,     => 1
-			  GTK_STATE_PRELIGHT,   => 2
-			  GTK_STATE_SELECTED,   => 3
-			  GTK_STATE_INSENSITIVE => 4
+				GTK_STATE_NORMAL,     => 0
+				GTK_STATE_ACTIVE,     => 1
+				GTK_STATE_PRELIGHT,   => 2
+				GTK_STATE_SELECTED,   => 3
+				GTK_STATE_INSENSITIVE => 4
 			} GtkStateType;
 			*/
 			widget.setEnabled(state != 4);

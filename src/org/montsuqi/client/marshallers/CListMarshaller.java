@@ -1,16 +1,16 @@
 /*      PANDA -- a simple transaction monitor
-                                                                                
+
 Copyright (C) 1998-1999 Ogochan.
-			  2000-2003 Ogochan & JMA (Japan Medical Association).
-                                                                                
+              2000-2003 Ogochan & JMA (Japan Medical Association).
+
 This module is part of PANDA.
-                                                                                
+
 		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
-                                                                                
+
 		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
@@ -80,14 +80,14 @@ class CListMarshaller extends WidgetMarshaller {
 			} else if ("rowattr".equals(name)) { //$NON-NLS-1$
 				int rowattr = con.receiveIntData();
 				switch	(rowattr) {
-				  case	1: // DOWN
+				case 1: // DOWN
 					rowattrw = 1.0;
 					break;
-				  case	2: // MIDDLE
+				case	2: // MIDDLE
 					rowattrw = 0.5;
 					break;
-				  default:
-				  	rowattrw = 0.0; // [0] TOP
+				default:
+					rowattrw = 0.0; // [0] TOP
 					break;
 				}
 			} else if ("column".equals(name)) { //$NON-NLS-1$
