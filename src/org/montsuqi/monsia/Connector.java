@@ -85,11 +85,11 @@ abstract class Connector {
 		return getConnector(null);
 	}
 
-	static void invoke(Protocol con, SignalHandler handler, Component target, Object other) {
+	static void invoke(final Protocol con, final SignalHandler handler, final Component target, final Object other) {
 		try {
 			handler.handle(con, target, other);
 		} catch (IOException e) {
-			throw new InterfaceBuildingException(e);
+			throw new HandlerInvocationException(e);
 		}
 	}
 
