@@ -52,27 +52,14 @@ public class PandaHTML extends JScrollPane {
 		});
 	}
 
-	public void setURI(final String uri) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					pane.setPage(uri);
-				} catch (FileNotFoundException e) {
-					pane.setText(e.toString());
-				} catch (IOException e) {
-					logger.warn(e);
-				}
-			}
-		});
-	}
-
 	public void setURI(final URL uri) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
 				try {
 					pane.setPage(uri);
 				} catch (FileNotFoundException e) {
-					pane.setText(e.toString());
+					setText(e.toString());
 				} catch (IOException e) {
 					logger.warn(e);
 				}
@@ -82,5 +69,9 @@ public class PandaHTML extends JScrollPane {
 
 	public URL getURI() {
 		return pane.getPage();
+	}
+
+	public void setText(String text) {
+		pane.setText(text);
 	}
 }

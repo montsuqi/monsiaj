@@ -26,6 +26,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -437,7 +439,13 @@ abstract class WidgetPropertySetter {
 		registerProperty(PandaHTML.class, "uri", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				PandaHTML pane = (PandaHTML)widget;
-				pane.setURI(value);
+				URL uri;
+				try {
+					uri = new URL(value);
+					pane.setURI(uri);
+				} catch (MalformedURLException e) {
+					pane.setText(e.toString());
+				}
 			}
 
 		});
