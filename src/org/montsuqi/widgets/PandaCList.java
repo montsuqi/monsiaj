@@ -50,31 +50,40 @@ public class PandaCList extends JTable {
 		}
 
 		public void actionPerformed(final ActionEvent e) {
-			JTable table = (JTable)e.getSource();
-			moveIndex((PandaCListSelectionModel)table.getSelectionModel(), rowMove, table.getRowCount() - 1);
-			moveIndex((PandaCListSelectionModel)table.getColumnModel().getSelectionModel(), columnMove, table.getColumnCount() - 1);
-			table.repaint();
+			int newRow = moveIndex((PandaCListSelectionModel)getSelectionModel(), rowMove, getRowCount() - 1);
+			int newColumn = moveIndex((PandaCListSelectionModel)getColumnModel().getSelectionModel(), columnMove, getColumnCount() - 1);
+			changeSelection(newRow, newColumn, false, true);
+			repaint();
 		}
 
-		private void moveIndex(PandaCListSelectionModel selections, int move, int max) {
+		private int moveIndex(PandaCListSelectionModel selections, int move, int max) {
 			boolean notify = selections.isNotifySelectionChange();
 			selections.setNotifySelectionChange(false);
-			int lead = selections.getLeadSelectionIndex() + move;
-			lead = lead < 0 ? 0 : max < lead ? max : lead;
-			selections.setLeadSelectionIndex(lead);
-			selections.setAnchorSelectionIndex(lead);
+			int selected = selections.getMinSelectionIndex();
+			selections.removeSelectionInterval(selected, selected);
+			selected += move;
+			selected = selected < 0 ? 0 : max < selected ? max : selected;
+			selections.setSelectionInterval(selected, selected);
 			selections.setNotifySelectionChange(notify);
+			return selected;
 		}
 	}
 
 	public PandaCList() {
 		setAutoResizeMode(AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+		setAutoscrolls(true);
 		initActions();
 	}
 
 	private void initActions() {
 		ActionMap actions = getActionMap();
-		InputMap inputs = getInputMap();
+		InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		KeyStroke enterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		for (InputMap parent = inputs; parent != null; parent = parent.getParent()) {
+			if (parent.get(enterKey) != null) {
+				parent.remove(enterKey);
+			}
+		}
 
 		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "focusOutNext"); //$NON-NLS-1$
