@@ -32,7 +32,7 @@ public class MarshalHandler {
 			logger.fatal(e);
 			return false;
 		} catch (InvocationTargetException e) {
-			logger.fatal(e);
+			logger.fatal(e.getTargetException()); // should use getCause() [J2SE 1.4+]
 			return false;
 		}
 	}
