@@ -25,6 +25,8 @@ package org.montsuqi.monsia.builders;
 import java.awt.Container;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import org.montsuqi.monsia.ChildInfo;
@@ -47,11 +49,17 @@ class MenuBarBuilder extends ContainerBuilder {
 			// skip redundant GtkMenuItem part.
 			ChildInfo cInfo = (ChildInfo)i.next();
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
+			Map properties = wInfo.getProperties();
 			List children = wInfo.getChildren();
 			assert children.size() == 1;
+			// get the info of the menu to be created.
 			ChildInfo menuItemChildInfo = wInfo.getChild(0);
 			WidgetInfo menuInfo = menuItemChildInfo.getWidgetInfo();
 			JMenu menu = (JMenu)WidgetBuilder.buildWidget(xml, menuInfo, menuBar);
+			if (properties.containsKey("stock_item")) { //$NON-NLS-1$
+				WidgetPropertySetter setter = WidgetPropertySetter.getSetter(JMenu.class, "stock_item"); //$NON-NLS-1$
+				setter.set(xml, menuBar, menu, (String)properties.get("stock_item")); //$NON-NLS-1$
+			}
 			menuBar.add(menu);
 		}
 	}
