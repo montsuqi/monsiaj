@@ -44,6 +44,7 @@ public class NumberEntry extends Entry {
 
 	public NumberEntry() {
 		super();
+		enableInputMethods(false);
 		setDocument(new NumberDocument());
 		setHorizontalAlignment(SwingConstants.RIGHT);
 	}	
