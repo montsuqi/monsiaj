@@ -11,12 +11,18 @@ import java.util.Map;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.Logger;
 
 public abstract class SignalHandler {
 
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
+	Logger logger;
+	
+	SignalHandler() {
+		logger = Logger.getLogger(SignalHandler.class);
+	}
 
 	protected boolean isWindowActive(Protocol con, Component widget) {
 		Window window = SwingUtilities.windowForComponent(widget);
@@ -86,8 +92,38 @@ public abstract class SignalHandler {
 			}
 		};
 
+		final SignalHandler changed = new SignalHandler() {
+			public void handle(Protocol con, Component widget, Object userData) throws IOException {
+				if ( ! isWindowActive(con, widget)) {
+					return;
+				}
+				con.addChangedWidget(widget);
+			}
+		};
+
+		SignalHandler sendEventWhenIdle = new SignalHandler() {
+			public void handle(final Protocol con, final Component widget, final Object userData) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						JTextComponent text = (JTextComponent)widget;
+						String t = text.getText();
+						int length = t.length();
+						char lastChar = t.charAt(length - 1);
+						if (length != 0 && Character.UnicodeBlock.of(lastChar) != Character.UnicodeBlock.KATAKANA) {
+							return;
+						}
+						try {
+							changed.handle(con, widget, userData);
+							sendEvent.handle(con, widget, userData);
+						} catch (IOException e) {
+							logger.warn(e);
+						}
+					}
+				});
+			}
+		};
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
-		registerHandler("send_event_when_idle", sendEvent);  //$NON-NLS-1$
+		registerHandler("send_event_when_idle", sendEventWhenIdle);  //$NON-NLS-1$
 		registerHandler("send_event_on_focus_out", sendEvent);  //$NON-NLS-1$
 
 		registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
@@ -117,15 +153,6 @@ public abstract class SignalHandler {
 				}
 			}
 		});
-
-		SignalHandler changed = new SignalHandler() {
-			public void handle(Protocol con, Component widget, Object userData) {
-				if ( ! isWindowActive(con, widget)) {
-					return;
-				}
-				con.addChangedWidget(widget);
-			}
-		};
 
 		registerHandler("changed", changed); //$NON-NLS-1$
 		registerHandler("entry_changed", changed); //$NON-NLS-1$
