@@ -141,6 +141,9 @@ public class WidgetBuilder {
 		}
 	}
 
+	private interface FontModifier {
+		Font modifyFont(Font font);
+	}
 	// set up UI resources
 	static {
 		String[] classes = {
@@ -153,23 +156,37 @@ public class WidgetBuilder {
 			"TabbedPane", //$NON-NLS-1$
 			"Label" //$NON-NLS-1$
 		};
-		for (int i = 0; i < classes.length; i++) {
-			String key = classes[i] + ".font"; //$NON-NLS-1$
-			Font font = (Font)UIManager.get(key);
-			if (font != null) {
-				font = font.deriveFont(font.getStyle() & ~Font.BOLD);
-				font = ScreenScale.scale(font);
-				UIManager.put(key, new FontUIResource(font));
+		FontModifier makePlainFont = new FontModifier() {
+			public Font modifyFont(Font font) {
+				return font.deriveFont(font.getStyle() & ~Font.BOLD);
 			}
+		};
+		for (int i = 0; i < classes.length; i++) {
+			modifyFont(classes[i], makePlainFont);
 		}
 		if (SystemEnvironment.isMacOSX()) {
-			String key = "TextField.font"; //$NON-NLS-1$
-			Font font = (Font)UIManager.get(key);
-			if (font != null) {
-				font = new Font("Osaka", Font.PLAIN, font.getSize()); //$NON-NLS-1$
-				font = ScreenScale.scale(font);
-				UIManager.put(key, new FontUIResource(font));
+			classes = new String[] {
+				"TextField", //$NON-NLS-1$
+				"ComboBox" //$NON-NLS-1$
+			};
+			FontModifier makeOsakaFont = new FontModifier() {
+				public Font modifyFont(Font font) {
+					return new Font("Osaka", Font.PLAIN, font.getSize()); //$NON-NLS-1$
+				}
+			};
+			for (int i = 0; i < classes.length; i++) {
+				modifyFont(classes[i], makeOsakaFont);
 			}
+		}
+	}
+
+	private static void modifyFont(String className, FontModifier creator) {
+		String key = className + ".font"; //$NON-NLS-1$
+		Font font = (Font)UIManager.get(key);
+		if (font != null) {
+			font = creator.modifyFont(font);
+			font = ScreenScale.scale(font);
+			UIManager.put(key, new FontUIResource(font));
 		}
 	}
 
