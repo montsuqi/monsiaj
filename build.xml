@@ -43,11 +43,16 @@
 		<property name="bin.name" value="monsiaj-bin-${DSTAMP}"/>
 		<property name="src.name" value="monsiaj-src-${DSTAMP}"/>
 		<property name="replay.name" value="monsiaj-replay-${DSTAMP}"/>
+		<mkdir dir="${dist.dir}/${bin.name}"/>
+		<mkdir dir="${dist.dir}/${src.name}"/>
+		<mkdir dir="${dist.dir}/${replay.name}"/>
 		<mkdir dir="${report.dir}"/>
-		<condition property="exclude.log4jlogger" value="**/Log4JLogger.java">
-			<not>
-				<available classname="org.apache.log4j.Logger"/>
-			</not>
+
+		<condition property="on.macosx">
+			<and>
+				<os family="mac"/>
+				<os family="unix"/>
+			</and>
 		</condition>
 	</target>
 
@@ -60,19 +65,23 @@
 			debug="${compile.debug}"
 			source="1.4">
 			<include name="**/*.java"/>
-			<exclude name="${exclude.log4jlogger}"/>
 			<exclude name="**/Test*.java"/>
 			<classpath refid="project.class.path"/>
 		</javac>
 	</target>
 
-	<target name="resources" depends="prepare">
+	<target name="resources" depends="resources-copy-files,resources-copy-jnlp"/>
+
+	<target name="resources-copy-files" depends="prepare">
 		<copy todir="${build.dir}">
 			<fileset dir="${src.dir}" includes="**/*.properties,**/*.jpg,**/*.png"/>
 		</copy>
 		<copy todir="${build.dir}">
 			<fileset dir="${resources.dir}" includes="style.properties"/>
 		</copy>
+	</target>
+	
+	<target name="resources-copy-jnlp" depends="prepare">
 		<native2ascii src="${resources.dir}" dest="${build.dir}"
 			includes="*.jnlp" encoding="EUC-JP"/>
 		<filter token="webstarturl" value="${webstart.url}"/>
@@ -89,22 +98,28 @@
 	<target name="dist" depends="dist-bin,dist-src"
 		description="Build files to be distributed."/>
 
-	<target name="dist-bin" depends="jars">
-		<mkdir dir="${dist.dir}/${bin.name}"/>
+	<target name="dist-bin" depends="dist-bin-copy-files">
+		<!-- ant 1.5.x should use destfile instead of zipfile-->
+		<zip zipfile="${dist.dir}/${bin.name}.zip">
+			<fileset dir="${dist.dir}" includes="${bin.name}/**"/>
+		</zip>
+		<antcall target="dist-bin-mac-bundle"/>
+	</target>
+
+	<target name="dist-bin-copy-files" depends="jars">
 		<!-- ant 1.5.x should use destfile instead of jarfile-->
 		<copy todir="${dist.dir}/${bin.name}">
 			<fileset dir="${dist.dir}" includes="jmareceipt.jar, pandaclient.jar"/>
 		</copy>
-		<copy todir="${dist.dir}/${bin.name}" verbose="true">
+		<copy todir="${dist.dir}/${bin.name}">
 			<fileset dir="${libs.dir}" includes="log4j.jar, WebKit.jar, *.jnilib"/>
 		</copy>
 		<copy todir="${dist.dir}/${bin.name}">
 			<fileset dir="${build.dir}" includes="*.jnlp"/>
 		</copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
-		<zip zipfile="${dist.dir}/${bin.name}.zip">
-			<fileset dir="${dist.dir}" includes="${bin.name}/**"/>
-		</zip>
+	</target>
+
+	<target name="dist-bin-mac-bundle" if="on.macosx" depends="dist-bin-copy-files">
 		<jarbundler dir="${dist.dir}/${bin.name}"
 			name="${application.name}"
 			mainclass="jp.or.med.jma_receipt.JMAReceiptLauncher"
@@ -116,16 +131,18 @@
 		</jarbundler>
 	</target>
 
-	<target name="dist-src" depends="prepare">
-		<mkdir dir="${dist.dir}/${src.name}"/>
-		<copy todir="${dist.dir}/${src.name}">
-			<fileset dir="." includes="src/**,resources/**,libs/**,docs/**,build.xml,Makefile"
-	excludes="**/CVS"/>
-		</copy>
+	<target name="dist-src" depends="dist-src-copy-files">
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${src.name}.zip">
 			<fileset dir="${dist.dir}" includes="${src.name}/**"/>
 		</zip>
+	</target>
+
+	<target name="dist-src-copy-files" depends="prepare">
+		<copy todir="${dist.dir}/${src.name}">
+			<fileset dir="." includes="src/**,resources/**,libs/**,docs/**,build.xml,Makefile"
+	excludes="**/CVS"/>
+		</copy>
 	</target>
 
 	<target name="buildclean"
@@ -223,7 +240,6 @@
 	</target>
 
 	<target name="dist.replay" depends="dist, jar.replay, resources">
-		<mkdir dir="${dist.dir}/${replay.name}"/>
 		<copy todir="${dist.dir}/${replay.name}">
 			<fileset dir="${libs.dir}" includes="*.jar"/>
 		</copy>
