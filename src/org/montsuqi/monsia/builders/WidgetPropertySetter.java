@@ -200,14 +200,13 @@ abstract class WidgetPropertySetter {
 		registerProperty(JLabel.class, "xalign", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JLabel label = (JLabel)widget;
-				if ("0.5".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.CENTER);
-				} else if ("0".equals(value)) { //$NON-NLS-1$
+				double align = Double.parseDouble(value);
+				if (align < 0.5) {
 					label.setHorizontalAlignment(SwingConstants.LEFT);
-				} else if ("1".equals(value)) { //$NON-NLS-1$
+				} else if (0.5 < align) {
 					label.setHorizontalAlignment(SwingConstants.RIGHT);
 				} else {
-					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
+					label.setHorizontalAlignment(SwingConstants.CENTER);
 				}
 			}
 		});
@@ -215,14 +214,13 @@ abstract class WidgetPropertySetter {
 		registerProperty(JLabel.class, "yalign", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JLabel label = (JLabel)widget;
-				if ("0.5".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.CENTER);
-				} else if ("0".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.NORTH);
-				} else if ("1".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.SOUTH);
+				double align = Double.parseDouble(value);
+				if (align < 0.5) {
+					label.setVerticalAlignment(SwingConstants.TOP);
+				} else if (0.5 < align) {
+					label.setVerticalAlignment(SwingConstants.BOTTOM);
 				} else {
-					logger.warn(Messages.getString("WidgetPropertySetter.not_supported"), value); //$NON-NLS-1$
+					label.setVerticalAlignment(SwingConstants.CENTER);
 				}
 			}
 		});
