@@ -30,7 +30,6 @@ public class Window extends JFrame {
 	public Window() {
 		super();
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setResizable(false);
 		setGlassPane(new JComponent() {
 			{
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

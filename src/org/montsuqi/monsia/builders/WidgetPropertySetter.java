@@ -64,6 +64,7 @@ import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.UIStock;
+import org.montsuqi.widgets.Window;
 
 abstract class WidgetPropertySetter {
 
@@ -545,6 +546,22 @@ abstract class WidgetPropertySetter {
 					if (oldText == null || oldText.length() == 0) {
 						item.setText(stock.getText());
 					}
+				}
+			}
+		});
+
+		registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Window window = (Window)widget;
+				window.setResizable(ParameterConverter.toBoolean(value));
+			}
+		});
+
+		registerProperty(Window.class, "allow_shrink", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				boolean allowShrink = ParameterConverter.toBoolean(value);
+				if ( ! allowShrink) {
+					logger.warn("allow_shrink is not supported."); //$NON-NLS-1$
 				}
 			}
 		});
