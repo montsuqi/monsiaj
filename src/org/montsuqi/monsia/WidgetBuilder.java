@@ -193,9 +193,7 @@ class WidgetBuilder {
 		registerProperty(javax.swing.JProgressBar.class, "upper", "setProgressBarUpper");
 		registerProperty(javax.swing.JProgressBar.class, "value", "setProgressBarValue");
 		registerProperty(javax.swing.JProgressBar.class, "orientation", "setProgressBarOrientation");
-		registerProperty(javax.swing.JProgressBar.class, "activity_mode", "setProgressBarActivityMode");
 		registerProperty(javax.swing.JProgressBar.class, "show_text", "setProgressBarShowText");
-
 	}
 	
 	private void initWidgetBuildData() {

@@ -519,15 +519,6 @@ class WidgetOperation {
 		}
 	}
 
-	static void setProgressBarActivityMode(Interface xml, Container widget, String name, String value) {
-		if ( ! (widget instanceof JProgressBar)) {
-			throw new IllegalArgumentException("not a ProgressBar widget");
-		}
-		JProgressBar progress = (JProgressBar)widget;
-		boolean indeterminate = ParameterConverter.toBoolean(value);
-		progress.setIndeterminate(indeterminate);
-	}
-
 	static void setProgressBarShowText(Interface xml, Container widget, String name, String value) {
 		if ( ! (widget instanceof JProgressBar)) {
 			throw new IllegalArgumentException("not a ProgressBar widget");
