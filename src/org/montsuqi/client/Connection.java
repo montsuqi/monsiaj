@@ -330,7 +330,8 @@ class Connection {
 		case Type.VARCHAR:
 		case Type.DBCODE:
 		case Type.TEXT:
-			return Integer.parseInt(receiveString());
+			String value = receiveString().trim();
+			return value.length() == 0 ? 0 : Integer.parseInt(value);
 		default:
 			throw new IllegalArgumentException();
 		}
