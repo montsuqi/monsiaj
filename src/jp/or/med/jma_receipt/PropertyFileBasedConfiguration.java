@@ -23,6 +23,7 @@ copies.
 package jp.or.med.jma_receipt;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -40,6 +41,8 @@ class PropertyFileBasedConfiguration extends Configuration {
 	void load() {
 		try {
 			props.load(new FileInputStream(CONFIGURATION_FILE));
+		} catch (FileNotFoundException e) {
+			System.err.println(e.getMessage());
 		} catch (IOException e) {
 			// TODO é©ìÆê∂ê¨Ç≥ÇÍÇΩ catch ÉuÉçÉbÉN
 			e.printStackTrace();
@@ -82,11 +85,21 @@ class PropertyFileBasedConfiguration extends Configuration {
 	}
 
 	String getStyleFile() {
-		return props.getProperty("style"); //$NON-NLS-1$
+		String style = props.getProperty("style"); //$NON-NLS-1$
+		if (style == null) {
+			return "";
+		} else {
+			return style;
+		}
 	}
 
 	String getApplication() {
-		return props.getProperty("application"); //$NON-NLS-1$
+		String app = props.getProperty("application"); //$NON-NLS-1$
+		if (app == null) {
+			return "orca00"; //$NON-NLS-1$
+		} else {
+			return app;
+		}
 	}
 
 	void setUser(String user) {
