@@ -181,7 +181,7 @@ public class Interface {
 		signalAutoConnect();
 	}
 
-	/* FIXME: signal with accels */
+	// FIXME signal with accels
 	private void signalAutoConnect() {
 		Class[] argTypes = { Container.class, Object.class };
 		Iterator entries = signals.entrySet().iterator();

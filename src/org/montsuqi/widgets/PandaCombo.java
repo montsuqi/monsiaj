@@ -22,9 +22,8 @@ copies.
 
 package org.montsuqi.widgets;
 
-import java.awt.Component;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 public class PandaCombo extends JComboBox {
@@ -35,9 +34,23 @@ public class PandaCombo extends JComboBox {
 }
 
 class PandaComboBoxEditor extends BasicComboBoxEditor {
-	JTextField editor = new PandaEntry();
-	public Component getEditorComponent() {
-		return editor;
+	public PandaComboBoxEditor() {
+		editor  = new BorderlessPandaEntry("", 9);
+		editor.setBorder(null);
 	}
 
+	static class BorderlessPandaEntry extends PandaEntry {
+		public BorderlessPandaEntry(String value,int n) {
+			super(value,n);
+		}
+		// workaround for 4530952
+		public void setText(String s) {
+			if (getText().equals(s)) {
+				return;
+			}
+			super.setText(s);
+		}
+		public void setBorder(Border b) {}
+	}
+    
 }

@@ -44,7 +44,7 @@ public class PandaEntry extends JTextField {
 	public PandaEntry(String text, int columns) {
 		super(new PandaDocument(), text, columns);
 		addFocusListener(new FocusListener() {
-			// TODO: only works in japanese environment
+			// NOTE only works in japanese environment
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
 			public void focusGained(FocusEvent e) {

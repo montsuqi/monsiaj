@@ -22,7 +22,6 @@ copies.
 
 package org.montsuqi.monsia;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
@@ -41,29 +40,54 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JApplet;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
+import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.JTextComponent;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
+import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.Fixed;
+import org.montsuqi.widgets.Frame;
+import org.montsuqi.widgets.HBox;
+import org.montsuqi.widgets.HSeparator;
+import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaCombo;
+import org.montsuqi.widgets.PandaEntry;
+import org.montsuqi.widgets.PandaHTML;
+import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
+import org.montsuqi.widgets.VBox;
+import org.montsuqi.widgets.VSeparator;
 
 class WidgetBuilder {
 
@@ -93,108 +117,93 @@ class WidgetBuilder {
 
 	private void initClassMap() {
 		classMap = new HashMap();
-		registerClass("Button", javax.swing.JButton.class); //$NON-NLS-1$
-		registerClass("Calendar", org.montsuqi.widgets.Calendar.class); //$NON-NLS-1$
-		registerClass("CList", javax.swing.JTable.class); //$NON-NLS-1$
-		registerClass("CheckButton", javax.swing.JCheckBox.class); //$NON-NLS-1$
-		registerClass("Combo", javax.swing.JComboBox.class); //$NON-NLS-1$
-		registerClass("Entry", javax.swing.JTextField.class); //$NON-NLS-1$
-		registerClass("Fixed", org.montsuqi.widgets.Fixed.class); //$NON-NLS-1$
-		registerClass("Frame", org.montsuqi.widgets.Frame.class); //$NON-NLS-1$
-		registerClass("HBox", org.montsuqi.widgets.HBox.class); //$NON-NLS-1$
-		registerClass("HSeparator", org.montsuqi.widgets.HSeparator.class); //$NON-NLS-1$
-		registerClass("ImageMenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
-		registerClass("Label", javax.swing.JLabel.class); //$NON-NLS-1$
-		registerClass("List", javax.swing.JList.class); //$NON-NLS-1$
-		registerClass("Menu", javax.swing.JMenu.class); //$NON-NLS-1$
-		registerClass("MenuBar", javax.swing.JMenuBar.class); //$NON-NLS-1$
-		registerClass("MenuItem", javax.swing.JLabel.class); //$NON-NLS-1$
-		registerClass("Notebook", javax.swing.JTabbedPane.class); //$NON-NLS-1$
-		registerClass("NumberEntry", org.montsuqi.widgets.NumberEntry.class); //$NON-NLS-1$
-		registerClass("OptionMenu", javax.swing.JMenu.class); //$NON-NLS-1$
+		registerClass("Button", JButton.class); //$NON-NLS-1$
+		registerClass("Calendar", Calendar.class); //$NON-NLS-1$
+		registerClass("CList", JTable.class); //$NON-NLS-1$
+		registerClass("CheckButton", JCheckBox.class); //$NON-NLS-1$
+		registerClass("Combo", JComboBox.class); //$NON-NLS-1$
+		registerClass("Entry", JTextField.class); //$NON-NLS-1$
+		registerClass("Fixed", Fixed.class); //$NON-NLS-1$
+		registerClass("Frame", Frame.class); //$NON-NLS-1$
+		registerClass("HBox", HBox.class); //$NON-NLS-1$
+		registerClass("HSeparator", HSeparator.class); //$NON-NLS-1$
+		registerClass("ImageMenuItem", JLabel.class); //$NON-NLS-1$
+		registerClass("Label", JLabel.class); //$NON-NLS-1$
+		registerClass("List", JList.class); //$NON-NLS-1$
+		registerClass("Menu", JMenu.class); //$NON-NLS-1$
+		registerClass("MenuBar", JMenuBar.class); //$NON-NLS-1$
+		registerClass("MenuItem", JLabel.class); //$NON-NLS-1$
+		registerClass("Notebook", JTabbedPane.class); //$NON-NLS-1$
+		registerClass("NumberEntry", NumberEntry.class); //$NON-NLS-1$
+		registerClass("OptionMenu", JMenu.class); //$NON-NLS-1$
 		registerClass("PandaCList", javax.swing.JTable.class); //$NON-NLS-1$
-		registerClass("PandaCombo", org.montsuqi.widgets.PandaCombo.class); //$NON-NLS-1$
-		registerClass("PandaEntry", org.montsuqi.widgets.PandaEntry.class); //$NON-NLS-1$
-		registerClass("PandaHTML", org.montsuqi.widgets.PandaHTML.class); //$NON-NLS-1$
-		registerClass("PandaText", javax.swing.JTextArea.class); //$NON-NLS-1$
-		registerClass("PandaTimer", org.montsuqi.widgets.PandaTimer.class); //$NON-NLS-1$
-		registerClass("ProgressBar", javax.swing.JProgressBar.class); //$NON-NLS-1$
-		registerClass("RadioButton", javax.swing.JRadioButton.class); //$NON-NLS-1$
-		registerClass("ScrolledWindow", javax.swing.JScrollPane.class); //$NON-NLS-1$
-		registerClass("SeparatorMenuItem", javax.swing.JSeparator.class); //$NON-NLS-1$
-		registerClass("Table", org.montsuqi.widgets.Table.class); //$NON-NLS-1$
-		registerClass("Text", javax.swing.JTextArea.class); //$NON-NLS-1$
-		registerClass("TextView", javax.swing.JTextArea.class); //$NON-NLS-1$
-		registerClass("ToggleButton", javax.swing.JToggleButton.class); //$NON-NLS-1$
-		registerClass("Toolbar", javax.swing.JToolBar.class); //$NON-NLS-1$
-		registerClass("VBox", org.montsuqi.widgets.VBox.class); //$NON-NLS-1$
-		registerClass("VSeparator", org.montsuqi.widgets.VSeparator.class); //$NON-NLS-1$
-		registerClass("Viewport", javax.swing.JViewport.class); //$NON-NLS-1$
-		registerClass("Window", javax.swing.JFrame.class); //$NON-NLS-1$
+		registerClass("PandaCombo", PandaCombo.class); //$NON-NLS-1$
+		registerClass("PandaEntry", PandaEntry.class); //$NON-NLS-1$
+		registerClass("PandaHTML", PandaHTML.class); //$NON-NLS-1$
+		registerClass("PandaText", JTextArea.class); //$NON-NLS-1$
+		registerClass("PandaTimer", PandaTimer.class); //$NON-NLS-1$
+		registerClass("ProgressBar", JProgressBar.class); //$NON-NLS-1$
+		registerClass("RadioButton", JRadioButton.class); //$NON-NLS-1$
+		registerClass("ScrolledWindow", JScrollPane.class); //$NON-NLS-1$
+		registerClass("SeparatorMenuItem", JSeparator.class); //$NON-NLS-1$
+		registerClass("Table", Table.class); //$NON-NLS-1$
+		registerClass("Text", JTextArea.class); //$NON-NLS-1$
+		registerClass("TextView", JTextArea.class); //$NON-NLS-1$
+		registerClass("ToggleButton", JToggleButton.class); //$NON-NLS-1$
+		registerClass("Toolbar", JToolBar.class); //$NON-NLS-1$
+		registerClass("VBox", VBox.class); //$NON-NLS-1$
+		registerClass("VSeparator", VSeparator.class); //$NON-NLS-1$
+		registerClass("Viewport", JViewport.class); //$NON-NLS-1$
+		registerClass("Window", JFrame.class); //$NON-NLS-1$
 	}
 
 	private void initPropertyMap() {
 		propertyMap = new HashMap();
 		registerProperty(java.awt.Frame.class, "title", "setWindowTitle"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JLabel.class, "justify", "setJustify"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Component.class, "width_request", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Component.class, "height_request", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Component.class, "width", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Component.class, "height", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
-
-/*
-		registerProperty("selectable", null);
-		registerProperty("xalign", null);
-		registerProperty("yalign", null);
-		registerProperty("xpad", null);
-		registerProperty("ypad", null);
-		registerProperty("xalign", null);
-		registerProperty("n_rows", null);
-		registerProperty("n_columns", null);
-		registerProperty("homogenous", null);
-		registerProperty("row_spacing", null);
-		registerProperty("column_spacing", null);
-*/
-	    registerProperty(java.awt.Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Container.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Container.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(java.awt.Container.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
-//		registerProperty(PIXMAP, "build_insensitive", pixmap_set_build_insensitive);
-//		registerProperty(PIXMAP, "filename", pixmap_set_filename);
-		registerProperty(javax.swing.text.JTextComponent.class, "editable", "setEditable"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
-//		registerProperty(CALENDAR, "display_options", calendar_set_display_options);
-		registerProperty(javax.swing.JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTable.class, "show_titles", "setCListShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTree.class, "selection_mode", "setTreeSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTree.class, "view_mode", "setTreeViewMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTree.class, "view_line", "setTreeViewLine"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JList.class, "selection_mode", "setListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JCheckBoxMenuItem.class, "always_show_toggle", "setCheckMenuItemAlwaysShowToggle"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextText"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JRadioButtonMenuItem.class, "group", "setRadioMenuItemGroup"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JToolBar.class, "tooltips", "setToolbarTooltips"); //$NON-NLS-1$ //$NON-NLS-2$
-//		registerPrfoperty(STATUSBAR, "has_resize_grip", statusbar_set_has_resize_grip);
-//		registerProperty(RULER, "metric", ruler_set_metric);
-		registerProperty(javax.swing.JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(org.montsuqi.widgets.NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(org.montsuqi.widgets.PandaEntry.class, "input_mode", "setPandaEntryInputMode"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(org.montsuqi.widgets.PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(org.montsuqi.widgets.PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(org.montsuqi.widgets.PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(javax.swing.JProgressBar.class, "lower", "setProgressBarLower");
-		registerProperty(javax.swing.JProgressBar.class, "upper", "setProgressBarUpper");
-		registerProperty(javax.swing.JProgressBar.class, "value", "setProgressBarValue");
-		registerProperty(javax.swing.JProgressBar.class, "orientation", "setProgressBarOrientation");
-		registerProperty(javax.swing.JProgressBar.class, "show_text", "setProgressBarShowText");
-		registerProperty(org.montsuqi.widgets.Frame.class, "label", "setFrameLabel");
+		registerProperty(Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JLabel.class, "justify", "setJustify"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextComponent.class, "editable", "setEditable"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextComponent.class, "text", "setTextText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextArea.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextField.class, "justify", "horizontalAlignment"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTextField.class, "invisible_char", "setEntryInvisibleChar"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "width_request", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "height_request", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "width", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "height", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
+	    registerProperty(Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Container.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Container.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Container.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTable.class, "show_titles", "setCListShowTitles"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTree.class, "selection_mode", "setTreeSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTree.class, "view_mode", "setTreeViewMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JTree.class, "view_line", "setTreeViewLine"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JList.class, "selection_mode", "setListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JCheckBoxMenuItem.class, "always_show_toggle", "setCheckMenuItemAlwaysShowToggle"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JRadioButtonMenuItem.class, "group", "setRadioMenuItemGroup"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JToolBar.class, "tooltips", "setToolbarTooltips"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JMenuItem.class, "label", "setMenuItemLabel"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(NumberEntry.class, "format", "setNumberEntryFormat"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaEntry.class, "input_mode", "setPandaEntryInputMode"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JProgressBar.class, "lower", "setProgressBarLower");
+		registerProperty(JProgressBar.class, "upper", "setProgressBarUpper");
+		registerProperty(JProgressBar.class, "value", "setProgressBarValue");
+		registerProperty(JProgressBar.class, "orientation", "setProgressBarOrientation");
+		registerProperty(JProgressBar.class, "show_text", "setProgressBarShowText");
+		registerProperty(Frame.class, "label", "setFrameLabel");
+		//registerProperty(Table.class, "rows", "setTableRows");
+		//registerProperty(Table.class, "columns", "setTableColumns");
+		//registerProperty(Table.class, "row_spacing", "setTableRowSpacing");
+		//registerProperty(Table.class, "column_spacing", "setTableColumnSpacing");
 	}
 	
 	private void initWidgetBuildData() {
@@ -215,7 +224,7 @@ class WidgetBuilder {
 								"standardBuildChildren", //$NON-NLS-1$
 								"colorSelectionDialogFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("Combo", //$NON-NLS-1$
-								"standardBuildWidget", //$NON-NLS-1$
+								"buildCombo", //$NON-NLS-1$
 								"buildComboChildren", //$NON-NLS-1$
 								"comboFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("CTree", //$NON-NLS-1$
@@ -278,7 +287,7 @@ class WidgetBuilder {
 								"buildOptionMenuChildren", //$NON-NLS-1$
 								null);
 		registerWidgetBuildData("PandaCombo", //$NON-NLS-1$
-								"standardBuildWidget", //$NON-NLS-1$
+								"buildPandaCombo", //$NON-NLS-1$
 								"buildPandaComboChildren", //$NON-NLS-1$
 								"comboFindInternalChild"); //$NON-NLS-1$
 		registerWidgetBuildData("PandaCList", //$NON-NLS-1$
@@ -434,9 +443,25 @@ class WidgetBuilder {
 		}
 	}
 
+	Container buildCombo(WidgetInfo info) {
+		Container widget = standardBuildWidget(info);
+		JComboBox combo = (JComboBox)widget;
+		combo.setEditable(true);
+		return widget;
+	}
+
+	Container buildPandaCombo(WidgetInfo info) {
+		Container widget = standardBuildWidget(info);
+		PandaCombo combo = (PandaCombo)widget;
+		combo.setEditable(true);
+		return widget;
+	}
+
 	Container buildList(WidgetInfo info) {
 		Container widget = standardBuildWidget(info);
-		((JList)widget).setModel(new DefaultListModel());
+		JList list = (JList)widget;
+		ListModel model = new DefaultListModel();
+		list.setModel(model);
 		return widget;
 	}
 
@@ -516,7 +541,6 @@ class WidgetBuilder {
 		if (cCount  != 1) {
 			throw new WidgetBuildingException("only one child for a Frame");
 		}
-		parent.setLayout(new BorderLayout());
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
 		Container child = buildWidget(wInfo);
