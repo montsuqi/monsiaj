@@ -47,6 +47,7 @@ class EntryMarshaller extends WidgetMarshaller {
 			String text = con.receiveStringData();
 			manager.registerValue(entry, name, null);
 			entry.setText(text);
+			entry.setCaretPosition(Math.max(0, text.length() - 1));
 		}
 	}
 
