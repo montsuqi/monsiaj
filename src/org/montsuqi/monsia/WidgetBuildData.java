@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,9 +49,9 @@ class WidgetBuildData {
 			 findMethod(findInternalChild, new Class[] { Container.class, String.class }));
 	}
 
-	Container build(WidgetBuilder builder, WidgetInfo info) {
+	Component build(WidgetBuilder builder, WidgetInfo info) {
 		Object[] args = { info };
-		return (Container)invoke(builder, buildMethod, args);
+		return (Component)invoke(builder, buildMethod, args);
 	}
 
 	void buildChildren(WidgetBuilder builder, Container parent, WidgetInfo info) {
@@ -58,9 +59,9 @@ class WidgetBuildData {
 		invoke(builder, buildChildrenMethod, args);
 	}
 
-	Container findInternalChild(WidgetBuilder builder, Container parent, String name) {
+	Component findInternalChild(WidgetBuilder builder, Container parent, String name) {
 		Object[] args = { builder, parent, name };
-		return (Container)invoke(builder, findInternalChildMethod, args);
+		return (Component)invoke(builder, findInternalChildMethod, args);
 	}
 
 	boolean hasBuildMethod() {

@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.monsia;
 
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -92,18 +92,18 @@ public class Interface {
 	private JWindow topLevel;
     private LinkedList accelGroup;
 	private Map signals;
-    private Container focusWidget;
-	private Container defaultWidget;
+    private Component focusWidget;
+	private Component defaultWidget;
 	private Logger logger;
 
 	private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; //$NON-NLS-1$
 	private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; //$NON-NLS-1$
 
-	void setDefaultWidget(Container widget) {
+	void setDefaultWidget(Component widget) {
 		defaultWidget = widget;
 	}
 
-	void setFocusWidget(Container widget) {
+	void setFocusWidget(Component widget) {
 		focusWidget = widget;
 	}
 
@@ -183,7 +183,7 @@ public class Interface {
 
 	// FIXME signal with accels
 	private void signalAutoConnect() {
-		Class[] argTypes = { Container.class, Object.class };
+		Class[] argTypes = { Component.class, Object.class };
 		Iterator entries = signals.entrySet().iterator();
 		while (entries.hasNext()) {
 			Map.Entry entry = (Map.Entry)entries.next();
@@ -194,7 +194,7 @@ public class Interface {
 				Method handler = Protocol.class.getMethod(handlerName, argTypes);
 				while (i.hasNext()) {
 					SignalData data = (SignalData)i.next();
-					Container target = (Container)data.getSignalObject();
+					Component target = (Component)data.getSignalObject();
 					String signalName = data.getName();
 					Object other = data.getConnectObject();
 					if (data.isAfter()) {
@@ -229,20 +229,20 @@ public class Interface {
 		return methodName.toString();
 	}
 	
-	private void connect(Container target, String signalName, Method handler, Object other)
+	private void connect(Component target, String signalName, Method handler, Object other)
 		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		Class[] argTypes = new Class[] { Container.class, Method.class, Object.class };
+		Class[] argTypes = new Class[] { Component.class, Method.class, Object.class };
 		Method method = Interface.class.getDeclaredMethod(connectMethodName(signalName), argTypes);
 		method.setAccessible(true);
 		method.invoke(this, new Object[] { target, handler, other });
 	}
 
-	private void connectAfter(Container target, String signalName, Method handler, Object other)
+	private void connectAfter(Component target, String signalName, Method handler, Object other)
 		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		connect(target, signalName, handler, other);
 	}
 
-	private void invoke(Method handler, Container target, Object other) {
+	private void invoke(Method handler, Component target, Object other) {
 		try {
 			handler.invoke(protocol, new Object[] { target, other });
 		} catch (IllegalAccessException e) {
@@ -255,7 +255,7 @@ public class Interface {
 		}
 	}
 		 
-	private void connectClicked(final Container target, final Method handler, final Object other) {
+	private void connectClicked(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof JButton) && ! (target instanceof JRadioButton)) {
 			return;
 		}
@@ -267,11 +267,11 @@ public class Interface {
 		});
 	}
 
-	private void connectButtonPressEvent(final Container target, final Method handler, final Object other) {
+	private void connectButtonPressEvent(final Component target, final Method handler, final Object other) {
 		connectClicked(target, handler, other);
 	}
 
-	private void connectKeyPressEvent(final Container target, final Method handler, final Object other) {
+	private void connectKeyPressEvent(final Component target, final Method handler, final Object other) {
 		target.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				invoke(handler, target, other);
@@ -279,7 +279,7 @@ public class Interface {
 		});
 	}
 
-	private void connectChanged(final Container target, final Method handler, final Object other) {
+	private void connectChanged(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof JTextComponent)) {
 			return;
 		}
@@ -297,7 +297,7 @@ public class Interface {
 		});
 	}
 
-	private void connectActivate(final Container target, final Method handler, final Object other) {
+	private void connectActivate(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof JTextField)) {
 			return;
 		}
@@ -309,11 +309,11 @@ public class Interface {
 		});
 	}
 	
-	private void connectEnter(final Container target, final Method handler, final Object other) {
+	private void connectEnter(final Component target, final Method handler, final Object other) {
 		connectActivate(target, handler, other);
 	}
 
-	private void connectFocusInEvent(final Container target, final Method handler, final Object other) {
+	private void connectFocusInEvent(final Component target, final Method handler, final Object other) {
 		target.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 				invoke(handler, target, other);
@@ -322,7 +322,7 @@ public class Interface {
 		});
 	}
 
-	private void connectFocusOutEvent(final Container target, final Method handler, final Object other) {
+	private void connectFocusOutEvent(final Component target, final Method handler, final Object other) {
 		target.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {}
 			public void focusLost(FocusEvent e) {
@@ -331,7 +331,7 @@ public class Interface {
 		});
 	}
 
-	private void connectMapEvent(final Container target, final Method handler, final Object other) {
+	private void connectMapEvent(final Component target, final Method handler, final Object other) {
 		if (target instanceof Window) {
 			Window window = (Window)target;
 			window.addWindowListener(new WindowAdapter() {
@@ -348,7 +348,7 @@ public class Interface {
 		}
 	}
 
-	private void connectDeleteEvent(final Container target, final Method handler, final Object other) {
+	private void connectDeleteEvent(final Component target, final Method handler, final Object other) {
 		if (target instanceof Window) {
 			Window window = (Window)target;
 			window.addWindowListener(new WindowAdapter() {
@@ -365,7 +365,7 @@ public class Interface {
 		}
 	}
 
-	private void connectDestroy(final Container target, final Method handler, final Object other) {
+	private void connectDestroy(final Component target, final Method handler, final Object other) {
 		if (target instanceof Window) {
 			Window window = (Window)target;
 			window.addWindowListener(new WindowAdapter() {
@@ -382,7 +382,7 @@ public class Interface {
 		}
 	}
 
-	private void connectSetFocus(final Container target, final Method handler, final Object other) {
+	private void connectSetFocus(final Component target, final Method handler, final Object other) {
 		target.addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent e) {
 				invoke(handler, target, other);
@@ -390,7 +390,7 @@ public class Interface {
 		});
 	}
 
-	private void connectSelectRow(final Container target, final Method handler, final Object other) {
+	private void connectSelectRow(final Component target, final Method handler, final Object other) {
 		if (target instanceof JTree) {
 			JTree tree = (JTree)target;
 			TreeSelectionModel model = tree.getSelectionModel();
@@ -417,20 +417,20 @@ public class Interface {
 		}
 	}
 
-	private void connectUnselectRow(Container target, Method handler, Object other) {
+	private void connectUnselectRow(Component target, Method handler, Object other) {
 		// XxxSelectionModels don't care selection/unselection so use connectSelectRow
 		connectSelectRow(target, handler, other);
 	}
 
-	private void connectSelectionChanged(Container target, Method handler, Object other) {
+	private void connectSelectionChanged(Component target, Method handler, Object other) {
 		connectSelectRow(target, handler, other);
 	}
 
-	private void connectClickColumn(Container target, Method handler, Object other) {
-		// TODO implement this.
+	private void connectClickColumn(Component target, Method handler, Object other) {
+		// NOTE need to implement this?
 	}
 
-	private void connectSwitchPage(final Container target, final Method handler, final Object other) {
+	private void connectSwitchPage(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof JTabbedPane)) {
 			return;
 		}
@@ -442,7 +442,7 @@ public class Interface {
 		});
 	}
 
-	private void connectToggled(final Container target, final Method handler, final Object other) {
+	private void connectToggled(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof JToggleButton)) {
 			return;
 		}
@@ -454,7 +454,7 @@ public class Interface {
 		});
 	}
 
-	private void connectTimeout(final Container target, final Method handler, final Object other) {
+	private void connectTimeout(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof PandaTimer)) {
 			return;
 		}
@@ -466,7 +466,7 @@ public class Interface {
 		});
 	}
 
-	private void connectDaySelected(final Container target, final Method handler, final Object other) {
+	private void connectDaySelected(final Component target, final Method handler, final Object other) {
 		if ( ! (target instanceof Calendar)) {
 			return;
 		}
@@ -483,18 +483,18 @@ public class Interface {
 		});
 	}
 
-	public Container getWidget(String name) {
+	public Component getWidget(String name) {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
-		return (Container)widgets.get(name);
+		return (Component)widgets.get(name);
 	}
 
-	public Container getWidgetByLongName(String longName) {
+	public Component getWidgetByLongName(String longName) {
 		if (longName == null) {
 			throw new IllegalArgumentException();
 		}
-		return (Container)longNames.get(longName);
+		return (Component)longNames.get(longName);
 	}
 
 	String relativeFile(String fileName) {
@@ -511,14 +511,14 @@ public class Interface {
 		return relativeFile.toString();
 	}
 
-	public String getWidgetName(Container widget) {
+	public String getWidgetName(Component widget) {
 		if (widget == null) {
 			throw new IllegalArgumentException();
 		}
 		Iterator entries = widgets.entrySet().iterator();
 		while (entries.hasNext()) {
 			Map.Entry e = (Map.Entry)entries.next();
-			Container value = (Container)e.getValue();
+			Component value = (Component)e.getValue();
 			if (value == widget) {
 				return (String)e.getKey();
 			}
@@ -526,14 +526,14 @@ public class Interface {
 		return null;
 	}
 
-	public String getWidgetLongName(Container widget) {
+	public String getWidgetLongName(Component widget) {
 		if (widget == null) {
 			throw new IllegalArgumentException();
 		}
 		Iterator entries = longNames.entrySet().iterator();
 		while (entries.hasNext()) {
 			Map.Entry e = (Map.Entry)entries.next();
-			Container value = (Container)e.getValue();
+			Component value = (Component)e.getValue();
 			if (value == widget) {
 				return (String)e.getKey();
 			}
@@ -593,12 +593,12 @@ public class Interface {
 		Iterator i = roots.iterator();
 		while (i.hasNext()) {
 			WidgetInfo info = (WidgetInfo)i.next();
-			Container widget = builder.buildWidget(info);
+			Component widget = builder.buildWidget(info);
 			widgets.put(info.getName(), widget);
 		}
 	}
 
-	public String getLongName(Container widget) {
+	public String getLongName(Component widget) {
 		Iterator i = longNames.entrySet().iterator();
 		while (i.hasNext()) {
 			Map.Entry e = (Map.Entry)i.next();
@@ -609,7 +609,7 @@ public class Interface {
 		return null;
 	}
 
-	void setLongName(String longName, Container widget) {
+	void setLongName(String longName, Component widget) {
 		longNames.put(longName, widget);
 	}
 }

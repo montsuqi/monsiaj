@@ -23,7 +23,7 @@ copies.
 package org.montsuqi.monsia;
 
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Font;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class Style {
 		this.name = name;
 	}
 
-	public void apply(Container widget) {
+	public void apply(Component widget) {
 		if (font != null) {
 			widget.setFont(font);
 		}
@@ -82,13 +82,13 @@ public class Style {
 			} else {
 				style = (Style)styles.get(styleName);
 			}
-			if ("font".equals(attribute)) {
+			if ("font".equals(attribute)) { //$NON-NLS-1$
 				Font font = Font.decode(value);
 				style.setFont(font);
-			} else if ("foreground".equals(attribute) || "fg".equals(attribute)) {
+			} else if ("foreground".equals(attribute) || "fg".equals(attribute)) { //$NON-NLS-1$ //$NON-NLS-2$
 				Color fg = Color.decode(value);
 				style.setForeground(fg);
-			} else if ("background".equals(attribute) || "bg".equals(attribute)) {
+			} else if ("background".equals(attribute) || "bg".equals(attribute)) { //$NON-NLS-1$ //$NON-NLS-2$
 				Color bg = Color.decode(value);
 				style.setBackground(bg);
 			}

@@ -161,7 +161,7 @@ class WidgetBuilder {
 	private void initPropertyMap() {
 		propertyMap = new HashMap();
 		registerProperty(java.awt.Frame.class, "title", "setWindowTitle"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(AbstractButton.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JLabel.class, "label", "text"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JLabel.class, "justify", "setJustify"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -174,10 +174,10 @@ class WidgetBuilder {
 		registerProperty(Component.class, "height_request", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "width", "setWidth"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(Component.class, "height", "setHeight"); //$NON-NLS-1$ //$NON-NLS-2$
-	    registerProperty(Container.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(Container.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(Container.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(Container.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
+	    registerProperty(Component.class, "visible", "setVisible"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Component.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JTable.class, "column_widths", "setCListColumnWidth"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JTable.class, "selection_mode", "setCListSelectionMode"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(JTable.class, "shadow_type", "setCListShadowType"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -195,12 +195,12 @@ class WidgetBuilder {
 		registerProperty(PandaEntry.class, "xim_enabled", "setPandaEntryXIMEnabled"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(PandaHTML.class, "uri", "setPandaHTMLURI"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(PandaTimer.class, "duration", "setPandaTimerDuration"); //$NON-NLS-1$ //$NON-NLS-2$
-		registerProperty(JProgressBar.class, "lower", "setProgressBarLower");
-		registerProperty(JProgressBar.class, "upper", "setProgressBarUpper");
-		registerProperty(JProgressBar.class, "value", "setProgressBarValue");
-		registerProperty(JProgressBar.class, "orientation", "setProgressBarOrientation");
-		registerProperty(JProgressBar.class, "show_text", "setProgressBarShowText");
-		registerProperty(Frame.class, "label", "setFrameLabel");
+		registerProperty(JProgressBar.class, "lower", "setProgressBarLower"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JProgressBar.class, "upper", "setProgressBarUpper"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JProgressBar.class, "value", "setProgressBarValue"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JProgressBar.class, "orientation", "setProgressBarOrientation"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(JProgressBar.class, "show_text", "setProgressBarShowText"); //$NON-NLS-1$ //$NON-NLS-2$
+		registerProperty(Frame.class, "label", "setFrameLabel"); //$NON-NLS-1$ //$NON-NLS-2$
 		//registerProperty(Table.class, "rows", "setTableRows");
 		//registerProperty(Table.class, "columns", "setTableColumns");
 		//registerProperty(Table.class, "row_spacing", "setTableRowSpacing");
@@ -399,8 +399,8 @@ class WidgetBuilder {
 	
 	//--------------------------------------------------------------------
 
-	synchronized Container buildWidget(WidgetInfo info) {
-		Container widget;
+	synchronized Component buildWidget(WidgetInfo info) {
+		Component widget;
 		String genericClassName = info.getClassName();
 		WidgetBuildData data = getBuildData(genericClassName);
 		if (data == null) {
@@ -424,15 +424,15 @@ class WidgetBuilder {
 		return widget;
 	}
 
-	Container standardBuildWidget(WidgetInfo info) {
+	Component standardBuildWidget(WidgetInfo info) {
 		String genericClassName = info.getClassName();
 		Class clazz  = (Class)classMap.get(genericClassName);
 		if (clazz == null) {
 			throw new IllegalArgumentException(genericClassName);
 		}
-		Container widget = null;
+		Component widget = null;
 		try {
-			widget = (Container)clazz.newInstance();
+			widget = (Component)clazz.newInstance();
 			setProperties(widget, info);
 			return widget;
 		} catch (InstantiationException e) {
@@ -444,29 +444,29 @@ class WidgetBuilder {
 		}
 	}
 
-	Container buildCombo(WidgetInfo info) {
-		Container widget = standardBuildWidget(info);
+	Component buildCombo(WidgetInfo info) {
+		Component widget = standardBuildWidget(info);
 		JComboBox combo = (JComboBox)widget;
 		combo.setEditable(true);
 		return widget;
 	}
 
-	Container buildPandaCombo(WidgetInfo info) {
-		Container widget = standardBuildWidget(info);
+	Component buildPandaCombo(WidgetInfo info) {
+		Component widget = standardBuildWidget(info);
 		PandaCombo combo = (PandaCombo)widget;
 		combo.setEditable(true);
 		return widget;
 	}
 
-	Container buildList(WidgetInfo info) {
-		Container widget = standardBuildWidget(info);
+	Component buildList(WidgetInfo info) {
+		Component widget = standardBuildWidget(info);
 		JList list = (JList)widget;
 		ListModel model = new DefaultListModel();
 		list.setModel(model);
 		return widget;
 	}
 
-	Container buildRadioButton(WidgetInfo info) {
+	Component buildRadioButton(WidgetInfo info) {
 		AbstractButton widget = (AbstractButton)standardBuildWidget(info);
 		ButtonGroup group = null;
 		for (int i = 0, n = info.getPropertiesCount(); i < n; i++) {
@@ -484,7 +484,7 @@ class WidgetBuilder {
 		return widget;
 	}
 
-	Container buildPreview(WidgetInfo info) {
+	Component buildPreview(WidgetInfo info) {
 		logger.warn(Messages.getString("WidgetBuilder.not_implemented")); //$NON-NLS-1$
 		return null;
 	}
@@ -498,7 +498,7 @@ class WidgetBuilder {
 			if (cInfo.getInternalChild() != null) {
 				handleInternalChild(parent, cInfo);
 			}
-			Container child = buildWidget(cInfo.getWidgetInfo());
+			Component child = buildWidget(cInfo.getWidgetInfo());
 			if (parent instanceof JWindow) {
 				parent = ((JWindow)parent).getContentPane();
 			} else if (parent instanceof JFrame) {
@@ -516,7 +516,7 @@ class WidgetBuilder {
 		JMenu menu = (JMenu)parent;
 		int cCount = info.getChildrenCount();
 		for (int i = 0; i < cCount; i++) {
-			Container child;
+			Component child;
 			ChildInfo cInfo = info.getChild(i);
 			if (cInfo.getInternalChild() != null) {
 				handleInternalChild(parent, cInfo);
@@ -540,11 +540,11 @@ class WidgetBuilder {
 	void buildFrameChildren(Container parent, WidgetInfo info) {
 		int cCount = info.getChildrenCount();
 		if (cCount  != 1) {
-			throw new WidgetBuildingException("only one child for a Frame");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_for_a_Frame")); //$NON-NLS-1$
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Container child = buildWidget(wInfo);
+		Component child = buildWidget(wInfo);
 		parent.add(child);
 	}
 
@@ -608,7 +608,7 @@ class WidgetBuilder {
 				logger.warn(Messages.getString("WidgetBuilder.the_child_of_the_option_menu_was_not_a_menu_widget"), wInfo.getName()); //$NON-NLS-1$
 				continue;
 			}
-			Container child = buildWidget(wInfo);
+			Component child = buildWidget(wInfo);
 
 			JMenu menu = (JMenu)parent;
 			menu.add(child);
@@ -623,7 +623,7 @@ class WidgetBuilder {
 		JScrollPane scroll = (JScrollPane)parent;
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Container child = buildWidget(wInfo);
+		Component child = buildWidget(wInfo);
 		scroll.setViewportView(child);
 	}
 
@@ -634,7 +634,7 @@ class WidgetBuilder {
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Container child = buildWidget(wInfo);
+		Component child = buildWidget(wInfo);
 		JViewport viewport = (JViewport)parent;
 		viewport.setView(child);
 	}
@@ -643,14 +643,14 @@ class WidgetBuilder {
 		JComboBox combo = (JComboBox)parent;
 		int cCount = info.getChildrenCount();
 		if (cCount != 1) {
-			throw new WidgetBuildingException("only one child is allowed in Combo");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_Combo")); //$NON-NLS-1$
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
 		if ( ! "Entry".equals(wInfo.getClassName())) { //$NON-NLS-1$
-			throw new WidgetBuildingException("not a Entry widget");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.not_a_Entry_widget")); //$NON-NLS-1$
 		}
-		Container editor = (Container)combo.getEditor().getEditorComponent();
+		Component editor = combo.getEditor().getEditorComponent();
 		xml.setLongName(wInfo.getLongName(), editor);
 	}
 
@@ -658,14 +658,14 @@ class WidgetBuilder {
 		PandaCombo combo = (PandaCombo)parent;
 		int cCount = info.getChildrenCount();
 		if (cCount != 1) {
-			throw new WidgetBuildingException("only one child is allowed in PandaCombo");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.only_one_child_is_allowed_in_PandaCombo")); //$NON-NLS-1$
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
 		if ( ! "PandaEntry".equals(wInfo.getClassName())) { //$NON-NLS-1$
-			throw new WidgetBuildingException("not a PandaEntry widget");
+			throw new WidgetBuildingException(Messages.getString("WidgetBuilder.not_a_PandaEntry_widget")); //$NON-NLS-1$
 		}
-		Container editor = (Container)combo.getEditor().getEditorComponent();
+		Component editor = combo.getEditor().getEditorComponent();
 		xml.setLongName(wInfo.getLongName(), editor);
 	}
 
@@ -714,7 +714,7 @@ class WidgetBuilder {
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Container child = null;
+			Component child = null;
 			String className = wInfo.getClassName();
 			if ("toggle".equals(className) || //$NON-NLS-1$
 				"radio".equals(className) || //$NON-NLS-1$
@@ -726,7 +726,7 @@ class WidgetBuilder {
 				boolean useStock = false;
 				boolean active = false;
 				boolean newGroup = false;
-				Container iconw = null;
+				Component iconw = null;
 				int pCount = wInfo.getPropertiesCount();
 				for (int j = 0; j < pCount; j++) {
 					Property p = wInfo.getProperty(j);
@@ -800,7 +800,7 @@ class WidgetBuilder {
 		
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Container child = buildWidget(wInfo);
+		Component child = buildWidget(wInfo);
 		boolean resize = false;
 		boolean shrink = true;
 
@@ -860,7 +860,7 @@ class WidgetBuilder {
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Container child = null;
+			Component child = null;
 			TableConstraints tc = new TableConstraints();
 
 			String internalChild = cInfo.getInternalChild();
@@ -901,7 +901,7 @@ class WidgetBuilder {
 		for (int i = 0; i < cCount; i++) {
 			ChildInfo cInfo = info.getChild(i);
 			WidgetInfo wInfo = cInfo.getWidgetInfo();
-			Container child = null;
+			Component child = null;
 			int x = 0, y = 0;
 			int w = 0, h = 0;
 
@@ -942,7 +942,7 @@ class WidgetBuilder {
 
 	//--------------------------------------------------------------------
 
-	Container dialogFindInternalChild(Container parent, String childName) {
+	Component dialogFindInternalChild(Container parent, String childName) {
 		JDialog dialog = (JDialog)parent;
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
@@ -953,7 +953,7 @@ class WidgetBuilder {
 		return null;
 	}
 
-	Container imageMenuFindInternalChild(Container parent, String childName) {
+	Component imageMenuFindInternalChild(Container parent, String childName) {
 		if ("image".equals(childName)) { //$NON-NLS-1$
 			return parent; // MenuItem itself is an AbstractButton and hase an icon with it.
 		} else {
@@ -961,7 +961,7 @@ class WidgetBuilder {
 		}
 	}
 
-	Container scrolledWindowFindInternalChild(Container parent, String childName) {
+	Component scrolledWindowFindInternalChild(Container parent, String childName) {
 		JScrollPane scroll = (JScrollPane)parent;
 		if ("vscrollbar".equals(childName)) { //$NON-NLS-1$
 			return scroll.getVerticalScrollBar();
@@ -973,7 +973,7 @@ class WidgetBuilder {
 		return null;
 	}
 
-	Container fileSelectionDialogFindInternalChild(Container parent, String childName) {
+	Component fileSelectionDialogFindInternalChild(Container parent, String childName) {
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -992,7 +992,7 @@ class WidgetBuilder {
 		return null;
 	}
 
-	Container colorSelectionDialogFindInternalChild(Container parent, String childName) {
+	Component colorSelectionDialogFindInternalChild(Container parent, String childName) {
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -1014,7 +1014,7 @@ class WidgetBuilder {
 		return null;
 	}
 
-	Container fontSelectionDialogFindInternalChild(Container parent, String childName) {
+	Component fontSelectionDialogFindInternalChild(Container parent, String childName) {
 		if ("vbox".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -1036,7 +1036,7 @@ class WidgetBuilder {
 		return null;
 	}
 
-	Container comboFindInternalChild(Container parent, String childName) {
+	Component comboFindInternalChild(Container parent, String childName) {
 		if ("entry".equals(childName)) { //$NON-NLS-1$
 			return parent;
 		}
@@ -1057,8 +1057,8 @@ class WidgetBuilder {
 
 	//--------------------------------------------------------------------
 
-	private void handleInternalChild(Container parent, ChildInfo cInfo) {
-		Container child;
+	private void handleInternalChild(Component parent, ChildInfo cInfo) {
+		Component child;
 		WidgetInfo info;
 		Class oClass;
 		int i;
@@ -1081,7 +1081,7 @@ class WidgetBuilder {
 			return;
 		}
 
-		child = parentBuildData.findInternalChild(this, parent, cInfo.getInternalChild());
+		child = parentBuildData.findInternalChild(this, (Container)parent, cInfo.getInternalChild());
 
 		if (child == null) {
 			logger.warn(Messages.getString("WidgetBuilder.could_not_find_internal_child_in_parent"), //$NON-NLS-1$
@@ -1094,7 +1094,7 @@ class WidgetBuilder {
 		setCommonParams(child, wInfo);
 	}
 
-	private void setProperties(Container widget, WidgetInfo info) {
+	private void setProperties(Component widget, WidgetInfo info) {
 		for (int i = 0, pCount = info.getPropertiesCount(); i < pCount; i++) {
 			try {
 				Property p = info.getProperty(i);
@@ -1161,19 +1161,19 @@ class WidgetBuilder {
 		return setter;
 	}
 
-	private void setCommonParams(Container widget, WidgetInfo info) {
+	private void setCommonParams(Component widget, WidgetInfo info) {
 		//addAccels(widget, info);
 		addSignals(widget, info);
 		widget.setName(info.getName());
 		String className = info.getClassName();
 		WidgetBuildData data = (WidgetBuildData)builderMap.get(className);
 		if (data.hasBuildChildrenMethod() && info.getChildrenCount() > 0) {
-			data.buildChildren(this, widget, info);
+			data.buildChildren(this, (Container)widget, info);
 		}
 		xml.setLongName(info.getLongName(), widget);
 	}
 
-	private void addSignals(Container widget, WidgetInfo info) {
+	private void addSignals(Component widget, WidgetInfo info) {
 		Iterator i = info.getSignals().iterator();
 		while (i.hasNext()) {
 			SignalInfo sInfo = (SignalInfo)i.next();
@@ -1181,7 +1181,7 @@ class WidgetBuilder {
 		}
 	}
 
-	private void addAccels(Container widget, WidgetInfo info) {
+	private void addAccels(Component widget, WidgetInfo info) {
 		Iterator i = info.getAccels().iterator();
 		while (i.hasNext()) {
 			AccelInfo accel = (AccelInfo)i.next();

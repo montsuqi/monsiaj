@@ -22,7 +22,7 @@ copies.
 
 package org.montsuqi.client;
 
-import java.awt.Container;
+import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
@@ -39,7 +39,7 @@ class Node {
 	Node(Interface xml, String wName) {
 		this.xml = xml;
 		this.name = wName;
-		Container widget = xml.getWidget(wName);
+		Component widget = xml.getWidget(wName);
 		this.window = (JFrame)widget;
 		this.changedWidgets = new HashMap();
 	}
@@ -64,7 +64,7 @@ class Node {
 		return changedWidgets;
 	}
 
-	void addChangedWidget(String name, Container widget) {
+	void addChangedWidget(String name, Component widget) {
 		if ( ! changedWidgets.containsKey(name)) {
 			changedWidgets.put(name, widget);
 		}

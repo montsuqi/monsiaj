@@ -67,7 +67,7 @@ class WidgetOperation {
 	static Method findMethod(String name) {
 		try {
 			Class[] argTypes = new Class[] { Interface.class,
-											 Container.class,
+											 Component.class,
 											 String.class,
 											 String.class };
 			return WidgetOperation.class.getDeclaredMethod(name, argTypes);
@@ -80,12 +80,12 @@ class WidgetOperation {
 		}
 	}
 
-	static void setVisible(Interface xml, Container widget, String name, String value) {
+	static void setVisible(Interface xml, Component widget, String name, String value) {
 		boolean v = ParameterConverter.toBoolean(value);
 		widget.setVisible(v);
 	}
 
-	static void setEditable(Interface xml, Container widget, String name, String value) {
+	static void setEditable(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTextComponent)) {
 			return;
 		}
@@ -94,7 +94,7 @@ class WidgetOperation {
 		text.setEditable(v);
 	}
 
-	static void setWindowTitle(Interface xml, Container widget, String name, String value) {
+	static void setWindowTitle(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof Frame)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Frame_widget")); //$NON-NLS-1$
 		}
@@ -102,7 +102,7 @@ class WidgetOperation {
 		frame.setTitle(value);
 	}
 
-	static void setWidth(Interface xml, Container widget, String name, String value) {
+	static void setWidth(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof Component)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.attempt_to_set_width_to_non_component")); //$NON-NLS-1$
 		}
@@ -117,7 +117,7 @@ class WidgetOperation {
 		}
 	}
 
-	static void setHeight(Interface xml, Container widget, String name, String value) {
+	static void setHeight(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof Component)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.attempt_to_set_height_to_non_component")); //$NON-NLS-1$
 		}
@@ -131,12 +131,12 @@ class WidgetOperation {
 		}
 	}
 
-	static void setJustify(Interface xml, Container widget, String name, String value) {
+	static void setJustify(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JLabel)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JLabel_widget")); //$NON-NLS-1$
 		}
 		int alignment = SwingConstants.CENTER;
-		value = normalize(value, "JUSTIFY_");
+		value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
 		if ("CENTER".equals(value)) { //$NON-NLS-1$
 			alignment = SwingConstants.CENTER;
 		} else if ("LEFT".equals(value)) { //$NON-NLS-1$
@@ -150,7 +150,7 @@ class WidgetOperation {
 		label.setHorizontalAlignment(alignment);
 	}
 
-	static void setTooltip(Interface xml, Container widget, String name, String value) {
+	static void setTooltip(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JComponent)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JComponent_widget")); //$NON-NLS-1$
 		}
@@ -158,19 +158,19 @@ class WidgetOperation {
 		c.setToolTipText(value);
 	}
 
-	static void setHasDefault(Interface xml, Container widget, String name, String value) {
+	static void setHasDefault(Interface xml, Component widget, String name, String value) {
 		if (ParameterConverter.toBoolean(value)) {
 			xml.setDefaultWidget(widget);
 		}
 	}
 
-	static void setHasFocus(Interface xml, Container widget, String name, String value) {
+	static void setHasFocus(Interface xml, Component widget, String name, String value) {
 		if (ParameterConverter.toBoolean(value)) {
 			xml.setFocusWidget(widget);
 		}
 	}
 
-	static void setListItemLabel(Interface xml, Container widget, String name, String value) {
+	static void setListItemLabel(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JLabel)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JLabel_widget")); //$NON-NLS-1$
 		}
@@ -178,7 +178,7 @@ class WidgetOperation {
 		label.setText(value);
 	}
 
-	static void setCListColumnWidth(Interface xml, Container widget, String name, String value) {
+	static void setCListColumnWidth(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTable)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
 		}
@@ -200,12 +200,12 @@ class WidgetOperation {
 		}
 	}
 
-	static void setCListSelectionMode(Interface xml, Container widget, String name, String value) {
+	static void setCListSelectionMode(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTable)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
 		}
 		JTable table = (JTable)widget;
-		value = normalize(value, "SELECTION_");
+		value = normalize(value, "SELECTION_"); //$NON-NLS-1$
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -219,11 +219,11 @@ class WidgetOperation {
 		}
 	}
 
-	static void setCListShadowType(Interface xml, Container widget, String name, String value) {
+	static void setCListShadowType(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCListShadowType_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setCListShowTitles(Interface xml, Container widget, String name, String value) {
+	static void setCListShowTitles(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTable)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTable_widget")); //$NON-NLS-1$
 		}
@@ -232,13 +232,13 @@ class WidgetOperation {
 		header.setVisible(ParameterConverter.toBoolean(value));
 	}
 
-	static void setTreeSelectionMode(Interface xml, Container widget, String name, String value) {
+	static void setTreeSelectionMode(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTree)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTree_widget")); //$NON-NLS-1$
 		}
 		JTree tree = (JTree)widget;
 		TreeSelectionModel model = tree.getSelectionModel();
-		value = normalize(value, "SELECTION_");
+		value = normalize(value, "SELECTION_"); //$NON-NLS-1$
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			model.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -252,21 +252,21 @@ class WidgetOperation {
 		}
 	}
 
-	static void setTreeViewMode(Interface xml, Container widget, String name, String value) {
+	static void setTreeViewMode(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setTreeViewMode_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setTreeViewLine(Interface xml, Container widget, String name, String value) {
+	static void setTreeViewLine(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setTreeViewLine_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setListSelectionMode(Interface xml, Container widget, String name, String value) {
+	static void setListSelectionMode(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JList)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JList_widget")); //$NON-NLS-1$
 		}
 		JList list = (JList)widget;
 		ListSelectionModel model = list.getSelectionModel();
-		value = normalize(value, "SELECTION_");
+		value = normalize(value, "SELECTION_"); //$NON-NLS-1$
 		if ("SINGLE".equals(value)) { //$NON-NLS-1$
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
@@ -280,11 +280,11 @@ class WidgetOperation {
 		}
 	}
 
-	static void setCheckMenuItemAlwaysShowToggle(Interface xml, Container widget, String name, String value) {
+	static void setCheckMenuItemAlwaysShowToggle(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setCheckMenuItemAlwaysShowToggle_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setTextText(Interface xml, Container widget, String name, String value) {
+	static void setTextText(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTextComponent)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
 		}
@@ -292,7 +292,7 @@ class WidgetOperation {
 		text.setText(value);
 	}
 
-	static void setTextViewText(Interface xml, Container widget, String name, String value) {
+	static void setTextViewText(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JTextComponent)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JTextComponent_widget")); //$NON-NLS-1$
 		}
@@ -300,7 +300,7 @@ class WidgetOperation {
 		text.setText(value);
 	}
 
-	static void setRadioMenuItemGroup(Interface xml, Container widget, String name, String value) {
+	static void setRadioMenuItemGroup(Interface xml, Component widget, String name, String value) {
 		ButtonGroup group;
 		group = xml.getButtonGroup(value);
 
@@ -317,7 +317,7 @@ class WidgetOperation {
 		group.add((AbstractButton)widget);
 	}
 
-	static void setToolbarTooltips(Interface xml, Container widget, String name, String value) {
+	static void setToolbarTooltips(Interface xml, Component widget, String name, String value) {
 		ToolTipManager manager = ToolTipManager.sharedInstance();
 		if ( ! (widget instanceof JToolBar)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_JToolBar")); //$NON-NLS-1$
@@ -332,32 +332,32 @@ class WidgetOperation {
 		}
 	}
 	
-	static void setStatusBarHasResizeGrip(Interface xml, Container widget, String name, String value) {
+	static void setStatusBarHasResizeGrip(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setStatusBarResizeGrip_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setRulerMetric(Interface xml, Container widget, String name, String value) {
+	static void setRulerMetric(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setRulerMetric_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setMenuItemLabel(Interface xml, Container widget, String name, String value) {
+	static void setMenuItemLabel(Interface xml, Component widget, String name, String value) {
 		JMenuItem item = (JMenuItem)widget;
 		item.setText(value);
 	}
 
-	static void setMenuItemUseUnderline(Interface xml, Container widget, String name, String value) {
+	static void setMenuItemUseUnderline(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setMenuItemUseUnderline_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setMenuItemUseStock(Interface xml, Container widget, String name, String value) {
+	static void setMenuItemUseStock(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setMenuItemUseStock_is_not_supported")); //$NON-NLS-1$
 	}
 
-	static void setWindowWMClassName(Interface xml, Container widget, String name, String value) {
+	static void setWindowWMClassName(Interface xml, Component widget, String name, String value) {
 		Logger.getLogger(WidgetOperation.class).info(Messages.getString("WidgetOperation.setWindowWMClassName_is_not_supported")); //$NON-NLS-1$
 	}
 	
-	static void setEntryInvisibleChar(Interface xml, Container widget, String name, String value) {
+	static void setEntryInvisibleChar(Interface xml, Component widget, String name, String value) {
 		if ( !(widget instanceof JPasswordField)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Password_field")); //$NON-NLS-1$
 		}
@@ -365,7 +365,7 @@ class WidgetOperation {
 		password.setEchoChar(value.charAt(0));
 	}
 
-	static void setTableLeftAttach(Interface xml, Container widget, String name, String value) {
+	static void setTableLeftAttach(Interface xml, Component widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
@@ -377,7 +377,7 @@ class WidgetOperation {
 		layout.setConstraints(widget, tc);
 	}
 
-	static void setTableRightAttach(Interface xml, Container widget, String name, String value) {
+	static void setTableRightAttach(Interface xml, Component widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
@@ -389,7 +389,7 @@ class WidgetOperation {
 		layout.setConstraints(widget, tc);
 	}
 
-	static void setTableTopAttach(Interface xml, Container widget, String name, String value) {
+	static void setTableTopAttach(Interface xml, Component widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
@@ -401,7 +401,7 @@ class WidgetOperation {
 		layout.setConstraints(widget, tc);
 	}
 
-	static void setTableBottomAttach(Interface xml, Container widget, String name, String value) {
+	static void setTableBottomAttach(Interface xml, Component widget, String name, String value) {
 		Container parent = widget.getParent();
 		if ( ! (parent instanceof Table)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Table_widget")); //$NON-NLS-1$
@@ -413,7 +413,7 @@ class WidgetOperation {
 		layout.setConstraints(widget, tc);
 	}
 
-	static void setNumberEntryFormat(Interface xml, Container widget, String name, String value) {
+	static void setNumberEntryFormat(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof NumberEntry)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_NumberEntry_widget")); //$NON-NLS-1$
 		}
@@ -421,7 +421,7 @@ class WidgetOperation {
 		entry.setFormat(value);		
 	}
 
-	static void setPandaHTMLURI(Interface xml, Container widget, String name, String value) {
+	static void setPandaHTMLURI(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof PandaHTML)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaHTML_widget")); //$NON-NLS-1$
 		}
@@ -429,7 +429,7 @@ class WidgetOperation {
 		pane.setURI(value);
 	}
 
-	static void setPandaEntryInputMode(Interface xml, Container widget, String name, String value) {
+	static void setPandaEntryInputMode(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof PandaEntry)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaEntry_widget")); //$NON-NLS-1$
 		}
@@ -445,7 +445,7 @@ class WidgetOperation {
 		}
 	}
 
-	static void setPandaEntryXIMEnabled(Interface xml, Container widget, String name, String value) {
+	static void setPandaEntryXIMEnabled(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof PandaEntry)) {
 			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaEntry_widget")); //$NON-NLS-1$
 		}
@@ -454,71 +454,71 @@ class WidgetOperation {
 		entry.setXIMEnabled(enabled);
 	}
 
-	static void setPandaTimerDuration(Interface xml, Container widget, String name, String value) {
+	static void setPandaTimerDuration(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof PandaTimer)) {
-			throw new IllegalArgumentException("not a PandaTimer widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_PandaTimer_widget")); //$NON-NLS-1$
 		}
 		PandaTimer timer = (PandaTimer)widget;
 		int duration = ParameterConverter.toInteger(value);
 		timer.setDuration(duration);
 	}
 
-	static void setProgressBarLower(Interface xml, Container widget, String name, String value) {
+	static void setProgressBarLower(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JProgressBar)) {
-			throw new IllegalArgumentException("not a ProgressBar widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_ProgressBar_widget")); //$NON-NLS-1$
 		}
 		JProgressBar progress = (JProgressBar)widget;
 		BoundedRangeModel model = progress.getModel();
 		model.setMinimum(ParameterConverter.toInteger(value));
 	}
 
-	static void setProgressBarUpper(Interface xml, Container widget, String name, String value) {
+	static void setProgressBarUpper(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JProgressBar)) {
-			throw new IllegalArgumentException("not a ProgressBar widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_ProgressBar_widget")); //$NON-NLS-1$
 		}
 		JProgressBar progress = (JProgressBar)widget;
 		BoundedRangeModel model = progress.getModel();
 		model.setMaximum(ParameterConverter.toInteger(value));
 	}
 
-	static void setProgressBarValue(Interface xml, Container widget, String name, String value) {
+	static void setProgressBarValue(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JProgressBar)) {
-			throw new IllegalArgumentException("not a ProgressBar widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_ProgressBar_widget")); //$NON-NLS-1$
 		}
 		JProgressBar progress = (JProgressBar)widget;
 		BoundedRangeModel model = progress.getModel();
 		model.setValue(ParameterConverter.toInteger(value));
 	}
 
-	static void setProgressBarOrientation(Interface xml, Container widget, String name, String value) {
+	static void setProgressBarOrientation(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JProgressBar)) {
-			throw new IllegalArgumentException("not a ProgressBar widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_ProgressBar_widget")); //$NON-NLS-1$
 		}
 		JProgressBar progress = (JProgressBar)widget;
-		value = normalize(value, "PROGRESS_");
-		if ("LEFT_TO_RIGHT".equals(value)) {
+		value = normalize(value, "PROGRESS_"); //$NON-NLS-1$
+		if ("LEFT_TO_RIGHT".equals(value)) { //$NON-NLS-1$
 			progress.setOrientation(JProgressBar.HORIZONTAL);
-		} else if ("RIGHT_TO_LEFT".equals(value)) {
+		} else if ("RIGHT_TO_LEFT".equals(value)) { //$NON-NLS-1$
 			progress.setOrientation(JProgressBar.HORIZONTAL);
-		} else if ("TOP_TO_BOTTOM".equals(value)) {
+		} else if ("TOP_TO_BOTTOM".equals(value)) { //$NON-NLS-1$
 			progress.setOrientation(JProgressBar.VERTICAL);
-		} else if ("BOTTOM_TO_TOP".equals(value)) {
+		} else if ("BOTTOM_TO_TOP".equals(value)) { //$NON-NLS-1$
 			progress.setOrientation(JProgressBar.VERTICAL);
 		}
 	}
 
-	static void setProgressBarShowText(Interface xml, Container widget, String name, String value) {
+	static void setProgressBarShowText(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof JProgressBar)) {
-			throw new IllegalArgumentException("not a ProgressBar widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_ProgressBar_widget")); //$NON-NLS-1$
 		}
 		JProgressBar progress = (JProgressBar)widget;
 		boolean showText = ParameterConverter.toBoolean(value);
 		progress.setStringPainted(showText);
 	}
 
-	static void setFrameLabel(Interface xml, Container widget, String name, String value) {
+	static void setFrameLabel(Interface xml, Component widget, String name, String value) {
 		if ( ! (widget instanceof org.montsuqi.widgets.Frame)) {
-			throw new IllegalArgumentException("not a Frame widget");
+			throw new IllegalArgumentException(Messages.getString("WidgetOperation.not_a_Frame_widget")); //$NON-NLS-1$
 		}
 		org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame)widget;
 		Border border = BorderFactory.createTitledBorder(value);
@@ -526,8 +526,8 @@ class WidgetOperation {
 	}
 
 	private static String normalize(String value, String prefixToRemove) {
-		if (value.startsWith("GTK_")) {
-			value = value.substring("GTK_".length());
+		if (value.startsWith("GTK_")) { //$NON-NLS-1$
+			value = value.substring("GTK_".length()); //$NON-NLS-1$
 		}
 		if (value.startsWith(prefixToRemove)) {
 			value = value.substring(prefixToRemove.length());
