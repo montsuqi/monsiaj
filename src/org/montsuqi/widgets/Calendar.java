@@ -148,7 +148,7 @@ public class Calendar extends JComponent {
 				l.daySelected(e);
 				break;
 			default:
-				throw new IllegalStateException("unknown event id");
+				throw new IllegalStateException(Messages.getString("Calendar.unknown_event_id")); //$NON-NLS-1$
 			}
 		}
 	}

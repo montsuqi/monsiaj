@@ -34,7 +34,7 @@ class Log4JLogger extends Logger {
 
 	static {
 		loggers = new HashMap();
-		String propertyFile = System.getProperty("monsia.logger.log4j.properties");
+		String propertyFile = System.getProperty("monsia.logger.log4j.properties"); //$NON-NLS-1$
 		if (propertyFile != null) {
 			PropertyConfigurator.configure(propertyFile);
 		} else {

@@ -144,7 +144,7 @@ public class OptionParser {
 
 	private boolean analyzeLine(String line) {
 		if (line.startsWith(";")) { //$NON-NLS-1$
-			logger.info("skipping comment: " + line);
+			logger.info("skipping comment: " + line); //$NON-NLS-1$
 			return false;
 		}
 		Iterator i = options.values().iterator();

@@ -35,7 +35,7 @@ public class PandaCombo extends JComboBox {
 
 class PandaComboBoxEditor extends BasicComboBoxEditor {
 	public PandaComboBoxEditor() {
-		editor  = new BorderlessPandaEntry("", 9);
+		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
 		editor.setBorder(null);
 	}
 

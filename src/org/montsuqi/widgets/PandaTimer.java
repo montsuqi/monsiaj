@@ -55,7 +55,6 @@ public class PandaTimer extends JComponent {
 		TimerListener[] listeners = (TimerListener[])listenerList.getListeners(TimerListener.class);
 		for (int i = 0, n = listeners.length; i < n; i++) {
 			TimerListener l = listeners[i];
-			System.out.println(new java.util.Date() + "firing timersignal on " + l);
 			l.timerSignaled(new TimerEvent(timer));
 		}
 	}
