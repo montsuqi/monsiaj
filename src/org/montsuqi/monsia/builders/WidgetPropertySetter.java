@@ -484,15 +484,13 @@ abstract class WidgetPropertySetter {
 		registerProperty(PandaHTML.class, "uri", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				PandaHTML pane = (PandaHTML)widget;
-				URL uri;
 				try {
-					uri = new URL(value);
+					URL uri = new URL(value);
 					pane.setURI(uri);
 				} catch (MalformedURLException e) {
-					pane.setText(e.toString());
+					logger.warn(e);
 				}
 			}
-
 		});
 
 		registerProperty(PandaTimer.class, "duration", new WidgetPropertySetter() { //$NON-NLS-1$

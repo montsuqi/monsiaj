@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="us-ascii"?>
-<!-- $Id: build.xml,v 1.27 2004-10-21 07:25:36 ozawa Exp $ -->
+<!-- $Id: build.xml,v 1.28 2004-11-11 06:20:27 ozawa Exp $ -->
 <project name="panda-client" default="jars" basedir=".">
 
   <!-- properties -->
@@ -43,7 +43,7 @@
         <available classname="org.apache.log4j.Logger"/>
       </not>
     </condition>
-  </target> 
+  </target>
 
   <target name="compile" depends="prepare"
     description="Compiles all Java sources.">
@@ -89,8 +89,8 @@
     <copy todir="${dist.dir}/${bin.name}">
       <fileset dir="${dist.dir}" includes="jmareceipt.jar, pandaclient.jar"/>
     </copy>
-    <copy todir="${dist.dir}/${bin.name}">
-      <fileset dir="${libs.dir}" includes="log4j.jar"/>
+    <copy todir="${dist.dir}/${bin.name}" verbose="true">
+      <fileset dir="${libs.dir}" includes="*.jar, *.jnilib"/>
     </copy>
     <copy todir="${dist.dir}/${bin.name}">
       <fileset dir="${build.dir}" includes="*.jnlp,style.properties"/>

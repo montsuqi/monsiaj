@@ -50,6 +50,7 @@ import org.montsuqi.monsia.SignalData;
 import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.CheckBox;
 import org.montsuqi.widgets.Entry;
@@ -65,6 +66,7 @@ import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaCombo;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
+import org.montsuqi.widgets.PandaHTMLWebKit;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.RadioButton;
@@ -132,6 +134,11 @@ public class WidgetBuilder {
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Window",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
+
+		// on MacOS replace PandaHTML with PandaHTMLWebKit.
+		if (SystemEnvironment.isMacOSX()) {
+			registerWidgetClass("PandaHTML", PandaHTMLWebKit.class, defaultWidgetBuilder); //$NON-NLS-1$
+		}
 	}
 
 	// set up UI resources

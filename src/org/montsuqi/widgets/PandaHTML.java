@@ -23,142 +23,65 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.Component;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;
 
 import org.montsuqi.util.Logger;
-import org.montsuqi.util.ParameterConverter;
-import org.montsuqi.util.SystemEnvironment;
 
-public class PandaHTML extends JScrollPane {
+public class PandaHTML extends JPanel {
 
 	protected static final Logger logger = Logger.getLogger(PandaHTML.class);
-	JTextPane pane;
+	protected Component html;
 
 	public PandaHTML() {
-		super();
-		pane = new JTextPane();
-		AbstractDocument doc = (AbstractDocument)pane.getDocument();
+		setLayout(new BorderLayout());
+		initComponents();
+	}
+
+	protected void initComponents() {
+		JEditorPane editorPane = new JEditorPane();
+		AbstractDocument doc = (AbstractDocument)editorPane.getDocument();
 		doc.setAsynchronousLoadPriority(1); // load documents asynchronously
-		setViewportView(pane);
-		pane.setEditable(false);
-		pane.addHyperlinkListener(new HyperlinkListener() {
+		editorPane.setEditable(false);
+		editorPane.addHyperlinkListener(new HyperlinkListener() {
 			public void hyperlinkUpdate(HyperlinkEvent event) {
 				if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 					setURI(event.getURL());
 				}
 			}
 		});
+		html = editorPane;
+		JScrollPane scroll = new JScrollPane();
+		scroll.setViewportView(editorPane);
+		add(scroll, BorderLayout.CENTER);
 	}
 
-	static final String PROPERTY_KEY_DISABLE_HTML = "monsia.pandahtml.disabled"; //$NON-NLS-1$
-	static {
-		String disabled = System.getProperty(PROPERTY_KEY_DISABLE_HTML);
-		if (disabled == null) {
-			System.setProperty(PROPERTY_KEY_DISABLE_HTML, String.valueOf(SystemEnvironment.isMacOSX()));
-		}
-	}
-
-	private boolean isLoadingDisabled() {
-		String disabled = System.getProperty(PROPERTY_KEY_DISABLE_HTML);
-		return ParameterConverter.toBoolean(disabled);
-	}
-
-	public void setURI(final URL uri) {
-		if (isLoadingDisabled()) {
-			setText(Messages.getString("PandaHTML.loading_is_disabled")); //$NON-NLS-1$
-			return;
-		}
-		setText(Messages.getString("PandaHTML.loading_please_wait")); //$NON-NLS-1$
-		Runnable loader = new HTMLLoader(uri);
+	public void setURI(URL uri) {
+		Runnable loader = createLoader(uri);
+		logger.debug("loading {0}", uri); //$NON-NLS-1$
 		SwingUtilities.invokeLater(loader);
 	}
 
-	public URL getURI() {
-		return pane.getPage();
-	}
-
-	public void setText(String text) {
-		pane.setText(text);
-	}
-
-	public static void main(String[] args) throws MalformedURLException {
-		final JFrame frame = new JFrame("PandaHTML Test"); //$NON-NLS-1$
-		Container container = frame.getContentPane();
-		container.setLayout(new BorderLayout());
-		final PandaHTML html = new PandaHTML();
-		html.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent e) {
-				Object[] logArgs = { e.getPropertyName(), e.getOldValue(), e.getNewValue() };
-				logger.debug("change: {0}: {1} => {2}", logArgs); //$NON-NLS-1$
-			}
-		});
-		JScrollPane scroll = new JScrollPane();
-		scroll.setViewportView(html);
-		container.add(scroll, BorderLayout.CENTER);
-
-		JToolBar toolBar = new JToolBar();
-		container.add(toolBar, BorderLayout.PAGE_START);
-		JButton quit = new JButton("Quit"); //$NON-NLS-1$
-		quit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-			}
-		});
-		toolBar.add(quit);
-
-		final JTextField location = new JTextField();
-		location.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+	protected Runnable createLoader(final URL uri) {
+		return new Runnable() {
+			public void run() {
 				try {
-					html.setURI(new URL(location.getText()));
-				} catch (MalformedURLException ex) {
-					logger.warn(ex);				}
+					assert html instanceof JEditorPane;
+					JEditorPane editorPane = (JEditorPane)html;
+					editorPane.setPage(uri);
+				} catch (IOException e) {
+					logger.warn(e);
+				}
 			}
-		});
-		toolBar.add(location);
-
-		frame.setSize(640, 480);
-		frame.setVisible(true);
-		if (args.length > 0) {
-			URL uri = new URL(args[0]);
-			html.setURI(uri);
-		}
-	}
-
-	class HTMLLoader implements Runnable {
-
-		URL uri;
-
-		HTMLLoader(URL uri) {
-			this.uri = uri;
-		}
-
-		public void run() {
-			try {
-				logger.debug("loading {0}", uri); //$NON-NLS-1$
-				pane.setPage(uri);
-			} catch (IOException e) {
-				setText(e.toString());
-				logger.warn(e);
-			}
-		}
+		};
 	}
 }
