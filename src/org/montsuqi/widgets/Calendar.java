@@ -26,6 +26,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -114,10 +115,13 @@ public class Calendar extends JComponent {
 			dateCellPanel.add(dayOfWeek);
 		}
 
+		Insets margin = new Insets(0, 0, 0, 0);
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				final JButton cell = new JButton();
 				cell.setHorizontalAlignment(JButton.RIGHT);
+				
+				cell.setMargin(margin);
 				final int finalRow = row;
 				final int finalCol = col;
 				cell.addActionListener(new ActionListener() {
