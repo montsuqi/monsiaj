@@ -39,7 +39,7 @@ class NotebookBuilder extends ContainerBuilder {
 		Notebook notebook = (Notebook)parent;
 		int cCount = info.getChildren().size();
 		if (cCount % 2 != 0) {
-			throw new WidgetBuildingException("odd number of notebook childrens"); //$NON-NLS-1$
+			throw new WidgetBuildingException("odd number of notebook children"); //$NON-NLS-1$
 		}
 		int tabCount = cCount / 2;
 		String[] labels = new String[tabCount];
