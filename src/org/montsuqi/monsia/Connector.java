@@ -47,6 +47,7 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -183,6 +184,13 @@ abstract class Connector {
 				} else if (target instanceof JComboBox) {
 					JComboBox combo = (JComboBox)target;
 					combo.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent event) {
+							invoke(con, handler, target, other);
+						}
+					});
+				} else if (target instanceof JMenuItem) {
+					JMenuItem item = (JMenuItem)target;
+					item.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent event) {
 							invoke(con, handler, target, other);
 						}
@@ -423,6 +431,12 @@ abstract class Connector {
 						invoke(con, handler, target, other);
 					}
 				});
+			}
+		});
+
+		registerConnector("selection_get", new Connector() { //$NON-NLS-1$
+			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+				// do nothing
 			}
 		});
 	}
