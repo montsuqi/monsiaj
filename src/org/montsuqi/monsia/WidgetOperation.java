@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
@@ -44,6 +45,22 @@ public class WidgetOperation {
 	public static void setVisible(Interface xml, Container widget, String name, String value) {
 		boolean v = ParameterConverter.toBoolean(value);
 		widget.setVisible(v);
+	}
+
+	public static void setJustify(Interface xml, Container widget, String name, String value) {
+		int alignment = SwingConstants.CENTER;
+		if ("JUSTIFY_CENTER".equals(value)) {
+			alignment = SwingConstants.CENTER;
+		} else if ("JUSTIFY_LEFT".equals(value)) {
+			alignment = SwingConstants.LEFT;
+		} else if ("JUSTIFY_RIGHT".equals(value)) {
+			alignment = SwingConstants.RIGHT;
+		} else {
+			Logger.getLogger(WidgetOperation.class).warn("not supported");
+		}
+		if (widget instanceof JLabel) {
+			((JLabel)widget).setHorizontalAlignment(alignment);
+		}
 	}
 
 	public static void setTooltip(Interface xml, Container widget, String name, String value) {

@@ -123,7 +123,7 @@ public class WidgetBuilder {
 		registerProperty(java.awt.Container.class, "tooltip", "setTooltip"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(java.awt.Container.class, "has_default", "setHasDefault"); //$NON-NLS-1$ //$NON-NLS-2$
 		registerProperty(java.awt.Container.class, "has_focus", "setHasFocus"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+		registerProperty(javax.swing.JLabel.class, "justify", "setJustify");
 //		registerProperty(PIXMAP, "build_insensitive", pixmap_set_build_insensitive);
 //		registerProperty(PIXMAP, "filename", pixmap_set_filename);
 		registerProperty(javax.swing.text.JTextComponent.class, "text", "setTextViewText"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -934,7 +934,7 @@ public class WidgetBuilder {
 					set = true;
 				}
 				if ( ! set) {
-					logger.info(Messages.getString("WidgetBuilder.{0}_is_ignored_in_Java"), pName); //$NON-NLS-1$
+					logger.info(Messages.getString("WidgetBuilder.ignored_in_Java"), pName); //$NON-NLS-1$
 				}
 			} catch (Exception e) {
 				logger.warn(e);
