@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -187,10 +188,10 @@ public class Protocol extends Connection {
 		String name = receiveString();
 		File cacheFile = new File(cacheRoot, name);
 		int size = receiveLong();
-		int mtime = receiveLong();
-		/* int ctime = */ receiveLong();
+		long mtime = receiveLong() * 1000L;
+		long ctime = receiveLong() * 1000L;
 
-		if (isCacheFileOld(size, mtime, cacheFile)) {
+		if (isCacheFileOld(size, mtime, ctime, cacheFile)) {
 			logger.info("receiving file: {0}", cacheFile); //$NON-NLS-1$
 			receiveFile(name, cacheFile);
 			destroyNode(name);
@@ -201,11 +202,15 @@ public class Protocol extends Connection {
 		return name;
 	}
 
-	private boolean isCacheFileOld(int size, int mtime, File cacheFile) throws IOException {
+	private boolean isCacheFileOld(int size, long mtime, long ctime, File cacheFile) throws IOException {
 		File parent = cacheFile.getParentFile();
 		parent.mkdirs();
 		cacheFile.createNewFile();
-		return cacheFile.lastModified() < mtime * 1000L || cacheFile.length() != size;
+		final long lastModified = cacheFile.lastModified();
+		logger.info("screen mtime = {0}", new Date(mtime));
+		logger.info("screen ctime = {0}", new Date(ctime));
+		logger.info("cache mtime = {0}", new Date(lastModified));
+		return lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
 	}
 
 	boolean receiveWidgetData(Component widget) throws IOException {
