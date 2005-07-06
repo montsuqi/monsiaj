@@ -75,6 +75,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 	}
 
 	public PandaCList() {
+		setFocusable(false);
 		addPropertyChangeListener("model", this);
 		setAutoResizeMode(AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		setAutoscrolls(true);
