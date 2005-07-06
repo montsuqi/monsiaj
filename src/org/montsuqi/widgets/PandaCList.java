@@ -193,15 +193,19 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 			return;
 		}
 		TableModel oldModel = (TableModel)e.getOldValue();
-		oldModel.removeTableModelListener(this);
+		if (oldModel != null) {
+			oldModel.removeTableModelListener(this);
+		}
 		TableModel newModel = (TableModel)e.getNewValue();
-		newModel.addTableModelListener(this);
+		if (newModel != null) {
+			newModel.addTableModelListener(this);
+		}
 	}
 
 	public void tableChanged(TableModelEvent e) {
 		super.tableChanged(e);
 		TableModel model = getModel();
-		setFocusable(model.getRowCount() != 0 && model.getColumnCount() != 0);
+		setFocusable(model != null && model.getRowCount() != 0 && model.getColumnCount() != 0);
 	}
 
 	
