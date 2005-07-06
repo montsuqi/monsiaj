@@ -26,6 +26,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -34,11 +36,13 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
-public class PandaCList extends JTable {
+public class PandaCList extends JTable implements PropertyChangeListener {
 
 	class MoveAction extends AbstractAction {
 
@@ -71,6 +75,7 @@ public class PandaCList extends JTable {
 	}
 
 	public PandaCList() {
+		addPropertyChangeListener("model", this);
 		setAutoResizeMode(AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		setAutoscrolls(true);
 		initActions();
@@ -181,4 +186,23 @@ public class PandaCList extends JTable {
 	public void removeActionListener(ActionListener listener) {
 		listenerList.remove(ActionListener.class, listener);
 	}
+
+	public void propertyChange(PropertyChangeEvent e) {
+		String name = e.getPropertyName();
+		if ( ! name.equals("model")) {
+			return;
+		}
+		TableModel oldModel = (TableModel)e.getOldValue();
+		oldModel.removeTableModelListener(this);
+		TableModel newModel = (TableModel)e.getNewValue();
+		newModel.addTableModelListener(this);
+	}
+
+	public void tableChanged(TableModelEvent e) {
+		super.tableChanged(e);
+		TableModel model = getModel();
+		setFocusable(model.getRowCount() != 0 && model.getColumnCount() != 0);
+	}
+
+	
 }
