@@ -33,6 +33,13 @@ import org.montsuqi.widgets.PandaCList;
 
 class CListBuilder extends ContainerBuilder {
 
+	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
+		final Component widget = super.buildSelf(xml, parent, info);
+		PandaCList clist = (PandaCList)widget;
+		clist.setParentFocusable(parent, false);
+		return widget;
+	}
+
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		int cCount = info.getChildren().size();
 

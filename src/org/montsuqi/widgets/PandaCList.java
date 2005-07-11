@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -33,7 +34,10 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
@@ -209,5 +213,29 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		setFocusable(model != null && model.getRowCount() != 0 && model.getColumnCount() != 0);
 	}
 
-	
+	public void setFocusable(boolean focusable) {
+		super.setFocusable(focusable);
+		final Container parent = getParent();
+		setParentFocusable(parent, focusable);
+	}
+
+	public void setParentFocusable(Container parent, boolean focusable) {
+		if ( ! (parent instanceof JScrollPane)) {
+			return;
+		}
+		parent.setFocusable(focusable);
+		final JScrollPane scroll = (JScrollPane)parent;
+		final JScrollBar vScroll = scroll.getVerticalScrollBar();
+		if (vScroll != null) {
+			vScroll.setFocusable(focusable);
+		}
+		final JScrollBar hScroll = scroll.getHorizontalScrollBar();
+		if (hScroll != null) {
+			hScroll.setFocusable(focusable);
+		}
+		final JViewport view = scroll.getViewport();
+		if (view != null) {
+			view.setFocusable(focusable);
+		}
+	}
 }
