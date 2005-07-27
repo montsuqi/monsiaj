@@ -62,6 +62,10 @@ public class PandaPreviewPane extends JPanel {
 		preview.load(fileName);
 	}
 
+	public void clear() {
+		preview.clear();
+	}
+
 	public static void main(String[] args) throws IOException {
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

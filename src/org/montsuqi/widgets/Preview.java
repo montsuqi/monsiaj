@@ -125,6 +125,8 @@ public abstract class Preview extends JPanel {
 
 	public abstract void load(String fileName) throws IOException;
 
+	public abstract void clear();
+
 	protected double scale;
 	protected int rotationStep;
 	private static final double SCALE_FACTOR = 1.2;

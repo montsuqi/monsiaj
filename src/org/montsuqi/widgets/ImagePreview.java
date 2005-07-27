@@ -43,6 +43,13 @@ class ImagePreview extends Preview {
 		updatePreferredSize();
 	}
 
+	public void clear() {
+		sourceImage = null;
+		image = null;
+		super.setScale(1.0);
+		updatePreferredSize();
+	}
+
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (image != null) {
