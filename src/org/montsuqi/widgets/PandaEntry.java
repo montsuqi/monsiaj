@@ -26,8 +26,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -36,14 +38,39 @@ import java.awt.im.InputContext;
 import java.awt.im.InputSubset;
 import java.util.Locale;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.InputMap;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 public class PandaEntry extends Entry {
+
+	private final class InsertEnterAsText extends AbstractAction {
+
+		public void actionPerformed(ActionEvent evt) {
+			Object source = evt.getSource();
+			if (source instanceof Entry) {
+				Entry entry = (Entry)source;
+				String text = entry.getText();
+				if (text.endsWith("n")) { //$NON-NLS-1$
+					Document doc = entry.getDocument();
+					try {
+						doc.insertString(doc.getLength(), "\n", null); //$NON-NLS-1$
+					} catch (BadLocationException e) {
+						throw new RuntimeException(e);
+					}
+				} else {
+					entry.postActionEvent();
+				}
+			}
+		}
+	}
 
 	boolean ximEnabled;
 	public static final int KANA = PandaDocument.KANA;
@@ -63,6 +90,7 @@ public class PandaEntry extends Entry {
 	}
 
 	private void initListeners() {
+		
 		addFocusListener(new FocusListener() {
 			// NOTE only works in japanese environment.
 			// See
@@ -98,10 +126,22 @@ public class PandaEntry extends Entry {
 			}
 		});
 	}
+
 	public void setInputMode(int mode) {
 		PandaDocument doc = (PandaDocument)getDocument();
 		doc.setInputMode(mode);
+		setEnterMode();
 		enableInputMethods(mode != ASCII);
+	}
+
+	private void setEnterMode() {
+		final KeyStroke pressEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		final InputMap inputMap = getInputMap();
+		if (getInputMode() == KANA && ! ximEnabled) {
+			inputMap.put(pressEnter, new InsertEnterAsText());
+		} else {
+			inputMap.put(pressEnter, getActionMap().get(notifyAction));
+		}
 	}
 
 	public int getInputMode() {
@@ -111,6 +151,7 @@ public class PandaEntry extends Entry {
 
 	public void setXIMEnabled(boolean enabled) {
 		ximEnabled = enabled;
+		setEnterMode();
 		enableInputMethods(enabled);
 	}
 
@@ -120,16 +161,25 @@ public class PandaEntry extends Entry {
 
 	public static void main(String[] args) {
 		final JFrame f = new JFrame("TestPandaEntry"); //$NON-NLS-1$
+		java.awt.event.ActionListener al = new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent ev) {
+				System.out.println("evt");
+			}
+		};
 		PandaEntry pe = new PandaEntry();
 		pe.setInputMode(XIM);
 		pe.setXIMEnabled(true);
+		pe.addActionListener(al);
+
 		PandaEntry pe2 = new PandaEntry();
-		pe2.setInputMode(XIM);
+		pe2.setInputMode(KANA);
 		pe2.setXIMEnabled(false);
+		pe2.addActionListener(al);
+
 		f.getContentPane().setLayout(new GridLayout(2, 1));
 		f.getContentPane().add(pe);
 		f.getContentPane().add(pe2);
-		f.setSize(200, 50);
+		f.setSize(200, 100);
 		f.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
@@ -265,12 +315,17 @@ class PandaDocument extends PlainDocument {
 			char thisChar = str.charAt(0);
 			if (prefix.length() == 0) {
 				// single char
-				char c = getSymbol(thisChar);
-				if (c != 0) {
-					str = String.valueOf(c);
-				} else {
-					super.insertString(offs, str, a);
+				if (thisChar == '\n') {
+					// ignore plain ENTER
 					return;
+				} else {
+					char c = getSymbol(thisChar);
+					if (c != 0) {
+						str = String.valueOf(c);
+					} else {
+						super.insertString(offs, str, a);
+						return;
+					}
 				}
 			} else if (AEIOU.indexOf(thisChar) >= 0) {
 				// \u30ab\u30ca
@@ -284,12 +339,15 @@ class PandaDocument extends PlainDocument {
 			} else if (prefix.charAt(0) == 'n' && thisChar != 'y') {
 				// n -> \u30f3
 				str = "\u30f3"; //$NON-NLS-1$
-				if (thisChar != 'n' && thisChar != '\'') {
+				if (thisChar != 'n' && thisChar != '\n' && thisChar != '\'') {
 					str += thisChar;
 				}
 			} else if (thisChar == prefix.charAt(0)) {
 				// xx -> \u30c3
 				str = "\u30c3" + thisChar; //$NON-NLS-1$
+			} else if (thisChar == '\n') {
+				// ignore ENTER after prefix
+				return;
 			} else {
 				super.insertString(offs, str, a);
 				return;
