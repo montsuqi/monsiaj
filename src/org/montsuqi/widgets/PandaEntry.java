@@ -65,9 +65,8 @@ public class PandaEntry extends Entry {
 					} catch (BadLocationException e) {
 						throw new RuntimeException(e);
 					}
-				} else {
-					entry.postActionEvent();
 				}
+				entry.postActionEvent();
 			}
 		}
 	}
