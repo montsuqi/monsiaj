@@ -94,7 +94,10 @@ abstract class Connector {
 
 	static void invoke(final Protocol con, final SignalHandler handler, final Component target, final Object other) {
 		try {
+			Object[] args = { handler.getSignalName(), target.getName(), other };
+			logger.debug("invoking {0} handler on target={1}, other={2}", args);
 			handler.handle(con, target, other);
+			logger.debug("done // {0}", handler.getSignalName());
 		} catch (IOException e) {
 			throw new HandlerInvocationException(e);
 		}

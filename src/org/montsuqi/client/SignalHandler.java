@@ -44,6 +44,16 @@ public abstract class SignalHandler {
 
 	protected static final Logger logger = Logger.getLogger(SignalHandler.class);
 
+	private String signalName = "";
+
+	public void setSignalName(final String signalName) {
+		this.signalName = signalName;
+	}
+
+	public String getSignalName() {
+		return signalName;
+	}
+
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 
 	public static SignalHandler getSignalHandler(String handlerName) {
@@ -61,6 +71,7 @@ public abstract class SignalHandler {
 	static final String SYMBOLS;
 	
 	private static void registerHandler(String signalName, SignalHandler handler) {
+		handler.setSignalName(signalName);
 		handlers.put(signalName, handler);
 	}
 

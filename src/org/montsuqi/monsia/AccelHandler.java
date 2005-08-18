@@ -30,7 +30,12 @@ import java.util.List;
 
 import javax.swing.AbstractButton;
 
+import org.montsuqi.util.Logger;
+
 class AccelHandler {
+
+	Logger logger = Logger.getLogger(AccelHandler.class);
+
 	class Pair {
 		Component widget;
 		AccelInfo accel;
@@ -68,6 +73,7 @@ class AccelHandler {
 			AbstractButton button = (AbstractButton)widget;
 			AccelInfo accel = pair.accel;
 			if (accel.getKey() == e.getKeyCode()&& accel.getModifiers() == e.getModifiers()) {
+				logger.debug("clicking button {0} via accel", button.getName());
 				button.doClick();
 				return true;
 			}
