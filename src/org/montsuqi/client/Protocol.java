@@ -498,22 +498,30 @@ public class Protocol extends Connection {
 	}
 
 	void sendEvent(String window, String widget, String event) throws IOException {
+		Object[] args = { window, widgetName, event };
+		logger.debug("sendEvent: window={0}, widget={1}, event={2}", args);
 		sendPacketClass(PacketClass.Event);
 		sendString(window);
 		sendString(widget);
 		sendString(event);
+		logger.debug("done // sendEvent");
 	}
 
 	void sendWindowData() throws IOException {
+		logger.debug("sendWindowData");
 		Iterator i = nodeTable.keySet().iterator();
+		logger.debug("loop over nodes");
 		while (i.hasNext()) {
 			sendWndowData1((String)i.next());
 		}
+		logger.debug("done // loop over nodes");
 		sendPacketClass(PacketClass.END);
 		clearWindowTable();
+		logger.debug("done // sendWindowData");
 	}
 
 	private void sendWndowData1(String windowName) throws IOException {
+		logger.debug("sendWindowData one for {0}", windowName);
 		sendPacketClass(PacketClass.WindowName);
 		sendString(windowName);
 		Node node = getNode(windowName);
@@ -523,6 +531,7 @@ public class Protocol extends Connection {
 			sendWidgetData((String)e.getKey(), (Component)e.getValue());
 		}
 		sendPacketClass(PacketClass.END);
+		logger.debug("done // sendWindowData one for {0}", windowName);
 	}
 
 	void clearWindowTable() {

@@ -36,6 +36,7 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.text.MessageFormat;
 
+import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
 class Connection {
@@ -45,6 +46,8 @@ class Connection {
 	protected DataInput in;
 	protected DataOutput out;
 	private int dataType;
+
+	private static final Logger logger = Logger.getLogger(Connection.class);
 
 	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
 		this.socket = s;
@@ -61,8 +64,10 @@ class Connection {
 	}
 
 	public void sendPacketClass(int c) throws IOException {
+		logger.debug("sendPacketClass: {0}", Integer.toHexString(c));
 		out.write((byte)c);
 		((OutputStream)out).flush();
+		logger.debug("done // sendPacketClass");
 	}
 
 	byte receivePacketClass() throws IOException {
@@ -114,6 +119,7 @@ class Connection {
 	}
 
 	public void sendString(String s) throws IOException {
+		logger.debug("sendString: {0}", s);
 		if (SystemEnvironment.isMS932()) {
 			s = fromMS932(s);
 		}
@@ -121,6 +127,7 @@ class Connection {
 		sendLength(bytes.length);
 		out.write(bytes);
 		((OutputStream)out).flush();
+		logger.debug("done // sendString");
 	}
 
 	private String fromMS932(String s) {
