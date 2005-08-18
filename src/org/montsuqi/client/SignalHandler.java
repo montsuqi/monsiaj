@@ -152,6 +152,8 @@ public abstract class SignalHandler {
 						event = widgetName;
 					}
 				}
+				Object[] args = { windowName, widgetName, event };
+				logger.debug("sendEvent: window={0}, widget={1}, event={2}", args);
 				con.sendEvent(windowName, widgetName, event);
 				con.sendWindowData();
 				synchronized (this) {
