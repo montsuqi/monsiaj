@@ -76,11 +76,15 @@ public abstract class SignalHandler {
 	}
 
 	static void blockChangedHandlers() {
+		logger.debug("block changed handlers");
 		timerBlocked = true;
+		logger.debug("done // block changed handlers");
 	}
 
 	static void unblockChangedHandlers() {
+		logger.debug("unblock changed handlers");
 		timerBlocked = false;
+		logger.debug("done // unblock changed handlers");
 	}
 
 	static {

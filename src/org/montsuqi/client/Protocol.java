@@ -120,11 +120,13 @@ public class Protocol extends Connection {
 	}
 
 	private Node showWindow(String name, int type) {
+		logger.debug("showWindow {0}", name);
 		Node node = getNode(name);
 		if (node == null && (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW)) {
 			node = createNode(name);
 		}
 		if (node == null) {
+			logger.debug("done // showWindow (node is null)");
 			return null;
 		}
 		Window window = node.getWindow();
@@ -140,12 +142,14 @@ public class Protocol extends Connection {
 					w.setVisible(true);
 				}
 			}
+			logger.debug("done // showWindow (new or current)");
 			return node;
 		}
 		if (type == ScreenType.CLOSE_WINDOW) {
 			window.setVisible(false);
 			clearPreview(window);
 		}
+		logger.debug("done // showWindow");
 		return null;
 	}
 
@@ -177,16 +181,21 @@ public class Protocol extends Connection {
 	}
 
 	void checkScreens(boolean init) throws IOException {
+		logger.debug("checkScreens");
+		logger.debug("loop over screens");
 		while (receivePacketClass() == PacketClass.QueryScreen) {
 			String name = checkScreen1();
+			logger.debug("name = {0}", name);
 			if (init) {
 				showWindow(name, ScreenType.NEW_WINDOW);
 				init = false;
 			}
 		}
+		logger.debug("done // checkScreens");
 	}
 
 	private String checkScreen1() throws IOException {
+		logger.debug("checkScreen one");
 		String name = receiveString();
 		File cacheFile = new File(cacheRoot, name);
 		int size = receiveLong();
@@ -201,6 +210,7 @@ public class Protocol extends Connection {
 			logger.info("cache is up to date: {0}", cacheFile); //$NON-NLS-1$
 			sendPacketClass(PacketClass.NOT);
 		}
+		logger.debug("done // checkScreen one");
 		return name;
 	}
 
@@ -386,6 +396,7 @@ public class Protocol extends Connection {
 	}
 
 	synchronized boolean getScreenData() throws IOException {
+		logger.debug("getScreenData");
 		String window = null;
 		Node node;
 		boolean fCancel = false;
@@ -396,8 +407,10 @@ public class Protocol extends Connection {
 			sendPacketClass(PacketClass.GetData);
 			sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
 			byte c;
+			logger.debug("loop over windows");
 			while ((c = receivePacketClass()) == PacketClass.WindowName) {
 				window = receiveString();
+				logger.debug("windowName: {0}", window);
 				int type = receiveInt();
 				switch (type) {
 				case ScreenType.END_SESSION:
@@ -459,6 +472,7 @@ public class Protocol extends Connection {
 		} finally {
 			isReceiving = false;
 		}
+		logger.debug("done // getScreenData");
 		return fCancel;
 	}
 
