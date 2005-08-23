@@ -50,7 +50,6 @@ public class Launcher {
 
 	protected static final Logger logger = Logger.getLogger(Launcher.class);
 
-	Client client;
 	protected Configuration conf;
 	protected String title;
 
@@ -72,7 +71,6 @@ public class Launcher {
 		this.title = title;
 		SystemEnvironment.setMacMenuTitle(title);
 		conf = new Configuration(this.getClass());
-		client = new Client(conf);
 	}
 
 	public void launch() {
@@ -84,7 +82,8 @@ public class Launcher {
 		}
 		panel.updateConfiguration();
 		conf.save();
-		JFrame logFrame = conf.getUseLogViewer() ? createLogFrame() : null;
+		Client client = new Client(conf);
+		JFrame logFrame = conf.getUseLogViewer() ? createLogFrame(client) : null;
 		try {
 			client.connect();
 			Thread t = new Thread(client);
@@ -113,7 +112,7 @@ public class Launcher {
 		return JOptionPane.showOptionDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, icon, options, initial);
 	}
 
-	private JFrame createLogFrame() {
+	private JFrame createLogFrame(final Client client) {
 		final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); //$NON-NLS-1$
 		Container container = f.getContentPane();
 		container.setLayout(new BorderLayout());
