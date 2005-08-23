@@ -54,13 +54,14 @@ import org.montsuqi.util.SystemEnvironment;
 public class Client implements Runnable {
 
 	private Configuration conf;
+	private Logger logger;
 	private Protocol protocol;
 
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
-	private static final Logger logger = Logger.getLogger(Client.class);
 
 	public Client(Configuration conf) {
 		this.conf = conf;
+		logger = Logger.getLogger(Client.class);
 	}
 
 	private static Client parseCommandLine(String[] args) {
