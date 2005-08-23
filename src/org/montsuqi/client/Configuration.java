@@ -54,6 +54,7 @@ public class Configuration {
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
 	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
+	private static final String PROPERTIES_KEY = "properties"; //$NON-NLS-1$
 
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
 	static final int DEFAULT_PORT = 8000;
@@ -271,6 +272,25 @@ public class Configuration {
 
 	public void setUseLogViewer(boolean flag) {
 		setBoolean(USE_LOG_VIEWER_KEY, flag);
+	}
+
+	public String getProperties() {
+		return getString(PROPERTIES_KEY, "");
+	}
+
+	public void setProperties(String propertiesString) {
+		setString(PROPERTIES_KEY, propertiesString);
+		String[] pairs = propertiesString.split("\n");
+		if (pairs.length > 0) {
+			for (int i = 0; i < pairs.length; i++) {
+				String[] pair = pairs[i].split("\\s*=\\s*");
+				if (pair.length == 2) {
+					String key = pair[0].trim();
+					String value = pair[1].trim();
+					System.setProperty(key, value);
+				}
+			}
+		}
 	}
 
 	protected String getString(String key, String defaultValue) {
