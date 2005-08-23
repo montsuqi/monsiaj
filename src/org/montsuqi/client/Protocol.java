@@ -562,7 +562,12 @@ public class Protocol extends Connection {
 		}
 		Node node = getNode(widget);
 		if (node != null) {
-			node.addChangedWidget(xml.getWidgetLongName(widget), widget);
+			try {
+				final String longName = xml.getWidgetLongName(widget);
+				node.addChangedWidget(longName, widget);
+			} catch (IllegalArgumentException e) {
+				logger.warn(e);
+			}
 		}
 	}
 
