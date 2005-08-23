@@ -188,7 +188,7 @@ public abstract class SignalHandler {
 						int length = t.length();
 						if (length > 0) {
 							char c = t.charAt(length - 1);
-							if (isKatakana(c) || isKanji(c) || isSymbol(c)) {
+							if (isKana(c) || isKanji(c) || isSymbol(c)) {
 								try {
 									changed.handle(con, widget, userData);
 									sendEvent.handle(con, widget, userData);
@@ -199,7 +199,7 @@ public abstract class SignalHandler {
 						}
 					}
 
-					private boolean isKatakana(char c) {
+					private boolean isKana(char c) {
 						Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
 						return block == Character.UnicodeBlock.KATAKANA
 							|| block == Character.UnicodeBlock.HIRAGANA;
@@ -215,7 +215,19 @@ public abstract class SignalHandler {
 						return SYMBOLS.indexOf(c) >= 0;
 					}
 				};
-				timer.schedule(timerTask, 1000);
+				int delay = 1000;
+				String envDelay = System.getenv("GL_SEND_EVENT_DELAY"); //$NON-NLS-1$
+				if (envDelay != null) {
+					try {
+						int newDelay = Integer.parseInt(envDelay);
+						if (newDelay > 0) {
+							delay = newDelay;
+						}
+					} catch (NumberFormatException e) {
+						logger.warn(e);
+					}
+				}
+				timer.schedule(timerTask, delay);
 			}
 		};
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
