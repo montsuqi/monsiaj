@@ -22,7 +22,10 @@ copies.
 
 package org.montsuqi.client;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.BackingStoreException;
@@ -275,20 +278,36 @@ public class Configuration {
 	}
 
 	public String getProperties() {
-		return getString(PROPERTIES_KEY, "");
+		final String properties = getString(PROPERTIES_KEY, "");
+		updateSystemProperties(properties);
+		return properties;
 	}
 
-	public void setProperties(String propertiesString) {
-		setString(PROPERTIES_KEY, propertiesString);
-		String[] pairs = propertiesString.split("\n");
-		if (pairs.length > 0) {
-			for (int i = 0; i < pairs.length; i++) {
-				String[] pair = pairs[i].split("\\s*=\\s*");
+	public void setProperties(String properties) {
+		setString(PROPERTIES_KEY, properties);
+		updateSystemProperties(properties);
+	}
+
+	private void updateSystemProperties(String properties) {
+		StringReader sr = new StringReader(properties);
+		BufferedReader br = new BufferedReader(sr);
+		String line;
+		try {
+			while ((line = br.readLine()) != null) {
+				String[] pair = line.split("\\s*=\\s*");
 				if (pair.length == 2) {
 					String key = pair[0].trim();
 					String value = pair[1].trim();
 					System.setProperty(key, value);
 				}
+			}
+		} catch (IOException e) {
+			logger.warn(e);
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				logger.warn(e);
 			}
 		}
 	}
