@@ -215,11 +215,11 @@ public abstract class SignalHandler {
 						return SYMBOLS.indexOf(c) >= 0;
 					}
 				};
-				int delay = 1000;
+				long delay = 1000;
 				String propDelay = System.getProperty("monsia.send.event.delay"); //$NON-NLS-1$
 				if (propDelay != null) {
 					try {
-						int newDelay = Integer.parseInt(propDelay);
+						long newDelay = Long.parseLong(propDelay);
 						if (newDelay > 0) {
 							delay = newDelay;
 						}
