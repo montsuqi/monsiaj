@@ -216,10 +216,10 @@ public abstract class SignalHandler {
 					}
 				};
 				int delay = 1000;
-				String envDelay = System.getenv("GL_SEND_EVENT_DELAY"); //$NON-NLS-1$
-				if (envDelay != null) {
+				String propDelay = System.getProperty("monsia.send.event.delay"); //$NON-NLS-1$
+				if (propDelay != null) {
 					try {
-						int newDelay = Integer.parseInt(envDelay);
+						int newDelay = Integer.parseInt(propDelay);
 						if (newDelay > 0) {
 							delay = newDelay;
 						}
