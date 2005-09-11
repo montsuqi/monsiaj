@@ -71,8 +71,12 @@ public class PandaTimer extends JComponent {
 	}
 
 	public void setDuration(int duration) {
-		timer.setInitialDelay(duration * 1000);
+		timer.setInitialDelay(duration * 1000); //throws IllegalArgumentException on negative argument.
 		timer.setDelay(duration * 1000);
+		assert duration >= 0;
+		if (duration == 0) {
+			timer.stop();
+		}
 	}
 
 	public void reset() {
