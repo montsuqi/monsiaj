@@ -45,6 +45,7 @@ import org.montsuqi.widgets.Frame;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaPreviewPane;
+import org.montsuqi.widgets.PandaTimer;
 
 public abstract class WidgetMarshaller {
 
@@ -69,6 +70,7 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
 		registerMarshaller(Frame.class, new FrameMarshaller());
 		registerMarshaller(FileEntry.class, new FileEntryMarshaller());
+		registerMarshaller(PandaTimer.class, new TimerMarshaller());
 	}
 
 	public abstract void receive(WidgetValueManager manager, Component widget) throws IOException;
