@@ -83,4 +83,8 @@ public class PandaTimer extends JComponent {
 		timer.stop();
 		super.finalize();
 	}
+
+	public int getDuration() {
+		return timer.getDelay() / 1000;
+	}
 }
