@@ -47,7 +47,26 @@ public class PandaTimer extends JComponent {
 			}
 		});
 		timer.setRepeats(true);
-		timer.start();
+		startTimer();
+	}
+
+	private void startTimer() {
+		if ( ! timer.isRunning()) {
+			logger.debug("starting timer {0}", getName());
+			timer.start();
+		}
+	}
+
+	private void stopTimer() {
+		if (timer.isRunning()) {
+			logger.debug("stopping timer {0}", getName());
+			timer.stop();
+		}
+	}
+
+	public void reset() {
+		stopTimer();
+		startTimer();
 	}
 
 	public void addTimerListener(TimerListener l) {
@@ -75,16 +94,16 @@ public class PandaTimer extends JComponent {
 		timer.setDelay(duration * 1000);
 		assert duration >= 0;
 		if (duration == 0) {
-			timer.stop();
+			stopTimer();
+		} else {
+			if ( ! timer.isRunning()) {
+				startTimer();
+			}
 		}
 	}
 
-	public void reset() {
-		timer.restart();
-	}
-
 	protected void finalize() throws Throwable {
-		timer.stop();
+		stopTimer();
 		super.finalize();
 	}
 
