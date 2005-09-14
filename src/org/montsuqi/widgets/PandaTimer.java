@@ -51,7 +51,7 @@ public class PandaTimer extends JComponent {
 	}
 
 	private void startTimer() {
-		if ( ! timer.isRunning()) {
+		if ( ! timer.isRunning() && timer.getDelay() != 0) {
 			logger.debug("starting timer {0}", getName());
 			timer.start();
 		}
