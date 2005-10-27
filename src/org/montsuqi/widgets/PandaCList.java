@@ -166,11 +166,6 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		TableCellRenderer renderer = new CListHeaderRenderer(header);
 		TableColumn column = columnModel.getColumn(i);
 		column.setHeaderRenderer(renderer);
-		int headerWidth = (int)header.getPreferredSize().getWidth();
-		if (headerWidth != 0) {
-			column.setPreferredWidth(headerWidth);
-			column.setWidth(headerWidth);
-		}
 	}
 
 	public TableCellRenderer getCellRenderer(int row, int column) {
