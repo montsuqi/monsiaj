@@ -430,10 +430,14 @@ abstract class WidgetPropertySetter {
 				for (int i = 0; tokens.hasMoreTokens(); i++) {
 					TableColumn column = model.getColumn(i);
 					int width = ParameterConverter.toInteger(tokens.nextToken());
+					width += 8; // FIXME do not use immediate value like this
 					column.setPreferredWidth(width);
 					column.setWidth(width);
 					totalWidth += width;
 				}
+				Dimension d = table.getPreferredSize();
+				d.setSize(totalWidth, d.getHeight());
+				table.setPreferredSize(d);
 				if (parent instanceof JScrollPane) {
 					JScrollPane scroll = (JScrollPane)parent;
 					int parentWidth = scroll.getWidth();
