@@ -435,9 +435,6 @@ abstract class WidgetPropertySetter {
 					column.setWidth(width);
 					totalWidth += width;
 				}
-				Dimension d = table.getPreferredSize();
-				d.setSize(totalWidth, d.getHeight());
-				table.setPreferredSize(d);
 				if (parent instanceof JScrollPane) {
 					JScrollPane scroll = (JScrollPane)parent;
 					int parentWidth = scroll.getWidth();
