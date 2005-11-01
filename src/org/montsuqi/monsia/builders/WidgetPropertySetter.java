@@ -435,9 +435,11 @@ abstract class WidgetPropertySetter {
 					column.setWidth(width);
 					totalWidth += width;
 				}
+
+				int parentWidth = table.getWidth();
 				if (parent instanceof JScrollPane) {
 					JScrollPane scroll = (JScrollPane)parent;
-					int parentWidth = scroll.getWidth();
+					parentWidth = scroll.getWidth();
 					Insets insets = scroll.getInsets();
 					parentWidth -= insets.left + insets.right;
 					JScrollBar vScrollBar = scroll.getVerticalScrollBar();
@@ -445,16 +447,14 @@ abstract class WidgetPropertySetter {
 						ComponentUI ui = vScrollBar.getUI();
 						parentWidth -= ui.getPreferredSize(vScrollBar).getWidth();
 					}
-					if (totalWidth < parentWidth) {
-						int delta = (parentWidth - totalWidth) / columns;
-						for (int i = 0; i < columns; i++) {
-							TableColumn column = model.getColumn(i);
-							int width = column.getPreferredWidth();
-							width += delta;
-							column.setPreferredWidth(width);
-							column.setWidth(width);
-						}
-					}
+				}
+
+				if (totalWidth < parentWidth) {
+					TableColumn lastColumn = model.getColumn(columns - 1);
+					int width = lastColumn.getPreferredWidth();
+					width += parentWidth - totalWidth;
+					lastColumn.setPreferredWidth(width);
+					lastColumn.setWidth(width);
 				}
 			}
 		});
