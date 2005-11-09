@@ -80,7 +80,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 
 	public PandaCList() {
 		setFocusable(false);
-		addPropertyChangeListener("model", this);
+		addPropertyChangeListener("model", this); //$NON-NLS-1$
 		setAutoResizeMode(AUTO_RESIZE_OFF);
 		setAutoscrolls(true);
 		initActions();
@@ -189,7 +189,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent e) {
 		String name = e.getPropertyName();
-		if ( ! name.equals("model")) {
+		if ( ! name.equals("model")) { //$NON-NLS-1$
 			return;
 		}
 		TableModel oldModel = (TableModel)e.getOldValue();

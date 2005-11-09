@@ -52,14 +52,14 @@ public class PandaTimer extends JComponent {
 
 	private void startTimer() {
 		if ( ! timer.isRunning() && timer.getDelay() != 0) {
-			logger.debug("starting timer {0}", getName());
+			logger.debug("starting timer {0}", getName()); //$NON-NLS-1$
 			timer.start();
 		}
 	}
 
 	private void stopTimer() {
 		if (timer.isRunning()) {
-			logger.debug("stopping timer {0}", getName());
+			logger.debug("stopping timer {0}", getName()); //$NON-NLS-1$
 			timer.stop();
 		}
 	}
@@ -91,7 +91,7 @@ public class PandaTimer extends JComponent {
 
 	public void setDuration(int duration) {
 		Object[] args = { getName(), new Integer(duration) };
-		logger.debug("setting duration of {0} to {1}", args);
+		logger.debug("setting duration of {0} to {1}", args); //$NON-NLS-1$
 		timer.setInitialDelay(duration * 1000); //throws IllegalArgumentException on negative argument.
 		timer.setDelay(duration * 1000);
 		assert duration >= 0;

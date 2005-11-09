@@ -162,7 +162,7 @@ public class PandaEntry extends Entry {
 		final JFrame f = new JFrame("TestPandaEntry"); //$NON-NLS-1$
 		java.awt.event.ActionListener al = new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent ev) {
-				System.out.println("evt");
+				System.out.println("evt"); //$NON-NLS-1$
 			}
 		};
 		PandaEntry pe = new PandaEntry();

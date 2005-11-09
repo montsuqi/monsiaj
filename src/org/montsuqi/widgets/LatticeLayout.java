@@ -141,6 +141,7 @@ public class LatticeLayout implements LayoutManager2, Serializable {
 	}
 
 	public void invalidateLayout(Container target) {
+		/* do nothing */
 	}
 
 	public void layoutContainer(Container parent) {
