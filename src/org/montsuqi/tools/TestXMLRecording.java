@@ -29,7 +29,7 @@ public class TestXMLRecording extends XMLTestSuite {
 	org.montsuqi.client.Client.main(args);
 
         try {
-          Thread.currentThread().sleep(3000);
+          Thread.sleep(3000);
         } catch (InterruptedException ex) {
           ; // Ignore
         }
