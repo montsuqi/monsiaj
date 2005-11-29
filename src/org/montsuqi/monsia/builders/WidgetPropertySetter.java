@@ -126,11 +126,7 @@ abstract class WidgetPropertySetter {
 				try {
 					size.width = Integer.parseInt(value);
 					int height = size.height;
-					if (widget instanceof java.awt.Window) {
-						size = ScreenScale.scaleForFrame(size);
-					} else {
-						size = ScreenScale.scale(size);
-					}
+					size = ScreenScale.scale(size);
 					size.height = height;
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
@@ -146,11 +142,7 @@ abstract class WidgetPropertySetter {
 				try {
 					size.height = Integer.parseInt(value);
 					int width = size.width;
-					if (widget instanceof java.awt.Window) {
-						size = ScreenScale.scaleForFrame(size);
-					} else {
-						size = ScreenScale.scale(size);
-					}
+					size = ScreenScale.scale(size);
 					size.width = width;
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
