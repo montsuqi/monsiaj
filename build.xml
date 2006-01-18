@@ -153,12 +153,13 @@
 				<include name="README.txt"/>
 			</fileset>
 		</copy>
-		<chmod perm="755" file="${build.dir}/${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${bin.macosx.name}.zip">
 			<fileset dir="${build.dir}">
 				<include name="${bin.macosx.name}/**"/>
+				<exclude name="${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/"/>
 			</fileset>
+			<zipfileset dir="${build.dir}" prefix="${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/" filemode="755" file="${build.dir}/${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
 		</zip>
 	</target>
 
