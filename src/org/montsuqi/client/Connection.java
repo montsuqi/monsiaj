@@ -255,6 +255,10 @@ class Connection {
 
 	void sendFixed(BigDecimal xval) throws IOException {
 		String s;
+		if (xval.equals(BigDecimal.ZERO)) {
+			sendString("0");
+			return;
+		}
 		if (xval.signum() >= 0) {
 			s = String.valueOf(xval.unscaledValue());
 		} else {
@@ -314,6 +318,9 @@ class Connection {
 	public void sendFixedData(int type, BigDecimal xval) throws IOException {
 		if (type == Type.NUMBER) {
 			type = Type.TEXT;
+			if (xval.intValue() == 0) {
+				xval = BigDecimal.ZERO;
+			}
 		}
 		sendDataType(type);
 		switch (type) {
