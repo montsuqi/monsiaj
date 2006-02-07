@@ -42,6 +42,9 @@ public class JMAReceiptLauncher extends Launcher {
 	}
 
 	protected ConfigurationPanel createConfigurationPanel() {
+		conf.setApplication("orca00"); //$NON-NLS-1$
+		conf.setEncoding("EUC-JP"); //$NON-NLS-1$
+		conf.setProtocolVersion(1);
 		return new JMAReceiptConfigurationPanel(conf);
 	}
 
