@@ -253,9 +253,12 @@ class Connection {
 		((OutputStream)out).flush();
 	}
 
+	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
+	private static final int NEGATIVE_FIXED_MASK = 0x40;
+
 	void sendFixed(BigDecimal xval) throws IOException {
 		String s;
-		if (xval.equals(BigDecimal.ZERO)) {
+		if (xval.equals(ZERO)) {
 			sendString("0");
 			return;
 		}
@@ -271,9 +274,6 @@ class Connection {
 		sendLength(xval.scale());
 		sendString(s);
 	}
-
-	private static final int NEGATIVE_FIXED_MASK = 0x40;
-	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
 
 	BigDecimal receiveFixed() throws IOException {
 		/* int flen = */ receiveLength();
@@ -319,7 +319,7 @@ class Connection {
 		if (type == Type.NUMBER) {
 			type = Type.TEXT;
 			if (xval.intValue() == 0) {
-				xval = BigDecimal.ZERO;
+				xval = ZERO;
 			}
 		}
 		sendDataType(type);
