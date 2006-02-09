@@ -169,6 +169,9 @@ public class Client implements Runnable {
 			return null;
 		}
 		char[] pass = conf.getClientCertificatePass().toCharArray();
+		if (pass.length == 0) {
+			pass = null;
+		}
 		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(new FileInputStream(fileName), pass);
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
