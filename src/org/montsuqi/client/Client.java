@@ -149,7 +149,7 @@ public class Client implements Runnable {
 		try {
 			return createSSLSocket(host, port, socket);
 		} catch (GeneralSecurityException e) {
-			IOException ioe = new IOException();
+			IOException ioe = new IOException(e.getMessage());
 			ioe.initCause(e);
 			throw ioe;
 		}
