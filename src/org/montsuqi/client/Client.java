@@ -33,8 +33,6 @@ import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
@@ -43,8 +41,6 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
@@ -160,27 +156,11 @@ public class Client implements Runnable {
 	}
 
 	private Socket createSSLSocket(String host, int port, Socket socket) throws GeneralSecurityException, IOException {
-		TrustManager[] tms = getTrustManagers();
 		KeyManager[] kms = getKeyManagers();
 		SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
-		ctx.init(kms, tms, null);
+		ctx.init(kms, null, null);
 		SSLSocketFactory factory = ctx.getSocketFactory();
 		return factory.createSocket(socket, host, port, true);
-	}
-
-	private TrustManager[] getTrustManagers() throws GeneralSecurityException, IOException {
-		String fileName = conf.getServerCertificateFileName();
-		if (fileName.length() == 0) {
-			return null;
-		}
-		CertificateFactory cf = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-		Certificate cert = cf.generateCertificate(new FileInputStream(fileName));
-		KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-		ks.load(null, null);
-		ks.setCertificateEntry(conf.getClientCertificateAlias(), cert); //$NON-NLS-1$
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		tmf.init(ks);
-		return tmf.getTrustManagers();
 	}
 
 	private KeyManager[] getKeyManagers() throws GeneralSecurityException, IOException {
@@ -192,7 +172,7 @@ public class Client implements Runnable {
 		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(new FileInputStream(fileName), pass);
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		kmf.init(ks, pass);
+		kmf.init(ks, null);
 		return kmf.getKeyManagers();
 	}
 

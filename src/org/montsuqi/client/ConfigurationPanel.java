@@ -119,10 +119,8 @@ public class ConfigurationPanel extends JPanel {
 	protected JTextField appEntry;
 
 	// SSL Tab
-	protected JTextField serverCertificateEntry;
 	protected JTextField clientCertificateEntry;
 	protected JPasswordField exportPasswordEntry;
-	protected JTextField clientCertificateAliasEntry;
 
 	// Misc Tab
 	protected JTextField styleEntry;
@@ -156,9 +154,7 @@ public class ConfigurationPanel extends JPanel {
 		conf.setApplication(appEntry.getText());
 
 		// SSL Tab
-		conf.setServerCertificateFileName(serverCertificateEntry.getText());
 		conf.setClientCertificateFileName(clientCertificateEntry.getText());
-		conf.setClientCertificateAlias(clientCertificateAliasEntry.getText());
 		conf.setClientCertificatePass(new String(exportPasswordEntry.getPassword()));
 
 		// Others Tab
@@ -233,15 +229,11 @@ public class ConfigurationPanel extends JPanel {
 		panel.setLayout(new GridBagLayout());
 
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
-		final String serverCertificateDescription = Messages.getString("ConfigurationPanel.server_certificate_description"); //$NON-NLS-1$
 		final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
 		int y = 0;
-		serverCertificateEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.server_certificate"), conf.getServerCertificateFileName()); //$NON-NLS-1$
-		addButtonFor(panel, serverCertificateEntry, new FileSelectionAction(serverCertificateEntry, home, ".pem", serverCertificateDescription)); //$NON-NLS-1$
 
 		clientCertificateEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.client_certificate"), conf.getClientCertificateFileName()); //$NON-NLS-1$
 		addButtonFor(panel, clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
-		clientCertificateAliasEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.alias"), conf.getClientCertificateAlias()); //$NON-NLS-1$
 		exportPasswordEntry = addPasswordFieldRow(panel, y++, Messages.getString("ConfigurationPanel.password")); //$NON-NLS-1$
 		final boolean savePassword = conf.getSavePassword();
 		if (savePassword) {
