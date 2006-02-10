@@ -253,9 +253,6 @@ class Connection {
 		((OutputStream)out).flush();
 	}
 
-	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
-	private static final int NEGATIVE_FIXED_MASK = 0x40;
-
 	void sendFixed(BigDecimal xval) throws IOException {
 		String s;
 		if (xval.equals(ZERO)) {
@@ -274,6 +271,9 @@ class Connection {
 		sendLength(xval.scale());
 		sendString(s);
 	}
+
+	private static final int NEGATIVE_FIXED_MASK = 0x40;
+	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
 
 	BigDecimal receiveFixed() throws IOException {
 		/* int flen = */ receiveLength();
