@@ -205,7 +205,7 @@ public class Client implements Runnable {
 			
 		} else if (SystemEnvironment.isMacOSX()){
 			File path = SystemEnvironment.createFilePath(new String[] {
-				home, "Libary", "Caches", "Java APplets", "security"	
+				home, "Library", "Caches", "Java Applets", "security"	
 			});
 			return new File(path, "deployment.certs");
 		} else {
