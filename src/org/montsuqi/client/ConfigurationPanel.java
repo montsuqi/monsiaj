@@ -321,7 +321,7 @@ public class ConfigurationPanel extends JPanel {
 			gbc.fill = GridBagConstraints.BOTH;
 		}
 		gbc.weightx = 1.0;
-		gbc.weighty = (double)h;
+		gbc.weighty = h;
 		gbc.insets = new Insets(2, 2, 2, 2);
 		container.add(component, gbc);
 	}
