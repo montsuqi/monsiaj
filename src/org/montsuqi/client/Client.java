@@ -156,7 +156,9 @@ public class Client implements Runnable {
 		String fileName = conf.getClientCertificateFileName();
 		System.setProperty("javax.net.ssl.keyStore", fileName);
 		String pass = conf.getClientCertificatePass();
-		System.setProperty("javax.net.ssl.keyStorePassword", pass);
+		if (pass != null && pass.length() > 0) {
+			System.setProperty("javax.net.ssl.keyStorePassword", pass);
+		}
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		return (SSLSocket)factory.createSocket(socket, host, port, true);
 	}
