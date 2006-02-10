@@ -32,18 +32,31 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
+
+import com.sun.deploy.security.BrowserKeystore;
+import com.sun.deploy.security.X509DeployKeyManager;
+import com.sun.deploy.security.X509DeployTrustManager;
+import com.sun.deploy.services.ServiceManager;
 
 public class Client implements Runnable {
 
@@ -150,14 +163,24 @@ public class Client implements Runnable {
 	}
 
 	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
+		SSLSocket sslSocket = null;
 		boolean useBrowserSetting = getUseBrowserSetting();
-		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
-		logger.debug("ignored...");
 		useBrowserSetting = false;
-		if ( ! useBrowserSetting) {
-			File trustStorePath = getTrustStorePath();
-			System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
+		if (useBrowserSetting) {
+			logger.info("trying to create SSL socket using browser settings.");
+			try {
+				sslSocket = createSSLSocketUsingBrowserSettings(host, port, socket);
+			} catch (Exception e) {
+				logger.info("failed to create SSL socket using browser settings.");
+				logger.info(e);
+			}
+			if (sslSocket != null) {
+				return sslSocket;
+			}
+			logger.info("falling back to the application settings.");
 		}
+		File trustStorePath = getTrustStorePath();
+		System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
 		System.setProperty("javax.net.ssl.keyStore", fileName);
@@ -166,6 +189,29 @@ public class Client implements Runnable {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
 		}
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+		return (SSLSocket)factory.createSocket(socket, host, port, true);
+	}
+
+	private SSLSocket createSSLSocketUsingBrowserSettings(String host, int port, Socket socket) throws NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, CertificateException, FileNotFoundException, IOException, KeyManagementException {
+		ServiceManager.setService(33024);
+		BrowserKeystore.registerSecurityProviders();
+
+		SSLContext ctx = SSLContext.getInstance("SSL");
+		X509DeployTrustManager tm = new X509DeployTrustManager();
+		TrustManager[] tms = new TrustManager[] { tm };
+		
+		X509DeployKeyManager km = new X509DeployKeyManager();
+		KeyManager[] kms = new KeyManager[] { km };
+
+//		KeyStore ks = KeyStore.getInstance("PKCS12");
+//		String pass = conf.getClientCertificatePass();
+//		FileInputStream fis = new FileInputStream(getTrustStorePath());
+//		ks.load(fis, pass.toCharArray());
+//		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+//		kmf.init(ks, pass.toCharArray());
+//		KeyManager[] kms = kmf.getKeyManagers();
+		ctx.init(kms, tms, null);
+		SSLSocketFactory factory = ctx.getSocketFactory();
 		return (SSLSocket)factory.createSocket(socket, host, port, true);
 	}
 
