@@ -24,6 +24,7 @@ package org.montsuqi.client;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -31,15 +32,12 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.montsuqi.monsia.Style;
@@ -146,37 +144,57 @@ public class Client implements Runnable {
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
-		try {
-			return createSSLSocket(host, port, socket);
-		} catch (GeneralSecurityException e) {
-			IOException ioe = new IOException(e.getMessage());
-			ioe.initCause(e);
-			throw ioe;
-		}
+		SSLSocket sslSocket = createSSLSocket(host, port, socket);
+		sslSocket.startHandshake();
+		return sslSocket;
 	}
 
-	private Socket createSSLSocket(String host, int port, Socket socket) throws GeneralSecurityException, IOException {
-		KeyManager[] kms = getKeyManagers();
-		SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
-		ctx.init(kms, null, null);
-		SSLSocketFactory factory = ctx.getSocketFactory();
-		return factory.createSocket(socket, host, port, true);
-	}
-
-	private KeyManager[] getKeyManagers() throws GeneralSecurityException, IOException {
+	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
+		File trustStorePath = getTrustStorePath();
+		System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
+		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
-		if (fileName.length() == 0) {
-			return null;
+		System.setProperty("javax.net.ssl.keyStore", fileName);
+		String pass = conf.getClientCertificatePass();
+		System.setProperty("javax.net.ssl.keyStorePassword", pass);
+		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+		return (SSLSocket)factory.createSocket(socket, host, port, true);
+	}
+
+	private File getTrustStorePath() {
+		String home = System.getProperty("user.home");
+		if (SystemEnvironment.isWindows()) {
+			File deploymentDirectory = SystemEnvironment.createFilePath(new String[] {
+				home, "Application Data", "Sun", "Java", "Deployment"
+			});
+
+			Properties deploymentProperties = new Properties();
+			File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
+			try {
+				FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
+				deploymentProperties.load(fis);
+				String useBrowserSetting = deploymentProperties.getProperty("deployment.security.browser.keystore.use");
+				//TODO browser's keystore -> deployment.security.browser.keystore.use=false or unexist
+			} catch (FileNotFoundException e) {
+				logger.info("{0} not fould", deploymentPropertiesFile);
+			} catch (IOException e) {
+				logger.info("{0} could not be read", deploymentPropertiesFile);
+			}
+
+			File securityDirectory = new File(deploymentDirectory, "security");
+			return new File(securityDirectory, "trusted.cacerts");
+			
+		} else if (SystemEnvironment.isMacOSX()){
+			File path = SystemEnvironment.createFilePath(new String[] {
+				home, "Libary", "Caches", "Java APplets", "security"	
+			});
+			return new File(path, "deployment.certs");
+		} else {
+			File path = SystemEnvironment.createFilePath(new String[] {
+				home, ".java", "deployment", "security"
+			});
+			return new File(path, "trusted.cacerts");
 		}
-		char[] pass = conf.getClientCertificatePass().toCharArray();
-		if (pass.length == 0) {
-			pass = null;
-		}
-		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(new FileInputStream(fileName), pass);
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		kmf.init(ks, null);
-		return kmf.getKeyManagers();
 	}
 
 	public void run() {
