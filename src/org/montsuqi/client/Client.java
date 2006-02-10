@@ -150,8 +150,14 @@ public class Client implements Runnable {
 	}
 
 	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
-		File trustStorePath = getTrustStorePath();
-		System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
+		boolean useBrowserSetting = getUseBrowserSetting();
+		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
+		logger.debug("ignored...");
+		useBrowserSetting = false;
+		if ( ! useBrowserSetting) {
+			File trustStorePath = getTrustStorePath();
+			System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
+		}
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
 		System.setProperty("javax.net.ssl.keyStore", fileName);
@@ -163,6 +169,29 @@ public class Client implements Runnable {
 		return (SSLSocket)factory.createSocket(socket, host, port, true);
 	}
 
+	private boolean getUseBrowserSetting() {
+		if ( ! SystemEnvironment.isWindows()) {
+			return false;
+		}
+		Properties deploymentProperties = new Properties();
+		String home = System.getProperty("user.home");
+		File deploymentDirectory = SystemEnvironment.createFilePath(new String[] {
+				home, "Application Data", "Sun", "Java", "Deployment"
+			});
+		File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
+		try {
+			FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
+			deploymentProperties.load(fis);
+			return ! "false".equals(deploymentProperties.getProperty("deployment.security.browser.keystore.use"));
+		} catch (FileNotFoundException e) {
+			logger.info("{0} not fould", deploymentPropertiesFile);
+			return false;
+		} catch (IOException e) {
+			logger.info("{0} could not be read", deploymentPropertiesFile);
+			return false;
+		}
+	}
+
 	private File getTrustStorePath() {
 		String home = System.getProperty("user.home");
 		if (SystemEnvironment.isWindows()) {
@@ -170,18 +199,6 @@ public class Client implements Runnable {
 				home, "Application Data", "Sun", "Java", "Deployment"
 			});
 
-			Properties deploymentProperties = new Properties();
-			File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
-			try {
-				FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
-				deploymentProperties.load(fis);
-				String useBrowserSetting = deploymentProperties.getProperty("deployment.security.browser.keystore.use");
-				//TODO browser's keystore -> deployment.security.browser.keystore.use=false or unexist
-			} catch (FileNotFoundException e) {
-				logger.info("{0} not fould", deploymentPropertiesFile);
-			} catch (IOException e) {
-				logger.info("{0} could not be read", deploymentPropertiesFile);
-			}
 
 			File securityDirectory = new File(deploymentDirectory, "security");
 			return new File(securityDirectory, "trusted.cacerts");
