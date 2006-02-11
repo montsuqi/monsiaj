@@ -74,6 +74,39 @@ public class Launcher {
 	}
 
 	public void launch() {
+		if (SystemEnvironment.getUseBrowserSetting()) {
+			final String FORKED_FOR_BROWSER_CERT = "org.montsuqi.forkedForBrowserCert";
+			String forkedForBrowserCert = System.getProperty(FORKED_FOR_BROWSER_CERT);
+			if ( ! Boolean.parseBoolean(forkedForBrowserCert)) {
+				try {
+					Class.forName("com.sun.deploy.services.ServiceManager");
+				} catch (ClassNotFoundException e) {
+					String javaHome = System.getProperty("java.home");
+					File deployJar = SystemEnvironment.createFilePath(new String[] {
+						javaHome, "lib", "deploy.jar"
+					});
+					Runtime runtime = Runtime.getRuntime();
+					String self = System.getProperty("java.class.path");
+					if (self.indexOf(File.pathSeparator) < 0 && self.endsWith(".jar")) {
+						try {
+							String[] args = new String[] {
+								"java",
+								"-Xbootclasspath/a:" + deployJar.getCanonicalPath(),
+								"-D" + FORKED_FOR_BROWSER_CERT + "=true",
+								"-jar",
+								self
+							};
+							runtime.exec(args);
+							logger.info("Another VM is forked to use browser's certificates.");
+							System.exit(0);
+						} catch (Exception e2) {
+							logger.fatal("Failed to fork real VM for work.");
+							System.exit(1);
+						}
+					}
+				}
+			}
+		}
 		ConfigurationPanel panel = createConfigurationPanel();
 		Icon icon = createIcon();
 		int result = configure(panel, icon);
