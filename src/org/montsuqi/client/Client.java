@@ -159,8 +159,12 @@ public class Client implements Runnable {
 				sslSocket.startHandshake();
 				logger.info("succeeded.");
 			} catch (Exception e) {
+				if (e instanceof ClassNotFoundException) {
+					logger.info(e.toString());
+				} else {
+					logger.info(e);
+				}
 				logger.info("failed to create SSL socket using browser settings.");
-				logger.info(e);
 			}
 			if (sslSocket != null) {
 				return sslSocket;
