@@ -69,10 +69,10 @@ public class BrowserSSLSocketFactory extends SSLSocketFactory {
 		} else {
 			logger.warn("{0} not found.", deployJarFile);
 		}
-		classLoader = null;
+		classLoader = cl;
 	}
 
-	public BrowserSSLSocketFactory() throws GeneralSecurityException {
+	public BrowserSSLSocketFactory() throws GeneralSecurityException, ClassNotFoundException {
 		try {
 //			Class.forName("com.sun.deploy.security.WIExplorerMyKeyStore", true, classLoader);
 //			Class.forName("sun.security.jca.GetInstance", true, classLoader);
@@ -94,7 +94,7 @@ public class BrowserSSLSocketFactory extends SSLSocketFactory {
 			registerSecurityProviders.invoke(null, null);
 
 			synchronized (this) {
-//				Thread.currentThread().setContextClassLoader(classLoader);
+				Thread.currentThread().setContextClassLoader(classLoader);
 				SSLContext ctx;
 				ctx = SSLContext.getInstance("SSL");
 				Class x509DeployTrustManager = Class.forName("com.sun.deploy.security.X509DeployTrustManager", true, classLoader);
@@ -115,6 +115,9 @@ public class BrowserSSLSocketFactory extends SSLSocketFactory {
 				factory = ctx.getSocketFactory();
 			}
 		} catch (Exception e) {
+			if (e instanceof ClassNotFoundException) {
+				throw (ClassNotFoundException)e;
+			}
 			if (e instanceof GeneralSecurityException) {
 				throw (GeneralSecurityException)e;
 			} else {
