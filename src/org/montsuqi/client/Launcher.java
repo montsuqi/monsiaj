@@ -77,7 +77,7 @@ public class Launcher {
 		if (SystemEnvironment.getUseBrowserSetting()) {
 			final String FORKED_FOR_BROWSER_CERT = "org.montsuqi.forkedForBrowserCert";
 			String forkedForBrowserCert = System.getProperty(FORKED_FOR_BROWSER_CERT);
-			if ( ! Boolean.parseBoolean(forkedForBrowserCert)) {
+			if (forkedForBrowserCert == null || "false".equals(forkedForBrowserCert)) {
 				try {
 					Class.forName("com.sun.deploy.services.ServiceManager");
 				} catch (ClassNotFoundException e) {
