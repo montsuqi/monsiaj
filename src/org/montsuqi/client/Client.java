@@ -145,19 +145,19 @@ public class Client implements Runnable {
 			return socket;
 		}
 		SSLSocket sslSocket = createSSLSocket(host, port, socket);
-		sslSocket.startHandshake();
 		return sslSocket;
 	}
 
 	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
 		SSLSocket sslSocket = null;
 		boolean useBrowserSetting = getUseBrowserSetting();
-		useBrowserSetting = false;
 		if (useBrowserSetting) {
 			logger.info("trying to create SSL socket using browser settings.");
 			try {
 				BrowserSSLSocketFactory factory = new BrowserSSLSocketFactory();
 				sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
+				sslSocket.startHandshake();
+				logger.info("succeeded.");
 			} catch (Exception e) {
 				logger.info("failed to create SSL socket using browser settings.");
 				logger.info(e);
@@ -177,7 +177,9 @@ public class Client implements Runnable {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
 		}
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-		return (SSLSocket)factory.createSocket(socket, host, port, true);
+		sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
+		sslSocket.startHandshake();
+		return sslSocket;
 	}
 
 	private boolean getUseBrowserSetting() {
