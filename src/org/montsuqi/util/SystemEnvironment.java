@@ -117,7 +117,7 @@ public class SystemEnvironment {
 			File path = createFilePath(new String[] {
 				home, ".java", "deployment", "security"
 			});
-			return new File(path, "trusted.cacerts");
+			return new File(path, "trusted.jssecacerts");
 		}
 	}
 }
