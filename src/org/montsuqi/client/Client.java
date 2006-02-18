@@ -23,6 +23,8 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -33,6 +35,7 @@ import java.nio.channels.SocketChannel;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -134,46 +137,27 @@ public class Client implements Runnable {
 	Socket createSocket() throws IOException {
 		String host = conf.getHost();
 		int port = conf.getPort();
-		if ( ! conf.getUseSSL()) {
-			return createSocket(host, port);
-		} else {
-			return createSSLSocket(host, port);
-		}
-	}
-
-	private Socket createSocket(String host, int port) throws IOException {
 		SocketAddress address = new InetSocketAddress(host, port);
 		SocketChannel socketChannel = SocketChannel.open();
 		socketChannel.connect(address);
-		return socketChannel.socket();
+		Socket socket = socketChannel.socket();
+		if ( ! conf.getUseSSL()) {
+			return socket;
+		}
+		SSLSocket sslSocket = createSSLSocket(host, port, socket);
+		sslSocket.startHandshake();
+		return sslSocket;
 	}
 
-	private SSLSocket createSSLSocket(String host, int port) throws IOException {
-		SSLSocket sslSocket = null;
-		if (SystemEnvironment.getUseBrowserSetting()) {
-			logger.info("trying to create SSL socket using browser settings.");
-			try {
-				BrowserSSLSocketFactory factory = new BrowserSSLSocketFactory();
-				Socket socket = createSocket(host, port);
-				sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
-				sslSocket.startHandshake();
-				logger.info("succeeded.");
-			} catch (Exception e) {
-				if (e instanceof ClassNotFoundException) {
-					logger.info(e.toString());
-				} else {
-					logger.info(e);
-				}
-				logger.info("failed to create SSL socket using browser settings.");
-				sslSocket = null;
-			}
-			if (sslSocket != null) {
-				return sslSocket;
-			}
-			logger.info("falling back to the application settings.");
+	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
+		boolean useBrowserSetting = getUseBrowserSetting();
+		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
+		logger.debug("ignored...");
+		useBrowserSetting = false;
+		if ( ! useBrowserSetting) {
+			File trustStorePath = getTrustStorePath();
+			System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
 		}
-		File trustStorePath = SystemEnvironment.getTrustStorePath();
-		System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
 		System.setProperty("javax.net.ssl.keyStore", fileName);
@@ -182,10 +166,54 @@ public class Client implements Runnable {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
 		}
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-		Socket socket = createSocket(host, port);
-		sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
-		sslSocket.startHandshake();
-		return sslSocket;
+		return (SSLSocket)factory.createSocket(socket, host, port, true);
+	}
+
+	private boolean getUseBrowserSetting() {
+		if ( ! SystemEnvironment.isWindows()) {
+			return false;
+		}
+		Properties deploymentProperties = new Properties();
+		String home = System.getProperty("user.home");
+		File deploymentDirectory = SystemEnvironment.createFilePath(new String[] {
+				home, "Application Data", "Sun", "Java", "Deployment"
+			});
+		File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
+		try {
+			FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
+			deploymentProperties.load(fis);
+			return ! "false".equals(deploymentProperties.getProperty("deployment.security.browser.keystore.use"));
+		} catch (FileNotFoundException e) {
+			logger.info("{0} not fould", deploymentPropertiesFile);
+			return false;
+		} catch (IOException e) {
+			logger.info("{0} could not be read", deploymentPropertiesFile);
+			return false;
+		}
+	}
+
+	private File getTrustStorePath() {
+		String home = System.getProperty("user.home");
+		if (SystemEnvironment.isWindows()) {
+			File deploymentDirectory = SystemEnvironment.createFilePath(new String[] {
+				home, "Application Data", "Sun", "Java", "Deployment"
+			});
+
+
+			File securityDirectory = new File(deploymentDirectory, "security");
+			return new File(securityDirectory, "trusted.cacerts");
+			
+		} else if (SystemEnvironment.isMacOSX()){
+			File path = SystemEnvironment.createFilePath(new String[] {
+				home, "Library", "Caches", "Java Applets", "security"	
+			});
+			return new File(path, "deployment.certs");
+		} else {
+			File path = SystemEnvironment.createFilePath(new String[] {
+				home, ".java", "deployment", "security"
+			});
+			return new File(path, "trusted.cacerts");
+		}
 	}
 
 	public void run() {

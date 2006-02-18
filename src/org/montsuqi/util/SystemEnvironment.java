@@ -23,19 +23,9 @@ copies.
 package org.montsuqi.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Locale;
-import java.util.Properties;
 
 public class SystemEnvironment {
-
-	private static final Logger logger;
-
-	static {
-		logger = Logger.getLogger(SystemEnvironment.class);
-	}
 
 	private SystemEnvironment() {
 		// inhibit instantiation
@@ -75,49 +65,5 @@ public class SystemEnvironment {
 			path = new File(path, elements[i]);
 		}
 		return path;
-	}
-
-	public static boolean getUseBrowserSetting() {
-		if ( ! isWindows()) {
-			return false;
-		}
-		Properties deploymentProperties = new Properties();
-		String home = System.getProperty("user.home");
-		File deploymentDirectory = createFilePath(new String[] {
-			home, "Application Data", "Sun", "Java", "Deployment"
-		});
-		File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
-		try {
-			FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
-			deploymentProperties.load(fis);
-			return ! "false".equals(deploymentProperties.getProperty("deployment.security.browser.keystore.use"));
-		} catch (FileNotFoundException e) {
-			logger.info("{0} not fould", deploymentPropertiesFile);
-			return false;
-		} catch (IOException e) {
-			logger.info("{0} could not be read", deploymentPropertiesFile);
-			return false;
-		}
-	}
-
-	public static File getTrustStorePath() {
-		String home = System.getProperty("user.home");
-		if (isWindows()) {
-			File deploymentDirectory = createFilePath(new String[] {
-				home, "Application Data", "Sun", "Java", "Deployment"
-			});
-			File securityDirectory = new File(deploymentDirectory, "security");
-			return new File(securityDirectory, "trusted.jssecacerts");
-		} else if (isMacOSX()){
-			File path = createFilePath(new String[] {
-				home, "Library", "Caches", "Java Applets", "security"	
-			});
-			return new File(path, "deployment.certs");
-		} else {
-			File path = createFilePath(new String[] {
-				home, ".java", "deployment", "security"
-			});
-			return new File(path, "trusted.jssecacerts");
-		}
 	}
 }
