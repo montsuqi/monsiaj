@@ -201,7 +201,7 @@ public class Client implements Runnable {
 
 
 			File securityDirectory = new File(deploymentDirectory, "security");
-			return new File(securityDirectory, "trusted.cacerts");
+			return new File(securityDirectory, "trusted.jssecacerts");
 			
 		} else if (SystemEnvironment.isMacOSX()){
 			File path = SystemEnvironment.createFilePath(new String[] {
@@ -212,7 +212,7 @@ public class Client implements Runnable {
 			File path = SystemEnvironment.createFilePath(new String[] {
 				home, ".java", "deployment", "security"
 			});
-			return new File(path, "trusted.cacerts");
+			return new File(path, "trusted.jssecacerts");
 		}
 	}
 
