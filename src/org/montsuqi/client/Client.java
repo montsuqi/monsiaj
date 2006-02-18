@@ -164,8 +164,6 @@ public class Client implements Runnable {
 		String pass = conf.getClientCertificatePass();
 		if (pass != null && pass.length() > 0) {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
-		} else {
-			throw new IOException(Messages.getString("Client.no_client_cert_pass"));
 		}
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		return (SSLSocket)factory.createSocket(socket, host, port, true);
