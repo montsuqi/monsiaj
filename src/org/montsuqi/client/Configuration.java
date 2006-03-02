@@ -171,7 +171,7 @@ public class Configuration {
 		if (styleFileName != null && styleFileName.length() > 0) {
 			File file = new File(styleFileName);
 			try {
-				return file.toURL();
+				return file.toURI().toURL();
 			} catch (MalformedURLException e) {
 				logger.warn(e);
 			}
