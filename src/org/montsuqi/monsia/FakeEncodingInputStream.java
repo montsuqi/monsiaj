@@ -26,11 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.montsuqi.util.Logger;
-
 final class FakeEncodingInputStream extends InputStream {
 	private InputStream in;
-	private Logger logger;
 	byte[] headerBytes;
 	private int index;
 
@@ -43,7 +40,9 @@ final class FakeEncodingInputStream extends InputStream {
 		try {
 			headerBytes = FAKE_HEADER.getBytes("euc-jp"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException e) {
-			logger.fatal(e);
+			IOException ioe = new IOException();
+			ioe.initCause(e);
+			throw ioe;
 		}
 		index = 0;
 	}
