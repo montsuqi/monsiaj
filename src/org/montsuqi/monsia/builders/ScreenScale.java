@@ -36,6 +36,7 @@ import java.awt.geom.AffineTransform;
 final class ScreenScale {
 	private static double widthScale;
 	private static double heightScale;
+	private static final Dimension screenSize;
 	private static Point center;
 	static {
 		Toolkit tk = Toolkit.getDefaultToolkit();
@@ -43,7 +44,7 @@ final class ScreenScale {
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
 		GraphicsConfiguration gc = gd.getDefaultConfiguration();
 		Insets insets = tk.getScreenInsets(gc);
-		Dimension screenSize = tk.getScreenSize();
+		screenSize = tk.getScreenSize();
 		widthScale = (screenSize.width - insets.right - insets.left) / (double)screenSize.width;
 		heightScale = (screenSize.height - insets.top - insets.bottom) / (double)screenSize.height;
 		center = new Point();
@@ -67,5 +68,9 @@ final class ScreenScale {
 
 	static void centerWindow(Window window) {
 		window.setLocation(center.x - window.getWidth() / 2, center.y - window.getHeight() / 2);
+	}
+
+	static Dimension getScreenSize() {
+		return new Dimension(screenSize);
 	}
 }

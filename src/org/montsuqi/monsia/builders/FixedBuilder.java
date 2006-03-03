@@ -24,6 +24,7 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -59,8 +60,14 @@ class FixedBuilder extends ContainerBuilder {
 			if (child instanceof JMenuBar) {
 				xml.setMenuBar((JMenuBar)child);
 			} else {
-				parent.add(child);
-				child.setLocation(ScreenScale.scale(new Point(x, y)));
+				Point p = new Point(x, y);
+				Point scaledPos = ScreenScale.scale(p);
+				Dimension screenSize = ScreenScale.getScreenSize();
+				Rectangle screenRect = new Rectangle(screenSize);
+				if (screenRect.contains(scaledPos)) {
+					parent.add(child);
+					child.setLocation(scaledPos);
+				}
 			}
 		}
 		Component[] children = parent.getComponents();
