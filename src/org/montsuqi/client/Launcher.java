@@ -45,6 +45,7 @@ import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
+import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
 
@@ -91,7 +92,7 @@ public class Launcher {
 			t.join();
 		} catch (Exception e) {
 			logger.fatal(e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+			ExceptionDialog.showExceptionDialog(e);
 			if (logFrame != null) {
 				logFrame.setExtendedState(Frame.NORMAL);
 			}
