@@ -99,7 +99,7 @@ abstract class Connector {
 			handler.handle(con, target, other);
 			logger.debug("done // {0}", handler.getSignalName());
 		} catch (IOException e) {
-			throw new HandlerInvocationException(e);
+			con.exceptionOccured(e);
 		}
 	}
 
