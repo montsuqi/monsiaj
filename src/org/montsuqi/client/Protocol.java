@@ -37,12 +37,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
 import javax.swing.SwingUtilities;
 import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
+import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
@@ -609,5 +611,10 @@ public class Protocol extends Connection {
 
 	public StringBuffer getWidgetNameBuffer() {
 		return widgetName;
+	}
+
+	public void exceptionOccured(IOException e) {
+		ExceptionDialog.showExceptionDialog(e);
+		client.exitSystem();
 	}
 }
