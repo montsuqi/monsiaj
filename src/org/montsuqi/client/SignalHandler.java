@@ -199,7 +199,7 @@ public abstract class SignalHandler {
 										changed.handle(con, widget, userData);
 										sendEvent.handle(con, widget, userData);
 									} catch (IOException e) {
-										logger.warn(e);
+										con.exceptionOccured(e);
 									}
 								}
 							}
