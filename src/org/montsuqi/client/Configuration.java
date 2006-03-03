@@ -304,10 +304,12 @@ public class Configuration {
 		} catch (IOException e) {
 			logger.warn(e);
 		} finally {
-			try {
-				br.close();
-			} catch (IOException e) {
-				logger.warn(e);
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					// do nothing
+				}
 			}
 		}
 	}
