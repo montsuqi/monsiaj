@@ -66,6 +66,7 @@ import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.UIStock;
 import org.montsuqi.widgets.Window;
 
@@ -658,6 +659,27 @@ abstract class WidgetPropertySetter {
 				JDialog dialog = (JDialog)widget;
 				dialog.setModal(ParameterConverter.toBoolean(value));
 				dialog.setModal(false);
+			}
+		});
+
+		registerProperty(Pixmap.class, "scaled", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Pixmap pixmap = (Pixmap)widget;
+				pixmap.setScaled(ParameterConverter.toBoolean(value));
+			}
+		});
+
+		registerProperty(Pixmap.class, "scaled_width", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Pixmap pixmap = (Pixmap)widget;
+				pixmap.setScaledWidth(ParameterConverter.toInteger(value));
+			}
+		});
+
+		registerProperty(Pixmap.class, "scaled_height", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Pixmap pixmap = (Pixmap)widget;
+				pixmap.setScaledHeight(ParameterConverter.toInteger(value));
 			}
 		});
 	}

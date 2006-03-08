@@ -71,6 +71,7 @@ import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaHTMLWebKit;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.RadioButton;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.ToggleButton;
@@ -128,6 +129,7 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaPS",        PandaPreviewPane.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Pixmap",         Pixmap.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Placeholder",    JPanel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("RadioButton",    RadioButton.class,   new RadioButtonBuilder()); //$NON-NLS-1$
