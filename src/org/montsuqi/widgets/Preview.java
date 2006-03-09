@@ -156,7 +156,11 @@ public abstract class Preview extends JPanel {
 		if ( ! isValidScale(newScale)) {
 			throw new IllegalArgumentException("non-positive scale"); //$NON-NLS-1$
 		}
-		scale = newScale;
+		if (Double.compare(scale, newScale) != 0) {
+			double oldScale = scale;
+			scale = newScale;
+			firePropertyChange("scale", oldScale, newScale);
+		}
 	}
 
 	private boolean isValidScale(double newScale) {
