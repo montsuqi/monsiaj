@@ -45,7 +45,6 @@ import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
 
@@ -149,7 +148,6 @@ public class Protocol extends Connection {
 		}
 		if (type == ScreenType.CLOSE_WINDOW) {
 			window.setVisible(false);
-			clearPreview(window);
 		}
 		logger.debug("done // showWindow");
 		return null;
@@ -385,18 +383,6 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private synchronized void clearPreview(Component widget) {
-		if (widget instanceof PandaPreviewPane) {
-			PandaPreviewPane preview = (PandaPreviewPane)widget;
-			preview.clear();
-		} else if (widget instanceof Container) {
-			Container container = (Container)widget;
-			for (int i = 0, n = container.getComponentCount(); i < n; i++) {
-				clearPreview(container.getComponent(i));
-			}
-		}
-	}
-
 	synchronized boolean getScreenData() throws IOException {
 		logger.debug("getScreenData");
 		String window = null;
@@ -591,7 +577,6 @@ public class Protocol extends Connection {
 			return;
 		}
 		node.getWindow().setVisible(false);
-		clearPreview(node.getWindow());
 		if (isReceiving()) {
 			return;
 		}
