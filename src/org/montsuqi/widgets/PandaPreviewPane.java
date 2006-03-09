@@ -45,6 +45,7 @@ public class PandaPreviewPane extends JPanel {
 
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
+		toolbar.add(preview.getResetScaleAction());
 		toolbar.add(preview.getZoomInAction());
 		toolbar.add(preview.getZoomOutAction());
 		toolbar.add(preview.getRotateClockwiseAction());
@@ -75,5 +76,6 @@ public class PandaPreviewPane extends JPanel {
 		JFileChooser chooser = new JFileChooser();
 		chooser.showOpenDialog(preview);
 		preview.load(chooser.getSelectedFile().getAbsolutePath());
+		f.pack();
 	}
 }
