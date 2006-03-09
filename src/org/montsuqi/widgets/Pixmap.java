@@ -40,7 +40,7 @@ public class Pixmap extends JLabel {
 
 		public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
 			final Image image = getImage();
-			if (isScaled() && image != null) {
+			if (image != null) {
 				ImageObserver imageObserver = getImageObserver();
 				if (imageObserver == null) {
 					imageObserver = c;
@@ -67,6 +67,7 @@ public class Pixmap extends JLabel {
 
 	private int scaledWidth;
 	private int scaledHeight;
+	private boolean scaled;
 
 	public Pixmap() {
 		super();
@@ -86,11 +87,11 @@ public class Pixmap extends JLabel {
 	}
 
 	public void setScaled(boolean scaled) {
-		// this.scaled = scaled;
+		this.scaled = scaled;
 	}
 
 	boolean isScaled() {
-		return true;
+		return scaled;
 	}
 
 	public void setScaledWidth(int scaledWidth) {
