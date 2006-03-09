@@ -80,9 +80,6 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		add(scroll, BorderLayout.CENTER);
-
-		// initialize scale display
-		preview.setScale(1.0);
 	}
 
 	public void load(String fileName) throws IOException {
