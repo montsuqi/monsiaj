@@ -165,6 +165,7 @@ public class WidgetBuilder {
 			"TabbedPane", //$NON-NLS-1$
 			"Label", //$NON-NLS-1$
 			"TextField", //$NON-NLS-1$
+			"TextArea", //$NON-NLS-1$
 			"Table" //$NON-NLS-1$
 		};
 		for (int i = 0; i < classes.length; i++) {
