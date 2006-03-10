@@ -164,13 +164,13 @@ public class WidgetBuilder {
 			"RadioButton", //$NON-NLS-1$
 			"TabbedPane", //$NON-NLS-1$
 			"Label", //$NON-NLS-1$
-			"TextField",
-			"Table"
+			"TextField", //$NON-NLS-1$
+			"Table" //$NON-NLS-1$
 		};
 		for (int i = 0; i < classes.length; i++) {
-			String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH));
+			String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); //$NON-NLS-1$
 			if (userFontSpec == null) {
-				userFontSpec = System.getProperty("monsia.user.font");
+				userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1$
 			}
 			if (userFontSpec == null) {
 				modifyFont(classes[i], new FontModifier() {

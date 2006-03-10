@@ -259,7 +259,7 @@ class Connection {
 	synchronized void sendFixed(BigDecimal xval) throws IOException {
 		String s;
 		if (xval.equals(ZERO)) {
-			sendString("0");
+			sendString("0"); //$NON-NLS-1$
 			return;
 		}
 		if (xval.signum() >= 0) {

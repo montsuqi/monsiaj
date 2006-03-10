@@ -44,7 +44,7 @@ public abstract class SignalHandler {
 
 	protected static final Logger logger = Logger.getLogger(SignalHandler.class);
 
-	private String signalName = "";
+	private String signalName = ""; //$NON-NLS-1$
 
 	public void setSignalName(final String signalName) {
 		this.signalName = signalName;

@@ -159,7 +159,7 @@ public abstract class Preview extends JPanel {
 		if (Double.compare(scale, newScale) != 0) {
 			double oldScale = scale;
 			scale = newScale;
-			firePropertyChange("scale", oldScale, newScale);
+			firePropertyChange("scale", oldScale, newScale); //$NON-NLS-1$
 		}
 	}
 
