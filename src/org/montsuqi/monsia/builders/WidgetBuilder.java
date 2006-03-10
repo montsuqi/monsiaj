@@ -165,9 +165,16 @@ public class WidgetBuilder {
 			"TabbedPane", //$NON-NLS-1$
 			"Label", //$NON-NLS-1$
 			"TextField", //$NON-NLS-1$
+			"FormattedTextField", //$NON-NLS-1$
 			"TextArea", //$NON-NLS-1$
-			"Table" //$NON-NLS-1$
+			"Table", //$NON-NLS-1$
+			"ToolBar", //$NON-NLS-1$
+			"TitledBorder", //$NON-NLS-1$
+			"ToolTip", //$NON-NLS-1$
+			"ProgressBar", //$NON-NLS-1$
+			"List", //$NON-NLS-1$
 		};
+
 		for (int i = 0; i < classes.length; i++) {
 			String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); //$NON-NLS-1$
 			if (userFontSpec == null) {
