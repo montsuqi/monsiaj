@@ -162,7 +162,9 @@ public class WidgetBuilder {
 			"CheckBox", //$NON-NLS-1$
 			"RadioButton", //$NON-NLS-1$
 			"TabbedPane", //$NON-NLS-1$
-			"Label" //$NON-NLS-1$
+			"Label", //$NON-NLS-1$
+			"TextField",
+			"Table"
 		};
 		FontModifier makePlainFont = new FontModifier() {
 			public Font modifyFont(Font font) {
@@ -171,6 +173,18 @@ public class WidgetBuilder {
 		};
 		for (int i = 0; i < classes.length; i++) {
 			modifyFont(classes[i], makePlainFont);
+		}
+		String userFontSpec = System.getProperty("org.monsia.user.font");
+		if (userFontSpec != null) {
+			final Font userFont = Font.decode(userFontSpec);
+			FontModifier makeUserFont = new FontModifier() {
+				public Font modifyFont(Font font) {
+					return userFont;
+				}
+			};
+			for (int i = 0; i < classes.length; i++) {
+				modifyFont(classes[i], makeUserFont);
+			}
 		}
 		if (SystemEnvironment.isMacOSX()) {
 			classes = new String[] {
