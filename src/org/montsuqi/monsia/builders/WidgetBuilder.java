@@ -27,6 +27,7 @@ import java.awt.Container;
 import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -166,24 +167,24 @@ public class WidgetBuilder {
 			"TextField",
 			"Table"
 		};
-		FontModifier makePlainFont = new FontModifier() {
-			public Font modifyFont(Font font) {
-				return font.deriveFont(font.getStyle() & ~Font.BOLD);
-			}
-		};
 		for (int i = 0; i < classes.length; i++) {
-			modifyFont(classes[i], makePlainFont);
-		}
-		String userFontSpec = System.getProperty("org.monsia.user.font");
-		if (userFontSpec != null) {
-			final Font userFont = Font.decode(userFontSpec);
-			FontModifier makeUserFont = new FontModifier() {
-				public Font modifyFont(Font font) {
-					return userFont;
-				}
-			};
-			for (int i = 0; i < classes.length; i++) {
-				modifyFont(classes[i], makeUserFont);
+			String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH));
+			if (userFontSpec == null) {
+				userFontSpec = System.getProperty("monsia.user.font");
+			}
+			if (userFontSpec == null) {
+				modifyFont(classes[i], new FontModifier() {
+					public Font modifyFont(Font font) {
+						return font.deriveFont(font.getStyle() & ~Font.BOLD);
+					}
+				});
+			} else {
+				final Font userFont = Font.decode(userFontSpec);
+				modifyFont(classes[i], new FontModifier() {
+					public Font modifyFont(Font font) {
+						return userFont;
+					}
+				});
 			}
 		}
 		if (SystemEnvironment.isMacOSX()) {
