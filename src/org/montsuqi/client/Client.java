@@ -147,7 +147,7 @@ public class Client implements Runnable {
 		SocketChannel socketChannel = SocketChannel.open();
 		socketChannel.connect(address);
 		Socket socket = socketChannel.socket();
-		socket.setSoTimeout(5 * 1000);
+		socket.setSoTimeout(3 * 60 * 1000);
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
