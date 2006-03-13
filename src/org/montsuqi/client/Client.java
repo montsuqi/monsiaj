@@ -147,7 +147,21 @@ public class Client implements Runnable {
 		SocketChannel socketChannel = SocketChannel.open();
 		socketChannel.connect(address);
 		Socket socket = socketChannel.socket();
-		socket.setSoTimeout(3 * 60 * 1000);
+		int defaultTimeout = 3 * 60 * 1000;
+		int timeout = defaultTimeout;
+		String timeoutProperty = System.getProperty("monsia.socket.timeout");
+		if (timeoutProperty != null) {
+			try {
+				timeout = Integer.parseInt(timeoutProperty);
+				if (timeout <= 0) {
+					logger.warn("non positive timeout: {0}", timeoutProperty);
+					timeout = defaultTimeout;
+				}
+			} catch (NumberFormatException e) {
+				logger.warn("not a number: {0}", timeoutProperty);
+			}
+		}
+		socket.setSoTimeout(timeout);
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
