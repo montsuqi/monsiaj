@@ -139,7 +139,6 @@ public class Protocol extends Connection {
 				 if (w != window) {
 					w.showBusyCursor();
 				} else {
-					w.pack();
 					w.hideBusyCursor();
 					w.setVisible(true);
 				}
