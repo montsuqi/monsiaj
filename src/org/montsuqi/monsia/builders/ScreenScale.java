@@ -71,8 +71,8 @@ final class ScreenScale {
 	}
 
 	static Dimension scaleFrame(Dimension size) {
-		int width = (int)(size.width * frameWidthScale) + frameInsets.right + frameInsets.left;
-		int height = (int)(size.height * frameHeightScale) + frameInsets.top + frameInsets.bottom;
+		final int width = (int)(size.width * frameWidthScale) + frameInsets.right + frameInsets.left;
+		final int height = (int)(size.height * frameHeightScale) + frameInsets.top + frameInsets.bottom;
 		return new Dimension(width, height);
 	}
 
