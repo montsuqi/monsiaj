@@ -38,9 +38,11 @@ final class ScreenScale {
 	private static final Dimension screenSize;
 	private static final Dimension screenFreeSize;
 	private static final Dimension frameFreeSize;
-	private static final double widthScale;
-	private static final double heightScale;
 	private static final Insets frameInsets;
+	private static final double frameWidthScale;
+	private static final double frameHeightScale;
+	private static final double compWidthScale;
+	private static final double compHeightScale;
 	static {
 		final Toolkit tk = Toolkit.getDefaultToolkit();
 		final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -62,49 +64,38 @@ final class ScreenScale {
 		frameFreeSize = new Dimension(screenFreeSize);
 		frameFreeSize.width -= frameInsets.left + frameInsets.right;
 		frameFreeSize.height -= frameInsets.top + frameInsets.bottom;
-		widthScale = frameFreeSize.width / (double)screenSize.width;
-		heightScale = frameFreeSize.height / (double)screenSize.height;
-
+		frameWidthScale = frameFreeSize.width / (double)screenSize.width;
+		frameHeightScale = frameFreeSize.height / (double)screenSize.height;
+		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width;
+		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height;
 	}
 
 	static Dimension scaleFrame(Dimension size) {
-		size.width += frameInsets.right + frameInsets.left;
-		size.height += frameInsets.top + frameInsets.bottom;
-		final int width;
-		final int height;
-		if (size.width > screenFreeSize.width) {
-			width = (int)(size.width * widthScale);
-		} else {
-			width = size.width;
-		}
-		if (size.height > screenFreeSize.height) {
-			height = (int)(size.height * heightScale);
-		} else {
-			height = size.height;
-		}
+		int width = (int)(size.width * frameWidthScale) + frameInsets.right + frameInsets.left;
+		int height = (int)(size.height * frameHeightScale) + frameInsets.top + frameInsets.bottom;
 		return new Dimension(width, height);
 	}
 
 	static Dimension scale(Dimension size) {
-		final int width = (int)(size.width * widthScale);
-		final int height = (int)(size.height * heightScale);
+		final int width = (int)(size.width * compWidthScale);
+		final int height = (int)(size.height * compHeightScale);
 		return new Dimension(width, height);
 	}
 
 	static Point scaleFrame(Point pos) {
-		final int x = (int)(pos.x * widthScale);
-		final int y = (int)(pos.y * heightScale);
+		final int x = (int)(pos.x * frameWidthScale);
+		final int y = (int)(pos.y * frameHeightScale);
 		return new Point(x, y);
 	}
 
 	static Point scale(Point pos) {
-		final int x = (int)(pos.x * widthScale);
-		final int y = (int)(pos.y * heightScale);
+		final int x = (int)(pos.x * compWidthScale);
+		final int y = (int)(pos.y * compHeightScale);
 		return new Point(x, y);
 	}
 
 	static Font scale(Font font) {
-		final AffineTransform t = AffineTransform.getScaleInstance(widthScale, heightScale);
+		final AffineTransform t = AffineTransform.getScaleInstance(compWidthScale, compHeightScale);
 		final int style = font.getStyle();
 		return font.deriveFont(style, t);
 	}
