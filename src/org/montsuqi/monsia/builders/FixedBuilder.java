@@ -60,8 +60,8 @@ class FixedBuilder extends ContainerBuilder {
 			if (child instanceof JMenuBar) {
 				xml.setMenuBar((JMenuBar)child);
 			} else {
-				Point p = new Point(x, y);
-				Point scaledPos = ScreenScale.scale(p);
+				final Point p = new Point(x, y);
+				final Point scaledPos = ScreenScale.scale(p);
 				Dimension screenSize = ScreenScale.getScreenSize();
 				Rectangle screenRect = new Rectangle(screenSize);
 				if (screenRect.contains(scaledPos)) {
