@@ -32,12 +32,15 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
+import javax.swing.JFrame;
 
 final class ScreenScale {
-	private static double widthScale;
-	private static double heightScale;
 	private static final Dimension screenSize;
-	private static Point center;
+	private static final Dimension screenFreeSize;
+	private static final double frameWidthScale;
+	private static final double frameHeightScale;
+	private static final double compWidthScale;
+	private static final double compHeightScale;
 	static {
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -45,29 +48,45 @@ final class ScreenScale {
 		GraphicsConfiguration gc = gd.getDefaultConfiguration();
 		Insets insets = tk.getScreenInsets(gc);
 		screenSize = tk.getScreenSize();
-		widthScale = (screenSize.width - insets.right - insets.left) / (double)screenSize.width;
-		heightScale = (screenSize.height - insets.top - insets.bottom) / (double)screenSize.height;
-		center = new Point();
-		center.x = (screenSize.width - insets.right + insets.left) / 2;
-		center.y = (screenSize.height - insets.bottom + insets.top) / 2;
+		screenFreeSize = new Dimension(screenSize.width - insets.right - insets.left,
+				screenSize.height - insets.top - insets.bottom);
+		frameWidthScale = screenFreeSize.width / (double)screenSize.width;
+		frameHeightScale = screenFreeSize.height / (double)screenSize.height;
+		JFrame dummy = new JFrame("DUMMY FRAME FOR METRICS CALCULATION");
+		dummy.addNotify();
+		dummy.setSize(screenFreeSize);
+		Insets frameInsets = dummy.getInsets();
+		dummy.dispose();
+		Dimension frameFreeSize = new Dimension(screenFreeSize.width - frameInsets.right - frameInsets.left,
+				screenFreeSize.height - frameInsets.top - frameInsets.bottom);
+		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width;
+		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height;
+	}
+
+	static Dimension scaleFrame(Dimension size) {
+		return new Dimension((int)(size.width * frameWidthScale), (int)(size.height * frameHeightScale));
 	}
 
 	static Dimension scale(Dimension size) {
-		return new Dimension((int)(size.width * widthScale), (int)(size.height * heightScale));
+		return new Dimension((int)(size.width * compWidthScale), (int)(size.height * compHeightScale));
+	}
+
+	static Point scaleFrame(Point pos) {
+		return new Point((int)(pos.x * frameWidthScale), (int)(pos.y * frameHeightScale));
 	}
 
 	static Point scale(Point pos) {
-		return new Point((int)(pos.x * widthScale), (int)(pos.y * heightScale));
+		return new Point((int)(pos.x * compWidthScale), (int)(pos.y * compHeightScale));
 	}
 
 	static Font scale(Font font) {
 		AffineTransform t = new AffineTransform();
-		t.setToScale(widthScale, heightScale);
+		t.setToScale(compWidthScale, compHeightScale);
 		return font.deriveFont(font.getStyle(), t);
 	}
 
 	static void centerWindow(Window window) {
-		window.setLocation(center.x - window.getWidth() / 2, center.y - window.getHeight() / 2);
+		window.setLocation(screenFreeSize.width / 2 - window.getWidth() / 2, screenFreeSize.height / 2 - window.getHeight() / 2);
 	}
 
 	static Dimension getScreenSize() {
