@@ -71,9 +71,6 @@ final class ScreenScale {
 		frameFreeSize.height -= frameInsetsSize.height;
 		frameWidthScale = frameFreeSize.width / (double)screenSize.width;
 		frameHeightScale = frameFreeSize.height / (double)screenSize.height;
-		System.out.println("frameInsetsSize=" + frameInsetsSize);
-		System.out.println("screenInsetsSize=" + screenInsetsSize);
-		System.out.println("screenFreeSize=" + screenFreeSize);
 		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width - 0.0145; /* TODO: Find an expression to compute this. */
 		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height - 0.0145;
 	}
