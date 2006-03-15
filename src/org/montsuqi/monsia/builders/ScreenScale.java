@@ -71,8 +71,10 @@ final class ScreenScale {
 		frameFreeSize.height -= frameInsetsSize.height;
 		frameWidthScale = frameFreeSize.width / (double)screenSize.width;
 		frameHeightScale = frameFreeSize.height / (double)screenSize.height;
-		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width - 0.0145; /* TODO: Find an expression to compute this. */
-		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height - 0.0145;
+		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width
+			- screenInsetsSize.width / (double)screenSize.width;
+		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height
+			- screenInsetsSize.height / (double)screenSize.height + 0.025; /* TODO Eliminate this magic number! */
 	}
 
 	static Dimension scaleFrame(Dimension size) {
