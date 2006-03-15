@@ -102,7 +102,7 @@ final class ScreenScale {
 
 	static void centerWindow(Window window) {
 		final int x = (screenFreeSize.width - window.getWidth()) / 2 + screenInsets.left;
-		final int y = (screenFreeSize.height - window.getHeight()) / 2 + screenInsets.right;
+		final int y = (screenFreeSize.height - window.getHeight()) / 2 + screenInsets.top;
 		window.setLocation(x, y);
 	}
 
