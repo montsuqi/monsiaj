@@ -35,6 +35,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JFrame;
 
 final class ScreenScale {
+	private static final Insets screenInsets;
 	private static final Dimension screenSize;
 	private static final Dimension screenFreeSize;
 	private static final Dimension frameFreeSize;
@@ -48,12 +49,11 @@ final class ScreenScale {
 		final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final GraphicsDevice gd = ge.getDefaultScreenDevice();
 		final GraphicsConfiguration gc = gd.getDefaultConfiguration();
-		final Insets insets = tk.getScreenInsets(gc);
-
+		screenInsets = tk.getScreenInsets(gc);
 		screenSize = tk.getScreenSize();
 		screenFreeSize = new Dimension(screenSize);
-		screenFreeSize.width -= insets.left + insets.right;
-		screenFreeSize.height -= insets.top + insets.bottom;
+		screenFreeSize.width -= screenInsets.left + screenInsets.right;
+		screenFreeSize.height -= screenInsets.top + screenInsets.bottom;
 
 		final JFrame dummy = new JFrame("DUMMY FRAME FOR METRICS CALCULATION");
 		dummy.addNotify();
@@ -101,8 +101,8 @@ final class ScreenScale {
 	}
 
 	static void centerWindow(Window window) {
-		final int x = (screenFreeSize.width - window.getWidth()) / 2;
-		final int y = (screenFreeSize.height - window.getHeight()) / 2;
+		final int x = (screenFreeSize.width - window.getWidth()) / 2 + screenInsets.left;
+		final int y = (screenFreeSize.height - window.getHeight()) / 2 + screenInsets.right;
 		window.setLocation(x, y);
 	}
 
