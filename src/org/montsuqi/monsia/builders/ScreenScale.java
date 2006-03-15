@@ -39,11 +39,14 @@ final class ScreenScale {
 	private static final Dimension screenSize;
 	private static final Dimension screenFreeSize;
 	private static final Dimension frameFreeSize;
+	private static final Dimension screenInsetsSize;
+	private static final Dimension frameInsetsSize;
 	private static final Insets frameInsets;
 	private static final double frameWidthScale;
 	private static final double frameHeightScale;
 	private static final double compWidthScale;
 	private static final double compHeightScale;
+
 	static {
 		final Toolkit tk = Toolkit.getDefaultToolkit();
 		final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -51,28 +54,33 @@ final class ScreenScale {
 		final GraphicsConfiguration gc = gd.getDefaultConfiguration();
 		screenInsets = tk.getScreenInsets(gc);
 		screenSize = tk.getScreenSize();
+		screenInsetsSize = new Dimension(screenInsets.left + screenInsets.right, screenInsets.top + screenInsets.bottom);
 		screenFreeSize = new Dimension(screenSize);
-		screenFreeSize.width -= screenInsets.left + screenInsets.right;
-		screenFreeSize.height -= screenInsets.top + screenInsets.bottom;
+		screenFreeSize.width -= screenInsetsSize.width;
+		screenFreeSize.height -= screenInsetsSize.height;
 
 		final JFrame dummy = new JFrame("DUMMY FRAME FOR METRICS CALCULATION");
 		dummy.addNotify();
 		dummy.setSize(screenFreeSize);
 		frameInsets = dummy.getInsets();
 		dummy.dispose();
+		frameInsetsSize = new Dimension(frameInsets.left + frameInsets.right, frameInsets.top + frameInsets.bottom);
 
 		frameFreeSize = new Dimension(screenFreeSize);
-		frameFreeSize.width -= frameInsets.left + frameInsets.right;
-		frameFreeSize.height -= frameInsets.top + frameInsets.bottom;
+		frameFreeSize.width -= frameInsetsSize.width;
+		frameFreeSize.height -= frameInsetsSize.height;
 		frameWidthScale = frameFreeSize.width / (double)screenSize.width;
 		frameHeightScale = frameFreeSize.height / (double)screenSize.height;
-		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width;
-		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height;
+		System.out.println("frameInsetsSize=" + frameInsetsSize);
+		System.out.println("screenInsetsSize=" + screenInsetsSize);
+		System.out.println("screenFreeSize=" + screenFreeSize);
+		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width - 0.0145; /* TODO: Find an expression to compute this. */
+		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height - 0.0145;
 	}
 
 	static Dimension scaleFrame(Dimension size) {
-		final int width = (int)(size.width * frameWidthScale) + frameInsets.right + frameInsets.left;
-		final int height = (int)(size.height * frameHeightScale) + frameInsets.top + frameInsets.bottom;
+		final int width = (int)(size.width * frameWidthScale) + frameInsetsSize.width;
+		final int height = (int)(size.height * frameHeightScale) + frameInsetsSize.height;
 		return new Dimension(width, height);
 	}
 
