@@ -161,7 +161,7 @@ public class Client implements Runnable {
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
 		System.setProperty("javax.net.ssl.keyStore", fileName);
-		String pass = conf.getClientCertificatePass();
+		String pass = conf.getClientCertificatePassword();
 		if (pass != null && pass.length() > 0) {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
 		}

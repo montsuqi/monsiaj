@@ -44,12 +44,13 @@ public class Configuration {
 	private static final String HOST_KEY = "host"; //$NON-NLS-1$
 	private static final String USER_KEY = "user"; //$NON-NLS-1$
 	private static final String CACHE_KEY = "cache"; //$NON-NLS-1$
-	private static final String SAVE_PASSWORD_KEY = "save pass"; //$NON-NLS-1$
+	private static final String SAVE_PASSWORD_KEY = "save_pass"; //$NON-NLS-1$
 	private static final String PASSWORD_KEY = "password"; //$NON-NLS-1$
 	private static final String ENCODING_KEY = "encoding"; //$NON-NLS-1$
 	private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
 	private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
 	private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
+	private static final String SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY = "save_client_certificate_pass"; //$NON-NLS-1$
 	private static final String CLIENT_CERTIFICATE_KEY = "client_certificate"; //$NON-NLS-1$
 	private static final String CLIENT_CERTIFICATE_PASSWORD_KEY = "client_certificate_password"; //$NON-NLS-1$
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
@@ -62,6 +63,7 @@ public class Configuration {
 	static final String DEFAULT_HOST = "localhost"; //$NON-NLS-1$
 	static final String DEFAULT_USER = System.getProperty("user.name"); //$NON-NLS-1$
 	static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
+	static final String DEFAULT_CLIENT_CERTIFICATE_PASSWORD = ""; //$NON-NLS-1$
 	static final String DEFAULT_CLIENT_CERTIFICATE = ""; //$NON-NLS-1$
 	static final boolean DEFAULT_SAVE_PASSWORD = false;
 	static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
@@ -78,6 +80,7 @@ public class Configuration {
 	static final String DEFAULT_STYLES = ""; //$NON-NLS-1$
 	static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties"; //$NON-NLS-1$
 	static final boolean DEFAULT_USE_SSL = false;
+	static final boolean DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD = false;
 	static final boolean DEFAULT_VERIFY = false;
 	static final int DEFAULT_PROTOCOL_VERSION = 1;
 	static final String DEFAULT_LOOK_AND_FEEL_CLASS_NAME = UIManager.getSystemLookAndFeelClassName();
@@ -120,6 +123,31 @@ public class Configuration {
 
 	public void setSavePassword(boolean flag) {
 		setBoolean(SAVE_PASSWORD_KEY, flag);
+	}
+
+	public String getClientCertificatePassword() {
+		if (getBoolean(SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY, false)) {
+			return getString(CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_CLIENT_CERTIFICATE_PASSWORD);
+		} else {
+			return clientCertificatePass;
+		}
+	}
+
+	public void setClientCertificatePassword(String pass) {
+		this.clientCertificatePass = pass;
+		if (getBoolean(SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY, false)) {
+			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, pass);
+		} else {
+			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_CLIENT_CERTIFICATE_PASSWORD);
+		}
+	}
+
+	public boolean getSaveClientCertificatePassword() {
+		return getBoolean(SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD);
+	}
+
+	public void setSaveClientCertificatePassword(boolean flag) {
+		setBoolean(SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY, flag);
 	}
 
 	public int getPort() {
@@ -211,23 +239,6 @@ public class Configuration {
 
 	public void setClientCertificateFileName(String fileName) {
 		setString(CLIENT_CERTIFICATE_KEY, fileName);
-	}
-
-	public String getClientCertificatePass() {
-		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
-			return getString(CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_PASSWORD);
-		} else {
-			return clientCertificatePass;
-		}
-	}
-
-	public void setClientCertificatePass(String pass) {
-		this.clientCertificatePass = pass;
-		if (getBoolean(SAVE_PASSWORD_KEY, false)) {
-			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, pass);
-		} else {
-			setString(CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_PASSWORD);
-		}
 	}
 
 	public int getProtocolVersion() {
