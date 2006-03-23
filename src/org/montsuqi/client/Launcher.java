@@ -31,6 +31,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.SocketException;
+import java.security.GeneralSecurityException;
+import java.text.MessageFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -90,8 +93,27 @@ public class Launcher {
 			t.start();
 			t.join();
 		} catch (Exception e) {
+			Throwable t = e;
+			Throwable cause;
+			while ((cause = t.getCause()) != null) {
+				t = cause;
+			}
 			logger.fatal(e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+			final String className = t.getClass().getName();
+			final String shortClassName = className.replaceAll(".*\\.", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			final Object[] messageArgs = new String[2];
+			messageArgs[1] = t.getMessage();
+			if (t instanceof GeneralSecurityException) {
+				messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
+			} else if (t instanceof SocketException) {
+				messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
+			} else if (t instanceof IOException) {
+				messageArgs[0] = Messages.getString("Launcher.io_exception_message"); //$NON-NLS-1$
+			} else {
+				messageArgs[0] = Messages.getString("Launcher.generic_exception_message"); //$NON-NLS-1$
+			}
+			final String exceptionMessage = MessageFormat.format("<html>{0}({1})", messageArgs); //$NON-NLS-1$
+			JOptionPane.showMessageDialog(null, exceptionMessage, shortClassName, JOptionPane.ERROR_MESSAGE);
 			if (logFrame != null) {
 				logFrame.setExtendedState(Frame.NORMAL);
 			}
