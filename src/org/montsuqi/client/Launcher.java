@@ -46,6 +46,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.StringUtils;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
 
@@ -93,31 +94,35 @@ public class Launcher {
 			t.start();
 			t.join();
 		} catch (Exception e) {
-			Throwable t = e;
-			Throwable cause;
-			while ((cause = t.getCause()) != null) {
-				t = cause;
-			}
 			logger.fatal(e);
-			final String className = t.getClass().getName();
-			final String shortClassName = className.replaceAll(".*\\.", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			final Object[] messageArgs = new String[2];
-			messageArgs[1] = t.getMessage();
-			if (t instanceof GeneralSecurityException) {
-				messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
-			} else if (t instanceof SocketException) {
-				messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
-			} else if (t instanceof IOException) {
-				messageArgs[0] = Messages.getString("Launcher.io_exception_message"); //$NON-NLS-1$
-			} else {
-				messageArgs[0] = Messages.getString("Launcher.generic_exception_message"); //$NON-NLS-1$
-			}
-			final String exceptionMessage = MessageFormat.format("<html>{0}({1})", messageArgs); //$NON-NLS-1$
-			JOptionPane.showMessageDialog(null, exceptionMessage, shortClassName, JOptionPane.ERROR_MESSAGE);
+			showExceptionDialog(e);
 			if (logFrame != null) {
 				logFrame.setExtendedState(Frame.NORMAL);
 			}
 		}
+	}
+
+	private void showExceptionDialog(Exception e) {
+		Throwable t = e;
+		Throwable cause;
+		while ((cause = t.getCause()) != null) {
+			t = cause;
+		}
+		final String[] messageArgs = new String[3];
+		if (t instanceof GeneralSecurityException) {
+			messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
+		} else if (t instanceof SocketException) {
+			messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
+		} else if (t instanceof IOException) {
+			messageArgs[0] = Messages.getString("Launcher.io_exception_message"); //$NON-NLS-1$
+		} else {
+			messageArgs[0] = Messages.getString("Launcher.generic_exception_message"); //$NON-NLS-1$
+		}
+		messageArgs[1] = t.getClass().getName().replaceAll(".*\\.", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		messageArgs[2] = StringUtils.escapeHTML(t.getMessage().replaceAll(":.*", "")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String format = Messages.getString("Launcher.exception_message_format"); //$NON-NLS-1$
+		final String exceptionMessage = MessageFormat.format(format, messageArgs);
+		JOptionPane.showMessageDialog(null, exceptionMessage, messageArgs[0], JOptionPane.ERROR_MESSAGE);
 	}
 
 	protected ConfigurationPanel createConfigurationPanel() {
