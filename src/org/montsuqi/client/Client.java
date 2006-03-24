@@ -204,10 +204,11 @@ public class Client implements Runnable {
 			return new File(securityDirectory, "trusted.jssecacerts");
 			
 		} else if (SystemEnvironment.isMacOSX()){
-			File path = SystemEnvironment.createFilePath(new String[] {
-				home, "Library", "Caches", "Java Applets", "security"	
+			final String javaHome = System.getProperty("java.home"); //$NON-NLS-1$
+			final File path = SystemEnvironment.createFilePath(new String[] {
+				javaHome, "lib", "security" //$NON-NLS-1$ //$NON-NLS-2$
 			});
-			return new File(path, "deployment.certs");
+			return new File(path, "cacerts");
 		} else {
 			File path = SystemEnvironment.createFilePath(new String[] {
 				home, ".java", "deployment", "security"
