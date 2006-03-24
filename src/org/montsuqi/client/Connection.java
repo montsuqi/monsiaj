@@ -318,7 +318,7 @@ class Connection {
 	public synchronized void sendFixedData(int type, BigDecimal xval) throws IOException {
 		if (type == Type.NUMBER) {
 			type = Type.TEXT;
-			if (xval.intValue() == 0) {
+			if (xval.movePointRight(xval.scale()).equals(ZERO)) {
 				xval = ZERO;
 			}
 		}
