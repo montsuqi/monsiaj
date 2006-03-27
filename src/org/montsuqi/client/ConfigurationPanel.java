@@ -136,7 +136,7 @@ public class ConfigurationPanel extends JPanel {
 	// SSL Tab
 	protected JCheckBox useSSLCheckbox;
 	protected JTextField clientCertificateEntry;
-	private JButton browseButton;
+	protected JButton browseButton;
 	protected JPasswordField exportPasswordEntry;
 	protected JCheckBox saveClientCertificatePasswordCheckbox;
 
