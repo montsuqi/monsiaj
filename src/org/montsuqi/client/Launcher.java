@@ -35,6 +35,7 @@ import java.net.SocketException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 
+import javax.net.ssl.SSLException;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -111,6 +112,8 @@ public class Launcher {
 		final String[] messageArgs = new String[3];
 		if (t instanceof GeneralSecurityException) {
 			messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
+		} else if (t instanceof SSLException) {
+			messageArgs[0] = Messages.getString("Launcher.ssl_exception_message"); //$NON-NLS-1$
 		} else if (t instanceof SocketException) {
 			messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
 		} else if (t instanceof IOException) {
