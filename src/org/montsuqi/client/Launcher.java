@@ -28,6 +28,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -95,6 +97,8 @@ public class Launcher {
 			ExceptionDialog.showExceptionDialog(e);
 			if (logFrame != null) {
 				logFrame.setExtendedState(Frame.NORMAL);
+			} else {
+				client.exitSystem();
 			}
 		}
 	}
@@ -170,6 +174,11 @@ public class Launcher {
 
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		f.addWindowListener(new WindowAdapter() {
+			public void windowClosed(WindowEvent e) {
+				client.exitSystem();
+			}
+		});
 		return f;
 	}
 }
