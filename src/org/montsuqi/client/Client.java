@@ -32,13 +32,22 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.security.auth.x500.X500Principal;
 
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
@@ -47,8 +56,50 @@ import org.montsuqi.util.SystemEnvironment;
 
 public class Client implements Runnable {
 
+	private final class DnChecker implements HandshakeCompletedListener {
+		private final String host;
+		private boolean matched;
+
+		private DnChecker(String host) {
+			super();
+			this.host = host;
+			this.matched = false;
+		}
+
+		public void handshakeCompleted(HandshakeCompletedEvent evt) {
+			try {
+				Certificate[] certs = evt.getPeerCertificates();
+				if (certs[0] instanceof X509Certificate) {
+					X509Certificate x509cert = (X509Certificate)certs[0];
+					X500Principal principal = x509cert.getSubjectX500Principal();
+					String name = principal.getName();
+					String[] parts = name.split("\\s*,\\s*");
+					Pattern pattern = Pattern.compile("\\ACN\\s*=\\s*(.*)");
+					for (int i = 0; i < parts.length; i++) {
+						Matcher match = pattern.matcher(parts[i]);
+						if (match.matches()) {
+							String value = match.group(1);
+							if (value.equals(host)) {
+								matched = true;
+								break;
+							}
+						}
+					}
+				} else {
+					throw new SSLPeerUnverifiedException("Certificate is not a X509 Certificate");
+				}
+			} catch (SSLPeerUnverifiedException e) {
+				logger.warn(e);
+			}
+		}
+
+		public boolean isMatched() {
+			return matched;
+		}
+	}
+
 	private Configuration conf;
-	private Logger logger;
+	Logger logger;
 	private Protocol protocol;
 
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
@@ -145,7 +196,12 @@ public class Client implements Runnable {
 			return socket;
 		}
 		SSLSocket sslSocket = createSSLSocket(host, port, socket);
+		final DnChecker checkDn = new DnChecker(host);
+		sslSocket.addHandshakeCompletedListener(checkDn);
 		sslSocket.startHandshake();
+		if ( ! checkDn.isMatched()) {
+			throw new SSLHandshakeException("DN mismatch");
+		}
 		return sslSocket;
 	}
 
