@@ -68,17 +68,17 @@ public class Client implements Runnable {
 
 		public void handshakeCompleted(HandshakeCompletedEvent evt) {
 			try {
-				Certificate[] certs = evt.getPeerCertificates();
+				final Certificate[] certs = evt.getPeerCertificates();
 				if (certs[0] instanceof X509Certificate) {
-					X509Certificate x509cert = (X509Certificate)certs[0];
-					X500Principal principal = x509cert.getSubjectX500Principal();
-					String name = principal.getName();
-					String[] parts = name.split("\\s*,\\s*");
-					Pattern pattern = Pattern.compile("\\ACN\\s*=\\s*(.*)");
+					final X509Certificate x509cert = (X509Certificate)certs[0];
+					final X500Principal principal = x509cert.getSubjectX500Principal();
+					final String name = principal.getName();
+					final String[] parts = name.split("\\s*,\\s*");
+					final Pattern pattern = Pattern.compile("\\ACN\\s*=\\s*(.*)");
 					for (int i = 0; i < parts.length; i++) {
-						Matcher match = pattern.matcher(parts[i]);
+						final Matcher match = pattern.matcher(parts[i]);
 						if (match.matches()) {
-							String value = match.group(1);
+							final String value = match.group(1);
 							if (value.equals(host)) {
 								matched = true;
 								break;
