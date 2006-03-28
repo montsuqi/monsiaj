@@ -164,7 +164,7 @@ public class Client implements Runnable {
 			final X509Certificate certificate = (X509Certificate)serverCertificate;
 			final X500Principal principal = certificate.getSubjectX500Principal();
 			final String name = principal.getName();
-			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,]+)", Pattern.CASE_INSENSITIVE);
+			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE);
 			final Matcher matcher = pattern.matcher(name);
 			final String host = conf.getHost();
 			if ( ! matcher.find() || ! matcher.group(1).equalsIgnoreCase(host)) {
