@@ -41,10 +41,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.security.auth.x500.X500Principal;
@@ -55,48 +53,6 @@ import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
 
 public class Client implements Runnable {
-
-	private final class DnChecker implements HandshakeCompletedListener {
-		private final String host;
-		private boolean matched;
-
-		private DnChecker(String host) {
-			super();
-			this.host = host;
-			this.matched = false;
-		}
-
-		public void handshakeCompleted(HandshakeCompletedEvent evt) {
-			try {
-				final Certificate[] certs = evt.getPeerCertificates();
-				if (certs[0] instanceof X509Certificate) {
-					final X509Certificate x509cert = (X509Certificate)certs[0];
-					final X500Principal principal = x509cert.getSubjectX500Principal();
-					final String name = principal.getName();
-					final String[] parts = name.split("\\s*,\\s*");
-					final Pattern pattern = Pattern.compile("\\ACN\\s*=\\s*(.*)");
-					for (int i = 0; i < parts.length; i++) {
-						final Matcher match = pattern.matcher(parts[i]);
-						if (match.matches()) {
-							final String value = match.group(1);
-							if (value.equals(host)) {
-								matched = true;
-								break;
-							}
-						}
-					}
-				} else {
-					throw new SSLPeerUnverifiedException("Certificate is not a X509 Certificate");
-				}
-			} catch (SSLPeerUnverifiedException e) {
-				logger.warn(e);
-			}
-		}
-
-		public boolean isMatched() {
-			return matched;
-		}
-	}
 
 	private Configuration conf;
 	Logger logger;
@@ -195,14 +151,28 @@ public class Client implements Runnable {
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
-		SSLSocket sslSocket = createSSLSocket(host, port, socket);
-		final DnChecker checkDn = new DnChecker(host);
-		sslSocket.addHandshakeCompletedListener(checkDn);
-		sslSocket.startHandshake();
-		if ( ! checkDn.isMatched()) {
-			throw new SSLHandshakeException("DN mismatch");
-		}
+		final SSLSocket sslSocket = createSSLSocket(host, port, socket);
+		verifySSLSocket(sslSocket);
 		return sslSocket;
+	}
+
+	private void verifySSLSocket(final SSLSocket sslSocket) throws SSLPeerUnverifiedException {
+		final SSLSession session = sslSocket.getSession();
+		final Certificate[] certificates = session.getPeerCertificates();
+		final Certificate serverCertificate = certificates[0];
+		if (serverCertificate instanceof X509Certificate) {
+			final X509Certificate certificate = (X509Certificate)serverCertificate;
+			final X500Principal principal = certificate.getSubjectX500Principal();
+			final String name = principal.getName();
+			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,]+)", Pattern.CASE_INSENSITIVE);
+			final Matcher matcher = pattern.matcher(name);
+			final String host = conf.getHost();
+			if ( ! matcher.find() || ! matcher.group(1).equalsIgnoreCase(host)) {
+				throw new SSLPeerUnverifiedException("DN mismatch");
+			}
+		} else {
+			logger.warn("Server Certificate is not a X.509 Certificate");
+		}
 	}
 
 	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
