@@ -170,7 +170,7 @@ public class Client implements Runnable {
 	private void testHostNameInCertificate(final X509Certificate certificate) throws SSLPeerUnverifiedException {
 		final String host = conf.getHost();
 		// no check against these hostnames.
-		if ("localhost".equals(host) // $NON-NLS-1$
+		if ("localhost".equalsIgnoreCase(host) // $NON-NLS-1$
 			|| "127.0.0.1".equals(host) // $NON-NLS-1$
 			|| "::1".equals(host)) { // $NON-NLS-1$
 			return;
