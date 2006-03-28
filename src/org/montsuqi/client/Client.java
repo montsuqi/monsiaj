@@ -33,9 +33,13 @@ import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -152,27 +156,58 @@ public class Client implements Runnable {
 			return socket;
 		}
 		final SSLSocket sslSocket = createSSLSocket(host, port, socket);
-		verifySSLSocket(sslSocket);
-		return sslSocket;
-	}
-
-	private void verifySSLSocket(final SSLSocket sslSocket) throws SSLPeerUnverifiedException {
 		final SSLSession session = sslSocket.getSession();
 		final Certificate[] certificates = session.getPeerCertificates();
 		final Certificate serverCertificate = certificates[0];
 		if (serverCertificate instanceof X509Certificate) {
-			final X509Certificate certificate = (X509Certificate)serverCertificate;
-			final X500Principal principal = certificate.getSubjectX500Principal();
-			final String name = principal.getName();
-			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE);
-			final Matcher matcher = pattern.matcher(name);
-			final String host = conf.getHost();
-			if ( ! matcher.find() || ! matcher.group(1).equalsIgnoreCase(host)) {
-				throw new SSLPeerUnverifiedException("DN mismatch");
-			}
+			testHostNameInCertificate((X509Certificate)serverCertificate);
 		} else {
 			logger.warn("Server Certificate is not a X.509 Certificate");
 		}
+		return sslSocket;
+	}
+
+	private void testHostNameInCertificate(final X509Certificate certificate) throws SSLPeerUnverifiedException {
+		final String host = conf.getHost();
+		// no check against these hostnames.
+		if ("localhost".equals(host) // $NON-NLS-1$
+			|| "127.0.0.1".equals(host) // $NON-NLS-1$
+			|| "::1".equals(host)) { // $NON-NLS-1$
+			return;
+		}
+		// check subjectAlternativeNames first.
+		try {
+			final Collection subjectAlternativeNames = certificate.getSubjectAlternativeNames();
+			if (subjectAlternativeNames == null) {
+				logger.info("Server certificate does not have subjectAlternativeNames.");
+			} else {
+				final Iterator i = subjectAlternativeNames.iterator();
+				while (i.hasNext()) {
+					final List alternativeName = (List)i.next();
+					final Integer type = (Integer)alternativeName.get(0);
+					if (type.intValue() == 2) { // dNSName. No symbolic names!
+						final String value = (String)alternativeName.get(1);
+						if (value.equals(host)) {
+							logger.info("One of subjectAlternativeNames matches.");
+							return;
+						}
+					}
+				}
+			}
+		} catch (CertificateParsingException e) {
+			SSLPeerUnverifiedException sslpue = new SSLPeerUnverifiedException(e.getMessage());
+			sslpue.initCause(e);
+			throw sslpue;
+		}
+		// If the flow comes here, check commonName then.
+		final X500Principal principal = certificate.getSubjectX500Principal();
+		final String name = principal.getName();
+		final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE);
+		final Matcher matcher = pattern.matcher(name);
+		if ( ! matcher.find() || ! matcher.group(1).equalsIgnoreCase(host)) {
+			throw new SSLPeerUnverifiedException("Hostname mismatch: " + matcher.group(1) + " vs " + host);
+		}
+		logger.info("CN matches.");
 	}
 
 	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
