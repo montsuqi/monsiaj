@@ -99,6 +99,8 @@ public class Launcher {
 			showExceptionDialog(e);
 			if (logFrame != null) {
 				logFrame.setExtendedState(Frame.NORMAL);
+			} else {
+				client.exitSystem();
 			}
 		}
 	}
