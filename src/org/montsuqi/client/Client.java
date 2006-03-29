@@ -190,7 +190,7 @@ public class Client implements Runnable {
 
 	private boolean isMissingPassphraseMessage(String message) {
 		return message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
-			message.indexOf("Get Key failed") >= 0 && message.indexOf("/ by zero") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
+			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private void validateLocalCertificates(final Certificate[] certificates) throws SSLException {
