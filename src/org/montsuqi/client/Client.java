@@ -164,7 +164,9 @@ public class Client implements Runnable {
 		}
 		try {
 			final SSLSocket sslSocket = createSSLSocket(host, port, socket);
+			sslSocket.startHandshake();
 			final SSLSession session = sslSocket.getSession();
+
 			validatePeerCertificates(session.getPeerCertificates());
 			return sslSocket;
 		} catch (SocketException e) {
