@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -164,9 +165,6 @@ public class Client implements Runnable {
 		try {
 			final SSLSocket sslSocket = createSSLSocket(host, port, socket);
 			final SSLSession session = sslSocket.getSession();
-			logger.debug("Checking local certificate chain"); //$NON-NLS-1$
-			validateLocalCertificates(session.getLocalCertificates());
-			logger.debug("Checking peer certificate chain"); //$NON-NLS-1$
 			validatePeerCertificates(session.getPeerCertificates());
 			return sslSocket;
 		} catch (SocketException e) {
@@ -193,30 +191,7 @@ public class Client implements Runnable {
 			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	private void validateLocalCertificates(final Certificate[] certificates) throws SSLException {
-		if (certificates == null) {
-			return;
-		}
-		for (int i = 0; i < certificates.length; i++) {
-			if (certificates[i] instanceof X509Certificate) {
-				checkCertificateExpiration(((X509Certificate)certificates[i]),
-					Messages.getString("Client.client_certificate_expired_format"),
-					Messages.getString("Client.client_certificate_not_yet_valid_format"));
-			}
-		}
-	}
-
 	private void validatePeerCertificates(final Certificate[] certificates) throws SSLException {
-		if (certificates == null) {
-			return;
-		}
-		for (int i = 0; i < certificates.length; i++) {
-			if (certificates[i] instanceof X509Certificate) {
-				checkCertificateExpiration((X509Certificate)certificates[i],
-					Messages.getString("Client.server_certificate_expired_format"),
-					Messages.getString("Client.server_certificate_not_yet_valid_format"));
-			}
-		}
 		final Certificate serverCertificate = certificates[0];
 		if (serverCertificate instanceof X509Certificate) {
 			checkHostNameInCertificate((X509Certificate)serverCertificate);
@@ -314,10 +289,21 @@ public class Client implements Runnable {
 			String password = conf.getClientCertificatePassword();
 			FileInputStream fis = new FileInputStream(file);
 			ks.load(fis, password.toCharArray());
+			final Enumeration e = ks.aliases();
+			final String alias = (String)e.nextElement();
+			assert ! e.hasMoreElements();
+			final Certificate certificate = ks.getCertificate(alias);
+			if (certificate instanceof X509Certificate) {
+				checkCertificateExpiration((X509Certificate)certificate,
+						Messages.getString("Client.client_certificate_expired_format"),
+						Messages.getString("Client.client_certificate_not_yet_valid_format"));
+			}
 		} catch (FileNotFoundException e) {
 			SSLException ssle = new SSLException(e.getMessage());
 			ssle.initCause(e);
 			throw ssle;
+		} catch (SSLException e) {
+			throw e;
 		} catch (IOException e) {
 			Throwable t = e.getCause();
 			if (t instanceof BadPaddingException) {
