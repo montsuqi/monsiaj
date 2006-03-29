@@ -193,13 +193,13 @@ public class Client implements Runnable {
 	}
 
 	private boolean isBadPkcs12Message(final String message) {
-		return message.contains("Default SSL context init failed") && //$NON-NLS-1$
-			(message.contains("DerInputStream rejects") || message.contains("DER input, Integer tag error")); //$NON-NLS-1$ //$NON-NLS-2$
+		return message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
+			(message.indexOf("DerInputStream rejects") >= 0 || message.indexOf("DER input, Integer tag error") >= 0); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private boolean isMissingPassphraseMessage(String message) {
-		return message.contains("Default SSL context init failed") && //$NON-NLS-1$
-			message.contains("Get Key failed") && message.contains("/ by zero"); //$NON-NLS-1$ //$NON-NLS-2$
+		return message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
+			message.indexOf("Get Key failed") >= 0 && message.indexOf("/ by zero") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private void validateLocalCertificates(final Certificate[] certificates) throws SSLException {
