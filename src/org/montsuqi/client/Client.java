@@ -33,6 +33,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -48,6 +49,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.crypto.BadPaddingException;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
@@ -168,33 +170,22 @@ public class Client implements Runnable {
 			validatePeerCertificates(session.getPeerCertificates());
 			return sslSocket;
 		} catch (SocketException e) {
-			if (isBadPkcs12Message(e.getMessage())) {
-				final File file = new File(conf.getClientCertificateFileName());
-				final Object[] args = { file.getName() };
-				final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
-				final String message = MessageFormat.format(format, args);
-				throw new SSLException(message);
-			} else if (isMissingPassphraseMessage(e.getMessage())) {
+			if (isMissingPassphraseMessage(e.getMessage())) {
 				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
 				throw new SSLException(message);
 			} else {
 				throw e;
 			}
-		} catch (FileNotFoundException e) {
-			final String path = e.getMessage();
-			final File file = new File(path);
-			final Object[] args = { file.getName() };
-			final String format = Messages.getString("Client.file_not_found_format"); //$NON-NLS-1$
-			final String message = MessageFormat.format(format, args);
-			throw new SSLException(message);
 		} catch (IOException e) {
+			if (isBrokenPipeMessage(e.getMessage())) {
+				throw new IOException(Messages.getString("Client.broken_pipe")); //$NON-NLS-1$
+			}
 			throw e;
 		}
 	}
 
-	private boolean isBadPkcs12Message(final String message) {
-		return message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
-			(message.indexOf("DerInputStream rejects") >= 0 || message.indexOf("DER input, Integer tag error") >= 0); //$NON-NLS-1$ //$NON-NLS-2$
+	private boolean isBrokenPipeMessage(String message) {
+		return message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
 	}
 
 	private boolean isMissingPassphraseMessage(String message) {
@@ -270,7 +261,7 @@ public class Client implements Runnable {
 					final Integer type = (Integer)alternativeName.get(0);
 					if (type.intValue() == 2) { // dNSName. No symbolic names!
 						final String value = (String)alternativeName.get(1);
-						if (value.equals(host)) {
+						if (value.equalsIgnoreCase(host)) {
 							logger.info("One of subjectAlternativeNames matches.");
 							return;
 						}
@@ -306,19 +297,47 @@ public class Client implements Runnable {
 		}
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
-		final File file = new File(fileName);
-		if ( ! file.exists()) {
-			throw new FileNotFoundException(fileName);
-		}
 		System.setProperty("javax.net.ssl.keyStore", fileName);
 		String pass = conf.getClientCertificatePassword();
 		if (pass != null && pass.length() > 0) {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
 		}
+		checkPkcs12FileFormat();
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		return (SSLSocket)factory.createSocket(socket, host, port, true);
 	}
 
+	private void checkPkcs12FileFormat() throws IOException {
+		try {
+			KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+			File file = new File(conf.getClientCertificateFileName());
+			String password = conf.getClientCertificatePassword();
+			FileInputStream fis = new FileInputStream(file);
+			ks.load(fis, password.toCharArray());
+		} catch (FileNotFoundException e) {
+			SSLException ssle = new SSLException(e.getMessage());
+			ssle.initCause(e);
+			throw ssle;
+		} catch (IOException e) {
+			Throwable t = e.getCause();
+			if (t instanceof BadPaddingException) {
+				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
+				final SSLException ssle = new SSLException(message);
+				throw ssle;
+			} else {
+				final File file = new File(conf.getClientCertificateFileName());
+				final Object[] args = { file.getName() };
+				final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
+				final String message = MessageFormat.format(format, args);
+				final SSLException ssle = new SSLException(message);
+				throw ssle;
+			}
+		} catch (Exception e) {
+			IOException ioe = new IOException(e.getMessage());
+			ioe.initCause(e);
+			throw ioe;
+		}
+	}
 	private boolean getUseBrowserSetting() {
 		if ( ! SystemEnvironment.isWindows()) {
 			return false;
@@ -379,7 +398,9 @@ public class Client implements Runnable {
 	void exitSystem() {
 		try {
 			synchronized (this) {
-				protocol.sendPacketClass(PacketClass.END);
+				if (protocol != null) {
+					protocol.sendPacketClass(PacketClass.END);
+				}
 			}
 		} catch (Exception e) {
 			logger.warn(e);

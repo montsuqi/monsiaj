@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.SocketException;
-import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 
 import javax.net.ssl.SSLException;
@@ -113,9 +112,8 @@ public class Launcher {
 		}
 		final String exceptionDialogTitle = Messages.getString("Launcher.exception_dialog_title"); //$NON-NLS-1$
 		final String[] messageArgs = new String[3];
-		if (t instanceof GeneralSecurityException) {
-			messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
-		} else if (t instanceof SSLException) {
+
+		if (t instanceof SSLException) {
 			messageArgs[0] = Messages.getString("Launcher.ssl_exception_message"); //$NON-NLS-1$
 		} else if (t instanceof SocketException) {
 			messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
@@ -128,7 +126,6 @@ public class Launcher {
 		messageArgs[2] = StringUtils.escapeHTML(t.getMessage()).replaceAll("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
 		final String format = Messages.getString("Launcher.exception_message_format"); //$NON-NLS-1$
 		final String exceptionMessage = MessageFormat.format(format, messageArgs);
-		System.out.println(exceptionMessage);
 		JOptionPane.showMessageDialog(null, exceptionMessage, exceptionDialogTitle, JOptionPane.ERROR_MESSAGE);
 	}
 
