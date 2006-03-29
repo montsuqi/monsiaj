@@ -40,8 +40,10 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +59,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.security.auth.x500.X500Principal;
+import javax.swing.JOptionPane;
 
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
@@ -65,6 +68,7 @@ import org.montsuqi.util.SystemEnvironment;
 
 public class Client implements Runnable {
 
+	private static final int DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD = 30;
 	private Configuration conf;
 	Logger logger;
 	private Protocol protocol;
@@ -185,7 +189,7 @@ public class Client implements Runnable {
 	}
 
 	private boolean isBrokenPipeMessage(String message) {
-		return message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
+		return message != null && message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
 	}
 
 	private boolean isMissingPassphraseMessage(String message) {
@@ -278,6 +282,9 @@ public class Client implements Runnable {
 		String pass = conf.getClientCertificatePassword();
 		if (pass != null && pass.length() > 0) {
 			System.setProperty("javax.net.ssl.keyStorePassword", pass);
+		} else {
+			final String message = Messages.getString("Client.empty_pass");
+			throw new SSLException(message);
 		}
 		checkPkcs12FileFormat();
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
@@ -296,9 +303,24 @@ public class Client implements Runnable {
 			assert ! e.hasMoreElements();
 			final Certificate certificate = ks.getCertificate(alias);
 			if (certificate instanceof X509Certificate) {
-				checkCertificateExpiration((X509Certificate)certificate,
-						Messages.getString("Client.client_certificate_expired_format"),
-						Messages.getString("Client.client_certificate_not_yet_valid_format"));
+				final X509Certificate x509certificate = (X509Certificate)certificate;
+				checkCertificateExpiration(x509certificate,
+						Messages.getString("Client.client_certificate_expired_format"), //$NON-NLS-1$
+						Messages.getString("Client.client_certificate_not_yet_valid_format")); //$NON-NLS-1$
+				Date end = x509certificate.getNotAfter();
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(end);
+				int before = getWarnCertificateExpirationThreashold();
+				cal.add(Calendar.DATE, -before);
+				Date oneMonthBeforeEnd = cal.getTime();
+				Date today = new Date();
+				if (today.after(oneMonthBeforeEnd) && today.before(end)) {
+					Object[] args = { x509certificate.getSubjectDN(), end };
+					final String format = Messages.getString("Client.warn_certificate_expiration_format");
+					final String message = MessageFormat.format(format, args);
+					final String title = Messages.getString("Client.warning_title");
+					JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		} catch (FileNotFoundException e) {
 			SSLException ssle = new SSLException(e.getMessage());
@@ -325,6 +347,24 @@ public class Client implements Runnable {
 			ioe.initCause(e);
 			throw ioe;
 		}
+	}
+
+	private int getWarnCertificateExpirationThreashold() {
+		int before = DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD;
+		String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before"); //$NON-NLS-1$
+		if (warnExpirationThreshold != null) {
+			try {
+				int newBefore = Integer.parseInt(warnExpirationThreshold);
+				if (newBefore > 0) {
+					before = newBefore;
+				} else {
+					logger.warn("monsia.warn.certificate.expiration.before must be a positive value, ignored."); //$NON-NLS-1$
+				}
+			} catch (NumberFormatException e) {
+				logger.warn("monsia.warn.certificate.expiration.before is not a number, falling back to default."); //$NON-NLS-1$
+			}
+		}
+		return before;
 	}
 	private boolean getUseBrowserSetting() {
 		if ( ! SystemEnvironment.isWindows()) {
