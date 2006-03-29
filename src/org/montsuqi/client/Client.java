@@ -30,9 +30,12 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
@@ -45,6 +48,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
@@ -155,19 +159,98 @@ public class Client implements Runnable {
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		}
-		final SSLSocket sslSocket = createSSLSocket(host, port, socket);
-		final SSLSession session = sslSocket.getSession();
-		final Certificate[] certificates = session.getPeerCertificates();
+		try {
+			final SSLSocket sslSocket = createSSLSocket(host, port, socket);
+			final SSLSession session = sslSocket.getSession();
+			logger.debug("Checking local certificate chain"); //$NON-NLS-1$
+			validateLocalCertificates(session.getLocalCertificates());
+			logger.debug("Checking peer certificate chain"); //$NON-NLS-1$
+			validatePeerCertificates(session.getPeerCertificates());
+			return sslSocket;
+		} catch (SocketException e) {
+			if (isBadPkcs12Message(e.getMessage())) {
+				final File file = new File(conf.getClientCertificateFileName());
+				final Object[] args = { file.getName() };
+				final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
+				final String message = MessageFormat.format(format, args);
+				throw new SSLException(message);
+			} else if (isMissingPassphraseMessage(e.getMessage())) {
+				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
+				throw new SSLException(message);
+			} else {
+				throw e;
+			}
+		} catch (FileNotFoundException e) {
+			final String path = e.getMessage();
+			final File file = new File(path);
+			final Object[] args = { file.getName() };
+			final String format = Messages.getString("Client.file_not_found_format"); //$NON-NLS-1$
+			final String message = MessageFormat.format(format, args);
+			throw new SSLException(message);
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+
+	private boolean isBadPkcs12Message(final String message) {
+		return message.contains("Default SSL context init failed") && //$NON-NLS-1$
+			(message.contains("DerInputStream rejects") || message.contains("DER input, Integer tag error")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private boolean isMissingPassphraseMessage(String message) {
+		return message.contains("Default SSL context init failed") && //$NON-NLS-1$
+			message.contains("Get Key failed") && message.contains("/ by zero"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private void validateLocalCertificates(final Certificate[] certificates) throws SSLException {
+		if (certificates == null) {
+			return;
+		}
+		for (int i = 0; i < certificates.length; i++) {
+			if (certificates[i] instanceof X509Certificate) {
+				checkCertificateExpiration(((X509Certificate)certificates[i]),
+					Messages.getString("Client.client_certificate_expired_format"),
+					Messages.getString("Client.client_certificate_not_yet_valid_format"));
+			}
+		}
+	}
+
+	private void validatePeerCertificates(final Certificate[] certificates) throws SSLException {
+		if (certificates == null) {
+			return;
+		}
+		for (int i = 0; i < certificates.length; i++) {
+			if (certificates[i] instanceof X509Certificate) {
+				checkCertificateExpiration((X509Certificate)certificates[i],
+					Messages.getString("Client.server_certificate_expired_format"),
+					Messages.getString("Client.server_certificate_not_yet_valid_format"));
+			}
+		}
 		final Certificate serverCertificate = certificates[0];
 		if (serverCertificate instanceof X509Certificate) {
-			testHostNameInCertificate((X509Certificate)serverCertificate);
+			checkHostNameInCertificate((X509Certificate)serverCertificate);
 		} else {
 			logger.warn("Server Certificate is not a X.509 Certificate");
 		}
-		return sslSocket;
 	}
 
-	private void testHostNameInCertificate(final X509Certificate certificate) throws SSLPeerUnverifiedException {
+	private void checkCertificateExpiration(final X509Certificate certificate,
+			final String expiredMessageFormat,
+			final String notYetValidMessageFormat) throws SSLException {
+		try {
+			certificate.checkValidity();
+		} catch (CertificateExpiredException e) {
+			final Object[] args = { certificate.getSubjectDN(), certificate.getNotAfter() };
+			final String message = MessageFormat.format(expiredMessageFormat, args);
+			throw new SSLException(message);
+		} catch (CertificateNotYetValidException e) {
+			final Object[] args = { certificate.getSubjectDN(), certificate.getNotBefore() };
+			final String message = MessageFormat.format(notYetValidMessageFormat, args);
+			throw new SSLException(message);
+		}
+	}
+
+	private void checkHostNameInCertificate(final X509Certificate certificate) throws SSLPeerUnverifiedException {
 		final String host = conf.getHost();
 		// no check against these hostnames.
 		if ("localhost".equalsIgnoreCase(host) // $NON-NLS-1$
@@ -205,7 +288,9 @@ public class Client implements Runnable {
 		final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE);
 		final Matcher matcher = pattern.matcher(name);
 		if ( ! matcher.find() || ! matcher.group(1).equalsIgnoreCase(host)) {
-			throw new SSLPeerUnverifiedException("Hostname mismatch: " + matcher.group(1) + " vs " + host);
+			final String format = Messages.getString("Client.hostname_mismatch_format");
+			final String message = MessageFormat.format(format, new Object[] { matcher.group(1), host });
+			throw new SSLPeerUnverifiedException(message);
 		}
 		logger.info("CN matches.");
 	}
@@ -221,6 +306,10 @@ public class Client implements Runnable {
 		}
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
+		final File file = new File(fileName);
+		if ( ! file.exists()) {
+			throw new FileNotFoundException(fileName);
+		}
 		System.setProperty("javax.net.ssl.keyStore", fileName);
 		String pass = conf.getClientCertificatePassword();
 		if (pass != null && pass.length() > 0) {

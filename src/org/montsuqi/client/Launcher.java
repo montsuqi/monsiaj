@@ -111,6 +111,7 @@ public class Launcher {
 		while ((cause = t.getCause()) != null) {
 			t = cause;
 		}
+		final String exceptionDialogTitle = Messages.getString("Launcher.exception_dialog_title"); //$NON-NLS-1$
 		final String[] messageArgs = new String[3];
 		if (t instanceof GeneralSecurityException) {
 			messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
@@ -124,10 +125,11 @@ public class Launcher {
 			messageArgs[0] = Messages.getString("Launcher.generic_exception_message"); //$NON-NLS-1$
 		}
 		messageArgs[1] = t.getClass().getName().replaceAll(".*\\.", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		messageArgs[2] = StringUtils.escapeHTML(t.getMessage()).replaceAll(":", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
+		messageArgs[2] = StringUtils.escapeHTML(t.getMessage()).replaceAll("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
 		final String format = Messages.getString("Launcher.exception_message_format"); //$NON-NLS-1$
 		final String exceptionMessage = MessageFormat.format(format, messageArgs);
-		JOptionPane.showMessageDialog(null, exceptionMessage, messageArgs[0], JOptionPane.ERROR_MESSAGE);
+		System.out.println(exceptionMessage);
+		JOptionPane.showMessageDialog(null, exceptionMessage, exceptionDialogTitle, JOptionPane.ERROR_MESSAGE);
 	}
 
 	protected ConfigurationPanel createConfigurationPanel() {
