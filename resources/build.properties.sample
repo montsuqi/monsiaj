@@ -1,9 +1,14 @@
 # example of build.properties
 # copy this to the top directory and edit.
-#
-# to deploy signed jar files, run ant as:
-# ant -propertyfile build.properties sign
+# and run ant as:
+# ant -propertyfile build.properties [target]
 
-deploy.dir=/path/to/the/directory/where/jars/will/go
-alias=whatever
-keystore=path/to/keystore
+# to build signed jar files, uncomment these lines.
+#
+#do.sign=yes
+#alias=whatever
+#keystore=/path/to/keystore
+
+# to build binaries without debug info, uncomment this line.
+#
+#javac.debug=yes

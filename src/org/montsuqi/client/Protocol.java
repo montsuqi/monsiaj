@@ -37,12 +37,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
 import javax.swing.SwingUtilities;
 import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
+import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
@@ -99,7 +101,7 @@ public class Protocol extends Connection {
 		return xml;
 	}
 
-	private boolean receiveFile(String name, File file) throws IOException {
+	private synchronized boolean receiveFile(String name, File file) throws IOException {
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
@@ -137,7 +139,6 @@ public class Protocol extends Connection {
 				 if (w != window) {
 					w.showBusyCursor();
 				} else {
-					w.pack();
 					w.hideBusyCursor();
 					w.setVisible(true);
 				}
@@ -180,7 +181,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	void checkScreens(boolean init) throws IOException {
+	synchronized void checkScreens(boolean init) throws IOException {
 		logger.debug("checkScreens");
 		logger.debug("loop over screens");
 		while (receivePacketClass() == PacketClass.QueryScreen) {
@@ -194,7 +195,7 @@ public class Protocol extends Connection {
 		logger.debug("done // checkScreens");
 	}
 
-	private String checkScreen1() throws IOException {
+	private synchronized String checkScreen1() throws IOException {
 		logger.debug("checkScreen one");
 		String name = receiveString();
 		File cacheFile = new File(cacheRoot, name);
@@ -225,7 +226,7 @@ public class Protocol extends Connection {
 		return lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
 	}
 
-	boolean receiveWidgetData(Component widget) throws IOException {
+	synchronized boolean receiveWidgetData(Component widget) throws IOException {
 		Class clazz = widget.getClass();
 		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
 		if (marshaller != null) {
@@ -235,7 +236,7 @@ public class Protocol extends Connection {
 		return false;
 	}
 
-	private boolean sendWidgetData(String name, Component widget) throws IOException {
+	private synchronized boolean sendWidgetData(String name, Component widget) throws IOException {
 		Class clazz = widget.getClass();
 		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
 		if (marshaller != null) {
@@ -245,7 +246,7 @@ public class Protocol extends Connection {
 		return false;
 	}
 
-	private void receiveValueSkip() throws IOException {
+	private synchronized void receiveValueSkip() throws IOException {
 		int type = Type.NULL;
 		if (protocol1) {
 			receiveDataType();
@@ -289,7 +290,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	public void receiveValue(StringBuffer longName, int offset) throws IOException {
+	public synchronized void receiveValue(StringBuffer longName, int offset) throws IOException {
 		if ( ! receiveValueNeedTrace(longName)) {
 			return;
 		}
@@ -306,7 +307,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private void receiveRecordValue(StringBuffer longName, int offset) throws IOException {
+	private synchronized void receiveRecordValue(StringBuffer longName, int offset) throws IOException {
 		for (int i = 0, n = receiveInt(); i < n; i++) {
 			String name = receiveString();
 			longName.replace(offset, longName.length(), '.' + name);
@@ -314,7 +315,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private void receiveArrayValue(StringBuffer longName, int offset) throws IOException {
+	private synchronized void receiveArrayValue(StringBuffer longName, int offset) throws IOException {
 		for (int i = 0, n = receiveInt(); i < n; i++) {
 			String name = '[' + String.valueOf(i) + ']';
 			longName.replace(offset, longName.length(), name);
@@ -322,7 +323,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private boolean receiveValueNeedTrace(StringBuffer longName) throws IOException {
+	private synchronized boolean receiveValueNeedTrace(StringBuffer longName) throws IOException {
 		boolean done = false;
 		boolean needTrace = true;
 		if (protocol1) {
@@ -364,15 +365,15 @@ public class Protocol extends Connection {
 		return needTrace;
 	}
 
-	public String receiveName() throws IOException {
+	public synchronized String receiveName() throws IOException {
 		return receiveString();
 	}
 
-	public void sendName(String name) throws IOException {
+	public synchronized void sendName(String name) throws IOException {
 		sendString(name);
 	}
 
-	private void resetTimer(Component widget) {
+	private synchronized void resetTimer(Component widget) {
 		if (widget instanceof PandaTimer) {
 			((PandaTimer)widget).reset();
 		} else if (widget instanceof Container) {
@@ -383,7 +384,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private void clearPreview(Component widget) {
+	private synchronized void clearPreview(Component widget) {
 		if (widget instanceof PandaPreviewPane) {
 			PandaPreviewPane preview = (PandaPreviewPane)widget;
 			preview.clear();
@@ -476,7 +477,7 @@ public class Protocol extends Connection {
 		return fCancel;
 	}
 
-	void sendConnect(String user, String pass, String app) throws IOException {
+	synchronized void sendConnect(String user, String pass, String app) throws IOException {
 		sendPacketClass(PacketClass.Connect);
 		sendVersionString();
 		sendString(user);
@@ -501,7 +502,7 @@ public class Protocol extends Connection {
 		}
 	}
 
-	private void sendVersionString() throws IOException {
+	private synchronized void sendVersionString() throws IOException {
 		byte[] bytes = VERSION.getBytes();
 		sendChar((byte)(bytes.length & 0xff));
 		sendChar((byte)0);
@@ -511,7 +512,7 @@ public class Protocol extends Connection {
 		((OutputStream)out).flush();
 	}
 
-	void sendEvent(String window, String widget, String event) throws IOException {
+	synchronized void sendEvent(String window, String widget, String event) throws IOException {
 		Object[] args = { window, widgetName, event };
 		logger.debug("sendEvent: window={0}, widget={1}, event={2}", args);
 		sendPacketClass(PacketClass.Event);
@@ -521,7 +522,7 @@ public class Protocol extends Connection {
 		logger.debug("done // sendEvent");
 	}
 
-	void sendWindowData() throws IOException {
+	synchronized void sendWindowData() throws IOException {
 		logger.debug("sendWindowData");
 		Iterator i = nodeTable.keySet().iterator();
 		logger.debug("loop over nodes");
@@ -534,7 +535,7 @@ public class Protocol extends Connection {
 		logger.debug("done // sendWindowData");
 	}
 
-	private void sendWndowData1(String windowName) throws IOException {
+	private synchronized void sendWndowData1(String windowName) throws IOException {
 		logger.debug("sendWindowData one for {0}", windowName);
 		sendPacketClass(PacketClass.WindowName);
 		sendString(windowName);
@@ -609,5 +610,10 @@ public class Protocol extends Connection {
 
 	public StringBuffer getWidgetNameBuffer() {
 		return widgetName;
+	}
+
+	public void exceptionOccured(IOException e) {
+		ExceptionDialog.showExceptionDialog(e);
+		client.exitSystem();
 	}
 }

@@ -195,7 +195,7 @@ public class Configuration {
 		if (styleFileName != null && styleFileName.length() > 0) {
 			File file = new File(styleFileName);
 			try {
-				return file.toURL();
+				return file.toURI().toURL();
 			} catch (MalformedURLException e) {
 				logger.warn(e);
 			}
@@ -269,7 +269,7 @@ public class Configuration {
 	}
 
 	public String getProperties() {
-		final String properties = getString(PROPERTIES_KEY, "");
+		final String properties = getString(PROPERTIES_KEY, ""); //$NON-NLS-1$
 		updateSystemProperties(properties);
 		return properties;
 	}
@@ -285,7 +285,7 @@ public class Configuration {
 		String line;
 		try {
 			while ((line = br.readLine()) != null) {
-				String[] pair = line.split("\\s*=\\s*");
+				String[] pair = line.split("\\s*=\\s*"); //$NON-NLS-1$
 				if (pair.length == 2) {
 					String key = pair[0].trim();
 					String value = pair[1].trim();
@@ -295,10 +295,12 @@ public class Configuration {
 		} catch (IOException e) {
 			logger.warn(e);
 		} finally {
-			try {
-				br.close();
-			} catch (IOException e) {
-				logger.warn(e);
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					// do nothing
+				}
 			}
 		}
 	}

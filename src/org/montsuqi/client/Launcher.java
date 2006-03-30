@@ -28,13 +28,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.SocketException;
-import java.text.MessageFormat;
 
-import javax.net.ssl.SSLException;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -46,9 +45,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
-import org.montsuqi.util.StringUtils;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
+import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
 
@@ -95,38 +94,13 @@ public class Launcher {
 			t.join();
 		} catch (Exception e) {
 			logger.fatal(e);
-			showExceptionDialog(e);
+			ExceptionDialog.showExceptionDialog(e);
 			if (logFrame != null) {
 				logFrame.setExtendedState(Frame.NORMAL);
 			} else {
 				client.exitSystem();
 			}
 		}
-	}
-
-	private void showExceptionDialog(Exception e) {
-		Throwable t = e;
-		Throwable cause;
-		while ((cause = t.getCause()) != null) {
-			t = cause;
-		}
-		final String exceptionDialogTitle = Messages.getString("Launcher.exception_dialog_title"); //$NON-NLS-1$
-		final String[] messageArgs = new String[3];
-
-		if (t instanceof SSLException) {
-			messageArgs[0] = Messages.getString("Launcher.ssl_exception_message"); //$NON-NLS-1$
-		} else if (t instanceof SocketException) {
-			messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
-		} else if (t instanceof IOException) {
-			messageArgs[0] = Messages.getString("Launcher.io_exception_message"); //$NON-NLS-1$
-		} else {
-			messageArgs[0] = Messages.getString("Launcher.generic_exception_message"); //$NON-NLS-1$
-		}
-		messageArgs[1] = t.getClass().getName().replaceAll(".*\\.", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		messageArgs[2] = StringUtils.escapeHTML(t.getMessage()).replaceAll("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
-		final String format = Messages.getString("Launcher.exception_message_format"); //$NON-NLS-1$
-		final String exceptionMessage = MessageFormat.format(format, messageArgs);
-		JOptionPane.showMessageDialog(null, exceptionMessage, exceptionDialogTitle, JOptionPane.ERROR_MESSAGE);
 	}
 
 	protected ConfigurationPanel createConfigurationPanel() {
@@ -200,6 +174,11 @@ public class Launcher {
 
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		f.addWindowListener(new WindowAdapter() {
+			public void windowClosed(WindowEvent e) {
+				client.exitSystem();
+			}
+		});
 		return f;
 	}
 }

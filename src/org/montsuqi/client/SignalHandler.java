@@ -44,7 +44,7 @@ public abstract class SignalHandler {
 
 	protected static final Logger logger = Logger.getLogger(SignalHandler.class);
 
-	private String signalName = "";
+	private String signalName = ""; //$NON-NLS-1$
 
 	public void setSignalName(final String signalName) {
 		this.signalName = signalName;
@@ -129,39 +129,41 @@ public abstract class SignalHandler {
 
 		final SignalHandler sendEvent = new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
-				if (con.isReceiving()) {
-					return;
-				}
-				if (widget instanceof JComponent) {
-					if (((JComponent)widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
-						con.addChangedWidget(widget);
+				synchronized (con) {
+					if (con.isReceiving()) {
+						return;
 					}
-				}
-				Window window = null;
-				if (widget instanceof JMenuItem) {
-					JComponent c = (JComponent)widget;
-					window = (Window)c.getClientProperty("window"); //$NON-NLS-1$
-				} else {
-					window = SwingUtilities.windowForComponent(widget);
-				}
-				assert window != null;
-				String windowName = window.getName();
-				String widgetName = widget.getName();
-				String event;
-				if (userData == null) {
-					event = widgetName;
-				} else {
-					event = userData.toString();
-					if (event.length() == 0) {
+					if (widget instanceof JComponent) {
+						if (((JComponent)widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
+							con.addChangedWidget(widget);
+						}
+					}
+					Window window = null;
+					if (widget instanceof JMenuItem) {
+						JComponent c = (JComponent)widget;
+						window = (Window)c.getClientProperty("window"); //$NON-NLS-1$
+					} else {
+						window = SwingUtilities.windowForComponent(widget);
+					}
+					assert window != null;
+					String windowName = window.getName();
+					String widgetName = widget.getName();
+					String event;
+					if (userData == null) {
 						event = widgetName;
+					} else {
+						event = userData.toString();
+						if (event.length() == 0) {
+							event = widgetName;
+						}
 					}
-				}
-				con.sendEvent(windowName, widgetName, event);
-				con.sendWindowData();
-				synchronized (this) {
-					blockChangedHandlers();
-					con.getScreenData();
-					unblockChangedHandlers();
+					con.sendEvent(windowName, widgetName, event);
+					con.sendWindowData();
+					synchronized (this) {
+						blockChangedHandlers();
+						con.getScreenData();
+						unblockChangedHandlers();
+					}
 				}
 			}
 		};
@@ -183,17 +185,22 @@ public abstract class SignalHandler {
 				}
 				timerTask = new TimerTask() {
 					public void run() {
-						JTextComponent text = (JTextComponent)widget;
-						String t = text.getText();
-						int length = t.length();
-						if (length > 0) {
-							char c = t.charAt(length - 1);
-							if (isKana(c) || isKanji(c) || isSymbol(c)) {
-								try {
-									changed.handle(con, widget, userData);
-									sendEvent.handle(con, widget, userData);
-								} catch (IOException e) {
-									logger.warn(e);
+						synchronized (con) {
+							if (con.isReceiving()) {
+								return;
+							}
+							JTextComponent text = (JTextComponent)widget;
+							String t = text.getText();
+							int length = t.length();
+							if (length > 0) {
+								char c = t.charAt(length - 1);
+								if (isKana(c) || isKanji(c) || isSymbol(c)) {
+									try {
+										changed.handle(con, widget, userData);
+										sendEvent.handle(con, widget, userData);
+									} catch (IOException e) {
+										con.exceptionOccured(e);
+									}
 								}
 							}
 						}

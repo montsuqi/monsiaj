@@ -419,7 +419,7 @@ public class Client implements Runnable {
 			protocol.checkScreens(true);
 			protocol.getScreenData();
 		} catch (IOException e) {
-			logger.fatal(e);
+			protocol.exceptionOccured(e);
 		}
 	}
 

@@ -27,6 +27,7 @@ import java.awt.Container;
 import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -71,6 +72,7 @@ import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaHTMLWebKit;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.RadioButton;
 import org.montsuqi.widgets.Table;
 import org.montsuqi.widgets.ToggleButton;
@@ -128,6 +130,7 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaPS",        PandaPreviewPane.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Pixmap",         Pixmap.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Placeholder",    JPanel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("RadioButton",    RadioButton.class,   new RadioButtonBuilder()); //$NON-NLS-1$
@@ -160,15 +163,37 @@ public class WidgetBuilder {
 			"CheckBox", //$NON-NLS-1$
 			"RadioButton", //$NON-NLS-1$
 			"TabbedPane", //$NON-NLS-1$
-			"Label" //$NON-NLS-1$
+			"Label", //$NON-NLS-1$
+			"TextField", //$NON-NLS-1$
+			"FormattedTextField", //$NON-NLS-1$
+			"TextArea", //$NON-NLS-1$
+			"Table", //$NON-NLS-1$
+			"ToolBar", //$NON-NLS-1$
+			"TitledBorder", //$NON-NLS-1$
+			"ToolTip", //$NON-NLS-1$
+			"ProgressBar", //$NON-NLS-1$
+			"List", //$NON-NLS-1$
 		};
-		FontModifier makePlainFont = new FontModifier() {
-			public Font modifyFont(Font font) {
-				return font.deriveFont(font.getStyle() & ~Font.BOLD);
-			}
-		};
+
 		for (int i = 0; i < classes.length; i++) {
-			modifyFont(classes[i], makePlainFont);
+			String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); //$NON-NLS-1$
+			if (userFontSpec == null) {
+				userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1$
+			}
+			if (userFontSpec == null) {
+				modifyFont(classes[i], new FontModifier() {
+					public Font modifyFont(Font font) {
+						return font.deriveFont(font.getStyle() & ~Font.BOLD);
+					}
+				});
+			} else {
+				final Font userFont = Font.decode(userFontSpec);
+				modifyFont(classes[i], new FontModifier() {
+					public Font modifyFont(Font font) {
+						return userFont;
+					}
+				});
+			}
 		}
 		if (SystemEnvironment.isMacOSX()) {
 			classes = new String[] {

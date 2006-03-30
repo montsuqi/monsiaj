@@ -34,8 +34,22 @@
 		<mkdir dir="${report.dir}"/>
 	</target>
 
-	<target name="compile" depends="prepare">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4">
+	<target name="set-javac-options" depends="set-javac-debug,set-javac-debuglevel">
+		<echo message="Javac Debug = ${javac.debug}"/>
+		<echo message="Javac Debug Level = ${javac.debuglevel}"/>
+	</target>
+
+	<target name="set-javac-debug">
+		<property name="javac.debug" value="yes"/>
+	</target>
+
+	<target name="set-javac-debuglevel">
+		<property name="javac.debuglevel" value="lines,vars,source"/>
+	</target>
+
+	<target name="compile" depends="prepare,set-javac-options">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4"
+			debug="${javac.debug}" debuglevel="${javac.debuglevel}">
 			<include name="**/*.java"/>
 			<classpath refid="project.class.path"/>
 		</javac>

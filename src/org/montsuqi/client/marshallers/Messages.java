@@ -20,23 +20,25 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.monsia;
+package org.montsuqi.client.marshallers;
 
-class HandlerInvocationException extends RuntimeException {
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-	HandlerInvocationException() {
-		super();
+public class Messages {
+	private static final String BUNDLE_NAME = "org.montsuqi.client.marshallers.messages"; //$NON-NLS-1$
+
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private Messages() {
+		// do nothing
 	}
 
-	HandlerInvocationException(String message) {
-		super(message);
-	}
-
-	HandlerInvocationException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	HandlerInvocationException(Throwable cause) {
-		super(cause);
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 }

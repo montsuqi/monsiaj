@@ -180,6 +180,8 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			if (localName.equals("class")) { //$NON-NLS-1$
 				if (value.startsWith("Gtk")) { //$NON-NLS-1$
 					value = value.substring("Gtk".length()); //$NON-NLS-1$
+				} else if (value.startsWith("Gnome")) {
+					value = value.substring("Gnome".length()); //$NON-NLS-1$
 				}
 				w.setClassName(value);
 			} else if (localName.equals("name")) { //$NON-NLS-1$

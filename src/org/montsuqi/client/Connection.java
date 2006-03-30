@@ -63,24 +63,24 @@ class Connection {
 		}
 	}
 
-	public void sendPacketClass(int c) throws IOException {
+	public synchronized void sendPacketClass(int c) throws IOException {
 		logger.debug("sendPacketClass: {0}", Integer.toHexString(c));
 		out.write((byte)c);
 		((OutputStream)out).flush();
 		logger.debug("done // sendPacketClass");
 	}
 
-	byte receivePacketClass() throws IOException {
+	synchronized byte receivePacketClass() throws IOException {
 		byte b = in.readByte();
 		return b;
 	}
 
-	public void sendDataType(int c) throws IOException {
+	public synchronized void sendDataType(int c) throws IOException {
 		out.write((byte)c);
 		((OutputStream)out).flush();
 	}
 
-	int receiveDataType() throws IOException {
+	synchronized int receiveDataType() throws IOException {
 		dataType = in.readByte();
 		if (dataType < 0) {
 			dataType = 0x100 + dataType;
@@ -88,7 +88,7 @@ class Connection {
 		return dataType;
 	}
 
-	public int receiveDataTypeWithCheck(int expected) throws IOException {
+	public synchronized int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
 			throw new IOException("data type mismatch: expected " + Type.getName(expected) + ", but was " + Type.getName(dataType)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -96,29 +96,29 @@ class Connection {
 		return dataType;
 	}
 
-	public int getLastDataType() {
+	public synchronized int getLastDataType() {
 		return dataType;
 	}
 
-	void sendPacketDataType(int t) throws IOException {
+	synchronized void sendPacketDataType(int t) throws IOException {
 		out.write((byte)t);
 		((OutputStream)out).flush();
 	}
 
-	int receivePacketDataType() throws IOException {
+	synchronized int receivePacketDataType() throws IOException {
 		return in.readByte();
 	}
 
-	void sendLength(int size) throws IOException {
+	synchronized void sendLength(int size) throws IOException {
 		out.writeInt(size);
 		((OutputStream)out).flush();
 	}
 
-	int receiveLength() throws IOException {
+	synchronized int receiveLength() throws IOException {
 		return in.readInt();
 	}
 
-	public void sendString(String s) throws IOException {
+	public synchronized void sendString(String s) throws IOException {
 		logger.debug("sendString: {0}", s);
 		if (SystemEnvironment.isMS932()) {
 			s = fromMS932(s);
@@ -184,22 +184,22 @@ class Connection {
 		return new String(chars);
 	}
 
-	void sendFixedString(String s) throws IOException {
+	synchronized void sendFixedString(String s) throws IOException {
 		sendString(s);
 	}
 
-	String receiveStringBody(int size) throws IOException {
+	synchronized String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
 		in.readFully(bytes);
 		final String s = new String(bytes, encoding);
 		return SystemEnvironment.isMS932() ? toMS932(s) : s;
 	}
 
-	public String receiveString() throws IOException {
+	public synchronized String receiveString() throws IOException {
 		return receiveStringBody(receiveLength());
 	}
 
-	int receiveLong() throws IOException { // longs: 4-byte long
+	synchronized int receiveLong() throws IOException { // longs: 4-byte long
 		int i = in.readInt();
 		// WORKAROUND:
 		// some application returns "    "(4 spaces) for
@@ -210,33 +210,33 @@ class Connection {
 		return i;
 	}
 
-	void sendLong(int data) throws IOException {
+	synchronized void sendLong(int data) throws IOException {
 		out.writeInt(data);
 		((OutputStream)out).flush();
 	}
 
-	public int receiveInt() throws IOException {
+	synchronized public int receiveInt() throws IOException {
 		return receiveLong();
 	}
 
-	public void sendInt(int data) throws IOException {
+	synchronized public void sendInt(int data) throws IOException {
 		sendLong(data);
 	}
 
-	int receiveChar() throws IOException {
+	synchronized int receiveChar() throws IOException {
 		return in.readUnsignedByte();
 	}
 
-	void sendChar(byte data) throws IOException {
+	synchronized void sendChar(byte data) throws IOException {
 		out.write(data);
 		((OutputStream)out).flush();
 	}
 
-	double receiveFloat() throws IOException {
+	synchronized double receiveFloat() throws IOException {
 		return in.readDouble();
 	}
 
-	void sendFloat(double data) throws IOException {
+	synchronized void sendFloat(double data) throws IOException {
 		out.writeDouble(data);
 		((OutputStream)out).flush();
 	}
@@ -244,19 +244,22 @@ class Connection {
 	private static final byte T_BYTE = 0x54;
 	private static final byte F_BYTE = 0x46;
 
-	boolean receiveBoolean() throws IOException {
+	synchronized boolean receiveBoolean() throws IOException {
 		return in.readByte() == T_BYTE ? true : false;
 	}
 
-	void sendBoolean(boolean data) throws IOException {
+	synchronized void sendBoolean(boolean data) throws IOException {
 		out.writeByte(data ? T_BYTE : F_BYTE);
 		((OutputStream)out).flush();
 	}
 
-	void sendFixed(BigDecimal xval) throws IOException {
+	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
+	private static final int NEGATIVE_FIXED_MASK = 0x40;
+
+	synchronized void sendFixed(BigDecimal xval) throws IOException {
 		String s;
 		if (xval.equals(ZERO)) {
-			sendString("0");
+			sendString("0"); //$NON-NLS-1$
 			return;
 		}
 		if (xval.signum() >= 0) {
@@ -272,10 +275,7 @@ class Connection {
 		sendString(s);
 	}
 
-	private static final int NEGATIVE_FIXED_MASK = 0x40;
-	private static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
-
-	BigDecimal receiveFixed() throws IOException {
+	synchronized BigDecimal receiveFixed() throws IOException {
 		/* int flen = */ receiveLength();
 		int slen = receiveLength();
 		String value = receiveString();
@@ -308,17 +308,17 @@ class Connection {
 		}
 	}
 
-	public BigDecimal receiveFixedData() throws IOException {
+	public synchronized BigDecimal receiveFixedData() throws IOException {
 		if (receiveDataType() == Type.NUMBER) {
 			return receiveFixed();
 		}
 		throw new IllegalArgumentException("invalid data conversion"); //$NON-NLS-1$
 	}
 
-	public void sendFixedData(int type, BigDecimal xval) throws IOException {
+	public synchronized void sendFixedData(int type, BigDecimal xval) throws IOException {
 		if (type == Type.NUMBER) {
 			type = Type.TEXT;
-			if (xval.intValue() == 0) {
+			if (xval.movePointRight(xval.scale()).equals(ZERO)) {
 				xval = ZERO;
 			}
 		}
@@ -338,7 +338,7 @@ class Connection {
 		}
 	}
 
-	public void sendStringData(int type, String str) throws IOException {
+	public synchronized void sendStringData(int type, String str) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -361,7 +361,7 @@ class Connection {
 		}
 	}
 
-	public String receiveStringData() throws IOException {
+	public synchronized String receiveStringData() throws IOException {
 		int type = receiveDataType();
 		switch (type) {
 		case Type.INT:
@@ -377,7 +377,7 @@ class Connection {
 		}
 	}
 
-	public void sendIntegerData(int type, int value) throws IOException {
+	public synchronized void sendIntegerData(int type, int value) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -403,7 +403,7 @@ class Connection {
 		}
 	}
 
-	public int receiveIntData() throws IOException {
+	public synchronized int receiveIntData() throws IOException {
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt();
@@ -418,7 +418,7 @@ class Connection {
 		}
 	}
 
-	public void sendBooleanData(int type, boolean value) throws IOException {
+	public synchronized void sendBooleanData(int type, boolean value) throws IOException {
 		sendDataType(type);
 		switch (type) {
 		case Type.CHAR:
@@ -441,7 +441,7 @@ class Connection {
 		}
 	}
 
-	public boolean receiveBooleanData() throws IOException {
+	public synchronized boolean receiveBooleanData() throws IOException {
 		switch (receiveDataType()) {
 		case Type.INT:
 			return receiveInt() != 0;
@@ -457,7 +457,7 @@ class Connection {
 		}
 	}
 
-	public byte[] receiveBinaryData() throws IOException {
+	public synchronized byte[] receiveBinaryData() throws IOException {
 		int type = receiveDataType();
 		switch (type) {
 		case Type.CHAR:
@@ -474,7 +474,7 @@ class Connection {
 		}
 	}
 
-	private byte[] receiveBinary() throws IOException {
+	private synchronized byte[] receiveBinary() throws IOException {
 		int size = receiveLength();
 		byte[] bin = new byte[size];
 		if (size > 0) {
@@ -483,7 +483,7 @@ class Connection {
 		return bin;
 	}
 
-	void close() throws IOException {
+	synchronized void close() throws IOException {
 		socket.shutdownInput(); 
 		socket.shutdownOutput();
 		((InputStream)in).close();

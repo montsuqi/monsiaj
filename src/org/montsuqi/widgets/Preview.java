@@ -33,6 +33,21 @@ import javax.swing.JPanel;
 
 public abstract class Preview extends JPanel {
 
+	private final class ResetScaleAction extends AbstractAction {
+		ResetScaleAction() {
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-reset.png"); //$NON-NLS-1$
+			if (iconURL != null) {
+				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+			}
+			putValue(Action.NAME, Messages.getString("PandaPreview.reset_scale")); //$NON-NLS-1$
+			putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.reset_scale_short_description")); //$NON-NLS-1$
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setScale(1.0);
+		}
+	}
+
 	private final class ZoomInAction extends AbstractAction {
 		ZoomInAction() {
 			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-in.png"); //$NON-NLS-1$
@@ -93,18 +108,24 @@ public abstract class Preview extends JPanel {
 		}
 	}
 
+	private final Action resetScaleAction;
 	private final Action zoomOutAction;
 	private final Action zoomInAction;
 	private final Action rotateClockwiseAction;
 	private final Action rotateCounterClockwiseAction;
 
 	public Preview() {
+		resetScaleAction = new ResetScaleAction();
 		zoomOutAction = new ZoomOutAction();
 		zoomInAction = new ZoomInAction();
 		rotateClockwiseAction = new RotateClockwiseAction();
 		rotateCounterClockwiseAction = new RotateCounterClockwiseAction();
 		setScale(1.0);
 		setRotationStep(0);
+	}
+
+	public Action getResetScaleAction() {
+		return resetScaleAction;
 	}
 
 	public Action getZoomOutAction() {
@@ -135,7 +156,11 @@ public abstract class Preview extends JPanel {
 		if ( ! isValidScale(newScale)) {
 			throw new IllegalArgumentException("non-positive scale"); //$NON-NLS-1$
 		}
-		scale = newScale;
+		if (Double.compare(scale, newScale) != 0) {
+			double oldScale = scale;
+			scale = newScale;
+			firePropertyChange("scale", oldScale, newScale); //$NON-NLS-1$
+		}
 	}
 
 	private boolean isValidScale(double newScale) {

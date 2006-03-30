@@ -66,6 +66,7 @@ import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.UIStock;
 import org.montsuqi.widgets.Window;
 
@@ -126,7 +127,11 @@ abstract class WidgetPropertySetter {
 				try {
 					size.width = Integer.parseInt(value);
 					int height = size.height;
-					size = ScreenScale.scale(size);
+					if (widget instanceof java.awt.Window) {
+						size = ScreenScale.scaleFrame(size);
+					} else {
+						size = ScreenScale.scale(size);
+					}
 					size.height = height;
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
@@ -142,7 +147,11 @@ abstract class WidgetPropertySetter {
 				try {
 					size.height = Integer.parseInt(value);
 					int width = size.width;
-					size = ScreenScale.scale(size);
+					if (widget instanceof java.awt.Window) {
+						size = ScreenScale.scaleFrame(size);
+					} else {
+						size = ScreenScale.scale(size);
+					}
 					size.width = width;
 					widget.setSize(size);
 				} catch (NumberFormatException e) {
@@ -640,7 +649,7 @@ abstract class WidgetPropertySetter {
 				java.awt.Window window = (java.awt.Window)widget;
 				int x = ParameterConverter.toInteger(value);
 				int y = window.getY();
-				window.setLocation(ScreenScale.scale(new Point(x, y)));
+				window.setLocation(ScreenScale.scaleFrame(new Point(x, y)));
 			}
 		});
 
@@ -649,7 +658,7 @@ abstract class WidgetPropertySetter {
 				java.awt.Window window = (java.awt.Window)widget;
 				int x = window.getX();
 				int y = ParameterConverter.toInteger(value);
-				window.setLocation(ScreenScale.scale(new Point(x, y)));
+				window.setLocation(ScreenScale.scaleFrame(new Point(x, y)));
 			}
 		});
 
@@ -658,6 +667,27 @@ abstract class WidgetPropertySetter {
 				JDialog dialog = (JDialog)widget;
 				dialog.setModal(ParameterConverter.toBoolean(value));
 				dialog.setModal(false);
+			}
+		});
+
+		registerProperty(Pixmap.class, "scaled", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Pixmap pixmap = (Pixmap)widget;
+				pixmap.setScaled(ParameterConverter.toBoolean(value));
+			}
+		});
+
+		registerProperty(Pixmap.class, "scaled_width", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Pixmap pixmap = (Pixmap)widget;
+				pixmap.setScaledWidth(ParameterConverter.toInteger(value));
+			}
+		});
+
+		registerProperty(Pixmap.class, "scaled_height", new WidgetPropertySetter() { //$NON-NLS-1$
+			void set(Interface xml, Container parent, Component widget, String value) {
+				Pixmap pixmap = (Pixmap)widget;
+				pixmap.setScaledHeight(ParameterConverter.toInteger(value));
 			}
 		});
 	}
