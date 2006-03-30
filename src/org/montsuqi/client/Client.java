@@ -330,7 +330,7 @@ public class Client implements Runnable {
 			throw e;
 		} catch (IOException e) {
 			Throwable t = e.getCause();
-			if (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte.")) { //$NON-NLS-1$
+			if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
 				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
