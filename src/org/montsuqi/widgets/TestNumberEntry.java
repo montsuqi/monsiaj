@@ -71,6 +71,16 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("10000", "10000");
 		assertFormattedInputEquals("1000000", "10000.00");
+		assertFormattedInputEquals("", "-0");
+		assertFormattedInputEquals("", "-00");
+		assertFormattedInputEquals("-1", "-01");
+		assertFormattedInputEquals("-1", "-0.01");
+		assertFormattedInputEquals("-1", "-0.1");
+		assertFormattedInputEquals("-10", "-10");
+		assertFormattedInputEquals("-100", "-100");
+		assertFormattedInputEquals("-1000", "-1000");
+		assertFormattedInputEquals("-10000", "-10000");
+		assertFormattedInputEquals("-1000000", "-10000.00");
 	}
 
 	public void test___c___c___() throws Exception {
@@ -87,6 +97,16 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1,000", "1000");
 		assertFormattedInputEquals("10,000", "10000");
 		assertFormattedInputEquals("1,000,000", "10000.00");
+		assertFormattedInputEquals("", "0");
+		assertFormattedInputEquals("", "00");
+		assertFormattedInputEquals("-1", "-01");
+		assertFormattedInputEquals("-1", "-0.01");
+		assertFormattedInputEquals("-1", "-0.1");
+		assertFormattedInputEquals("-10", "-10");
+		assertFormattedInputEquals("-100", "-100");
+		assertFormattedInputEquals("-1,000", "-1000");
+		assertFormattedInputEquals("-10,000", "-10000");
+		assertFormattedInputEquals("-1,000,000", "-10000.00");
 	}
 
 	public void test___c___c__9() throws Exception {
@@ -103,6 +123,16 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1,000", "1000");
 		assertFormattedInputEquals("10,000", "10000");
 		assertFormattedInputEquals("1,000,000", "10000.00");
+		assertFormattedInputEquals("0", "0");
+		assertFormattedInputEquals("0", "00");
+		assertFormattedInputEquals("-1", "-01");
+		assertFormattedInputEquals("-1", "-0.01");
+		assertFormattedInputEquals("-1", "-0.1");
+		assertFormattedInputEquals("-10", "-10");
+		assertFormattedInputEquals("-100", "-100");
+		assertFormattedInputEquals("-1,000", "-1000");
+		assertFormattedInputEquals("-10,000", "-10000");
+		assertFormattedInputEquals("-1,000,000", "-10000.00");
 	}
 
 	public void testZ() {

@@ -122,6 +122,7 @@ class NumberDocument extends PlainDocument {
 	private BigDecimal value;
 	private int scale;
 	private int expo;
+	private boolean minus = false;
 
 	protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
 	static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
@@ -133,6 +134,7 @@ class NumberDocument extends PlainDocument {
 		expo = 0;
 		scale = 0;
 		value = ZERO;
+		minus = value.signum() < 0;
 	}
 
 	synchronized void setValue(BigDecimal v) {
@@ -142,6 +144,7 @@ class NumberDocument extends PlainDocument {
 		PrecisionScale ps = new PrecisionScale(originalFormat);
 		String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
 		value = ZERO;
+		minus = false;
 		try {
 			expo = 0;
 			scale = 0;
@@ -219,7 +222,6 @@ class NumberDocument extends PlainDocument {
 		}
 
 		PrecisionScale ps = new PrecisionScale(originalFormat);
-		boolean minus = value.signum() < 0;
 		BigDecimal v = value.abs();
 		char[] p = str.toCharArray();
 		for (int i = 0; i < p.length; i++) {
@@ -248,10 +250,10 @@ class NumberDocument extends PlainDocument {
 				}
 			}
 		}
-		value = minus ? v.negate() : v;
 		if (v.movePointRight(v.scale()).equals(ZERO)) {
 			v = ZERO;
 		}
+		value = minus ? v.negate() : v;
 		String formatted = formatValue(format, value);
 		remove(0, getLength());
 		// treat zero value representation specially
