@@ -278,15 +278,17 @@ public class Client implements Runnable {
 		}
 		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		String fileName = conf.getClientCertificateFileName();
-		System.setProperty("javax.net.ssl.keyStore", fileName);
-		String pass = conf.getClientCertificatePassword();
-		if (pass != null && pass.length() > 0) {
-			System.setProperty("javax.net.ssl.keyStorePassword", pass);
-		} else {
-			final String message = Messages.getString("Client.empty_pass");
-			throw new SSLException(message);
+		if (fileName != null && fileName.length() > 0) {
+			System.setProperty("javax.net.ssl.keyStore", fileName);
+			String pass = conf.getClientCertificatePassword();
+			if (pass != null && pass.length() > 0) {
+				System.setProperty("javax.net.ssl.keyStorePassword", pass);
+			} else {
+				final String message = Messages.getString("Client.empty_pass");
+				throw new SSLException(message);
+			}
+			checkPkcs12FileFormat();
 		}
-		checkPkcs12FileFormat();
 		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
 		return (SSLSocket)factory.createSocket(socket, host, port, true);
 	}
