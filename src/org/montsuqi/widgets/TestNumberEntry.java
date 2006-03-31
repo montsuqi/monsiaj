@@ -1,5 +1,6 @@
 package org.montsuqi.widgets;
 
+import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 
 import org.montsuqi.widgets.Window;
@@ -8,6 +9,7 @@ import org.montsuqi.widgets.NumberEntry;
 import junit.extensions.jfcunit.JFCTestCase;
 import junit.extensions.jfcunit.JFCTestHelper;
 import junit.extensions.jfcunit.TestHelper;
+import junit.extensions.jfcunit.eventdata.KeyEventData;
 import junit.extensions.jfcunit.eventdata.StringEventData;
 import junit.extensions.jfcunit.finder.NamedComponentFinder;
 import junit.extensions.jfcunit.finder.FrameFinder;
@@ -26,6 +28,15 @@ public class TestNumberEntry extends JFCTestCase {
 	public void assertFormattedInputEquals(String expected, String input) {
 		m_numberEntry.setValue(new BigDecimal(0));
 		m_helper.sendString(new StringEventData(this, m_numberEntry, input));
+		final NumberDocument doc = (NumberDocument)m_numberEntry.getDocument();
+		final String format = doc.getFormat();
+		final String actual = m_numberEntry.getText();
+		assertEquals("Using format \"" + format + "\", input:<" + input + ">, value=<" + m_numberEntry.getValue() + ">", expected, actual);
+	}
+
+	private void assertBackSpaceAfterInputEquals(String expected, String input) {
+		m_helper.sendString(new StringEventData(this, m_numberEntry, input));
+		m_helper.sendKeyAction(new KeyEventData(this, m_numberEntry, KeyEvent.VK_BACK_SPACE));
 		final NumberDocument doc = (NumberDocument)m_numberEntry.getDocument();
 		final String format = doc.getFormat();
 		final String actual = m_numberEntry.getText();
@@ -81,6 +92,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("-1000", "-1000");
 		assertFormattedInputEquals("-10000", "-10000");
 		assertFormattedInputEquals("-1000000", "-10000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void test___c___c___() throws Exception {
@@ -97,8 +109,8 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1,000", "1000");
 		assertFormattedInputEquals("10,000", "10000");
 		assertFormattedInputEquals("1,000,000", "10000.00");
-		assertFormattedInputEquals("", "0");
-		assertFormattedInputEquals("", "00");
+		assertFormattedInputEquals("", "-0");
+		assertFormattedInputEquals("", "-00");
 		assertFormattedInputEquals("-1", "-01");
 		assertFormattedInputEquals("-1", "-0.01");
 		assertFormattedInputEquals("-1", "-0.1");
@@ -107,6 +119,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("-1,000", "-1000");
 		assertFormattedInputEquals("-10,000", "-10000");
 		assertFormattedInputEquals("-1,000,000", "-10000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void test___c___c__9() throws Exception {
@@ -123,8 +136,8 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1,000", "1000");
 		assertFormattedInputEquals("10,000", "10000");
 		assertFormattedInputEquals("1,000,000", "10000.00");
-		assertFormattedInputEquals("0", "0");
-		assertFormattedInputEquals("0", "00");
+		assertFormattedInputEquals("0", "-0");
+		assertFormattedInputEquals("0", "-00");
 		assertFormattedInputEquals("-1", "-01");
 		assertFormattedInputEquals("-1", "-0.01");
 		assertFormattedInputEquals("-1", "-0.1");
@@ -133,6 +146,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("-1,000", "-1000");
 		assertFormattedInputEquals("-10,000", "-10000");
 		assertFormattedInputEquals("-1,000,000", "-10000.00");
+		assertBackSpaceAfterInputEquals("0", "10000");
 	}
 
 	public void testZ() {
@@ -149,6 +163,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1", "1000");
 		assertFormattedInputEquals("1", "10000");
 		assertFormattedInputEquals("1", "10000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void testZZ() {
@@ -165,6 +180,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("10", "1000");
 		assertFormattedInputEquals("10", "10000");
 		assertFormattedInputEquals("10", "10000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void testZZZZ() {
@@ -181,6 +197,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("1000", "10000");
 		assertFormattedInputEquals("1000", "1000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void testZZZZZZZZZZ() {
@@ -197,6 +214,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("10000", "10000");
 		assertFormattedInputEquals("100000", "1000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void test9() {
@@ -213,6 +231,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1", "1000");
 		assertFormattedInputEquals("1", "10000");
 		assertFormattedInputEquals("1", "1000.00");
+		assertBackSpaceAfterInputEquals("0", "10000");
 	}
 
 	public void test99() {
@@ -229,6 +248,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("10", "1000");
 		assertFormattedInputEquals("10", "10000");
 		assertFormattedInputEquals("10", "1000.00");
+		assertBackSpaceAfterInputEquals("00", "10000");
 	}
 
 	public void testZ9() {
@@ -245,6 +265,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("10", "1000");
 		assertFormattedInputEquals("10", "10000");
 		assertFormattedInputEquals("10", "1000.00");
+		assertBackSpaceAfterInputEquals("0", "10000");
 	}
 
 	public void test9999() {
@@ -261,6 +282,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("1000", "10000");
 		assertFormattedInputEquals("1000", "1000.00");
+		assertBackSpaceAfterInputEquals("0000", "10000");
 	}
 
 	public void testZZZ9() {
@@ -277,6 +299,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("1000", "10000");
 		assertFormattedInputEquals("1000", "1000.00");
+		assertBackSpaceAfterInputEquals("0", "10000");
 	}
 
 	public void test9999999999() {
@@ -293,6 +316,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("0000001000", "1000");
 		assertFormattedInputEquals("0000010000", "10000");
 		assertFormattedInputEquals("0000100000", "1000.00");
+		assertBackSpaceAfterInputEquals("0000000000", "10000");
 	}
 
 	public void testZZZZZZZZZ9() {
@@ -309,6 +333,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("10000", "10000");
 		assertFormattedInputEquals("100000", "1000.00");
+		assertBackSpaceAfterInputEquals("0", "10000");
 	}
 
 	public void testZZZZZZZZ99() {
@@ -325,6 +350,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000", "1000");
 		assertFormattedInputEquals("10000", "10000");
 		assertFormattedInputEquals("100000", "1000.00");
+		assertBackSpaceAfterInputEquals("00", "10000");
 	}
 
 	public void testZZZcZZZcZZZ() {
@@ -341,6 +367,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1,000", "1000");
 		assertFormattedInputEquals("10,000", "10000");
 		assertFormattedInputEquals("100,000", "1000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public void testZZ99d99() {
@@ -357,6 +384,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000.00", "1000");
 		assertFormattedInputEquals("1000.00", "10000");
 		assertFormattedInputEquals("1000.00", "1000.00");
+		assertBackSpaceAfterInputEquals("00.00", "10000");
 	}
 
 	public void testZZZ99d99999() {
@@ -373,6 +401,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("1000.00000", "1000");
 		assertFormattedInputEquals("10000.00000", "10000");
 		assertFormattedInputEquals("1000.00000", "1000.00");
+		assertBackSpaceAfterInputEquals("00.00000", "10000");
 	}
 
 	public void test99d9() {
@@ -389,6 +418,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("10.0", "1000");
 		assertFormattedInputEquals("10.0", "10000");
 		assertFormattedInputEquals("10.0", "1000.00");
+		assertBackSpaceAfterInputEquals("00.0", "10000");
 	}
 
 	public void testZZdZ() {
@@ -405,6 +435,7 @@ public class TestNumberEntry extends JFCTestCase {
 		assertFormattedInputEquals("10", "1000");
 		assertFormattedInputEquals("10", "10000");
 		assertFormattedInputEquals("10", "1000.00");
+		assertBackSpaceAfterInputEquals("", "10000");
 	}
 
 	public static void main (String[] args){
