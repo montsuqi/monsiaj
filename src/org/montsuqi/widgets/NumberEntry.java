@@ -23,7 +23,8 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,6 +32,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
@@ -72,12 +75,18 @@ public class NumberEntry extends Entry {
 	public static void main(String[] args) {
 		final JFrame f = new JFrame("TestNumberEntry"); //$NON-NLS-1$
 		final NumberEntry ne = new NumberEntry();
-		ne.setForeground(Color.red);
-		ne.setFormat("---,---,---"); //$NON-NLS-1$
-		ne.setValue(new BigDecimal(-123456));
+		ne.setFormat("-----"); //$NON-NLS-1$
+		ne.setValue(new BigDecimal(0));
 		f.getContentPane().setLayout(new BorderLayout());
 		f.getContentPane().add(ne, BorderLayout.CENTER);
-		f.setSize(200, 50);
+		JButton b = new JButton("show");
+		b.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("[" + ne.getValue() + "]");
+			}
+		});
+		f.getContentPane().add(b, BorderLayout.SOUTH);
+		f.setSize(200, 120);
 		f.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
@@ -188,8 +197,8 @@ class NumberDocument extends PlainDocument {
 		StringBuffer tmp = new StringBuffer();
 		if (positive) {
 			tmp.append('+');
-		} else if (negative) {
-			tmp.append(' ');
+		} else {
+			tmp.append('#');
 		}
 		tmp.append(buf);
 		if (negative) {
@@ -240,6 +249,9 @@ class NumberDocument extends PlainDocument {
 			}
 		}
 		value = minus ? v.negate() : v;
+		if (v.movePointRight(v.scale()).equals(ZERO)) {
+			v = ZERO;
+		}
 		String formatted = formatValue(format, value);
 		remove(0, getLength());
 		// treat zero value representation specially
