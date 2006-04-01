@@ -227,7 +227,7 @@ public abstract class SignalHandler {
 				if (propDelay != null) {
 					try {
 						long newDelay = Long.parseLong(propDelay);
-						if (newDelay > 0) {
+						if (newDelay >= 0) {
 							delay = newDelay;
 						}
 					} catch (NumberFormatException e) {
