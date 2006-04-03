@@ -50,7 +50,6 @@ public class SSLSocketBuilder {
 
 	private static final int DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD = 30;
 
-	private Configuration conf;
 	private Logger logger;
 
 	private SSLSocketFactory factory;
@@ -58,11 +57,10 @@ public class SSLSocketBuilder {
 	private KeyManager[] keyManagers;
 	TrustManager[] trustManagers;
 
-	public SSLSocketBuilder(Configuration conf) throws IOException {
-		this.conf = conf;
+	public SSLSocketBuilder(String fileName, String password) throws IOException {
 		logger = Logger.getLogger(this.getClass());
 		try {
-			keyManagers = createKeyManagers();
+			keyManagers = createKeyManagers(fileName, password);
 			trustManagers = createTrustManagers();
 			final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 			ctx.init(keyManagers, trustManagers, null);
@@ -74,7 +72,7 @@ public class SSLSocketBuilder {
 		} catch (SSLException e) {
 			throw e;
 		} catch (IOException e) {
-			Throwable t = e.getCause();
+			final Throwable t = e.getCause();
 			if (isMissingPassphraseMessage(e.getMessage())) {
 				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
 				final SSLException ssle = new SSLException(message);
@@ -85,7 +83,7 @@ public class SSLSocketBuilder {
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
 			}
-			final File file = new File(conf.getClientCertificateFileName());
+			final File file = new File(fileName);
 			final Object[] args = { file.getName() };
 			final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
 			final String message = MessageFormat.format(format, args);
@@ -98,21 +96,19 @@ public class SSLSocketBuilder {
 		}
 	}
 
-	public SSLSocket createSSLSocket(Socket socket) throws IOException {
-		final String host = conf.getHost();
-		final int port = conf.getPort();
+	public SSLSocket createSSLSocket(Socket socket, String host, int port) throws IOException {
 		try {
 			SSLSocket sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
 			sslSocket.startHandshake();
 			final SSLSession session = sslSocket.getSession();
-			validatePeerCertificates(session.getPeerCertificates());
+			validatePeerCertificates(session.getPeerCertificates(), host);
 			return sslSocket;
 		} catch (SSLException e) {
 			if (e.getCause() instanceof RuntimeException) {
 				Throwable t = e.getCause();
 				t = t.getCause();
 				logger.fatal(t);
-				String message = Messages.getString("Client.untrusted_certificate");
+				final String message = Messages.getString("Client.untrusted_certificate");
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
 			}
@@ -125,17 +121,16 @@ public class SSLSocketBuilder {
 		}
 	}
 
-	private void validatePeerCertificates(final Certificate[] certificates) throws SSLException {
+	private void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
 		final Certificate serverCertificate = certificates[0];
 		if (serverCertificate instanceof X509Certificate) {
-			checkHostNameInCertificate((X509Certificate)serverCertificate);
+			checkHostNameInCertificate((X509Certificate)serverCertificate, host);
 		} else {
 			logger.warn("Server Certificate is not a X.509 Certificate");
 		}
 	}
 
-	private void checkHostNameInCertificate(final X509Certificate certificate) throws SSLPeerUnverifiedException {
-		final String host = conf.getHost();
+	private void checkHostNameInCertificate(final X509Certificate certificate, final String host) throws SSLPeerUnverifiedException {
 		// no check against these hostnames.
 		if ("localhost".equalsIgnoreCase(host) // $NON-NLS-1$
 			|| "127.0.0.1".equals(host) // $NON-NLS-1$
@@ -213,12 +208,10 @@ public class SSLSocketBuilder {
 		return tms;
 	}
 
-	private KeyManager[] createKeyManagers() throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
-		String fileName = conf.getClientCertificateFileName();
+	private KeyManager[] createKeyManagers(String fileName, String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
 		if (fileName == null || fileName.length() <= 0) {
 			return null;
 		}
-		String pass = conf.getClientCertificatePassword();
 		if (pass != null && pass.length() > 0) {
 			KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 			InputStream is = new FileInputStream(fileName);

@@ -138,8 +138,10 @@ public class Client implements Runnable {
 		if ( ! conf.getUseSSL()) {
 			return socket;
 		} else {
-			final SSLSocketBuilder builder = new SSLSocketBuilder(conf);
-			return builder.createSSLSocket(socket);
+			final String fileName = conf.getClientCertificateFileName();
+			final String password = conf.getClientCertificatePassword();
+			final SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
+			return builder.createSSLSocket(socket, host, port);
 		}
 	}
 
