@@ -52,10 +52,10 @@ public class SSLSocketBuilder {
 
 	private Logger logger;
 
-	private SSLSocketFactory factory;
+	private final SSLSocketFactory factory;
 
-	private KeyManager[] keyManagers;
-	TrustManager[] trustManagers;
+	private final KeyManager[] keyManagers;
+	final TrustManager[] trustManagers;
 
 	public SSLSocketBuilder(String fileName, String password) throws IOException {
 		logger = Logger.getLogger(this.getClass());
@@ -96,9 +96,9 @@ public class SSLSocketBuilder {
 		}
 	}
 
-	public SSLSocket createSSLSocket(Socket socket, String host, int port) throws IOException {
+	public SSLSocket createSSLSocket(final Socket socket, final String host, final int port) throws IOException {
 		try {
-			SSLSocket sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
+			final SSLSocket sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
 			sslSocket.startHandshake();
 			final SSLSession session = sslSocket.getSession();
 			validatePeerCertificates(session.getPeerCertificates(), host);
@@ -201,29 +201,29 @@ public class SSLSocketBuilder {
 		for (int i = 0; i < tms.length; i++) {
 			if (tms[i] instanceof X509TrustManager) {
 				final X509TrustManager delegatee = (X509TrustManager)tms[i];
-				TrustManager tm = new MyTrustManager(delegatee);
+				final TrustManager tm = new MyTrustManager(delegatee);
 				return new TrustManager[] { tm };
 			}
 		}
 		return tms;
 	}
 
-	private KeyManager[] createKeyManagers(String fileName, String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
+	private KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
 		if (fileName == null || fileName.length() <= 0) {
 			return null;
 		}
 		if (pass != null && pass.length() > 0) {
-			KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-			InputStream is = new FileInputStream(fileName);
+			final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+			final InputStream is = new FileInputStream(fileName);
 			ks.load(is, pass.toCharArray());
 			checkPkcs12FileFormat(ks);
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+			final KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
 			kmf.init(ks, pass.toCharArray());
 			final KeyManager[] kms = kmf.getKeyManagers();
 			for (int i = 0; i < kms.length; i++) {
 				if (kms[i] instanceof X509KeyManager) {
 					final X509KeyManager delegatee = (X509KeyManager)kms[i];
-					KeyManager km = new MyKeyManager(delegatee);
+					final KeyManager km = new MyKeyManager(delegatee);
 					return new KeyManager[] { km };
 				}
 			}
@@ -264,7 +264,6 @@ public class SSLSocketBuilder {
 				home, "Application Data", "Sun", "Java", "Deployment"
 			});
 
-
 			File securityDirectory = new File(deploymentDirectory, "security");
 			return new File(securityDirectory, "trusted.jssecacerts");
 			
@@ -282,7 +281,7 @@ public class SSLSocketBuilder {
 		}
 	}
 
-	private void checkPkcs12FileFormat(KeyStore ks) throws IOException {
+	private void checkPkcs12FileFormat(final KeyStore ks) throws IOException {
 		try {
 			final Enumeration e = ks.aliases();
 			final String alias = (String)e.nextElement();
@@ -300,37 +299,38 @@ public class SSLSocketBuilder {
 		} catch (SSLException e) {
 			throw e;
 		} catch (Exception e) {
-			IOException ioe = new IOException(e.getMessage());
+			final String message = e.getMessage();
+			final IOException ioe = new IOException(message);
 			ioe.initCause(e);
 			throw ioe;
 		}
 	}
 
-	private void checkCertificateExpiration(final X509Certificate x509certificate) throws SSLException {
+	private void checkCertificateExpiration(final X509Certificate certificate) throws SSLException {
 		try {
-			x509certificate.checkValidity();
-		} catch (CertificateExpiredException ex) {
-			final Object[] args = { x509certificate.getSubjectDN(), x509certificate.getNotAfter() };
+			certificate.checkValidity();
+		} catch (CertificateExpiredException e) {
+			final Object[] args = { certificate.getSubjectDN(), certificate.getNotAfter() };
 			final String format = Messages.getString("Client.client_certificate_expired_format"); //$NON-NLS-1$
 			final String message = MessageFormat.format(format, args);
 			throw new SSLException(message);
-		} catch (CertificateNotYetValidException ex) {
-			final Object[] args = { x509certificate.getSubjectDN(), x509certificate.getNotBefore() };
+		} catch (CertificateNotYetValidException e) {
+			final Object[] args = { certificate.getSubjectDN(), certificate.getNotBefore() };
 			final String format = Messages.getString("Client.client_certificate_not_yet_valid_format"); //$NON-NLS-1$
 			final String message = MessageFormat.format(format, args);
 			throw new SSLException(message);
 		}
 	}
 
-	private void warnCertificateExpirationWithin(final X509Certificate x509certificate, int before) {
-		final Date end = x509certificate.getNotAfter();
+	private void warnCertificateExpirationWithin(final X509Certificate certificate, final int before) {
+		final Date end = certificate.getNotAfter();
 		final Calendar cal = Calendar.getInstance();
 		cal.setTime(end);
 		cal.add(Calendar.DATE, -before);
 		final Date oneMonthBeforeEnd = cal.getTime();
 		final Date today = new Date();
 		if (today.after(oneMonthBeforeEnd) && today.before(end)) {
-			final Object[] args = { x509certificate.getSubjectDN(), end };
+			final Object[] args = { certificate.getSubjectDN(), end };
 			final String format = Messages.getString("Client.warn_certificate_expiration_format");
 			final String message = MessageFormat.format(format, args);
 			final String title = Messages.getString("Client.warning_title");
@@ -363,24 +363,24 @@ public class SSLSocketBuilder {
 			this.delegatee = delegatee;
 		}
 	
-		public String[] getClientAliases(String arg0, Principal[] arg1) {
-			return delegatee.getClientAliases(arg0, arg1);
+		public String[] getClientAliases(String keyType, Principal[] issuers) {
+			return delegatee.getClientAliases(keyType, issuers);
 		}
 	
-		public String chooseClientAlias(String[] arg0, Principal[] arg1, Socket arg2) {
-			return delegatee.chooseClientAlias(arg0, arg1, arg2);
+		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+			return delegatee.chooseClientAlias(keyType, issuers, socket);
 		}
 	
-		public String[] getServerAliases(String arg0, Principal[] arg1) {
-			return delegatee.getServerAliases(arg0, arg1);
+		public String[] getServerAliases(String keyType, Principal[] issuers) {
+			return delegatee.getServerAliases(keyType, issuers);
 		}
 	
-		public String chooseServerAlias(String arg0, Principal[] arg1, Socket arg2) {
-			return delegatee.chooseServerAlias(arg0, arg1, arg2);
+		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+			return delegatee.chooseServerAlias(keyType, issuers, socket);
 		}
 	
-		public X509Certificate[] getCertificateChain(String arg0) {
-			final X509Certificate[] chain = delegatee.getCertificateChain(arg0);
+		public X509Certificate[] getCertificateChain(String alias) {
+			final X509Certificate[] chain = delegatee.getCertificateChain(alias);
 			X509TrustManager tm;
 			try {
 				tm = (X509TrustManager)trustManagers[0];
@@ -391,8 +391,8 @@ public class SSLSocketBuilder {
 			return chain;
 		}
 	
-		public PrivateKey getPrivateKey(String arg0) {
-			return delegatee.getPrivateKey(arg0);
+		public PrivateKey getPrivateKey(String alias) {
+			return delegatee.getPrivateKey(alias);
 		}
 	}
 	
