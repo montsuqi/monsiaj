@@ -227,14 +227,18 @@ public abstract class SignalHandler {
 				if (propDelay != null) {
 					try {
 						long newDelay = Long.parseLong(propDelay);
-						if (newDelay > 0) {
+						if (newDelay >= 0) {
 							delay = newDelay;
 						}
 					} catch (NumberFormatException e) {
 						logger.warn(e);
 					}
 				}
-				timer.schedule(timerTask, delay);
+				if (delay > 0) {
+					timer.schedule(timerTask, delay);
+				} else {
+					timer.cancel();
+				}
 			}
 		};
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
