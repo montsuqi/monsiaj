@@ -33,6 +33,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
@@ -53,11 +54,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.BadPaddingException;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
 
@@ -170,7 +176,6 @@ public class Client implements Runnable {
 			final SSLSocket sslSocket = createSSLSocket(host, port, socket);
 			sslSocket.startHandshake();
 			final SSLSession session = sslSocket.getSession();
-
 			validatePeerCertificates(session.getPeerCertificates());
 			return sslSocket;
 		} catch (SocketException e) {
@@ -193,7 +198,7 @@ public class Client implements Runnable {
 	}
 
 	private boolean isMissingPassphraseMessage(String message) {
-		return message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
+		return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
 			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -203,22 +208,6 @@ public class Client implements Runnable {
 			checkHostNameInCertificate((X509Certificate)serverCertificate);
 		} else {
 			logger.warn("Server Certificate is not a X.509 Certificate");
-		}
-	}
-
-	private void checkCertificateExpiration(final X509Certificate certificate,
-			final String expiredMessageFormat,
-			final String notYetValidMessageFormat) throws SSLException {
-		try {
-			certificate.checkValidity();
-		} catch (CertificateExpiredException e) {
-			final Object[] args = { certificate.getSubjectDN(), certificate.getNotAfter() };
-			final String message = MessageFormat.format(expiredMessageFormat, args);
-			throw new SSLException(message);
-		} catch (CertificateNotYetValidException e) {
-			final Object[] args = { certificate.getSubjectDN(), certificate.getNotBefore() };
-			final String message = MessageFormat.format(notYetValidMessageFormat, args);
-			throw new SSLException(message);
 		}
 	}
 
@@ -250,7 +239,7 @@ public class Client implements Runnable {
 				}
 			}
 		} catch (CertificateParsingException e) {
-			SSLPeerUnverifiedException sslpue = new SSLPeerUnverifiedException(e.getMessage());
+			final SSLPeerUnverifiedException sslpue = new SSLPeerUnverifiedException(e.getMessage());
 			sslpue.initCause(e);
 			throw sslpue;
 		}
@@ -268,70 +257,25 @@ public class Client implements Runnable {
 	}
 
 	private SSLSocket createSSLSocket(String host, int port, Socket socket) throws IOException {
-		boolean useBrowserSetting = getUseBrowserSetting();
-		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
-		logger.debug("ignored...");
-		useBrowserSetting = false;
-		if ( ! useBrowserSetting) {
-			File trustStorePath = getTrustStorePath();
-			System.setProperty("javax.net.ssl.trustStore", trustStorePath.getAbsolutePath());
-		}
-		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
-		String fileName = conf.getClientCertificateFileName();
-		if (fileName != null && fileName.length() > 0) {
-			System.setProperty("javax.net.ssl.keyStore", fileName);
-			String pass = conf.getClientCertificatePassword();
-			if (pass != null && pass.length() > 0) {
-				System.setProperty("javax.net.ssl.keyStorePassword", pass);
-			} else {
-				final String message = Messages.getString("Client.empty_pass");
-				throw new SSLException(message);
-			}
-			checkPkcs12FileFormat();
-		}
-		SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-		return (SSLSocket)factory.createSocket(socket, host, port, true);
-	}
-
-	private void checkPkcs12FileFormat() throws IOException {
 		try {
-			KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-			File file = new File(conf.getClientCertificateFileName());
-			String password = conf.getClientCertificatePassword();
-			FileInputStream fis = new FileInputStream(file);
-			ks.load(fis, password.toCharArray());
-			final Enumeration e = ks.aliases();
-			final String alias = (String)e.nextElement();
-			assert ! e.hasMoreElements();
-			final Certificate certificate = ks.getCertificate(alias);
-			if (certificate instanceof X509Certificate) {
-				final X509Certificate x509certificate = (X509Certificate)certificate;
-				checkCertificateExpiration(x509certificate,
-						Messages.getString("Client.client_certificate_expired_format"), //$NON-NLS-1$
-						Messages.getString("Client.client_certificate_not_yet_valid_format")); //$NON-NLS-1$
-				Date end = x509certificate.getNotAfter();
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(end);
-				int before = getWarnCertificateExpirationThreashold();
-				cal.add(Calendar.DATE, -before);
-				Date oneMonthBeforeEnd = cal.getTime();
-				Date today = new Date();
-				if (today.after(oneMonthBeforeEnd) && today.before(end)) {
-					Object[] args = { x509certificate.getSubjectDN(), end };
-					final String format = Messages.getString("Client.warn_certificate_expiration_format");
-					final String message = MessageFormat.format(format, args);
-					final String title = Messages.getString("Client.warning_title");
-					JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
-				}
-			}
+			final KeyManager[] kms = getKeyManagers();
+			final TrustManager[] tms = getTrustManagers();
+			final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+			ctx.init(kms, tms, null);
+			final SSLSocketFactory factory = ctx.getSocketFactory();
+			return (SSLSocket)factory.createSocket(socket, host, port, true);
+		} catch (GeneralSecurityException e) {
+			final String message = e.getMessage();
+			final SSLException ssle = new SSLException(message);
+			throw ssle;
 		} catch (FileNotFoundException e) {
-			SSLException ssle = new SSLException(e.getMessage());
-			ssle.initCause(e);
+			final String message = e.getMessage();
+			final SSLException ssle = new SSLException(message);
 			throw ssle;
 		} catch (SSLException e) {
 			throw e;
 		} catch (IOException e) {
-			Throwable t = e.getCause();
+			final Throwable t = e.getCause();
 			if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
 				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
 				final SSLException ssle = new SSLException(message);
@@ -344,6 +288,63 @@ public class Client implements Runnable {
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
 			}
+		}
+	}
+
+	private TrustManager[] getTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+		boolean useBrowserSetting = getUseBrowserSetting();
+		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
+		logger.debug("ignored...");
+		useBrowserSetting = false;
+		if (useBrowserSetting) {
+			return null;
+		}
+		final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+		final File trustStorePath = getTrustStorePath();
+		final InputStream is = new FileInputStream(trustStorePath);
+		ks.load(is, null);
+		final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+		tmf.init(ks);
+		return tmf.getTrustManagers();
+	}
+
+	private KeyManager[] getKeyManagers() throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
+		String fileName = conf.getClientCertificateFileName();
+		if (fileName == null || fileName.length() <= 0) {
+			return null;
+		}
+		String pass = conf.getClientCertificatePassword();
+		if (pass != null && pass.length() > 0) {
+			KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+			InputStream is = new FileInputStream(fileName);
+			ks.load(is, pass.toCharArray());
+			checkPkcs12FileFormat(ks);
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+			kmf.init(ks, pass.toCharArray());
+			return kmf.getKeyManagers();
+		} else {
+			final String message = Messages.getString("Client.empty_pass"); //$NON-NLS-1$
+			throw new SSLException(message);
+		}
+	}
+
+	private void checkPkcs12FileFormat(KeyStore ks) throws IOException {
+		try {
+			final Enumeration e = ks.aliases();
+			final String alias = (String)e.nextElement();
+			if (e.hasMoreElements()) {
+				final String message = Messages.getString("Client.more_than_one_client_certificate_in_pkcs12"); //$NON-NLS-1$
+				throw new SSLException(message);
+			}
+			final Certificate certificate = ks.getCertificate(alias);
+			if (certificate instanceof X509Certificate) {
+				final X509Certificate x509certificate = (X509Certificate)certificate;
+				checkCertificateExpiration(x509certificate);
+				final int before = getWarnCertificateExpirationThreashold();
+				warnCertificateExpirationWithin(x509certificate, before);
+			}
+		} catch (SSLException e) {
+			throw e;
 		} catch (Exception e) {
 			IOException ioe = new IOException(e.getMessage());
 			ioe.initCause(e);
@@ -351,12 +352,44 @@ public class Client implements Runnable {
 		}
 	}
 
+	private void checkCertificateExpiration(final X509Certificate x509certificate) throws SSLException {
+		try {
+			x509certificate.checkValidity();
+		} catch (CertificateExpiredException ex) {
+			final Object[] args = { x509certificate.getSubjectDN(), x509certificate.getNotAfter() };
+			final String format = Messages.getString("Client.client_certificate_expired_format"); //$NON-NLS-1$
+			final String message = MessageFormat.format(format, args);
+			throw new SSLException(message);
+		} catch (CertificateNotYetValidException ex) {
+			final Object[] args = { x509certificate.getSubjectDN(), x509certificate.getNotBefore() };
+			final String format = Messages.getString("Client.client_certificate_not_yet_valid_format"); //$NON-NLS-1$
+			final String message = MessageFormat.format(format, args);
+			throw new SSLException(message);
+		}
+	}
+
+	private void warnCertificateExpirationWithin(final X509Certificate x509certificate, int before) {
+		final Date end = x509certificate.getNotAfter();
+		final Calendar cal = Calendar.getInstance();
+		cal.setTime(end);
+		cal.add(Calendar.DATE, -before);
+		final Date oneMonthBeforeEnd = cal.getTime();
+		final Date today = new Date();
+		if (today.after(oneMonthBeforeEnd) && today.before(end)) {
+			final Object[] args = { x509certificate.getSubjectDN(), end };
+			final String format = Messages.getString("Client.warn_certificate_expiration_format");
+			final String message = MessageFormat.format(format, args);
+			final String title = Messages.getString("Client.warning_title");
+			JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
 	private int getWarnCertificateExpirationThreashold() {
 		int before = DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD;
-		String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before"); //$NON-NLS-1$
+		final String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before"); //$NON-NLS-1$
 		if (warnExpirationThreshold != null) {
 			try {
-				int newBefore = Integer.parseInt(warnExpirationThreshold);
+				final int newBefore = Integer.parseInt(warnExpirationThreshold);
 				if (newBefore > 0) {
 					before = newBefore;
 				} else {
