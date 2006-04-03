@@ -85,22 +85,22 @@ public class SSLSocketBuilder {
 				throw e;
 			}
 		} catch (SSLHandshakeException e) {
-			final Throwable t = e.getCause();
-			if (t != null && (t instanceof SSLHandshakeException)) {
-				throw new IOException(Messages.getString("Client.broken_pipe")); //$NON-NLS-1$
+			if (isUnknownCaMessage(e.getMessage())) {
+				final String message = Messages.getString("Client.untrusted_ca"); // $NON-NLS-1$
+				final SSLException ssle = new SSLException(message);
+				throw ssle;
 			}
 			throw e;
 		} catch (IOException e) {
-			final Throwable t = e.getCause();
-			if (t != null && isBrokenPipeMessage(t.getMessage())) {
+			if (isBrokenPipeMessage(e.getMessage())) {
 				throw new IOException(Messages.getString("Client.broken_pipe")); //$NON-NLS-1$
 			}
+			final Throwable t = e.getCause();
 			if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
 				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
 			} else {
-				System.out.println(e);
 				final File file = new File(conf.getClientCertificateFileName());
 				final Object[] args = { file.getName() };
 				final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
@@ -165,9 +165,13 @@ public class SSLSocketBuilder {
 		logger.info("CN matches.");
 	}
 
+	private boolean isUnknownCaMessage(String message) {
+		return message != null && message.indexOf("unknown ca") >= 0; //$NON-NLS-1$
+	}
+
 	private boolean isMissingPassphraseMessage(String message) {
 		return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
-			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
+			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$
 	}
 
 	private boolean isBrokenPipeMessage(String message) {
