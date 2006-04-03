@@ -6,10 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.Principal;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateParsingException;
@@ -30,13 +32,14 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
 
@@ -50,43 +53,66 @@ public class SSLSocketBuilder {
 	private Configuration conf;
 	private Logger logger;
 
-	public SSLSocketBuilder(Configuration conf) {
+	private SSLSocketFactory factory;
+
+	private KeyManager[] keyManagers;
+	TrustManager[] trustManagers;
+
+	public SSLSocketBuilder(Configuration conf) throws IOException {
 		this.conf = conf;
 		logger = Logger.getLogger(this.getClass());
+		try {
+			keyManagers = createKeyManagers();
+			trustManagers = createTrustManagers();
+			final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+			ctx.init(keyManagers, trustManagers, null);
+			factory = ctx.getSocketFactory();
+		} catch (FileNotFoundException e) {
+			final String message = e.getMessage();
+			final SSLException ssle = new SSLException(message);
+			throw ssle;
+		} catch (SSLException e) {
+			throw e;
+		} catch (IOException e) {
+			Throwable t = e.getCause();
+			if (isMissingPassphraseMessage(e.getMessage())) {
+				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
+				final SSLException ssle = new SSLException(message);
+				throw ssle;
+			}
+			if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
+				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
+				final SSLException ssle = new SSLException(message);
+				throw ssle;
+			}
+			final File file = new File(conf.getClientCertificateFileName());
+			final Object[] args = { file.getName() };
+			final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
+			final String message = MessageFormat.format(format, args);
+			final SSLException ssle = new SSLException(message);
+			throw ssle;
+		} catch (GeneralSecurityException e) {
+			final String message = e.getMessage();
+			final SSLException ssle = new SSLException(message);
+			throw ssle;
+		}
 	}
 
 	public SSLSocket createSSLSocket(Socket socket) throws IOException {
 		final String host = conf.getHost();
 		final int port = conf.getPort();
 		try {
-			final KeyManager[] kms = getKeyManagers();
-			final TrustManager[] tms = getTrustManagers();
-			final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
-			ctx.init(kms, tms, null);
-			final SSLSocketFactory factory = ctx.getSocketFactory();
 			SSLSocket sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
 			sslSocket.startHandshake();
 			final SSLSession session = sslSocket.getSession();
 			validatePeerCertificates(session.getPeerCertificates());
 			return sslSocket;
-		} catch (GeneralSecurityException e) {
-			final String message = e.getMessage();
-			final SSLException ssle = new SSLException(message);
-			throw ssle;
-		} catch (FileNotFoundException e) {
-			final String message = e.getMessage();
-			final SSLException ssle = new SSLException(message);
-			throw ssle;
-		} catch (SocketException e) {
-			if (isMissingPassphraseMessage(e.getMessage())) {
-				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
-				throw new SSLException(message);
-			} else {
-				throw e;
-			}
-		} catch (SSLHandshakeException e) {
-			if (isUnknownCaMessage(e.getMessage())) {
-				final String message = Messages.getString("Client.untrusted_ca"); // $NON-NLS-1$
+		} catch (SSLException e) {
+			if (e.getCause() instanceof RuntimeException) {
+				Throwable t = e.getCause();
+				t = t.getCause();
+				logger.fatal(t);
+				String message = Messages.getString("Client.untrusted_certificate");
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
 			}
@@ -95,19 +121,7 @@ public class SSLSocketBuilder {
 			if (isBrokenPipeMessage(e.getMessage())) {
 				throw new IOException(Messages.getString("Client.broken_pipe")); //$NON-NLS-1$
 			}
-			final Throwable t = e.getCause();
-			if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
-				final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
-				final SSLException ssle = new SSLException(message);
-				throw ssle;
-			} else {
-				final File file = new File(conf.getClientCertificateFileName());
-				final Object[] args = { file.getName() };
-				final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
-				final String message = MessageFormat.format(format, args);
-				final SSLException ssle = new SSLException(message);
-				throw ssle;
-			}
+			throw e;
 		}
 	}
 
@@ -165,10 +179,6 @@ public class SSLSocketBuilder {
 		logger.info("CN matches.");
 	}
 
-	private boolean isUnknownCaMessage(String message) {
-		return message != null && message.indexOf("unknown ca") >= 0; //$NON-NLS-1$
-	}
-
 	private boolean isMissingPassphraseMessage(String message) {
 		return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
 			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$
@@ -178,7 +188,7 @@ public class SSLSocketBuilder {
 		return message != null && message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
 	}
 
-	private TrustManager[] getTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+	TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
 		boolean useBrowserSetting = getUseBrowserSetting();
 		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
 		logger.debug("ignored...");
@@ -192,10 +202,18 @@ public class SSLSocketBuilder {
 		ks.load(is, null);
 		final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
 		tmf.init(ks);
-		return tmf.getTrustManagers();
+		final TrustManager[] tms = tmf.getTrustManagers();
+		for (int i = 0; i < tms.length; i++) {
+			if (tms[i] instanceof X509TrustManager) {
+				final X509TrustManager delegatee = (X509TrustManager)tms[i];
+				TrustManager tm = new MyTrustManager(delegatee);
+				return new TrustManager[] { tm };
+			}
+		}
+		return tms;
 	}
 
-	private KeyManager[] getKeyManagers() throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
+	private KeyManager[] createKeyManagers() throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
 		String fileName = conf.getClientCertificateFileName();
 		if (fileName == null || fileName.length() <= 0) {
 			return null;
@@ -208,7 +226,15 @@ public class SSLSocketBuilder {
 			checkPkcs12FileFormat(ks);
 			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
 			kmf.init(ks, pass.toCharArray());
-			return kmf.getKeyManagers();
+			final KeyManager[] kms = kmf.getKeyManagers();
+			for (int i = 0; i < kms.length; i++) {
+				if (kms[i] instanceof X509KeyManager) {
+					final X509KeyManager delegatee = (X509KeyManager)kms[i];
+					KeyManager km = new MyKeyManager(delegatee);
+					return new KeyManager[] { km };
+				}
+			}
+			return kms;
 		} else {
 			final String message = Messages.getString("Client.empty_pass"); //$NON-NLS-1$
 			throw new SSLException(message);
@@ -337,4 +363,63 @@ public class SSLSocketBuilder {
 		return before;
 	}
 
+	final class MyKeyManager implements X509KeyManager {
+		private final X509KeyManager delegatee;
+	
+		MyKeyManager(X509KeyManager delegatee) {
+			this.delegatee = delegatee;
+		}
+	
+		public String[] getClientAliases(String arg0, Principal[] arg1) {
+			return delegatee.getClientAliases(arg0, arg1);
+		}
+	
+		public String chooseClientAlias(String[] arg0, Principal[] arg1, Socket arg2) {
+			return delegatee.chooseClientAlias(arg0, arg1, arg2);
+		}
+	
+		public String[] getServerAliases(String arg0, Principal[] arg1) {
+			return delegatee.getServerAliases(arg0, arg1);
+		}
+	
+		public String chooseServerAlias(String arg0, Principal[] arg1, Socket arg2) {
+			return delegatee.chooseServerAlias(arg0, arg1, arg2);
+		}
+	
+		public X509Certificate[] getCertificateChain(String arg0) {
+			final X509Certificate[] chain = delegatee.getCertificateChain(arg0);
+			X509TrustManager tm;
+			try {
+				tm = (X509TrustManager)trustManagers[0];
+				tm.checkClientTrusted(chain, "RSA"); //$NON-NLS-1$
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return chain;
+		}
+	
+		public PrivateKey getPrivateKey(String arg0) {
+			return delegatee.getPrivateKey(arg0);
+		}
+	}
+	
+	final class MyTrustManager implements X509TrustManager {
+		private final X509TrustManager delegatee;
+	
+		MyTrustManager(X509TrustManager delegatee) {
+			this.delegatee = delegatee;
+		}
+	
+		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			delegatee.checkClientTrusted(chain, authType);
+		}
+	
+		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			delegatee.checkServerTrusted(chain, authType);
+		}
+	
+		public X509Certificate[] getAcceptedIssuers() {
+			return delegatee.getAcceptedIssuers();
+		}
+	}
 }
