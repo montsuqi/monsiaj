@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.client;
 
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,10 +64,13 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketBuilder {
 
@@ -446,13 +450,53 @@ public class SSLSocketBuilder {
 			try {
 				delegatee.checkServerTrusted(chain, authType);
 			} catch (CertificateException e) {
-				final Object[] args = { e.getMessage() };
-				final String format = Messages.getString("Client.untrusted_server_certificate_format");
-				final String message = MessageFormat.format(format, args);
-				throw new CertificateException(message);
+				showAuthenticationFailure(chain, e);
+			}
+		}
+
+		private void showAuthenticationFailure(X509Certificate[] chain, CertificateException e) throws CertificateException {
+			Object[] options = {
+				Messages.getString("Client.proceed"),
+				Messages.getString("Client.check_certificates"),
+				Messages.getString("Client.cancel")
+			};
+			int n = JOptionPane.showOptionDialog(null,
+				Messages.getString("Client.verify_failed_proceed_connection_p"),
+				Messages.getString("Client.warning_title"),
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
+				options[2]);
+			System.out.println(n);
+			switch (n) {
+			case 0:
+				// do nothing
+				break;
+			case 1:
+				examineCertificateChain(chain);
+				break;
+			default:
+				throw new CertificateException(Messages.getString("Client.server_certificate_could_not_be_trusted"));
 			}
 		}
 	
+		private void examineCertificateChain(X509Certificate[] chain) throws CertificateException {
+			final JPanel panel = new JPanel();
+			panel.setLayout(new BorderLayout());
+			final String message = Messages.getString("Client.trust_this_certificate_chain_p");
+			final JLabel messageLabel = new JLabel(message);
+			panel.add(messageLabel, BorderLayout.NORTH);
+			final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
+			certificatePanel.setCertificateChain(chain);
+			panel.add(certificatePanel, BorderLayout.CENTER);
+			final String title = Messages.getString("Client.checking_certificate_chain");
+			int i = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
+			if (i != JOptionPane.YES_OPTION) {
+				throw new CertificateException(Messages.getString("Client.server_certificate_could_not_be_trusted"));
+			}
+		}
+		
 		public X509Certificate[] getAcceptedIssuers() {
 			return delegatee.getAcceptedIssuers();
 		}
