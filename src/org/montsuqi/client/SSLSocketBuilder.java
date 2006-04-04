@@ -144,7 +144,7 @@ public class SSLSocketBuilder {
 				Throwable t = e.getCause();
 				t = t.getCause();
 				logger.fatal(t);
-				final String message = Messages.getString("Client.untrusted_certificate");
+				final String message = Messages.getString("Client.untrusted_client_certificate");
 				final SSLException ssle = new SSLException(message);
 				throw ssle;
 			}
@@ -468,35 +468,30 @@ public class SSLSocketBuilder {
 				null,
 				options,
 				options[2]);
-			System.out.println(n);
 			switch (n) {
 			case 0:
 				// do nothing
 				break;
 			case 1:
-				examineCertificateChain(chain);
-				break;
+				final JPanel panel = new JPanel();
+				panel.setLayout(new BorderLayout());
+				final String message = Messages.getString("Client.trust_this_certificate_chain_p");
+				final JLabel messageLabel = new JLabel(message);
+				panel.add(messageLabel, BorderLayout.NORTH);
+				final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
+				certificatePanel.setCertificateChain(chain);
+				panel.add(certificatePanel, BorderLayout.CENTER);
+				final String title = Messages.getString("Client.checking_certificate_chain");
+				int i = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
+				if (i == JOptionPane.YES_OPTION) {
+					break;
+				}
+				// fall through
 			default:
 				throw new CertificateException(Messages.getString("Client.server_certificate_could_not_be_trusted"));
 			}
 		}
 	
-		private void examineCertificateChain(X509Certificate[] chain) throws CertificateException {
-			final JPanel panel = new JPanel();
-			panel.setLayout(new BorderLayout());
-			final String message = Messages.getString("Client.trust_this_certificate_chain_p");
-			final JLabel messageLabel = new JLabel(message);
-			panel.add(messageLabel, BorderLayout.NORTH);
-			final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
-			certificatePanel.setCertificateChain(chain);
-			panel.add(certificatePanel, BorderLayout.CENTER);
-			final String title = Messages.getString("Client.checking_certificate_chain");
-			int i = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
-			if (i != JOptionPane.YES_OPTION) {
-				throw new CertificateException(Messages.getString("Client.server_certificate_could_not_be_trusted"));
-			}
-		}
-		
 		public X509Certificate[] getAcceptedIssuers() {
 			return delegatee.getAcceptedIssuers();
 		}
