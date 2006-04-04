@@ -443,7 +443,14 @@ public class SSLSocketBuilder {
 		}
 	
 		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-			delegatee.checkServerTrusted(chain, authType);
+			try {
+				delegatee.checkServerTrusted(chain, authType);
+			} catch (CertificateException e) {
+				final Object[] args = { e.getMessage() };
+				final String format = Messages.getString("Client.untrusted_server_certificate_format");
+				final String message = MessageFormat.format(format, args);
+				throw new CertificateException(message);
+			}
 		}
 	
 		public X509Certificate[] getAcceptedIssuers() {
