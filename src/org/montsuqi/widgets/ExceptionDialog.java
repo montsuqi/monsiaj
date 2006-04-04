@@ -24,6 +24,7 @@ package org.montsuqi.widgets;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 
 import javax.net.ssl.SSLException;
@@ -54,6 +55,8 @@ public class ExceptionDialog extends JOptionPane {
 			messageArgs[0] = Messages.getString("Launcher.socket_exception_message"); //$NON-NLS-1$
 		} else if (t instanceof IOException) {
 			messageArgs[0] = Messages.getString("Launcher.io_exception_message"); //$NON-NLS-1$
+		} else if (t instanceof GeneralSecurityException) {
+			messageArgs[0] = Messages.getString("Launcher.security_exception_message"); //$NON-NLS-1$
 		} else {
 			messageArgs[0] = Messages.getString("Launcher.generic_exception_message"); //$NON-NLS-1$
 		}
