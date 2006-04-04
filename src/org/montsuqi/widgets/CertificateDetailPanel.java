@@ -25,6 +25,7 @@ import javax.swing.table.TableModel;
 
 public class CertificateDetailPanel extends JPanel {
 
+	static final int BYTES_IN_ROW = 16;
 	JTable table;
 	JTextArea text;
 	JList list;
@@ -36,7 +37,7 @@ public class CertificateDetailPanel extends JPanel {
 
 	public void setCertificateChain(final X509Certificate[] chain) {
 		this.chain = chain;
-		final ListModel listModel = new CertificateListModel(chain);
+		final ListModel listModel = new CertificateListModel();
 		list.setModel(listModel);
 		final ListSelectionModel selection = list.getSelectionModel();
 		selection.addListSelectionListener(new ListSelectionListener() {
@@ -76,7 +77,7 @@ public class CertificateDetailPanel extends JPanel {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		text = new JTextArea(7, 4 + 1 + 16 * 3);
+		text = new JTextArea(128 / BYTES_IN_ROW + 1, 4 + 1 + BYTES_IN_ROW * 3 + 1 + 1);
 		Font font = text.getFont();
 		int style = font.getSize();
 		int size = font.getSize();
@@ -95,152 +96,149 @@ public class CertificateDetailPanel extends JPanel {
 		panel.add(textScroll, BorderLayout.SOUTH);
 		add(panel, BorderLayout.EAST);
 	}
+
+	class CertificateListModel extends AbstractListModel {
+
+		public int getSize() {
+			return chain.length;
+		}
+
+		public Object getElementAt(int index) {
+			final X509Certificate certificate = chain[index];
+			final X500Principal issuerPrincipal = certificate.getIssuerX500Principal();
+			final String issuerName = getCommonName(issuerPrincipal);
+			final X500Principal subjectPrincipal = certificate.getSubjectX500Principal();
+			final String subjectName = getCommonName(subjectPrincipal);
+			return subjectName + " (" + issuerName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		private String getCommonName(X500Principal principal) {
+			final String distingishName = principal.getName();
+			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+			final Matcher matcher = pattern.matcher(distingishName);
+			if (matcher.find()) {
+				return matcher.group(1);
+			} else {
+				return "NOT KNOWN"; //$NON-NLS-1$
+			}
+		}
+	}
+
+	class CertificateTableModel extends AbstractTableModel {
+
+		String[] fieldNames = {
+			Messages.getString("CertificateDetailPanel.Version"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Serial"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Algorithm"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Issuer"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Validity"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Subject"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Signature") //$NON-NLS-1$
+		};
+
+		private static final int VERSION_FIELD = 0;
+		private static final int SERIAL_FIELD = 1;
+		private static final int ALGORITHM_FIELD = 2;
+		private static final int ISSUER_FIELD = 3;
+		private static final int VALIDITY_FIELD = 4;
+		private static final int SUBJECT_FIELD = 5;
+		private static final int SIGNATURE_FIELD = 6;
+
+		private String[] columnNames = {
+				Messages.getString("CertificateDetailPanel.Field"), //$NON-NLS-1$
+				Messages.getString("CertificateDetailPanel.Value") //$NON-NLS-1$
+		};
+
+		private static final int FIELD_COLUMN = 0;
+		static final int VALUE_COLUMN = 1;
+
+		private X509Certificate certificate;
+
+		public CertificateTableModel(X509Certificate certificate) {
+			this.certificate = certificate;
+		}
+
+		public int getRowCount() {
+			return fieldNames.length;
+		}
+
+		public int getColumnCount() {
+			return columnNames.length;
+		}
+
+		public String getColumnName(int columnIndex) {
+			return columnNames[columnIndex];
+		}
+
+		public Class getColumnClass(int columnIndex) {
+			return String.class;
+		}
+
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return false;
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			switch (columnIndex) {
+			case FIELD_COLUMN:
+				return fieldNames[rowIndex];
+			case VALUE_COLUMN:
+				return getFieldValueFor(rowIndex);
+			}
+			throw new IllegalArgumentException("column is out of range."); //$NON-NLS-1$
+		}
+
+		private Object getFieldValueFor(int rowIndex) {
+			switch (rowIndex) {
+			case VERSION_FIELD:
+				return new Integer(certificate.getVersion());
+			case SERIAL_FIELD:
+				return certificate.getSerialNumber();
+			case ALGORITHM_FIELD:
+				return certificate.getSigAlgName();
+			case ISSUER_FIELD:
+				return certificate.getIssuerDN();
+			case VALIDITY_FIELD:
+				final Date notBefore = certificate.getNotBefore();
+				final Date notAfter = certificate.getNotAfter();
+				final Format format = new MessageFormat("[{0}, {1}]"); //$NON-NLS-1$
+				final Object[] args = { notBefore, notAfter };
+				return format.format(args);
+			case SUBJECT_FIELD:
+				return certificate.getSubjectDN();
+			case SIGNATURE_FIELD:
+				return formatSignature(certificate.getSignature());
+			default:
+				throw new IllegalArgumentException("row out of range."); //$NON-NLS-1$
+			}
+		}
+
+		private String formatSignature(byte[] signature) {
+			StringBuffer buf = new StringBuffer();
+			int rows = signature.length / BYTES_IN_ROW;
+			for (int row = 0; row < rows; row++) {
+				String offset = ("0000" + Integer.toHexString(row * BYTES_IN_ROW)); //$NON-NLS-1$
+				offset = offset.substring(offset.length() - "0000".length()); //$NON-NLS-1$
+				byte[] rowBytes = new byte[CertificateDetailPanel.BYTES_IN_ROW];
+				System.arraycopy(signature, row * BYTES_IN_ROW, rowBytes, 0, BYTES_IN_ROW);
+				buf.append(offset);
+				buf.append(':');
+				appendBytes(buf, rowBytes);
+				buf.append('\n');
+			}
+			return buf.toString();
+		}
+
+		private void appendBytes(StringBuffer buf, byte[] rowBytes) {
+			for (int i = 0; i < rowBytes.length; i++) {
+				String hex = ("00" + Integer.toHexString(rowBytes[i])); //$NON-NLS-1$
+				hex = hex.substring(hex.length() - "00".length()); //$NON-NLS-1$
+				buf.append(' ');
+				if (i == BYTES_IN_ROW / 2) {
+					buf.append(' ');
+				}
+				buf.append(hex);
+			}
+		}
+	}
 } 
-
-class CertificateListModel extends AbstractListModel {
-
-	private X509Certificate[] chain;
-
-	CertificateListModel(X509Certificate[] chain) {
-		this.chain = chain;
-	}
-
-	public int getSize() {
-		return chain.length;
-	}
-
-	public Object getElementAt(int index) {
-		final X509Certificate certificate = chain[index];
-		final X500Principal issuerPrincipal = certificate.getIssuerX500Principal();
-		final String issuerName = getCommonName(issuerPrincipal);
-		final X500Principal subjectPrincipal = certificate.getSubjectX500Principal();
-		final String subjectName = getCommonName(subjectPrincipal);
-		return subjectName + " (" + issuerName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	private String getCommonName(X500Principal principal) {
-		final String distingishName = principal.getName();
-		final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-		final Matcher matcher = pattern.matcher(distingishName);
-		if (matcher.find()) {
-			return matcher.group(1);
-		} else {
-			return "NOT KNOWN"; //$NON-NLS-1$
-		}
-	}
-}
-
-class CertificateTableModel extends AbstractTableModel {
-
-	String[] fieldNames = {
-		Messages.getString("CertificateDetailPanel.Version"), //$NON-NLS-1$
-		Messages.getString("CertificateDetailPanel.Serial"), //$NON-NLS-1$
-		Messages.getString("CertificateDetailPanel.Algorithm"), //$NON-NLS-1$
-		Messages.getString("CertificateDetailPanel.Issuer"), //$NON-NLS-1$
-		Messages.getString("CertificateDetailPanel.Validity"), //$NON-NLS-1$
-		Messages.getString("CertificateDetailPanel.Subject"), //$NON-NLS-1$
-		Messages.getString("CertificateDetailPanel.Signature") //$NON-NLS-1$
-	};
-
-	private static final int VERSION_FIELD = 0;
-	private static final int SERIAL_FIELD = 1;
-	private static final int ALGORITHM_FIELD = 2;
-	private static final int ISSUER_FIELD = 3;
-	private static final int VALIDITY_FIELD = 4;
-	private static final int SUBJECT_FIELD = 5;
-	private static final int SIGNATURE_FIELD = 6;
-
-	private String[] columnNames = {
-			Messages.getString("CertificateDetailPanel.Field"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Value") //$NON-NLS-1$
-	};
-
-	private static final int FIELD_COLUMN = 0;
-	static final int VALUE_COLUMN = 1;
-
-	private X509Certificate certificate;
-
-	public CertificateTableModel(X509Certificate certificate) {
-		this.certificate = certificate;
-	}
-
-	public int getRowCount() {
-		return fieldNames.length;
-	}
-
-	public int getColumnCount() {
-		return columnNames.length;
-	}
-
-	public String getColumnName(int columnIndex) {
-		return columnNames[columnIndex];
-	}
-
-	public Class getColumnClass(int columnIndex) {
-		return String.class;
-	}
-
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return false;
-	}
-
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		switch (columnIndex) {
-		case FIELD_COLUMN:
-			return fieldNames[rowIndex];
-		case VALUE_COLUMN:
-			return getFieldValueFor(rowIndex);
-		}
-		throw new IllegalArgumentException("column is out of range."); //$NON-NLS-1$
-	}
-
-	private Object getFieldValueFor(int rowIndex) {
-		switch (rowIndex) {
-		case VERSION_FIELD:
-			return new Integer(certificate.getVersion());
-		case SERIAL_FIELD:
-			return certificate.getSerialNumber();
-		case ALGORITHM_FIELD:
-			return certificate.getSigAlgName();
-		case ISSUER_FIELD:
-			return certificate.getIssuerDN();
-		case VALIDITY_FIELD:
-			final Date notBefore = certificate.getNotBefore();
-			final Date notAfter = certificate.getNotAfter();
-			final Format format = new MessageFormat("[{0}, {1}]"); //$NON-NLS-1$
-			final Object[] args = { notBefore, notAfter };
-			return format.format(args);
-		case SUBJECT_FIELD:
-			return certificate.getSubjectDN();
-		case SIGNATURE_FIELD:
-			return formatSignature(certificate.getSignature());
-		default:
-			throw new IllegalArgumentException("row out of range."); //$NON-NLS-1$
-		}
-	}
-
-	private String formatSignature(byte[] signature) {
-		StringBuffer buf = new StringBuffer();
-		int rows = signature.length / 16;
-		for (int row = 0; row < rows; row++) {
-			String offset = ("0000" + Integer.toHexString(row * 16)); //$NON-NLS-1$
-			offset = offset.substring(offset.length() - "0000".length()); //$NON-NLS-1$
-			byte[] rowBytes = new byte[16];
-			System.arraycopy(signature, row * 16, rowBytes, 0, 16);
-			buf.append(offset);
-			buf.append(':');
-			appendBytes(buf, rowBytes);
-			buf.append('\n');
-		}
-		return buf.toString();
-	}
-
-	private void appendBytes(StringBuffer buf, byte[] rowBytes) {
-		for (int i = 0; i < rowBytes.length; i++) {
-			String hex = ("00" + Integer.toHexString(rowBytes[i])); //$NON-NLS-1$
-			hex = hex.substring(hex.length() - "00".length()); //$NON-NLS-1$
-			buf.append(" "); //$NON-NLS-1$
-			buf.append(hex);
-		}
-	}
-}
