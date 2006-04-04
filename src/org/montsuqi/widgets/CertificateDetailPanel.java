@@ -36,12 +36,12 @@ public class CertificateDetailPanel extends JPanel {
 
 	public void setCertificateChain(final X509Certificate[] chain) {
 		this.chain = chain;
-		ListModel listModel = new CertificateListModel(chain);
+		final ListModel listModel = new CertificateListModel(chain);
 		list.setModel(listModel);
-		ListSelectionModel selection = list.getSelectionModel();
+		final ListSelectionModel selection = list.getSelectionModel();
 		selection.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				int selected = list.getSelectedIndex();
+				final int selected = list.getSelectedIndex();
 				setFocusedCertificate(CertificateDetailPanel.this.chain[selected]);
 			}
 		});
@@ -49,18 +49,18 @@ public class CertificateDetailPanel extends JPanel {
 	}
 
 	public void setFocusedCertificate(final X509Certificate certificate) {
-		TableModel model = new CertificateTableModel(certificate);
-		ListSelectionModel oldSelection = table.getSelectionModel();
-		int oldSelectionIndex = oldSelection.getLeadSelectionIndex();
+		final TableModel model = new CertificateTableModel(certificate);
+		final ListSelectionModel oldSelection = table.getSelectionModel();
+		final int oldSelectionIndex = oldSelection.getLeadSelectionIndex();
 		table.setModel(model);
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
-		ListSelectionModel selection = table.getSelectionModel();
+		final ListSelectionModel selection = table.getSelectionModel();
 		selection.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if ( ! e.getValueIsAdjusting()) {
 					final int selectedRow = table.getSelectedRow();
 					if (0 <= selectedRow && selectedRow < table.getRowCount()) {
-						Object value = table.getValueAt(selectedRow, CertificateTableModel.VALUE_COLUMN);
+						final Object value = table.getValueAt(selectedRow, CertificateTableModel.VALUE_COLUMN);
 						text.setText(value.toString());
 					}
 				}
@@ -86,7 +86,7 @@ public class CertificateDetailPanel extends JPanel {
 		final JScrollPane listScroll = new JScrollPane(list);
 		add(listScroll, BorderLayout.WEST);
 
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		final JScrollPane tableScroll = new JScrollPane(table);
 		panel.add(tableScroll, BorderLayout.NORTH);
@@ -115,12 +115,12 @@ class CertificateListModel extends AbstractListModel {
 		final String issuerName = getCommonName(issuerPrincipal);
 		final X500Principal subjectPrincipal = certificate.getSubjectX500Principal();
 		final String subjectName = getCommonName(subjectPrincipal);
-		return subjectName + " (" + issuerName + ")";
+		return subjectName + " (" + issuerName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private String getCommonName(X500Principal principal) {
 		final String distingishName = principal.getName();
-		final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE);
+		final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 		final Matcher matcher = pattern.matcher(distingishName);
 		if (matcher.find()) {
 			return matcher.group(1);
@@ -208,7 +208,7 @@ class CertificateTableModel extends AbstractTableModel {
 			final Date notBefore = certificate.getNotBefore();
 			final Date notAfter = certificate.getNotAfter();
 			final Format format = new MessageFormat("[{0}, {1}]"); //$NON-NLS-1$
-			final Object[] args = new Object[] {notBefore, notAfter };
+			final Object[] args = { notBefore, notAfter };
 			return format.format(args);
 		case SUBJECT_FIELD:
 			return certificate.getSubjectDN();
