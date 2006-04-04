@@ -30,6 +30,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
+import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class Client implements Runnable {
 		return new Client(conf);
 	}
 
-	void connect() throws IOException {
+	void connect() throws IOException, GeneralSecurityException {
 		String encoding = conf.getEncoding();
 		Map styles = loadStyles();
 		String[] pathElements = {
@@ -128,7 +129,7 @@ public class Client implements Runnable {
 		}
 	}
 
-	Socket createSocket() throws IOException {
+	Socket createSocket() throws IOException, GeneralSecurityException {
 		String host = conf.getHost();
 		int port = conf.getPort();
 		SocketAddress address = new InetSocketAddress(host, port);

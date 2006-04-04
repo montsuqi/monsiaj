@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -65,7 +66,7 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException {
+	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException, GeneralSecurityException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		this.cacheRoot = cacheRoot;
