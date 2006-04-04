@@ -132,7 +132,7 @@ public class SSLSocketBuilder {
 		}
 	}
 
-	public SSLSocket createSSLSocket(final Socket socket, final String host, final int port) throws IOException {
+	public SSLSocket createSSLSocket(final Socket socket, final String host, final int port) throws IOException, GeneralSecurityException {
 		try {
 			final SSLSocket sslSocket = (SSLSocket)factory.createSocket(socket, host, port, true);
 			sslSocket.startHandshake();
@@ -144,9 +144,9 @@ public class SSLSocketBuilder {
 				Throwable t = e.getCause();
 				t = t.getCause();
 				logger.fatal(t);
-				final String message = Messages.getString("Client.untrusted_client_certificate");
-				final SSLException ssle = new SSLException(message);
-				throw ssle;
+				if (t instanceof GeneralSecurityException) {
+					throw (GeneralSecurityException)t;
+				}
 			}
 			throw e;
 		} catch (IOException e) {
@@ -443,25 +443,33 @@ public class SSLSocketBuilder {
 		}
 	
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-			delegatee.checkClientTrusted(chain, authType);
+			try {
+				delegatee.checkClientTrusted(chain, authType);
+			} catch (CertificateException e) {
+				final String messageForDialog = Messages.getString("Client.client_certificate_verify_failed_proceed_connection_p");
+				final String messageForException = Messages.getString("Client.untrusted_client_certificate");
+				showAuthenticationFailure(chain, messageForDialog, messageForException);
+			}
 		}
 	
 		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 			try {
 				delegatee.checkServerTrusted(chain, authType);
 			} catch (CertificateException e) {
-				showAuthenticationFailure(chain, e);
+				final String messageForDialog = Messages.getString("Client.server_certificate_verify_failed_proceed_connection_p");
+				final String messageForException = Messages.getString("Client.server_certificate_could_not_be_trusted");
+				showAuthenticationFailure(chain, messageForDialog, messageForException);
 			}
 		}
 
-		private void showAuthenticationFailure(X509Certificate[] chain, CertificateException e) throws CertificateException {
+		private void showAuthenticationFailure(X509Certificate[] chain, String messageForDialog, String messageForException) throws CertificateException {
 			Object[] options = {
 				Messages.getString("Client.proceed"),
 				Messages.getString("Client.check_certificates"),
 				Messages.getString("Client.cancel")
 			};
 			int n = JOptionPane.showOptionDialog(null,
-				Messages.getString("Client.verify_failed_proceed_connection_p"),
+				messageForDialog,
 				Messages.getString("Client.warning_title"),
 				JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE,
@@ -488,7 +496,7 @@ public class SSLSocketBuilder {
 				}
 				// fall through
 			default:
-				throw new CertificateException(Messages.getString("Client.server_certificate_could_not_be_trusted"));
+				throw new CertificateException(messageForException);
 			}
 		}
 	
