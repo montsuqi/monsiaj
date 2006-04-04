@@ -79,20 +79,30 @@ public class SSLSocketBuilder {
 	private final KeyManager[] keyManagers;
 	final TrustManager[] trustManagers;
 
-	public SSLSocketBuilder(String fileName, String password) throws SSLException {
+	public SSLSocketBuilder(String fileName, String password) throws IOException {
 		logger = Logger.getLogger(this.getClass());
+		boolean keyManagerIsReady = false;
 		try {
 			keyManagers = createKeyManagers(fileName, password);
+			keyManagerIsReady = true;
 			trustManagers = createTrustManagers();
 			final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 			ctx.init(keyManagers, trustManagers, null);
 			factory = ctx.getSocketFactory();
-		} catch (FileNotFoundException e) {
-			final String message = e.getMessage();
-			final SSLException ssle = new SSLException(message);
-			throw ssle;
 		} catch (SSLException e) {
 			throw e;
+		} catch (FileNotFoundException e) {
+			String missingFileName;
+			// we cannot check keyManagers != null here, since it may not be initialized.
+			if (keyManagerIsReady) {
+				missingFileName = getTrustStorePath().getName();
+			} else {
+				missingFileName = new File(fileName).getName();
+			}
+			final String format = Messages.getString("Client.file_not_found_format");
+			Object[] args = { missingFileName };
+			final String message = MessageFormat.format(format, args);
+			throw new IOException(message);
 		} catch (IOException e) {
 			final Throwable t = e.getCause();
 			if (isMissingPassphraseMessage(e.getMessage())) {
@@ -137,7 +147,8 @@ public class SSLSocketBuilder {
 			throw e;
 		} catch (IOException e) {
 			if (isBrokenPipeMessage(e.getMessage())) {
-				throw new IOException(Messages.getString("Client.broken_pipe")); //$NON-NLS-1$
+				final String message = Messages.getString("Client.broken_pipe");
+				throw new IOException(message); //$NON-NLS-1$
 			}
 			throw e;
 		}
@@ -179,7 +190,8 @@ public class SSLSocketBuilder {
 				}
 			}
 		} catch (CertificateParsingException e) {
-			final SSLPeerUnverifiedException sslpue = new SSLPeerUnverifiedException(e.getMessage());
+			final String message = e.getMessage();
+			final SSLPeerUnverifiedException sslpue = new SSLPeerUnverifiedException(message);
 			sslpue.initCause(e);
 			throw sslpue;
 		}
@@ -190,7 +202,8 @@ public class SSLSocketBuilder {
 		final Matcher matcher = pattern.matcher(name);
 		if ( ! matcher.find() || ! matcher.group(1).equalsIgnoreCase(host)) {
 			final String format = Messages.getString("Client.hostname_mismatch_format");
-			final String message = MessageFormat.format(format, new Object[] { matcher.group(1), host });
+			final Object[] args = new Object[] { matcher.group(1), host };
+			final String message = MessageFormat.format(format, args);
 			throw new SSLPeerUnverifiedException(message);
 		}
 		logger.info("CN matches.");
@@ -407,7 +420,7 @@ public class SSLSocketBuilder {
 			try {
 				tm = (X509TrustManager)trustManagers[0];
 				tm.checkClientTrusted(chain, "RSA"); //$NON-NLS-1$
-			} catch (Exception e) {
+			} catch (CertificateException e) {
 				throw new RuntimeException(e);
 			}
 			return chain;
