@@ -79,7 +79,7 @@ public class SSLSocketBuilder {
 	private final KeyManager[] keyManagers;
 	final TrustManager[] trustManagers;
 
-	public SSLSocketBuilder(String fileName, String password) throws IOException {
+	public SSLSocketBuilder(String fileName, String password) throws SSLException {
 		logger = Logger.getLogger(this.getClass());
 		try {
 			keyManagers = createKeyManagers(fileName, password);
