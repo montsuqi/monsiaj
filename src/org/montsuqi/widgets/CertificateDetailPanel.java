@@ -1,6 +1,7 @@
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.security.cert.X509Certificate;
 import java.text.Format;
@@ -43,7 +44,10 @@ public class CertificateDetailPanel extends JPanel {
 		selection.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				final int selected = list.getSelectedIndex();
-				setFocusedCertificate(CertificateDetailPanel.this.chain[selected]);
+				if (0 <= selected && selected < CertificateDetailPanel.this.chain.length) {
+					final X509Certificate certificate = CertificateDetailPanel.this.chain[selected];
+					setFocusedCertificate(certificate);
+				}
 			}
 		});
 		list.setSelectedIndex(0);
@@ -54,7 +58,8 @@ public class CertificateDetailPanel extends JPanel {
 		final ListSelectionModel oldSelection = table.getSelectionModel();
 		final int oldSelectionIndex = oldSelection.getLeadSelectionIndex();
 		table.setModel(model);
-		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		final Dimension preferredSize = table.getPreferredSize();
+		table.setPreferredScrollableViewportSize(preferredSize);
 		final ListSelectionModel selection = table.getSelectionModel();
 		selection.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
@@ -63,12 +68,16 @@ public class CertificateDetailPanel extends JPanel {
 					if (0 <= selectedRow && selectedRow < table.getRowCount()) {
 						final Object value = table.getValueAt(selectedRow, CertificateTableModel.VALUE_COLUMN);
 						text.setText(value.toString());
+						text.setCaretPosition(0);
 					}
 				}
 			}
 		});
 		selection.setSelectionInterval(oldSelectionIndex, oldSelectionIndex);
 	}
+
+	static final int BYTE_WIDTH = "00".length();
+	static final int HEADING_WIDTH = "0000".length();
 
 	private void initComponents() {
 		setLayout(new BorderLayout());
@@ -77,12 +86,16 @@ public class CertificateDetailPanel extends JPanel {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		text = new JTextArea(128 / BYTES_IN_ROW + 1, 4 + 1 + BYTES_IN_ROW * 3 + 1 + 1);
-		Font font = text.getFont();
-		int style = font.getSize();
-		int size = font.getSize();
-		font = new Font("Monospaced", style, size);
-		text.setFont(font);
+		final int keyLength = 128;
+		final int rows = keyLength / BYTES_IN_ROW;
+		final int columns = HEADING_WIDTH + 1 + BYTES_IN_ROW * (1 + BYTE_WIDTH) + 1 /* center gap width */;
+		text = new JTextArea(rows + 1, columns + 1); /* +1 to count in scrollbar width */
+		final Font font = text.getFont();
+		final int style = font.getSize();
+		final int size = font.getSize();
+		final Font monospaceFont = new Font("Monospaced", style, size); //$NON-NLS-1$
+		text.setFont(monospaceFont);
+		text.setEditable(false);
 
 		final JScrollPane listScroll = new JScrollPane(list);
 		add(listScroll, BorderLayout.WEST);
@@ -109,7 +122,10 @@ public class CertificateDetailPanel extends JPanel {
 			final String issuerName = getCommonName(issuerPrincipal);
 			final X500Principal subjectPrincipal = certificate.getSubjectX500Principal();
 			final String subjectName = getCommonName(subjectPrincipal);
-			return subjectName + " (" + issuerName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			final Object[] args = { subjectName, issuerName };
+			final MessageFormat format = new MessageFormat("{0} ({1})"); //$NON-NLS-1$
+			final String value = format.format(args);
+			return value;
 		}
 
 		private String getCommonName(X500Principal principal) {
@@ -119,7 +135,7 @@ public class CertificateDetailPanel extends JPanel {
 			if (matcher.find()) {
 				return matcher.group(1);
 			} else {
-				return "NOT KNOWN"; //$NON-NLS-1$
+				return null;
 			}
 		}
 	}
@@ -216,29 +232,43 @@ public class CertificateDetailPanel extends JPanel {
 		private String formatSignature(byte[] signature) {
 			StringBuffer buf = new StringBuffer();
 			int rows = signature.length / BYTES_IN_ROW;
+			int rest = signature.length % BYTES_IN_ROW;
 			for (int row = 0; row < rows; row++) {
-				String offset = ("0000" + Integer.toHexString(row * BYTES_IN_ROW)); //$NON-NLS-1$
-				offset = offset.substring(offset.length() - "0000".length()); //$NON-NLS-1$
-				byte[] rowBytes = new byte[CertificateDetailPanel.BYTES_IN_ROW];
-				System.arraycopy(signature, row * BYTES_IN_ROW, rowBytes, 0, BYTES_IN_ROW);
-				buf.append(offset);
-				buf.append(':');
-				appendBytes(buf, rowBytes);
-				buf.append('\n');
+				int offset = row * BYTES_IN_ROW;
+				appendRow(buf, signature, offset, BYTES_IN_ROW);
+			}
+			if (rest > 0) {
+				appendRow(buf, signature, signature.length - rest, rest);
 			}
 			return buf.toString();
 		}
 
-		private void appendBytes(StringBuffer buf, byte[] rowBytes) {
-			for (int i = 0; i < rowBytes.length; i++) {
-				String hex = ("00" + Integer.toHexString(rowBytes[i])); //$NON-NLS-1$
-				hex = hex.substring(hex.length() - "00".length()); //$NON-NLS-1$
+		private void appendRow(StringBuffer buf, byte[] bytes, int offset, int length) {
+			final String heading = zeroPad(Integer.toHexString(offset), HEADING_WIDTH);
+			buf.append(heading);
+			buf.append(':');
+			for (int i = offset, half = offset + BYTES_IN_ROW / 2, end = offset + length; i < end; i++) {
 				buf.append(' ');
-				if (i == BYTES_IN_ROW / 2) {
+				if (i == half) {
 					buf.append(' ');
 				}
+				int v = bytes[i];
+				if (v < 0) {
+					v += 0x100;
+				}
+				final String hex = zeroPad(Integer.toHexString(v), BYTE_WIDTH);
 				buf.append(hex);
 			}
+			buf.append('\n');
+		}
+
+		private String zeroPad(final String value, int width) {
+			StringBuffer buf = new StringBuffer();
+			for (int i = width - value.length(); i > 0; i--) {
+				buf.append('0');
+			}
+			buf.append(value);
+			return buf.toString();
 		}
 	}
 } 
