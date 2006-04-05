@@ -22,7 +22,6 @@ copies.
 
 package org.montsuqi.client;
 
-import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,9 +63,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -436,6 +433,7 @@ public class SSLSocketBuilder {
 	}
 	
 	final class MyTrustManager implements X509TrustManager {
+
 		private final X509TrustManager delegatee;
 	
 		MyTrustManager(X509TrustManager delegatee) {
@@ -462,41 +460,37 @@ public class SSLSocketBuilder {
 			}
 		}
 
+		private static final int PROCEED_OPTION = 0;
+		private static final int CHECK_OPTION = 1;
+
 		private void showAuthenticationFailure(X509Certificate[] chain, String messageForDialog, String messageForException) throws CertificateException {
 			Object[] options = {
 				Messages.getString("Client.proceed"),
 				Messages.getString("Client.check_certificates"),
 				Messages.getString("Client.cancel")
 			};
-			int n = JOptionPane.showOptionDialog(null,
-				messageForDialog,
-				Messages.getString("Client.warning_title"),
-				JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				options,
-				options[2]);
-			switch (n) {
-			case 0:
-				// do nothing
-				break;
-			case 1:
-				final JPanel panel = new JPanel();
-				panel.setLayout(new BorderLayout());
-				final String message = Messages.getString("Client.trust_this_certificate_chain_p");
-				final JLabel messageLabel = new JLabel(message);
-				panel.add(messageLabel, BorderLayout.NORTH);
-				final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
-				certificatePanel.setCertificateChain(chain);
-				panel.add(certificatePanel, BorderLayout.CENTER);
-				final String title = Messages.getString("Client.checking_certificate_chain");
-				int i = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
-				if (i == JOptionPane.YES_OPTION) {
-					break;
+		CONFIRMATION_LOOP:
+			while (true) {
+				int n = JOptionPane.showOptionDialog(null,
+					messageForDialog,
+					Messages.getString("Client.warning_title"),
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[2]);
+				switch (n) {
+				case PROCEED_OPTION:
+					break CONFIRMATION_LOOP;
+				case CHECK_OPTION:
+					final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
+					certificatePanel.setCertificateChain(chain);
+					final String title = Messages.getString("Client.checking_certificate_chain");
+					JOptionPane.showMessageDialog(null, certificatePanel, title, JOptionPane.PLAIN_MESSAGE);
+					continue CONFIRMATION_LOOP;
+				default:
+					throw new CertificateException(messageForException);
 				}
-				// fall through
-			default:
-				throw new CertificateException(messageForException);
 			}
 		}
 	
