@@ -3,6 +3,9 @@ package org.montsuqi.widgets;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.Format;
 import java.text.MessageFormat;
@@ -149,7 +152,8 @@ public class CertificateDetailPanel extends JPanel {
 			Messages.getString("CertificateDetailPanel.Issuer"), //$NON-NLS-1$
 			Messages.getString("CertificateDetailPanel.Validity"), //$NON-NLS-1$
 			Messages.getString("CertificateDetailPanel.Subject"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Signature") //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Signature"), //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.SHA1Fingerprint") //$NON-NLS-1$
 		};
 
 		private static final int VERSION_FIELD = 0;
@@ -159,6 +163,7 @@ public class CertificateDetailPanel extends JPanel {
 		private static final int VALIDITY_FIELD = 4;
 		private static final int SUBJECT_FIELD = 5;
 		private static final int SIGNATURE_FIELD = 6;
+		private static final int FINGERPRINT_FIELD = 7;
 
 		private String[] columnNames = {
 				Messages.getString("CertificateDetailPanel.Field"), //$NON-NLS-1$
@@ -223,13 +228,38 @@ public class CertificateDetailPanel extends JPanel {
 			case SUBJECT_FIELD:
 				return certificate.getSubjectDN();
 			case SIGNATURE_FIELD:
-				return formatSignature(certificate.getSignature());
+				return formatSignature(certificate);
+			case FINGERPRINT_FIELD:
+				return formatFingerprint(certificate);
 			default:
 				throw new IllegalArgumentException("row out of range."); //$NON-NLS-1$
 			}
 		}
 
-		private String formatSignature(byte[] signature) {
+		private String formatFingerprint(X509Certificate cert) {
+			try {
+				final MessageDigest digester = MessageDigest.getInstance("SHA"); //$NON-NLS-1$
+				final byte[] digest = digester.digest(cert.getEncoded());
+				final StringBuffer buf = new StringBuffer();
+				for (int i = 0; i < digest.length; i++) {
+					if (i > 0) {
+						buf.append(':');
+					}
+					final int upper = (digest[i] >> 4) & 0xf;
+					final int lower = (digest[i])      & 0xf;
+					final String hex = Integer.toHexString(upper) + Integer.toHexString(lower);
+					buf.append(hex);
+				}
+				return buf.toString().toUpperCase();
+			} catch (NoSuchAlgorithmException e) {
+				return e.getMessage();
+			} catch (CertificateEncodingException e) {
+				return e.getMessage();
+			}
+		}
+
+		private String formatSignature(X509Certificate cert) {
+			byte[] signature = cert.getSignature();
 			StringBuffer buf = new StringBuffer();
 			int rows = signature.length / BYTES_IN_ROW;
 			int rest = signature.length % BYTES_IN_ROW;
@@ -245,19 +275,17 @@ public class CertificateDetailPanel extends JPanel {
 
 		private void appendRow(StringBuffer buf, byte[] bytes, int offset, int length) {
 			final String heading = zeroPad(Integer.toHexString(offset), HEADING_WIDTH);
-			buf.append(heading);
+			buf.append(heading.toUpperCase());
 			buf.append(':');
 			for (int i = offset, half = offset + BYTES_IN_ROW / 2, end = offset + length; i < end; i++) {
 				buf.append(' ');
 				if (i == half) {
 					buf.append(' ');
 				}
-				int v = bytes[i];
-				if (v < 0) {
-					v += 0x100;
-				}
-				final String hex = zeroPad(Integer.toHexString(v), BYTE_WIDTH);
-				buf.append(hex);
+				final int upper = (bytes[i] >> 4) & 0xf;
+				final int lower = (bytes[i])      & 0xf;
+				final String hex = Integer.toHexString(upper) + Integer.toHexString(lower);
+				buf.append(hex.toUpperCase());
 			}
 			buf.append('\n');
 		}
