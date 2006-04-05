@@ -36,6 +36,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
@@ -92,7 +93,13 @@ public abstract class WidgetMarshaller {
 				GTK_STATE_INSENSITIVE => 4
 			} GtkStateType;
 			*/
-			widget.setEnabled(state != 4);
+			final boolean flag = state != 4;
+			widget.setEnabled(flag);
+			widget.setFocusable(flag);
+			if (widget instanceof JTextComponent) {
+				JTextComponent text = (JTextComponent)widget;
+				text.setEditable(flag);
+			}
 			return true;
 		} else if ("style".equals(name)) { //$NON-NLS-1$
 			String buff = con.receiveStringData();
