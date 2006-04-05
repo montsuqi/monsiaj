@@ -439,8 +439,17 @@ public class SSLSocketBuilder {
 		MyTrustManager(X509TrustManager delegatee) {
 			this.delegatee = delegatee;
 		}
-	
+
+		private boolean isSelfCertificate(X509Certificate[] chain) {
+			final Principal subjectDN = chain[0].getSubjectDN();
+			final Principal issuerDN = chain[0].getIssuerDN();
+			return chain.length == 1 && subjectDN.equals(issuerDN);
+		}
+
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			if (isSelfCertificate(chain)) {
+				return;
+			}
 			try {
 				delegatee.checkClientTrusted(chain, authType);
 			} catch (CertificateException e) {
