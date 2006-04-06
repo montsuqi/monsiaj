@@ -23,7 +23,6 @@ copies.
 package org.montsuqi.client;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -32,19 +31,9 @@ import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
@@ -54,7 +43,7 @@ import org.montsuqi.util.SystemEnvironment;
 public class Client implements Runnable {
 
 	private Configuration conf;
-	private Logger logger;
+	Logger logger;
 	private Protocol protocol;
 
 	private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
@@ -109,7 +98,7 @@ public class Client implements Runnable {
 		return new Client(conf);
 	}
 
-	void connect() throws IOException {
+	void connect() throws IOException, GeneralSecurityException {
 		String encoding = conf.getEncoding();
 		Map styles = loadStyles();
 		String[] pathElements = {
@@ -140,7 +129,7 @@ public class Client implements Runnable {
 		}
 	}
 
-	Socket createSocket() throws IOException {
+	Socket createSocket() throws IOException, GeneralSecurityException {
 		String host = conf.getHost();
 		int port = conf.getPort();
 		SocketAddress address = new InetSocketAddress(host, port);
@@ -149,51 +138,12 @@ public class Client implements Runnable {
 		Socket socket = socketChannel.socket();
 		if ( ! conf.getUseSSL()) {
 			return socket;
+		} else {
+			final String fileName = conf.getClientCertificateFileName();
+			final String password = conf.getClientCertificatePassword();
+			final SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
+			return builder.createSSLSocket(socket, host, port);
 		}
-		try {
-			return createSSLSocket(host, port, socket);
-		} catch (GeneralSecurityException e) {
-			IOException ioe = new IOException();
-			ioe.initCause(e);
-			throw ioe;
-		}
-	}
-
-	private Socket createSSLSocket(String host, int port, Socket socket) throws GeneralSecurityException, IOException {
-		TrustManager[] tms = getTrustManagers();
-		KeyManager[] kms = getKeyManagers();
-		SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
-		ctx.init(kms, tms, null);
-		SSLSocketFactory factory = ctx.getSocketFactory();
-		return factory.createSocket(socket, host, port, true);
-	}
-
-	private TrustManager[] getTrustManagers() throws GeneralSecurityException, IOException {
-		String fileName = conf.getServerCertificateFileName();
-		if (fileName.length() == 0) {
-			return null;
-		}
-		CertificateFactory cf = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-		Certificate cert = cf.generateCertificate(new FileInputStream(fileName));
-		KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-		ks.load(null, null);
-		ks.setCertificateEntry(conf.getClientCertificateAlias(), cert); //$NON-NLS-1$
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		tmf.init(ks);
-		return tmf.getTrustManagers();
-	}
-
-	private KeyManager[] getKeyManagers() throws GeneralSecurityException, IOException {
-		String fileName = conf.getClientCertificateFileName();
-		if (fileName.length() == 0) {
-			return null;
-		}
-		char[] pass = conf.getClientCertificatePass().toCharArray();
-		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(new FileInputStream(fileName), pass);
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-		kmf.init(ks, pass);
-		return kmf.getKeyManagers();
 	}
 
 	public void run() {
@@ -208,7 +158,9 @@ public class Client implements Runnable {
 	void exitSystem() {
 		try {
 			synchronized (this) {
-				protocol.sendPacketClass(PacketClass.END);
+				if (protocol != null) {
+					protocol.sendPacketClass(PacketClass.END);
+				}
 			}
 		} catch (Exception e) {
 			logger.warn(e);

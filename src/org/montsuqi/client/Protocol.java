@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -65,7 +66,7 @@ public class Protocol extends Connection {
 	private static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException {
+	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException, GeneralSecurityException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		this.cacheRoot = cacheRoot;
@@ -489,13 +490,13 @@ public class Protocol extends Connection {
 			// throw nothing
 			break;
 		case PacketClass.NOT:
-			throw new ConnectException("cannot connect server"); //$NON-NLS-1$
+			throw new ConnectException(Messages.getString("Client.cannot_connect_to_server")); //$NON-NLS-1$
 		case PacketClass.E_VERSION:
-			throw new ConnectException("cannot connect to server(version mismatch)"); //$NON-NLS-1$
+			throw new ConnectException(Messages.getString("Client.version_mismatch")); //$NON-NLS-1$
 		case PacketClass.E_AUTH:
-			throw new ConnectException("cannot connect to server(authentication error)"); //$NON-NLS-1$
+			throw new ConnectException(Messages.getString("Client.authentication_error")); //$NON-NLS-1$
 		case PacketClass.E_APPL:
-			throw new ConnectException("cannot connect to server(application name invalid)"); //$NON-NLS-1$
+			throw new ConnectException(Messages.getString("Client.application_name_invalid")); //$NON-NLS-1$
 		default:
 			Object[] args = { Integer.toHexString(pc) };
 			throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$

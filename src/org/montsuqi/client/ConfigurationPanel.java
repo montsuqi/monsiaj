@@ -34,8 +34,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.AbstractAction;
@@ -93,7 +91,7 @@ public class ConfigurationPanel extends JPanel {
 		}
 	}
 
-	private class FieldSelected extends FocusAdapter {
+	private final class FieldSelected extends FocusAdapter {
 
 		public void focusGained(FocusEvent e) {
 	           Object o = e.getSource();
@@ -106,6 +104,24 @@ public class ConfigurationPanel extends JPanel {
 		}
 	}
 
+	private final class ConfirmSavePasswordAction implements ActionListener {
+
+		final JCheckBox checkbox;
+
+		public ConfirmSavePasswordAction(JCheckBox checkbox) {
+			this.checkbox = checkbox;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (checkbox.isSelected()) {
+				int result = JOptionPane.showConfirmDialog(ConfigurationPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+				if (result != JOptionPane.YES_OPTION) {
+					checkbox.setSelected(false);
+				}
+			}
+		}
+	}
+
 	protected static final Logger logger = Logger.getLogger(ConfigurationPanel.class);
 	protected Configuration conf;
 
@@ -115,14 +131,14 @@ public class ConfigurationPanel extends JPanel {
 	protected JCheckBox savePasswordCheckbox;
 	protected JTextField hostEntry;
 	protected JTextField portEntry;
-	protected JCheckBox useSSLCheckbox;
 	protected JTextField appEntry;
 
 	// SSL Tab
-	protected JTextField serverCertificateEntry;
+	protected JCheckBox useSSLCheckbox;
 	protected JTextField clientCertificateEntry;
+	protected JButton browseButton;
 	protected JPasswordField exportPasswordEntry;
-	protected JTextField clientCertificateAliasEntry;
+	protected JCheckBox saveClientCertificatePasswordCheckbox;
 
 	// Misc Tab
 	protected JTextField styleEntry;
@@ -152,14 +168,13 @@ public class ConfigurationPanel extends JPanel {
 		conf.setSavePassword(savePasswordCheckbox.isSelected());
 		conf.setHost(hostEntry.getText());
 		conf.setPort(Integer.parseInt(portEntry.getText()));
-		conf.setUseSSL(useSSLCheckbox.isSelected());
 		conf.setApplication(appEntry.getText());
 
 		// SSL Tab
-		conf.setServerCertificateFileName(serverCertificateEntry.getText());
+		conf.setUseSSL(useSSLCheckbox.isSelected());
 		conf.setClientCertificateFileName(clientCertificateEntry.getText());
-		conf.setClientCertificateAlias(clientCertificateAliasEntry.getText());
-		conf.setClientCertificatePass(new String(exportPasswordEntry.getPassword()));
+		conf.setClientCertificatePassword(new String(exportPasswordEntry.getPassword()));
+		conf.setSaveClientCertificatePassword(saveClientCertificatePasswordCheckbox.isSelected());
 
 		// Others Tab
 		conf.setStyleFileName(styleEntry.getText());
@@ -197,35 +212,21 @@ public class ConfigurationPanel extends JPanel {
 		if (savePassword) {
 			passwordEntry.setText(conf.getPass());
 		}
-		savePasswordCheckbox = addCheckBoxRow(panel, y++, Messages.getString("ConfigurationPanel.save_passwords"), savePassword); //$NON-NLS-1$
-		savePasswordCheckbox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (savePasswordCheckbox.isSelected()) {
-					int result = JOptionPane.showConfirmDialog(ConfigurationPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
-					if (result != JOptionPane.YES_OPTION) {
-						savePasswordCheckbox.setSelected(false);
-					}
-				}
-			}
-		});
+		savePasswordCheckbox = addCheckBoxRow(panel, y++, Messages.getString("ConfigurationPanel.save_password"), savePassword); //$NON-NLS-1$
+		savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
 		hostEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.host"), conf.getHost()); //$NON-NLS-1$
 		portEntry = addIntFieldRow(panel, y++, Messages.getString("ConfigurationPanel.port"), conf.getPort()); //$NON-NLS-1$
-		useSSLCheckbox = addCheckBoxRow(panel, y++, Messages.getString("ConfigurationPanel.use_ssl"), conf.getUseSSL()); //$NON-NLS-1$
-		useSSLCheckbox.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent e) {
-				if (tabbed.getTabCount() >= SSL_TAB + 1) {
-					tabbed.setEnabledAt(SSL_TAB, useSSLCheckbox.isSelected());
-				}
-			}
-		});
-		useSSLCheckbox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				tabbed.setEnabledAt(SSL_TAB, useSSLCheckbox.isSelected());
-			}
-		});
 		appEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.application"), conf.getApplication()); //$NON-NLS-1$
 		
 		return panel;
+	}
+
+	void updateSslTabComponentsEnabled() {
+		final boolean useSsl = useSSLCheckbox.isSelected();
+		clientCertificateEntry.setEnabled(useSsl);
+		exportPasswordEntry.setEnabled(useSsl);
+		browseButton.setEnabled(useSsl);
+		saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
 	}
 
 	private Component createSslTab() {
@@ -233,21 +234,29 @@ public class ConfigurationPanel extends JPanel {
 		panel.setLayout(new GridBagLayout());
 
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
-		final String serverCertificateDescription = Messages.getString("ConfigurationPanel.server_certificate_description"); //$NON-NLS-1$
 		final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
 		int y = 0;
-		serverCertificateEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.server_certificate"), conf.getServerCertificateFileName()); //$NON-NLS-1$
-		addButtonFor(panel, serverCertificateEntry, new FileSelectionAction(serverCertificateEntry, home, ".pem", serverCertificateDescription)); //$NON-NLS-1$
+
+		useSSLCheckbox = addCheckBoxRow(panel, y++, Messages.getString("ConfigurationPanel.use_ssl"), conf.getUseSSL()); //$NON-NLS-1$
+		useSSLCheckbox.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				updateSslTabComponentsEnabled();
+			}
+
+		});
 
 		clientCertificateEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.client_certificate"), conf.getClientCertificateFileName()); //$NON-NLS-1$
-		addButtonFor(panel, clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
-		clientCertificateAliasEntry = addTextFieldRow(panel, y++, Messages.getString("ConfigurationPanel.alias"), conf.getClientCertificateAlias()); //$NON-NLS-1$
-		exportPasswordEntry = addPasswordFieldRow(panel, y++, Messages.getString("ConfigurationPanel.password")); //$NON-NLS-1$
-		final boolean savePassword = conf.getSavePassword();
-		if (savePassword) {
-			exportPasswordEntry.setText(conf.getClientCertificatePass());
+		browseButton = addButtonFor(panel, clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
+		exportPasswordEntry = addPasswordFieldRow(panel, y++, Messages.getString("ConfigurationPanel.cert_password")); //$NON-NLS-1$
+		final boolean saveClientCertificatePassword = conf.getSaveClientCertificatePassword();
+		if (saveClientCertificatePassword) {
+			exportPasswordEntry.setText(conf.getClientCertificatePassword());
 		}
+		saveClientCertificatePasswordCheckbox = addCheckBoxRow(panel, y++, Messages.getString("ConfigurationPanel.save_cert_password"), saveClientCertificatePassword); //$NON-NLS-1$
+		saveClientCertificatePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(saveClientCertificatePasswordCheckbox));
 
+		updateSslTabComponentsEnabled();
 		return panel;
 	}
 
@@ -307,8 +316,10 @@ public class ConfigurationPanel extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = y;
 		if (h == 1) {
+			gbc.fill = GridBagConstraints.HORIZONTAL;
 			gbc.anchor = GridBagConstraints.WEST;
 		} else {
+			gbc.fill = GridBagConstraints.BOTH;
 			gbc.anchor = GridBagConstraints.NORTHWEST;
 		}
 		gbc.weightx = 0.0;
@@ -404,7 +415,7 @@ public class ConfigurationPanel extends JPanel {
 		return radios;
 	}
 
-	protected void addButtonFor(JPanel container, JTextField entry, Action action) {
+	protected JButton addButtonFor(JPanel container, JTextField entry, Action action) {
 		GridBagLayout gbl = (GridBagLayout)container.getLayout();
 
 		GridBagConstraints gbc;
@@ -418,6 +429,7 @@ public class ConfigurationPanel extends JPanel {
 		gbc.gridx = 3;
 		gbc.gridwidth = 1;
 		container.add(button, gbc);
+		return button;
 	}
 
 	protected void changeLookAndFeel(String className) {
