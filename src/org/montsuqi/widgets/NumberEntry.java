@@ -142,7 +142,7 @@ class NumberDocument extends PlainDocument {
 			return;
 		}
 		PrecisionScale ps = new PrecisionScale(originalFormat);
-		String t = formatValue(format, v.setScale(ps.precision + 1, ps.scale));
+		String t = formatValue(v.setScale(ps.precision + 1, ps.scale));
 		value = ZERO;
 		minus = false;
 		try {
@@ -253,8 +253,12 @@ class NumberDocument extends PlainDocument {
 		if (v.movePointRight(v.scale()).equals(ZERO)) {
 			v = ZERO;
 		}
-		value = minus ? v.negate() : v;
-		String formatted = formatValue(format, value);
+		if (originalFormat.startsWith("-") && minus) {
+			value = v.negate();
+		} else {
+			value = v;
+		}
+		String formatted = formatValue(value);
 		remove(0, getLength());
 		// treat zero value representation specially
 		if (formatted.trim().equals("0") && leaveZeroAsBlank()) { //$NON-NLS-1$
@@ -273,7 +277,11 @@ class NumberDocument extends PlainDocument {
 		return last == 'Z' || last == '-' || last == '+';
 	}
 
-	private static String formatValue(NumberFormat format, BigDecimal v) {
-		return format.format(v);
+	private String formatValue(BigDecimal v) {
+		if ( ! originalFormat.startsWith("-") && v.signum() < 0) {
+			return format.format(v.negate());
+		} else {
+			return format.format(v);
+		}
 	}
 }
