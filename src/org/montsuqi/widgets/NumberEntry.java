@@ -204,7 +204,7 @@ class NumberDocument extends PlainDocument {
 			tmp.append('#');
 		}
 		tmp.append(buf);
-		if (negative) {
+		if (negative || positive) {
 			tmp.append(';');
 			tmp.append('-');
 			tmp.append(buf);
@@ -253,7 +253,7 @@ class NumberDocument extends PlainDocument {
 		if (v.movePointRight(v.scale()).equals(ZERO)) {
 			v = ZERO;
 		}
-		if (originalFormat.startsWith("-") && minus) {
+		if (minus && wantsSign()) {
 			value = v.negate();
 		} else {
 			value = v;
@@ -261,7 +261,7 @@ class NumberDocument extends PlainDocument {
 		String formatted = formatValue(value);
 		remove(0, getLength());
 		// treat zero value representation specially
-		if (formatted.trim().equals("0") && leaveZeroAsBlank()) { //$NON-NLS-1$
+		if ((formatted.trim().equals("0") || formatted.trim().equals("+0")) && leaveZeroAsBlank()) { //$NON-NLS-1$
 			// do nothing
 		} else {
 			super.insertString(0, formatted, a);
@@ -278,10 +278,14 @@ class NumberDocument extends PlainDocument {
 	}
 
 	private String formatValue(BigDecimal v) {
-		if ( ! originalFormat.startsWith("-") && v.signum() < 0) {
+		if (v.signum() < 0 && ! wantsSign()) {
 			return format.format(v.negate());
 		} else {
 			return format.format(v);
 		}
+	}
+
+	private boolean wantsSign() {
+		return originalFormat.startsWith("-") || originalFormat.startsWith("+");
 	}
 }
