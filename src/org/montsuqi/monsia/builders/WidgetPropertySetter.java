@@ -286,6 +286,15 @@ abstract class WidgetPropertySetter {
 			}
 		});
 
+		registerProperty(JTextComponent.class, "can_focus", new WidgetPropertySetter() { //$NON-NLS-1$
+			public void set(Interface xml, Container parent, Component widget, String value) {
+				JTextComponent text = (JTextComponent)widget;
+				final boolean flag = ParameterConverter.toBoolean(value);
+				text.setEditable(flag);
+				text.setFocusable(flag);
+			}
+		});
+
 		registerProperty(JTextComponent.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				JTextComponent text = (JTextComponent)widget;

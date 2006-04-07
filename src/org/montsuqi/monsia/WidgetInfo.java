@@ -92,9 +92,13 @@ public class WidgetInfo {
 		return (String)properties.get(key);
 	}
 
-	synchronized void setProperties(Map properties) {
+	public synchronized void setProperties(Map properties) {
 		this.properties.clear();
 		this.properties.putAll(properties);
+	}
+
+	public void setProperty(String key, String value) {
+		properties.put(key, value);
 	}
 
 	protected void addProperty(String key, String value) {

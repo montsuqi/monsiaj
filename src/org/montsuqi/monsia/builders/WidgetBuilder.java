@@ -100,6 +100,7 @@ public class WidgetBuilder {
 
 		WidgetBuilder defaultWidgetBuilder= new WidgetBuilder();
 		WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
+		WidgetBuilder entryBuilder = new EntryBuilder();
 
 		registerWidgetClass("Button",         Button.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Calendar",       Calendar.class,      defaultWidgetBuilder); //$NON-NLS-1$
@@ -107,7 +108,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
 		registerWidgetClass("CList",          PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Dialog",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
-		registerWidgetClass("Entry",          Entry.class,         defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Entry",          Entry.class,         entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("FileEntry",      FileEntry.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
@@ -121,11 +122,11 @@ public class WidgetBuilder {
 		registerWidgetClass("MenuItem",       JMenuItem.class,     new MenuItemBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PixmapMenuItem", JMenuItem.class,     new MenuItemBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Notebook",       Notebook.class,      new NotebookBuilder()); //$NON-NLS-1$
-		registerWidgetClass("NumberEntry",    NumberEntry.class,   defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("NumberEntry",    NumberEntry.class,   entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("OptionMenu",     OptionMenu.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaCombo",     PandaCombo.class,    new PandaComboBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaCList",     PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
-		registerWidgetClass("PandaEntry",     PandaEntry.class,    defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("PandaEntry",     PandaEntry.class,    entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaHTML",      PandaHTML.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaPS",        PandaPreviewPane.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
