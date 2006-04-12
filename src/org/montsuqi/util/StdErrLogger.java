@@ -29,7 +29,13 @@ import java.util.Map;
 
 class StdErrLogger extends Logger {
 
+	public static final int FATAL = 0;
+	public static final int WARNING = 10;
+	public static final int INFO = 20;
+	public static final int DEBUG = 30;
+	public static final int TRACE = 40;
 	private static Map loggers;
+	private int level;
 	private PrintStream log;
 
 	static {
@@ -59,6 +65,22 @@ class StdErrLogger extends Logger {
 				// ignore
 			}
 		}
+		String s = System.getProperty("monsia.logger.stderr.level");
+		if (s == null) {
+			level = WARNING;
+		} else if ("FATAL".equalsIgnoreCase(s)){
+			level = FATAL;
+		} else if ("WARNING".equalsIgnoreCase(s)){
+			level = WARNING;
+		} else if ("INFO".equalsIgnoreCase(s)){
+			level = INFO;
+		} else if ("DEBUG".equalsIgnoreCase(s)){
+			level = DEBUG;
+		} else if ("TRACE".equalsIgnoreCase(s)){
+			level = TRACE;
+		} else {
+			level = WARNING;
+		}
 	}
 
 	private void writeLog(String message) {
@@ -76,32 +98,46 @@ class StdErrLogger extends Logger {
 	}
 
 	public void trace(String message) {
-		writeLog("TRACE:" + message); //$NON-NLS-1$
+		if (level >= TRACE) {
+			writeLog("TRACE:" + message); //$NON-NLS-1$
+		}
 	}
 
 	public void debug(String message) {
-		writeLog("DEBUG:" + message); //$NON-NLS-1$
+		if (level >= DEBUG) {
+			writeLog("DEBUG:" + message); //$NON-NLS-1$
+		}
 	}
 
 	public void info(String message) {
-		writeLog("INFO:" + message); //$NON-NLS-1$
+		if (level >= INFO) {
+			writeLog("INFO:" + message); //$NON-NLS-1$
+		}
 	}
 
 	public void warn(String message) {
-		writeLog("WARN:" + message); //$NON-NLS-1$
+		if (level >= WARNING) {
+			writeLog("WARN:" + message); //$NON-NLS-1$
+		}
 	}
 
 	public void fatal(String message) {
-		writeLog("FATAL: " + message); //$NON-NLS-1$
+		if (level >= FATAL) {
+			writeLog("FATAL: " + message); //$NON-NLS-1$
+		}
 	}
 
 	public void warn(Throwable e) {
-		warn(e.toString());
-		writeStackTrace(e);
+		if (level >= WARNING) {
+			warn(e.toString());
+			writeStackTrace(e);
+		}
 	}
 
 	public void fatal(Throwable e) {
-		fatal(e.toString());
-		writeStackTrace(e);
+		if (level >= FATAL) {
+			fatal(e.toString());
+			writeStackTrace(e);
+		}
 	}
 }
