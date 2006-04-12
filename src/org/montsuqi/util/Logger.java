@@ -27,6 +27,12 @@ import java.text.MessageFormat;
 
 public abstract class Logger {
 
+	public static final int FATAL = 0;
+	public static final int WARNING = 10;
+	public static final int INFO = 20;
+	public static final int DEBUG = 30;
+	public static final int TRACE = 40;
+
 	public static Logger getLogger(Class clazz) {
 		return getLogger(clazz.getName());
 	}
@@ -45,6 +51,17 @@ public abstract class Logger {
 		} catch (Exception e) {
 			System.out.println(e);
 			return StdErrLogger.getLogger(name);
+		}
+	}
+
+	protected abstract int getLevel();
+
+	protected String getLevelProperty() {
+		final String s = System.getProperty("monsia.logger.level"); //$NON-NLS-1$
+		if (s == null) {
+			return "WARNING";
+		} else {
+			return s;
 		}
 	}
 
@@ -72,62 +89,92 @@ public abstract class Logger {
 	}
 
 	public void trace(String format, Object[] args) {
-		trace(formatMessage(format, args));
+		if (getLevel() >= TRACE) {
+			trace(formatMessage(format, args));
+		}
 	}
 
 	public void debug(String format, Object[] args) {
-		debug(formatMessage(format, args));
+		if (getLevel() >= DEBUG) {
+			debug(formatMessage(format, args));
+		}
 	}
 
 	public void info(String format, Object[] args) {
-		info(formatMessage(format, args));
+		if (getLevel() >= INFO) {
+			info(formatMessage(format, args));
+		}
 	}
 
 	public void warn(String format, Object[] args) {
-		warn(formatMessage(format, args));
+		if (getLevel() >= WARNING) {
+			warn(formatMessage(format, args));
+		}
 	}
 
 	public void fatal(String format, Object[] args) {
-		fatal(formatMessage(format, args));
+		if (getLevel() >= FATAL) {
+			fatal(formatMessage(format, args));
+		}
 	}
 
 	public void trace(String format, Object arg) {
-		trace(formatMessage(format, arg));
+		if (getLevel() >= TRACE) {
+			trace(formatMessage(format, arg));
+		}
 	}
 
 	public void debug(String format, Object arg) {
-		debug(formatMessage(format, arg));
+		if (getLevel() >= DEBUG) {
+			debug(formatMessage(format, arg));
+		}
 	}
 
 	public void info(String format, Object arg) {
-		info(formatMessage(format, arg));
+		if (getLevel() >= INFO) {
+			info(formatMessage(format, arg));
+		}
 	}
 
 	public void warn(String format, Object arg) {
-		warn(formatMessage(format, arg));
+		if (getLevel() >= WARNING) {
+			warn(formatMessage(format, arg));
+		}
 	}
 
 	public void fatal(String format, Object arg) {
-		fatal(formatMessage(format, arg));
+		if (getLevel() >= FATAL) {
+			fatal(formatMessage(format, arg));
+		}
 	}
 
 	public void trace(Throwable e) {
-		trace(e.toString());
+		if (getLevel() >= TRACE) {
+			trace(e.toString());
+		}
 	}
 
 	public void debug(Throwable e) {
-		debug(e.toString());
+		if (getLevel() >= DEBUG) {
+			debug(e.toString());
+		}
 	}
 
 	public void info(Throwable e) {
-		info(e.toString());
+		if (getLevel() >= INFO) {
+			info(e.toString());
+		}
 	}
 
 	public void warn(Throwable e) {
-		warn(e.toString());
+		if (getLevel() >= WARNING) {
+			warn(e.toString());
+		}
 	}
 
 	public void fatal(Throwable e) {
-		fatal(e.toString());
+		if (getLevel() >= FATAL) {
+			fatal(e.toString());
+		}
 	}
 }

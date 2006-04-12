@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
 import org.apache.log4j.PropertyConfigurator;
 
 class Log4JLogger extends Logger {
@@ -57,6 +58,35 @@ class Log4JLogger extends Logger {
 
 	private Log4JLogger(org.apache.log4j.Logger logger) {
 		this.logger = logger;
+		final String s = getLevelProperty();
+		if ("FATAL".equalsIgnoreCase(s)){
+			this.logger.setLevel(Level.FATAL);
+		} else if ("WARNING".equalsIgnoreCase(s)){
+			this.logger.setLevel(Level.WARN);
+		} else if ("INFO".equalsIgnoreCase(s)){
+			this.logger.setLevel(Level.INFO);
+		} else if ("DEBUG".equalsIgnoreCase(s)){
+			this.logger.setLevel(Level.DEBUG);
+		} else if ("TRACE".equalsIgnoreCase(s)){
+			this.logger.setLevel(Level.ALL);
+		} else {
+			this.logger.setLevel(Level.WARN);
+		}
+	}
+
+	protected int getLevel() {
+		Level level = logger.getLevel();
+		if (level.isGreaterOrEqual(Level.ALL)) {
+			return TRACE;
+		} else if (level.isGreaterOrEqual(Level.DEBUG)) {
+			return DEBUG;
+		} else if (level.isGreaterOrEqual(Level.INFO)) {
+			return INFO;
+		} else if (level.isGreaterOrEqual(Level.WARN)) {
+			return WARNING;
+		} else {
+			return FATAL;
+		}
 	}
 
 	public void trace(String message) {

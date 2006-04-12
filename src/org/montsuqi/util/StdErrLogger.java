@@ -29,11 +29,6 @@ import java.util.Map;
 
 class StdErrLogger extends Logger {
 
-	public static final int FATAL = 0;
-	public static final int WARNING = 10;
-	public static final int INFO = 20;
-	public static final int DEBUG = 30;
-	public static final int TRACE = 40;
 	private static Map loggers;
 	private int level;
 	private PrintStream log;
@@ -65,10 +60,8 @@ class StdErrLogger extends Logger {
 				// ignore
 			}
 		}
-		String s = System.getProperty("monsia.logger.stderr.level");
-		if (s == null) {
-			level = WARNING;
-		} else if ("FATAL".equalsIgnoreCase(s)){
+		String s = getLevelProperty();
+		if ("FATAL".equalsIgnoreCase(s)){
 			level = FATAL;
 		} else if ("WARNING".equalsIgnoreCase(s)){
 			level = WARNING;
@@ -81,6 +74,10 @@ class StdErrLogger extends Logger {
 		} else {
 			level = WARNING;
 		}
+	}
+
+	protected int getLevel() {
+		return level;
 	}
 
 	private void writeLog(String message) {

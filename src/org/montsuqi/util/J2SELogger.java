@@ -24,6 +24,7 @@ package org.montsuqi.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 class J2SELogger extends Logger {
 
@@ -48,11 +49,43 @@ class J2SELogger extends Logger {
 
 	private J2SELogger(java.util.logging.Logger logger) {
 		this.logger = logger;
+		final String s = getLevelProperty();
+		if ("FATAL".equalsIgnoreCase(s)) {
+			this.logger.setLevel(Level.SEVERE);
+		} else if ("WARNING".equalsIgnoreCase(s)) {
+			this.logger.setLevel(Level.WARNING);
+		} else if ("INFO".equalsIgnoreCase(s)) {
+			this.logger.setLevel(Level.INFO);
+		} else if ("DEBUG".equalsIgnoreCase(s)) {
+			this.logger.setLevel(Level.FINER);
+		} else if ("TRACE".equalsIgnoreCase(s)) {
+			this.logger.setLevel(Level.FINEST);
+		} else {
+			this.logger.setLevel(Level.WARNING);
+		}
+	}
+
+	protected int getLevel() {
+		Level level = logger.getLevel();
+		if (level.equals(Level.FINEST)) {
+			return TRACE;
+		} else if (level.equals(Level.FINER)) {
+			return DEBUG;
+		} else if (level.equals(Level.INFO)) {
+			return INFO;
+		} else if (level.equals(Level.WARNING)) {
+			return WARNING;
+		} else if (level.equals(Level.SEVERE)) {
+			return FATAL;
+		} else {
+			return WARNING;
+		}
 	}
 
 	public void trace(String message) {
 		logger.finest(message);
 	}
+
 	public void debug(String message) {
 		logger.finer(message);
 	}
