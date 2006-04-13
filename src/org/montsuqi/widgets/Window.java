@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
@@ -39,6 +40,8 @@ public class Window extends JFrame {
 		setGlassPane(new JPanel() {
 			{
 				setOpaque(false);
+				Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+				setCursor(waitCursor);
 				addMouseListener(new MouseAdapter() {
 					// nothing overridden
 				});
@@ -61,6 +64,15 @@ public class Window extends JFrame {
 
 	public boolean isActive() {
 		return ! getGlassPane().isVisible();
+	}
+
+
+	public static void busyAllWindows() {
+		Window[] windows = getWindows();
+		for (int i = 0; i < windows.length; i++) {
+			Window w = windows[i];
+			w.showBusyCursor();
+		}
 	}
 
 	public static Window[] getWindows() {

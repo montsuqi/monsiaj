@@ -185,6 +185,7 @@ public class Protocol extends Connection {
 	synchronized void checkScreens(boolean init) throws IOException {
 		logger.debug("checkScreens");
 		logger.debug("loop over screens");
+		Window.busyAllWindows();
 		while (receivePacketClass() == PacketClass.QueryScreen) {
 			String name = checkScreen1();
 			logger.debug("name = {0}", name);

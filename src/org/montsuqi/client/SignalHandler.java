@@ -157,6 +157,7 @@ public abstract class SignalHandler {
 							event = widgetName;
 						}
 					}
+					org.montsuqi.widgets.Window.busyAllWindows();
 					con.sendEvent(windowName, widgetName, event);
 					con.sendWindowData();
 					synchronized (this) {
