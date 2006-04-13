@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.util;
 
+import java.awt.Component;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 
@@ -65,14 +66,82 @@ public abstract class Logger {
 		}
 	}
 
-	public void enter(String methodName) {
-		trace("entering " + methodName); //$NON-NLS-1$
+	public void enter() {
+		enter(null);
 	}
 
-	public void leave(String methodName) {
-		trace("leaving " + methodName); //$NON-NLS-1$
+	public void enter(Object arg1) {
+		enter(new Object[] { arg1 });
 	}
 
+	public void enter(Object arg1, Object arg2) {
+		enter(new Object[] { arg1, arg2 });
+	}
+
+	public void enter(Object arg1, Object arg2, Object arg3) {
+		enter(new Object[] { arg1, arg2, arg3 });
+	}
+
+	public void enter(Object[] args) {
+		if (getLevel() < TRACE) {
+			return;
+		}
+		StackTraceElement caller = getCaller();
+		trace("enter: " + caller);
+		if (args != null && args.length > 0) {
+			final StringBuffer buf = new StringBuffer("\targs:");
+			for (int i = 0; i < args.length; i++) {
+				buf.append(' ');
+				if (args[i] instanceof Byte) {
+					final int value = ((Byte)args[i]).intValue();
+					buf.append("0x");
+					buf.append(Integer.toHexString((value >> 4) & 0x0f));
+					buf.append(Integer.toHexString((value >> 0) & 0x0f));
+				} else if (args[i] instanceof Component) {
+					final Component c = (Component)args[i];
+					String name = c.getName();
+					String className = c.getClass().getName();
+					if (name != null && name.length() > 0) {
+						buf.append(className + ": " + name);
+					} else {
+						buf.append(args[i]);
+					}
+				} else {
+					buf.append(args[i]);
+				}
+				if (i < args.length - 1) {
+					buf.append(',');
+				}
+			}
+			trace(buf.toString());
+		}
+	}
+
+	public void leave() {
+		if (getLevel() < TRACE) {
+			return;
+		}
+		StackTraceElement caller = getCaller();
+		trace("leave: " + caller);
+	}
+
+	private StackTraceElement getCaller() {
+		Throwable t = new Exception();
+		StackTraceElement[] st = t.getStackTrace();
+		for (int i = 0; i < st.length; i++) {
+			String className = st[i].getClassName();
+			Class clazz;
+			try {
+				clazz = Class.forName(className);
+			} catch (ClassNotFoundException e) {
+				return st[0];
+			}
+			if ( ! clazz.isAssignableFrom(Logger.class)) {
+				return st[i];
+			}
+		}
+		return st[0];
+	}
 	public abstract void trace(String message);
 	public abstract void debug(String message);
 	public abstract void info(String message);
