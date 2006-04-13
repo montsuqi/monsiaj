@@ -89,12 +89,15 @@ public class Protocol extends Connection {
 	}
 
 	private static boolean isNetworkByteOrder() {
+		logger.enter();
 		StringTokenizer tokens = new StringTokenizer(VERSION, String.valueOf(':'));
 		while (tokens.hasMoreTokens()) {
 			if ("no".equals(tokens.nextToken())) { //$NON-NLS-1$
+				logger.leave();
 				return true;
 			}
 		}
+		logger.leave();
 		return false;
 	}
 
@@ -103,12 +106,14 @@ public class Protocol extends Connection {
 	}
 
 	private synchronized boolean receiveFile(String name, File file) throws IOException {
+		logger.enter(name, file);
 		sendPacketClass(PacketClass.GetScreen);
 		sendString(name);
 		byte pc = receivePacketClass();
 		if (pc != PacketClass.ScreenDefine) {
 			Object[] args = { new Byte(PacketClass.ScreenDefine), new Byte(pc) };
 			logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args); //$NON-NLS-1$
+			logger.leave();
 			return false;
 		}
 
@@ -119,17 +124,18 @@ public class Protocol extends Connection {
 		cache.write(bytes);
 		cache.flush();
 		cache.close();
+		logger.leave();
 		return true;
 	}
 
 	private Node showWindow(String name, int type) {
-		logger.debug("showWindow {0}", name);
+		logger.enter(name, new Byte((byte)type));
 		Node node = getNode(name);
 		if (node == null && (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW)) {
 			node = createNode(name);
 		}
 		if (node == null) {
-			logger.debug("done // showWindow (node is null)");
+			logger.leave();
 			return null;
 		}
 		Window window = node.getWindow();
@@ -144,26 +150,26 @@ public class Protocol extends Connection {
 					w.setVisible(true);
 				}
 			}
-			logger.debug("done // showWindow (new or current)");
+			logger.leave();
 			return node;
 		}
 		if (type == ScreenType.CLOSE_WINDOW) {
 			window.setVisible(false);
 			clearPreview(window);
 		}
-		logger.debug("done // showWindow");
+		logger.leave();
 		return null;
 	}
 
 	private Node createNode(String name) {
-		Object[] args = { name };
-		logger.info("creating node: {0}", args); //$NON-NLS-1$
+		logger.enter(name);
 		try {
 			File cacheFile = new File(cacheRoot, name);
 			InputStream input = new FileInputStream(cacheFile);
 			Node node = new Node(Interface.parseInput(input, this), name);
 			input.close();
 			nodeTable.put(name, node);
+			logger.leave();
 			return node;
 		} catch (IOException e) {
 			throw new InterfaceBuildingException(e);
@@ -171,6 +177,7 @@ public class Protocol extends Connection {
 	}
 
 	private void destroyNode(String name) {
+		logger.enter(name);
 		if (nodeTable.containsKey(name)) {
 			Node node = (Node)nodeTable.get(name);
 			Window window = node.getWindow();
@@ -180,11 +187,11 @@ public class Protocol extends Connection {
 			node.clearChangedWidgets();
 			nodeTable.remove(name);
 		}
+		logger.leave();
 	}
 
 	synchronized void checkScreens(boolean init) throws IOException {
-		logger.debug("checkScreens");
-		logger.debug("loop over screens");
+		logger.enter(new Boolean(init));
 		Window.busyAllWindows();
 		while (receivePacketClass() == PacketClass.QueryScreen) {
 			String name = checkScreen1();
@@ -194,11 +201,11 @@ public class Protocol extends Connection {
 				init = false;
 			}
 		}
-		logger.debug("done // checkScreens");
+		logger.leave();
 	}
 
 	private synchronized String checkScreen1() throws IOException {
-		logger.debug("checkScreen one");
+		logger.enter();
 		String name = receiveString();
 		File cacheFile = new File(cacheRoot, name);
 		int size = receiveLong();
@@ -213,11 +220,12 @@ public class Protocol extends Connection {
 			logger.info("cache is up to date: {0}", cacheFile); //$NON-NLS-1$
 			sendPacketClass(PacketClass.NOT);
 		}
-		logger.debug("done // checkScreen one");
+		logger.leave();
 		return name;
 	}
 
 	private boolean isCacheFileOld(int size, long mtime, long ctime, File cacheFile) throws IOException {
+		logger.enter(new Object[] { new Integer(size), new Long(mtime), new Long(ctime), cacheFile });
 		File parent = cacheFile.getParentFile();
 		parent.mkdirs();
 		cacheFile.createNewFile();
@@ -225,30 +233,39 @@ public class Protocol extends Connection {
 		logger.info("screen mtime = {0}", new Date(mtime));
 		logger.info("screen ctime = {0}", new Date(ctime));
 		logger.info("cache mtime = {0}", new Date(lastModified));
-		return lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
+		final boolean result = lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
+		logger.leave();
+		return result;
 	}
 
 	synchronized boolean receiveWidgetData(Component widget) throws IOException {
+		logger.enter(widget);
 		Class clazz = widget.getClass();
 		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
 		if (marshaller != null) {
 			marshaller.receive(valueManager, widget);
+			logger.leave();
 			return true;
 		}
+		logger.leave();
 		return false;
 	}
 
 	private synchronized boolean sendWidgetData(String name, Component widget) throws IOException {
+		logger.enter(name, widget);
 		Class clazz = widget.getClass();
 		WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
 		if (marshaller != null) {
 			marshaller.send(valueManager, name, widget);
+			logger.leave();
 			return true;
 		}
+		logger.leave();
 		return false;
 	}
 
 	private synchronized void receiveValueSkip() throws IOException {
+		logger.enter();
 		int type = Type.NULL;
 		if (protocol1) {
 			receiveDataType();
@@ -290,10 +307,13 @@ public class Protocol extends Connection {
 		default:
 			break;
 		}
+		logger.leave();
 	}
 
 	public synchronized void receiveValue(StringBuffer longName, int offset) throws IOException {
+		logger.enter(longName, new Integer(offset));
 		if ( ! receiveValueNeedTrace(longName)) {
+			logger.leave();
 			return;
 		}
 		switch (receiveDataType()) {
@@ -307,25 +327,31 @@ public class Protocol extends Connection {
 			receiveValueSkip();
 			break;
 		}
+		logger.leave();
 	}
 
 	private synchronized void receiveRecordValue(StringBuffer longName, int offset) throws IOException {
+		logger.enter(longName, new Integer(offset));
 		for (int i = 0, n = receiveInt(); i < n; i++) {
 			String name = receiveString();
 			longName.replace(offset, longName.length(), '.' + name);
 			receiveValue(longName, offset + name.length() + 1);
 		}
+		logger.leave();
 	}
 
 	private synchronized void receiveArrayValue(StringBuffer longName, int offset) throws IOException {
+		logger.enter(longName, new Integer(offset));
 		for (int i = 0, n = receiveInt(); i < n; i++) {
 			String name = '[' + String.valueOf(i) + ']';
 			longName.replace(offset, longName.length(), name);
 			receiveValue(longName, offset + name.length());
 		}
+		logger.leave();
 	}
 
 	private synchronized boolean receiveValueNeedTrace(StringBuffer longName) throws IOException {
+		logger.enter(longName);
 		boolean done = false;
 		boolean needTrace = true;
 		if (protocol1) {
@@ -364,18 +390,25 @@ public class Protocol extends Connection {
 			needTrace = true;
 		}
 
+		logger.leave();
 		return needTrace;
 	}
 
 	public synchronized String receiveName() throws IOException {
-		return receiveString();
+		logger.enter();
+		final String s = receiveString();
+		logger.leave();
+		return s;
 	}
 
 	public synchronized void sendName(String name) throws IOException {
+		logger.enter(name);
 		sendString(name);
+		logger.leave();
 	}
 
 	private synchronized void resetTimer(Component widget) {
+		//logger.enter(widget);
 		if (widget instanceof PandaTimer) {
 			((PandaTimer)widget).reset();
 		} else if (widget instanceof Container) {
@@ -384,9 +417,11 @@ public class Protocol extends Connection {
 				resetTimer(container.getComponent(i));
 			}
 		}
+		//logger.leave();
 	}
 
 	private synchronized void clearPreview(Component widget) {
+		//logger.enter(widget);
 		if (widget instanceof PandaPreviewPane) {
 			PandaPreviewPane preview = (PandaPreviewPane)widget;
 			preview.clear();
@@ -396,10 +431,11 @@ public class Protocol extends Connection {
 				clearPreview(container.getComponent(i));
 			}
 		}
+		//logger.leave();
 	}
 
 	synchronized boolean getScreenData() throws IOException {
-		logger.debug("getScreenData");
+		logger.enter();
 		String window = null;
 		Node node;
 		boolean fCancel = false;
@@ -475,11 +511,12 @@ public class Protocol extends Connection {
 		} finally {
 			isReceiving = false;
 		}
-		logger.debug("done // getScreenData");
+		logger.leave();
 		return fCancel;
 	}
 
 	synchronized void sendConnect(String user, String pass, String app) throws IOException {
+		logger.enter(user, pass, app);
 		sendPacketClass(PacketClass.Connect);
 		sendVersionString();
 		sendString(user);
@@ -502,9 +539,11 @@ public class Protocol extends Connection {
 			Object[] args = { Integer.toHexString(pc) };
 			throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
 		}
+		logger.leave();
 	}
 
 	private synchronized void sendVersionString() throws IOException {
+		logger.enter();
 		byte[] bytes = VERSION.getBytes();
 		sendChar((byte)(bytes.length & 0xff));
 		sendChar((byte)0);
@@ -512,33 +551,31 @@ public class Protocol extends Connection {
 		sendChar((byte)0);
 		out.write(bytes);
 		((OutputStream)out).flush();
+		logger.leave();
 	}
 
 	synchronized void sendEvent(String window, String widget, String event) throws IOException {
-		Object[] args = { window, widgetName, event };
-		logger.debug("sendEvent: window={0}, widget={1}, event={2}", args);
+		logger.enter(window, widget, event);
 		sendPacketClass(PacketClass.Event);
 		sendString(window);
 		sendString(widget);
 		sendString(event);
-		logger.debug("done // sendEvent");
+		logger.leave();
 	}
 
 	synchronized void sendWindowData() throws IOException {
-		logger.debug("sendWindowData");
+		logger.enter();
 		Iterator i = nodeTable.keySet().iterator();
-		logger.debug("loop over nodes");
 		while (i.hasNext()) {
 			sendWndowData1((String)i.next());
 		}
-		logger.debug("done // loop over nodes");
 		sendPacketClass(PacketClass.END);
 		clearWindowTable();
-		logger.debug("done // sendWindowData");
+		logger.leave();
 	}
 
 	private synchronized void sendWndowData1(String windowName) throws IOException {
-		logger.debug("sendWindowData one for {0}", windowName);
+		logger.enter(windowName);
 		sendPacketClass(PacketClass.WindowName);
 		sendString(windowName);
 		Node node = getNode(windowName);
@@ -548,19 +585,23 @@ public class Protocol extends Connection {
 			sendWidgetData((String)e.getKey(), (Component)e.getValue());
 		}
 		sendPacketClass(PacketClass.END);
-		logger.debug("done // sendWindowData one for {0}", windowName);
+		logger.leave();
 	}
 
 	void clearWindowTable() {
+		logger.enter();
 		Iterator i = nodeTable.values().iterator();
 		while (i.hasNext()) {
 			Node node = (Node)i.next();
 			node.clearChangedWidgets();
 		}
+		logger.leave();
 	}
 
 	synchronized void addChangedWidget(Component widget) {
+		logger.enter(widget);
 		if (isReceiving) {
+			logger.leave();
 			return;
 		}
 		Node node = getNode(widget);
@@ -572,6 +613,7 @@ public class Protocol extends Connection {
 				logger.warn(e);
 			}
 		}
+		logger.leave();
 	}
 
 	public boolean isReceiving() {
@@ -587,26 +629,33 @@ public class Protocol extends Connection {
 	}
 
 	void closeWindow(Component widget) {
+		logger.enter(widget);
 		Node node = getNode(widget);
 		if (node == null) {
+			logger.leave();
 			return;
 		}
 		node.getWindow().setVisible(false);
 		clearPreview(node.getWindow());
 		if (isReceiving()) {
+			logger.leave();
 			return;
 		}
 		Iterator i = nodeTable.values().iterator();
 		while (i.hasNext()) {
 			if (((Node)i.next()).getWindow() != null) {
+				logger.leave();
 				return;
 			}
 		}
+		logger.leave();
 		client.exitSystem();
 	}
 
 	synchronized void exit() {
+		logger.enter();
 		isReceiving = true;
+		logger.leave();
 		client.exitSystem();
 	}
 
@@ -615,7 +664,9 @@ public class Protocol extends Connection {
 	}
 
 	public void exceptionOccured(IOException e) {
+		logger.enter(e);
 		ExceptionDialog.showExceptionDialog(e);
+		logger.leave();
 		client.exitSystem();
 	}
 }
