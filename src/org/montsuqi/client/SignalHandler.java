@@ -46,6 +46,10 @@ public abstract class SignalHandler {
 
 	private String signalName = ""; //$NON-NLS-1$
 
+	public String toString() {
+		return getSignalName();
+	}
+
 	public void setSignalName(final String signalName) {
 		this.signalName = signalName;
 	}
@@ -57,11 +61,16 @@ public abstract class SignalHandler {
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 
 	public static SignalHandler getSignalHandler(String handlerName) {
+		logger.enter(handlerName);
 		if (handlers.containsKey(handlerName)) {
-			return (SignalHandler)handlers.get(handlerName);
+			final SignalHandler handler = (SignalHandler)handlers.get(handlerName);
+			logger.leave();
+			return handler;
 		}
 		logger.info("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
-		return getSignalHandler(null);
+		final SignalHandler handler = getSignalHandler(null);
+		logger.leave();
+		return handler;
 	}
 
 	static Map handlers;
@@ -76,15 +85,15 @@ public abstract class SignalHandler {
 	}
 
 	static void blockChangedHandlers() {
-		logger.debug("block changed handlers");
+		logger.enter();
 		timerBlocked = true;
-		logger.debug("done // block changed handlers");
+		logger.leave();
 	}
 
 	static void unblockChangedHandlers() {
-		logger.debug("unblock changed handlers");
+		logger.enter();
 		timerBlocked = false;
-		logger.debug("done // unblock changed handlers");
+		logger.leave();
 	}
 
 	static {

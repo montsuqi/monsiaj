@@ -85,26 +85,32 @@ abstract class Connector {
 	abstract void connect(Protocol con, Component target, SignalHandler handler, Object other);
 
 	public static Connector getConnector(String signalName) {
+		logger.enter(signalName);
 		if (connectors.containsKey(signalName)) {
-			return (Connector)connectors.get(signalName);
+			final Connector connector = (Connector)connectors.get(signalName);
+			logger.leave();
+			return connector;
 		}
 		logger.info("connector not found for signal {0}", signalName); //$NON-NLS-1$
-		return getConnector(null);
+		final Connector connector = getConnector(null);
+		logger.leave();
+		return connector;
 	}
 
 	static void invoke(final Protocol con, final SignalHandler handler, final Component target, final Object other) {
+		logger.enter(new Object[] { handler, target, other });
 		try {
-			Object[] args = { handler.getSignalName(), target.getName(), other };
-			logger.debug("invoking {0} handler on target={1}, other={2}", args);
 			handler.handle(con, target, other);
-			logger.debug("done // {0}", handler.getSignalName());
 		} catch (IOException e) {
 			con.exceptionOccured(e);
 		}
+		logger.leave();
 	}
 
 	private static void registerConnector(String signalName, Connector connector) {
+		logger.enter(signalName, connector);
 		connectors.put(signalName, connector);
+		logger.leave();
 	}
 
 	static {
@@ -128,7 +134,9 @@ abstract class Connector {
 				AbstractButton button = (AbstractButton)target;
 				button.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent event) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -140,9 +148,11 @@ abstract class Connector {
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
 				target.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
+						logger.enter();
 						if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 							invoke(con, handler, target, other);
 						}
+						logger.leave();
 					}
 				});
 			}
@@ -156,7 +166,9 @@ abstract class Connector {
 					final Component c = combo.getEditor().getEditorComponent();
 					model.addListDataListener(new ListDataListener() {
 						public void contentsChanged(ListDataEvent e) {
+							logger.enter();
 							invoke(con, handler, c, other);
+							logger.leave();
 						}
 						public void intervalAdded(ListDataEvent e) {
 							// do nothing
@@ -167,20 +179,28 @@ abstract class Connector {
 					});
 					combo.addItemListener(new ItemListener() {
 						public void itemStateChanged(ItemEvent e) {
+							logger.enter();
 							invoke(con, handler, c, other);
+							logger.leave();
 						}
 					});
 				} else if (target instanceof JTextComponent) {
 					final JTextComponent text = (JTextComponent)target;
 					text.getDocument().addDocumentListener(new DocumentListener() {
 						public void insertUpdate(DocumentEvent event) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 						public void removeUpdate(DocumentEvent event) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 						public void changedUpdate(DocumentEvent event) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				}
@@ -197,14 +217,18 @@ abstract class Connector {
 					final JTextField textField = (JTextField)target;
 					textField.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent event) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				} else if (target instanceof JMenuItem) {
 					JMenuItem item = (JMenuItem)target;
 					item.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent event) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				}
@@ -217,7 +241,9 @@ abstract class Connector {
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
 				target.addFocusListener(new FocusAdapter() {
 					public void focusGained(FocusEvent e) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -227,7 +253,9 @@ abstract class Connector {
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
 				target.addFocusListener(new FocusAdapter() {
 					public void focusLost(FocusEvent e) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -239,13 +267,17 @@ abstract class Connector {
 					Window window = (Window)target;
 					window.addWindowListener(new WindowAdapter() {
 						public void windowOpened(WindowEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				} else {
 					target.addComponentListener(new ComponentAdapter() {
 						public void componentShown(ComponentEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				}
@@ -258,13 +290,17 @@ abstract class Connector {
 					Window window = (Window)target;
 					window.addWindowListener(new WindowAdapter() {
 						public void windowClosing(WindowEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				} else {
 					target.addComponentListener(new ComponentAdapter() {
 						public void componentHidden(ComponentEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				}
@@ -277,13 +313,17 @@ abstract class Connector {
 					Window window = (Window)target;
 					window.addWindowListener(new WindowAdapter() {
 						public void windowClosed(WindowEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				} else {
 					target.addComponentListener(new ComponentAdapter() {
 						public void componentHidden(ComponentEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				}
@@ -294,7 +334,9 @@ abstract class Connector {
 			public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
 				target.addFocusListener(new FocusAdapter() {
 					public void focusGained(FocusEvent e) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -307,15 +349,19 @@ abstract class Connector {
 					TreeSelectionModel model = tree.getSelectionModel();
 					model.addTreeSelectionListener(new TreeSelectionListener() {
 						public void valueChanged(TreeSelectionEvent e) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				} else {
 					ListSelectionListener listener = new ListSelectionListener() {
 						public void valueChanged(ListSelectionEvent e) {
+							logger.enter();
 							if ( ! e.getValueIsAdjusting()) {
 								invoke(con, handler, target, other);
 							}
+							logger.leave();
 						}
 					};
 					if (target instanceof JList) {
@@ -328,7 +374,9 @@ abstract class Connector {
 						model.addListSelectionListener(listener);
 						table.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent arg0) {
+								logger.enter();
 								invoke(con, handler, target, other);
+								logger.leave();
 							}
 						});
 					}
@@ -362,7 +410,9 @@ abstract class Connector {
 				JTabbedPane tabbedPane = (JTabbedPane)target;
 				tabbedPane.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent event) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -378,9 +428,11 @@ abstract class Connector {
 				if (target instanceof JRadioButton) {
 					toggle.addMouseListener(new MouseAdapter() {
 						public void mousePressed(MouseEvent e) {
+							logger.enter();
 							ButtonGroup g = (ButtonGroup)toggle.getClientProperty("group"); //$NON-NLS-1$
 							JRadioButton deselected = null;
 							if (g == null) {
+								logger.leave();
 								return;
 							}
 							Enumeration elements = g.getElements();
@@ -392,6 +444,7 @@ abstract class Connector {
 								}
 							}
 							if (deselected == null) {
+								logger.leave();
 								return;
 							}
 							JRadioButton none = (JRadioButton)deselected.getClientProperty("none"); //$NON-NLS-1$
@@ -405,14 +458,17 @@ abstract class Connector {
 							toggle.setSelected(true);
 							invoke(con, handler, target, o);
 							invoke(con, sendEvent, target, o);
+							logger.leave();
 						}
 					});
 				} else {
 					toggle.addChangeListener(new ChangeListener() {
 						public void stateChanged(ChangeEvent e) {
+							logger.enter();
 							if (toggle.isSelected()) {
 								invoke(con, handler, target, other);
 							}
+							logger.leave();
 						}
 					});
 				}
@@ -427,7 +483,9 @@ abstract class Connector {
 				PandaTimer timer = (PandaTimer)target;
 				timer.addTimerListener(new TimerListener() {
 					public void timerSignaled(TimerEvent e) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -441,7 +499,9 @@ abstract class Connector {
 				Calendar cal = (Calendar)target;
 				cal.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent e) {
+						logger.enter();
 						invoke(con, handler, target, other);
+						logger.leave();
 					}
 				});
 			}
@@ -453,7 +513,9 @@ abstract class Connector {
 					JMenuItem item = (JMenuItem)target;
 					item.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent event) {
+							logger.enter();
 							invoke(con, handler, target, other);
+							logger.leave();
 						}
 					});
 				}

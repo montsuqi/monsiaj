@@ -225,14 +225,12 @@ public class Protocol extends Connection {
 	}
 
 	private boolean isCacheFileOld(int size, long mtime, long ctime, File cacheFile) throws IOException {
-		logger.enter(new Object[] { new Integer(size), new Long(mtime), new Long(ctime), cacheFile });
+		logger.enter(new Object[] { new Integer(size), new Date(mtime), new Date(ctime), cacheFile });
 		File parent = cacheFile.getParentFile();
 		parent.mkdirs();
 		cacheFile.createNewFile();
 		final long lastModified = cacheFile.lastModified();
-		logger.info("screen mtime = {0}", new Date(mtime));
-		logger.info("screen ctime = {0}", new Date(ctime));
-		logger.info("cache mtime = {0}", new Date(lastModified));
+		logger.info("cache mtime = {0}", new Date(lastModified)); //$NON-NLS-1$
 		final boolean result = lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
 		logger.leave();
 		return result;
