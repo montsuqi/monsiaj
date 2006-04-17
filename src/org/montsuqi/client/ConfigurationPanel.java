@@ -164,8 +164,10 @@ public class ConfigurationPanel extends JPanel {
 
 		// Basic Tab
 		conf.setUser(userEntry.getText());
-		conf.setPass(new String(passwordEntry.getPassword()));
+		// Save save_pass check field before the password itself,
+		// since setPass fetches its value from the preferences internally.
 		conf.setSavePassword(savePasswordCheckbox.isSelected());
+		conf.setPass(new String(passwordEntry.getPassword()));
 		conf.setHost(hostEntry.getText());
 		conf.setPort(Integer.parseInt(portEntry.getText()));
 		conf.setApplication(appEntry.getText());
