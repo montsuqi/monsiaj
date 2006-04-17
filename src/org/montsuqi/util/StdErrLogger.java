@@ -30,7 +30,6 @@ import java.util.Map;
 class StdErrLogger extends Logger {
 
 	private static Map loggers;
-	private int level;
 	private PrintStream log;
 
 	static {
@@ -51,6 +50,7 @@ class StdErrLogger extends Logger {
 	}
 
 	private StdErrLogger() {
+		super();
 		log = null;
 		String logName = System.getProperty("monsia.logger.stderr.file"); //$NON-NLS-1$
 		if (logName != null) {
@@ -60,24 +60,6 @@ class StdErrLogger extends Logger {
 				// ignore
 			}
 		}
-		String s = getLevelProperty();
-		if ("FATAL".equalsIgnoreCase(s)){
-			level = FATAL;
-		} else if ("WARNING".equalsIgnoreCase(s)){
-			level = WARNING;
-		} else if ("INFO".equalsIgnoreCase(s)){
-			level = INFO;
-		} else if ("DEBUG".equalsIgnoreCase(s)){
-			level = DEBUG;
-		} else if ("TRACE".equalsIgnoreCase(s)){
-			level = TRACE;
-		} else {
-			level = WARNING;
-		}
-	}
-
-	protected int getLevel() {
-		return level;
 	}
 
 	private void writeLog(String message) {

@@ -34,10 +34,6 @@ class NullLogger extends Logger {
 		// inhibit instantiation
 	}
 
-	protected int getLevel() {
-		return 0;
-	}
-
 	public void trace(String message) {
 		// do nothing 
 	}

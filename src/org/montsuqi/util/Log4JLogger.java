@@ -57,35 +57,20 @@ class Log4JLogger extends Logger {
 	}
 
 	private Log4JLogger(org.apache.log4j.Logger logger) {
+		super();
 		this.logger = logger;
-		final String s = getLevelProperty();
-		if ("FATAL".equalsIgnoreCase(s)){
+		if (level == FATAL) {
 			this.logger.setLevel(Level.FATAL);
-		} else if ("WARNING".equalsIgnoreCase(s)){
+		} else if (level == WARNING) {
 			this.logger.setLevel(Level.WARN);
-		} else if ("INFO".equalsIgnoreCase(s)){
+		} else if (level == INFO) {
 			this.logger.setLevel(Level.INFO);
-		} else if ("DEBUG".equalsIgnoreCase(s)){
+		} else if (level == DEBUG) {
 			this.logger.setLevel(Level.DEBUG);
-		} else if ("TRACE".equalsIgnoreCase(s)){
+		} else if (level == TRACE) {
 			this.logger.setLevel(Level.ALL);
 		} else {
 			this.logger.setLevel(Level.WARN);
-		}
-	}
-
-	protected int getLevel() {
-		Level level = logger.getLevel();
-		if (level.isGreaterOrEqual(Level.ALL)) {
-			return TRACE;
-		} else if (level.isGreaterOrEqual(Level.DEBUG)) {
-			return DEBUG;
-		} else if (level.isGreaterOrEqual(Level.INFO)) {
-			return INFO;
-		} else if (level.isGreaterOrEqual(Level.WARN)) {
-			return WARNING;
-		} else {
-			return FATAL;
 		}
 	}
 

@@ -48,37 +48,20 @@ class J2SELogger extends Logger {
 	}
 
 	private J2SELogger(java.util.logging.Logger logger) {
+		super();
 		this.logger = logger;
-		final String s = getLevelProperty();
-		if ("FATAL".equalsIgnoreCase(s)) {
+		if (level == FATAL) {
 			this.logger.setLevel(Level.SEVERE);
-		} else if ("WARNING".equalsIgnoreCase(s)) {
+		} else if (level == WARNING) {
 			this.logger.setLevel(Level.WARNING);
-		} else if ("INFO".equalsIgnoreCase(s)) {
+		} else if (level == INFO) {
 			this.logger.setLevel(Level.INFO);
-		} else if ("DEBUG".equalsIgnoreCase(s)) {
+		} else if (level == DEBUG) {
 			this.logger.setLevel(Level.FINER);
-		} else if ("TRACE".equalsIgnoreCase(s)) {
+		} else if (level == TRACE) {
 			this.logger.setLevel(Level.FINEST);
 		} else {
 			this.logger.setLevel(Level.WARNING);
-		}
-	}
-
-	protected int getLevel() {
-		Level level = logger.getLevel();
-		if (level.equals(Level.FINEST)) {
-			return TRACE;
-		} else if (level.equals(Level.FINER)) {
-			return DEBUG;
-		} else if (level.equals(Level.INFO)) {
-			return INFO;
-		} else if (level.equals(Level.WARNING)) {
-			return WARNING;
-		} else if (level.equals(Level.SEVERE)) {
-			return FATAL;
-		} else {
-			return WARNING;
 		}
 	}
 

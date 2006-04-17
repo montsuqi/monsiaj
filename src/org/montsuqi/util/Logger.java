@@ -24,7 +24,9 @@ package org.montsuqi.util;
 
 import java.awt.Component;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.util.Date;
 
 public abstract class Logger {
 
@@ -33,6 +35,8 @@ public abstract class Logger {
 	public static final int INFO = 20;
 	public static final int DEBUG = 30;
 	public static final int TRACE = 40;
+
+	protected int level;
 
 	public static Logger getLogger(Class clazz) {
 		return getLogger(clazz.getName());
@@ -55,14 +59,23 @@ public abstract class Logger {
 		}
 	}
 
-	protected abstract int getLevel();
-
-	protected String getLevelProperty() {
-		final String s = System.getProperty("monsia.logger.level"); //$NON-NLS-1$
+	protected Logger() {
+		String s = System.getProperty("monsia.logger.level"); //$NON-NLS-1$
 		if (s == null) {
-			return "WARNING";
+			s = "WARNING"; //$NON-NLS-1$
+		}
+		if ("FATAL".equalsIgnoreCase(s)){
+			this.level = FATAL;
+		} else if ("WARNING".equalsIgnoreCase(s)){
+			this.level = WARNING;
+		} else if ("INFO".equalsIgnoreCase(s)){
+			this.level = INFO;
+		} else if ("DEBUG".equalsIgnoreCase(s)){
+			this.level = DEBUG;
+		} else if ("TRACE".equalsIgnoreCase(s)){
+			this.level = TRACE;
 		} else {
-			return s;
+			this.level = WARNING;
 		}
 	}
 
@@ -83,32 +96,16 @@ public abstract class Logger {
 	}
 
 	public void enter(Object[] args) {
-		if (getLevel() < TRACE) {
+		if (level < TRACE) {
 			return;
 		}
 		StackTraceElement caller = getCaller();
-		trace("enter: " + caller);
+		trace("-->enter: " + callerToString(caller)); //$NON-NLS-1$
 		if (args != null && args.length > 0) {
-			final StringBuffer buf = new StringBuffer("\targs:");
+			final StringBuffer buf = new StringBuffer("    args:"); //$NON-NLS-1$
 			for (int i = 0; i < args.length; i++) {
 				buf.append(' ');
-				if (args[i] instanceof Byte) {
-					final int value = ((Byte)args[i]).intValue();
-					buf.append("0x");
-					buf.append(Integer.toHexString((value >> 4) & 0x0f));
-					buf.append(Integer.toHexString((value >> 0) & 0x0f));
-				} else if (args[i] instanceof Component) {
-					final Component c = (Component)args[i];
-					String name = c.getName();
-					String className = c.getClass().getName();
-					if (name != null && name.length() > 0) {
-						buf.append(className + ": " + name);
-					} else {
-						buf.append(args[i]);
-					}
-				} else {
-					buf.append(args[i]);
-				}
+				appendArg(buf, args[i]);
 				if (i < args.length - 1) {
 					buf.append(',');
 				}
@@ -117,12 +114,41 @@ public abstract class Logger {
 		}
 	}
 
+	private void appendArg(final StringBuffer buf, final Object arg) {
+		if (arg instanceof Byte) {
+			final int value = ((Byte)arg).intValue();
+			buf.append("0x"); //$NON-NLS-1$
+			buf.append(Integer.toHexString((value >> 4) & 0x0f));
+			buf.append(Integer.toHexString((value >> 0) & 0x0f));
+		} else if (arg instanceof Component) {
+			final Component c = (Component)arg;
+			final String className = c.getClass().getName();
+			buf.append(toShortClassName(className));
+			final String name = c.getName();
+			if (name != null && name.length() > 0) {
+				buf.append(':');
+				buf.append(name);
+			}
+		} else if (arg instanceof Date) {
+			final DateFormat format = DateFormat.getInstance();
+			buf.append(format.format((Date)arg));
+		} else if (arg instanceof StringBuffer) {
+			appendArg(buf, ((StringBuffer)arg).toString());
+		} else if (arg instanceof String) {
+			buf.append('"');
+			buf.append(((String)arg).replaceAll("\"", "\\\"")); //$NON-NLS-1$ //$NON-NLS-2$
+			buf.append('"');
+		} else {
+			buf.append(arg);
+		}
+	}
+
 	public void leave() {
-		if (getLevel() < TRACE) {
+		if (level < TRACE) {
 			return;
 		}
 		StackTraceElement caller = getCaller();
-		trace("leave: " + caller);
+		trace("<--leave: " + callerToString(caller)); //$NON-NLS-1$
 	}
 
 	private StackTraceElement getCaller() {
@@ -142,6 +168,44 @@ public abstract class Logger {
 		}
 		return st[0];
 	}
+
+	private String callerToString(StackTraceElement caller) {
+		final StringBuffer buf = new StringBuffer();
+		final String className = toShortClassName(caller.getClassName());
+		buf.append(className);
+		final String methodName = caller.getMethodName();
+		buf.append('.');
+		buf.append(methodName);
+		buf.append('(');
+		if (caller.isNativeMethod()) {
+			buf.append("Native Method"); //$NON-NLS-1$
+		} else {
+			final String fileName = caller.getFileName();
+			if (fileName != null) {
+				buf.append(fileName);
+				final int lineNumber = caller.getLineNumber();
+				if (lineNumber >= 0) {
+					buf.append(':');
+					buf.append(lineNumber);
+				}
+			} else {
+				buf.append("Unknown Source"); //$NON-NLS-1$
+			}
+		}
+		buf.append(')');
+
+		return buf.toString();
+	}
+
+	private String toShortClassName(String className) {
+		int dot = className.lastIndexOf('.');
+		if (dot >= 0) {
+			return className.substring(dot + 1);
+		} else {
+			return className;
+		}
+	}
+
 	public abstract void trace(String message);
 	public abstract void debug(String message);
 	public abstract void info(String message);
@@ -158,91 +222,91 @@ public abstract class Logger {
 	}
 
 	public void trace(String format, Object[] args) {
-		if (getLevel() >= TRACE) {
+		if (level >= TRACE) {
 			trace(formatMessage(format, args));
 		}
 	}
 
 	public void debug(String format, Object[] args) {
-		if (getLevel() >= DEBUG) {
+		if (level >= DEBUG) {
 			debug(formatMessage(format, args));
 		}
 	}
 
 	public void info(String format, Object[] args) {
-		if (getLevel() >= INFO) {
+		if (level >= INFO) {
 			info(formatMessage(format, args));
 		}
 	}
 
 	public void warn(String format, Object[] args) {
-		if (getLevel() >= WARNING) {
+		if (level >= WARNING) {
 			warn(formatMessage(format, args));
 		}
 	}
 
 	public void fatal(String format, Object[] args) {
-		if (getLevel() >= FATAL) {
+		if (level >= FATAL) {
 			fatal(formatMessage(format, args));
 		}
 	}
 
 	public void trace(String format, Object arg) {
-		if (getLevel() >= TRACE) {
+		if (level >= TRACE) {
 			trace(formatMessage(format, arg));
 		}
 	}
 
 	public void debug(String format, Object arg) {
-		if (getLevel() >= DEBUG) {
+		if (level >= DEBUG) {
 			debug(formatMessage(format, arg));
 		}
 	}
 
 	public void info(String format, Object arg) {
-		if (getLevel() >= INFO) {
+		if (level >= INFO) {
 			info(formatMessage(format, arg));
 		}
 	}
 
 	public void warn(String format, Object arg) {
-		if (getLevel() >= WARNING) {
+		if (level >= WARNING) {
 			warn(formatMessage(format, arg));
 		}
 	}
 
 	public void fatal(String format, Object arg) {
-		if (getLevel() >= FATAL) {
+		if (level >= FATAL) {
 			fatal(formatMessage(format, arg));
 		}
 	}
 
 	public void trace(Throwable e) {
-		if (getLevel() >= TRACE) {
+		if (level >= TRACE) {
 			trace(e.toString());
 		}
 	}
 
 	public void debug(Throwable e) {
-		if (getLevel() >= DEBUG) {
+		if (level >= DEBUG) {
 			debug(e.toString());
 		}
 	}
 
 	public void info(Throwable e) {
-		if (getLevel() >= INFO) {
+		if (level >= INFO) {
 			info(e.toString());
 		}
 	}
 
 	public void warn(Throwable e) {
-		if (getLevel() >= WARNING) {
+		if (level >= WARNING) {
 			warn(e.toString());
 		}
 	}
 
 	public void fatal(Throwable e) {
-		if (getLevel() >= FATAL) {
+		if (level >= FATAL) {
 			fatal(e.toString());
 		}
 	}
