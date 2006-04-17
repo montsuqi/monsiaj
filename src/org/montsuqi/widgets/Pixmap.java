@@ -33,8 +33,8 @@ import javax.swing.JLabel;
 
 public class Pixmap extends JLabel {
 
-	private final class ScalableImageIcon extends ImageIcon {
-		private ScalableImageIcon(Image image) {
+	final class ScalableImageIcon extends ImageIcon {
+		ScalableImageIcon(Image image) {
 			super(image);
 		}
 

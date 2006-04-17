@@ -51,7 +51,7 @@ import javax.swing.text.PlainDocument;
 
 public class PandaEntry extends Entry {
 
-	private final class InsertEnterAsText extends AbstractAction {
+	final class InsertEnterAsText extends AbstractAction {
 
 		public void actionPerformed(ActionEvent evt) {
 			Object source = evt.getSource();

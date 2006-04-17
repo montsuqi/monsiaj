@@ -72,7 +72,7 @@ public class ConfigurationPanel extends JPanel {
 		private String extension;
 		private String description;
 
-		private FileSelectionAction(JTextComponent entry, String home, String extension, String description) {
+		FileSelectionAction(JTextComponent entry, String home, String extension, String description) {
 			super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
 			this.entry = entry;
 			this.home = home;
@@ -91,7 +91,7 @@ public class ConfigurationPanel extends JPanel {
 		}
 	}
 
-	private final class FieldSelected extends FocusAdapter {
+	final class FieldSelected extends FocusAdapter {
 
 		public void focusGained(FocusEvent e) {
 	           Object o = e.getSource();
