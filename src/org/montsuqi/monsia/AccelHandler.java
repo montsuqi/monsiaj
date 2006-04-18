@@ -73,7 +73,6 @@ class AccelHandler {
 			AbstractButton button = (AbstractButton)widget;
 			AccelInfo accel = pair.accel;
 			if (accel.getKey() == e.getKeyCode()&& accel.getModifiers() == e.getModifiers()) {
-				logger.debug("clicking button {0} via accel", button.getName());
 				button.doClick();
 				return true;
 			}

@@ -147,6 +147,7 @@ public class Protocol extends Connection {
 					w.showBusyCursor();
 				} else {
 					w.hideBusyCursor();
+					logger.debug("window: {0}", w.getName());
 					w.setVisible(true);
 				}
 			}
@@ -154,6 +155,7 @@ public class Protocol extends Connection {
 			return node;
 		}
 		if (type == ScreenType.CLOSE_WINDOW) {
+			logger.debug("closing: {0}", window.getName());
 			window.setVisible(false);
 			clearPreview(window);
 		}
@@ -195,7 +197,6 @@ public class Protocol extends Connection {
 		Window.busyAllWindows();
 		while (receivePacketClass() == PacketClass.QueryScreen) {
 			String name = checkScreen1();
-			logger.debug("name = {0}", name);
 			if (init) {
 				showWindow(name, ScreenType.NEW_WINDOW);
 				init = false;
@@ -207,17 +208,16 @@ public class Protocol extends Connection {
 	private synchronized String checkScreen1() throws IOException {
 		logger.enter();
 		String name = receiveString();
+		logger.debug("checking: {0}", name);
 		File cacheFile = new File(cacheRoot, name);
 		int size = receiveLong();
 		long mtime = receiveLong() * 1000L;
 		long ctime = receiveLong() * 1000L;
 
 		if (isCacheFileOld(size, mtime, ctime, cacheFile)) {
-			logger.info("receiving file: {0}", cacheFile); //$NON-NLS-1$
 			receiveFile(name, cacheFile);
 			destroyNode(name);
 		} else {
-			logger.info("cache is up to date: {0}", cacheFile); //$NON-NLS-1$
 			sendPacketClass(PacketClass.NOT);
 		}
 		logger.leave();
@@ -230,7 +230,7 @@ public class Protocol extends Connection {
 		parent.mkdirs();
 		cacheFile.createNewFile();
 		final long lastModified = cacheFile.lastModified();
-		logger.info("cache mtime = {0}", new Date(lastModified)); //$NON-NLS-1$
+		logger.debug("cache mtime: {0}", new Date(lastModified)); //$NON-NLS-1$
 		final boolean result = lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
 		logger.leave();
 		return result;
@@ -444,10 +444,9 @@ public class Protocol extends Connection {
 			sendPacketClass(PacketClass.GetData);
 			sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
 			byte c;
-			logger.debug("loop over windows");
 			while ((c = receivePacketClass()) == PacketClass.WindowName) {
 				window = receiveString();
-				logger.debug("windowName: {0}", window);
+				logger.debug("window: {0}", window);
 				int type = receiveInt();
 				switch (type) {
 				case ScreenType.END_SESSION:

@@ -76,7 +76,7 @@ abstract class WidgetPropertySetter {
 	protected static final Logger logger = Logger.getLogger(WidgetPropertySetter.class);
 
 	protected void warnUnsupportedProperty(String value) {
-		logger.info("{0} is not supported", value); //$NON-NLS-1$
+		logger.debug("not supported: {0}", value); //$NON-NLS-1$
 	}
 
 	private static Map propertyMap;
@@ -638,7 +638,7 @@ abstract class WidgetPropertySetter {
 			void set(Interface xml, Container parent, Component widget, String value) {
 				boolean allowShrink = ParameterConverter.toBoolean(value);
 				if ( ! allowShrink) {
-					logger.info("allow_shrink is not supported."); //$NON-NLS-1$
+					logger.info("not supported: allow_shrink"); //$NON-NLS-1$
 				}
 			}
 		});
