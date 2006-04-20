@@ -77,6 +77,7 @@
 			</fileset>
 			<fileset dir=".">
 				<include name="README.txt"/>
+				<include name="HOWTOBUILD.txt"/>
 			</fileset>
 		</copy>
 		<native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
@@ -184,7 +185,9 @@
 				<include name="src/**/"/>
 				<include name="resources/**"/>
 				<include name="libs/**"/>
-				<include name="build.xml,Makefile,README.txt"/>
+				<include name="build.xml"/>
+				<include name="README.txt"/>
+				<include name="HOWTOBUILD.txt"/>
 				<exclude name="**/CVS"/>
 			</fileset>
 		</copy>
