@@ -148,7 +148,9 @@ public class Protocol extends Connection {
 				} else {
 					w.hideBusyCursor();
 					logger.debug("window: {0}", w.getName());
-					w.setVisible(true);
+					if ( ! w.isVisible()) {
+						w.setVisible(true);
+					}
 				}
 			}
 			logger.leave();
