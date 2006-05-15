@@ -295,12 +295,10 @@ public class Configuration {
 		} catch (IOException e) {
 			logger.warn(e);
 		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					// do nothing
-				}
+			try {
+				br.close();
+			} catch (IOException e) {
+				// do nothing
 			}
 		}
 	}

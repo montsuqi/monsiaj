@@ -31,7 +31,7 @@ public class TestXMLRecording extends XMLTestSuite {
         try {
           Thread.sleep(3000);
         } catch (InterruptedException ex) {
-          ; // Ignore
+          // Ignore
         }
     }
 
@@ -51,6 +51,6 @@ public class TestXMLRecording extends XMLTestSuite {
      * @param args   Command line arguments.
      */
     public static void main(final String[] args) {
-        TestRunner.run((Test) TestXMLRecording.suite(args));
+        TestRunner.run(TestXMLRecording.suite(args));
     }
 }

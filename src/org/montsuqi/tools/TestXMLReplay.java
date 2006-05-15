@@ -68,7 +68,7 @@ public class TestXMLReplay extends XMLTestSuite {
      */
     public static Test suite(String[] args) {
 	    TestSuite suite = new TestSuite("XMLRecordTest");
-	    FilenameFilter namefilter = new XMLFileFilter();;
+	    FilenameFilter namefilter = new XMLFileFilter();
 	    String foldername = "testrecords";
 	    File fp = new File(foldername);
 	    namefilter.accept(fp, ".xml");
@@ -88,6 +88,6 @@ public class TestXMLReplay extends XMLTestSuite {
      * @param args   Command line arguments.
      */
     public static void main(final String[] args) {
-        TestRunner.run((Test) TestXMLReplay.suite(args));
+        TestRunner.run(TestXMLReplay.suite(args));
     }
 }

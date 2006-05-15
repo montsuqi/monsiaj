@@ -54,7 +54,9 @@ public class TestPandaCombo extends JFCTestCase {
 	public void testComboClick() throws Exception {
 		try {
 			setHelper(new JFCTestHelper());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// do nothing
+		}
 
 		String text = null;
 		text = (String) m_pandaCombo.getSelectedItem();
