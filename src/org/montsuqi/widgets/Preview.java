@@ -48,6 +48,23 @@ public abstract class Preview extends JPanel {
 		}
 	}
 
+	private final class FitToSizeAction extends AbstractAction {
+
+		FitToSizeAction() {
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-reset.png"); //$NON-NLS-1$
+			if (iconURL != null) {
+				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+			}
+			putValue(Action.NAME, Messages.getString("PandaPreview.fit_to_size")); //$NON-NLS-1$
+			putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.fit_to_size_short_description")); //$NON-NLS-1$
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			fitToSize();
+		}
+
+	}
+
 	private final class ZoomInAction extends AbstractAction {
 		ZoomInAction() {
 			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-in.png"); //$NON-NLS-1$
@@ -108,6 +125,7 @@ public abstract class Preview extends JPanel {
 		}
 	}
 
+	private final Action fitToSizeAction;
 	private final Action resetScaleAction;
 	private final Action zoomOutAction;
 	private final Action zoomInAction;
@@ -115,6 +133,7 @@ public abstract class Preview extends JPanel {
 	private final Action rotateCounterClockwiseAction;
 
 	public Preview() {
+		fitToSizeAction = new FitToSizeAction();
 		resetScaleAction = new ResetScaleAction();
 		zoomOutAction = new ZoomOutAction();
 		zoomInAction = new ZoomInAction();
@@ -122,6 +141,10 @@ public abstract class Preview extends JPanel {
 		rotateCounterClockwiseAction = new RotateCounterClockwiseAction();
 		setScale(1.0);
 		setRotationStep(0);
+	}
+
+	public Action getFitToSizeAction() {
+		return fitToSizeAction;
 	}
 
 	public Action getResetScaleAction() {
@@ -147,7 +170,8 @@ public abstract class Preview extends JPanel {
 	public abstract void load(String fileName) throws IOException;
 
 	public abstract void clear();
-
+	public abstract void fitToSize();
+	
 	protected double scale;
 	protected int rotationStep;
 	private static final double SCALE_FACTOR = 1.2;

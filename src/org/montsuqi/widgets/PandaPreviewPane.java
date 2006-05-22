@@ -68,6 +68,7 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 		scaleField.setMaximumSize(preferredSize);
 		scaleField.setHorizontalAlignment(SwingConstants.RIGHT);
 		toolbar.add(scaleField);
+		toolbar.add(preview.getFitToSizeAction());
 		toolbar.add(preview.getResetScaleAction());
 		toolbar.add(preview.getZoomInAction());
 		toolbar.add(preview.getZoomOutAction());

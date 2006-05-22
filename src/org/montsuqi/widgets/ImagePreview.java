@@ -22,6 +22,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
@@ -46,6 +47,24 @@ class ImagePreview extends Preview {
 		sourceImage = null;
 		image = null;
 		updatePreferredSize();
+	}
+
+	public void fitToSize() {
+		if (image == null) {
+			return;
+		}
+		final Container parent = getParent();
+		if (parent == null) {
+			return;
+		}
+		int iw = image.getWidth();
+		int ih = image.getHeight();
+		int pw = parent.getWidth();
+		int ph = parent.getHeight();
+		double wScale = (double)pw / iw;
+		double hScale = (double)ph / ih;
+		double scale = Math.min(wScale, hScale);
+		setScale(scale);
 	}
 
 	protected void paintComponent(Graphics g) {
