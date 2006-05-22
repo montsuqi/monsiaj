@@ -51,7 +51,7 @@ public abstract class Preview extends JPanel {
 	private final class FitToSizeAction extends AbstractAction {
 
 		FitToSizeAction() {
-			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-reset.png"); //$NON-NLS-1$
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-fit.png"); //$NON-NLS-1$
 			if (iconURL != null) {
 				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 			}
