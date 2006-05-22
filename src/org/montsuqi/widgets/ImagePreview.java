@@ -50,15 +50,15 @@ class ImagePreview extends Preview {
 	}
 
 	public void fitToSize() {
-		if (image == null) {
+		if (sourceImage == null) {
 			return;
 		}
 		final Container parent = getParent();
 		if (parent == null) {
 			return;
 		}
-		int iw = image.getWidth();
-		int ih = image.getHeight();
+		int iw = sourceImage.getWidth();
+		int ih = sourceImage.getHeight();
 		int pw = parent.getWidth();
 		int ph = parent.getHeight();
 		double wScale = (double)pw / iw;
