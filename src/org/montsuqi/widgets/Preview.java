@@ -24,6 +24,7 @@ package org.montsuqi.widgets;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -216,18 +217,11 @@ public abstract class Preview extends JPanel {
 	}
 
 	protected void setRotationStep(int newRotationStep) {
-		// normalize rotationStep to the range of [0,4)
-		if (newRotationStep < 0) {
-			newRotationStep += 4 * ((-newRotationStep) / 4 + 1);
-		}
-		newRotationStep %= 4;
-		if ( ! isValidRotationStep(newRotationStep)) {
-			throw new IllegalArgumentException("invalid rotation"); //$NON-NLS-1$
-		}
+		BigInteger r = BigInteger.valueOf(newRotationStep);
+		r = r.mod(BigInteger.valueOf(4));
+		newRotationStep = r.intValue();
+		assert 0 <= newRotationStep && newRotationStep < 4;
 		rotationStep = newRotationStep;
 	}
 
-	private boolean isValidRotationStep(int newRotationStep) {
-		return 0 <= newRotationStep && newRotationStep < 4;
-	}
 }
