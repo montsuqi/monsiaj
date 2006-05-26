@@ -73,8 +73,8 @@ class ImagePreview extends Preview {
 		int ph = parent.getHeight();
 		double wScale = (double)pw / iw;
 		double hScale = (double)ph / ih;
-		double scale = Math.min(wScale, hScale);
-		setScale(scale);
+		double lesserScale = Math.min(wScale, hScale);
+		setScale(lesserScale);
 	}
 
 	protected void paintComponent(Graphics g) {
