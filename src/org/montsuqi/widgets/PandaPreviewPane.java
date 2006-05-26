@@ -69,6 +69,7 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 		scaleField.setHorizontalAlignment(SwingConstants.RIGHT);
 		toolbar.add(scaleField);
 		toolbar.add(preview.getFitToSizeAction());
+		toolbar.add(preview.getFitToSizeHorizontallyAction());
 		toolbar.add(preview.getResetScaleAction());
 		toolbar.add(preview.getZoomInAction());
 		toolbar.add(preview.getZoomOutAction());
@@ -85,6 +86,7 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 
 	public void load(String fileName) throws IOException {
 		preview.load(fileName);
+		preview.fitToSizeHorizontally();
 	}
 
 	public void clear() {
