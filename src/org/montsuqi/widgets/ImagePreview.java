@@ -67,8 +67,16 @@ class ImagePreview extends Preview {
 		if (parent == null) {
 			return;
 		}
-		double wScale = computeScale(sourceImage.getWidth(), parent.getWidth());
-		double hScale = computeScale(sourceImage.getHeight(), parent.getHeight());
+		double wScale;
+		double hScale;
+		if (rotationStep % 2 == 0) {
+			wScale = computeScale(sourceImage.getWidth(), parent.getWidth());
+			hScale = computeScale(sourceImage.getHeight(), parent.getHeight());
+			setScale(Math.min(wScale, hScale));
+		} else {
+			wScale = computeScale(sourceImage.getWidth(), parent.getHeight());
+			hScale = computeScale(sourceImage.getHeight(), parent.getWidth());
+		}
 		setScale(Math.min(wScale, hScale));
 	}
 
@@ -80,7 +88,12 @@ class ImagePreview extends Preview {
 		if (parent == null) {
 			return;
 		}
-		double scale = computeScale(sourceImage.getWidth(), parent.getWidth());
+		double scale;
+		if (rotationStep % 2 == 0) {
+			scale = computeScale(sourceImage.getWidth(), parent.getWidth());
+		} else {
+			scale = computeScale(sourceImage.getHeight(), parent.getHeight());
+		}
 		setScale(scale);
 	}
 
