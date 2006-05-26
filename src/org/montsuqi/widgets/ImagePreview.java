@@ -67,14 +67,25 @@ class ImagePreview extends Preview {
 		if (parent == null) {
 			return;
 		}
-		int iw = sourceImage.getWidth();
-		int ih = sourceImage.getHeight();
-		int pw = parent.getWidth();
-		int ph = parent.getHeight();
-		double wScale = (double)pw / iw;
-		double hScale = (double)ph / ih;
-		double lesserScale = Math.min(wScale, hScale);
-		setScale(lesserScale);
+		double wScale = computeScale(sourceImage.getWidth(), parent.getWidth());
+		double hScale = computeScale(sourceImage.getHeight(), parent.getHeight());
+		setScale(Math.min(wScale, hScale));
+	}
+
+	public void fitToSizeHorizontally() {
+		if (sourceImage == null) {
+			return;
+		}
+		final Container parent = getParent();
+		if (parent == null) {
+			return;
+		}
+		double scale = computeScale(sourceImage.getWidth(), parent.getWidth());
+		setScale(scale);
+	}
+
+	private double computeScale(double imageMetric, double parentMetric) {
+		return parentMetric / imageMetric;
 	}
 
 	protected void paintComponent(Graphics g) {
