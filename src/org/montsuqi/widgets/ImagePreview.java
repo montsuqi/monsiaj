@@ -72,12 +72,12 @@ class ImagePreview extends Preview {
 		if (rotationStep % 2 == 0) {
 			wScale = computeScale(sourceImage.getWidth(), parent.getWidth());
 			hScale = computeScale(sourceImage.getHeight(), parent.getHeight());
-			setScale(Math.min(wScale, hScale));
 		} else {
 			wScale = computeScale(sourceImage.getWidth(), parent.getHeight());
 			hScale = computeScale(sourceImage.getHeight(), parent.getWidth());
 		}
-		setScale(Math.min(wScale, hScale));
+		final double newScale = Math.min(wScale, hScale);
+		setScale(newScale);
 	}
 
 	public void fitToSizeHorizontally() {
@@ -88,13 +88,13 @@ class ImagePreview extends Preview {
 		if (parent == null) {
 			return;
 		}
-		double scale;
+		double newScale;
 		if (rotationStep % 2 == 0) {
-			scale = computeScale(sourceImage.getWidth(), parent.getWidth());
+			newScale = computeScale(sourceImage.getWidth(), parent.getWidth());
 		} else {
-			scale = computeScale(sourceImage.getHeight(), parent.getHeight());
+			newScale = computeScale(sourceImage.getHeight(), parent.getHeight());
 		}
-		setScale(scale);
+		setScale(newScale);
 	}
 
 	private double computeScale(double imageMetric, double parentMetric) {
