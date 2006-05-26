@@ -25,6 +25,7 @@ package org.montsuqi.widgets;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -39,14 +40,23 @@ class ImagePreview extends Preview {
 	BufferedImage image;
 
 	public void load(String fileName) throws IOException {
+		flushImage(sourceImage);
 		sourceImage = ImageIO.read(new File(fileName));
 		updatePreferredSize();
 	}
 
 	public void clear() {
+		flushImage(sourceImage);
 		sourceImage = null;
+		flushImage(image);
 		image = null;
 		updatePreferredSize();
+	}
+
+	private void flushImage(final Image img) {
+		if (img != null) {
+			img.flush();
+		}
 	}
 
 	public void fitToSize() {
@@ -98,6 +108,7 @@ class ImagePreview extends Preview {
 		int h = (int)(sh * scale);
 		Dimension size = rotationStep % 2 != 0 ? new Dimension(h, w) : new Dimension(w, h);
 		setPreferredSize(size);
+		flushImage(image);
 		image = new BufferedImage(size.width, size.height, sourceImage.getType());
 
 		AffineTransform t = new AffineTransform();
