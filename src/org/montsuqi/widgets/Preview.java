@@ -29,8 +29,11 @@ import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 public abstract class Preview extends JPanel {
 
@@ -159,6 +162,24 @@ public abstract class Preview extends JPanel {
 		zoomInAction = new ZoomInAction();
 		rotateClockwiseAction = new RotateClockwiseAction();
 		rotateCounterClockwiseAction = new RotateCounterClockwiseAction();
+		ActionMap actionMap = getActionMap();
+		actionMap.put("fitToSize", fitToSizeAction);
+		actionMap.put("fitToSizeHorizontally", fitToSizeHorizontallyAction);
+		actionMap.put("resetScale", resetScaleAction);
+		actionMap.put("zoomOut", zoomOutAction);
+		actionMap.put("zoomIn", zoomInAction);
+		actionMap.put("rotateClockwise", rotateClockwiseAction);
+		actionMap.put("rotateCounterClockwise", rotateCounterClockwiseAction);
+
+		InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+		inputMap.put(KeyStroke.getKeyStroke("ctrl G"), "fitToSize");
+		inputMap.put(KeyStroke.getKeyStroke("shift F6"), "fitToSize");
+		inputMap.put(KeyStroke.getKeyStroke("ctrl F"), "fitToSizeHorizontally");
+		inputMap.put(KeyStroke.getKeyStroke("shift F5"), "fitToSizeHorizontally");
+		inputMap.put(KeyStroke.getKeyStroke("ctrl MINUS"), "zoomOut");
+		inputMap.put(KeyStroke.getKeyStroke("shift F8"), "zoomOut");
+		inputMap.put(KeyStroke.getKeyStroke("ctrl PLUS"), "zoomIn");
+		inputMap.put(KeyStroke.getKeyStroke("shift F7"), "zoomIn");
 		setScale(1.0);
 		setRotationStep(0);
 	}
