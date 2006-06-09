@@ -52,7 +52,7 @@ public abstract class Preview extends JPanel {
 	private final class FitToSizeAction extends AbstractAction {
 
 		FitToSizeAction() {
-			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-fit.png"); //$NON-NLS-1$
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-fitp.png"); //$NON-NLS-1$
 			if (iconURL != null) {
 				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 			}
@@ -69,7 +69,7 @@ public abstract class Preview extends JPanel {
 	private final class FitToSizeHorizontallyAction extends AbstractAction {
 
 		FitToSizeHorizontallyAction() {
-			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-fith.png"); //$NON-NLS-1$
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/zoom-fitw.png"); //$NON-NLS-1$
 			if (iconURL != null) {
 				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
 			}
