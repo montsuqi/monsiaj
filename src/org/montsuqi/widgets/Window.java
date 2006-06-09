@@ -68,14 +68,14 @@ public class Window extends JFrame {
 
 
 	public static void busyAllWindows() {
-		Window[] windows = getWindows();
+		Window[] windows = getMontsuqiWindows();
 		for (int i = 0; i < windows.length; i++) {
 			Window w = windows[i];
 			w.showBusyCursor();
 		}
 	}
 
-	public static Window[] getWindows() {
+	public static Window[] getMontsuqiWindows() {
 		Frame[] frames = Frame.getFrames();
 		List list = new ArrayList();
 		for (int i = 0; i < frames.length; i++) {

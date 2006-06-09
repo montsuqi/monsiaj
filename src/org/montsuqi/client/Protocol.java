@@ -140,7 +140,7 @@ public class Protocol extends Connection {
 		}
 		Window window = node.getWindow();
 		if (type == ScreenType.NEW_WINDOW || type == ScreenType.CURRENT_WINDOW) {
-			Window[] windows = Window.getWindows();
+			Window[] windows = Window.getMontsuqiWindows();
 			for (int i = 0; i < windows.length; i++) {
 				Window w = windows[i];
 				 if (w != window) {
