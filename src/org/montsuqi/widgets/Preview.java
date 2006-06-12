@@ -178,8 +178,7 @@ public abstract class Preview extends JPanel {
 		inputMap.put(KeyStroke.getKeyStroke("shift F6"), "fitToSizeHorizontally");
 		inputMap.put(KeyStroke.getKeyStroke("ctrl MINUS"), "zoomOut");
 		inputMap.put(KeyStroke.getKeyStroke("shift F7"), "zoomOut");
-		inputMap.put(KeyStroke.getKeyStroke("ctrl PLUS"), "zoomIn");
-		inputMap.put(KeyStroke.getKeyStroke("shift ctrl PLUS"), "zoomIn");
+		inputMap.put(KeyStroke.getKeyStroke("shift ctrl SEMICOLON"), "zoomIn");
 		inputMap.put(KeyStroke.getKeyStroke("shift F8"), "zoomIn");
 		setScale(1.0);
 		setRotationStep(0);
