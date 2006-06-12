@@ -70,11 +70,11 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 		toolbar.add(scaleField);
 		toolbar.add(preview.getFitToSizeAction());
 		toolbar.add(preview.getFitToSizeHorizontallyAction());
-		toolbar.add(preview.getResetScaleAction());
-		toolbar.add(preview.getZoomInAction());
+		//toolbar.add(preview.getResetScaleAction());
 		toolbar.add(preview.getZoomOutAction());
-		toolbar.add(preview.getRotateClockwiseAction());
-		toolbar.add(preview.getRotateCounterClockwiseAction());
+		toolbar.add(preview.getZoomInAction());
+		//toolbar.add(preview.getRotateClockwiseAction());
+		//toolbar.add(preview.getRotateCounterClockwiseAction());
 		add(toolbar, BorderLayout.NORTH);
 
 		JScrollPane scroll = new JScrollPane();
