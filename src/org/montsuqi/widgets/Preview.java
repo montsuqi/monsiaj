@@ -173,13 +173,14 @@ public abstract class Preview extends JPanel {
 
 		InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
 		inputMap.put(KeyStroke.getKeyStroke("ctrl G"), "fitToSize");
-		inputMap.put(KeyStroke.getKeyStroke("shift F6"), "fitToSize");
+		inputMap.put(KeyStroke.getKeyStroke("shift F5"), "fitToSize");
 		inputMap.put(KeyStroke.getKeyStroke("ctrl F"), "fitToSizeHorizontally");
-		inputMap.put(KeyStroke.getKeyStroke("shift F5"), "fitToSizeHorizontally");
+		inputMap.put(KeyStroke.getKeyStroke("shift F6"), "fitToSizeHorizontally");
 		inputMap.put(KeyStroke.getKeyStroke("ctrl MINUS"), "zoomOut");
-		inputMap.put(KeyStroke.getKeyStroke("shift F8"), "zoomOut");
+		inputMap.put(KeyStroke.getKeyStroke("shift F7"), "zoomOut");
 		inputMap.put(KeyStroke.getKeyStroke("ctrl PLUS"), "zoomIn");
-		inputMap.put(KeyStroke.getKeyStroke("shift F7"), "zoomIn");
+		inputMap.put(KeyStroke.getKeyStroke("shift ctrl PLUS"), "zoomIn");
+		inputMap.put(KeyStroke.getKeyStroke("shift F8"), "zoomIn");
 		setScale(1.0);
 		setRotationStep(0);
 	}
