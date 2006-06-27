@@ -38,10 +38,25 @@ class ImagePreview extends Preview {
 
 	BufferedImage sourceImage;
 	BufferedImage image;
+	Dimension lastImageSize;
+
+	public ImagePreview() {
+	    super();
+	    sourceImage = null;
+	    image = null;
+	    lastImageSize = null;
+    }
 
 	public void load(String fileName) throws IOException {
 		flushImage(sourceImage);
 		sourceImage = ImageIO.read(new File(fileName));
+		if (sourceImage != null) {
+			final Dimension imageSize =  new Dimension(sourceImage.getWidth(), sourceImage.getHeight());
+			if (lastImageSize == null || ! lastImageSize.equals(imageSize)) {
+				fitToSizeHorizontally();
+				lastImageSize = imageSize;
+			}
+		}
 		updatePreferredSize();
 	}
 
