@@ -43,12 +43,14 @@ import javax.swing.WindowConstants;
 
 public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 
+	private boolean hasLoadedImageOnce;
 	private JToolBar toolbar;
 	private Preview preview;
 	private JFormattedTextField scaleField;
 
 	public PandaPreviewPane() {
 		super();
+		hasLoadedImageOnce = false;
 		setLayout(new BorderLayout());
 
 		preview = new ImagePreview();
@@ -86,7 +88,10 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 
 	public void load(String fileName) throws IOException {
 		preview.load(fileName);
-		preview.fitToSizeHorizontally();
+		if ( ! hasLoadedImageOnce) {
+			hasLoadedImageOnce = true;
+			preview.fitToSizeHorizontally();
+		}
 	}
 
 	public void clear() {
