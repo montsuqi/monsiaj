@@ -32,11 +32,15 @@ public class Entry extends JTextField {
 
 	public Entry() {
 		super();
+		setDocument(new LengthLimitableDocument());
 		initActions();
 	}
 
 	public Entry(String text, int n) {
-		super(text, n);
+		super();
+		setDocument(new LengthLimitableDocument());
+		setText(text);
+		setColumns(n);
 		initActions();
 	}
 
@@ -49,5 +53,15 @@ public class Entry extends JTextField {
 
 		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
+	}
+
+	public void setLimit(int limit) {
+		LengthLimitableDocument doc = (LengthLimitableDocument)getDocument();
+		doc.setLimit(limit);
+	}
+
+	public int getLimit() {
+		LengthLimitableDocument doc = (LengthLimitableDocument)getDocument();
+		return doc.getLimit();
 	}
 }

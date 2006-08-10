@@ -62,6 +62,7 @@ import javax.swing.text.JTextComponent;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
+import org.montsuqi.widgets.Entry;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
@@ -365,6 +366,14 @@ abstract class WidgetPropertySetter {
 					throw new IllegalArgumentException("invalid input mode"); //$NON-NLS-1$
 				}
 			}
+		});
+
+		registerProperty(Entry.class, "text_max_length", new WidgetPropertySetter() {
+			void set(Interface xml, Container parent, Component widget, String value) {
+				final Entry entry = (Entry)widget;
+				final int limit = ParameterConverter.toInteger(value);
+				entry.setLimit(limit);
+            }
 		});
 
 		registerProperty(PandaEntry.class, "xim_enabled", new WidgetPropertySetter() { //$NON-NLS-1$

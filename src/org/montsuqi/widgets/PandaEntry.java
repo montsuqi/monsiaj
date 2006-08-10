@@ -47,7 +47,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
 
 public class PandaEntry extends Entry {
 
@@ -83,8 +82,10 @@ public class PandaEntry extends Entry {
 	}
 
 	public PandaEntry(String value, int n) {
-		super(value, n);
+		super();
 		setDocument(new PandaDocument());
+		setText(value);
+		setColumns(n);
 		initListeners();
 	}
 
@@ -188,7 +189,7 @@ public class PandaEntry extends Entry {
 	}
 }
 
-class PandaDocument extends PlainDocument {
+class PandaDocument extends LengthLimitableDocument {
 
 	public static final int KANA = 1;
 	public static final int XIM = 2;
