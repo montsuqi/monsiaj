@@ -298,7 +298,7 @@ class PandaDocument extends LengthLimitableDocument {
 				return;
 			}
 
-			assert length == 0;
+			assert length == 1;
 
 			// Find the prefix
 			int prefixStart;
