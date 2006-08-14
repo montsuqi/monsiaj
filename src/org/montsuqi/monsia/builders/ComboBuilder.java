@@ -50,6 +50,7 @@ class ComboBuilder extends ContainerBuilder {
 		Component editor = combo.getEditor().getEditorComponent();
 		setCommonParameters(xml, editor, wInfo);
 		setSignals(xml, editor, wInfo);
+		setProperties(xml, parent, editor, wInfo.getProperties());
 	}
 
 	protected void ensureValidEntryType(String actualType) {
