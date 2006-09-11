@@ -76,7 +76,7 @@ public class WidgetInfo {
 		return name;
 	}
 
-	void setClassName(String className) {
+	public void setClassName(String className) {
 		this.className = className;
 	}
 
