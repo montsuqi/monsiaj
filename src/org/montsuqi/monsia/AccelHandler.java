@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractButton;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.montsuqi.util.Logger;
 
@@ -91,5 +93,21 @@ public class AccelHandler {
 
 	public static void setEnabled(boolean enabled) {
 		AccelHandler.enabled = enabled;
+	}
+
+
+	public static class Enabler implements PopupMenuListener {
+
+		public void popupMenuCanceled(PopupMenuEvent e) {
+			setEnabled(true);
+		}
+
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			setEnabled(true);
+		}
+
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			setEnabled(false);
+		}
 	}
 }

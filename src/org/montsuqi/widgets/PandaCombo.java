@@ -37,8 +37,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
-import org.montsuqi.monsia.AccelHandler;
-
 public class PandaCombo extends JComboBox {
 
 	class MoveSelectionAction extends AbstractAction {
@@ -66,7 +64,6 @@ public class PandaCombo extends JComboBox {
 	public PandaCombo() {
 		super();
 		setEditor(new PandaComboBoxEditor(this));
-		addPopupMenuListener(new AccelEnabler());
 		initActions();
 	}
 
@@ -158,20 +155,5 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 			}
 			super.setText(s);
 		}
-	}
-}
-
-class AccelEnabler implements PopupMenuListener {
-
-	public void popupMenuCanceled(PopupMenuEvent e) {
-		AccelHandler.setEnabled(true);
-	}
-
-	public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-		AccelHandler.setEnabled(true);
-	}
-
-	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-		AccelHandler.setEnabled(false);
 	}
 }

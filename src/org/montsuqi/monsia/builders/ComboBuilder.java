@@ -27,6 +27,7 @@ import java.awt.Container;
 
 import javax.swing.JComboBox;
 
+import org.montsuqi.monsia.AccelHandler;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
@@ -36,6 +37,7 @@ class ComboBuilder extends ContainerBuilder {
 		Component widget = super.buildSelf(xml, parent, info);
 		JComboBox combo = (JComboBox)widget;
 		combo.setEditable(true);
+		combo.addPopupMenuListener(new AccelHandler.Enabler());
 		return widget;
 	}
 
