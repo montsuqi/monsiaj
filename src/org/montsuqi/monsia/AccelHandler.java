@@ -32,7 +32,9 @@ import javax.swing.AbstractButton;
 
 import org.montsuqi.util.Logger;
 
-class AccelHandler {
+public class AccelHandler {
+
+	private static boolean enabled = true;
 
 	Logger logger = Logger.getLogger(AccelHandler.class);
 
@@ -60,6 +62,9 @@ class AccelHandler {
 	}
 
 	boolean handleAccel(KeyEvent e) {
+		if ( ! isEnabled()) {
+			return false;
+		}
 		if (e.getID() != KeyEvent.KEY_PRESSED) {
 			return false;
 		}
@@ -78,5 +83,13 @@ class AccelHandler {
 			}
 		}
 		return false;
+	}
+
+	private static boolean isEnabled() {
+		return enabled;
+	}
+
+	public static void setEnabled(boolean enabled) {
+		AccelHandler.enabled = enabled;
 	}
 }
