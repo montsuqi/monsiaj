@@ -73,12 +73,13 @@ public final class WidgetValueManager {
 	}
 
 	void setStyle(Component widget, String styleName) {
-		Style style = (Style)styles.get(styleName);
-		if (style != null) {
-			style.apply(widget);
+		final Style style;
+		if (styles.containsKey(styleName)) {
+			style = (Style)styles.get(styleName);
 		} else {
-			Style.DEFAULT_STYLE.apply(widget);
+			style = Style.DEFAULT_STYLE;
 		}
+		style.apply(widget);
 	}
 
 }

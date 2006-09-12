@@ -38,8 +38,6 @@ public class Style {
 	public static final Style DEFAULT_STYLE;
 	static {
 		DEFAULT_STYLE = new Style(null);
-		DEFAULT_STYLE.setForeground(SystemColor.textText);
-		DEFAULT_STYLE.setBackground(SystemColor.text);
 	}
 	private String name;
 	private Color background;
@@ -48,6 +46,8 @@ public class Style {
 
 	private Style(String name) {
 		this.name = name;
+		foreground = SystemColor.textText;
+		background = SystemColor.text;
 	}
 
 	public void apply(Component widget) {
@@ -112,5 +112,19 @@ public class Style {
 
 	public String getName() {
 		return name;
+	}
+
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("style[");
+		buf.append(name);
+		buf.append(": foreground=");
+		buf.append(foreground);
+		buf.append(", background=");
+		buf.append(background);
+		buf.append(", font=");
+		buf.append(font);
+		buf.append("]");
+		return buf.toString();
 	}
 }
