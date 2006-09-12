@@ -25,6 +25,7 @@ package org.montsuqi.monsia;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.SystemColor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -34,6 +35,12 @@ import java.util.Properties;
 
 public class Style {
 
+	public static final Style DEFAULT_STYLE;
+	static {
+		DEFAULT_STYLE = new Style(null);
+		DEFAULT_STYLE.setForeground(SystemColor.textText);
+		DEFAULT_STYLE.setBackground(SystemColor.text);
+	}
 	private String name;
 	private Color background;
 	private Color foreground;

@@ -76,10 +76,9 @@ public final class WidgetValueManager {
 		Style style = (Style)styles.get(styleName);
 		if (style != null) {
 			style.apply(widget);
-			return;
+		} else {
+			Style.DEFAULT_STYLE.apply(widget);
 		}
-		Object[] args = { styleName, (widget == null ? "null" : widget.getName()) }; //$NON-NLS-1$
-		logger.debug("ignored style \"{0}\" applying to {1}", args); //$NON-NLS-1$
 	}
 
 }
