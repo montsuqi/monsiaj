@@ -150,6 +150,7 @@ public class Protocol extends Connection {
 					logger.debug("window: {0}", w.getName());
 					if ( ! w.isVisible()) {
 						w.setVisible(true);
+						w.toFront();
 					}
 				}
 			}
@@ -505,7 +506,9 @@ public class Protocol extends Connection {
 			// reset GtkPandaTimer if exists
 			node = getNode(window);
 			if (node != null) {
-				resetTimer(node.getWindow());
+				final Window w = node.getWindow();
+				resetTimer(w);
+				w.toFront();
 			}
 		} finally {
 			isReceiving = false;
