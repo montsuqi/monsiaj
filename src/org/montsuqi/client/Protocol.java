@@ -151,6 +151,10 @@ public class Protocol extends Connection {
 					if ( ! w.isVisible()) {
 						w.setVisible(true);
 						w.toFront();
+						final Component lastFocusOwner = w.getMostRecentFocusOwner();
+						if (lastFocusOwner != null) {
+							lastFocusOwner.requestFocus();
+						}
 					}
 				}
 			}
@@ -509,6 +513,10 @@ public class Protocol extends Connection {
 				final Window w = node.getWindow();
 				resetTimer(w);
 				w.toFront();
+				final Component lastFocusOwner = w.getMostRecentFocusOwner();
+				if (lastFocusOwner != null) {
+					lastFocusOwner.requestFocus();
+				}
 			}
 		} finally {
 			isReceiving = false;
