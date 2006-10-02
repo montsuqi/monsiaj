@@ -107,7 +107,7 @@ public class WidgetBuilder {
 		registerWidgetClass("CheckButton",    CheckBox.class,      new CheckButtonBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Combo",          JComboBox.class,     new ComboBuilder()); //$NON-NLS-1$
 		registerWidgetClass("CList",          PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Dialog",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("Dialog",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Entry",          Entry.class,         entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("FileEntry",      FileEntry.class,     defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
@@ -143,7 +143,7 @@ public class WidgetBuilder {
 		registerWidgetClass("VPaned",         VPaned.class,        defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
-		registerWidgetClass("Window",         Window.class,        defaultContainerBuilder); //$NON-NLS-1$
+		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 
 		// on MacOS replace PandaHTML with PandaHTMLWebKit.
 		if (SystemEnvironment.isMacOSX()) {
