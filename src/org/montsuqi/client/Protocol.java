@@ -512,11 +512,6 @@ public class Protocol extends Connection {
 			if (node != null) {
 				final Window w = node.getWindow();
 				resetTimer(w);
-//				w.toFront();
-				final Component lastFocusOwner = w.getMostRecentFocusOwner();
-				if (lastFocusOwner != null) {
-					lastFocusOwner.requestFocus();
-				}
 			}
 		} finally {
 			isReceiving = false;
