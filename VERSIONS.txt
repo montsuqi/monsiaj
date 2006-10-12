@@ -1,3 +1,8 @@
+REL_20061010:
+	monsiaj-bin-20061010.zip
+	monsiaj-bin-macosx-20061010.zip
+	monsiaj-replay-20061010.zip
+	monsiaj-src-20061010.zip
 REL_20060914:
 	monsiaj-bin-20060915.zip
 	monsiaj-bin-macosx-20060915.zip
