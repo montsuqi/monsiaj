@@ -41,6 +41,7 @@ import java.util.StringTokenizer;
 
 import javax.swing.SwingUtilities;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
@@ -150,10 +151,11 @@ public class Protocol extends Connection {
 					logger.debug("window: {0}", w.getName());
 					if ( ! w.isVisible()) {
 						w.setVisible(true);
-//						w.toFront();
-						final Component lastFocusOwner = w.getMostRecentFocusOwner();
-						if (lastFocusOwner != null) {
-							lastFocusOwner.requestFocus();
+						if ( ! SystemEnvironment.isWindows()) {
+							final Component lastFocusOwner = w.getMostRecentFocusOwner();
+							if (lastFocusOwner != null) {
+								lastFocusOwner.requestFocus();
+							}
 						}
 					}
 				}
