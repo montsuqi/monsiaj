@@ -53,6 +53,28 @@ import org.montsuqi.widgets.Window;
 
 public class Protocol extends Connection {
 
+	private final class FocusRequester implements Runnable {
+
+	    private final Component widget;
+
+	    FocusRequester(Component widget) {
+		    this.widget = widget;
+	    }
+
+	    public void run() {
+	    	for (Component comp = widget; comp != null; comp = comp.getParent()) {
+	    		while ( ! comp.isVisible()) {
+	    			try {
+	                    Thread.sleep(50);
+	                } catch (InterruptedException e) {
+	                    // ignore
+	                }
+	    		}
+	    	}
+	    	widget.requestFocus();
+	    }
+    }
+
 	private Client client;
 	private File cacheRoot;
 	private boolean protocol1;
@@ -504,7 +526,7 @@ public class Protocol extends Connection {
 				if (node != null && node.getInterface() != null) {
 					Component widget = xml.getWidget(wName);
 					if (widget != null) {
-						widget.requestFocus();
+						SwingUtilities.invokeLater(new FocusRequester(widget));
 					}
 				}
 				c = receivePacketClass();
