@@ -38,6 +38,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
 import org.montsuqi.util.Logger;
@@ -55,25 +57,41 @@ public class Protocol extends Connection {
 
 	private final class FocusRequester implements Runnable {
 
-	    private final Component widget;
+		final class Terminator extends TimerTask {
 
-	    FocusRequester(Component widget) {
-		    this.widget = widget;
-	    }
+			public void run() {
+				running = false;
+			}
+		}
 
-	    public void run() {
-	    	for (Component comp = widget; comp != null; comp = comp.getParent()) {
-	    		while ( ! comp.isVisible()) {
-	    			try {
-	                    Thread.sleep(50);
-	                } catch (InterruptedException e) {
-	                    // ignore
-	                }
-	    		}
-	    	}
-	    	widget.requestFocus();
-	    }
-    }
+		private final Component widget;
+		boolean running;
+
+		FocusRequester(Component widget) {
+			this.widget = widget;
+			running = false;
+		}
+
+		public void run() {
+			final int delay = 50;
+			final Timer terminator = new Timer();
+			for (Component comp = widget; running && comp != null; comp = comp.getParent()) {
+				running = true;
+				terminator.schedule(new Terminator(), (long)delay * 3);
+				while (running && !comp.isVisible()) {
+					try {
+						Thread.sleep(delay);
+					} catch (InterruptedException e) {
+						// ignore
+					}
+				}
+				if (!running) {
+					logger.debug("Timed out waiting {0} to be visible.", comp.getName());
+				}
+			}
+			widget.requestFocus();
+		}
+	}
 
 	private Client client;
 	private File cacheRoot;
@@ -86,7 +104,7 @@ public class Protocol extends Connection {
 	private StringBuffer widgetName;
 	private Interface xml;
 
-	private static final Logger logger = Logger.getLogger(Protocol.class);
+	static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
 	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException, GeneralSecurityException {
@@ -166,7 +184,7 @@ public class Protocol extends Connection {
 			Window[] windows = Window.getMontsuqiWindows();
 			for (int i = 0; i < windows.length; i++) {
 				Window w = windows[i];
-				 if (w != window) {
+				if (w != window) {
 					w.showBusyCursor();
 				} else {
 					w.hideBusyCursor();
@@ -262,7 +280,7 @@ public class Protocol extends Connection {
 		cacheFile.createNewFile();
 		final long lastModified = cacheFile.lastModified();
 		logger.debug("cache mtime: {0}", new Date(lastModified)); //$NON-NLS-1$
-		final boolean result = lastModified < mtime || lastModified < ctime ||  cacheFile.length() != size;
+		final boolean result = lastModified < mtime || lastModified < ctime || cacheFile.length() != size;
 		logger.leave();
 		return result;
 	}
@@ -392,7 +410,7 @@ public class Protocol extends Connection {
 				done = true;
 			} else {
 				if ( ! protocol2) {
-					needTrace = false;	// fatal error
+					needTrace = false; // fatal error
 					done = true;
 					receiveValueSkip();
 				}
@@ -415,7 +433,7 @@ public class Protocol extends Connection {
 				}
 			}
 		}
-		if ( ! done) {
+		if (!done) {
 			needTrace = true;
 		}
 
@@ -437,7 +455,7 @@ public class Protocol extends Connection {
 	}
 
 	private synchronized void resetTimer(Component widget) {
-		//logger.enter(widget);
+		// logger.enter(widget);
 		if (widget instanceof PandaTimer) {
 			((PandaTimer)widget).reset();
 		} else if (widget instanceof Container) {
@@ -446,11 +464,11 @@ public class Protocol extends Connection {
 				resetTimer(container.getComponent(i));
 			}
 		}
-		//logger.leave();
+		// logger.leave();
 	}
 
 	private synchronized void clearPreview(Component widget) {
-		//logger.enter(widget);
+		// logger.enter(widget);
 		if (widget instanceof PandaPreviewPane) {
 			PandaPreviewPane preview = (PandaPreviewPane)widget;
 			preview.clear();
@@ -460,7 +478,7 @@ public class Protocol extends Connection {
 				clearPreview(container.getComponent(i));
 			}
 		}
-		//logger.leave();
+		// logger.leave();
 	}
 
 	synchronized boolean getScreenData() throws IOException {
@@ -482,7 +500,7 @@ public class Protocol extends Connection {
 				switch (type) {
 				case ScreenType.END_SESSION:
 					client.exitSystem();
-					fCancel= true;
+					fCancel = true;
 					break;
 				case ScreenType.CLOSE_WINDOW:
 				case ScreenType.JOIN_WINDOW:
