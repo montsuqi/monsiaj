@@ -60,23 +60,27 @@ public class Protocol extends Connection {
 		final class Terminator extends TimerTask {
 
 			public void run() {
-				running = false;
+				FocusRequester.this.stop();
 			}
 		}
 
 		private final Component widget;
-		boolean running;
+		private boolean running;
 
 		FocusRequester(Component widget) {
 			this.widget = widget;
 			running = false;
 		}
 
+		synchronized void stop() {
+			running = false;
+		}
+
 		public void run() {
 			final int delay = 50;
-			final Timer terminator = new Timer();
 			for (Component comp = widget; running && comp != null; comp = comp.getParent()) {
 				running = true;
+				final Timer terminator = new Timer();
 				terminator.schedule(new Terminator(), (long)delay * 3);
 				while (running && !comp.isVisible()) {
 					try {
@@ -85,8 +89,12 @@ public class Protocol extends Connection {
 						// ignore
 					}
 				}
-				if (!running) {
-					logger.debug("Timed out waiting {0} to be visible.", comp.getName());
+				synchronized (this) {
+					if (running) {
+						terminator.cancel();
+					} else {
+						logger.debug("Timed out waiting {0} to be visible.", comp.getName());
+					}
 				}
 			}
 			widget.requestFocus();
