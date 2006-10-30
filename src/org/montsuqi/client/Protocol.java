@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 import org.montsuqi.util.Logger;
@@ -552,7 +554,15 @@ public class Protocol extends Connection {
 				if (node != null && node.getInterface() != null) {
 					Component widget = xml.getWidget(wName);
 					if (widget != null) {
-						SwingUtilities.invokeLater(new FocusRequester(widget));
+						// JDK 1.5 focus problem: workaround
+						final String javaVersion = System.getProperty("java.version");
+						final Pattern pat = Pattern.compile("\\A1\\.5");
+						final Matcher match = pat.matcher(javaVersion);
+						if (match.find()) {
+							SwingUtilities.invokeLater(new FocusRequester(widget));
+						} else {
+							widget.requestFocus();
+						}
 					}
 				}
 				c = receivePacketClass();
