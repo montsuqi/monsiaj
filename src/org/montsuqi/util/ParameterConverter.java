@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -22,16 +23,30 @@ copies.
 
 package org.montsuqi.util;
 
+/** <p>An utility class for converting string to other types.</p>
+ */
 public class ParameterConverter {
 
 	private ParameterConverter() {
 		// inhibit instantiation
 	}
 
+	/** <p>Converts the given string into integer.</p>
+	 * 
+	 * @param s the string to convert.
+	 */
 	public static int toInteger(String s) {
 		return Integer.parseInt(s);
 	}
 
+	/** <p>Converts the given string into boolean.</p>
+	 * 
+	 * @param s the string to convert.
+	 * @return true for strings which starts with 't', 'y', 'T' or 'Y'.
+	 * false for strings which starts with 'f', 'n', 'F' or 'N'.
+	 * Otherwise the string is converted to integer and returns true
+	 * if it is not zero, false if it is zero.
+	 */
 	public static boolean toBoolean(String s) {
 		if ("tyTY".indexOf(s.charAt(0)) >= 0) { //$NON-NLS-1$
 			return true;
@@ -42,6 +57,10 @@ public class ParameterConverter {
 		}
 	}
 
+	/** <p>Converts the given string into double.</p>
+	 * 
+	 * @param s the string to convert.
+	 */
 	public double toDouble(String s) {
 		return Double.parseDouble(s);
 	}

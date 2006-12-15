@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,6 +32,9 @@ import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.widgets.PandaCList;
 
+/** <p>A builder to create clist widgets.</p>
+ * <p>This component assigns a CListHeaderRenderer for each column headers.</p>
+ */
 class CListBuilder extends ContainerBuilder {
 
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
@@ -44,6 +48,7 @@ class CListBuilder extends ContainerBuilder {
 		int cCount = info.getChildren().size();
 
 		PandaCList clist = (PandaCList)parent;
+		// make all cells uneditable.
 		clist.setModel(new DefaultTableModel(0, cCount) {
 			public boolean isCellEditable(int row, int column) {
 				return false;

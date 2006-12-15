@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -29,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/** <p>A value ofject used to hold information of a widget in Glade interface definition.</p>
+ */
 public class WidgetInfo {
 
 	private String className;

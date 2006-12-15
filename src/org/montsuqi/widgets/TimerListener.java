@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -24,6 +25,10 @@ package org.montsuqi.widgets;
 
 import java.util.EventListener;
 
+/** <p>An event listener interface for TimerEvent.</p>
+ */
 public interface TimerListener extends EventListener {
+
+	/** <p>Implement this method to handle TimerEvent.</p> */
 	public void timerSignaled(TimerEvent e);
 }

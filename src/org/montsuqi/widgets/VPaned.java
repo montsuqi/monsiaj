@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -24,10 +25,11 @@ package org.montsuqi.widgets;
 
 import javax.swing.JSplitPane;
 
+/** <p>A class that simulates Gtk+'s VPaned(Horizontally splitted pane).</p>
+ */
 public class VPaned extends JSplitPane {
 
 	public VPaned() {
 		super(HORIZONTAL_SPLIT);
 	}
-
 }

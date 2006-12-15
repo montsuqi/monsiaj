@@ -2,16 +2,17 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
+		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
+		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
 to you along with PANDA so you can know your rights and
@@ -35,6 +36,19 @@ import javax.swing.InputMap;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+/** <p>An abstract document preview class.</p>
+ * 
+ * <p>This class provides basic actions to the preview
+ * such as zoom in/out, fit to size and rotation.</p>
+ * 
+ * <p>Subclass implementors must implement following methods.</p>
+ * <ul>
+ * <li>public abstract void load(String fileName) throws IOException;</li>
+ * <li>public abstract void clear();</li>
+ * <li>public abstract void fitToSize();</li>
+ * <li>public abstract void fitToSizeHorizontally();</li>
+ * </ul>
+ */
 public abstract class Preview extends JPanel {
 
 	private final class ResetScaleAction extends AbstractAction {
@@ -154,6 +168,7 @@ public abstract class Preview extends JPanel {
 	private final Action rotateClockwiseAction;
 	private final Action rotateCounterClockwiseAction;
 
+	/** <p>Constructs a Preview.</p> */
 	public Preview() {
 		fitToSizeAction = new FitToSizeAction();
 		fitToSizeHorizontallyAction = new FitToSizeHorizontallyAction();
@@ -184,42 +199,81 @@ public abstract class Preview extends JPanel {
 		setRotationStep(0);
 	}
 
+	/** <p>Returns FitToSize action.</p>
+	 */
 	public Action getFitToSizeAction() {
 		return fitToSizeAction;
 	}
 
+	/** <p>Returns FitToSizeHorizontally action.</p>
+	 */
 	public Action getFitToSizeHorizontallyAction() {
 		return fitToSizeHorizontallyAction;
 	}
 
+	/** <p>Returns ResetScale action.</p>
+	 */
 	public Action getResetScaleAction() {
 		return resetScaleAction;
 	}
 
+	/** <p>Returns ZoomOut action.</p>
+	 */
 	public Action getZoomOutAction() {
 		return zoomOutAction;
 	}
 
+	/** <p>Returns ZoomIn action.</p>
+	 */
 	public Action getZoomInAction() {
 		return zoomInAction;
 	}
 
+	/** <p>Returns RotateClockwise action.</p>
+	 */
 	public Action getRotateClockwiseAction() {
 		return rotateClockwiseAction;
 	}
 
+	/** <p>Returns RotateCounterClockwise action.</p>
+	 */
 	public Action getRotateCounterClockwiseAction() {
 		return rotateCounterClockwiseAction;
 	}
 
+	/** <p>Loads a preview source from the given file.</p>
+	 * 
+	 * @param fileName the source of preview.
+	 */
 	public abstract void load(String fileName) throws IOException;
 
+	/** <p>Clears the preview content.</p>
+	 */
 	public abstract void clear();
+
+	/** <p>Scale the image to fit within the component's size.</p>
+	 */
 	public abstract void fitToSize();
+
+	/** <p>Scale the image horizontally to fit within the component's width.</p>
+	 */
 	public abstract void fitToSizeHorizontally();
-	
+
+	/** <p>The scale of preview. 1.0 means the original size. When it is greater,
+	 * the preview becomes larger. WHen it is smaller, the preview becoms smaller.</p>
+	 * <p>Should be altered by multiplying/dividing 1.0 by SCALE_FACTOR
+	 * several times.</p>
+	 */
 	protected double scale;
+
+	/** <p>Represents the rotation of the preview.</p>
+	 * <p>0 means it is not rotated. It rotates 90 degree by one step.</p>
+	 * <p>This variable takes integer in range 0..3 inclusive.</p>
+	 */
 	protected int rotationStep;
+
+	/** <p>The factor used to multipy/divide the internal scale parameter.</p>
+	 */
 	private static final double SCALE_FACTOR = 1.2;
 
 	protected void setScale(double newScale) {
@@ -238,6 +292,7 @@ public abstract class Preview extends JPanel {
 	}
 
 	protected void setRotationStep(int newRotationStep) {
+		// % operator does not work as expected...
 		BigInteger r = BigInteger.valueOf(newRotationStep);
 		r = r.mod(BigInteger.valueOf(4));
 		newRotationStep = r.intValue();

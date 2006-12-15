@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -37,6 +38,9 @@ import javax.swing.text.AbstractDocument;
 
 import org.montsuqi.util.Logger;
 
+/** <p>A HTML viewer for platforms other than MacOS X.</p>
+ * <p>This component uses JEditorPane to render HTML.</p>
+ */
 public class PandaHTML extends JPanel {
 
 	protected static final Logger logger = Logger.getLogger(PandaHTML.class);
@@ -65,6 +69,10 @@ public class PandaHTML extends JPanel {
 		add(scroll, BorderLayout.CENTER);
 	}
 
+	/** <p>Loads a HTML from the given URL and render it.</p>
+	 * 
+	 * @param uri source URL of the document.
+	 */
 	public void setURI(URL uri) {
 		Runnable loader = createLoader(uri);
 		logger.info("loading: {0}", uri); //$NON-NLS-1$

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,6 +32,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+/** <p>A class that simulates Gtk+'s Button widget.</p>
+ * 
+ * <p>Down arrow key moves focus out to the next component, and
+ * up arrow key moves focus out to the previous component respectively.</p>
+ * <p>Enter key simulates button press.</p>
+ */
 public class Button extends JButton {
 
 	public Button() {

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -29,6 +30,8 @@ import java.awt.Rectangle;
 import javax.swing.JComponent;
 import org.montsuqi.util.Logger;
 
+/** <p>A container that lays out components in fixed position and size.</p>
+ */
 public class Fixed extends JComponent {
 
 	public Fixed() {

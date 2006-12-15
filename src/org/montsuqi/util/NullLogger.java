@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -22,10 +23,18 @@ copies.
 
 package org.montsuqi.util;
 
+/** <p>A logger that logs nothing.</p>
+ * 
+ *  <p>This is helpful for supressing all logging.</p> */
 class NullLogger extends Logger {
 
 	private static Logger instance  = new NullLogger();
 
+	/** <p>Returns a singleton null logger.</p>
+	 *
+	 * @param name ignored.
+	 * @return the singleton null logger.
+	 */
 	public static synchronized Logger getLogger(String name) {
 		return instance;
 	}
@@ -34,22 +43,27 @@ class NullLogger extends Logger {
 		// inhibit instantiation
 	}
 
+	/** <p>Do nothing.</p> */
 	public void trace(String message) {
 		// do nothing 
 	}
 
+	/** <p>Do nothing.</p> */
 	public void debug(String message) {
 		// do nothing 
 	}
 
+	/** <p>Do nothing.</p> */
 	public void info(String message) {
 		// do nothing 
 	}
 
+	/** <p>Do nothing.</p> */
 	public void warn(String message) {
 		// do nothing
 	}
 
+	/** <p>Do nothing.</p> */
 	public void fatal(String message) {
 		// do nothing
 	}

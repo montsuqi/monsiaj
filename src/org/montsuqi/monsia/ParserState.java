@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -25,6 +26,8 @@ package org.montsuqi.monsia;
 import org.montsuqi.util.Logger;
 import org.xml.sax.Attributes;
 
+/** <p>State ofject for interface definition parser(SAX Handler)s.</p>
+ */
 abstract class ParserState {
 
 	protected static final Logger logger = Logger.getLogger(ParserState.class);
@@ -33,25 +36,56 @@ abstract class ParserState {
 		this.name = name;
 	}
 
+	/** <p>Receives notification of the beginning of an element.</p>
+	 * @param uri the namespace URI if any.
+	 * @param localName the element's locale name (name without prefix).
+	 * @param qName the element's qualified name (name with prefix).
+	 * @param attrs attributes of the element.
+	 */
 	abstract void startElement(String uri, String localName, String qName, Attributes attrs);
+
+	/** <p>Receives notification of the end of an element.</p>
+	 * @param uri the namespace URI if any.
+	 * @param localName the element's locale name (name without prefix).
+	 * @param qName the element's qualified name (name with prefix).
+	 */
 	abstract void endElement(String uri, String localName, String qName);
 
 	private final String name;
 
+
+	/** <p>A helper method to warn that the parser finds an unexpected element closing tag.</p>
+	 * @param element expected element to close.
+	 * @param found acutual element name of the closing tag encountered.
+	 */
 	protected void warnShouldFindClosing(String element, String found) {
 		Object[] args = { element, found };
 		logger.warn("should find </{0}> here, found </{1}>", args); //$NON-NLS-1$
 	}
 
+	/** <p>A helper method to warn that some element found in an element which should be
+	 * empty.</p>
+	 * @param element current element, which should be empty.
+	 * @param found an element found in <var>element</var>.
+	 */
 	protected void warnShouldBeEmpty(String element, String found) {
 		Object[] args = { element, found };
 		logger.warn("<{0}> element should be empty, found <{1}>", args); //$NON-NLS-1$
 	}
 
+	/** <p>A helper method to warn that an element which should have no attributes detects
+	 * some attributes specified.</p>
+	 * 
+	 * @param element current element.
+	 */
 	protected void warnShouldHaveNoAttributes(String element) {
 		logger.warn("<{0}> should have no attributes", element); //$NON-NLS-1$
 	}
 
+	/** <p>A helper method to warn that wrong type of property is being set at the current
+	 * position.</p>
+	 * @param element current element.
+	 */
 	protected void warnInvalidPropertiesDefinedHere(String element) {
 		logger.warn("non {0} properties defined here", element); //$NON-NLS-1$
 	}

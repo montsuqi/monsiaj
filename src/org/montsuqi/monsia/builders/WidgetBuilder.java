@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -81,6 +82,11 @@ import org.montsuqi.widgets.VPaned;
 import org.montsuqi.widgets.VSeparator;
 import org.montsuqi.widgets.Window;
 
+/** <p>Super class for all widget builders.</p>
+ * 
+ * <p>A widget builder is a class which provides methods to create instances of
+ * a specific class.</p>
+ */
 public class WidgetBuilder {
 
 	protected static final Logger logger = Logger.getLogger(WidgetBuilder.class);
@@ -88,6 +94,12 @@ public class WidgetBuilder {
 	private static Map classMap;
 	private static Map builderMap;
 
+	/** <p>Maps a generic(toolkit independent) widget class name, to actual Java class
+	 * and widget builder.</p>
+	 * @param genericClassName a toolkit independent widget type like 'Button' or 'List'.
+	 * @param clazz a class adopted to perform as the given generic class in Java.
+	 * @param builder a widget builder which will build the given type of widgets.
+	 */
 	private static void registerWidgetClass(String genericClassName, Class clazz, WidgetBuilder builder) {
 		classMap.put(genericClassName, clazz);
 		builderMap.put(genericClassName, builder);
@@ -151,9 +163,11 @@ public class WidgetBuilder {
 		}
 	}
 
+	// an interface to make a modified font.
 	private interface FontModifier {
 		Font modifyFont(Font font);
 	}
+
 	// set up UI resources
 	static {
 		String[] classes = {
@@ -182,6 +196,7 @@ public class WidgetBuilder {
 				userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1$
 			}
 			if (userFontSpec == null) {
+				// remove boldness
 				modifyFont(classes[i], new FontModifier() {
 					public Font modifyFont(Font font) {
 						return font.deriveFont(font.getStyle() & ~Font.BOLD);
@@ -196,6 +211,7 @@ public class WidgetBuilder {
 				});
 			}
 		}
+		// Use Osaka font on Mac.
 		if (SystemEnvironment.isMacOSX()) {
 			classes = new String[] {
 				"TextField", //$NON-NLS-1$
@@ -222,6 +238,23 @@ public class WidgetBuilder {
 		}
 	}
 
+	/** <p>Builds a widget.</p>
+	 * 
+	 * 
+	 * <p>A widget is build in following steps:</p>
+	 * <ol>
+	 * <li>Build Self.  Build the widget itself using the widget info and other stuff. This is performed by
+	 * buildSelf method.  Properties in widget info are set. Accelerators are set too.</li>
+	 * <li>Build Children.  Build children widgets in it.  This is performed by buildChildren method.
+	 * Basic procedure of building children is defined in ContainerBuilder widget builder.</li>
+	 * <li>Names are assigned.</li>
+	 * <li>Signals are set.</li>
+	 * </ol>
+	 * @param xml glade interface definition.
+	 * @param info widget info for the target widget.
+	 * @param parent parent component of the target widget.
+	 * @return a widget.
+	 */
 	public static Component buildWidget(Interface xml, WidgetInfo info, Container parent) {
 		String genericClassName = info.getClassName();
 		WidgetBuilder builder = (WidgetBuilder)builderMap.get(genericClassName);
@@ -247,6 +280,14 @@ public class WidgetBuilder {
 		}
 	}
 
+	/** <p>Instantiate a specific component.</p>
+	 * <p>When one is created successfuly, properties are set
+	 * and accelerators are assigned.</p>
+	 * @param xml glade screen definition.
+	 * @param parent parent widget.
+	 * @param info widget info.
+	 * @return constructed widget.
+	 */
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		String genericClassName = info.getClassName();
 		Class clazz  = (Class)classMap.get(genericClassName);

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,11 +32,14 @@ import javax.swing.JRadioButton;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
+/** <p>A builder to create RadioButton widgets.</p>
+ */
 class RadioButtonBuilder extends ContainerBuilder {
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
 		JRadioButton radio = (JRadioButton)widget;
 		Map properties = info.getProperties();
+		// button group is managed in Interface.
 		if (properties.containsKey("group")) { //$NON-NLS-1$
 			xml.setButtonGroup(radio, (String)properties.get("group")); //$NON-NLS-1$
 		} else {

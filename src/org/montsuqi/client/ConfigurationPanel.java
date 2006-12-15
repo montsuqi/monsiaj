@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -65,6 +66,10 @@ import org.montsuqi.util.Logger;
 
 public class ConfigurationPanel extends JPanel {
 
+	/** <p>An action to pop a fiel selection dialog.</p>
+	 * <p>When a file is selected, the path of the selected file is set to specified
+	 * text field.</p>
+	 */
 	private final class FileSelectionAction extends AbstractAction {
 
 		private JTextComponent entry;
@@ -72,6 +77,13 @@ public class ConfigurationPanel extends JPanel {
 		private String extension;
 		private String description;
 
+		/** <p>Constructs a FileSelectionAction.</p>
+		 * 
+		 * @param entry a text field to which the path of the selected file is set.
+		 * @param home a directory path from which file selection starts.
+		 * @param extension a file name extension passed to an ExtensionFIleFilter.
+		 * @param description ditto.
+		 */
 		FileSelectionAction(JTextComponent entry, String home, String extension, String description) {
 			super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
 			this.entry = entry;
@@ -91,19 +103,23 @@ public class ConfigurationPanel extends JPanel {
 		}
 	}
 
+	/** <p>An action to select all text in the component when it is focused.</p>
+	 */
 	final class FieldSelected extends FocusAdapter {
 
 		public void focusGained(FocusEvent e) {
-	           Object o = e.getSource();
-               if ( ! (o instanceof JTextComponent)) {
-                       return;
-               }
-               JTextComponent tc = (JTextComponent)o;
-               tc.setCaretPosition(tc.getText().length());
-               tc.selectAll();
+			Object o = e.getSource();
+			if ( ! (o instanceof JTextComponent)) {
+				return;
+			}
+			JTextComponent tc = (JTextComponent)o;
+			tc.setCaretPosition(tc.getText().length());
+			tc.selectAll();
 		}
 	}
 
+	/** <p>An action to warn vulnerability of saving password.</p>
+	 */
 	private final class ConfirmSavePasswordAction implements ActionListener {
 
 		final JCheckBox checkbox;
@@ -160,6 +176,8 @@ public class ConfigurationPanel extends JPanel {
 		initComponents();
 	}
 
+	/** <p>Updates configuration ofject using values set to UI.</p>
+	 */
 	protected void updateConfiguration() {
 
 		// Basic Tab

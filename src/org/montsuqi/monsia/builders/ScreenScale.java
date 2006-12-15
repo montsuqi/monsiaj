@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -34,6 +35,8 @@ import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import javax.swing.JFrame;
 
+/** <p>A class to scale frames and components to fit in screen insets.</p>
+ */
 final class ScreenScale {
 	private static final Insets screenInsets;
 	private static final Dimension screenSize;
@@ -77,42 +80,71 @@ final class ScreenScale {
 			- screenInsetsSize.height / (double)screenSize.height + 0.025; /* TODO Eliminate this magic number! */
 	}
 
+	/** <p>Scale the given size so a frame with that size will fit in the screen insets.</p>
+	 * 
+	 * @param size arbitrary size (of a frame)
+	 * @return scaled size
+	 */
 	static Dimension scaleFrame(Dimension size) {
 		final int width = (int)(size.width * frameWidthScale) + frameInsetsSize.width;
 		final int height = (int)(size.height * frameHeightScale) + frameInsetsSize.height;
 		return new Dimension(width, height);
 	}
 
+	/** <p>Scale the given size so a component with that size will fit in the screen insets.</p>
+	 * 
+	 * @param size arbitrary size (of a component)
+	 * @return scaled size
+	 */
 	static Dimension scale(Dimension size) {
 		final int width = (int)(size.width * compWidthScale);
 		final int height = (int)(size.height * compHeightScale);
 		return new Dimension(width, height);
 	}
 
+	/** <p>Translates the given position so a frame at that position will fit in the screen insets.</p>
+	 * 
+	 * @param pos arbitrary position (of a frame)
+	 * @return translated position
+	 */
 	static Point scaleFrame(Point pos) {
 		final int x = (int)(pos.x * frameWidthScale);
 		final int y = (int)(pos.y * frameHeightScale);
 		return new Point(x, y);
 	}
 
+	/** <p>Translates the given position so a component at that position will fit in the screen insets.</p>
+	 * 
+	 * @param pos arbitrary position (of a component)
+	 * @return translated position
+	 */
 	static Point scale(Point pos) {
 		final int x = (int)(pos.x * compWidthScale);
 		final int y = (int)(pos.y * compHeightScale);
 		return new Point(x, y);
 	}
 
+	/** <p>Scales the size of the given font.</p>
+	 * @param font font to scale.
+	 * @return scaled font.
+	 */
 	static Font scale(Font font) {
 		final AffineTransform t = AffineTransform.getScaleInstance(compWidthScale, compHeightScale);
 		final int style = font.getStyle();
 		return font.deriveFont(style, t);
 	}
 
+	/** <p>Centers a window in the screen insets.</p>
+	 * @param window a window to center.
+	 */
 	static void centerWindow(Window window) {
 		final int x = (screenFreeSize.width - window.getWidth()) / 2 + screenInsets.left;
 		final int y = (screenFreeSize.height - window.getHeight()) / 2 + screenInsets.top;
 		window.setLocation(x, y);
 	}
 
+	/** <p>Gets the size of the screen.</p>
+	 */
 	static Dimension getScreenSize() {
 		return new Dimension(screenSize);
 	}

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -32,6 +33,11 @@ import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
+/** <p>A builder to create combo widgets.</p>
+ * <p>JComboBox does not have children while Gtk+ combo's editor is expected
+ *  to be child of the combo.  To fill this gap settings for children are delegated
+ *  to JComboBox's editor component.</p>
+ */
 class ComboBuilder extends ContainerBuilder {
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
@@ -55,6 +61,9 @@ class ComboBuilder extends ContainerBuilder {
 		setProperties(xml, parent, editor, wInfo.getProperties());
 	}
 
+	/** <p>Tests if the type of editor component is valid.</p>
+	 * @param actualType the type given in screen definition.
+	 */
 	protected void ensureValidEntryType(String actualType) {
 		if ( ! "Entry".equals(actualType)) { //$NON-NLS-1$
 			throw new WidgetBuildingException("not a Entry widget"); //$NON-NLS-1$

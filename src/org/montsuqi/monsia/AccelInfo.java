@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -22,6 +23,9 @@ copies.
 
 package org.montsuqi.monsia;
 
+/** <p>A value ofject that holds acceleration key/modifiers and
+ * the signal which is to be issued.</p>
+ */
 public class AccelInfo {
 	AccelInfo(int key, int modifiers, String signal) {
 		this.key = key;

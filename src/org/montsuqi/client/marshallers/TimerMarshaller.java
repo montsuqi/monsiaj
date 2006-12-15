@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -30,6 +31,8 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.widgets.PandaTimer;
 
+/** <p>A class to send/receive Timer data.</p>
+ */
 public class TimerMarshaller extends WidgetMarshaller {
 	public void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();

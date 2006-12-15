@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -19,6 +20,7 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
 */
+
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
@@ -27,6 +29,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.border.TitledBorder;
 
+/** <p>A class that simulates Gtk+'s Frame(border with title) widget.</p>
+ */
 public class Frame extends JComponent {
 	public Frame() {
 		super();

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+/** <p>A Logger subclass which wraps J2SE's logging system.</p> */
 class J2SELogger extends Logger {
 
 	private static Map loggers;
@@ -34,6 +36,14 @@ class J2SELogger extends Logger {
 		loggers = new HashMap();
 	}
 
+	/** <p>Returns a logger instance mapped to the given name.</p>
+	 * 
+	 * <p>When a logger already exists for the name, that is returned.
+	 * When no logger exists for the name, newly created one is returned.</p>
+	 * 
+	 * @param name 
+	 * @return a logger instance
+	 */
 	public static synchronized Logger getLogger(String name) {
 		Logger logger = null;
 		if ( ! loggers.containsKey(name)) {
@@ -65,26 +75,50 @@ class J2SELogger extends Logger {
 		}
 	}
 
+	/** <p>Logs message in <em>trace</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void trace(String message) {
 		logger.finest(message);
 	}
 
+	/** <p>Logs message in <em>debug</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void debug(String message) {
 		logger.finer(message);
 	}
 
+	/** <p>Logs message in <em>info</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void info(String message) {
 		logger.fine(message);
 	}
 
+	/** <p>Logs message in <em>warn</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void warn(String message) {
 		logger.warning(message);
 	}
 
+	/** <p>Logs message in <em>fatal</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void fatal(String message) {
 		logger.severe(message);
 	}
 
+	/** <p>Logs exception in <em>info</em> level.</p>
+	 * 
+	 * @param e an exception to log.
+	 */
 	public void info(Throwable e) {
 		StackTraceElement stackTop = e.getStackTrace()[0];
 		String clazz = stackTop.getClassName();
@@ -92,13 +126,22 @@ class J2SELogger extends Logger {
 		logger.throwing(clazz, method, e);
 	}
 
+	/** <p>Logs exception in <em>warn</em> level.</p>
+	 * 
+	 * @param e an exception to log.
+	 */
 	public void warn(Throwable e) {
 		info(e);
 	}
 
+	/** <p>Logs exception in <em>fatal</em> level.</p>
+	 * 
+	 * @param e an exception to log.
+	 */
 	public void fatal(Throwable e) {
 		info(e);
 	}
 
+	// delegates logging to this.
 	private final java.util.logging.Logger logger;
 }

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -25,12 +26,20 @@ package jp.or.med.jma_receipt;
 import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationPanel;
 
+/** <p>Launcher configuration panel specialized for JMA receipt.</p>
+ */
 public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 
+	/** <p>Constructs a configuration panel with given configuration.</p>
+	 * 
+	 * @param conf configuration to read initial values and write result to.
+	 */
 	JMAReceiptConfigurationPanel(Configuration conf) {
 		super(conf);
 	}
 
+	/** <p>Creates components and disable some so users cannot alter preset values.</p>
+	 */
 	protected void initComponents() {
 		super.initComponents();
 		appEntry.setEditable(false);
@@ -40,6 +49,9 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 		}
 	}
 
+	/** <p>Updates configuration ofject using values set to UI.</p>
+	 * <p>It also ensures some configuration remain preset values.</p>
+	 */
 	protected void updateConfiguration() {
 		super.updateConfiguration();
 		conf.setApplication("orca00"); //$NON-NLS-1$

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -29,6 +30,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 
+/** <p>A HTML viewer for MacOS X.</p>
+ * <p>This component uses native WebKit to render HTML.</p>
+ * 
+ * <p><em>Implementation note:</em>
+ * All WebKitJava wrapper specific methods are called via Java reflection API.
+ * This is because the code must be compiled on any platform, not on only MacOS X.</p>
+ */
 public class PandaHTMLWebKit extends PandaHTML {
 
 	private static Class WebKitJava;

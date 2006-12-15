@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -36,6 +37,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
+/** <p>A CellRenderer that is used for CList's cells whose representation is a Fixed widget.</p>
+ */
 class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 
     private static final Border NO_FOCUS_BORDER;
@@ -53,6 +56,7 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 		g.setColor(getBackground());
 		g.fillRect(0, 0, getWidth(), getHeight());
 	}
+
 	public CListFixedCellRenderer(Fixed fixed) {
 		super();
 		setOpaque(true);
@@ -71,6 +75,23 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 
 		removeAll();
 		JLabel[] labels = new JLabel[positions.length];
+		// overlay labels to render components in Fixed.
+		// +------------------------------+
+		// |+--------+-------+-----------+|
+		// ||Label1  |Label2 |Label3     ||
+		// |+--------+-------+-----------+|
+		// +------------------------------+
+		//      |                  |
+		//      v                  v
+		//  +----------------------------+
+		//  |Label1                      |
+		//  +----------------------------+
+		//           +-------------------+
+		//           |Label2             |
+		//           +-------------------+
+		//                   +-----------+
+		//                   |Label3     |
+		//                   +-----------+
 		for (int i = 0, n = labels.length; i < n; i++) {
 			JLabel label = new JLabel(""); //$NON-NLS-1$
 			label.setFont(table.getFont());

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -24,6 +25,8 @@ package org.montsuqi.client;
 
 import java.lang.reflect.Field;
 
+/** <p>Data type enums.</p>
+ */
 public final class Type {
 	public static final int CLASS = 0xF0;
 	public static final int NULL = 0x00;
@@ -53,6 +56,9 @@ public final class Type {
 		// inhibit instantiation
 	}
 
+	/** <p>A utility method to return the name for a given type(int).
+	 * <p>Useful in logging.</p>
+	 */
 	public static String getName(int type) {
 		Field[] fields = Type.class.getDeclaredFields();
 		for (int i = 0, n = fields.length; i < n; i++) {

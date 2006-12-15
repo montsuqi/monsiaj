@@ -6,6 +6,7 @@
 	<property name="src.dir"             value="src"/>
 	<property name="build.dir"           value="bin"/>
 	<property name="tmp.dir"             value="tmp"/>
+	<property name="doc.dir"             value="doc"/>
 	<property name="dist.dir"            value="dist"/>
 	<property name="resources.dir"       value="resources"/>
 	<property name="libs.dir"            value="libs"/>
@@ -29,6 +30,7 @@
 	<target name="prepare">
 		<tstamp/>
 		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
 		<mkdir dir="${tmp.dir}"/>
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${report.dir}"/>
@@ -256,12 +258,25 @@
 		</apply>
 	</target>
 
+	<target name="javadoc" description="Creates Javadoc documents">
+		<javadoc
+			locale="en"
+			packagenames="org.montsuqi.*,jp.or.med.jma_receipt.*"
+			excludepackagenames="org.montsuqi.certman.*,org.montsuqi.tools.*,org.montsuqi.widgets.Test*"
+			sourcepath="${src.dir}"
+			source="1.4"
+			destdir="${doc.dir}"
+			access="package"
+			classpathref="project.class.path"/>
+	</target>
+
 	<target name="clean" description="Cleans all built files.">
 		<delete includeEmptyDirs="true">
 			<fileset dir="." defaultexcludes="no">
 				<include name="**/*~"/>
 				<include name="**/.#*#"/>
 				<include name="${build.dir}/**"/>
+				<include name="${doc.dir}/**"/>
 				<include name="${tmp.dir}/**"/>
 				<include name="${dist.dir}/**"/>
 				<include name="${report.dir}/**"/>

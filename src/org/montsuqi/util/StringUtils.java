@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** <p>A class that holds utility methods for string manipulation.</p>
+ */
 public class StringUtils {
 	private static final Map ENTITY_REPLACEMENTS = new HashMap();
 	static {
@@ -37,6 +40,16 @@ public class StringUtils {
 	}
 	private static final Pattern ENTITY_PATTERN = Pattern.compile("[\"<>&]");
 
+	private StringUtils() {
+		// inhibit instantiation
+	}
+
+	/** <p>Escapes '&dquot;', '&lt;', '&gt;' and '&amp;' in the given string
+	 * to '&amp;dquot;', '&amp;lt;', '&amp;gt;' and '&amp;amp;' respectively.</p>
+	 * 
+	 * @param src a string to escape characters in it.
+	 * @return new string with html escapes.
+	 */
 	public static String escapeHTML(String src) {
 		Matcher m = ENTITY_PATTERN.matcher(src);
 		StringBuffer sb = new StringBuffer();

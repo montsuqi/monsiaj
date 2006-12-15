@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -43,6 +44,8 @@ import javax.swing.text.PlainDocument;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.PrecisionScale;
 
+/** <p>A class that simulates Gtk+'s NumberEntry.</p>
+ */
 public class NumberEntry extends Entry {
 
 	public NumberEntry() {
@@ -268,6 +271,10 @@ class NumberDocument extends PlainDocument {
 		}
 	}
 
+	/** <p>Test if zero value should be printed or left blank.</p>
+	 * 
+	 * @return true if zero should be blank. false if zero should be printed.
+	 */
 	private boolean leaveZeroAsBlank() {
 		int pos = originalFormat.indexOf('.');
 		if (pos < 1) {

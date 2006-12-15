@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -27,6 +28,13 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/** <p>A logger class that logs messages to the standard error output or
+ * specified file.</p>
+ *
+ * <p>By default StdErrLogger logs messages to the standard error output.
+ * When the system property "monsia.logging.stderr.file" is set to a file name
+ * and it is writable, logs will <em>also</em> be written to that file.</p>
+ */
 class StdErrLogger extends Logger {
 
 	private static Map loggers;
@@ -36,6 +44,14 @@ class StdErrLogger extends Logger {
 		loggers = new HashMap();
 	}
 
+	/** <p>Returns a logger instance mapped to the given name.</p>
+	 * 
+	 * <p>When a logger already exists for the name, that is returned.
+	 * When no logger exists for the name, newly created one is returned.</p>
+	 * 
+	 * @param name 
+	 * @return a logger instance
+	 */
 	public static synchronized Logger getLogger(String name) {
 		Logger logger = null;
 		if ( ! loggers.containsKey(name)) {
@@ -76,36 +92,60 @@ class StdErrLogger extends Logger {
 		}
 	}
 
+	/** <p>Logs message in <em>trace</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void trace(String message) {
 		if (level >= TRACE) {
 			writeLog("TRACE:" + message); //$NON-NLS-1$
 		}
 	}
 
+	/** <p>Logs message in <em>debug</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void debug(String message) {
 		if (level >= DEBUG) {
 			writeLog("DEBUG:" + message); //$NON-NLS-1$
 		}
 	}
 
+	/** <p>Logs message in <em>info</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void info(String message) {
 		if (level >= INFO) {
 			writeLog("INFO:" + message); //$NON-NLS-1$
 		}
 	}
 
+	/** <p>Logs message in <em>warn</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void warn(String message) {
 		if (level >= WARNING) {
 			writeLog("WARN:" + message); //$NON-NLS-1$
 		}
 	}
 
+	/** <p>Logs message in <em>fatal</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void fatal(String message) {
 		if (level >= FATAL) {
 			writeLog("FATAL: " + message); //$NON-NLS-1$
 		}
 	}
 
+	/** <p>Logs exception in <em>warn</em> level.</p>
+	 * 
+	 * @param e an exception to log.
+	 */
 	public void warn(Throwable e) {
 		if (level >= WARNING) {
 			warn(e.toString());
@@ -113,6 +153,10 @@ class StdErrLogger extends Logger {
 		}
 	}
 
+	/** <p>Logs exception in <em>fatal</em> level.</p>
+	 * 
+	 * @param e an exception to log.
+	 */
 	public void fatal(Throwable e) {
 		if (level >= FATAL) {
 			fatal(e.toString());

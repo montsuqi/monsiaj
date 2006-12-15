@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -26,7 +27,6 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -54,6 +54,8 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaFocusManager;
 
+/** <p>An class that represents the result of parsing Glade's interface definition.
+ */
 public class Interface {
 	private Map widgets;
     private Map longNames;
@@ -102,6 +104,20 @@ public class Interface {
 		OLD_PROLOGUE_LENGTH = oldPrologue.getBytes().length;
 	}
 
+	/** <p>A factory method that builds an Interface instance.</p>
+	 * <p>This method takes its source XML from <var>input</var> InputStream and parses
+	 * it using a SAX parser.</p>
+	 * <p>SAX parser is selected in following way:</p>
+	 * <ol>
+	 * <li>If system property "monsia.document.handler" is set, use it.</li>
+	 * <li>Otherwise, if the input's beginning looks like old interface definition(root element
+	 * is GTK-Interface and such), old handler is used.</li>
+	 * <li>Otherwise, new handler is used.</li>
+	 * </ol>
+	 * @param input source input stream from which the Glade file is read.
+	 * @param protocol protocol(connection) object passed to signal connectors.
+	 * @return an Interface instance.
+	 */
 	public static Interface parseInput(InputStream input, Protocol protocol) {
 		try {
 			if ( ! (input instanceof BufferedInputStream)) {
@@ -190,20 +206,6 @@ public class Interface {
 			throw new NullPointerException("long name is null."); //$NON-NLS-1$
 		}
 		return (Component)longNames.get(longName);
-	}
-
-	String relativeFile(String fileName) {
-		if (fileName == null) {
-			throw new NullPointerException("file name is null."); //$NON-NLS-1$
-		}
-
-		File targetFile = new File(fileName);
-		if (targetFile.isAbsolute()) {
-			return fileName;
-		}
-		File xmlFile = new File(fileName);
-		File relativeFile = new File(xmlFile.getParent(), fileName);
-		return relativeFile.toString();
 	}
 
 	public String getWidgetLongName(Component widget) {

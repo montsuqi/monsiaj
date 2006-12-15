@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -20,11 +21,6 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-/** Acknowledgement:
- * This class is heavily inspired from Sakuraba's LatticeLayout.
- * http://www5.airnet.ne.jp/sakuraba/java/softwares/library/lattice/latticelayout.html
- */
-
 package org.montsuqi.widgets;
 
 import java.awt.Component;
@@ -36,6 +32,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/** <p>A layout manager that lays out component in lattices(grids).</p>
+ * <p><em>Acknowledgement:
+ * This class is heavily inspired from
+ * <a href="http://www5.airnet.ne.jp/sakuraba/java/softwares/library/lattice/latticelayout.html">Sakuraba's
+ * LatticeLayout</a>.</em></p>
+ */
 public class LatticeLayout implements LayoutManager2, Serializable {
 
 	private Map components;

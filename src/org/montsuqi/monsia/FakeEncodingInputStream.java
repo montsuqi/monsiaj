@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -26,6 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+/** <p>An InputStream to read glade 1.0 screen definition file.</p>
+ * <p>Since glade 1.0's screen definitions are written in EUC-JP but does not
+ * have encoding in xml declaration, normal xml parser cannot read them correctly.</p>
+ * <p>This class fakes xml encoding parameter to solve this problem.</p>
+ */
 final class FakeEncodingInputStream extends InputStream {
 	private InputStream in;
 	byte[] headerBytes;
@@ -47,6 +53,10 @@ final class FakeEncodingInputStream extends InputStream {
 		index = 0;
 	}
 
+	/** <p>To fake xml encoding, this method returns bytes in FAKE_HEADER string
+	 * while the index is less than FAKE_HEADER's length.  When it read all from
+	 * FAKE_HEADER, it returns bytes actually read.</p>
+	 */
 	public int read() throws IOException {
 		int b;
 		if (index < headerBytes.length) {

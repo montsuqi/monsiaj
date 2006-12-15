@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -30,6 +31,9 @@ import javax.swing.JTextArea;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
+/** <p>A builder to create TextArea widgets.</p>
+ * <p>It sets wrapping mode to fit Gtk+'s behavior.</p>
+ */
 public class TextAreaBuilder extends WidgetBuilder {
 
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -29,27 +30,44 @@ import javax.swing.text.Document;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
+/** <p>An output stream that writes text onto a JTextPane component.</p>
+ */
 public class TextPaneOutputStream extends ByteArrayOutputStream {
 
 	private final JTextPane target;
 	private final MutableAttributeSet attributeSet;
 
+	/** <p>Creates a TextPaneOutputStream that writes text onto the given target.</p>
+	 * 
+	 * @param target The target text pane this stream writes on.
+	 */
 	public TextPaneOutputStream(JTextPane target) {
 		super();
 		this.target = target;
 		attributeSet = new SimpleAttributeSet(target.getCharacterAttributes());
 	}
 
+	/** <p>Creates a TextPaneOutputStream that writes text onto the given target.</p>
+	 * 
+	 * @param target The target text pane this stream writes on.
+	 * @param size the size of buffer.
+	 */
 	public TextPaneOutputStream(JTextPane target, int size) {
 		super(size);
 		this.target = target;
 		attributeSet = new SimpleAttributeSet(target.getCharacterAttributes());
 	}
 
+	/** <p>Gets the attribute set which is used to write text.</p>
+	 * <p>You can modify the returned attribute set since it is mutable.</p>
+	 * @return the MutableAttributeSet object.
+	 */
 	public MutableAttributeSet getAttributeSet() {
 		return attributeSet;
 	}
 
+	/** <p>Appends the given data to the target teext pane.</p>
+	 */
 	public synchronized void write(byte[] b, int off, int len)  {
 		String s = new String(b, off, len);
 		Document doc = target.getDocument();

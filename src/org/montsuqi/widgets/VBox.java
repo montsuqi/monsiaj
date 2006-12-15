@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -27,6 +28,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import org.montsuqi.util.Logger;
 
+/** <p>A class that simulates Gtk+'s VBox(Vertically stackable container).</p>
+ */
 public class VBox extends JComponent {
 
 	public VBox() {

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -24,6 +25,10 @@ package org.montsuqi.widgets;
 
 import java.awt.GridBagConstraints;
 
+/** <p>The layout constraints used by TableLayout.</p>
+ * <p>As TableLayout uses GridBagConstraints internally,
+ * this class provides interfaces to convert itself from/to GridBagConstraints.</p>
+ */
 public class TableConstraints {
 	public int leftAttach;
 	public int rightAttach;
@@ -39,6 +44,8 @@ public class TableConstraints {
 	public boolean xFill;
 	public boolean yFill;
 
+	/** <p>Constructs a TableConstaints with the default parameters.</p>
+	 */
 	public TableConstraints() {
 		leftAttach = 0;
 		topAttach = 0;
@@ -50,6 +57,8 @@ public class TableConstraints {
 		yFill = true;
 	}
 
+	/** <p>Constructs a TableConstaints by converting a GridBagConstraints.</p>
+	 */
 	public TableConstraints(GridBagConstraints gbc) {
 		leftAttach = gbc.gridx;
 		topAttach = gbc.gridy;
@@ -61,6 +70,8 @@ public class TableConstraints {
 		yFill = gbc.fill == GridBagConstraints.BOTH || gbc.fill == GridBagConstraints.VERTICAL;
 	}
 
+	/** <p>Converts self to the equivalent GridBagConstraints.</p>
+	 */
 	public GridBagConstraints toGridBagConstraints() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.CENTER;

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -33,6 +34,9 @@ import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.TableConstraints;
 import org.montsuqi.widgets.TableLayout;
 
+/** <p>A builder to create Gtk+'s Table container widget.</p>
+ * <p>This class uses TableLayout as its layout manager.</p>
+ */
 class TableBuilder extends ContainerBuilder {
 
 	private static final String LEFT_ATTACH_KEY = "left_attach"; //$NON-NLS-1$

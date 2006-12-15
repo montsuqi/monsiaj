@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -28,6 +29,14 @@ import javax.swing.InputMap;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+/** <p>A class to simulate Gtk+'s Entry widget.</p>
+ * 
+ * <p>Down arrow key moves focus out to the next component, and
+ * up arrow key moves focus out to the previous component respectively.</p>
+ * 
+ * <p>This component uses LengthLimitableDocument by default and length of
+ * the text can be set.</p>
+ */
 public class Entry extends JTextField {
 
 	public Entry() {

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,6 +32,11 @@ import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 
+/** <p>A class that simulates Gtk+'s RadioButton.</p>
+ * 
+ * <p>Down arrow key moves focus out to the next component, and
+ * up arrow key moves focus out to the previous component respectively.</p>
+ */
 public class RadioButton extends JRadioButton {
 
 	public RadioButton() {
@@ -48,6 +54,11 @@ public class RadioButton extends JRadioButton {
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
 	}
 
+	/** <p>Overrides super.setSize to ensure width is not zero.</p>
+	 * 
+	 * @param d the size to set. when its width is zero, it is set to equal to
+	 * its height.
+	 */
 	public void setSize(Dimension d) {
 		if (d.width == 0) {
 			d.width = d.height;

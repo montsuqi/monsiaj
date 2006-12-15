@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -71,9 +72,23 @@ import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.UIStock;
 import org.montsuqi.widgets.Window;
 
+/** <p>WidgetPropertySetter is a class to help assigning properties to widgets.</p>
+ * <p>These setters exist one for a class(and subclass) and property name.</p>
+ * <p>When building a widget, a widget builder will look up a suitable setter
+ * for each key in provided properties. When such a setter is found, its set method
+ * is called to set a certain property of the widget.</p>
+ */
 abstract class WidgetPropertySetter {
 
+	/** <p>This method does the actual work of setting a property.
+	 * Subclasses must implement this method.</p>
+	 * @param xml glade screen definition
+	 * @param parent parent widget of the target widget.
+	 * @param widget target widget.
+	 * @param value the value to set in String.
+	 */
 	abstract void set(Interface xml, Container parent, Component widget, String value);
+
 	protected static final Logger logger = Logger.getLogger(WidgetPropertySetter.class);
 
 	protected void warnUnsupportedProperty(String value) {
@@ -83,7 +98,15 @@ abstract class WidgetPropertySetter {
 	private static Map propertyMap;
 
 	private static final WidgetPropertySetter nullWidgetPropertySetter;
-	
+
+	/** <p>Looks up a property setter for given class or its ancestors and
+	 * property name.</p>
+	 * <p>When no setter is found, nullWidgetPropertySetter, which does nothing,
+	 * is returned.</p>
+	 * @param clazz class of the widget whose property is to be set.
+	 * @param name the proeprty name to be set.
+	 * @return a setter.
+	 */
 	static WidgetPropertySetter getSetter(Class clazz, String name) {
 		for (/**/; clazz != null; clazz = clazz.getSuperclass()) {
 			Map map = (Map)propertyMap.get(clazz);
@@ -710,6 +733,12 @@ abstract class WidgetPropertySetter {
 		});
 	}
 
+	/** <p>Removes given prefix along with "GTK_" and "GTK_".
+	 * </p>
+	 * @param value target string to be normalized.
+	 * @param prefixToRemove a prefix to remove. Ignored if it is null or its length is zero.
+	 * @return normalized string.
+	 */
 	static String normalize(String value, String prefixToRemove) {
 		if (value.startsWith("GDK_")) { //$NON-NLS-1$
 			value = value.substring("GDK_".length()); //$NON-NLS-1$

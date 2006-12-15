@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -40,6 +41,8 @@ import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.Logger;
 
+/** <p>Class to perform an action for a widget.</p>
+ */
 public abstract class SignalHandler {
 
 	protected static final Logger logger = Logger.getLogger(SignalHandler.class);
@@ -60,6 +63,11 @@ public abstract class SignalHandler {
 
 	public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 
+	/** <p>Returns signal handler for the given name. If such handler could not be found,
+	 * returns the fallback handler, which does nothing.</p>
+	 * @param handlerName name of a signal handler.
+	 * @return a SignalHandler instance.
+	 */
 	public static SignalHandler getSignalHandler(String handlerName) {
 		logger.enter(handlerName);
 		if (handlers.containsKey(handlerName)) {
@@ -103,6 +111,7 @@ public abstract class SignalHandler {
 		timerTask = null;
 		timerBlocked = false;
 
+		// In addition to kana/kanji, some special symbols can trigger sendEventWhenIdle.
 		StringBuffer buf = new StringBuffer();
 		buf.append("\u3000\uff01\u201d\uff03\uff04\uff05\uff06\u2019"); //$NON-NLS-1$
 		buf.append("\uff08\uff09\uff0a\uff0b\uff0c\u30fc\uff0e\uff0f"); //$NON-NLS-1$
@@ -116,12 +125,16 @@ public abstract class SignalHandler {
 		buf.append("\uff5d\uffe3"); //$NON-NLS-1$
 		SYMBOLS = buf.toString();
 
+		/** <p>A signal handler which does nothing.</p>
+		 */
 		registerHandler(null, new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) {
 				// do nothing
 			}
 		});
 
+		/** <p>A signal handler which selects all text on a text field.</p>
+		 */
 		registerHandler("select_all", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				JTextField field = (JTextField)widget;
@@ -129,6 +142,8 @@ public abstract class SignalHandler {
 			}
 		});
 
+		/** <p>A signal handler which unselect all text on a text field.</p>
+		 */
 		registerHandler("unselect_all", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				JTextField field = (JTextField)widget;
@@ -136,6 +151,8 @@ public abstract class SignalHandler {
 			}
 		});
 
+		/** <p>A signal handler which sends event and parameters.</p>
+		 */
 		final SignalHandler sendEvent = new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				synchronized (con) {
@@ -178,12 +195,17 @@ public abstract class SignalHandler {
 			}
 		};
 
+		/** <p>A signal handler which registers the target widget as "changed."</p>
+		 */
 		final SignalHandler changed = new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				con.addChangedWidget(widget);
 			}
 		};
 
+		/** <p>A signal handler which sends event only while no other action is performed.</p>
+		 * <p>System property monsia.send.event.delay can control this behavior.</p>
+		 */
 		SignalHandler sendEventWhenIdle = new SignalHandler() {
 			public synchronized void handle(final Protocol con, final Component widget, final Object userData) {
 				if (timerTask != null) {
@@ -251,10 +273,14 @@ public abstract class SignalHandler {
 				}
 			}
 		};
+
 		registerHandler("send_event", sendEvent); //$NON-NLS-1$
 		registerHandler("send_event_when_idle", sendEventWhenIdle); //$NON-NLS-1$
 		registerHandler("send_event_on_focus_out", sendEvent); //$NON-NLS-1$
 
+		/** <p>A signal handler which registers the taret widget as "changed" and
+		 * sends "SELECT" event.</p>
+		 */
 		registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				con.addChangedWidget(widget);
@@ -262,12 +288,16 @@ public abstract class SignalHandler {
 			}
 		});
 
+		/** <p>A signal handler which sends an "ACTIVATE".</p>
+		 */
 		registerHandler("activate_widget", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				sendEvent.handle(con, widget, "ACTIVATE"); //$NON-NLS-1$
 			}
 		});
 
+		/** <p>A signal handler which moves the focus to the widget of given name.</p>
+		 */
 		registerHandler("entry_next_focus", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				Node node = con.getNode(widget);
@@ -295,12 +325,15 @@ public abstract class SignalHandler {
 			}
 		});
 
+		/** <p>A signal handler which removes all changed widgets from all windows.</p>
+		 */
 		registerHandler("map_event", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				con.clearWindowTable();
 			}
 		});
 
+		/** do nothing for now */
 		registerHandler("set_focus", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				// Node node = con.getNode(widget);
@@ -308,6 +341,8 @@ public abstract class SignalHandler {
 			}
 		});
 
+		/** <p>A signal handler to close the window on which target widget is.</p>
+		 */
 		registerHandler("window_close", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				con.closeWindow(widget);
@@ -320,6 +355,8 @@ public abstract class SignalHandler {
 			}
 		});
 
+		/** <p>A signal handler to open the given URL on target JTextPane widget.</p>
+		 */
 		registerHandler("open_browser", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				if ( ! (widget instanceof JTextPane)) {

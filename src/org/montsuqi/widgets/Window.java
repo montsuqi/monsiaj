@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -32,13 +33,22 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/** <p>A JFrame wrapper.</p>
+ */
 public class Window extends JFrame {
 
+	/** <p>Constructs a Window instance.</p>
+	 */
 	public Window() {
 		super();
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		// Prepare a glass pane with wait cursor.
+		// This pane is usually invisible, but is visible and gains focus to
+		// disalbe this window when it is busy.
 		setGlassPane(new JPanel() {
 			{
+				// Make the pane transparent.
 				setOpaque(false);
 				Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 				setCursor(waitCursor);
@@ -53,20 +63,30 @@ public class Window extends JFrame {
 		hideBusyCursor();
 	}
 
+	/** <p>Show the window is busy by changing the mouse cursor to wait cursor.
+	 * Accepts no input.</p>
+	 */
 	public void showBusyCursor() {
 		getGlassPane().setVisible(true);
 		getGlassPane().requestFocus();
 	}
 
+	/** <p>Cancel the busy state of this window.</p>
+	 */
 	public void hideBusyCursor() {
 		getGlassPane().setVisible(false);
 	}
 
+	/** <p>Test if this window is active(=accpets input)</p>
+	 * 
+	 * @return true if this window is active. false otherwise.
+	 */
 	public boolean isActive() {
 		return ! getGlassPane().isVisible();
 	}
 
-
+	/** <p>Make <em>all</em> window busy.</p>
+	 */
 	public static void busyAllWindows() {
 		Window[] windows = getMontsuqiWindows();
 		for (int i = 0; i < windows.length; i++) {
@@ -75,6 +95,10 @@ public class Window extends JFrame {
 		}
 	}
 
+	/** <p>Returns all java.awt.Frames which are instances of this class.</p>
+	 * 
+	 * @return array of Frames which are instances of this class. 
+	 */
 	public static Window[] getMontsuqiWindows() {
 		Frame[] frames = Frame.getFrames();
 		List list = new ArrayList();

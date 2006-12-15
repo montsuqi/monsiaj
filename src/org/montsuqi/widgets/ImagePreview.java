@@ -2,16 +2,17 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
+		PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
+		Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
 to you along with PANDA so you can know your rights and
@@ -34,12 +35,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+/** <p>Preview component that uses images for implementation.</p>
+ */
 class ImagePreview extends Preview {
 
 	BufferedImage sourceImage;
 	BufferedImage image;
 	Dimension lastImageSize;
 
+	/** <p>Constructs an ImagePreview</p>
+	 */
 	public ImagePreview() {
 	    super();
 	    sourceImage = null;
@@ -47,6 +52,13 @@ class ImagePreview extends Preview {
 	    lastImageSize = null;
     }
 
+	/** <p>Loads a image from file of given name.</p>
+	 * 
+	 * <p>If the size of newly loaded image is different from that of the old one,
+	 * new image is scaled to the component horizontally.</p>
+	 * 
+	 * @param fileName name of the image file.
+	 */
 	public void load(String fileName) throws IOException {
 		flushImage(sourceImage);
 		sourceImage = ImageIO.read(new File(fileName));
@@ -60,6 +72,8 @@ class ImagePreview extends Preview {
 		updatePreferredSize();
 	}
 
+	/** <p>Clears the preview.</p>
+	 */
 	public void clear() {
 		flushImage(sourceImage);
 		sourceImage = null;
@@ -68,12 +82,18 @@ class ImagePreview extends Preview {
 		updatePreferredSize();
 	}
 
+	/** <p>Dispose the image resource.</p>
+	 * 
+	 * @param img image to dispose.
+	 */
 	private void flushImage(final Image img) {
 		if (img != null) {
 			img.flush();
 		}
 	}
 
+	/** <p>Scales the image to component(parent) size.</p>
+	 */
 	public void fitToSize() {
 		if (sourceImage == null) {
 			return;
@@ -95,6 +115,8 @@ class ImagePreview extends Preview {
 		setScale(newScale);
 	}
 
+	/** <p>Scales the image --only horizontally-- to component(parent) size.</p>
+	 */
 	public void fitToSizeHorizontally() {
 		if (sourceImage == null) {
 			return;

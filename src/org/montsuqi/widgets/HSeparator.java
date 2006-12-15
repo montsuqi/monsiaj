@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -26,6 +27,10 @@ import java.awt.Rectangle;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
 
+/** <p>A class that simulates Gtk+'s HSeparator(horizontal separator).</p>
+ * 
+ * <p>This class simulates Gtk+'s separator by displacing vertical location.</p>
+ */
 public class HSeparator extends JSeparator {
 	public HSeparator() {
 		super(SwingConstants.HORIZONTAL);

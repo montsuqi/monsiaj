@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -30,17 +31,25 @@ import javax.swing.ImageIcon;
 import org.montsuqi.client.ConfigurationPanel;
 import org.montsuqi.client.Launcher;
 
+/** <p>Launcher specialized for JMA receipt.</p>
+ */
 public class JMAReceiptLauncher extends Launcher {
 
+	/** <p>Constructs a launcher.</p>
+	 * @param title title of the launcher dialog.
+	 */
 	protected JMAReceiptLauncher(String title) {
 		super(title);
 	}
 
+	/** <p>Application entry point.</p> */
 	public static void main(String[] args) {
 		Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
 		launcher.launch();
 	}
 
+	/** <p>Constructs the configuration panel.</p>
+	 */
 	protected ConfigurationPanel createConfigurationPanel() {
 		conf.setApplication("orca00"); //$NON-NLS-1$
 		conf.setEncoding("EUC-JP"); //$NON-NLS-1$
@@ -48,6 +57,8 @@ public class JMAReceiptLauncher extends Launcher {
 		return new JMAReceiptConfigurationPanel(conf);
 	}
 
+	/** <p>Creates icon to display on the left.</p>
+	 */
 	protected Icon createIcon() {
 		URL iconURL = getClass().getResource("/jp/or/med/jma_receipt/standard60.png"); //$NON-NLS-1$
 		if (iconURL != null) {

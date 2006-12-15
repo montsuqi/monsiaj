@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -38,6 +39,10 @@ import java.text.MessageFormat;
 
 import org.montsuqi.util.SystemEnvironment;
 
+/** <p>A class that represents client/server connection.</p>
+ * <p>This class implements methods for sending/receiving basic data types such as
+ * booleans, integers and strings.</p>
+ */
 class Connection {
 
 	private String encoding;
@@ -46,6 +51,12 @@ class Connection {
 	protected DataOutput out;
 	private int dataType;
 
+	/** <p>Constructs a Connection instance.</p>
+	 * <p>Input/Output streams are initialized correctly by <var>networkByteOrder</var>.
+	 * @param s the socket to communicate.
+	 * @param encoding the encoding to use.
+	 * @param networkByteOrder true if networkByteOrder(Big Endian) is used. false otherwise(Litle Endian).
+	 */
 	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
 		this.socket = s;
 		this.encoding = encoding;
@@ -60,21 +71,37 @@ class Connection {
 		}
 	}
 
+	/** <p>Sends a packet class.</p>
+	 * @param c packet class. should use constants defined in PacketClass.
+	 * @throws IOException on I/O error.
+	 */
 	public synchronized void sendPacketClass(int c) throws IOException {
 		out.write((byte)c);
 		((OutputStream)out).flush();
 	}
 
+	/** <p>Receives a packet class.</p>
+	 * @return a byte representing packet class.
+	 * @throws IOException on I/O error.
+	 */
 	synchronized byte receivePacketClass() throws IOException {
 		byte b = in.readByte();
 		return b;
 	}
 
+	/** <p>Sends a data type.</p>
+	 * @param c data type. should use constants defined in Type.
+	 * @throws IOException on I/O error.
+	 */
 	public synchronized void sendDataType(int c) throws IOException {
 		out.write((byte)c);
 		((OutputStream)out).flush();
 	}
 
+	/** <p>Receives a data type.</p>
+	 * @return a byte representing data type.
+	 * @throws IOException on I/O error.
+	 */
 	synchronized int receiveDataType() throws IOException {
 		dataType = in.readByte();
 		if (dataType < 0) {
@@ -83,6 +110,12 @@ class Connection {
 		return dataType;
 	}
 
+	/** <p>Receives a data type.  If the type does not match to <var>expected</var> type,
+	 * an IOException is thrown.</p>
+	 * @param expected data type that should have been sent from the server.
+	 * @return the type received.
+	 * @throws IOException on I/O error or type mismatch.
+	 */
 	public synchronized int receiveDataTypeWithCheck(int expected) throws IOException {
 		receiveDataType();
 		if (dataType != expected) {
@@ -91,28 +124,38 @@ class Connection {
 		return dataType;
 	}
 
+	/** <p>Returns the last(latest) data type received.</p>
+	 * @return the latest result of recevieDataType().
+	 */
 	public synchronized int getLastDataType() {
 		return dataType;
 	}
 
-	synchronized void sendPacketDataType(int t) throws IOException {
-		out.write((byte)t);
-		((OutputStream)out).flush();
-	}
-
-	synchronized int receivePacketDataType() throws IOException {
-		return in.readByte();
-	}
-
+	/** <p>Sends length of 4-byte long.</p>
+	 * 
+	 * @param size the length to send.
+	 * @throws IOException on I/O error.
+	 */
 	synchronized void sendLength(int size) throws IOException {
 		out.writeInt(size);
 		((OutputStream)out).flush();
 	}
 
+	/** <p>Receives length of 4-byte long.</p>
+	 * 
+	 * @return the length received.
+	 * @throws IOException on I/O error.
+	 */
 	synchronized int receiveLength() throws IOException {
 		return in.readInt();
 	}
 
+	/** <p>Sends a string.</p>
+	 * <p>If the client environment uses MS932 characters, incompatible
+	 * characters are converted to compatible ones.</p>
+	 * @param s the string to send.
+	 * @throws IOException on I/O error.
+	 */
 	public synchronized void sendString(String s) throws IOException {
 		if (SystemEnvironment.isMS932()) {
 			s = fromMS932(s);
@@ -123,6 +166,8 @@ class Connection {
 		((OutputStream)out).flush();
 	}
 
+	/** <p>Converts MS932 characters to compatible characters.</p>
+	 */
 	private String fromMS932(String s) {
 		char[] chars = s.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
@@ -150,6 +195,8 @@ class Connection {
 		return new String(chars);
 	}
 
+	/** <p>Converts characters to MS932 characters.</p>
+	 */
 	private String toMS932(String s) {
 		char[] chars = s.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
@@ -177,10 +224,12 @@ class Connection {
 		return new String(chars);
 	}
 
-	synchronized void sendFixedString(String s) throws IOException {
-		sendString(s);
-	}
-
+	/** <p>Receives string data part of given size.</p>
+	 * 
+	 * @param size the size of the data to be received.
+	 * @return a String instance.
+	 * @throws IOException on I/O error.
+	 */
 	synchronized String receiveStringBody(int size) throws IOException {
 		byte[] bytes = new byte[size];
 		in.readFully(bytes);
@@ -188,10 +237,21 @@ class Connection {
 		return SystemEnvironment.isMS932() ? toMS932(s) : s;
 	}
 
+	/** <p>Receives a string </p>
+	 * <p>At first, the length of the string is received. Then
+	 * the string's data of that length are received and built into a String.
+	 * 
+	 * @return a String instance.
+	 * @throws IOException on I/O error.
+	 */
 	public synchronized String receiveString() throws IOException {
 		return receiveStringBody(receiveLength());
 	}
 
+	/** <p>Receives an integer of 4-byte long.</p>
+	 * @return the integer received.
+	 * @throws IOException on I/O error.
+	 */
 	synchronized int receiveLong() throws IOException { // longs: 4-byte long
 		int i = in.readInt();
 		// WORKAROUND:

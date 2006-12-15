@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -28,6 +29,7 @@ import java.io.OutputStream;
 import java.io.IOException;
 import org.montsuqi.util.ByteOrder;
 
+/** <p>A DataOutputStream decorator that writes data in little endian.</p> */
 public class LittleEndianDataOutputStream extends OutputStream implements DataOutput {
 
 	private DataOutputStream dos;

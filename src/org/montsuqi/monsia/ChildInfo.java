@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -25,6 +26,12 @@ package org.montsuqi.monsia;
 import java.util.HashMap;
 import java.util.Map;
 
+/** <p>A value ofject that holds information about child widgets of
+ * a container widget.</p>
+ * <p>Note that some Gtk+'s widgets have children even though their counterparts
+ * in Swing are not conttainer widgets. ComboBox and Notebook are example of such
+ * widget types.</p>
+ */
 public class ChildInfo {
 
 	private WidgetInfo child;

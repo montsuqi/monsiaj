@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,10 +32,12 @@ import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
+/** <p>A builder to create ScrolledWindow widgets.</p>
+ */
 class ScrolledWindowBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		if (info.getChildren().size() != 1) {
-			throw new WidgetBuildingException("only one child for a ScrolledWIndow"); //$NON-NLS-1$
+			throw new WidgetBuildingException("only one child for a ScrolledWindow"); //$NON-NLS-1$
 		}
 		JScrollPane scroll = (JScrollPane)parent;
 		ChildInfo cInfo = info.getChild(0);

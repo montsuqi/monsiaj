@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,12 +32,23 @@ import javax.swing.JComponent;
 
 import org.montsuqi.util.Logger;
 
+/** <p>A component that holds a timer to fire events periodically.</p>
+ * 
+ * <p>This class repeatedly fires a TimerEvent once on every repetition
+ * of period to its TimerListeners.</p>
+ */
 public class PandaTimer extends JComponent {
 
 	protected static final Logger logger = Logger.getLogger(PandaTimer.class);
 
 	private Timer timer;
 
+	/** <p>Constructs a timer component.</p>
+	 * 
+	 * <p>Initially this component's timer has a duration of 60 seconds.
+	 * This helps it wait firing events until the component is on view.</p>
+	 * <p>Correct duration should be set later.</p>
+	 */
 	public PandaTimer() {
 		super();
 		// initial delay is 60sec, to wait widget construction,
@@ -64,15 +76,25 @@ public class PandaTimer extends JComponent {
 		}
 	}
 
+	/** <p>Stops and restarts the timer.</p>
+	 */
 	public void reset() {
 		stopTimer();
 		startTimer();
 	}
 
+	/** <p>Adds a timer listener to this component.</p>
+	 * 
+	 * @param l a TimerListener instance to add.
+	 */
 	public void addTimerListener(TimerListener l) {
 		listenerList.add(TimerListener.class, l);
 	}
 
+	/** <p>Removes a timer listener from this component.</p>
+	 * 
+	 * @param l a TimerListener instance to remove.
+	 */
 	public void removeTimerListener(TimerListener l) {
 		listenerList.remove(TimerListener.class, l);
 	}
@@ -89,6 +111,11 @@ public class PandaTimer extends JComponent {
 		}
 	}
 
+	/** <p>Sets the duration(repetition period) of the timer in seconds.</p>
+	 * 
+	 * @param duration specifies duration in seconds.
+	 * If it is zero, the timer is stopped.
+	 */
 	public void setDuration(int duration) {
 		Object[] args = { getName(), new Integer(duration) };
 		logger.debug("duration of {0}: {1}", args); //$NON-NLS-1$
@@ -109,6 +136,8 @@ public class PandaTimer extends JComponent {
 		super.finalize();
 	}
 
+	/** <p>Gets the duration(repetition period) of the timer in seconds.</p>
+	 */
 	public int getDuration() {
 		return timer.getDelay() / 1000;
 	}

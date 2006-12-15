@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -25,16 +26,26 @@ package org.montsuqi.util;
 import java.io.File;
 import java.util.Locale;
 
+/** <p>A class that represents the system(platform) environment.</p>
+ */
 public class SystemEnvironment {
 
 	private SystemEnvironment() {
 		// inhibit instantiation
 	}
 
+	/** <p>Tests if the system is MacOS X.</p>
+	 * 
+	 * @return true if the running system is MacOS X. false otherwise.
+	 */
 	public static boolean isMacOSX() {
 		return System.getProperty("os.name").toLowerCase().startsWith("mac os x"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	/** <p>Tests if the system is Windows.</p>
+	 * 
+	 * @return true if the running system is Windows. false otherwise.
+	 */
 	public static boolean isWindows() {
 		String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
 		return osName.startsWith("windows"); //$NON-NLS-1$
@@ -49,16 +60,31 @@ public class SystemEnvironment {
 		}
 	}
 
+	/** <p>Tests if the system uses MS932 characters.</p>
+	 * 
+	 * @return true if the running system uses MS932 characters. false otherwise.
+	 */
 	public static boolean isMS932() {
 		return isMS932;
 	}
 
+	/** <p>On MacOS X, sets the menu title.</p>
+	 * <p>On other platforms, does nothing.</p>
+	 * 
+	 * @param title Title to set.
+	 */
 	public static void setMacMenuTitle(String title) {
 		if (title != null && isMacOSX()) {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
 		}
 	}
 
+	/** <p>Creates a file instance with the given path elements in platform
+	 * independent way.</p>
+	 * 
+	 * @param elements path elements.
+	 * @return the File instance constructed using the given path elements.
+	 */
 	public static File createFilePath(String[] elements) {
 		File path = new File(elements[0]);
 		for (int i = 1; i < elements.length; i++) {

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -50,6 +51,8 @@ import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
 
+/** <p>Superclass for all widget marshallers.</p>
+ */
 public abstract class WidgetMarshaller {
 
 	protected static final Logger logger = Logger.getLogger(WidgetMarshaller.class);
@@ -81,6 +84,13 @@ public abstract class WidgetMarshaller {
 	public abstract void receive(WidgetValueManager manager, Component widget) throws IOException;
 	public abstract void send(WidgetValueManager manager, String name, Component widget) throws IOException;
 
+	/** <p>Handles parameters common for all widget types: "state" and "style".</p>
+	 * @param manager value manager.
+	 * @param widget target widget.
+	 * @param name parameter name.
+	 * @return true if handled(name was "state" or "style".
+	 * @throws IOException on IO error.
+	 */
 	protected boolean handleStateStyle(WidgetValueManager manager, Component widget, String name) throws IOException {
 		Protocol con = manager.getProtocol();
 		if ("state".equals(name)) { //$NON-NLS-1$

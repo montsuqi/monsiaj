@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -24,6 +25,8 @@ package org.montsuqi.widgets;
 
 import java.awt.AWTEvent;
 
+/** <p>An event object which is periodically fired from PandaTimers.</p>
+ */
 public class TimerEvent extends AWTEvent {
 
 	protected static final int TIMER_SIGNALED = AWTEvent.RESERVED_ID_MAX + 4;

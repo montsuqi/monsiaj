@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -55,8 +56,14 @@ import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
 
+/** <p>A class that implements high level operations over client/server connection.</p>
+ */
 public class Protocol extends Connection {
 
+	/** A helper class to fix focus problem in JDK1.5.
+	 * This class ensures all ancestors of the component to be focused is 
+	 * visible before issuing focus request.</p>
+	 */
 	private final class FocusRequester implements Runnable {
 
 		final class Terminator extends TimerTask {

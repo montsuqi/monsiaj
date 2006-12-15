@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -31,8 +32,13 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+/** <p>A image label components that simulates Gtk+'s Pixmap widget.</p> 
+ */
 public class Pixmap extends JLabel {
 
+	/** <p>An ImageIcon subclass which scales the image to fit within the component
+	 * size.</p>
+	 */
 	final class ScalableImageIcon extends ImageIcon {
 		ScalableImageIcon(Image image) {
 			super(image);

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -28,6 +29,13 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 
+/** <p>An abstract logger class.</p>
+ * 
+ * <p>This class abstracts differences among various logging systems.</p>
+ * 
+ * <p>Actual class of loggers are determined by the system
+ * property "monsia.logger.factory".</p>
+ */
 public abstract class Logger {
 
 	public static final int FATAL = 0;
@@ -38,10 +46,30 @@ public abstract class Logger {
 
 	protected int level;
 
+	/** <p>Creates a logger for the name of given class.</p>
+	 * 
+	 * @param clazz
+	 */
 	public static Logger getLogger(Class clazz) {
 		return getLogger(clazz.getName());
 	}
 
+	/** <p>Creates a logger for the given name.</p>
+	 * 
+	 * <p>Actual class for the logger is determined by the system
+	 * property "monsia.logger.factory". Possible values are:
+	 * <ul>
+	 * <li>org.montsuqi.util.J2SELogger</li>
+	 * <li>org.montsuqi.util.Log4JLogger</li>
+	 * <li>org.montsuqi.util.NullLogger</li>
+	 * <li>org.montsuqi.util.StdErrLogger</li>
+	 * </ul>
+	 *
+	 * <p>If "monsia.logger.factory" is not set, org.montsuqi.util.StdErrLogger
+	 * is used.</p>
+	 * 
+	 * @param name
+	 */
 	public static Logger getLogger(String name) {
 		String factory = System.getProperty("monsia.logger.factory"); //$NON-NLS-1$
 		if (factory == null || factory.length() == 0) {
@@ -79,22 +107,43 @@ public abstract class Logger {
 		}
 	}
 
+	/** <p>Used to log on entering into a method with no argument.</p>
+	 */
 	public void enter() {
 		enter(null);
 	}
 
+	/** <p>Used to log on entering into a method with one argument.</p>
+	 * 
+	 * @param arg1 argument to the method in concern.
+	 */
 	public void enter(Object arg1) {
 		enter(new Object[] { arg1 });
 	}
 
+	/** <p>Used to log on entering into a method with two arguments.</p>
+	 * 
+	 * @param arg1 first argument to the method in concern.
+	 * @param arg2 second argument to the method in concern.
+	 */
 	public void enter(Object arg1, Object arg2) {
 		enter(new Object[] { arg1, arg2 });
 	}
 
+	/** <p>Used to log on entering into a method with three arguments.</p>
+	 * 
+	 * @param arg1 first argument to the method in concern.
+	 * @param arg2 second argument to the method in concern.
+	 * @param arg3 third argument to the method in concern.
+	 */
 	public void enter(Object arg1, Object arg2, Object arg3) {
 		enter(new Object[] { arg1, arg2, arg3 });
 	}
 
+	/** <p>Used to log on entering into a method with any number of arguments.</p>
+	 * 
+	 * @param args arguments to the method in concern.
+	 */
 	public void enter(Object[] args) {
 		if (level < TRACE) {
 			return;
@@ -143,6 +192,8 @@ public abstract class Logger {
 		}
 	}
 
+	/** <p>Used to log on leaving a method.</p>
+	 */
 	public void leave() {
 		if (level < TRACE) {
 			return;
@@ -206,10 +257,34 @@ public abstract class Logger {
 		}
 	}
 
+	/** <p>Logs a message in <em>trace</em> level.</p>
+	 * 
+	 * @param message the message to log.
+	 */
 	public abstract void trace(String message);
+
+	/** <p>Logs a message in <em>debug</em> level.</p>
+	 * 
+	 * @param message the message to log.
+	 */
 	public abstract void debug(String message);
+
+	/** <p>Logs a message in <em>info</em> level.</p>
+	 * 
+	 * @param message the message to log.
+	 */
 	public abstract void info(String message);
+
+	/** <p>Logs a message in <em>warn</em> level.</p>
+	 * 
+	 * @param message the message to log.
+	 */
 	public abstract void warn(String message);
+
+	/** <p>Logs a message in <em>fatal</em> level.</p>
+	 * 
+	 * @param message the message to log.
+	 */
 	public abstract void fatal(String message);
 
 	protected final String formatMessage(String format, Object[] args) {
@@ -221,90 +296,175 @@ public abstract class Logger {
 		return formatMessage(format, args);
 	}
 
+	/** <p>Logs a formatted mesasge with given arguments in
+	 * <em>trace</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param args the objects to format.
+	 */
 	public void trace(String format, Object[] args) {
 		if (level >= TRACE) {
 			trace(formatMessage(format, args));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given arguments in
+	 * <em>debug</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param args the objects to format.
+	 */
 	public void debug(String format, Object[] args) {
 		if (level >= DEBUG) {
 			debug(formatMessage(format, args));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given arguments in
+	 * <em>info</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param args the objects to format.
+	 */
 	public void info(String format, Object[] args) {
 		if (level >= INFO) {
 			info(formatMessage(format, args));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given arguments in
+	 * <em>warn</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param args the objects to format.
+	 */
 	public void warn(String format, Object[] args) {
 		if (level >= WARNING) {
 			warn(formatMessage(format, args));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given arguments in
+	 * <em>fatal</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param args the objects to format.
+	 */
 	public void fatal(String format, Object[] args) {
 		if (level >= FATAL) {
 			fatal(formatMessage(format, args));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given argument in
+	 * <em>trace</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param arg the object to format.
+	 */
 	public void trace(String format, Object arg) {
 		if (level >= TRACE) {
 			trace(formatMessage(format, arg));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given argument in
+	 * <em>debug</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param arg the object to format.
+	 */
 	public void debug(String format, Object arg) {
 		if (level >= DEBUG) {
 			debug(formatMessage(format, arg));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given argument in
+	 * <em>info</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param arg the object to format.
+	 */
 	public void info(String format, Object arg) {
 		if (level >= INFO) {
 			info(formatMessage(format, arg));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given argument in
+	 * <em>warn</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param arg the object to format.
+	 */
 	public void warn(String format, Object arg) {
 		if (level >= WARNING) {
 			warn(formatMessage(format, arg));
 		}
 	}
 
+	/** <p>Logs a formatted mesasge with given argument in
+	 * <em>fatal</em> level.</p>
+	 * 
+	 * @param format the message format.
+	 * @param arg the object to format.
+	 */
 	public void fatal(String format, Object arg) {
 		if (level >= FATAL) {
 			fatal(formatMessage(format, arg));
 		}
 	}
 
+	/** <p>Logs an exception in
+	 * <em>trace</em> level.</p>
+	 * 
+	 * @param e the exception to log.
+	 */
 	public void trace(Throwable e) {
 		if (level >= TRACE) {
 			trace(e.toString());
 		}
 	}
 
+	/** <p>Logs an exception in
+	 * <em>debug</em> level.</p>
+	 * 
+	 * @param e the exception to log.
+	 */
 	public void debug(Throwable e) {
 		if (level >= DEBUG) {
 			debug(e.toString());
 		}
 	}
 
+	/** <p>Logs an exception in
+	 * <em>info</em> level.</p>
+	 * 
+	 * @param e the exception to log.
+	 */
 	public void info(Throwable e) {
 		if (level >= INFO) {
 			info(e.toString());
 		}
 	}
 
+	/** <p>Logs an exception in
+	 * <em>warn</em> level.</p>
+	 * 
+	 * @param e the exception to log.
+	 */
 	public void warn(Throwable e) {
 		if (level >= WARNING) {
 			warn(e.toString());
 		}
 	}
 
+	/** <p>Logs an exception in
+	 * <em>fatal</em> level.</p>
+	 * 
+	 * @param e theexception to log.
+	 */
 	public void fatal(Throwable e) {
 		if (level >= FATAL) {
 			fatal(e.toString());

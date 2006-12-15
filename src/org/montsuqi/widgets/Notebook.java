@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -30,6 +31,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.montsuqi.util.Logger;
 
+/** <p>A class that simulates Gtk+'s Notebook widget.</p>
+ * 
+ * <p>Since Gtk+'s Notebook uses button for tabs, this component maps
+ * a dummy button(NotebookDummyButton) for each tab to simulate its behavior.
+ * Dummy buttons are not displayed but can react on action events.</p>
+ */
 public class Notebook extends JTabbedPane {
 
 	Map buttons;
@@ -53,6 +60,10 @@ public class Notebook extends JTabbedPane {
 		});
 	}
 
+	/** <p>Registers a dummy button to a tab.</p>
+	 * 
+	 * @param button a NotebookDummyButton with an index.
+	 */
 	public void registerTabButton(NotebookDummyButton button) {
 		buttons.put(new Integer(button.getIndex()), button);
 	}

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -24,12 +25,21 @@ package org.montsuqi.widgets;
 
 import javax.swing.JOptionPane;
 
+/** <p>A Dialog to display information about an exception briefly.</p>
+ */
 public class ExceptionDialog extends JOptionPane {
 
 	// inhibit instantiation
 	private ExceptionDialog() {
 		// do nothing
 	}
+
+	/** <p>Shows up a dialog that explains given exception.</p>
+	 * 
+	 * <p>If the exception is chained(nested), the root exception is looked through.</p>
+	 * 
+	 * @param e an exception to explain.
+	 */
 	public static void showExceptionDialog(Throwable e) {
 		while (true) {
 			Throwable cause = e.getCause();

@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -25,20 +26,40 @@ package org.montsuqi.util;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
+/** <p>A FileFilter that filters by file name extension.</p>
+ *
+ * <p>This filter accepts files whose names end with the specified
+ * extension. All directories (with any name) are also accepted.</p>
+ */
 public class ExtensionFileFilter extends FileFilter {
 
 	private String extension;
 	private String description;
 
+	/** <p>Constructs a ExtensionFileFilter that filters by given extension.</p>
+	 *
+	 * @param extension extension which is accepted.
+	 * @param description descriptive text that explains this filter.
+	 */
 	public ExtensionFileFilter(String extension, String description) {
 		this.extension = extension;
 		this.description = description;
 	}
 
+	/** <p>Returns true when the given file is a directory or its name ends with
+	 * the extension. False otherwise.</p>
+	 * 
+	 * @param f a File to test.
+	 * @return true when the file is acceptable by this filter, false otherwise.
+	 */ 
 	public boolean accept(File f) {
 		return f.isDirectory() || f.getPath().endsWith(extension);
 	}
 
+	/** <p>Returns textual description of this filter.</p>
+	 * 
+	 * @return a descriptive text.
+	 */
 	public String getDescription() {
 		return description;
 	}

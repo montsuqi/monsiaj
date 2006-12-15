@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -32,6 +33,8 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+/** <p>This class provides mapping from a string name to a set of icon/text/tooltip/accelerator.</p>
+ */
 public class UIStock {
 
 	private static Map stocks;
@@ -65,22 +68,42 @@ public class UIStock {
 
 	}
 
+	/** <p>Gets the text resource of this ui scock.</p>
+	 * 
+	 * @return a text.
+	 */
 	public String getText() {
 		return text;
 	}
 
+	/** <p>Gets the tooltip resource of this ui scock.</p>
+	 * 
+	 * @return a tooltip.
+	 */
 	public String getToolTip() {
 		return tooltip;
 	}
 
+	/** <p>Gets the icon resource of this ui scock.</p>
+	 * 
+	 * @return an icon.
+	 */
 	public Icon getIcon() {
 		return icon;
 	}
 
+	/** <p>Gets the accelerator resource of this ui scock.</p>
+	 * 
+	 * @return an accelerator's key stroke.
+	 */
 	public KeyStroke getAccelerator() {
 		return accelerator;
 	}
 
+	/** <p>Returns a ui stock named <var>key</var>.</p>
+	 * 
+	 * @param key the key to look up the ui stock for.
+	 */
 	public static UIStock get(String key) {
 		if ( ! stocks.containsKey(key)) {
 			stocks.put(key, createStock(key));

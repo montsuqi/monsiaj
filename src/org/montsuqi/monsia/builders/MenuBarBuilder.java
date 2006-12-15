@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -33,6 +34,8 @@ import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
+/** <p>A builder to create MenuBar widget.</p>
+ */
 class MenuBarBuilder extends ContainerBuilder {
 	
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {

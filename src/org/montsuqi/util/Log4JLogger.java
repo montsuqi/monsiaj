@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -29,10 +30,16 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.PropertyConfigurator;
 
+/** <p>A Logger subclass which wraps Log4j logging system.</p>
+ * 
+ *  <p>Log4j system can be initialized by specifying a property file's name to
+ *  "monsia.logger.log4j.properties" system property.</p>
+ */
 class Log4JLogger extends Logger {
 
 	private static Map loggers;
 
+	// initialize Log4j logging system.
 	static {
 		loggers = new HashMap();
 		String propertyFile = System.getProperty("monsia.logger.log4j.properties"); //$NON-NLS-1$
@@ -43,6 +50,14 @@ class Log4JLogger extends Logger {
 		}
 	}
 
+	/** <p>Returns a logger instance mapped to the given name.</p>
+	 * 
+	 * <p>When a logger already exists for the name, that is returned.
+	 * When no logger exists for the name, newly created one is returned.</p>
+	 * 
+	 * @param name 
+	 * @return a logger instance
+	 */
 	public static synchronized Logger getLogger(String name) {
 		Logger logger = null;
 		if ( ! loggers.containsKey(name)) {
@@ -74,22 +89,42 @@ class Log4JLogger extends Logger {
 		}
 	}
 
+	/** <p>Logs message in <em>trace</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void trace(String message) {
 		logger.debug(message);
 	}
 
+	/** <p>Logs message in <em>debug</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void debug(String message) {
 		logger.debug(message);
 	}
 
+	/** <p>Logs message in <em>info</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void info(String message) {
 		logger.info(message);
 	}
 
+	/** <p>Logs message in <em>warn</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void warn(String message) {
 		logger.warn(message);
 	}
 
+	/** <p>Logs message in <em>fatal</em> level.</p>
+	 * 
+	 * @param message a message to log.
+	 */
 	public void fatal(String message) {
 		logger.fatal(message);
 	}

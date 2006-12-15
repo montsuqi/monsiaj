@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -33,6 +34,8 @@ import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 
+/** <p>A basic builder for container widgets.</p>
+ */
 class ContainerBuilder extends WidgetBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		Iterator i = info.getChildren().iterator();
@@ -52,6 +55,10 @@ class ContainerBuilder extends WidgetBuilder {
 		}
 	}
 
+	/** <p>Insert a scroll pane under the specified child.</p>
+	 * @param child a widget that wants to be in a scroll pane.
+	 * @return the newly created scroll pane with the given child in it.
+	 */
 	protected Component underlayScrollPane(Component child) {
 		JScrollPane scroll = new JScrollPane(child);
 		scroll.setSize(child.getSize());

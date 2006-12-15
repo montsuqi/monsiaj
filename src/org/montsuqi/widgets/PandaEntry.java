@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -48,6 +49,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+/** <p>A class that simulates GtkPandaButton widget.</p>
+ */
 public class PandaEntry extends Entry {
 
 	final class InsertEnterAsText extends AbstractAction {
@@ -90,7 +93,8 @@ public class PandaEntry extends Entry {
 	}
 
 	private void initListeners() {
-		
+	
+		// If ximEnabled is true, enable/disable Japanese input on focus gained/lost.
 		addFocusListener(new FocusListener() {
 			// NOTE only works in japanese environment.
 			// See
@@ -110,6 +114,8 @@ public class PandaEntry extends Entry {
 				ic.selectInputMethod(Locale.ENGLISH);
 			}
 		});
+
+		// When this component hides a button under itself, propagete mouse click to the button.
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				Component source = (Component)e.getSource();
@@ -127,6 +133,10 @@ public class PandaEntry extends Entry {
 		});
 	}
 
+	/** <p>Sets the input mode to KANA, XIM or ASCII.</p>
+	 * 
+	 * @param mode one of PandaEntry.KANA, PandaEntry.XIM or PandaEntry.ASCII.
+	 */
 	public void setInputMode(int mode) {
 		PandaDocument doc = (PandaDocument)getDocument();
 		doc.setInputMode(mode);
@@ -134,6 +144,9 @@ public class PandaEntry extends Entry {
 		enableInputMethods(mode != ASCII);
 	}
 
+	/** <p>When the input mode == KANA and xim is not enabled,
+	 * treat Enter as text commit key. Otherwise treat it as action trigger.</p>
+	 */
 	private void setEnterMode() {
 		final KeyStroke pressEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 		final InputMap inputMap = getInputMap();
@@ -144,17 +157,23 @@ public class PandaEntry extends Entry {
 		}
 	}
 
+	/** <p>Gets current input mode.</p>
+	 */
 	public int getInputMode() {
 		PandaDocument doc = (PandaDocument)getDocument();
 		return doc.getInputMode();
 	}
 
+	/** <p>Sets xim enabled.</p>
+	 */
 	public void setXIMEnabled(boolean enabled) {
 		ximEnabled = enabled;
 		setEnterMode();
 		enableInputMethods(enabled);
 	}
 
+	/** <p>Gets xim enabled.</p>
+	 */
 	public boolean getXIMEnabled() {
 		return ximEnabled;
 	}

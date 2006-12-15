@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -33,6 +34,9 @@ import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.Notebook;
 import org.montsuqi.widgets.NotebookDummyButton;
 
+/** <p>A builder to create Notebook widget.</p>
+ * <p>For each tab, a NotebookDummyButton is created and mapped to handle events.</p>
+ */
 class NotebookBuilder extends ContainerBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		// create tabs first

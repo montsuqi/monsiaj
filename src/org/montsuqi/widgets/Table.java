@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -26,6 +27,7 @@ import java.awt.LayoutManager;
 import javax.swing.JComponent;
 import org.montsuqi.util.Logger;
 
+/** A Container that simulates Gtk+'s Table widget. */
 public class Table extends JComponent {
 
 	public Table() {

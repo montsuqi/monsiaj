@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -22,12 +23,17 @@ copies.
 
 package org.montsuqi.util;
 
+/** <p>An utility class to reverse the byte order of numbers.</p> */
 public class ByteOrder {
 
 	private ByteOrder() {
 		// inhibit instantiation
 	}
 
+	/** <p>Reverse the byte order of given long integer.</p>
+	 *
+	 * @param l a long integer to revese its byte order.
+	 */
 	public static long reverse(long l) {
 		return
 			(((l >> 56) & 0xff) <<  0) |
@@ -40,6 +46,10 @@ public class ByteOrder {
 			(((l >>  0) & 0xff) << 56);
 	}
 
+	/** <p>Reverse the byte order of given int.</p>
+	 *
+	 * @param i an int to revese its byte order.
+	 */
 	public static int reverse(int i) {
 		return
 			(((i >> 24) & 0xff) <<  0) |
@@ -48,22 +58,38 @@ public class ByteOrder {
 			(((i >>  0) & 0xff) << 24);
 	}
 
+	/** <p>Reverse the byte order of given short integer.</p>
+	 *
+	 * @param s a short integer to revese its byte order.
+	 */
 	public static short reverse(short s) {
 		return (short)
 			((((s >> 8) & 0xff) << 0) |
 			(((s >> 0) & 0xff) << 8));
 	}
 
+	/** <p>Reverse the byte order of given char.</p>
+	 *
+	 * @param c a char to revese its byte order.
+	 */
 	public static char reverse(char c) {
 		return (char)
 			((((c >> 8) & 0xff) << 0) |
 			(((c >> 0) & 0xff) << 8));
 	}
 
+	/** <p>Reverse the byte order of given double.</p>
+	 *
+	 * @param d a double to revese its byte order.
+	 */
 	public static double reverse(double d) {
 		return Double.longBitsToDouble(reverse(Double.doubleToLongBits(d)));
 	}
 
+	/** <p>Reverse the byte order of given float.</p>
+	 *
+	 * @param f a float to revese its byte order.
+	 */
 	public static float reverse(float f) {
 		return Float.intBitsToFloat(reverse(Float.floatToIntBits(f)));
 	}

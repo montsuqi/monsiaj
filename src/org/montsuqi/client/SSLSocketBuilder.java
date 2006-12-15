@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -181,7 +182,7 @@ public class SSLSocketBuilder {
 				while (i.hasNext()) {
 					final List alternativeName = (List)i.next();
 					final Integer type = (Integer)alternativeName.get(0);
-					if (type.intValue() == 2) { // dNSName. No symbolic names!
+					if (type.intValue() == 2) { // dNSName == 2. Symbolic names not defined :/
 						final String value = (String)alternativeName.get(1);
 						if (value.equalsIgnoreCase(host)) {
 							logger.info("One of subjectAlternativeNames matches.");
@@ -210,11 +211,15 @@ public class SSLSocketBuilder {
 		logger.info("CN matches.");
 	}
 
+	/** <p>Test if the given message means that passphrase is missing.</p>
+	 */
 	private boolean isMissingPassphraseMessage(String message) {
 		return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
 			message.indexOf("/ by zero") >= 0; //$NON-NLS-1$
 	}
 
+	/** <p>Test if the given message means broken pipe.</p>
+	 */
 	private boolean isBrokenPipeMessage(String message) {
 		return message != null && message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
 	}
@@ -223,6 +228,7 @@ public class SSLSocketBuilder {
 		boolean useBrowserSetting = getUseBrowserSetting();
 		logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
 		logger.debug("ignored...");
+		// Force false for now.
 		useBrowserSetting = false;
 		if (useBrowserSetting) {
 			return null;
@@ -274,6 +280,7 @@ public class SSLSocketBuilder {
 		if ( ! SystemEnvironment.isWindows()) {
 			return false;
 		}
+		// Following code runs only on Windows.
 		Properties deploymentProperties = new Properties();
 		String home = System.getProperty("user.home");
 		File deploymentDirectory = SystemEnvironment.createFilePath(new String[] {

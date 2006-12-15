@@ -2,6 +2,7 @@
 
 Copyright (C) 1998-1999 Ogochan.
               2000-2003 Ogochan & JMA (Japan Medical Association).
+              2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
@@ -32,6 +33,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JFrame;
 
+/** <p>A layout manager that simulates Gtk+'s table's layout strategy
+ * by using GridBagLayout.</p>
+ */
 public class TableLayout extends GridBagLayout {
 
 	public void addLayoutComponent(Component comp, Object object) {
