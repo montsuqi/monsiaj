@@ -40,6 +40,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/** <p>Abstract base class for Glade1Handler and MonsiaHandler.</p>
+ * <p>Thid document parser runs as a state transition machine.
+ * Subclass must instantiate ParserState instances for each element to make this work.</p>
+ */
 abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	protected static final Logger logger = Logger.getLogger(AbstractDocumentHandler.class);
@@ -61,6 +65,8 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected String propertyName;
 	protected PropertyType propertyType = PropertyType.NONE;
 
+	/** <p>Constructs and initializes the instance.</p>
+	 */
 	public AbstractDocumentHandler() {
 		super();
 		content = new StringBuffer();
@@ -72,39 +78,77 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	}
 
+	/** <p>Tests if current characters should be appended to the content.</p>
+	 * 
+	 * @return true if current characters are part of the con.tent. false otherwise.
+	 */
 	protected abstract boolean shouldAppendCharactersToContent();
 
+	/** <p>Tests if the parsing has ended.</p>
+	 * 
+	 * @return true if parsing has ended(end tag for the root element is found). false otherwise.
+	 */
 	protected boolean isFinished() {
 		return state == FINISH;
 	}
 
+	/** <p>Empties the content buffer.</p>
+	 */
 	protected void clearContent() {
 		content.delete(0, content.length());
 	}
 
+	/** <p>Warning helper method that warns about an attribute which should be zero but not.</p>
+	 * 
+	 * @param name an attribute that is expected to be zero.
+	 * @param actual the attribute's actual value.
+	 */
 	protected void warnNotZero(String name, int actual) {
 		Object[] args = { name, new Integer(actual) };
 		logger.warn("{0} is not  0, but was {1}", args); //$NON-NLS-1$
 	}
 
+	/** <p>Warning helper method that warns about an unknown attribute.</p>
+	 * 
+	 * @param element the element interested.
+	 * @param attr an attribute detected but unknown.
+	 */
 	protected void warnUnknownAttribute(String element, String attr) {
 		Object[] args = { attr, element };
 		logger.warn("unknown attribute {0} for <{1}>", args); //$NON-NLS-1$
 	}
 
+	/** <p>Warning helper method that warns that some attributes are missing.</p>
+	 * 
+	 * @param element the element interested.
+	 */
 	protected void warnMissingAttribute(String element) {
 		logger.warn("<{0}> element missing required attributes", element); //$NON-NLS-1$
 	}
 
+	/** <p>Warning helper method that warns unexpected element nesting is found.</p>
+	 * 
+	 * @param outer the outer method who does not expect the <var>inner</var> method.
+	 * @param inner the inner method who is not expected to be a child of <var>outer</var>.
+	 */
 	protected void warnUnexpectedElement(String outer, String inner) {
 		Object[] args = { outer, inner };
 		logger.warn("unexpected element <{0}> inside <{1}>", args); //$NON-NLS-1$
 	}
 
+	/** <p>Warning helper method that warns about an attribute alue which is not supported in Java.</p>
+	 * 
+	 * @param value the unsupported value name.
+	 */
 	protected void warnNotSupported(String value) {
 		logger.warn("{0} is not supported in Java", value); //$NON-NLS-1$
 	}
 
+	/** <p>Builds the interface as the result of parsing.</p>
+	 * 
+	 * @param protocol the protocol used for event binding(connecting).
+	 * @return the Interface instance.
+	 */
 	protected Interface getInterface(Protocol protocol) {
 		if (isFinished()) {
 			return new Interface(topLevels, protocol);
@@ -112,6 +156,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		throw new IllegalStateException("parsing is not finished yet"); //$NON-NLS-1$
 	}
 
+	/** <p>SAX handler called at the start of a document.</p>
+	 * <p>Initializes parser state and variables.</p>
+	 */
 	public void startDocument() throws SAXException {
 		state = startState;
 		unknownDepth = 0;
@@ -123,6 +170,8 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		propertyName = null;
 	}
 
+	/** <p>SAX handler called at te end of a document.</p>
+	 */
 	public void endDocument() throws SAXException {
 		if (unknownDepth != 0) {
 			warnNotZero("unknownDepth", unknownDepth); //$NON-NLS-1$
@@ -132,15 +181,25 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	}
 
+	/** <p>SAX handler called at the start of an element.</p.
+	 * <p>This method delegates its work to current <var>state</var>'s startElement.</p>
+	 */
 	public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 		state.startElement(uri, localName, qName, attrs);
 		clearContent();
 	}
 
+	/** <p>SAX handler called at the end of an element.</p>
+	 * <p>This method delegates its work to current <var>state</var>'s endElement.</p>
+	 */
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		state.endElement(uri, localName, qName);
 	}
 
+	/** <p>A ParserState instance that represents the "UNKNOWN" state.</p>
+	 * <p>Parser starts parsing at this state.</p>
+	 * <p>Parser transits to this state when it detects an unknown element.</p>
+	 */
 	protected final ParserState UNKNOWN = new ParserState("UNKNOWN") { //$NON-NLS-1$
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			unknownDepth++;
@@ -154,6 +213,8 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	};
 
+	/** <p>A ParserState instance that represents that parsing is end.</p>
+	 */
 	final ParserState FINISH = new ParserState("FINISH") { //$NON-NLS-1$
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			logger.warn("there should be no elements here, but found <{0}>", localName); //$NON-NLS-1$
@@ -179,6 +240,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		logger.fatal(e);
 	}
 
+	/** <p>Assigns pending properties to the appropriate variable depending on
+	 * current value of <var>propertyType</var>.</p>
+	 */
 	protected void flushProperties() {
 		if (propertyType == PropertyType.NONE) {
 			// do nothing
@@ -207,6 +271,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		properties.clear();
 	}
 
+	/** <p>Replace className in a WidgetInfo to "Dialog" if it is a dialog.</p>
+	 * <p>Since Gtk+ treats a Dialog as a kind of Window while Swing treats these two in different way,
+	 * this hack is required.</p>
+	 * @param info the WidgetInfo interested.
+	 */
 	protected void dialogHack(WidgetInfo info) {
 		String genericClassName = info.getClassName();
 		// handle Window/Dialog specially
@@ -218,16 +287,25 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	}
 
+	/** <p>Assigns pending signal info to current WidgetInfo.</p>
+	 */
 	protected void flushSignals() {
 		widget.setSignals(signals);
 		signals.clear();
 	}
 
+	/** <p>Assigns pending accel info to current WidgetInfo.</p>
+	 */
 	protected void flushAccels() {
 		widget.setAccels(accels);
 		accels.clear();
 	}
 
+	/** <p>Remove Gtk+'s/Gdk's prefix in constant names.</p>
+	 * 
+	 * @param name raw name
+	 * @return normalized name
+	 */
 	private String removePrefix(String name) {
 		if (name.startsWith("GDK_")) { //$NON-NLS-1$
 			name = name.substring("GDK_".length()); //$NON-NLS-1$
@@ -238,6 +316,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		return name;
 	}
 
+	/** <p>Converts symbolic key names to AWT key code.</p>
+	 * 
+	 * @param keyName Key name
+	 * @return key code
+	 */
 	protected int keyCode(String keyName) {
 		final Field[] fields = KeyEvent.class.getDeclaredFields();
 		keyName = removePrefix(keyName);
@@ -261,6 +344,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		return 0;
 	}
 
+	/** <p>Converts a set of symbolic modifier names to an integer.</p>
+	 * 
+	 * @param modifierValue symbolic modifier names. Multiple modifiers can be OR-ed with | operator.
+	 * @return algebraically or-ed modifier masks.
+	 */
 	protected int parseModifiers(String modifierValue) {
 		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|"); //$NON-NLS-1$
 		int modifiers = 0;
@@ -284,6 +372,10 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		return modifiers;
 	}
 
+	/** <p>Converts button mask to integer.</p>
+	 * @param mask a button mask
+	 * @return integer value of the button mask.
+	 */
 	protected int parseButtonMask(String mask) {
 		try {
 			int value = Integer.parseInt(mask);
@@ -304,11 +396,17 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	}
 
-	// returns name with all dashes converted to underscores.
+	/** <p>Returns a string all dashes in given <var>name</var> replaced to underscores.</p>
+	 * 
+	 * @param name dash-separated-parameter-name.
+	 * @return underscore_separated_parameter_name.
+	 */
 	protected String makePropertyName(String name) {
 		return name.replace('-', '_');
 	}
 
+	/** <p>A SAX hander called on character chunks.</p>
+	 */
 	public void characters(char[] chars, int start, int length) throws SAXException {
 		if (shouldAppendCharactersToContent()) {
 			content.append(chars, start, length);

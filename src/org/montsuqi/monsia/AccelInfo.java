@@ -27,6 +27,13 @@ package org.montsuqi.monsia;
  * the signal which is to be issued.</p>
  */
 public class AccelInfo {
+
+	/** <p></p>
+	 * 
+	 * @param key key code
+	 * @param modifiers modifiers(OR-ed)
+	 * @param signal signal name.
+	 */
 	AccelInfo(int key, int modifiers, String signal) {
 		this.key = key;
 		this.modifiers = modifiers;

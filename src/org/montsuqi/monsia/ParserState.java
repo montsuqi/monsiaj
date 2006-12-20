@@ -32,6 +32,10 @@ abstract class ParserState {
 
 	protected static final Logger logger = Logger.getLogger(ParserState.class);
 
+	/** <p>Constructs a state with given <var>name</var>.</p>
+	 * 
+	 * @param name name of a parser state.
+	 */
 	ParserState(String name) {
 		this.name = name;
 	}
@@ -90,6 +94,10 @@ abstract class ParserState {
 		logger.warn("non {0} properties defined here", element); //$NON-NLS-1$
 	}
 
+	/** <p>Returns the name of this state.</p>
+	 * 
+	 * @return name of this state.
+	 */
 	public String getName() {
 		return name;
 	}

@@ -23,14 +23,27 @@ copies.
 
 package org.montsuqi.monsia;
 
+/** <p>A set of constants which indicates the destination of current pending property hash.</p>
+ */
 class PropertyType {
 
 	private PropertyType() {
 		// inhibit instantiation
 	}
 
+	/** <p> A constant which indicates that current property hash is for nothing.</p>
+	 */
 	static final PropertyType NONE = new PropertyType();
+	
+	/** <p> A constant which indicates that current property hash is to be set to widget info.</p>
+	 */
 	static final PropertyType WIDGET = new PropertyType();
+	
+	/** <p> A constant which indicates that current property hash is to be set to atk.</p>
+	 */
 	static final PropertyType ATK = new PropertyType();
+	
+	/** <p> A constant which indicates that current property hash is to be set to child info.</p>
+	 */
 	static final PropertyType CHILD = new PropertyType();
 }

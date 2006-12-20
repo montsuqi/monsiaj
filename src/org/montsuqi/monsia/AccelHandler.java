@@ -80,7 +80,7 @@ public class AccelHandler {
 			}
 			AbstractButton button = (AbstractButton)widget;
 			AccelInfo accel = pair.accel;
-			if (accel.getKey() == e.getKeyCode()&& accel.getModifiers() == e.getModifiers()) {
+			if (accel.getKey() == e.getKeyCode() && accel.getModifiers() == e.getModifiers()) {
 				button.doClick();
 				return true;
 			}
