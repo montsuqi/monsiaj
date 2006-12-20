@@ -7,12 +7,12 @@
 
 クラス: org.montsuqi.client.Launcher(汎用), jp.or.med.jma_receipt.JMAReceiptLauncher(日レセ専用)
 
-1. launch()で起動。
-2. 設定ダイアログを表示し、Configurationオブジェクト(conf)を生成する。
+1. 起動。(Launcher.launch)
+2. 設定ダイアログを表示し、Configurationオブジェクト(conf)を生成する。Configurationクラスは実質的にPreferences APIのラッパ。
 3. キャンセルならそのまま終了する。OKが押されたら、
   1. confを保存。
   2. confを用い、Clientオブジェクト(client)を生成。
-  3. client.connect() でサーバに接続。
+  3. サーバに接続。(client.connect)
   4. スレッド上でclientを動かし(client#run())、終了を待つ。
 
 クライアントの動作
@@ -21,24 +21,41 @@
 クラス: org.montsuqi.client.Client
 
 1. conf(Configuration)の設定に従って各種パラメータを設定する。
-2. connect()メソッドにより、
-	1. 実際の処理を行うProtocolイオブジェクト(protocol)が生成される。
-	2. protocol.sendConnect()により、サーバにユーザ名・パスワード・アプリケーション名が伝えられる。
-3. 以降、終了までprotocolオブジェクトが画面要求、更新を行い続ける。
+2. 実際の処理を行うProtocolオブジェクト(protocol)が生成される。(client.connect)
+3. サーバにユーザ名・パスワード・アプリケーション名を伝える。(protocol.sendConnect)
+4. 以降、終了までprotocolオブジェクトが画面要求、更新を行い続ける。
 
 プロトコルオブジェクトの動作
 ==============
 
-ここの動作はglclientのロジックをJavaに置き換えただけなので、本質的には変わるところはない。
-Cコードとの対応もほぼ取れる。
+クラス: org.montsuqi.client.Protocol
 
-1. checkScreen()により、画面定義を受け取る。タイムスタンプを比較し、古ければ取り直す。
-2. getScreenData()により、クライアントが管理しているそれぞれのウィンドウについて、
-	1. nodeを取得する。nodeが存在しなければ、createNode()により作成する。
-	この際、取得済みの画面定義キャッシュを用いて、Interface.parseInput()により作成する。
-	2. ウィンドウを必要に応じて表示する。
-	3. 画面に表示すべきデータをmarshaller.receive()を使って取得する。
-3. イベントを処理する。多くのイベント処理は、
-	* nodeに対して、変更があったこと画面部品情報を登録する。 または
-	* クライアントからアプリケーションへのイベント通知を行い、変更のあった画面データをmarshaller.send()を用いて送る。
-4. 再びgetScreenData()を呼び出し、画面が更新される。以下繰り返し。
+glclientの中心的な処理をJava風に置き換えたものであり、本質的には変わるところはない。
+
+1. 画面定義ファイルのダウンロードし、キャッシュする。(Protocol.checkScreens)
+  1. QueryScreenパケットの受信により、サーバから一連の画面定義をダウンロードする。
+  2. タイムスタンプとファイルサイズの比較により、不要な場合はキャッシュを利用し、ダウンロードは要求しない。
+2. 表示/非表示を行う。(Protocl.showWindow)
+  1. 指示された名前に対応するNodeオブジェクトを探す。
+     Protocolでは、各画面はNodeクラスのインスタンスとして、画面の名前をキーとしたMapで管理されている。
+     Nodeは、画面定義(Interfaceクラス)と、変更のあった画面部品の情報を管理している。
+	 * 既に作成済みであれば、そのnodeを使用する。
+	 * 見つからなかった場合は作成する。(Protocol.createNode/Interface.parseInput)
+  2. NodeからInterfaceを得て、Windowを表示する。
+  3. 続くパケットに従い、各種marshallerを用いて、表示データを取得する。(WidgetMarshaller.receive)
+4. イベントを待ち、処理する。多くのイベント処理は、
+  * nodeに対して、変更があったこと画面部品情報を登録する。 または
+  * クライアントからアプリケーションへのイベント通知を行い、変更のあった画面データを送る。(Widgetmarshaller.send)
+5. イベント処理の結果として、再びgetScreenData()が呼び出され、画面更新が続く。
+
+画面データの取得
+========
+ScreenDataパケットの受信(Protocol.getScreenData)により、画面データの受信(Protocol.receiveValue)を開始する。
+
+receiveValueでは、パケットで示されるデータ種別に応じて、
+* 現在widgetName変数が示す画面部品があれば、receiveWidgetDataによって画面部品のデータを受信する。
+* なければreceiveRecordValue/receiveArrayValueを使って部品名を取得していく。
+* receiveWidgetDataでは、画面部品の型に対応したWidgetMarshallerを検索し、そのreceiveメソッドを使ってデータを受信する。
+
+Interfaceの生成
+============
