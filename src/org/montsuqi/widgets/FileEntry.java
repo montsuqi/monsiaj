@@ -129,7 +129,7 @@ public class FileEntry extends JComponent {
 		System.arraycopy(data, 0, this.data, 0, data.length);
 	}
 
-	public byte[] getdaa() {
+	public byte[] getData() {
 		byte[] result = new byte[data.length];
 		System.arraycopy(result, 0, data, 0, data.length);
 		return result;
@@ -144,5 +144,9 @@ public class FileEntry extends JComponent {
 			JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		}
 		
+	}
+
+	public JTextField getEntry() {
+		return fileEntry;
 	}
 }

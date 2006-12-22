@@ -121,7 +121,7 @@ public class WidgetBuilder {
 		registerWidgetClass("CList",          PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Dialog",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Entry",          Entry.class,         entryBuilder); //$NON-NLS-1$
-		registerWidgetClass("FileEntry",      FileEntry.class,     defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("FileEntry",      FileEntry.class,     new FileEntryBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
 		registerWidgetClass("HBox",           HBox.class,          defaultContainerBuilder); //$NON-NLS-1$
