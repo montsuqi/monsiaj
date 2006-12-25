@@ -37,6 +37,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.montsuqi.util.Logger;
 
@@ -110,9 +111,19 @@ public class FileEntry extends JComponent {
 		
 			final File initialFile = getFile();
 			chooser.setSelectedFile(initialFile);
-
-			if (chooser.showSaveDialog(FileEntry.this) != JFileChooser.APPROVE_OPTION) {
-				return;
+			Window root = (Window)SwingUtilities.windowForComponent(FileEntry.this);
+			try {
+				if (root.isDialog() && root.isVisible()) {
+					root.setVisible(false);
+				}
+				if (chooser.showSaveDialog(FileEntry.this) != JFileChooser.APPROVE_OPTION) {
+					return;
+				}
+			} finally {
+				if (root.isDialog() && ! root.isVisible()) {
+					root.setVisible(true);
+				}
+					
 			}
 			File selected = chooser.getSelectedFile();
 			setFile(selected);

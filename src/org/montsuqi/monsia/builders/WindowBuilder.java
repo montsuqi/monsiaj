@@ -44,6 +44,7 @@ public class WindowBuilder extends ContainerBuilder {
 			if (info.getClassName().equals("Dialog")) {
 				Method setAlwaysOnTop = Window.class.getMethod("setAlwaysOnTop", new Class[] { Boolean.TYPE });
 				setAlwaysOnTop.invoke(w, new Object[] { Boolean.TRUE });
+				w.setDialog(true);
 			}
 		} catch (NoSuchMethodException e) {
 			// ignore
