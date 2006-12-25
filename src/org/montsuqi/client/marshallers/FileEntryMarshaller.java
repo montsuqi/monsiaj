@@ -48,6 +48,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
 		Interface xml = con.getInterface();
 
 		byte[] binary = null;
+		boolean entryReceived = false;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
@@ -61,6 +62,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
 				if (sub != null) {
 					JTextField dummy = (JTextField)sub;
 					entryMarshaller.receive(manager, dummy);
+					entryReceived = true;
 				} else {
 					throw new WidgetMarshallingException("subwidget not found"); //$NON-NLS-1$
 				}
@@ -68,6 +70,9 @@ class FileEntryMarshaller extends WidgetMarshaller {
 		}
 		if (binary != null && binary.length > 0) {
 			fe.setData(binary);
+			if (entryReceived) {
+				fe.getBrowseButton().doClick();
+			}
 		}
 	}
 

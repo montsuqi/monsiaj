@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -156,4 +157,8 @@ public class FileEntry extends JComponent {
 	public JTextField getEntry() {
 		return fileEntry;
 	}
+
+	public AbstractButton getBrowseButton() {
+		return browseButton;
+    }
 }
