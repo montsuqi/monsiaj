@@ -37,14 +37,11 @@ import javax.swing.JPanel;
  */
 public class Window extends JFrame {
 
-	private boolean isDialog;
-
 	/** <p>Constructs a Window instance.</p>
 	 */
 	public Window() {
 		super();
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		isDialog = false;
 
 		// Prepare a glass pane with wait cursor.
 		// This pane is usually invisible, but is visible and gains focus to
@@ -113,12 +110,4 @@ public class Window extends JFrame {
 		}
 		return (Window[])list.toArray(new Window[list.size()]);
 	}
-
-	public boolean isDialog() {
-		return isDialog;
-	}
-
-	public void setDialog(boolean flag) {
-		isDialog = flag;
-    }
 }
