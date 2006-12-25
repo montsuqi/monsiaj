@@ -109,10 +109,7 @@ public class FileEntry extends JComponent {
 			final JFileChooser chooser = new JFileChooser();
 		
 			final File initialFile = getFile();
-			final File parent = initialFile.getParentFile();
-			if (parent.isDirectory()) {
-				chooser.setSelectedFile(initialFile);
-			}
+			chooser.setSelectedFile(initialFile);
 
 			if (chooser.showSaveDialog(FileEntry.this) != JFileChooser.APPROVE_OPTION) {
 				return;
