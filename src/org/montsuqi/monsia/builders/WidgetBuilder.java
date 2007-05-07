@@ -233,7 +233,7 @@ public class WidgetBuilder {
 		Font font = (Font)UIManager.get(key);
 		if (font != null) {
 			font = creator.modifyFont(font);
-			font = ScreenScale.scale(font);
+//			font = ScreenScale.scale(font);
 			UIManager.put(key, new FontUIResource(font));
 		}
 	}
