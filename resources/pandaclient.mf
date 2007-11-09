@@ -1,2 +1,2 @@
 Main-Class: org.montsuqi.client.Launcher
-Class-Path: log4j.jar WebKit.jar
+Class-Path: log4j.jar WebKit.jar BareBonesBrowserLaunch.jar

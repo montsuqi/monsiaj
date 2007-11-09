@@ -33,6 +33,7 @@
             <string>$JAVAROOT/libwebkitsample.jnilib</string>
             <string>$JAVAROOT/log4j.jar</string>
             <string>$JAVAROOT/pandaclient.jar</string>
+            <string>$JAVAROOT/BareBonesBrowserLaunch.jar</string>
         </array>
         <key>Properties</key>
         <dict>

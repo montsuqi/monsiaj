@@ -36,6 +36,10 @@
 		<mkdir dir="${report.dir}"/>
 	</target>
 
+	<target name="set-version" depends="prepare" unless="version">
+		<property name="version" value="${DSTAMP}"/>
+	</target>
+
 	<target name="set-javac-options" depends="set-javac-debug,set-javac-debuglevel">
 		<echo message="Javac Debug = ${javac.debug}"/>
 		<echo message="Javac Debug Level = ${javac.debuglevel}"/>
@@ -49,7 +53,8 @@
 		<property name="javac.debuglevel" value="lines,vars,source"/>
 	</target>
 
-	<target name="compile" depends="prepare,set-javac-options">
+
+	<target name="compile" depends="prepare,set-javac-options,set-version">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4"
 			debug="${javac.debug}" debuglevel="${javac.debuglevel}">
 			<include name="**/*.java"/>
@@ -57,23 +62,25 @@
 		</javac>
 	</target>
 
-	<target name="set-version" depends="prepare" unless="version">
-		<property name="version" value="${DSTAMP}"/>
-	</target>
-
 	<target name="copy-files" depends="prepare">
-		<copy todir="${build.dir}">
+		<filter token="version" value="${version}"/>
+		<copy todir="${build.dir}" filtering="true">
 			<fileset dir="${src.dir}">
 				<include name="**/*.properties"/>
-				<include name="**/*.jpg"/>
-				<include name="**/*.png"/>
-				<include name="org/montsuqi/tools/*.xml"/>
 			</fileset>
 			<fileset dir="${resources.dir}">
 				<include name="*.properties"/>
 			</fileset>
+		</copy>
+		<copy todir="${build.dir}" >
+			<fileset dir="${src.dir}">
+				<include name="**/*.jpg"/>
+				<include name="**/*.png"/>
+				<include name="org/montsuqi/tools/*.xml"/>
+			</fileset>
 			<fileset dir="${libs.dir}">
 				<include name="log4j.jar"/>
+				<include name="BareBonesBrowserLaunch.jar"/>
 				<include name="WebKit.jar"/>
 				<include name="*.jnilib"/>
 			</fileset>

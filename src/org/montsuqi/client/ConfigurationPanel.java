@@ -23,6 +23,8 @@ copies.
 
 package org.montsuqi.client;
 
+import com.centerkey.utils.BareBonesBrowserLaunch;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -35,6 +37,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.Font;
 import java.io.File;
 
 import javax.swing.AbstractAction;
@@ -63,6 +66,7 @@ import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
+
 
 public class ConfigurationPanel extends JPanel {
 
@@ -218,6 +222,7 @@ public class ConfigurationPanel extends JPanel {
 		tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), createBasicTab()); //$NON-NLS-1$
 		tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), createSslTab()); //$NON-NLS-1$
 		tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), createOthersTab()); //$NON-NLS-1$
+		tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), createInfoTab()); //$NON-NLS-1$
 		add(tabbed, BorderLayout.CENTER);
 	}
 
@@ -323,6 +328,46 @@ public class ConfigurationPanel extends JPanel {
 		return panel;
 	}
 
+	private Component createInfoTab() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+
+		int y = 0;
+		JLabel name = new JLabel("monsiaj ver." + Messages.getString("application.version"));
+		name.setFont(new Font(null, Font.BOLD, 20));
+		addRow(panel, y++, name);
+		addRow(panel, y++, new JLabel("Copyright (C) 2007 ORCA Project"));
+		JButton orcasite = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
+		orcasite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BareBonesBrowserLaunch.openURL(Messages.getString("ConfigurationPanel.info_orca_url"));
+			}
+		});
+		addRow(panel, y++, orcasite);
+		JButton montsuqisite = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
+		montsuqisite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BareBonesBrowserLaunch.openURL(Messages.getString("ConfigurationPanel.info_montsuqi_url"));
+			}
+		});
+		addRow(panel, y++, montsuqisite);
+		return panel;
+	}
+
+	private void addRow(Container container, int y, JComponent component)
+	{
+		GridBagConstraints gbc;
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = y;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 1.0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		container.add(component, gbc);
+	}
+
 	private void addRow(Container container, int y, String text, JComponent component) {
 		addRow(container, y, 1, text, component);
 	}
@@ -375,7 +420,7 @@ public class ConfigurationPanel extends JPanel {
 
 	protected JTextField addIntFieldRow(Container container, int y, String text, int value) {
 		JTextField entry = new JTextField();
-		entry.setHorizontalAlignment(SwingConstants.RIGHT);
+		entry.setHorizontalAlignment(SwingConstants.LEFT);
 		entry.setText(String.valueOf(value));
 		entry.addFocusListener(new FieldSelected());
 		addRow(container, y, text, entry);
