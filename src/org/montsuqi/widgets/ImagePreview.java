@@ -79,6 +79,7 @@ class ImagePreview extends Preview {
 		sourceImage = null;
 		flushImage(image);
 		image = null;
+		lastImageSize = null;
 		updatePreferredSize();
 	}
 
@@ -158,31 +159,36 @@ class ImagePreview extends Preview {
 	}
 
 	private void updatePreferredSize() {
-		if (sourceImage == null) {
+		try {
+			if (sourceImage == null) {
+				return;
+			}
+	
+			int sw = sourceImage.getWidth();
+			int sh = sourceImage.getHeight();
+	
+			int w = (int)(sw * scale);
+			int h = (int)(sh * scale);
+			Dimension size = rotationStep % 2 != 0 ? new Dimension(h, w) : new Dimension(w, h);
+			setPreferredSize(size);
+			flushImage(image);
+			image = new BufferedImage(size.width, size.height, sourceImage.getType());
+	
+			AffineTransform t = new AffineTransform();
+			t.scale(scale, scale);
+			int cx = rotationStep != 1 ? sw / 2 : sh / 2;
+			int cy = rotationStep != 3 ? sh / 2 : sw / 2;
+			double angle = (Math.PI / 2.0) * rotationStep;
+			t.rotate(angle, cx, cy);
+	
+			AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BILINEAR);
+			op.filter(sourceImage, image);
+	
+			revalidate();
+			repaint();
+		} catch (Exception ex) {
+			clear();
 			return;
 		}
-
-		int sw = sourceImage.getWidth();
-		int sh = sourceImage.getHeight();
-
-		int w = (int)(sw * scale);
-		int h = (int)(sh * scale);
-		Dimension size = rotationStep % 2 != 0 ? new Dimension(h, w) : new Dimension(w, h);
-		setPreferredSize(size);
-		flushImage(image);
-		image = new BufferedImage(size.width, size.height, sourceImage.getType());
-
-		AffineTransform t = new AffineTransform();
-		t.scale(scale, scale);
-		int cx = rotationStep != 1 ? sw / 2 : sh / 2;
-		int cy = rotationStep != 3 ? sh / 2 : sw / 2;
-		double angle = (Math.PI / 2.0) * rotationStep;
-		t.rotate(angle, cx, cy);
-
-		AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BILINEAR);
-		op.filter(sourceImage, image);
-
-		revalidate();
-		repaint();
 	}
 }

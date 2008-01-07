@@ -536,6 +536,31 @@ class Connection {
 		return bin;
 	}
 
+	public synchronized void sendBinaryData(int type, byte [] binary) throws IOException {
+		sendDataType(type);
+		switch (type) {
+		case Type.CHAR:
+		case Type.VARCHAR:
+		case Type.DBCODE:
+		case Type.TEXT:
+		case Type.BINARY:
+		case Type.BYTE:
+		case Type.OBJECT:
+			sendBinary(binary);
+			break;
+		default:
+			Object[] args = { Integer.toHexString(type) };
+			throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); //$NON-NLS-1$
+		}
+	}
+
+	synchronized void sendBinary(byte [] binary) throws IOException {
+		sendLength(binary.length);
+		if (binary.length > 0) {
+			out.write(binary);
+		}
+	}
+	
 	synchronized void close() throws IOException {
 		socket.shutdownInput(); 
 		socket.shutdownOutput();

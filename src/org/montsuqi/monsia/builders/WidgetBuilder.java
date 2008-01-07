@@ -57,6 +57,7 @@ import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.CheckBox;
 import org.montsuqi.widgets.Entry;
 import org.montsuqi.widgets.FileEntry;
+import org.montsuqi.widgets.PixmapEntry;
 import org.montsuqi.widgets.HPaned;
 import org.montsuqi.widgets.Notebook;
 import org.montsuqi.widgets.OptionMenu;
@@ -122,6 +123,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Dialog",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Entry",          Entry.class,         entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("FileEntry",      FileEntry.class,     new FileEntryBuilder()); //$NON-NLS-1$
+		registerWidgetClass("PixmapEntry",    PixmapEntry.class,   new PixmapEntryBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
 		registerWidgetClass("HBox",           HBox.class,          defaultContainerBuilder); //$NON-NLS-1$

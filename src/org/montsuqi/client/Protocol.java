@@ -687,6 +687,20 @@ public class Protocol extends Connection {
 		}
 		logger.leave();
 	}
+	
+	public void _addChangedWidget(Component widget) {
+		logger.enter(widget);
+		Node node = getNode(widget);
+		if (node != null) {
+			try {
+				final String longName = xml.getWidgetLongName(widget);
+				node.addChangedWidget(longName, widget);
+			} catch (IllegalArgumentException e) {
+				logger.warn(e);
+			}
+		}
+		logger.leave();
+	}
 
 	public boolean isReceiving() {
 		return isReceiving;

@@ -33,36 +33,42 @@ import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.Pixmap;
 
 /** <p>A class that simulates Gtk+'s FileEntry.</p>
  * 
  * <p>It can hold a binary data with it.</p>
  */
-public class FileEntry extends JComponent {
-	private JTextField fileEntry;
+public class PixmapEntry extends JComponent {
+	private JTextField entry;
 	private JButton browseButton;
+	private Pixmap pixmap;
 	private Logger logger;
 	byte[] data;
 
-	public FileEntry() {
+	public PixmapEntry() {
 		initComponents();
 		layoutComponents();
-		data = new byte[0];
 	}
 
 	private void initComponents() {
-		fileEntry = new JTextField();
+		pixmap = new Pixmap();
+		entry = new JTextField();
 		browseButton = new JButton();
-		add(fileEntry);
+		add(pixmap);
+		add(entry);
 		add(browseButton);
-		browseButton.setAction(new BrowseActionForSave());
+		browseButton.setAction(new BrowseAction());
 	}
 
 	private void layoutComponents() {
@@ -70,23 +76,32 @@ public class FileEntry extends JComponent {
 		setLayout(gbl);
 
 		GridBagConstraints gbc = new GridBagConstraints();
+		
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
+		gbl.addLayoutComponent(pixmap, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbl.addLayoutComponent(fileEntry, gbc);
+		gbl.addLayoutComponent(entry, gbc);
 
 		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.weightx = 0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.NONE;
+		gbc.gridy = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbl.addLayoutComponent(browseButton, gbc);
 	}
-	
+
 	public void setFile(String fileName) {
-		fileEntry.setText(fileName);
+		entry.setText(fileName);
 	}
 
 	public void setFile(File file) {
@@ -96,22 +111,14 @@ public class FileEntry extends JComponent {
 			logger.warn(e);
 		}
 	}
-
+	
 	public File getFile() {
-		return new File(fileEntry.getText());
-	}
-	
-	public void setSaveAction() {
-		browseButton.setAction(new BrowseActionForSave());
-	}
-	
-	public void setLoadAction() {
-		browseButton.setAction(new BrowseActionForLoad());
+		return new File(entry.getText());
 	}
 
-	private class BrowseActionForSave extends AbstractAction {
-		BrowseActionForSave() {
-			super(Messages.getString("FileEntry.browse")); //$NON-NLS-1$
+	private class BrowseAction extends AbstractAction {
+		BrowseAction() {
+			super(Messages.getString("PixmapEntry.browse")); //$NON-NLS-1$
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -120,64 +127,29 @@ public class FileEntry extends JComponent {
 			final File initialFile = getFile();
 			chooser.setSelectedFile(initialFile);
 
-			if (chooser.showSaveDialog(FileEntry.this) != JFileChooser.APPROVE_OPTION) {
+			if (chooser.showOpenDialog(PixmapEntry.this) != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
 			File selected = chooser.getSelectedFile();
 			setFile(selected);
-			assert data != null;
-			if (data.length <= 0) {
-				return;
-			}
-			if (selected.exists() && selected.canWrite()) {
-				if (JOptionPane.showConfirmDialog(FileEntry.this, Messages.getString("FileEntry.ask_overwrite"), Messages.getString("FileEntry.question"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) { //$NON-NLS-1$ //$NON-NLS-2$
-					return;
-				}
-			}
-			saveData();
+			printPreview();
 		}
 	}
 	
-	private class BrowseActionForLoad extends AbstractAction {
-		BrowseActionForLoad() {
-			super(Messages.getString("FileEntry.browse")); //$NON-NLS-1$
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			final JFileChooser chooser = new JFileChooser();
-		
-			final File initialFile = getFile();
-			chooser.setSelectedFile(initialFile);
-
-			if (chooser.showOpenDialog(FileEntry.this) != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			File selected = chooser.getSelectedFile();
-			setFile(selected);
-		}
+	public void clearPreview() {
+		pixmap.setIcon(null);
 	}
 
-	public void setData(byte[] data) {
-		this.data = new byte[data.length];
-		System.arraycopy(data, 0, this.data, 0, data.length);
-	}
-
-	public byte[] getData() {
-		byte[] result = new byte[data.length];
-		System.arraycopy(result, 0, data, 0, data.length);
-		return result;
-	}
-
-	void saveData() {
-		FileOutputStream out;
+	void printPreview() {
 		try {
-			out = new FileOutputStream(getFile());
-			out.write(data);
-			JOptionPane.showMessageDialog(FileEntry.this, Messages.getString("FileEntry.saved")); //$NON-NLS-1$
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			byte [] data;
+			data = loadData();
+			Icon icon = new ImageIcon(data);
+			pixmap.setScaled(false);
+			pixmap.setText("");
+			pixmap.setIcon(icon);
+		} catch (Exception e) {
+			return;
 		}
 	}
 		
@@ -191,13 +163,13 @@ public class FileEntry extends JComponent {
 			in.read(data, 0, length);
 			in.close();
 		} catch (IOException e){
-			JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			JOptionPane.showMessageDialog(PixmapEntry.this, e.getMessage(), Messages.getString("PixmapEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		}
 		return data;
 	}
 
 	public JTextField getEntry() {
-		return fileEntry;
+		return entry;
 	}
 
 	public AbstractButton getBrowseButton() {

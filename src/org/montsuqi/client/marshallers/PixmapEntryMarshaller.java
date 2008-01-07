@@ -27,7 +27,7 @@ import java.awt.Component;
 import java.io.IOException;
 import javax.swing.JTextField;
 
-import org.montsuqi.widgets.FileEntry;
+import org.montsuqi.widgets.PixmapEntry;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
@@ -35,17 +35,17 @@ import org.montsuqi.client.Type;
 
 /** <p>A class to send/receive FileEntry data.</p>
  */
-class FileEntryMarshaller extends WidgetMarshaller {
+class PixmapEntryMarshaller extends WidgetMarshaller {
 
 	private WidgetMarshaller entryMarshaller;
 
-	FileEntryMarshaller() {
+	PixmapEntryMarshaller() {
 		entryMarshaller = new EntryMarshaller();
 	}
 
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		FileEntry fe = (FileEntry)widget;
+		PixmapEntry pe = (PixmapEntry)widget;
 		Interface xml = con.getInterface();
 
 		byte[] binary = null;
@@ -56,6 +56,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			if ("objectdata".equals(name)) { //$NON-NLS-1$
 				binary = con.receiveBinaryData();
+				pe.clearPreview();
 				manager.registerValue(widget, "objectdata", null);
 			} else {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
@@ -73,22 +74,17 @@ class FileEntryMarshaller extends WidgetMarshaller {
 			}
 		}
 		if (binary != null && binary.length > 0) {
-			fe.setSaveAction();
-			fe.setData(binary);
-			if (entryReceived) {
-				fe.getBrowseButton().doClick();
-			}
+			// reciv
 		} else {
-			fe.setLoadAction();
 			con._addChangedWidget(widget);
-			con._addChangedWidget(fe.getEntry());
+			con._addChangedWidget(pe.getEntry());
 		}
 	}
 
 	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		FileEntry fe = (FileEntry)widget;
-		byte [] binary = fe.loadData();
+		PixmapEntry pe = (PixmapEntry)widget;
+		byte [] binary = pe.loadData();
 		if (binary.length <= 0){
 			return;
 		}
