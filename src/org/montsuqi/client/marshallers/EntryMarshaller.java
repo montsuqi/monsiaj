@@ -49,7 +49,7 @@ class EntryMarshaller extends WidgetMarshaller {
 			String text = con.receiveStringData();
 			manager.registerValue(entry, name, null);
 			entry.setText(text);
-			entry.setCaretPosition(Math.max(0, entry.getText().length()));
+			entry.setCaretPosition(0);
 		}
 	}
 

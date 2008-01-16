@@ -23,6 +23,8 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -62,6 +64,7 @@ public class Entry extends JTextField {
 
 		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
 		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
+		addFocusListener(new EntryFocusListener());
 	}
 
 	public void setLimit(int limit) {
@@ -73,4 +76,14 @@ public class Entry extends JTextField {
 		LengthLimitableDocument doc = (LengthLimitableDocument)getDocument();
 		return doc.getLimit();
 	}
+	
+    private static class EntryFocusListener implements FocusListener {
+       public void focusGained(final FocusEvent e) {
+    	   JTextField tf = (JTextField)e.getSource();
+            tf.setCaretPosition(Math.max(0, tf.getText().length()));
+        }
+       public void focusLost(final FocusEvent e) {
+
+       }        
+    }
 }
