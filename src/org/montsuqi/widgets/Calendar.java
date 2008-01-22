@@ -46,6 +46,8 @@ import javax.swing.event.ChangeListener;
 
 import java.util.Date;
 
+import org.montsuqi.util.Logger;
+
 /** <p>A class that simulates Gtk+'s Calendar widget.</p>
  * 
  * <p>When the date selection is changed, ChangeEvent will be fired.</p>
@@ -55,6 +57,9 @@ public class Calendar extends JComponent {
 	Date date;
 	private JComponent caption;
 	private JButton[][] dateCells;
+	private JSpinner monthSpinner;
+	private JSpinner yearSpinner;
+	private Logger logger;
 	Date[][] cellDates;
 	java.util.Calendar cal;
 
@@ -64,9 +69,11 @@ public class Calendar extends JComponent {
 		caption = new JPanel();
 		add(caption, BorderLayout.NORTH);
 		caption.setLayout(new GridLayout(1, 2));
-
-		caption.add(createDateSpinner(java.util.Calendar.MONTH, Messages.getString("Calendar.month_format"))); //$NON-NLS-1$
-		caption.add(createDateSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format"))); //$NON-NLS-1$
+		
+		monthSpinner = createDateSpinner(java.util.Calendar.MONTH, Messages.getString("Calendar.month_format"));
+		yearSpinner = createDateSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format")); //$NON-NLS-1$
+		caption.add(monthSpinner); //$NON-NLS-1$
+		caption.add(yearSpinner); //$NON-NLS-1$
 
 		dateCells = new JButton[7][7];
 		cellDates = new Date[7][7];
@@ -163,6 +170,21 @@ public class Calendar extends JComponent {
 			}
 		}
 		//monthLabel.setText(df.format(date));
+
+	}
+	
+	void updateSpinner() {
+		try {
+			monthSpinner.setValue(date);
+			yearSpinner.setValue(date);
+		} catch (IllegalArgumentException e) {
+			logger.warn(e);
+		}
+	}
+	
+	public void updateCalendar() {
+		setCells();
+		updateSpinner();
 	}
 
 	private Date computeCellDate(int row, int col) {
