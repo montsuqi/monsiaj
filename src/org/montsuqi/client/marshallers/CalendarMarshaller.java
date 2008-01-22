@@ -66,7 +66,6 @@ class CalendarMarshaller extends WidgetMarshaller {
 		if (year > 0) {
 			Date date = calendar.getTime();
 			calendarWidget.setDate(date);
-			calendarWidget.updateCalendar();
 		}
 	}
 

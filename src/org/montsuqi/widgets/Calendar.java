@@ -82,7 +82,7 @@ public class Calendar extends JComponent {
 		add(dateCellPanel, BorderLayout.CENTER);
 
 		cal = java.util.Calendar.getInstance();
-		setDate(cal.getTime());
+		this.date = cal.getTime();
 
 		SimpleDateFormat df = new SimpleDateFormat();
 		DateFormatSymbols symbols = df.getDateFormatSymbols();
@@ -154,6 +154,8 @@ public class Calendar extends JComponent {
 
 	public void setDate(Date date) {
 		this.date = date;
+		setCells();
+		setSpinner();
 	}
 
 	void setCells() {
@@ -170,21 +172,15 @@ public class Calendar extends JComponent {
 			}
 		}
 		//monthLabel.setText(df.format(date));
-
 	}
 	
-	void updateSpinner() {
+	void setSpinner() {
 		try {
 			monthSpinner.setValue(date);
 			yearSpinner.setValue(date);
 		} catch (IllegalArgumentException e) {
 			logger.warn(e);
 		}
-	}
-	
-	public void updateCalendar() {
-		setCells();
-		updateSpinner();
 	}
 
 	private Date computeCellDate(int row, int col) {
