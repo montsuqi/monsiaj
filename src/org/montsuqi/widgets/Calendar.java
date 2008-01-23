@@ -24,6 +24,8 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.SystemColor;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -57,8 +59,8 @@ public class Calendar extends JComponent {
 	Date date;
 	private JComponent caption;
 	private JButton[][] dateCells;
-	private JSpinner monthSpinner;
-	private JSpinner yearSpinner;
+	private CalendarSpinner monthSpinner;
+	private CalendarSpinner yearSpinner;
 	private Logger logger;
 	Date[][] cellDates;
 	java.util.Calendar cal;
@@ -70,8 +72,8 @@ public class Calendar extends JComponent {
 		add(caption, BorderLayout.NORTH);
 		caption.setLayout(new GridLayout(1, 2));
 		
-		monthSpinner = createDateSpinner(java.util.Calendar.MONTH, Messages.getString("Calendar.month_format"));
-		yearSpinner = createDateSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format")); //$NON-NLS-1$
+		monthSpinner = new CalendarSpinner(java.util.Calendar.MONTH, Messages.getString("Calendar.month_format"));
+		yearSpinner = new CalendarSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format")); //$NON-NLS-1$
 		caption.add(monthSpinner); //$NON-NLS-1$
 		caption.add(yearSpinner); //$NON-NLS-1$
 
@@ -104,7 +106,7 @@ public class Calendar extends JComponent {
 				final int finalCol = col;
 				cell.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						setDate(cellDates[finalRow][finalCol]);
+						Calendar.this.date = cellDates[finalRow][finalCol];
 						fireChangeEvent(new ChangeEvent(Calendar.this));
 					}
 				});
@@ -114,38 +116,14 @@ public class Calendar extends JComponent {
 		}
 		setCells();
 	}
-
-	private JSpinner createDateSpinner(final int field, String format) {
-		SpinnerDateModel model = new SpinnerDateModel();
-		model.setCalendarField(field);
-		final JSpinner spinner = new JSpinner(model);
-		JSpinner.DateEditor editor = new JSpinner.DateEditor(spinner, format);
-		spinner.setEditor(editor);
-
-		JTextField textField = editor.getTextField();
-		textField.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		spinner.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Date newDate = (Date)spinner.getValue();
-				cal.setTime(newDate);
-				int value = cal.get(field);
-				cal.setTime(date);
-				cal.set(field, value);
-				setDate(cal.getTime());
-				setCells();
-			}
-		});
-
-		return spinner;
-	}
-
+	
 	protected void fireChangeEvent(ChangeEvent e) {
 		ChangeListener[] listeners = (ChangeListener[])listenerList.getListeners(ChangeListener.class);
 		for (int i = 0, n = listeners.length; i < n; i++) {
 			ChangeListener l = listeners[i];
 			l.stateChanged(e);
 		}
+		setCells();
 	}
 
 	public Date getDate() {
@@ -153,14 +131,15 @@ public class Calendar extends JComponent {
 	}
 
 	public void setDate(Date date) {
-		this.date = date;
+		this.date = date;		
 		setCells();
-		setSpinner();
+		setSpinners();
 	}
-
+	
 	void setCells() {
 		cal.setTime(date);
 		int month = cal.get(java.util.Calendar.MONTH);
+		int day = cal.get(java.util.Calendar.DATE);
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				Date d = computeCellDate(row, col);
@@ -169,12 +148,21 @@ public class Calendar extends JComponent {
 				JButton cell = dateCells[row][col];
 				cell.setText(String.valueOf(cal.get(java.util.Calendar.DATE)));
 				cell.setEnabled(month == cal.get(java.util.Calendar.MONTH));
+				if (month == cal.get(java.util.Calendar.MONTH)) {
+					if ( cal.get(java.util.Calendar.DATE) == day) {
+						cell.setBackground((Color)SystemColor.controlLtHighlight);
+					} else {
+						cell.setBackground((Color)SystemColor.controlHighlight);
+					}
+				} else {
+					cell.setBackground((Color)SystemColor.control);
+				}
 			}
 		}
 		//monthLabel.setText(df.format(date));
 	}
 	
-	void setSpinner() {
+	void setSpinners() {
 		try {
 			monthSpinner.setValue(date);
 			yearSpinner.setValue(date);
@@ -204,6 +192,48 @@ public class Calendar extends JComponent {
 
 	public void removeChangeListener(ChangeListener l) {
 		listenerList.remove(ChangeListener.class, l);
+	}
+	
+	class CalendarSpinner extends JSpinner {
+		private ChangeListener[] listeners;
+		public CalendarSpinner(final int field, String format) {
+			super();
+			SpinnerDateModel model = new SpinnerDateModel();
+			model.setCalendarField(field);
+			setModel(model);
+			JSpinner.DateEditor editor = new JSpinner.DateEditor(CalendarSpinner.this, format);
+			setEditor(editor);
+			JTextField textField = editor.getTextField();
+			textField.setHorizontalAlignment(SwingConstants.RIGHT);
+			addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					int value;
+					int oldvalue;
+					Date newDate = (Date)getValue();
+					cal.setTime(newDate);
+					value = cal.get(field);
+					cal.setTime(date);
+					oldvalue = cal.get(field);
+					cal.add(field, value - oldvalue);
+					if (value == oldvalue) return;
+					Calendar.this.date = cal.getTime();
+					fireChangeEvent(new ChangeEvent(Calendar.this));
+				}
+			});
+			listeners = getChangeListeners();
+		}
+		
+		public void addChangeListener() {
+			for (int i = 0, n = listeners.length; i < n; i++) {
+				addChangeListener(listeners[i]);
+			}
+		}
+		
+		public void removeChangeListener() {
+			for (int i = 0, n = listeners.length; i < n; i++) {
+				removeChangeListener(listeners[i]);
+			}
+		}
 	}
 
 	public static void main(String[] args) {
