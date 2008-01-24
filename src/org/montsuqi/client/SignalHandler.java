@@ -156,6 +156,10 @@ public abstract class SignalHandler {
 		final SignalHandler sendEvent = new SignalHandler() {
 			public void handle(Protocol con, Component widget, Object userData) throws IOException {
 				synchronized (con) {
+					if (timerTask != null) {
+						timerTask.cancel();
+						timerTask = null;
+					}
 					if (con.isReceiving()) {
 						return;
 					}
