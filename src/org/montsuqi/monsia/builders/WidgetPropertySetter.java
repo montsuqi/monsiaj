@@ -539,6 +539,7 @@ abstract class WidgetPropertySetter {
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				PandaHTML pane = (PandaHTML)widget;
 				try {
+					if (value.length() == 0) return; 
 					URL uri = new URL(value);
 					pane.setURI(uri);
 				} catch (MalformedURLException e) {
