@@ -28,6 +28,11 @@
 	<!-- targets -->
 
 	<target name="prepare">
+		<delete includeEmptyDirs="true">
+			<fileset dir="." defaultexcludes="no">
+				<include name="${build.dir}/**"/>
+			</fileset>
+		</delete>
 		<tstamp/>
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${doc.dir}"/>
