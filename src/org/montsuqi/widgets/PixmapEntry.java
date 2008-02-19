@@ -23,14 +23,21 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.Image;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import javax.imageio.*;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
@@ -39,8 +46,8 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Pixmap;
@@ -54,6 +61,7 @@ public class PixmapEntry extends JComponent {
 	private JButton browseButton;
 	private Pixmap pixmap;
 	private Logger logger;
+	private GridBagLayout layout;
 	byte[] data;
 
 	public PixmapEntry() {
@@ -65,6 +73,7 @@ public class PixmapEntry extends JComponent {
 		pixmap = new Pixmap();
 		entry = new JTextField();
 		browseButton = new JButton();
+		layout = new GridBagLayout();
 		add(pixmap);
 		add(entry);
 		add(browseButton);
@@ -72,32 +81,51 @@ public class PixmapEntry extends JComponent {
 	}
 
 	private void layoutComponents() {
-		GridBagLayout gbl = new GridBagLayout();
-		setLayout(gbl);
-
 		GridBagConstraints gbc = new GridBagConstraints();
-		
+		setLayout(layout);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		gbl.addLayoutComponent(pixmap, gbc);
+		layout.addLayoutComponent(pixmap, gbc);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.0;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbl.addLayoutComponent(entry, gbc);
+		layout.addLayoutComponent(entry, gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.weightx = 0.0;
 		gbc.weighty = 0.0;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbl.addLayoutComponent(browseButton, gbc);
+		layout.addLayoutComponent(browseButton, gbc);
+	}
+	
+	public void setPreview(boolean doPreview) {
+		if (!doPreview) {
+			GridBagConstraints gbc = new GridBagConstraints();
+			this.remove(pixmap);	
+			layout.removeLayoutComponent(pixmap);
+			
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.weightx = 1.0;
+			gbc.weighty = 0.0;
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			layout.setConstraints(entry,gbc);
+
+			gbc.gridx = 1;
+			gbc.gridy = 0;
+			gbc.weightx = 0.0;
+			gbc.weighty = 0.0;
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			layout.setConstraints(browseButton,gbc);
+		}
 	}
 
 	public void setFile(String fileName) {
@@ -117,13 +145,17 @@ public class PixmapEntry extends JComponent {
 	}
 
 	private class BrowseAction extends AbstractAction {
+		
 		BrowseAction() {
 			super(Messages.getString("PixmapEntry.browse")); //$NON-NLS-1$
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			final JFileChooser chooser = new JFileChooser();
-		
+			ImagePreview preview = new ImagePreview(chooser);
+			chooser.addPropertyChangeListener(preview);
+			chooser.setAccessory(preview);
+			
 			final File initialFile = getFile();
 			chooser.setSelectedFile(initialFile);
 
@@ -175,4 +207,52 @@ public class PixmapEntry extends JComponent {
 	public AbstractButton getBrowseButton() {
 		return browseButton;
     }
+
+	private class ImagePreview extends JPanel implements PropertyChangeListener {
+	    private JFileChooser jfc;
+	    private Image img;
+	    
+	    public ImagePreview(JFileChooser jfc) {
+	        this.jfc = jfc;
+	        Dimension sz = new Dimension(100,100);
+	        setPreferredSize(sz);
+	    }
+	    
+	    public void propertyChange(PropertyChangeEvent evt) {
+	    	try {
+	            File file = jfc.getSelectedFile();
+	            updateImage(file);
+	    	} catch (IOException ex) {
+	        	//
+	        }
+	    }
+	    
+	    public void updateImage(File file) throws IOException {
+	        if(file == null) {
+	            return;
+	        }
+	        
+	        img = ImageIO.read(file);
+	        repaint();
+	    }
+	    
+	    public void paintComponent(Graphics g) {
+	        // fill the background
+	        g.setColor(Color.white);
+	        g.fillRect(0,0,getWidth(),getHeight());
+	        
+	        if(img != null) {
+	            // calculate the scaling factor
+	            int w = img.getWidth(null);
+	            int h = img.getHeight(null);
+	            int side = Math.max(w,h);
+	            double scale = 100.0/(double)side;
+	            w = (int)(scale * (double)w);
+	            h = (int)(scale * (double)h);
+	            
+	            // draw the image
+	            g.drawImage(img,0,0,w,h,null);
+	        }
+	    }
+	}
 }

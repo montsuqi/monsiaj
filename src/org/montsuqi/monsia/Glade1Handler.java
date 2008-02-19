@@ -99,7 +99,8 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			state == WIDGET_CHILD_ATTRIBUTE ||
 			state == SIGNAL_ATTRIBUTE ||
 			state == ACCELERATOR_ATTRIBUTE ||
-			state == STYLE_ATTRIBUTE;
+			state == STYLE_ATTRIBUTE ||
+			state == PREVIEW;
 	}
 
 	void noElementHere(String inner) {
@@ -156,6 +157,8 @@ public class Glade1Handler extends AbstractDocumentHandler {
 				state = WIDGET_CHILD;
 			} else if (localName.equals("widget")) { //$NON-NLS-1$
 				initializeWidgetInfo();
+			} else if (localName.equals("preview") || localName.equals("Preview")) {
+				state = PREVIEW;
 			} else {
 				propertyType = PropertyType.WIDGET;
 				propertyName = localName;
@@ -333,6 +336,18 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = STYLE;
 			// ignore all style stuff in Java
+		}
+	};
+	
+	final ParserState PREVIEW = new ParserState("PREVIEW") {
+		void startElement(String uri, String localName, String qName, Attributes attrs) {
+			noElementHere(localName);
+		}
+		void endElement(String uri, String localName, String qName) {
+			WidgetInfo w = getLastPendingWidget();
+			String value = content.toString();
+			w.addProperty("do_preview", value.charAt(0) == 'T' ? "true" : "false");
+			state = WIDGET;
 		}
 	};
 }
