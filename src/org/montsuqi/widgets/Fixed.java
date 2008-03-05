@@ -57,7 +57,7 @@ public class Fixed extends JComponent
 			int childTop = (int)childRect.getY();			
 			int childBottom = (int)(childRect.getY() + childRect.getHeight());
 			int childLeft = (int)childRect.getX();
-			int childRight = (int)(childRect.getX() + childRect.getHeight());
+			int childRight = (int)(childRect.getX() + childRect.getWidth());
 			int viewTop = (int)viewRect.getY();
 			int viewBottom = (int)(viewRect.getY() + viewRect.getHeight());
 			int viewLeft = (int)viewRect.getX();
