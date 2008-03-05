@@ -27,6 +27,7 @@ import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
@@ -41,6 +42,14 @@ public class TextAreaBuilder extends WidgetBuilder {
 		JTextArea ta = (JTextArea)c;
 		ta.setLineWrap(true);
 		ta.setWrapStyleWord(true);
+		/*
+		if (!(c.getParent() instanceof JScrollPane)) {
+			c.getParent.remove
+			JScrollPane scroll = new JScrollPane(ta,
+							JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+							JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		}
+		*/
 		return ta;
 	}
 }

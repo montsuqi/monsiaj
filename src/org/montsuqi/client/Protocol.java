@@ -25,6 +25,7 @@ package org.montsuqi.client;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -43,8 +44,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
@@ -497,6 +499,19 @@ public class Protocol extends Connection {
 		}
 		// logger.leave();
 	}
+	
+	private synchronized void resetScrollPane(Component widget) {
+		if (widget instanceof JScrollPane) {
+			JViewport view = ((JScrollPane)widget).getViewport();
+			view.setViewPosition(new Point(0,0));
+		}
+		if (widget instanceof Container) {
+			Component[] children = ((Container)widget).getComponents();
+			for (int i = 0, n = children.length; i < n; i++) {
+				resetScrollPane(children[i]);
+			}
+		}
+	}
 
 	synchronized boolean getScreenData() throws IOException {
 		logger.enter();
@@ -542,6 +557,12 @@ public class Protocol extends Connection {
 					c = receivePacketClass();
 					if (c == PacketClass.ScreenData) {
 						receiveValue(widgetName, widgetName.length());
+					}
+					if (type != ScreenType.CURRENT_WINDOW && xml != null) {
+						Component widget = xml.getWidget(window);
+						if (widget != null) {
+							resetScrollPane(widget);
+						}
 					}
 					break;
 				default:

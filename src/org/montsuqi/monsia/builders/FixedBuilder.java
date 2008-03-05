@@ -26,6 +26,7 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.FocusListener;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -86,7 +87,9 @@ class FixedBuilder extends ContainerBuilder {
 			Rectangle rect = children[i].getBounds();
 			bottomMost = Math.max(bottomMost, rect.y + rect.height);
 			rightMost = Math.max(rightMost, rect.x + rect.width);
+			children[i].addFocusListener((FocusListener)parent);
 		}
+		
 		Insets insets = parent.getInsets();
 		parent.setSize(rightMost + insets.right, bottomMost + insets.bottom);
 	}

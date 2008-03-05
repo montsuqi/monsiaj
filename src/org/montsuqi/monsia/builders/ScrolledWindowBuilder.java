@@ -27,6 +27,7 @@ import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
@@ -43,7 +44,11 @@ class ScrolledWindowBuilder extends ContainerBuilder {
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
 		Component child = buildWidget(xml, wInfo, parent);
-		scroll.setViewportView(child);
+		if (child != null && child instanceof JViewport) {
+			scroll.setViewport((JViewport)child);
+		} else {
+			System.out.println("scroll:"+ ((JScrollPane)parent).getViewportBorderBounds().toString());
+			scroll.setViewportView(child);
+		}
 	}
 }
-
