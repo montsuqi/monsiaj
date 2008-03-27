@@ -144,6 +144,23 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 						combo.setSelectedIndex(i);
 						setText(s);
 						setCaretPosition(pos + 1);
+						setSelectionStart(pos + 1);
+						setSelectionEnd(getText().length());
+						return true;
+					}
+				}
+			} else if (e.getID() == KeyEvent.KEY_PRESSED && 
+					e.getKeyCode() == KeyEvent.VK_UNDEFINED) {
+				ComboBoxModel model = combo.getModel();
+				int pos = getText().length();
+				String prefix = getText().substring(0, pos);
+				for (int i = 0, n = model.getSize(); i < n; i++) {
+					Object o = model.getElementAt(i);
+					String s = o.toString();
+					if (s.startsWith(prefix)) {
+						combo.setSelectedIndex(i);
+						setText(s);
+						setCaretPosition(pos);
 						return true;
 					}
 				}

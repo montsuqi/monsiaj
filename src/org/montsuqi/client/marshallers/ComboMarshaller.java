@@ -24,6 +24,8 @@ copies.
 package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,6 +52,7 @@ class ComboMarshaller extends WidgetMarshaller {
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
 		JComboBox combo = (JComboBox)widget;
+		Component sub = null;
 
 		DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
 		Interface xml = con.getInterface();
@@ -88,11 +91,11 @@ class ComboMarshaller extends WidgetMarshaller {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
 				int offset = widgetName.length();
 				widgetName.replace(offset, widgetName.length(), '.' + name);
-				Component sub =  xml.getWidgetByLongName(widgetName.toString());
+				sub =  xml.getWidgetByLongName(widgetName.toString());
 				if (sub != null) {
 					JTextField dummy = (JTextField)sub;
 					entryMarshaller.receive(manager, dummy);
-					selectedItem = dummy.getText();
+					selectedItem = dummy.getText();						
 				} else {
 					throw new WidgetMarshallingException("subwidget not found"); //$NON-NLS-1$
 				}
@@ -100,6 +103,7 @@ class ComboMarshaller extends WidgetMarshaller {
 		}
 		if (selectedItem != null) {
 			combo.setSelectedItem(selectedItem);
+			widget.dispatchEvent(new KeyEvent(sub,KeyEvent.KEY_PRESSED,0,0,KeyEvent.VK_UNDEFINED,KeyEvent.CHAR_UNDEFINED));			
 		}
 	}
 
