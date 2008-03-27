@@ -135,7 +135,8 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 		private boolean selectWithKey(KeyEvent e) {
 			if (e.getID() == KeyEvent.KEY_TYPED) {
 				ComboBoxModel model = combo.getModel();
-				int pos = getCaretPosition();
+				int pos = getSelectionStart();
+				if (pos == 0) pos = getCaretPosition();
 				String prefix = getText().substring(0, pos) + e.getKeyChar();
 				for (int i = 0, n = model.getSize(); i < n; i++) {
 					Object o = model.getElementAt(i);
@@ -143,7 +144,6 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 					if (s.startsWith(prefix)) {
 						combo.setSelectedIndex(i);
 						setText(s);
-						setCaretPosition(pos + 1);
 						setSelectionStart(pos + 1);
 						setSelectionEnd(getText().length());
 						return true;
