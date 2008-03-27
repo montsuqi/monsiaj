@@ -47,7 +47,6 @@ class ScrolledWindowBuilder extends ContainerBuilder {
 		if (child != null && child instanceof JViewport) {
 			scroll.setViewport((JViewport)child);
 		} else {
-			System.out.println("scroll:"+ ((JScrollPane)parent).getViewportBorderBounds().toString());
 			scroll.setViewportView(child);
 		}
 	}
