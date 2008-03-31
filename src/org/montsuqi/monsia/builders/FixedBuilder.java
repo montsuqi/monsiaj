@@ -33,7 +33,10 @@ import java.awt.Rectangle;
 import java.util.Map;
 
 import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+
 
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
@@ -62,7 +65,14 @@ class FixedBuilder extends ContainerBuilder {
 			// Since JTable itself does not have capability to scroll,
 			// insert a scroll pane as the parent of a table.
 			if (child instanceof JTable) {
-				child = underlayScrollPane(child);
+				child = underlayScrollPane(child,
+						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			} 
+			if (child instanceof JTextArea) {
+				child = underlayScrollPane(child,
+						JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+						JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 			}
 			if (child instanceof JMenuBar) {
 				xml.setMenuBar((JMenuBar)child);

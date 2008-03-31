@@ -59,8 +59,8 @@ class ContainerBuilder extends WidgetBuilder {
 	 * @param child a widget that wants to be in a scroll pane.
 	 * @return the newly created scroll pane with the given child in it.
 	 */
-	protected Component underlayScrollPane(Component child) {
-		JScrollPane scroll = new JScrollPane(child);
+	protected Component underlayScrollPane(Component child, int vpol, int hpol) {
+		JScrollPane scroll = new JScrollPane(child, vpol, hpol);
 		scroll.setSize(child.getSize());
 		return scroll;
 	}
