@@ -23,40 +23,27 @@ copies.
 
 package jp.or.med.jma_receipt;
 
+import java.awt.Dialog;
 import org.montsuqi.client.Configuration;
-import org.montsuqi.client.ConfigurationPanel;
+import org.montsuqi.client.ConfigurationViewer;
+import org.montsuqi.widgets.TablePanel;
 
-/** <p>Launcher configuration panel specialized for JMA receipt.</p>
- */
-public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
+public class JMAReceiptConfigurationViewer extends ConfigurationViewer {
 
-	/** <p>Constructs a configuration panel with given configuration.</p>
-	 * 
-	 * @param conf configuration to read initial values and write result to.
-	 */
-	JMAReceiptConfigurationPanel(Configuration conf) {
+	public JMAReceiptConfigurationViewer(Configuration conf) {
 		super(conf);
 	}
 
-	/** <p>Creates components and disable some so users cannot alter preset values.</p>
-	 */
-	protected void initComponents() {
-		super.initComponents();
+	protected TablePanel createEditConfigurationPanel(String configName, boolean newFlag) {
+		TablePanel panel = super.createEditConfigurationPanel(configName, newFlag);
 		appEntry.setEditable(false);
 		encodingEntry.setEditable(false);
 		for (int i = 0; i < protocolVersionRadios.length; i++) {
 			protocolVersionRadios[i].setEnabled(false);
 		}
-	}
-
-	/** <p>Updates configuration ofject using values set to UI.</p>
-	 * <p>It also ensures some configuration remain preset values.</p>
-	 */
-	protected void updateConfiguration() {
-		super.updateConfiguration();
-		String configName = conf.getConfigurationName();
-		conf.setApplication(configName, "orca00"); //$NON-NLS-1$
-		conf.setEncoding(configName, "EUC-JP"); //$NON-NLS-1$
-		conf.setProtocolVersion(configName, 1);
+		appEntry.setText("orca00");
+		encodingEntry.setText("EUC-JP");
+		protocolVersionRadios[0].setSelected(true);
+		return panel;
 	}
 }

@@ -29,6 +29,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.montsuqi.client.ConfigurationPanel;
+import org.montsuqi.client.ConfigurationViewer;
 import org.montsuqi.client.Launcher;
 
 /** <p>Launcher specialized for JMA receipt.</p>
@@ -51,12 +52,19 @@ public class JMAReceiptLauncher extends Launcher {
 	/** <p>Constructs the configuration panel.</p>
 	 */
 	protected ConfigurationPanel createConfigurationPanel() {
-		conf.setApplication("orca00"); //$NON-NLS-1$
-		conf.setEncoding("EUC-JP"); //$NON-NLS-1$
-		conf.setProtocolVersion(1);
+		String [] configNames = conf.getConfigurationNames();
+		for (int i = 0; i < configNames.length; i++) {
+			conf.setApplication(configNames[i], "orca00"); //$NON-NLS-1$
+			conf.setEncoding(configNames[i], "EUC-JP"); //$NON-NLS-1$
+			conf.setProtocolVersion(configNames[i], 1);
+		}
 		return new JMAReceiptConfigurationPanel(conf);
 	}
 
+	protected ConfigurationViewer createConfigurationViewer() {
+		return new JMAReceiptConfigurationViewer(conf);
+	}
+	
 	/** <p>Creates icon to display on the left.</p>
 	 */
 	protected Icon createIcon() {

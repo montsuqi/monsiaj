@@ -34,28 +34,32 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
+import org.montsuqi.widgets.PandaCList;
 
 public class Launcher {
 
 	protected static final Logger logger = Logger.getLogger(Launcher.class);
-
-	protected Configuration conf;
 	protected String title;
+	protected Configuration conf;
 
 	static {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -78,21 +82,64 @@ public class Launcher {
 	}
 
 	public void launch() {
-		ConfigurationPanel panel = createConfigurationPanel();
-		Icon icon = createIcon();
-		int result = configure(panel, icon);
-		if (result != JOptionPane.OK_OPTION) {
-			System.exit(0);
-		}
-		panel.updateConfiguration();
+		final JFrame f = new JFrame(title);
+		Container container = f.getContentPane();
+		container.setLayout(new BorderLayout(10,5));
+		final ConfigurationPanel panel = createConfigurationPanel();
+		final ConfigurationViewer viewer = createConfigurationViewer();
+		container.add(panel, BorderLayout.CENTER);
+		
+		JLabel iconLabel = new JLabel("", createIcon(), JLabel.CENTER);
+		container.add(iconLabel, BorderLayout.WEST);
+
+		JPanel bar = new JPanel();
+		bar.setLayout(new FlowLayout());
+		container.add(bar, BorderLayout.SOUTH);
+
+		JButton run = new JButton(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent ev) {
+				panel.updateConfiguration();
+				connect();
+				f.dispose();
+			}
+		});
+		bar.add(run);
+
+		JButton cancel = new JButton(new AbstractAction(Messages.getString("Launcher.cancel_label")) { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		bar.add(cancel);
+		
+		JButton config = new JButton(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				viewer.run(f);
+				panel.updateConfigCombo();
+			}
+		});
+		bar.add(config);
+
+		f.setSize(640, 320);
+		int state = f.getExtendedState();
+		f.setExtendedState(state | Frame.ICONIFIED);
+		f.setVisible(true);
+
+		f.setLocationRelativeTo(null);
+		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	}
+	
+	private void connect() {
 		conf.save();
 		Client client = new Client(conf);
-		JFrame logFrame = conf.getUseLogViewer() ? createLogFrame(client) : null;
+		JFrame logFrame = conf.getUseLogViewer(conf.getConfigurationName()) ? createLogFrame(client) : null;
+		
 		try {
 			client.connect();
-			Thread t = new Thread(client);
-			t.start();
-			t.join();
+			client.run();
+			//Thread t = new Thread(client);
+			//t.start();
+			//t.join();
 		} catch (Exception e) {
 			logger.fatal(e);
 			ExceptionDialog.showExceptionDialog(e);
@@ -108,21 +155,18 @@ public class Launcher {
 		return new ConfigurationPanel(conf); 
 	}
 
+	protected ConfigurationViewer createConfigurationViewer() {
+		return new ConfigurationViewer(conf);
+	}
+	
 	protected Icon createIcon() {
 		return null;
 	}
-
-	private int configure(ConfigurationPanel panel, Icon icon) {
-		Object[] options = { Messages.getString("Launcher.run_label"), Messages.getString("Launcher.cancel_label") }; //$NON-NLS-1$ //$NON-NLS-2$
-		Object initial = options[0];
-		return JOptionPane.showOptionDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, icon, options, initial);
-	}
-
+	
 	private JFrame createLogFrame(final Client client) {
 		final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); //$NON-NLS-1$
 		Container container = f.getContentPane();
 		container.setLayout(new BorderLayout());
-
 		final ConsolePane console = new ConsolePane();
 		System.setOut(console.getOut());
 		System.setErr(console.getErr());

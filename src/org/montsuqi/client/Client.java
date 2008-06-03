@@ -82,13 +82,14 @@ public class Client implements Runnable {
 		String[] files = options.parse(Client.class.getName(), args);
 		
 		Configuration conf = new Configuration(Client.class);
-		conf.setPort(options.getInt("port")); //$NON-NLS-1$
-		conf.setHost(options.getString("host")); //$NON-NLS-1$
-		conf.setCache(options.getString("cache")); //$NON-NLS-1$
-		conf.setUser(options.getString("user")); //$NON-NLS-1$
-		conf.setPass(options.getString("pass")); //$NON-NLS-1$
-		conf.setEncoding(options.getString("encoding")); //$NON-NLS-1$
-		conf.setStyleFileName(options.getString("style")); //$NON-NLS-1$
+		String configName = conf.getConfigurationName();
+		conf.setPort(configName, options.getInt("port")); //$NON-NLS-1$
+		conf.setHost(configName, options.getString("host")); //$NON-NLS-1$
+		conf.setCache(configName, options.getString("cache")); //$NON-NLS-1$
+		conf.setUser(configName, options.getString("user")); //$NON-NLS-1$
+		conf.setPassword(configName, options.getString("pass")); //$NON-NLS-1$
+		conf.setEncoding(configName, options.getString("encoding")); //$NON-NLS-1$
+		conf.setStyleFileName(configName, options.getString("style")); //$NON-NLS-1$
 
 		boolean v1 = options.getBoolean("v1"); //$NON-NLS-1$
 		boolean v2 = options.getBoolean("v2"); //$NON-NLS-1$
@@ -96,16 +97,16 @@ public class Client implements Runnable {
 			throw new IllegalArgumentException("specify -v1 or -v2, not both."); //$NON-NLS-1$
 		}
 		if (v1) {
-			conf.setProtocolVersion(1);
+			conf.setProtocolVersion(configName, 1);
 		} else if (v2) {
-			conf.setProtocolVersion(2);
+			conf.setProtocolVersion(configName, 2);
 		} else {
 			assert false : "-v1 or -v2 should have been given."; //$NON-NLS-1$
 		}
 
-		conf.setUseSSL(options.getBoolean("useSSL")); //$NON-NLS-1$
+		conf.setUseSSL(configName, options.getBoolean("useSSL")); //$NON-NLS-1$
 
-		conf.setApplication(files.length > 0 ? files[0] : null);
+		conf.setApplication(configName, files.length > 0 ? files[0] : null);
 
 		return new Client(conf);
 	}
@@ -116,25 +117,26 @@ public class Client implements Runnable {
 	 * @throws GeneralSecurityException on SSL verification/authentication failure.
 	 */
 	void connect() throws IOException, GeneralSecurityException {
-		String encoding = conf.getEncoding();
+		String configName = conf.getConfigurationName();
+		String encoding = conf.getEncoding(configName);
 		Map styles = loadStyles();
 		String[] pathElements = {
-			conf.getCache(),
-			conf.getHost(),
-			String.valueOf(conf.getPort())
+			conf.getCache(configName),
+			conf.getHost(configName),
+			String.valueOf(conf.getPort(configName))
 		};
 		File cacheRoot = SystemEnvironment.createFilePath(pathElements);
-		int protocolVersion = conf.getProtocolVersion();
+		int protocolVersion = conf.getProtocolVersion(configName);
 		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion);
 
-		String user = conf.getUser();
-		String password = conf.getPass();
-		String application = conf.getApplication();
+		String user = conf.getUser(configName);
+		String password = conf.getPassword(configName);
+		String application = conf.getApplication(configName);
 		protocol.sendConnect(user, password, application);
 	}
 
 	private Map loadStyles() {
-		URL url = conf.getStyleURL();
+		URL url = conf.getStyleURL(conf.getConfigurationName());
 		try {
 			logger.info("loading styles from URL: {0}", url); //$NON-NLS-1$
 			InputStream in = url.openStream();
@@ -153,17 +155,18 @@ public class Client implements Runnable {
 	 * @throws GeneralSecurityException on SSL verification/authentication failure.
 	 */
 	Socket createSocket() throws IOException, GeneralSecurityException {
-		String host = conf.getHost();
-		int port = conf.getPort();
+		String configName = conf.getConfigurationName();
+		String host = conf.getHost(configName);
+		int port = conf.getPort(configName);
 		SocketAddress address = new InetSocketAddress(host, port);
 		SocketChannel socketChannel = SocketChannel.open();
 		socketChannel.connect(address);
 		Socket socket = socketChannel.socket();
-		if ( ! conf.getUseSSL()) {
+		if ( ! conf.getUseSSL(configName)) {
 			return socket;
 		} else {
-			final String fileName = conf.getClientCertificateFileName();
-			final String password = conf.getClientCertificatePassword();
+			final String fileName = conf.getClientCertificateFileName(configName);
+			final String password = conf.getClientCertificatePassword(configName);
 			final SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
 			return builder.createSSLSocket(socket, host, port);
 		}
