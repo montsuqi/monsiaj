@@ -93,12 +93,14 @@ public class ConfigurationPanel extends JPanel {
 	protected JPasswordField exportPasswordEntry;
 	protected JCheckBox saveClientCertificatePasswordCheckbox;
 
-	// Misc Tab
+	// Others Tab
 	protected JTextField styleEntry;
 	protected JTextField encodingEntry;
 	protected JComboBox lookAndFeelCombo;
 	protected JRadioButton[] protocolVersionRadios;
 	protected JCheckBox useLogViewerCheck;
+	protected JCheckBox useTimerCheck;
+	protected JTextField timerPeriodEntry;
 	protected JTextArea propertiesText;
 
 	LookAndFeelInfo[] lafs;
@@ -106,14 +108,12 @@ public class ConfigurationPanel extends JPanel {
 	protected static final int BASIC_TAB = 0;
 	protected static final int SSL_TAB = 1;
 	protected static final int OTHERS_TAB = 2;
-	protected static final int ETC_TAB = 3;
 	
 	/** <p>An action to warn vulnerability of saving password.</p>
 	 */
 	private final class ConfirmSavePasswordAction implements ActionListener {
 
 		final JCheckBox checkbox;
-
 		public ConfirmSavePasswordAction(JCheckBox checkbox) {
 			this.checkbox = checkbox;
 		}
@@ -204,6 +204,8 @@ public class ConfigurationPanel extends JPanel {
 			}
 		}
 		conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
+		conf.setUseTimer(configName, useTimerCheck.isSelected());
+		conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
 		conf.setProperties(configName, propertiesText.getText());
 	}
 
@@ -301,6 +303,8 @@ public class ConfigurationPanel extends JPanel {
 		}
 		protocolVersionRadios[conf.getProtocolVersion(configName) - 1].setSelected(true);
 		useLogViewerCheck.setSelected(conf.getUseLogViewer(configName));
+		useTimerCheck.setSelected(conf.getUseTimer(configName));
+		timerPeriodEntry.setText(String.valueOf(conf.getTimerPeriod(configName)));
 		propertiesText.setText(conf.getProperties(configName));
 	}
 
@@ -342,13 +346,10 @@ public class ConfigurationPanel extends JPanel {
 
 		useSSLCheckbox = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_ssl"), conf.getUseSSL(configName)); //$NON-NLS-1$
 		useSSLCheckbox.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				updateSslTabComponentsEnabled();
 			}
-
 		});
-
 		clientCertificateEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.client_certificate"), conf.getClientCertificateFileName(configName)); //$NON-NLS-1$
 		browseButton = panel.addButtonFor(clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
 		exportPasswordEntry = panel.addPasswordFieldRow(y++, Messages.getString("ConfigurationPanel.cert_password")); //$NON-NLS-1$
@@ -399,9 +400,14 @@ public class ConfigurationPanel extends JPanel {
 
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = panel.addRadioButtonGroupRow(y++, Messages.getString("ConfigurationPanel.protocol_version"), versions, String.valueOf(conf.getProtocolVersion(configName))); //$NON-NLS-1$
-
 		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), conf.getUseLogViewer(configName)); //$NON-NLS-1$
-
+		useTimerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_timer"), conf.getUseTimer(configName)); //$NON-NLS-1$
+		useTimerCheck.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				timerPeriodEntry.setEnabled(useTimerCheck.isSelected());
+			}
+		});
+		timerPeriodEntry = panel.addLongFieldRow(y++, Messages.getString("ConfigurationPanel.timer_period"), conf.getTimerPeriod(configName)); //$NON-NLS-1$	
 		propertiesText = panel.addTextAreaRow(y++, 3, 30, Messages.getString("ConfigurationPanel.additional_system_properties"), conf.getProperties(configName)); //$NON-NLS-1$
 		return panel;
 	}

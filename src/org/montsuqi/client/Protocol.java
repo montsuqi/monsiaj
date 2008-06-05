@@ -117,6 +117,7 @@ public class Protocol extends Connection {
 	private boolean protocol1;
 	private boolean protocol2;
 	private boolean isReceiving;
+	private long timerPeriod;
 	private Map nodeTable;
 	private WidgetValueManager valueManager;
 
@@ -126,7 +127,7 @@ public class Protocol extends Connection {
 	static final Logger logger = Logger.getLogger(Protocol.class);
 	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
 
-	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion) throws IOException, GeneralSecurityException {
+	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
 		this.cacheRoot = cacheRoot;
@@ -146,8 +147,13 @@ public class Protocol extends Connection {
 		isReceiving = false;
 		nodeTable = new HashMap();
 		valueManager = new WidgetValueManager(this, styleMap);
+		this.timerPeriod = timerPeriod;
 	}
 
+	public long getTimerPeriod() {
+		return timerPeriod;
+	}
+	
 	private static boolean isNetworkByteOrder() {
 		logger.enter();
 		StringTokenizer tokens = new StringTokenizer(VERSION, String.valueOf(':'));

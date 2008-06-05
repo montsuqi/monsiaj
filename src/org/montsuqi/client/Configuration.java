@@ -65,6 +65,8 @@ public class Configuration {
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
 	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
 	private static final String PROPERTIES_KEY = "properties"; //$NON-NLS-1$
+	private static final String USE_TIMER_KEY = "use_timer"; //$NON-NLS-1$
+	private static final String TIMER_PERIOD_KEY = "timer_period"; //$NON-NLS-1$
 	private static final String CURRENT_CONFIG_KEY = "current_config"; //$NON-NLS-1$
 
 	private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
@@ -130,8 +132,14 @@ public class Configuration {
 	/** <p>Default value of use log viewer checkbox: false.</p> */
 	static final boolean DEFAULT_USE_LOG_VIEWER = false;
 	
-	/** <p>Default value of use log viewer checkbox: false.</p> */
+	/** <p>Default value of properties: false.</p> */
 	static final String DEFAULT_PROPERTIES = "";
+	
+	/** <p>Default value of use timer: false.</p> */
+	static final boolean DEFAULT_USE_TIMER = true;
+
+	/** <p>Default value of timer period(ms): 1000.</p> */
+	static final long DEFAULT_TIMER_PERIOD = 1000;
 	
 	/** <p>Default value of default config name.</p> */
 	static final String DEFAULT_CONFIG_NAME = "default";
@@ -148,6 +156,19 @@ public class Configuration {
 		hasDefault = nodeExists(DEFAULT_CONFIG_NAME);
 		if ( !hasDefault ) {
 			copyOldConfig();
+		}
+	}
+	
+	public void listConfiguration(){
+		System.out.println(Messages.getString("Configuration.list_title"));
+		System.out.println("------------------");
+		String [] configNames = getConfigurationNames();
+		for(int i = 0; i < configNames.length; i++) {
+			System.out.println(configNames[i]);
+			System.out.println(Messages.getString("Configuration.list_host") + getHost(configNames[i]));
+			System.out.println(Messages.getString("Configuration.list_port") + getPort(configNames[i]));
+			System.out.println(Messages.getString("Configuration.list_application") + getApplication(configNames[i]));
+			System.out.println(Messages.getString("Configuration.list_user") + getUser(configNames[i]));
 		}
 	}
 	
@@ -663,14 +684,39 @@ public class Configuration {
 		}
 	}
 	
-	/** <p>Sets other properties.</p>
+	/** <p>Returns the timer period.</p>>
+ 	 * @params configName the configuration name.
+	 * @return the timer period.
+	 */
+	public long getTimerPeriod(String configName) {
+		return getLong(configName, TIMER_PERIOD_KEY, DEFAULT_TIMER_PERIOD);
+	}
+
+	/** <p>Sets the timer period.</p>
+	 * <p>It stores the timer period.</p>
+	 * @param configName the configuration name.
+	 * @param period the timer period.
+	 */
+	public void setTimerPeriod(String configName, long period) {
+		setLong(configName, TIMER_PERIOD_KEY ,period);
+	}
+
+	/** <p>Returns the value of use timer.</p>
 	 * 
 	 * @param configName the configuration name.
-	 * @param properties new line separated property assignments.
+	 * @return value of use timer.</p>
 	 */
-	public void setConfigurationName(String configName, String properties) {
-		setString(configName, PROPERTIES_KEY, properties);
-		updateSystemProperties(properties);
+	public boolean getUseTimer(String configName) {
+		return getBoolean(configName, USE_TIMER_KEY, DEFAULT_USE_TIMER);
+	}
+	
+	/** <p>Sets the value of use timer.</p>
+	 * 
+	 * @param configName the configuration name.
+	 * @param flag the use timer flag.
+	 */
+	public void setUseTimer(String configName, boolean flag) {
+		setBoolean(configName, USE_TIMER_KEY, flag);
 	}
 	
 	/** <p>Returns configuration value(String).</p>
@@ -703,6 +749,24 @@ public class Configuration {
 		if ( nodeExists(configName) ) {
 			Preferences config = prefs.node(CONFIG_NODE + configName);
 			ret = config.getInt(key, defaultValue);
+		} else {
+			logger.warn("configuration:" + configName + " is not exist.");
+		}
+		return ret;
+	}
+	
+	/** <p>Returns configuration value(long).</p>
+	 * 
+	 * @param configName the configuration name.
+	 * @param key configuration key.
+	 * @param defaultValue value if the configuration for the given key is missing.
+	 * @return the configuration value.
+	 */
+	protected long getLong(String configName, String key, long defaultValue) {
+		long ret = 0;
+		if ( nodeExists(configName) ) {
+			Preferences config = prefs.node(CONFIG_NODE + configName);
+			ret = config.getLong(key, defaultValue);
 		} else {
 			logger.warn("configuration:" + configName + " is not exist.");
 		}
@@ -757,6 +821,21 @@ public class Configuration {
 		}
 	}
 
+	/** <p>Sets configuration value(long).</p>
+	 * 
+	 * @param configName configuration name.
+	 * @param key configuration key.
+	 * @param value the configuration value.
+	 */
+	protected void setLong(String configName, String key, long value) {
+		if ( nodeExists(configName) ) {
+			Preferences config = prefs.node(CONFIG_NODE + configName);
+			config.putLong(key, value);
+		} else {
+			logger.warn("configuration:" + configName + " is not exist.");
+		}
+	}
+	
 	/** <p>Sets configuration value(boolean).</p>
 	 * 
 	 * @param configName the configuration name.

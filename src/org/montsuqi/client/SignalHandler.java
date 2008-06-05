@@ -258,18 +258,7 @@ public abstract class SignalHandler {
 						return SYMBOLS.indexOf(c) >= 0;
 					}
 				};
-				long delay = 1000;
-				String propDelay = System.getProperty("monsia.send.event.delay"); //$NON-NLS-1$
-				if (propDelay != null) {
-					try {
-						long newDelay = Long.parseLong(propDelay);
-						if (newDelay >= 0) {
-							delay = newDelay;
-						}
-					} catch (NumberFormatException e) {
-						logger.warn(e);
-					}
-				}
+				long delay = con.getTimerPeriod();
 				if (delay > 0) {
 					timer.schedule(timerTask, delay);
 				} else {

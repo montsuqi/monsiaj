@@ -46,7 +46,7 @@ public class JMAReceiptLauncher extends Launcher {
 	/** <p>Application entry point.</p> */
 	public static void main(String[] args) {
 		Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
-		launcher.launch();
+		launcher.launch(args);
 	}
 
 	/** <p>Constructs the configuration panel.</p>

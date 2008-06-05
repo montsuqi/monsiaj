@@ -50,6 +50,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
@@ -70,9 +71,9 @@ public class Launcher {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		Launcher launcher = new Launcher(Messages.getString("application.title")); //$NON-NLS-1$
-		launcher.launch();
+		launcher.launch(args);
 	}
 
 	public Launcher(String title) {
@@ -81,7 +82,30 @@ public class Launcher {
 		conf = new Configuration(this.getClass());
 	}
 
-	public void launch() {
+	public boolean checkCommandLineOption(String [] args) {
+		OptionParser options = new OptionParser();
+		options.add("config", Messages.getString("Launcher.config_option_message"), ""); //$NON-NLS-1$ //$NON-NLS-2$
+		options.add("config-list", Messages.getString("Launcher.config_list_option_message"), false); //$NON-NLS-1$ //$NON-NLS-2$
+		String[] files = options.parse(Client.class.getName(), args);
+		
+		String configName = options.getString("config");
+		boolean listConfigFlag = options.getBoolean("config-list");
+		if ( listConfigFlag ) {
+			conf.listConfiguration();
+			return true;
+		}
+		if ( ! configName.equals("") ) {
+			conf.setConfigurationName(configName);
+			connect();
+			return true;
+		}
+		return false;
+	}
+	
+	public void launch(String [] args) {
+		if ( checkCommandLineOption(args) ) {
+			return;
+		}
 		final JFrame f = new JFrame(title);
 		Container container = f.getContentPane();
 		container.setLayout(new BorderLayout(10,5));
@@ -123,10 +147,10 @@ public class Launcher {
 		f.setSize(640, 320);
 		int state = f.getExtendedState();
 		f.setExtendedState(state | Frame.ICONIFIED);
-		f.setVisible(true);
 
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		f.setVisible(true);
 	}
 	
 	private void connect() {

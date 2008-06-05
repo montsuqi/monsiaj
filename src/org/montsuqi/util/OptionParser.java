@@ -142,8 +142,9 @@ public class OptionParser {
 				break;
 			case COMMAND_SWITCH:
 				isParam = true;
-				if (arg.equals("?") || arg.equals("h") || arg.equals("H")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (arg.equals("-?") || arg.equals("-h") || arg.equals("-H")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					System.out.println(usage("USAGE:" + program + " <option(s)> files...")); //$NON-NLS-1$ //$NON-NLS-2$
+					System.exit(0);
 				} else {
 					isParam = analyzeLine(arg.substring(1));
 				}
@@ -164,18 +165,22 @@ public class OptionParser {
 			logger.info("skipping comment: " + line); //$NON-NLS-1$
 			return false;
 		}
+		String key = line;
+		String value = "";
+		int index = line.indexOf("=");
+		if ( index != -1 ) {
+			key = line.substring(0, index);
+			value = line.substring(index + 1, line.length());
+		}
+		
 		Iterator i = options.values().iterator();
 		while (i.hasNext()) {
 			Option option = (Option)i.next();
 			String name = option.getName();
-
-			if (line.substring(0, name.length()).equals(name)) {
-				String arg = line.substring(name.length()).trim();
-				if (arg.length() > 0 && arg.charAt(0) == '=') {
-					arg = arg.substring(1);
-				}
-				if (arg.length() > 0 || option.getType() == Boolean.class) {
-					option.setValue(arg);
+			
+			if ( key.equals(name)) {
+				if (value.length() > 0 || option.getType() == Boolean.class) {
+					option.setValue(value);
 					return true;
 				}
 			}

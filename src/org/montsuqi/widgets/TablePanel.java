@@ -158,6 +158,15 @@ public class TablePanel extends JPanel {
 		return entry;
 	}
 
+	public JTextField addLongFieldRow(int y, String text, long value) {
+		JTextField entry = new JTextField();
+		entry.setHorizontalAlignment(SwingConstants.LEFT);
+		entry.setText(String.valueOf(value));
+		entry.addFocusListener(new FieldSelected());
+		addRow(y, text, entry);
+		return entry;
+	}
+	
 	public JPasswordField addPasswordFieldRow(int y, String text) {
 		JPasswordField entry = new JPasswordField();
 		entry.setText(""); //$NON-NLS-1$

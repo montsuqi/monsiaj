@@ -99,6 +99,8 @@ public class ConfigurationViewer{
 	protected JComboBox lookAndFeelCombo;
 	protected JRadioButton[] protocolVersionRadios;
 	protected JCheckBox useLogViewerCheck;
+	protected JCheckBox useTimerCheck;
+	protected JTextField timerPeriodEntry;
 	protected JTextArea propertiesText;
 	protected LookAndFeelInfo[] lafs;
 	
@@ -238,7 +240,7 @@ public class ConfigurationViewer{
 			tableData[i][2] = String.valueOf(conf.getPort(configNames[i]));
 			tableData[i][3] = conf.getApplication(configNames[i]);
 			tableData[i][4] = conf.getUser(configNames[i]);
-		}		
+		}
 		DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -271,6 +273,8 @@ public class ConfigurationViewer{
 		String lookAndFeelClassName = newFlag ? conf.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
 		int protocolVersion = newFlag ? conf.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
 		boolean useLogViewer = newFlag ? conf.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
+		boolean useTimer = newFlag ? conf.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
+		long timerPeriod = newFlag ? conf.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
 		String properties = newFlag ? conf.DEFAULT_PROPERTIES : conf.getProperties(configName);
 		
 		int y = 0;
@@ -322,6 +326,8 @@ public class ConfigurationViewer{
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = panel.addRadioButtonGroupRow(y++, Messages.getString("ConfigurationPanel.protocol_version"), versions, String.valueOf(protocolVersion)); //$NON-NLS-1$
 		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), useLogViewer); //$NON-NLS-1$
+		useTimerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_timer"), conf.getUseTimer(configName)); //$NON-NLS-1$
+		timerPeriodEntry = panel.addLongFieldRow(y++, Messages.getString("ConfigurationPanel.timer_period"), conf.getTimerPeriod(configName)); //$NON-NLS-1$
 		propertiesText = panel.addTextAreaRow(y++, 3, 30, Messages.getString("ConfigurationPanel.additional_system_properties"), properties); //$NON-NLS-1$		
 		return panel;
 	}
@@ -345,6 +351,12 @@ public class ConfigurationViewer{
 		JButton editOKButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				String entryName = configNameEntry.getText();
+				if ( entryName.equals("") ) {
+					String message = Messages.getString("ConfigurationViewer.edit_config_empty_config_name_error_message") + entryName;
+					logger.warn(message);
+					JOptionPane.showMessageDialog(f, message, "" , JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if ( newFlag ) {
 					// new configuration
 					if ( ! conf.newConfiguration(entryName) ) {
@@ -363,6 +375,7 @@ public class ConfigurationViewer{
 						return;
 					}
 				}
+
 				// Basic Tab
 				conf.setUser(entryName, userEntry.getText());
 				// Save save_pass check field before the password itself,
@@ -390,6 +403,8 @@ public class ConfigurationViewer{
 					}
 				}
 				conf.setUseLogViewer(entryName, useLogViewerCheck.isSelected());
+				conf.setUseTimer(entryName, useTimerCheck.isSelected());
+				conf.setTimerPeriod(entryName, Long.parseLong(timerPeriodEntry.getText()));
 				conf.setProperties(entryName, propertiesText.getText());
 				f.dispose();
 			}
@@ -403,7 +418,7 @@ public class ConfigurationViewer{
 		});
 		bar.add(editCancelButton);
 		
-		f.setSize(640, 480);
+		f.setSize(480, 640);
 		f.setVisible(true);
 
 		f.setLocationRelativeTo(null);

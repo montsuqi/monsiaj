@@ -82,7 +82,7 @@ public class Client implements Runnable {
 		String[] files = options.parse(Client.class.getName(), args);
 		
 		Configuration conf = new Configuration(Client.class);
-		String configName = conf.getConfigurationName();
+		String configName = conf.DEFAULT_CONFIG_NAME;
 		conf.setPort(configName, options.getInt("port")); //$NON-NLS-1$
 		conf.setHost(configName, options.getString("host")); //$NON-NLS-1$
 		conf.setCache(configName, options.getString("cache")); //$NON-NLS-1$
@@ -127,7 +127,8 @@ public class Client implements Runnable {
 		};
 		File cacheRoot = SystemEnvironment.createFilePath(pathElements);
 		int protocolVersion = conf.getProtocolVersion(configName);
-		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion);
+		long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
+		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion, timerPeriod);
 
 		String user = conf.getUser(configName);
 		String password = conf.getPassword(configName);
