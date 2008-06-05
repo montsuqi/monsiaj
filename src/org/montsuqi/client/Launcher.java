@@ -146,7 +146,6 @@ public class Launcher {
 
 		f.setSize(640, 320);
 		int state = f.getExtendedState();
-		//f.setExtendedState(state | Frame.ICONIFIED);
 
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
