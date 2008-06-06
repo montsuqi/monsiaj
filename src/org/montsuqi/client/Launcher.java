@@ -144,7 +144,7 @@ public class Launcher {
 		});
 		bar.add(config);
 
-		f.setSize(640, 320);
+		f.setSize(640, 400);
 		int state = f.getExtendedState();
 
 		f.setLocationRelativeTo(null);
