@@ -86,7 +86,7 @@ public class Launcher {
 		OptionParser options = new OptionParser();
 		options.add("config", Messages.getString("Launcher.config_option_message"), ""); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("config-list", Messages.getString("Launcher.config_list_option_message"), false); //$NON-NLS-1$ //$NON-NLS-2$
-		String[] files = options.parse(Client.class.getName(), args);
+		String[] files = options.parse(this.getClass().getName(), args);
 		
 		String configName = options.getString("config");
 		boolean listConfigFlag = options.getBoolean("config-list");
