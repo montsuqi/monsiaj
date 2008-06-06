@@ -45,6 +45,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
@@ -96,6 +97,31 @@ public class Launcher {
 		}
 		if ( ! configName.equals("") ) {
 			conf.setConfigurationName(configName);
+			
+			/* confirm password when the password not preserved */
+			if ( 	! conf.getSavePassword(configName) ) {
+				JPasswordField pwd = new JPasswordField();
+				Object[] message = { Messages.getString("Launcher.input_password_message"), pwd };
+				int resp = JOptionPane.showConfirmDialog(null, message, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if(resp == JOptionPane.OK_OPTION) {
+				   conf.setPassword(configName, String.valueOf(pwd.getPassword()));
+				} else {
+					return true;
+				}
+			}
+			/* confirm certificate password when the certificate password not preserved */
+			if ( conf.getUseSSL(configName) &&
+					! conf.getClientCertificateFileName(configName).equals("") &&
+					! conf.getSaveClientCertificatePassword(configName)) {
+				JPasswordField pwd = new JPasswordField();
+				Object[] message = { Messages.getString("Launcher.input_certificate_password_message"), pwd};
+				int resp = JOptionPane.showConfirmDialog(null, message, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if(resp == JOptionPane.OK_OPTION) {
+				   conf.setClientCertificatePassword(configName, String.valueOf(pwd.getPassword()));
+				} else {
+					return true;
+				}
+			}
 			connect();
 			return true;
 		}

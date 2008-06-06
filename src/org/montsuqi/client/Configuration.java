@@ -157,6 +157,8 @@ public class Configuration {
 		if ( !hasDefault ) {
 			copyOldConfig();
 		}
+		pass = DEFAULT_PASSWORD;
+		clientCertificatePass = DEFAULT_CLIENT_CERTIFICATE_PASSWORD;
 	}
 	
 	public void listConfiguration(){
@@ -360,7 +362,7 @@ public class Configuration {
 		if (getBoolean(configName, SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY, false)) {
 			return getString(configName, CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_CLIENT_CERTIFICATE_PASSWORD);
 		} else {
-			return DEFAULT_CLIENT_CERTIFICATE_PASSWORD;
+			return clientCertificatePass;
 		}
 	}
 
