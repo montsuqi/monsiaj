@@ -326,8 +326,8 @@ public class ConfigurationViewer{
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = panel.addRadioButtonGroupRow(y++, Messages.getString("ConfigurationPanel.protocol_version"), versions, String.valueOf(protocolVersion)); //$NON-NLS-1$
 		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), useLogViewer); //$NON-NLS-1$
-		useTimerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_timer"), conf.getUseTimer(configName)); //$NON-NLS-1$
-		timerPeriodEntry = panel.addLongFieldRow(y++, Messages.getString("ConfigurationPanel.timer_period"), conf.getTimerPeriod(configName)); //$NON-NLS-1$
+		useTimerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_timer"), useTimer); //$NON-NLS-1$
+		timerPeriodEntry = panel.addLongFieldRow(y++, Messages.getString("ConfigurationPanel.timer_period"), timerPeriod); //$NON-NLS-1$
 		propertiesText = panel.addTextAreaRow(y++, 3, 30, Messages.getString("ConfigurationPanel.additional_system_properties"), properties); //$NON-NLS-1$		
 		return panel;
 	}
