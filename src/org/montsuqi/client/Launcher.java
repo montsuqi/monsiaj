@@ -49,6 +49,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
@@ -97,6 +98,15 @@ public class Launcher {
 		}
 		if ( ! configName.equals("") ) {
 			conf.setConfigurationName(configName);
+			
+			/* set look and feel */
+			
+			try {
+				UIManager.setLookAndFeel(conf.getLookAndFeelClassName(configName));
+			} catch (Exception e) {
+				logger.warn(e);
+				return true;
+			}
 			
 			/* confirm password when the password not preserved */
 			if ( 	! conf.getSavePassword(configName) ) {
