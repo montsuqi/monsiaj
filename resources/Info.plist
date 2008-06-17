@@ -35,6 +35,8 @@
             <string>$JAVAROOT/pandaclient.jar</string>
             <string>$JAVAROOT/BareBonesBrowserLaunch.jar</string>
         </array>
+        <key>Arguments</key>
+        <string></string>
         <key>Properties</key>
         <dict>
             <key>com.apple.mrj.application.apple.menu.about.name</key>
