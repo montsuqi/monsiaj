@@ -324,4 +324,21 @@
 			<test name="${testcase}"/>
 		</junit>
 	</target>
+        
+        <target name="pandaclient" depends="compile">
+            <java classname="org.montsuqi.client.Launcher">
+                <classpath>
+                    <pathelement path="bin:src" />
+                </classpath>
+            </java>
+        </target>
+        
+        <target name="jmareceipt" depends="compile">
+            <java classname="jp.or.med.jma_receipt.JMAReceiptLauncher">
+                <classpath>
+                    <pathelement path="bin:src" />
+                </classpath>
+            </java>
+        </target>
+        
 </project>

@@ -112,7 +112,7 @@ public class Launcher {
 			if ( 	! conf.getSavePassword(configName) ) {
 				JPasswordField pwd = new JPasswordField();
 				Object[] message = { Messages.getString("Launcher.input_password_message"), pwd };
-				int resp = JOptionPane.showConfirmDialog(null, message, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if(resp == JOptionPane.OK_OPTION) {
 				   conf.setPassword(configName, String.valueOf(pwd.getPassword()));
 				} else {
@@ -125,7 +125,7 @@ public class Launcher {
 					! conf.getSaveClientCertificatePassword(configName)) {
 				JPasswordField pwd = new JPasswordField();
 				Object[] message = { Messages.getString("Launcher.input_certificate_password_message"), pwd};
-				int resp = JOptionPane.showConfirmDialog(null, message, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_certificate_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if(resp == JOptionPane.OK_OPTION) {
 				   conf.setClientCertificatePassword(configName, String.valueOf(pwd.getPassword()));
 				} else {
