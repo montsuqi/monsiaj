@@ -4,7 +4,7 @@
     <title>日医標準レセプトソフト</title>
     <vendor>NaCl</vendor>
     <icon href="jma-receipt.jpg"/>
-    <description>demo</description>
+    <description>JMA receipt java client</description>
     <offline-allowed/>
     <shortcut online="false">
       <desktop/>
@@ -17,8 +17,9 @@
     <j2se version="1.4+"/>
     <jar href="jmareceipt.jar"/>
     <jar href="pandaclient.jar"/>
+    <jar href="BareBonesBrowserLaunch.jar"/>
   </resources>
-  <resources os="Mac OS X">
+  <resources os="Mac\ OS\ X">
     <jar href="WebKit.jar"/>
     <nativelib href="libwebkitsample.jnilib.jar"/>
   </resources>
