@@ -159,8 +159,9 @@ public class WidgetBuilder {
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 
-		// on MacOS replace PandaHTML with PandaHTMLWebKit.
-		if (SystemEnvironment.isMacOSX()) {
+		// on MacOS & Java 1.4 replace PandaHTML with PandaHTMLWebKit.
+		String javaVersion = System.getProperty("java.version");
+		if (SystemEnvironment.isMacOSX() && javaVersion.startsWith("1.4")) {
 			registerWidgetClass("PandaHTML", PandaHTMLWebKit.class, defaultWidgetBuilder); //$NON-NLS-1$
 		}
 	}
