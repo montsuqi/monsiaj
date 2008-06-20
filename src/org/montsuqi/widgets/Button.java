@@ -43,7 +43,7 @@ public class Button extends JButton {
 	public Button() {
 		super();
 		initActions();
-		setMargin(new Insets(2, 2, 2, 2));
+		setMargin(new Insets(0, -20, 0, -20));
 	}
 
 	private void initActions() {
