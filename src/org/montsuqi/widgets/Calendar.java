@@ -95,7 +95,7 @@ public class Calendar extends JComponent {
 			dateCellPanel.add(dayOfWeek);
 		}
 
-		Insets margin = new Insets(0, 0, 0, 0);
+		Insets margin = new Insets(0, -20, 0, -20);
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				final JButton cell = new JButton();
