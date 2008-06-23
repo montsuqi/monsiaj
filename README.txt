@@ -1,148 +1,148 @@
-!�ڎ�
+!目次
 
-*�z�z���̓��e
-*�����`���[�̋N�����@
-*�ݒ荀�ڂɂ���
-*�V�X�e���v���p�e�B�ɂ���
-*�X�^�C���t�@�C���ɂ���
-*�v���L�V�ɂ���
+*配布物の内容
+*ランチャーの起動方法
+*設定項目について
+*システムプロパティについて
+*スタイルファイルについて
+*プロキシについて
 
-!�z�z���̓��e
+!配布物の内容
 
-3��ނ̔z�z��������܂��B
+3種類の配布物があります。
 
-*�o�C�i���z�z�� monsiaj-bin-YYYYMMDD.zip
-*�o�C�i���z�z��(MacOS X �A�v���P�[�V�����o���h����) monsiaj-bin-macos-YYYYMMDD.zip
-*�\�[�X�z�z�� monsiaj-src-YYYYMMDD.zip
+*バイナリ配布物 monsiaj-bin-YYYYMMDD.zip
+*バイナリ配布物(MacOS X アプリケーションバンドル版) monsiaj-bin-macos-YYYYMMDD.zip
+*ソース配布物 monsiaj-src-YYYYMMDD.zip
 
-YYYYMMDD�͔z�z���쐬�̔N������\���܂��B
+YYYYMMDDは配布物作成の年月日を表します。
 
-!!�o�C�i���z�z���̓��e
+!!バイナリ配布物の内容
 
-:README.txt, README.html:������(���s�ɂ͕s�v�ł�)
-:jmareceipt.jar:�����Z��p�����`���[
-:pandaclient.jar:Java�N���C�A���g�{��(�ėp�����`���[���܂݂܂�)
-:WebKit.jar, libwebkitsample.jnilib, libwebkitsample.jnilib.jar:MacOS X�Ŏg�p�����HTML�\�����W���[��(MacOS X�ȊO�ł͕s�v�ł�)
-:log4j.jar:���O�o�̓��W���[��(�Ȃ��Ă����s�\�ł�)
-:jmareceipt.jnlp:Java Web Start�z���p�T���v���ݒ�t�@�C��(���s�ɂ͕s�v�ł�)
+:README.txt, README.html:説明書(実行には不要です)
+:jmareceipt.jar:日レセ専用ランチャー
+:pandaclient.jar:Javaクライアント本体(汎用ランチャーを含みます)
+:WebKit.jar, libwebkitsample.jnilib, libwebkitsample.jnilib.jar:MacOS Xで使用されるHTML表示モジュール(MacOS X以外では不要です)
+:log4j.jar:ログ出力モジュール(なくても実行可能です)
+:jmareceipt.jnlp:Java Web Start配備用サンプル設定ファイル(実行には不要です)
 
-!!�o�C�i���z�z��(MacOS X �A�v���P�[�V�����o���h����)�̓��e
+!!バイナリ配布物(MacOS X アプリケーションバンドル版)の内容
 
-:README.txt, README.html:������(���s�ɂ͕s�v�ł�)
-:JMAReceipt.app:�����Z�A�v���P�[�V�����o���h����
+:README.txt, README.html:説明書(実行には不要です)
+:JMAReceipt.app:日レセアプリケーションバンドル版
 
-!!�\�[�X�z�z���̓��e
+!!ソース配布物の内容
 
-:README.txt, README.html:������(���s�ɂ͕s�v�ł�)
-:HOWTOBUILD.txt:�r���h���@�̐���(���s�ɂ͕s�v�ł�)
-:src/ �ȉ��̃t�@�C��:�\�[�X�R�[�h
-:libs/ �ȉ��̃t�@�C��:�e�탉�C�u����
-:resources/:�摜��ݒ�t�@�C���ȂǊe�탊�\�[�X
-:build.xml:ant�ŃR���p�C�����s�����߂̃r���h�t�@�C��
+:README.txt, README.html:説明書(実行には不要です)
+:HOWTOBUILD.txt:ビルド方法の説明(実行には不要です)
+:src/ 以下のファイル:ソースコード
+:libs/ 以下のファイル:各種ライブラリ
+:resources/:画像や設定ファイルなど各種リソース
+:build.xml:antでコンパイルを行うためのビルドファイル
 
-!!�����`���[�̋N�����@
+!!ランチャーの起動方法
 
-�t�@�C���}�l�[�W��(�G�N�X�v���[���A�t�@�C���_�Ȃ�)����A�����`���[(jmareceipt.jar
-�܂���pandaclient.jar)�̒u����Ă���f�B���N�g��(�t�H���_)���J���A�����`���[��
-jar�t�@�C�����_�u���N���b�N���ċN�����܂��B
+ファイルマネージャ(エクスプローラ、ファインダなど)から、ランチャー(jmareceipt.jar
+またはpandaclient.jar)の置かれているディレクトリ(フォルダ)を開き、ランチャーの
+jarファイルをダブルクリックして起動します。
 
-�����`���[�ɂ͓����Z���N�����邽�߂̐�p�����`���[�Ƒ��̃A�v���P�[�V�����̋N��
-�ɂ��g����ėp�̃����`���[������܂��B
+ランチャーには日レセを起動するための専用ランチャーと他のアプリケーションの起動
+にも使える汎用のランチャーがあります。
 
-!!!��p�����`���[���N������ꍇ
-jmareceipt.jar �̃A�C�R�����_�u���N���b�N�B
-!!!�ėp�����`���[���N������ꍇ
-pandaclient.jar �̃A�C�R�����_�u���N���b�N�B
+!!!専用ランチャーを起動する場合
+jmareceipt.jar のアイコンをダブルクリック。
+!!!汎用ランチャーを起動する場合
+pandaclient.jar のアイコンをダブルクリック。
 
-�N���̍ۂɂ́A�z�z���ꂽjar�t�@�C�������ׂē���̃f�B���N�g��(�t�H���_)�ɂ���
-�K�v������܂��B
+起動の際には、配布されたjarファイルがすべて同一のディレクトリ(フォルダ)にある
+必要があります。
 
-�����`���[���N��������A�e��ݒ���s���Ă��烉���`���[�̎��s�{�^�����N���b�N���A
-�A�v���P�[�V���������s���܂��B
+ランチャーを起動したら、各種設定を行ってからランチャーの実行ボタンをクリックし、
+アプリケーションを実行します。
 
-!!�ݒ荀�ڂɂ���
+!!設定項目について
 
-�����`���[�Ŋe��ݒ���s�����Ƃ��o���܂��B
-�ݒ荀�ڂ�3�̃^�u�ɕ�����Ă��܂��B
+ランチャーで各種設定を行うことが出来ます。
+設定項目は3つのタブに分かれています。
 
-!!!��{�ݒ�^�u
+!!!基本設定タブ
 
-:���[�U�[:���[�U�[������͂��܂��BSSL�N���C�A���g�F�؂��g�p����ꍇ�́A���͂��Ă���������܂��B
-:�p�X���[�h:�p�X���[�h����͂��܂��B���͂��������̑���� * ���\������܂��BSSL�N���C�A���g�F�؂��g�p����ꍇ�́A���͂��Ă���������܂��B
-:�p�X���[�h��ۑ�:�`�F�b�N����ƁA�p�X���[�h���V�X�e���ɕۑ�����悤�ɂȂ�܂��B�Í����͍s�킸���̂܂ܕۑ�����̂ŁA�Z�L�����e�B�̊ϓ_����͐�������܂���B�`�F�b�N����������ƁA���܂ŃV�X�e���ɕۑ����Ă����p�X���[�h�͍폜����܂��B
-:�z�X�g:�ڑ�����z�X�g���w�肵�܂��B
-:�|�[�g:�ʐM�Ɏg�p����|�[�g�ԍ����w�肵�܂��B�ʏ�� 8000 �ł��B
-�A�v���P�[�V����:���s����A�v���P�[�V������ panda:�A�v���P�[�V������ �̌`���Ŏw�肵�܂��B�����Z��p�����`���[���g�p�����ꍇ�́Apanda:orca00 ����ύX���邱�Ƃ͂ł��܂���B
+:ユーザー:ユーザー名を入力します。SSLクライアント認証を使用する場合は、入力しても無視されます。
+:パスワード:パスワードを入力します。入力した文字の代わりに * が表示されます。SSLクライアント認証を使用する場合は、入力しても無視されます。
+:パスワードを保存:チェックすると、パスワードをシステムに保存するようになります。暗号化は行わずそのまま保存するので、セキュリティの観点からは推奨されません。チェックを解除すると、今までシステムに保存していたパスワードは削除されます。
+:ホスト:接続するホストを指定します。
+:ポート:通信に使用するポート番号を指定します。通常は 8000 です。
+アプリケーション:実行するアプリケーションを panda:アプリケーション名 の形式で指定します。日レセ専用ランチャーを使用した場合は、panda:orca00 から変更することはできません。
 
-!!!SSL�^�u
+!!!SSLタブ
 
-:SSL���g�p:�ʐM��SSL���g�p����ꍇ�A�`�F�b�N���܂��B
-:�N���C�A���g�ؖ���:�N���C�A���g�ؖ����t�@�C��(PKCS#12�`��)���w�肵�܂��B�N���C�A���g�F�؂��g�p���Ȃ��ꍇ�͖�������܂��B
-:�ؖ����p�X���[�h:�N���C�A���g�ؖ����̃p�X���[�h����͂��܂��B�N���C�A���g�F�؂��g�p���Ȃ��ꍇ�͖�������܂��B
-:�ؖ����p�X���[�h��ۑ�:�`�F�b�N����ƁA�ؖ����p�X���[�h���V�X�e���ɕۑ�����悤�ɂȂ�܂��B���ӓ_�͊�{�ݒ�^�u�̃p�X���[�h�Ɠ��l�ł��B
+:SSLを使用:通信にSSLを使用する場合、チェックします。
+:クライアント証明書:クライアント証明書ファイル(PKCS#12形式)を指定します。クライアント認証を使用しない場合は無視されます。
+:証明書パスワード:クライアント証明書のパスワードを入力します。クライアント認証を使用しない場合は無視されます。
+:証明書パスワードを保存:チェックすると、証明書パスワードをシステムに保存するようになります。注意点は基本設定タブのパスワードと同様です。
 
-!!!���̑��̐ݒ�^�u
+!!!その他の設定タブ
 
-:�X�^�C��:�X�^�C���t�@�C�����w�肵�܂��B���w�莞�ɂ͓����̃X�^�C���t�@�C�����g�p����܂��B
-:�G���R�[�f�B���O:��ʒ�`�t�@�C���̕����G���R�[�f�B���O���w�肵�܂��B�ʏ�� EUC-JP �ł��B�����Z��p�����`���[���g�p�����ꍇ�� EUC-JP ����ύX���邱�Ƃ͂ł��܂���B
-:���b�N&�t�B�[��:��ʂ̊O�����w�肵�܂��B�ŏ��Ɏ��s�����ۂɁA���s���ɍ��킹������(Windows�Ȃ�Windows���Ȃ�)���I������Ă��܂����A���̕��ɕύX���Ă���肠��܂���B
-:�v���g�R���o�[�W����:�ʐM�v���g�R���̃o�[�W�������w�肵�܂��B�����Z�̏ꍇ�́A1�ł��B����ȊO�̏ꍇ�̓A�v���P�[�V�������ƂɈقȂ�̂Ŋm�F���K�v�ł��B�����Z��p�����`���[�̏ꍇ�A1����ύX���邱�Ƃ͂ł��܂���B
-:���O�r���[���̎g�p:�`�F�b�N����ƁA���O�\���E�B���h�E���A�C�R�������ꂽ��ԂŌ���܂��B�s��������ɗ��p���Ă��������B
-:�^�C�}�[�̎g�p:�`�F�b�N����ƁA���͂��Ȃ��玩���I�Ɍ������i�荞�ދ@�\���L���ɂȂ�܂��B
-:�^�C�}�[�N������:�������J�n����܂łɑҋ@���鎞�Ԃ��w�肵�܂��B�P�ʂ̓~���b(1000����1�b)�ł��B
-:�ǉ��V�X�e���v���p�e�B:�K�v�ɉ����āA���̑��̃v���p�e�B��1�s��1�̌`���ŋL�q���܂��B
+:スタイル:スタイルファイルを指定します。無指定時には内蔵のスタイルファイルが使用されます。
+:エンコーディング:画面定義ファイルの文字エンコーディングを指定します。通常は EUC-JP です。日レセ専用ランチャーを使用した場合は EUC-JP から変更することはできません。
+:ルック&フィール:画面の外見を指定します。最初に実行した際に、実行環境に合わせたもの(WindowsならWindows風など)が選択されていますが、他の物に変更しても問題ありません。
+:プロトコルバージョン:通信プロトコルのバージョンを指定します。日レセの場合は、1です。それ以外の場合はアプリケーションごとに異なるので確認が必要です。日レセ専用ランチャーの場合、1から変更することはできません。
+:ログビューワの使用:チェックすると、ログ表示ウィンドウがアイコン化された状態で現れます。不具合発生時に利用してください。
+:タイマーの使用:チェックすると、入力しながら自動的に検索を絞り込む機能が有効になります。
+:タイマー起動時間:検索を開始するまでに待機する時間を指定します。単位はミリ秒(1000分の1秒)です。
+:追加システムプロパティ:必要に応じて、その他のプロパティを1行に1つの形式で記述します。
 
-!! �T�[�o�ݒ�
+!! サーバ設定
 
-�����`���[�㕔�̃T�[�o�I���R���{�{�b�N�X�ŃT�[�o�ݒ薼��I������ƁA�����`���[�̐ݒ��ؑւ��邱�Ƃ��ł��܂��B
-2008�N6���ȑO�̃o�[�W�����̐ݒ��default�Ɉ����p����܂��B
+ランチャー上部のサーバ選択コンボボックスでサーバ設定名を選択すると、ランチャーの設定を切替えることができます。
+2008年6月以前のバージョンの設定はdefaultに引き継がれます。
  
-!!! �T�[�o�ݒ�̓o�^
-#�����`���[�����̐ݒ�{�^���������ăT�[�o�ݒ�_�C�A���O���N�����܂��B
-#�V�K�쐬�{�^���������āA�V�K�쐬�_�C�A���O���N�����܂��B
-#�e�ݒ荀�ڂ�ݒ肵�܂��B�ݒ�͐����̍��ڂ������ă����`���[�Ɠ��l�ł��B�����̍��ڂ͐ݒ薼�ɂȂ�܂��B
-#�ݒ��AOK�{�^���������Ɠo�^�����ł��B
+!!! サーバ設定の登録
+#ランチャー下部の設定ボタンを押してサーバ設定ダイアログを起動します。
+#新規作成ボタンを押して、新規作成ダイアログを起動します。
+#各設定項目を設定します。設定は説明の項目を除いてランチャーと同様です。説明の項目は設定名になります。
+#設定後、OKボタンを押すと登録完了です。
 
 
-!!! �T�[�o�ݒ�̕ύX
-#�����`���[�����̐ݒ�{�^���������ăT�[�o�ݒ�_�C�A���O���N�����܂��B
-#���X�g����ύX�������ݒ��I�����āA�ҏW�{�^���������܂��B
-#�ҏW�_�C�A���O�Őݒ荀�ڂ�ύX���܂��B 
-#�ݒ��AOK�{�^���������ƕύX�����ł��B
+!!! サーバ設定の変更
+#ランチャー下部の設定ボタンを押してサーバ設定ダイアログを起動します。
+#リストから変更したい設定を選択して、編集ボタンを押します。
+#編集ダイアログで設定項目を変更します。 
+#設定後、OKボタンを押すと変更完了です。
 
-!!! �T�[�o�ݒ�̍폜
-#�����`���[�����̐ݒ�{�^���������ăT�[�o�ݒ�_�C�A���O���N�����܂��B
-#���X�g����폜�������ݒ��I�����āA�폜�{�^���������܂��B
-#�m�F�_�C�A���O���\������܂��B
-#OK�{�^���������ƍ폜�����ł��B
+!!! サーバ設定の削除
+#ランチャー下部の設定ボタンを押してサーバ設定ダイアログを起動します。
+#リストから削除したい設定を選択して、削除ボタンを押します。
+#確認ダイアログが表示されます。
+#OKボタンを押すと削除完了です。
 
-!! �V�X�e���v���p�e�B�ɂ���
+!! システムプロパティについて
 
-�����`���[�́u���̑��̐ݒ�v�^�u�ɂ���u�ǉ��V�X�e���v���p�e�B�v���ɋL�q���邱�ƂŁA
-�ꕔ�̓�����J�X�^�}�C�Y���邱�Ƃ��o���܂��B
+ランチャーの「その他の設定」タブにある「追加システムプロパティ」欄に記述することで、
+一部の動作をカスタマイズすることが出来ます。
 
- �v���p�e�B��=�ݒ�l
-�Ƃ��������ŁA1�s��1���L�q���܂��B
+ プロパティ名=設定値
+という書式で、1行に1つずつ記述します。
 
-!!!�ݒ�ł���v���p�e�B
+!!!設定できるプロパティ
  
 !!!!monsia.user.font
-�v���O�����S�̂Ŏg�p����t�H���g���w�肵�܂��B�l�́u�t�H���g��-����-�T�C�Y�v�̌`�ł��B
+プログラム全体で使用するフォントを指定します。値は「フォント名-書体-サイズ」の形です。
 
-�t�H���g�́A�v���b�g�t�H�[�����ʂ�Java�_���t�H���g��
-(Serif/SansSerif/Monospaced/Dialog/DialogInput)�A
-�������̓v���b�g�t�H�[���ŗL�̕����t�H���g�����w�肵�܂��B
+フォントは、プラットフォーム共通のJava論理フォント名
+(Serif/SansSerif/Monospaced/Dialog/DialogInput)、
+もしくはプラットフォーム固有の物理フォント名を指定します。
 
-���̂�PLAIN/BOLD/ITALIC/BOLDITALIC(�啶���������̋�ʂ͂Ȃ�)�̂����ꂩ�ł��B
+書体はPLAIN/BOLD/ITALIC/BOLDITALIC(大文字小文字の区別はなし)のいずれかです。
 
-�T�C�Y�͐����ŒP�ʂ̓|�C���g�ł��B
+サイズは整数で単位はポイントです。
 
-��:�Z���t�t����18�|�C���g�t�H���g���g�p����B
+例:セリフ付きの18ポイントフォントを使用する。
  monsia.user.font=Serif-PLAIN-18
 
 !!!!monsia.user.font.XXX
-����̉�ʕ��i�^�C�v(�{�^���Ȃ�)�ɌŗL�̃t�H���g���w�肵�܂��BXXX�̕����ɂ�
-�ȉ��̂��̂��g�p�ł��܂��B
+特定の画面部品タイプ(ボタンなど)に固有のフォントを指定します。XXXの部分には
+以下のものが使用できます。
 *button
 *togglebutton
 *radiobutton
@@ -152,132 +152,156 @@ pandaclient.jar �̃A�C�R�����_�u���N���b�N�B
 *textfield
 *table
 
-��:�{�^����14�|�C���g�A���x����12�|�C���g�̃Z���t�t���t�H���g���g�p����B
+例:ボタンに14ポイント、ラベルに12ポイントのセリフ付きフォントを使用する。
  monsia.user.font.button=Serif-PLAIN-14
  monsia.user.font.label=Serif-PLAIN-12
 
-monsia.user.font�����A�����̒l�̕����D�悳��܂��B
+monsia.user.fontよりも、これらの値の方が優先されます。
 
 !!!!monsia.warn.certificate.expiration.before
-�N���C�A���g�ؖ����̗L�������؂�̌x�����s���������w�肵�܂��B
-�P�ʂ͓��ł��B
+クライアント証明書の有効期限切れの警告を行う日数を指定します。
+単位は日です。
 
-���w�莞��30�ƂȂ��Ă���A�L�������؂��30���O����x�����s���܂��B
+無指定時は30となっており、有効期限切れの30日前から警告が行われます。
 
-��:�L�������؂�̈�T�ԑO����x����\������B
+例:有効期限切れの一週間前から警告を表示する。
  monsia.warn.certificate.expiration.before=7
 
 !!!!monsia.logger.factory
-���O�o�̓��W���[����ύX���܂��B
-�f�o�b�O�p�ł��B
+ログ出力モジュールを変更します。
+デバッグ用です。
 
-!!�X�^�C���t�@�C���ɂ���
+!!スタイルファイルについて
 
-�X�^�C���t�@�C����Ǝ��ɒ�`����ꍇ�A�ȉ��ɏ]���Ă��������B
+スタイルファイルを独自に定義する場合、以下に従ってください。
 
-!!!����
+!!!書式
 
-Java�̃v���p�e�B�t�@�C���ł��B
-�ȉ��̂悤�Ɏw�肵�܂��B
+Javaのプロパティファイルです。
+以下のように指定します。
 
- �X�^�C����.font=�t�H���g��-����-�T�C�Y
- �X�^�C����.fg=�F�w��
- �X�^�C����.bg=�F�w��
+ スタイル名.font=フォント名-書体-サイズ
+ スタイル名.fg=色指定
+ スタイル名.bg=色指定
 
-�t�H���g���� monsia.user.font �v���p�e�B�Ɠ��l�̏����Ŏw��ł��܂��B
+フォント名は monsia.user.font プロパティと同様の書式で指定できます。
 
-�F�w��̒l�� # �L���ɑ����ĐF��RGB�l��\��6����16�i�����L�q���܂��B
+色指定の値は # 記号に続けて色のRGB値を表す6桁の16進数を記述します。
 
-fg�̓��`��Ƃ��Ă����� foreground�A
-bg�̓��`��Ƃ��Ă����� background���g�p�ł��܂��B
+fgの同義語としてかわりに foreground、
+bgの同義語としてかわりに backgroundも使用できます。
 
-!!!�G���R�[�f�B���O�ɂ���
-Java�̃v���p�e�B�t�@�C���ł́A�d�l��A
-�v���b�g�t�H�[���l�C�e�B�u�ȕ����G���R�[�f�B���O���o���Ȃ��̂ŁA
-�u�l�r�S�V�b�N�v�̂悤�Ȕ�ASCII��������܂ޏꍇ�́Anative2ascii
-���g�p���� \uxxxx �`���ɕϊ�����K�v������܂��B
+!!!エンコーディングについて
+Javaのプロパティファイルでは、仕様上、
+プラットフォームネイティブな文字エンコーディングを出来ないので、
+「ＭＳゴシック」のような非ASCII文字列を含む場合は、native2ascii
+を使用して \uxxxx 形式に変換する必要があります。
 
-!!�v���L�V�ɂ���
+!!プロキシについて
 
-Web�A�N�Z�X�Ƀv���L�V���K�v�Ȋ��ł́A�ȉ��̐ݒ���s���Ă��������B
+Webアクセスにプロキシが必要な環境では、以下の設定を行ってください。
 
-!!!MacOS X�ȊO�̏ꍇ
-�u���̑��̐ݒ�v�^�u�́u�ǉ��V�X�e���v���p�e�B�v���Ɉȉ���2�s�̓��e���L�q���܂��B
- http.proxyHost=�z�X�g��
- http.proxyPort=�|�[�g�ԍ�
-(��) =�̍����ł́A�啶���Ə������͋�ʂ���܂��B
+!!!MacOS X以外の場合
+「その他の設定」タブの「追加システムプロパティ」欄に以下の2行の内容を記述します。
+ http.proxyHost=ホスト名
+ http.proxyPort=ポート番号
+(注) =の左側では、大文字と小文字は区別されます。
 
-!!!MacOS X�̏ꍇ
-#�A�b�v�����j���[���V�X�e�����ݒ聨�l�b�g���[�N ���J���܂��B
-#�g�p���Ă���l�b�g���[�N��I�����܂��B
-#�ݒ�...�{�^���������܂��B
-#�����΂�E�́u�v���L�V�v�^�u��I�����܂��B
-#�u�v���L�V�̐ݒ�v�Łu����́v��I�����܂��B
-#�u�ݒ肷��v���L�V�T�[�o��I���v���X�g���́A��Web�v���L�V (HTTP)�Ƀ`�F�b�N�����܂��B
-#�uWeb�v���L�V�T�[�o�v���̃z�X�g�ƃ|�[�g���L�����܂��B
+!!!MacOS Xの場合
+#アップルメニュー→システム環境設定→ネットワーク を開きます。
+#使用しているネットワークを選択します。
+#設定...ボタンを押します。
+#いちばん右の「プロキシ」タブを選択します。
+#「プロキシの設定」で「手入力」を選択します。
+#「設定するプロキシサーバを選択」リスト内の、□Webプロキシ (HTTP)にチェックを入れます。
+#「Webプロキシサーバ」欄のホストとポートを記入します。
 
-!! �R�}���h���C���I�v�V����
+!! コマンドラインオプション
 
-�R���\�[���Ő�p�����`���[�܂��͔ėp�����`���[���N������ۂɁA�R�}���h���C���I�v�V�������w��o���܂��B
+コンソールで専用ランチャーまたは汎用ランチャーを起動する際に、コマンドラインオプションを指定出来ます。
 
-!!! �w���v�̕\��
+!!! ヘルプの表示
 
   > java -jar jmareceipt.jar -h
   USAGE:jp.or.med.jma_receipt.JMAReceiptLauncher <option(s)> files...
-  -config : �w�肳�ꂽ�ݒ�Őڑ�����
+  -config : 指定された設定で接続する
    []
-  -config-list : �ݒ胊�X�g��\������
+  -config-list : 設定リストを表示する
    [false]
 
-!!! �ݒ胊�X�g�̕\��
+!!! 設定リストの表示
 
   > java -jar jmareceipt.jar -config-list
-  �ݒ胊�X�g
+  設定リスト
   ------------------
   192.168.1.51
-     �z�X�g:                 192.168.1.51
-     �|�[�g:                 8000
-     �A�v���P�[�V����:       panda:orca00
-     ���[�U:                 ormaster
+     ホスト:                 192.168.1.51
+     ポート:                 8000
+     アプリケーション:       panda:orca00
+     ユーザ:                 ormaster
   default
-     �z�X�g:                 192.168.1.51
-     �|�[�g:                 8000
-     �A�v���P�[�V����:       panda:orca00
-     ���[�U:                 ormaster
+     ホスト:                 192.168.1.51
+     ポート:                 8000
+     アプリケーション:       panda:orca00
+     ユーザ:                 ormaster
 
-!!! �ݒ���w�肵�ăT�[�o�֐ڑ�
+!!! 設定を指定してサーバへ接続
 
-  > java -jar jmareceipt.jar -config=�ݒ薼
+  > java -jar jmareceipt.jar -config=設定名
 
-�ݒ薼�ɓo�^���Ă���T�[�o�ݒ���w�肵�܂��B
-�p�X���[�h��ۑ����Ȃ��ݒ�̏ꍇ�A�p�X���[�h���̓_�C�A���O���\������܂��B
+設定名に登録してあるサーバ設定を指定します。
+パスワードを保存しない設定の場合、パスワード入力ダイアログが表示されます。
 
-!! �V���[�g�J�b�g�A�C�R���̍쐬
+!! ショートカットアイコンの作成
 
-�ݒ���w�肷��R�}���h���C���I�v�V�����𗘗p���āA����̃T�[�o�ɐڑ�����V���[�g�J�b�g�A�C�R�����쐬���邱�Ƃ��ł��܂��B
+設定を指定するコマンドラインオプションを利用して、特定のサーバに接続するショートカットアイコンを作成することができます。
 
-!!! Windows XP �̏ꍇ
-#monsiaj-bin-YYYYMMDD.zip��W�J���܂��B
-#jmareceipt.jar�̃V���[�g�J�b�g���쐬���܂��B
-#�V���[�g�J�b�g���E�N���b�N���A�V���[�g�J�b�g�̃v���p�e�B���J���܂��B
-#�V���[�g�J�b�g�^�u�̃����N��̖�����"-config=�ݒ薼"��ǉ����܂��B
-#�V���[�J�b�g���_�u���N���b�N����ƃT�[�o�ɐڑ����܂��B
+!!! Windows XP の場合
+#monsiaj-bin-YYYYMMDD.zipを展開します。
+#jmareceipt.jarのショートカットを作成します。
+#ショートカットを右クリックし、ショートカットのプロパティを開きます。
+#ショートカットタブのリンク先の末尾に"-config=設定名"を追加します。
+#ショーカットをダブルクリックするとサーバに接続します。
 
-!!! MacOS X �̏ꍇ
-#monsiaj-bin-macosx-YYYYMMDD.zip��W�J���܂��B
-#JMAReceipt�A�C�R���� Control�L�[�������Ȃ���N���b�N���ă��j���[��\�����A"�p�b�P�[�W�̓��e��\��"���J���܂��B
-#JMAReceipt�t�H���_���\�������̂ŁAContents�t�H���_���J���܂��B
-#Info.plist�t�@�C�����_�u���N���b�N���ҏW���܂��B
-#<key>Arguments<key> �̉��s�� <string></string> �� -config=|�ݒ薼| ���L�q���܂��B
+!!! MacOS X の場合
+
+!!!! MacOS Xアプリケーションバンドル版を使用する方法(推奨)
+
+#monsiaj-bin-macosx-YYYYMMDD.zipを展開します。
+#JMAReceiptアイコンを Controlキーを押しながらクリックしてメニューを表示し、"パッケージの内容を表示"を開きます。
+#JMAReceiptフォルダが表示されるので、Contentsフォルダを開きます。
+#Info.plistファイルをダブルクリックし編集します。
+#<key>Arguments<key> の下行の <string></string> に -config=|設定名| 記述します(下部参照)。
+#Info.plist を閉じて、保存します。
+#JMAReceiptアイコンをダブルクリックするとサーバに接続します。
 
      ...
        </array>
         <key>Arguments</key>
-        <string>-config=|�ݒ薼|</string>
+        <string>-config=|設定名|</string>
                 ^^^^^^^^^^^^^^^^
         <key>Properties</key>
         <dict>
      ...
 
-#Info.plist ����āA�ۑ����܂��B
-#JMAReceipt�A�C�R�����_�u���N���b�N����ƃT�[�o�ɐڑ����܂��B
+※ 複数作成する場合は、アプリケーションバンドルの複製を作成して、複製に対して同様の手順を実行します。
+
+!!!! 共通版を使用する方法
+
+#monsiaj-bin-YYYYMMDD.zipを展開します。
+#Finderより、アプリケーション->AppleScript->スクリプトエディタを起動します。
+#スクリプト入力欄にスクリプトを記述します(下部参照)。
+**-jarの後に1文字スペースを空けて|jmareceipt.jarのフルパス|を記述します。
+**-config=の後に|設定名|を記述します。
+#再生ボタンを押して、一度スクリプトを実行し日レセメイン画面が表示されるかどうか確認します。
+#メイン画面が表示されたら日レセを終了します。
+#スクリプトエディタのメニューから保存を選択します。
+#スクリプト保存のダイアログが表示されるので、以下の設定をして保存します。
+**フォーマット -> "アプリケーション"に設定
+**実行専用 -> チェックしない
+**初期画面 -> チェックしない
+**実行後、自動的に終了しない -> チェックしない
+#作成したスクリプトのアイコンをダブルクリックするとサーバに接続します。
+
+     do shell script "java -jar |jmareceipt.jarへのフルパス| -config=|設定名|"
+
