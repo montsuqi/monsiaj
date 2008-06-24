@@ -2,7 +2,7 @@
 <jnlp spec="1.0+" codebase="@webstarturl@" href="jmareceipt.jnlp">
   <information>
     <title>日医標準レセプトソフト</title>
-    <vendor>NaCl</vendor>
+    <vendor>@webstartvendor@</vendor>
     <icon href="jma-receipt.jpg"/>
     <description>JMA receipt java client</description>
     <offline-allowed/>

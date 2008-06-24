@@ -13,6 +13,7 @@
 	<property name="report.dir"          value="report"/>
 
 	<property name="webstart.url"        value="http://localhost/java-client/"/>
+	<property name="webstart.vendor"     value="NaCl"/>
 
 	<property name="macosx.app.name"     value="JMAReceipt"/>
 	<property name="macosx.app.dir"      value="${macosx.app.name}.app"/>
@@ -97,6 +98,7 @@
 		</copy>
 		<native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
 		<filter token="webstarturl" value="${webstart.url}"/>
+		<filter token="webstartvendor" value="${webstart.vendor}"/>
 		<copy todir="${tmp.dir}" filtering="true">
 			<fileset dir="${build.dir}">
 				<include name="*.jnlp"/>
