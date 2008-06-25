@@ -34,9 +34,9 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
 
+import java.util.logging.Logger;
+import javax.security.auth.login.Configuration;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -48,7 +48,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.Logger;
@@ -57,6 +56,7 @@ import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaCList;
+import sun.misc.resources.Messages;
 
 public class Launcher {
 

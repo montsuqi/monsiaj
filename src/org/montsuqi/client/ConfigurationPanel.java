@@ -25,42 +25,32 @@ package org.montsuqi.client;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.Font;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ButtonGroup;
+import javax.swing.BorderFactory; 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -210,6 +200,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 	protected void initComponents() {
+		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc;
 		setLayout(layout);
@@ -222,6 +213,7 @@ public class ConfigurationPanel extends JPanel {
 		gbc.weightx = 0.0;
 		gbc.weighty = 0.0;
 		gbc.ipadx = 5;
+		gbc.insets = new Insets(2,2,2,2);
 		layout.addLayoutComponent(configLabel, gbc);		
 		
 		configCombo = new JComboBox();
@@ -237,6 +229,7 @@ public class ConfigurationPanel extends JPanel {
 		gbc.gridy = 0;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.0;
+		gbc.insets = new Insets(2,2,2,2);
 		gbc.fill = GridBagConstraints.BOTH;
 		layout.addLayoutComponent(configCombo, gbc);
 
@@ -256,6 +249,7 @@ public class ConfigurationPanel extends JPanel {
 		gbc.weighty = 1.0;
 		gbc.gridwidth = 2;
 		layout.addLayoutComponent(tabbed, gbc);
+		loadConfiguration();
 	}
 	
 	public void updateConfigCombo() {
@@ -310,6 +304,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private Component createBasicTab() {
 		TablePanel panel = new TablePanel();
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		String configName = conf.getConfigurationName();
 
 		int y = 0;
@@ -338,6 +333,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private Component createSslTab() {
 		TablePanel panel = new TablePanel();
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		String configName = conf.getConfigurationName();
 
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
@@ -366,6 +362,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private Component createOthersTab() {
 		TablePanel panel = new TablePanel();
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		String configName = conf.getConfigurationName();
 
 		int y = 0;
@@ -401,19 +398,30 @@ public class ConfigurationPanel extends JPanel {
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = panel.addRadioButtonGroupRow(y++, Messages.getString("ConfigurationPanel.protocol_version"), versions, String.valueOf(conf.getProtocolVersion(configName))); //$NON-NLS-1$
 		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), conf.getUseLogViewer(configName)); //$NON-NLS-1$
-		useTimerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_timer"), conf.getUseTimer(configName)); //$NON-NLS-1$
+
+		JPanel timerPanel = new JPanel();
+		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
+		useTimerCheck = new JCheckBox();
 		useTimerCheck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				timerPeriodEntry.setEnabled(useTimerCheck.isSelected());
 			}
 		});
-		timerPeriodEntry = panel.addLongFieldRow(y++, Messages.getString("ConfigurationPanel.timer_period"), conf.getTimerPeriod(configName)); //$NON-NLS-1$	
+		timerPanel.add(useTimerCheck);
+		JPanel timerPeriodEntryPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		timerPeriodEntryPanel.add(new JLabel(Messages.getString("ConfigurationPanel.timer_period")));
+		timerPeriodEntry = new JTextField(5);
+		timerPeriodEntryPanel.add(timerPeriodEntry);
+		timerPanel.add(timerPeriodEntryPanel);
+		panel.addRow(y++,Messages.getString("ConfigurationPanel.use_timer") ,timerPanel);
+		
 		propertiesText = panel.addTextAreaRow(y++, 3, 30, Messages.getString("ConfigurationPanel.additional_system_properties"), conf.getProperties(configName)); //$NON-NLS-1$
 		return panel;
 	}
 
 	private Component createInfoTab() {
 		TablePanel panel = new TablePanel();
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 		int y = 0;
 		JLabel name = new JLabel("monsiaj ver." + Messages.getString("application.version"));

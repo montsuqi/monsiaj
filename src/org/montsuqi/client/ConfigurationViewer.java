@@ -26,29 +26,19 @@ package org.montsuqi.client;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Vector;
 
 import javax.swing.AbstractAction;
-import javax.swing.Icon;
+import javax.swing.BorderFactory; 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -157,7 +147,7 @@ public class ConfigurationViewer{
 	public void run(Frame parent) {
 		final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); //$NON-NLS-1$		
 		Container container = f.getContentPane();
-		container.setLayout(new BorderLayout());
+		container.setLayout(new BorderLayout(5,5));
 		final PandaCList clist = new PandaCList();
 		clist.setFocusable(true);
 		clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -168,6 +158,7 @@ public class ConfigurationViewer{
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		container.add(scroll, BorderLayout.CENTER);
+		scroll.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 		JPanel bar = new JPanel();
 		bar.setLayout(new FlowLayout());
@@ -255,6 +246,7 @@ public class ConfigurationViewer{
 
 	protected TablePanel createEditConfigurationPanel(String configName, boolean newFlag) {
 		TablePanel panel = new TablePanel();
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		
 		// Basic tab
 		String user = newFlag ? conf.DEFAULT_USER : conf.getUser(configName);
@@ -328,9 +320,21 @@ public class ConfigurationViewer{
 		lookAndFeelCombo = panel.addComboBoxRow(y++, Messages.getString("ConfigurationPanel.look_and_feel"), lafNames, selected); //$NON-NLS-1$
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = panel.addRadioButtonGroupRow(y++, Messages.getString("ConfigurationPanel.protocol_version"), versions, String.valueOf(protocolVersion)); //$NON-NLS-1$
-		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), useLogViewer); //$NON-NLS-1$
-		useTimerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_timer"), useTimer); //$NON-NLS-1$
-		timerPeriodEntry = panel.addLongFieldRow(y++, Messages.getString("ConfigurationPanel.timer_period"), timerPeriod); //$NON-NLS-1$
+		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), useLogViewer);//$NON-NLS-1$
+
+		JPanel timerPanel = new JPanel();
+		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
+		useTimerCheck = new JCheckBox();
+		useTimerCheck.setSelected(useTimer);
+		timerPanel.add(useTimerCheck);
+		JPanel timerPeriodEntryPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		timerPeriodEntryPanel.add(new JLabel(Messages.getString("ConfigurationPanel.timer_period")));
+		timerPeriodEntry = new JTextField(5);
+		timerPeriodEntry.setText(String.valueOf(timerPeriod));
+		timerPeriodEntryPanel.add(timerPeriodEntry);
+		timerPanel.add(timerPeriodEntryPanel);
+		panel.addRow(y++,Messages.getString("ConfigurationPanel.use_timer") ,timerPanel);
+		
 		propertiesText = panel.addTextAreaRow(y++, 3, 30, Messages.getString("ConfigurationPanel.additional_system_properties"), properties); //$NON-NLS-1$		
 		return panel;
 	}
