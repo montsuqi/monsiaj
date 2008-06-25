@@ -26,6 +26,7 @@ package org.montsuqi.widgets;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -180,6 +181,7 @@ public class TablePanel extends JPanel {
 		textArea.setText(value);
 		textArea.addFocusListener(new FieldSelected());
 		JScrollPane scroll = new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setMinimumSize(new Dimension(0,100));
 		addRow(y, rows, text, scroll);
 		return textArea;
 	}
