@@ -48,6 +48,7 @@ import javax.swing.event.ChangeListener;
 
 import java.util.Date;
 
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.Logger;
 
 /** <p>A class that simulates Gtk+'s Calendar widget.</p>
@@ -94,8 +95,11 @@ public class Calendar extends JComponent {
 			dayOfWeek.setHorizontalAlignment(SwingConstants.CENTER);
 			dateCellPanel.add(dayOfWeek);
 		}
-
-		Insets margin = new Insets(0, -20, 0, -20);
+		String javaVersion = System.getProperty("java.version");
+		Insets margin = new Insets(0, 0, 0, 0);
+		if (SystemEnvironment.isMacOSX() && javaVersion.startsWith("1.6")) {
+		    margin = new Insets(0, -20, 0, -20);
+		}
 		for (int row = 1; row < 7; row++) {
 			for (int col = 0; col < 7; col++) {
 				final JButton cell = new JButton();
