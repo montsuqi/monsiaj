@@ -42,6 +42,10 @@ public class SystemEnvironment {
 		return System.getProperty("os.name").toLowerCase().startsWith("mac os x"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	public static boolean isJavaVersionMatch(String version) {
+	        return System.getProperty("java.version").startsWith(version);
+	}
+
 	/** <p>Tests if the system is Windows.</p>
 	 * 
 	 * @return true if the running system is Windows. false otherwise.
@@ -67,7 +71,7 @@ public class SystemEnvironment {
 	public static boolean isMS932() {
 		return isMS932;
 	}
-
+    
 	/** <p>On MacOS X, sets the menu title.</p>
 	 * <p>On other platforms, does nothing.</p>
 	 * 

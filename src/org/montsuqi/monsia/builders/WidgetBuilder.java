@@ -160,8 +160,7 @@ public class WidgetBuilder {
 		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 
 		// on MacOS & Java 1.4 replace PandaHTML with PandaHTMLWebKit.
-		String javaVersion = System.getProperty("java.version");
-		if (SystemEnvironment.isMacOSX() && javaVersion.startsWith("1.4")) {
+		if (SystemEnvironment.isMacOSX() && SystemEnvironment.isJavaVersionMatch("1.4")) {
 			registerWidgetClass("PandaHTML", PandaHTMLWebKit.class, defaultWidgetBuilder); //$NON-NLS-1$
 		}
 	}
@@ -215,7 +214,7 @@ public class WidgetBuilder {
 			}
 		}
 		// Use Osaka font on Mac.
-		if (SystemEnvironment.isMacOSX()) {
+		if (SystemEnvironment.isMacOSX() && SystemEnvironment.isJavaVersionMatch("1.4")) {
 			classes = new String[] {
 				"TextField", //$NON-NLS-1$
 				"ComboBox" //$NON-NLS-1$
