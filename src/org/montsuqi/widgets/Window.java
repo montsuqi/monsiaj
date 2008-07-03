@@ -36,6 +36,8 @@ import javax.swing.JPanel;
 /** <p>A JFrame wrapper.</p>
  */
 public class Window extends JFrame {
+	
+	private String title = "";
 
 	/** <p>Constructs a Window instance.</p>
 	 */
@@ -109,5 +111,18 @@ public class Window extends JFrame {
 			}
 		}
 		return (Window[])list.toArray(new Window[list.size()]);
+	}
+	
+	public void setTitleString(String title) {
+		this.title = title;
+	}
+	
+	public void setSessionTitle(String sessionTitle) {
+		Frame frame = (Frame)this;
+		if (sessionTitle.equals("")) {
+			frame.setTitle(title);			
+		} else {
+			frame.setTitle(sessionTitle + " - " + title);
+		}
 	}
 }

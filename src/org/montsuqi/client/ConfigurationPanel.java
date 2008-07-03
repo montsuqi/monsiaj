@@ -25,8 +25,6 @@ package org.montsuqi.client;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
 
-import com.centerkey.utils.BareBonesBrowserLaunch;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;

@@ -41,6 +41,7 @@ public class WindowBuilder extends ContainerBuilder {
 		Component c = super.buildSelf(xml, parent, info);
 		Window w = (Window)c;
 		try {
+			w.setTitleString(info.getProperty("title"));
 			if (info.getClassName().equals("Dialog")) {
 				Method setAlwaysOnTop = Window.class.getMethod("setAlwaysOnTop", new Class[] { Boolean.TYPE });
 				setAlwaysOnTop.invoke(w, new Object[] { Boolean.TRUE });

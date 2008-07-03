@@ -120,6 +120,7 @@ public class Protocol extends Connection {
 	private long timerPeriod;
 	private Map nodeTable;
 	private WidgetValueManager valueManager;
+	private String sessionTitle;
 
 	private StringBuffer widgetName;
 	private Interface xml;
@@ -148,6 +149,7 @@ public class Protocol extends Connection {
 		nodeTable = new HashMap();
 		valueManager = new WidgetValueManager(this, styleMap);
 		this.timerPeriod = timerPeriod;
+		sessionTitle = "";
 	}
 
 	public long getTimerPeriod() {
@@ -606,12 +608,19 @@ public class Protocol extends Connection {
 			if (node != null) {
 				final Window w = node.getWindow();
 				resetTimer(w);
+				if (w != null) {
+					w.setSessionTitle(sessionTitle);
+				}
 			}
 		} finally {
 			isReceiving = false;
 		}
 		logger.leave();
 		return fCancel;
+	}
+	
+	public synchronized void setSessionTitle(String title) {
+		sessionTitle = title;
 	}
 
 	synchronized void sendConnect(String user, String pass, String app) throws IOException {

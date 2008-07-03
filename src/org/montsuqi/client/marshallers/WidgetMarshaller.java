@@ -51,6 +51,7 @@ import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreviewPane;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
+import org.montsuqi.widgets.Window;
 
 /** <p>Superclass for all widget marshallers.</p>
  */
@@ -81,6 +82,7 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(PandaTimer.class, new TimerMarshaller());
 		registerMarshaller(Pixmap.class, new PixmapMarshaller());
 		registerMarshaller(PandaHTML.class, new PandaHTMLMarshaller());
+		registerMarshaller(Window.class, new WindowMarshaller());
 	}
 
 	public abstract void receive(WidgetValueManager manager, Component widget) throws IOException;
