@@ -80,8 +80,6 @@ class FileEntryMarshaller extends WidgetMarshaller {
 			}
 		} else {
 			fe.setLoadAction();
-			con._addChangedWidget(widget);
-			con._addChangedWidget(fe.getEntry());
 		}
 	}
 

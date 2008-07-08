@@ -24,6 +24,7 @@ copies.
 package org.montsuqi.client;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
@@ -40,6 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.Logger;
+import org.montsuqi.widgets.FileEntry;
 
 /** <p>Class to perform an action for a widget.</p>
  */
@@ -312,6 +314,20 @@ public abstract class SignalHandler {
 		registerHandler("day_selected", changed); //$NON-NLS-1$
 		registerHandler("switch_page", changed); //$NON-NLS-1$
 
+		registerHandler("fileentry_changed", new SignalHandler() {
+			public void handle(Protocol con, Component widget, Object userData) {
+				Container parent;
+				while ((parent = widget.getParent()) != null ) {
+					if ( parent instanceof FileEntry) {						
+						con.addChangedWidget(parent);
+						con.addChangedWidget(widget);
+						break;
+					}
+				}
+			}
+			
+		});
+		
 		registerHandler("entry_set_editable", new SignalHandler() { //$NON-NLS-1$
 			public void handle(Protocol con, Component widget, Object userData) {
 				// do nothing?

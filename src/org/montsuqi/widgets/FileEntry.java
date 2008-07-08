@@ -154,6 +154,7 @@ public class FileEntry extends JComponent {
 			}
 			File selected = chooser.getSelectedFile();
 			setFile(selected);
+			fileEntry.postActionEvent();
 		}
 	}
 

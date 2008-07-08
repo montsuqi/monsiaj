@@ -73,12 +73,6 @@ class PixmapEntryMarshaller extends WidgetMarshaller {
 				}
 			}
 		}
-		if (binary != null && binary.length > 0) {
-			// reciv
-		} else {
-			con._addChangedWidget(widget);
-			con._addChangedWidget(pe.getEntry());
-		}
 	}
 
 	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
