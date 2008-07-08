@@ -1,2 +1,3 @@
 Main-Class: jp.or.med.jma_receipt.JMAReceiptLauncher
-Class-Path: pandaclient.jar log4j.jar WebKit.jar BareBonesBrowserLaunch.jar
+Class-Path: pandaclient.jar log4j.jar WebKit.jar BareBonesBrowserLaunch.jar nimrodlf.jar
+

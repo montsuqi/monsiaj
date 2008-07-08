@@ -76,6 +76,7 @@
 			</fileset>
 			<fileset dir="${resources.dir}">
 				<include name="*.properties"/>
+				<include name="*.theme"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}" >
@@ -85,6 +86,7 @@
 				<include name="org/montsuqi/tools/*.xml"/>
 			</fileset>
 			<fileset dir="${libs.dir}">
+				<include name="nimrodlf.jar"/>
 				<include name="log4j.jar"/>
 				<include name="BareBonesBrowserLaunch.jar"/>
 				<include name="WebKit.jar"/>
@@ -121,6 +123,7 @@
 				<include name="*.jar"/>
 				<include name="*.jnilib"/>
 				<include name="*.jnlp"/>
+				<include name="*.theme"/>
 				<include name="README.txt"/>
 				<include name="README.html"/>
 				<exclude name="pandarecord.jar"/>

@@ -69,6 +69,8 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.text.JTextComponent;
 
+import com.nilo.plaf.nimrod.*;
+
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.TablePanel;
@@ -387,6 +389,7 @@ public class ConfigurationPanel extends JPanel {
 		panel.addButtonFor(styleEntry, new FileSelectionAction(styleEntry, home, extension, description));
 
 		encodingEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.encoding"), conf.getEncoding(configName)); //$NON-NLS-1$
+		UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
 		lafs = UIManager.getInstalledLookAndFeels();
 		String selectedLookAndFeelClassName = conf.getLookAndFeelClassName(configName);
 		String selected = null;
