@@ -63,6 +63,9 @@ import javax.swing.text.JTextComponent;
 
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.SystemEnvironment;
+
+import com.nilo.plaf.nimrod.*;
 
 public class ConfigurationPanel extends JPanel {
 
@@ -93,6 +96,8 @@ public class ConfigurationPanel extends JPanel {
 	protected JTextField styleEntry;
 	protected JTextField encodingEntry;
 	protected JComboBox lookAndFeelCombo;
+	protected JTextField lafThemeEntry;
+	protected JButton lafThemeButton;
 	protected JRadioButton[] protocolVersionRadios;
 	protected JCheckBox useLogViewerCheck;
 	protected JCheckBox useTimerCheck;
@@ -162,6 +167,40 @@ public class ConfigurationPanel extends JPanel {
 		}
 	}
 	
+	private final class ThemeSelectionAction extends AbstractAction {
+
+		private JTextComponent entry;
+		private String home;
+		private String extension;
+		private String description;
+
+		/** <p>Constructs a FileSelectionAction.</p>
+		 * 
+		 * @param entry a text field to which the path of the selected file is set.
+		 * @param home a directory path from which file selection starts.
+		 * @param extension a file name extension passed to an ExtensionFIleFilter.
+		 * @param description ditto.
+		 */
+		ThemeSelectionAction(JTextComponent entry, String home, String extension, String description) {
+			super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
+			this.entry = entry;
+			this.home = home;
+			this.extension = extension;
+			this.description = description;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser(home); //$NON-NLS-1$
+			fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
+			int ret = fileChooser.showOpenDialog(null);
+			if (ret == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				entry.setText(file.getAbsolutePath());
+				changeLookAndFeel();
+			}
+		}
+	}
+	
 	final class TextAreaSelected extends FocusAdapter {
 
 		public void focusGained(FocusEvent e) {
@@ -181,7 +220,16 @@ public class ConfigurationPanel extends JPanel {
 	
 	protected void changeLookAndFeel(String className) {
 		try {
-			UIManager.setLookAndFeel(className);
+			if ( !SystemEnvironment.isJavaVersionMatch("1.4") ) {
+				if ( className.startsWith("com.nilo.plaf.nimrod")) {
+					System.setProperty("nimrodlf.themeFile", lafThemeEntry.getText());
+					UIManager.setLookAndFeel(new NimRODLookAndFeel());
+				} else {
+					UIManager.setLookAndFeel(className);
+				}
+			} else {
+				UIManager.setLookAndFeel(className);
+			}
 		} catch (Exception e) {
 			logger.warn(e);
 		}
@@ -235,6 +283,7 @@ public class ConfigurationPanel extends JPanel {
 		String styleFileName = newFlag ? conf.DEFAULT_STYLES : conf.getStyleFileName(configName);
 		String encoding = newFlag ? conf.DEFAULT_ENCODING : conf.getEncoding(configName);
 		String lookAndFeelClassName = newFlag ? conf.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
+		String lafThemeFileName = newFlag ? conf.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
 		int protocolVersion = newFlag ? conf.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
 		boolean useLogViewer = newFlag ? conf.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
 		boolean useTimer = newFlag ? conf.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
@@ -260,6 +309,7 @@ public class ConfigurationPanel extends JPanel {
 		// Others Tab
 		styleEntry.setText(styleFileName);
 		encodingEntry.setText(encoding);
+		lafThemeEntry.setText(lafThemeFileName);
 		for (int i = 0; i < lafs.length; i++) {
 			if (lookAndFeelClassName.equals(lafs[i].getClassName())) {
 				lookAndFeelCombo.setSelectedItem(lafs[i].getName());
@@ -300,6 +350,7 @@ public class ConfigurationPanel extends JPanel {
 				break;
 			}
 		}
+		conf.setLAFThemeFileName(configName, lafThemeEntry.getText());
 		conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
 		conf.setUseTimer(configName, useTimerCheck.isSelected());
 		conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
@@ -322,9 +373,9 @@ public class ConfigurationPanel extends JPanel {
 	public static JLabel createLabel(String str) {
 		JLabel label = new JLabel(str);
 		label.setHorizontalAlignment(SwingConstants.RIGHT);
-		label.setPreferredSize(new Dimension(150,20));
-		label.setMinimumSize(new Dimension(150,20));
-
+		label.setPreferredSize(new Dimension(170,20));
+		label.setMinimumSize(new Dimension(170,20));
+		label.setBorder(BorderFactory.createEmptyBorder(0,0,0,5));
 		return label;
 	}
 	
@@ -347,15 +398,47 @@ public class ConfigurationPanel extends JPanel {
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
+		hostEntry = createTextField();
+		portEntry = createTextField();
+		appEntry = createTextField();
+		String[] versions = { String.valueOf(1), String.valueOf(2) };
+		protocolVersionRadios = new JRadioButton[versions.length];
+		ButtonGroup group = new ButtonGroup();
+		JPanel protocolVersionPanel = new JPanel();
+		protocolVersionPanel.setLayout(new GridLayout(1, versions.length));
+		for (int i = 0; i < versions.length; i++) {
+			JRadioButton radio = new JRadioButton(versions[i]);
+			radio.setSelected(versions[i].equals(versions[0]));
+			group.add(radio);
+			protocolVersionPanel.add(radio);
+			protocolVersionRadios[i] = radio;
+		}
 		userEntry = createTextField();
 		passwordEntry = createPasswordField();
 		savePasswordCheckbox = new JCheckBox();
 		savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
-		hostEntry = createTextField();
-		portEntry = createTextField();
-		appEntry = createTextField();
 		
 		y = 0;
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.host")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(hostEntry, 
+			createConstraints(1, y, 2, 1, 1.0, 0.0));
+		panel.add(portEntry, 
+			createConstraints(3, y, 1, 1, 0.0, 0.0));
+		y++;	
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.application")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(appEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.protocol_version")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(protocolVersionPanel, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
 		panel.add(createLabel(Messages.getString("ConfigurationPanel.user")), 
 			createConstraints(0, y, 1, 1, 0.0, 1.0));
 		panel.add(userEntry, 
@@ -371,24 +454,6 @@ public class ConfigurationPanel extends JPanel {
 		panel.add(createLabel(Messages.getString("ConfigurationPanel.save_password")), 
 			createConstraints(0, y, 1, 1, 0.0, 1.0));
 		panel.add(savePasswordCheckbox, 
-			createConstraints(1, y, 3, 1, 1.0, 0.0));
-		y++;
-
-		panel.add(createLabel(Messages.getString("ConfigurationPanel.host")), 
-			createConstraints(0, y, 1, 1, 0.0, 1.0));
-		panel.add(hostEntry, 
-			createConstraints(1, y, 3, 1, 1.0, 0.0));
-		y++;
-	
-		panel.add(createLabel(Messages.getString("ConfigurationPanel.port")), 
-			createConstraints(0, y, 1, 1, 0.0, 1.0));
-		panel.add(portEntry, 
-			createConstraints(1, y, 3, 1, 1.0, 0.0));
-		y++;
-		
-		panel.add(createLabel(Messages.getString("ConfigurationPanel.application")), 
-			createConstraints(0, y, 1, 1, 0.0, 1.0));
-		panel.add(appEntry, 
 			createConstraints(1, y, 3, 1, 1.0, 0.0));
 		y++;
 
@@ -467,6 +532,13 @@ public class ConfigurationPanel extends JPanel {
 		return panel;
 	}
 
+	private void updateLAFThemeEnabled() {
+		String laf = (String)lookAndFeelCombo.getSelectedItem();
+		boolean isNimrod = laf.equals("Nimrod");
+		lafThemeEntry.setEnabled(isNimrod);
+		lafThemeButton.setEnabled(isNimrod);
+	}	
+	
 	protected JPanel createOthersPanel() {		
 		int y;
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
@@ -478,9 +550,10 @@ public class ConfigurationPanel extends JPanel {
 
 		styleEntry = createTextField();
 		JButton styleButton = new JButton();
-		styleButton.setAction(new FileSelectionAction(styleEntry, home, extension, description));
+		styleButton.setAction(
+			new FileSelectionAction(styleEntry, home, ".properties", 
+				Messages.getString("ConfigurationPanel.style_filter_pattern")));
 		encodingEntry = createTextField();
-
 		lafs = UIManager.getInstalledLookAndFeels();
 		String[] lafNames = new String[lafs.length];
 		for (int i = 0; i < lafNames.length; i++) {
@@ -493,21 +566,15 @@ public class ConfigurationPanel extends JPanel {
 		}
 		lookAndFeelCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				updateLAFThemeEnabled();
 				changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
 			}
 		});
-		String[] versions = { String.valueOf(1), String.valueOf(2) };
-		protocolVersionRadios = new JRadioButton[versions.length];
-		ButtonGroup group = new ButtonGroup();
-		JPanel protocolVersionPanel = new JPanel();
-		protocolVersionPanel.setLayout(new GridLayout(1, versions.length));
-		for (int i = 0; i < versions.length; i++) {
-			JRadioButton radio = new JRadioButton(versions[i]);
-			radio.setSelected(versions[i].equals(versions[0]));
-			group.add(radio);
-			protocolVersionPanel.add(radio);
-			protocolVersionRadios[i] = radio;
-		}
+		lafThemeEntry = createTextField();
+		lafThemeButton = new JButton();
+		lafThemeButton.setAction(
+			new ThemeSelectionAction(lafThemeEntry, home,".theme",
+				Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 		useLogViewerCheck = new JCheckBox();
 		JPanel timerPanel = new JPanel();
 		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
@@ -549,11 +616,13 @@ public class ConfigurationPanel extends JPanel {
 		panel.add(lookAndFeelCombo, 
 			createConstraints(1, y, 3, 1, 1.0, 0.0));
 		y++;
-
-		panel.add(createLabel(Messages.getString("ConfigurationPanel.protocol_version")), 
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.laf_theme")), 
 			createConstraints(0, y, 1, 1, 0.0, 1.0));
-		panel.add(protocolVersionPanel, 
-			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		panel.add(lafThemeEntry, 
+			createConstraints(1, y, 2, 1, 1.0, 0.0));
+		panel.add(lafThemeButton, 
+			createConstraints(3, y, 1, 1, 0.0, 0.0));
 		y++;
 
 		panel.add(createLabel(Messages.getString("ConfigurationPanel.use_log_viewer")), 

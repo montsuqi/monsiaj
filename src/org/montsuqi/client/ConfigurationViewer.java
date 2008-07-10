@@ -135,8 +135,6 @@ public class ConfigurationViewer{
 		bar.add(closeButton);
 		
 		f.setSize(640, 480);
-		f.setMinimumSize(new Dimension(640,480));
-		f.setPreferredSize(new Dimension(640,480));
 		f.setVisible(true);
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -191,7 +189,7 @@ public class ConfigurationViewer{
 		}
 				
 		JPanel configNamePanel = new JPanel(new GridBagLayout());
-		configNamePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		configNamePanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
 		configNamePanel.add(ConfigurationPanel.createLabel(Messages.getString("ConfigurationPanel.config_name")),
 			ConfigurationPanel.createConstraints(0, 0, 1, 1, 0.0, 1.0));
 		final JTextField configNameEntry = ConfigurationPanel.createTextField();
@@ -203,7 +201,7 @@ public class ConfigurationViewer{
 		JPanel sslPanel = configPanel.getSSLPanel();
 		JPanel othersPanel = configPanel.getOthersPanel();
 		
-		Border border = BorderFactory.createMatteBorder(3,3,3,3, (Color)SystemColor.controlLtHighlight);
+		Border border = BorderFactory.createMatteBorder(1,1,1,1, (Color)SystemColor.controlDkShadow);
 		basicPanel.setBorder(
 			BorderFactory.createTitledBorder(border,
 				Messages.getString("ConfigurationPanel.basic_tab_label")));
@@ -268,8 +266,6 @@ public class ConfigurationViewer{
 		bar.add(editCancelButton);
 		
 		f.setSize(480, 700);
-		f.setMinimumSize(new Dimension(480,700));
-		f.setPreferredSize(new Dimension(480,700));
 		f.setVisible(true);
 
 		f.setLocationRelativeTo(null);

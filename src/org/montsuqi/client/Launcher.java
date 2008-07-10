@@ -75,10 +75,10 @@ public class Launcher {
 
 	static {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
-			System.setProperty("monsia.logger.factory", "org.montsuqi.util.StdErrLogger"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("monsia.logger.factory", "org.montsuqi.util.StdErrLogger"); 
 		}
 		if (SystemEnvironment.isMacOSX()) {
-			System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.awt.brushMetalLook", "true"); 
 		}
 	}
 
@@ -95,13 +95,19 @@ public class Launcher {
 	}
 	
 	private void installLookAndFeels() {
-		UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
+		if (!SystemEnvironment.isJavaVersionMatch("1.4")) {
+			try {
+				UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
+			} catch (Exception e) {
+				logger.warn(e);
+			}
+		}
 	}
 
 	public boolean checkCommandLineOption(String [] args) {
 		OptionParser options = new OptionParser();
-		options.add("config", Messages.getString("Launcher.config_option_message"), ""); //$NON-NLS-1$ //$NON-NLS-2$
-		options.add("config-list", Messages.getString("Launcher.config_list_option_message"), false); //$NON-NLS-1$ //$NON-NLS-2$
+		options.add("config", Messages.getString("Launcher.config_option_message"), ""); 
+		options.add("config-list", Messages.getString("Launcher.config_list_option_message"), false);
 		String[] files = options.parse(this.getClass().getName(), args);
 		
 		String configName = options.getString("config");
@@ -265,9 +271,7 @@ public class Launcher {
 		});
 		bar.add(config);
 
-		f.setSize(640, 480);
-		f.setMinimumSize(new Dimension(640,480));
-		f.setPreferredSize(new Dimension(640,480));
+		f.setSize(760, 480);
 		f.setResizable(true);
 
 		f.setLocationRelativeTo(null);

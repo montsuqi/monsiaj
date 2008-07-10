@@ -63,6 +63,7 @@ public class Configuration {
 	private static final String CLIENT_CERTIFICATE_PASSWORD_KEY = "client_certificate_password"; //$NON-NLS-1$
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
+	private static final String LAF_THEME_KEY = "laf_theme"; //$NON-NLS-1$
 	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
 	private static final String PROPERTIES_KEY = "properties"; //$NON-NLS-1$
 	private static final String USE_TIMER_KEY = "use_timer"; //$NON-NLS-1$
@@ -129,6 +130,9 @@ public class Configuration {
 	/** <p>Default look and feel class name: system look and feel.</p> */
 	static final String DEFAULT_LOOK_AND_FEEL_CLASS_NAME = UIManager.getSystemLookAndFeelClassName();
 
+	/** <p>Default look and feel theme filename: "".</p> */
+	static final String DEFAULT_LAF_THEME = "";
+	
 	/** <p>Default value of use log viewer checkbox: false.</p> */
 	static final boolean DEFAULT_USE_LOG_VIEWER = false;
 	
@@ -624,6 +628,23 @@ public class Configuration {
 		setString(configName, LOOK_AND_FEEL_KEY, className);
 	}
 
+	/** <p>Returns the laf theme file name.</p>
+	 * 
+	 * @param configName the configuration name.
+	 * @return the laf theme file name.
+	 */
+	public String getLAFThemeFileName(String configName) {
+		return getString(configName, LAF_THEME_KEY, DEFAULT_LAF_THEME);
+	}
+
+	/** <p>Sets the LAF theme file name.</p>
+	 * @param configName the configuration name.
+	 * @param styles new value of laf theme file name.
+	 */
+	public void setLAFThemeFileName(String configName, String styles) {
+		setString(configName, LAF_THEME_KEY, styles);
+	}	
+	
 	/** <p>Returns the value of use log viewer.</p>
 	 * 
 	 * @param configName the configuration name.
