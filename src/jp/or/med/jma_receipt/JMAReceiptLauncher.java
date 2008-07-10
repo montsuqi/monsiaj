@@ -42,8 +42,8 @@ public class JMAReceiptLauncher extends Launcher {
 	protected JMAReceiptLauncher(String title) {
 		super(title);
 	}
-
-	/** <p>Application entry point.</p> */
+	
+		/** <p>Application entry point.</p> */
 	public static void main(String[] args) {
 		Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
 		launcher.launch(args);
@@ -58,9 +58,9 @@ public class JMAReceiptLauncher extends Launcher {
 			conf.setEncoding(configNames[i], "EUC-JP"); //$NON-NLS-1$
 			conf.setProtocolVersion(configNames[i], 1);
 		}
-		return new JMAReceiptConfigurationPanel(conf);
+		return new JMAReceiptConfigurationPanel(conf, true);
 	}
-
+	
 	protected ConfigurationViewer createConfigurationViewer() {
 		return new JMAReceiptConfigurationViewer(conf);
 	}
@@ -73,5 +73,5 @@ public class JMAReceiptLauncher extends Launcher {
 			return new ImageIcon(iconURL);
 		}
 		return super.createIcon();
-	}
+	}	
 }

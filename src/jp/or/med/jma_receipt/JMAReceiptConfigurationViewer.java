@@ -23,10 +23,9 @@ copies.
 
 package jp.or.med.jma_receipt;
 
-import java.awt.Dialog;
 import org.montsuqi.client.Configuration;
+import org.montsuqi.client.ConfigurationPanel;
 import org.montsuqi.client.ConfigurationViewer;
-import org.montsuqi.widgets.TablePanel;
 
 public class JMAReceiptConfigurationViewer extends ConfigurationViewer {
 
@@ -34,16 +33,7 @@ public class JMAReceiptConfigurationViewer extends ConfigurationViewer {
 		super(conf);
 	}
 
-	protected TablePanel createEditConfigurationPanel(String configName, boolean newFlag) {
-		TablePanel panel = super.createEditConfigurationPanel(configName, newFlag);
-		appEntry.setEditable(false);
-		encodingEntry.setEditable(false);
-		for (int i = 0; i < protocolVersionRadios.length; i++) {
-			protocolVersionRadios[i].setEnabled(false);
-		}
-		appEntry.setText("orca00");
-		encodingEntry.setText("EUC-JP");
-		protocolVersionRadios[0].setSelected(true);
-		return panel;
+	protected ConfigurationPanel createConfigurationPanel(Configuration conf) {
+		return new JMAReceiptConfigurationPanel(conf, false);
 	}
 }

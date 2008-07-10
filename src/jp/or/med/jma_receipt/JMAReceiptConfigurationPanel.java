@@ -34,8 +34,8 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	 * 
 	 * @param conf configuration to read initial values and write result to.
 	 */
-	JMAReceiptConfigurationPanel(Configuration conf) {
-		super(conf);
+	JMAReceiptConfigurationPanel(Configuration conf, boolean padding) {
+		super(conf, padding);
 	}
 
 	/** <p>Creates components and disable some so users cannot alter preset values.</p>
@@ -52,11 +52,17 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	/** <p>Updates configuration ofject using values set to UI.</p>
 	 * <p>It also ensures some configuration remain preset values.</p>
 	 */
-	protected void updateConfiguration() {
-		super.updateConfiguration();
-		String configName = conf.getConfigurationName();
+	protected void saveConfiguration(String configName) {
+		super.saveConfiguration(configName);
 		conf.setApplication(configName, "orca00"); //$NON-NLS-1$
 		conf.setEncoding(configName, "EUC-JP"); //$NON-NLS-1$
 		conf.setProtocolVersion(configName, 1);
+	}
+
+	protected void loadConfiguration(String configName) {
+		super.loadConfiguration(configName);
+		appEntry.setText("panda:orca00");
+		encodingEntry.setText("EUC-JP");
+		protocolVersionRadios[0].setSelected(true);
 	}
 }

@@ -23,23 +23,27 @@ copies.
 
 package org.montsuqi.client;
 
+import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -48,9 +52,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
@@ -58,11 +63,15 @@ import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaCList;
 
+import com.nilo.plaf.nimrod.*;
+
 public class Launcher {
 
 	protected static final Logger logger = Logger.getLogger(Launcher.class);
 	protected String title;
 	protected Configuration conf;
+	protected ConfigurationPanel configPanel;
+	protected JComboBox configCombo;
 
 	static {
 		if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -82,6 +91,11 @@ public class Launcher {
 		this.title = title;
 		SystemEnvironment.setMacMenuTitle(title);
 		conf = new Configuration(this.getClass());
+		installLookAndFeels();
+	}
+	
+	private void installLookAndFeels() {
+		UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
 	}
 
 	public boolean checkCommandLineOption(String [] args) {
@@ -138,6 +152,75 @@ public class Launcher {
 		return false;
 	}
 	
+	protected JPanel createMainPanel() {
+		JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		GridBagConstraints gbc;
+		
+		JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
+		configCombo = new JComboBox();
+		updateConfigCombo();
+		configCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				configPanel.loadConfiguration((String)configCombo.getSelectedItem());
+			}
+		});
+		configPanel = createConfigurationPanel();
+		configPanel.loadConfiguration(conf.getConfigurationName());
+		JTabbedPane tabbed = new JTabbedPane();
+		tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$
+		tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel()); //$NON-NLS-1$
+		tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); //$NON-NLS-1$
+		tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); //$NON-NLS-1$
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.ipadx = 5;
+		gbc.insets = new Insets(2,2,2,2);
+		panel.add(configLabel, gbc);		
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		gbc.insets = new Insets(2,2,2,2);
+		gbc.fill = GridBagConstraints.BOTH;
+		panel.add(configCombo, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.gridwidth = 2;
+		panel.add(tabbed, gbc);
+		return panel;
+	}
+	
+	private void updateConfigCombo() {
+		ActionListener [] listeners = configCombo.getActionListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			configCombo.removeActionListener(listeners[i]);
+		}
+		String [] configNames = conf.getConfigurationNames();
+		configCombo.removeAllItems();
+		for (int i = 0; i < configNames.length; i++) {
+			configCombo.addItem(configNames[i]);
+		}
+		for (int i = 0; i < listeners.length; i++) {
+			configCombo.addActionListener(listeners[i]);
+		}
+		configCombo.setSelectedItem(conf.getConfigurationName());
+	}
+	
+	
 	public void launch(String [] args) {
 		if ( checkCommandLineOption(args) ) {
 			return;
@@ -145,9 +228,9 @@ public class Launcher {
 		final JFrame f = new JFrame(title);
 		Container container = f.getContentPane();
 		container.setLayout(new BorderLayout(10,5));
-		final ConfigurationPanel panel = createConfigurationPanel();
+		final JPanel mainPanel = createMainPanel();
 		final ConfigurationViewer viewer = createConfigurationViewer();
-		container.add(panel, BorderLayout.CENTER);
+		container.add(mainPanel, BorderLayout.CENTER);
 		
 		JLabel iconLabel = new JLabel("", createIcon(), JLabel.CENTER);
 		container.add(iconLabel, BorderLayout.WEST);
@@ -158,7 +241,9 @@ public class Launcher {
 
 		JButton run = new JButton(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent ev) {
-				panel.updateConfiguration();
+				String configName = (String)configCombo.getSelectedItem();
+				configPanel.saveConfiguration(configName);
+				conf.setConfigurationName(configName);
 				connect();
 				f.dispose();
 			}
@@ -175,17 +260,20 @@ public class Launcher {
 		JButton config = new JButton(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				viewer.run(f);
-				panel.updateConfigCombo();
+				updateConfigCombo();
 			}
 		});
 		bar.add(config);
 
-		f.setSize(640, 400);
-		int state = f.getExtendedState();
+		f.setSize(640, 480);
+		f.setMinimumSize(new Dimension(640,480));
+		f.setPreferredSize(new Dimension(640,480));
+		f.setResizable(true);
 
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		f.setVisible(true);
+		configPanel.changeLookAndFeel();
 	}
 	
 	private void connect() {
@@ -211,7 +299,7 @@ public class Launcher {
 	}
 
 	protected ConfigurationPanel createConfigurationPanel() {
-		return new ConfigurationPanel(conf); 
+		return new ConfigurationPanel(conf, true); 
 	}
 
 	protected ConfigurationViewer createConfigurationViewer() {

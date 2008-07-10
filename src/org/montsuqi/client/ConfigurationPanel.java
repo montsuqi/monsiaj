@@ -25,33 +25,26 @@ package org.montsuqi.client;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
-import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.Font;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory; 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -59,7 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
@@ -69,20 +61,19 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.text.JTextComponent;
 
-import com.nilo.plaf.nimrod.*;
-
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.TablePanel;
 
 public class ConfigurationPanel extends JPanel {
 
 	protected static final Logger logger = Logger.getLogger(ConfigurationPanel.class);
 	protected Configuration conf;
 	
-	// for select server configration
-	protected JComboBox configCombo;
-
+	protected JPanel basicPanel;
+	protected JPanel sslPanel;
+	protected JPanel othersPanel;
+	protected JPanel infoPanel;
+	
 	// Basic Tab
 	protected JTextField userEntry;
 	protected JPasswordField passwordEntry;
@@ -93,8 +84,8 @@ public class ConfigurationPanel extends JPanel {
 
 	// SSL Tab
 	protected JCheckBox useSSLCheckbox;
+	protected JButton clientCertificateButton;
 	protected JTextField clientCertificateEntry;
-	protected JButton browseButton;
 	protected JPasswordField exportPasswordEntry;
 	protected JCheckBox saveClientCertificatePasswordCheckbox;
 
@@ -108,11 +99,12 @@ public class ConfigurationPanel extends JPanel {
 	protected JTextField timerPeriodEntry;
 	protected JTextArea propertiesText;
 
-	LookAndFeelInfo[] lafs;
-	JTabbedPane tabbed;
-	protected static final int BASIC_TAB = 0;
-	protected static final int SSL_TAB = 1;
-	protected static final int OTHERS_TAB = 2;
+	protected LookAndFeelInfo[] lafs;
+	
+	private static final int MAX_PANEL_ROWS = 12;
+	private static final int MAX_PANEL_COLUMNS = 4;
+	
+	private boolean panelPadding;
 	
 	/** <p>An action to warn vulnerability of saving password.</p>
 	 */
@@ -170,18 +162,118 @@ public class ConfigurationPanel extends JPanel {
 		}
 	}
 	
-	protected ConfigurationPanel(Configuration conf) {
+	final class TextAreaSelected extends FocusAdapter {
+
+		public void focusGained(FocusEvent e) {
+			Object o = e.getSource();
+			if ( ! (o instanceof JTextComponent)) {
+				return;
+			}
+			JTextComponent tc = (JTextComponent)o;
+			tc.setCaretPosition(tc.getText().length());
+			tc.selectAll();
+		}
+	}
+	
+	protected void changeLookAndFeel() {
+		changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
+	}
+	
+	protected void changeLookAndFeel(String className) {
+		try {
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e) {
+			logger.warn(e);
+		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				Component root = SwingUtilities.getRoot(basicPanel);
+				try {
+					if (root != null) {
+						SwingUtilities.updateComponentTreeUI(root);
+					}
+					
+				} catch (Exception e) {
+					logger.warn(e);
+				}
+			}
+		});
+	}
+	
+	protected ConfigurationPanel(Configuration conf, boolean padding) {
 		this.conf = conf;
-		changeLookAndFeel(conf.getLookAndFeelClassName(conf.getConfigurationName()));
+		this.panelPadding = padding;
 		initComponents();
 	}
 
-	/** <p>Updates configuration ofject using values set to UI.</p>
-	 */
-	protected void updateConfiguration() {
-		String configName = (String)configCombo.getSelectedItem();
-		conf.setConfigurationName(configName);
+	protected void initComponents() {
+		basicPanel = createBasicPanel();
+		sslPanel = createSSLPanel();
+		othersPanel = createOthersPanel();
+		infoPanel = createInfoPanel();
+		loadConfiguration("");
+	}
 		
+	protected void loadConfiguration(String configName) {
+		boolean newFlag = configName.equals("");
+		
+		// Basic tab
+		String user = newFlag ? conf.DEFAULT_USER : conf.getUser(configName);
+		String password = newFlag ? conf.DEFAULT_PASSWORD : conf.getPassword(configName);
+		boolean savePassword = newFlag ? conf.DEFAULT_SAVE_PASSWORD : conf.getSavePassword(configName);
+		String host = newFlag ? conf.DEFAULT_HOST : conf.getHost(configName);
+		int port = newFlag ? conf.DEFAULT_PORT : conf.getPort(configName);
+		String application  = newFlag ? conf.DEFAULT_APPLICATION : conf.getApplication(configName);
+		
+		// SSL tab
+		boolean useSSL = newFlag ? conf.DEFAULT_USE_SSL : conf.getUseSSL(configName);
+		String clientCertificate = newFlag ? conf.DEFAULT_CLIENT_CERTIFICATE : conf.getClientCertificateFileName(configName);
+		boolean saveClientCertificatePassword = newFlag ? conf.DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD : conf.getSaveClientCertificatePassword(configName);
+		String clientCertificatePassword = newFlag ? conf.DEFAULT_CLIENT_CERTIFICATE_PASSWORD : conf.getClientCertificatePassword(configName);
+		
+		// Others tab
+		String styleFileName = newFlag ? conf.DEFAULT_STYLES : conf.getStyleFileName(configName);
+		String encoding = newFlag ? conf.DEFAULT_ENCODING : conf.getEncoding(configName);
+		String lookAndFeelClassName = newFlag ? conf.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
+		int protocolVersion = newFlag ? conf.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
+		boolean useLogViewer = newFlag ? conf.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
+		boolean useTimer = newFlag ? conf.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
+		long timerPeriod = newFlag ? conf.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
+		String properties = newFlag ? conf.DEFAULT_PROPERTIES : conf.getProperties(configName);
+		
+		// Basic Tab
+		userEntry.setText(user);
+		// Save save_pass check field before the password itself,
+		// since setPass fetches its value from the preferences internally.
+		savePasswordCheckbox.setSelected(savePassword);
+		passwordEntry.setText(password);
+		hostEntry.setText(host);
+		portEntry.setText(String.valueOf(port));
+		appEntry.setText(application);
+
+		// SSL Tab
+		useSSLCheckbox.setSelected(useSSL);
+		clientCertificateEntry.setText(clientCertificate);
+		exportPasswordEntry.setText(clientCertificatePassword);
+		saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
+
+		// Others Tab
+		styleEntry.setText(styleFileName);
+		encodingEntry.setText(encoding);
+		for (int i = 0; i < lafs.length; i++) {
+			if (lookAndFeelClassName.equals(lafs[i].getClassName())) {
+				lookAndFeelCombo.setSelectedItem(lafs[i].getName());
+			}
+		}
+		protocolVersionRadios[protocolVersion - 1].setSelected(true);
+		useLogViewerCheck.setSelected(useLogViewer);
+		useTimerCheck.setSelected(useTimer);
+		timerPeriodEntry.setText(String.valueOf(timerPeriod));
+		propertiesText.setText(properties);
+		updateSSLPanelComponentsEnabled();
+	}
+
+	protected void saveConfiguration(String configName) {
 		// Basic Tab
 		conf.setUser(configName, userEntry.getText());
 		// Save save_pass check field before the password itself,
@@ -214,207 +306,209 @@ public class ConfigurationPanel extends JPanel {
 		conf.setProperties(configName, propertiesText.getText());
 	}
 
-	protected void initComponents() {
-		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		GridBagLayout layout = new GridBagLayout();
-		GridBagConstraints gbc;
-		setLayout(layout);
-		
-		JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
-		add(configLabel);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.ipadx = 5;
-		gbc.insets = new Insets(2,2,2,2);
-		layout.addLayoutComponent(configLabel, gbc);		
-		
-		configCombo = new JComboBox();
-		updateConfigCombo();
-		configCombo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				loadConfiguration();
-			}
-		});
-		add(configCombo);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
-		gbc.insets = new Insets(2,2,2,2);
-		gbc.fill = GridBagConstraints.BOTH;
-		layout.addLayoutComponent(configCombo, gbc);
-
-		tabbed = new JTabbedPane();
-		tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), createBasicTab()); //$NON-NLS-1$
-		tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), createSslTab()); //$NON-NLS-1$
-		tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), createOthersTab()); //$NON-NLS-1$
-		tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), createInfoTab()); //$NON-NLS-1$
-		add(tabbed);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.BOTH;
+	public static GridBagConstraints createConstraints(int x, int y, int width, int height, double weightx, double weighty) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = x;
+		gbc.gridy = y;
+		gbc.gridwidth = width;
+		gbc.gridheight = height;
+		gbc.weightx = weightx;
+		gbc.weighty = weighty;
 		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.gridwidth = 2;
-		layout.addLayoutComponent(tabbed, gbc);
-		loadConfiguration();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		return gbc;
 	}
 	
-	public void updateConfigCombo() {
-		ActionListener [] listeners = configCombo.getActionListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			configCombo.removeActionListener(listeners[i]);
-		}
-		String [] configNames = conf.getConfigurationNames();
-		configCombo.removeAllItems();
-		for (int i = 0; i < configNames.length; i++) {
-			configCombo.addItem(configNames[i]);
-		}
-		for (int i = 0; i < listeners.length; i++) {
-			configCombo.addActionListener(listeners[i]);
-		}
-		configCombo.setSelectedItem(conf.getConfigurationName());
+	public static JLabel createLabel(String str) {
+		JLabel label = new JLabel(str);
+		label.setHorizontalAlignment(SwingConstants.RIGHT);
+		label.setPreferredSize(new Dimension(150,20));
+		label.setMinimumSize(new Dimension(150,20));
+
+		return label;
 	}
 	
-	protected void loadConfiguration() {
-		String configName = (String)configCombo.getSelectedItem();
-		conf.setConfigurationName(configName);
-		// Basic Tab
-		userEntry.setText(conf.getUser(configName));
-		// Save save_pass check field before the password itself,
-		// since setPass fetches its value from the preferences internally.
-		savePasswordCheckbox.setSelected(conf.getSavePassword(configName));
-		passwordEntry.setText(conf.getPassword(configName));
-		hostEntry.setText(conf.getHost(configName));
-		portEntry.setText(String.valueOf(conf.getPort(configName)));
-		appEntry.setText(conf.getApplication(configName));
+	public static JTextField createTextField() {
+		JTextField tf = new JTextField();
+		tf.setHorizontalAlignment(SwingConstants.LEFT);
+		tf.setText("");
+		return tf;
+	}
+	
+	public static JPasswordField createPasswordField() {
+		JPasswordField pf = new JPasswordField();
+		pf.setHorizontalAlignment(SwingConstants.LEFT);
+		pf.setText("");
+		return pf;
+	}
+	
+	protected JPanel createBasicPanel() {
+		int y;
+		JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-		// SSL Tab
-		useSSLCheckbox.setSelected(conf.getUseSSL(configName));
-		clientCertificateEntry.setText(conf.getClientCertificateFileName(configName));
-		exportPasswordEntry.setText(conf.getClientCertificatePassword(configName));
-		saveClientCertificatePasswordCheckbox.setSelected(conf.getSaveClientCertificatePassword(configName));
+		userEntry = createTextField();
+		passwordEntry = createPasswordField();
+		savePasswordCheckbox = new JCheckBox();
+		savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
+		hostEntry = createTextField();
+		portEntry = createTextField();
+		appEntry = createTextField();
+		
+		y = 0;
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.user")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(userEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.password")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(passwordEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
 
-		// Others Tab
-		styleEntry.setText(conf.getStyleFileName(configName));
-		encodingEntry.setText(conf.getEncoding(configName));
-		for (int i = 0; i < lafs.length; i++) {
-			if (conf.getLookAndFeelClassName(configName).equals(lafs[i].getClassName())) {
-				lookAndFeelCombo.setSelectedItem(lafs[i].getName());
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.save_password")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(savePasswordCheckbox, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.host")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(hostEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+	
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.port")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(portEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.application")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(appEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+
+		if (panelPadding) {
+			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
+				panel.add(new JLabel(" "), 
+					createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
 			}
 		}
-		protocolVersionRadios[conf.getProtocolVersion(configName) - 1].setSelected(true);
-		useLogViewerCheck.setSelected(conf.getUseLogViewer(configName));
-		useTimerCheck.setSelected(conf.getUseTimer(configName));
-		timerPeriodEntry.setText(String.valueOf(conf.getTimerPeriod(configName)));
-		propertiesText.setText(conf.getProperties(configName));
-	}
-
-	private Component createBasicTab() {
-		TablePanel panel = new TablePanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		String configName = conf.getConfigurationName();
-
-		int y = 0;
-		userEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.user"), conf.getUser(configName)); //$NON-NLS-1$
-		passwordEntry = panel.addPasswordFieldRow(y++, Messages.getString("ConfigurationPanel.password")); //$NON-NLS-1$
-		final boolean savePassword = conf.getSavePassword(configName);
-		if (savePassword) {
-			passwordEntry.setText(conf.getPassword(configName));
-		}
-		savePasswordCheckbox = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.save_password"), savePassword); //$NON-NLS-1$
-		savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
-		hostEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.host"), conf.getHost(configName)); //$NON-NLS-1$
-		portEntry = panel.addIntFieldRow(y++, Messages.getString("ConfigurationPanel.port"), conf.getPort(configName)); //$NON-NLS-1$
-		appEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.application"), conf.getApplication(configName)); //$NON-NLS-1$
-		
 		return panel;
 	}
 
-	void updateSslTabComponentsEnabled() {
+	private void updateSSLPanelComponentsEnabled() {
 		final boolean useSsl = useSSLCheckbox.isSelected();
 		clientCertificateEntry.setEnabled(useSsl);
 		exportPasswordEntry.setEnabled(useSsl);
-		browseButton.setEnabled(useSsl);
+		clientCertificateButton.setEnabled(useSsl);
 		saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
 	}
 
-	private Component createSslTab() {
-		TablePanel panel = new TablePanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		String configName = conf.getConfigurationName();
-
+	protected JPanel createSSLPanel() {
+		int y;
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
 		final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
-		int y = 0;
 
-		useSSLCheckbox = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_ssl"), conf.getUseSSL(configName)); //$NON-NLS-1$
+		JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		
+		useSSLCheckbox = new JCheckBox();
 		useSSLCheckbox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateSslTabComponentsEnabled();
+				updateSSLPanelComponentsEnabled();
 			}
 		});
-		clientCertificateEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.client_certificate"), conf.getClientCertificateFileName(configName)); //$NON-NLS-1$
-		browseButton = panel.addButtonFor(clientCertificateEntry, new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription)); //$NON-NLS-1$
-		exportPasswordEntry = panel.addPasswordFieldRow(y++, Messages.getString("ConfigurationPanel.cert_password")); //$NON-NLS-1$
-		final boolean saveClientCertificatePassword = conf.getSaveClientCertificatePassword(configName);
-		if (saveClientCertificatePassword) {
-			exportPasswordEntry.setText(conf.getClientCertificatePassword(configName));
-		}
-		saveClientCertificatePasswordCheckbox = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.save_cert_password"), saveClientCertificatePassword); //$NON-NLS-1$
+		clientCertificateEntry = createTextField();
+		clientCertificateButton = new JButton();
+		clientCertificateButton.setAction( new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription));
+		exportPasswordEntry = createPasswordField();
+		saveClientCertificatePasswordCheckbox = new JCheckBox();
 		saveClientCertificatePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(saveClientCertificatePasswordCheckbox));
+		
+		y = 0;
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(useSSLCheckbox, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.client_certificate")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(clientCertificateEntry, 
+			createConstraints(1, y, 2, 1, 1.0, 0.0));
+		panel.add(clientCertificateButton, 
+			createConstraints(3, y, 1, 1, 0.0, 0.0));
+		y++;
 
-		updateSslTabComponentsEnabled();
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.cert_password")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(exportPasswordEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.save_cert_password")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(saveClientCertificatePasswordCheckbox, 
+			createConstraints(1, y, 3, 1, 0.0, 0.0));
+		y++;
+
+		if (panelPadding) {
+			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
+				panel.add(new JLabel(" "), 
+					createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
+			}
+		}
+
 		return panel;
 	}
 
-	private Component createOthersTab() {
-		TablePanel panel = new TablePanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		String configName = conf.getConfigurationName();
-
-		int y = 0;
-		styleEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.style"), conf.getStyleFileName(configName)); //$NON-NLS-1$
-		styleEntry.setColumns(20);
+	protected JPanel createOthersPanel() {		
+		int y;
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
 		final String extension = ".properties"; //$NON-NLS-1$
 		final String description = Messages.getString("ConfigurationPanel.filter_pattern"); //$NON-NLS-1$
-		panel.addButtonFor(styleEntry, new FileSelectionAction(styleEntry, home, extension, description));
+		
+		JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-		encodingEntry = panel.addTextFieldRow(y++, Messages.getString("ConfigurationPanel.encoding"), conf.getEncoding(configName)); //$NON-NLS-1$
-		UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
+		styleEntry = createTextField();
+		JButton styleButton = new JButton();
+		styleButton.setAction(new FileSelectionAction(styleEntry, home, extension, description));
+		encodingEntry = createTextField();
+
 		lafs = UIManager.getInstalledLookAndFeels();
-		String selectedLookAndFeelClassName = conf.getLookAndFeelClassName(configName);
-		String selected = null;
 		String[] lafNames = new String[lafs.length];
 		for (int i = 0; i < lafNames.length; i++) {
 			lafNames[i] = lafs[i].getName();
-			if (selectedLookAndFeelClassName.equals(lafs[i].getClassName())) {
-				selected = lafNames[i];
-			}
 		}
-		if (selected == null) {
-			selected = lafNames[0];
+		lookAndFeelCombo = new JComboBox();
+		lookAndFeelCombo.setEditable(false);
+		for (int i = 0; i < lafNames.length; i++) {
+			lookAndFeelCombo.addItem(lafNames[i]);
 		}
-		lookAndFeelCombo = panel.addComboBoxRow(y++, Messages.getString("ConfigurationPanel.look_and_feel"), lafNames, selected); //$NON-NLS-1$
-		final JComboBox combo = lookAndFeelCombo;
 		lookAndFeelCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeLookAndFeel(lafs[combo.getSelectedIndex()].getClassName());
+				changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
 			}
 		});
-
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
-		protocolVersionRadios = panel.addRadioButtonGroupRow(y++, Messages.getString("ConfigurationPanel.protocol_version"), versions, String.valueOf(conf.getProtocolVersion(configName))); //$NON-NLS-1$
-		useLogViewerCheck = panel.addCheckBoxRow(y++, Messages.getString("ConfigurationPanel.use_log_viewer"), conf.getUseLogViewer(configName)); //$NON-NLS-1$
-
+		protocolVersionRadios = new JRadioButton[versions.length];
+		ButtonGroup group = new ButtonGroup();
+		JPanel protocolVersionPanel = new JPanel();
+		protocolVersionPanel.setLayout(new GridLayout(1, versions.length));
+		for (int i = 0; i < versions.length; i++) {
+			JRadioButton radio = new JRadioButton(versions[i]);
+			radio.setSelected(versions[i].equals(versions[0]));
+			group.add(radio);
+			protocolVersionPanel.add(radio);
+			protocolVersionRadios[i] = radio;
+		}
+		useLogViewerCheck = new JCheckBox();
 		JPanel timerPanel = new JPanel();
 		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
 		useTimerCheck = new JCheckBox();
@@ -429,63 +523,127 @@ public class ConfigurationPanel extends JPanel {
 		timerPeriodEntry = new JTextField(5);
 		timerPeriodEntryPanel.add(timerPeriodEntry);
 		timerPanel.add(timerPeriodEntryPanel);
-		panel.addRow(y++,Messages.getString("ConfigurationPanel.use_timer") ,timerPanel);
+
+		propertiesText = new JTextArea(4, 30);
+		propertiesText.addFocusListener(new TextAreaSelected());
+		JScrollPane propertiesScroll = new JScrollPane(propertiesText, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		propertiesScroll.setMinimumSize(new Dimension(0,100));
 		
-		propertiesText = panel.addTextAreaRow(y++, 3, 30, Messages.getString("ConfigurationPanel.additional_system_properties"), conf.getProperties(configName)); //$NON-NLS-1$
+		y = 0;
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.style")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(styleEntry, 
+			createConstraints(1, y, 2, 1, 1.0, 0.0));
+		panel.add(styleButton, 
+			createConstraints(3, y, 1, 1, 0.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.encoding")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(encodingEntry, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.look_and_feel")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(lookAndFeelCombo, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.protocol_version")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(protocolVersionPanel, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.use_log_viewer")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(useLogViewerCheck, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.use_timer")), 
+			createConstraints(0, y, 1, 1, 0.0, 1.0));
+		panel.add(timerPanel, 
+			createConstraints(1, y, 3, 1, 1.0, 0.0));
+		y++;
+		
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.additional_system_properties")), 
+			createConstraints(0, y, 1, 4, 0.0, 1.0));
+		panel.add(propertiesScroll, 
+			createConstraints(1, y, 3, 4, 1.0, 1.0));
+		y += 4;
+		if (panelPadding) {
+			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
+				panel.add(new JLabel(" "), 
+				createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
+			}	
+		}
 		return panel;
 	}
 
-	private Component createInfoTab() {
-		TablePanel panel = new TablePanel();
+	protected JPanel createInfoPanel() {
+		int y;
+		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-		int y = 0;
-		JLabel name = new JLabel("monsiaj ver." + Messages.getString("application.version"));
-		name.setFont(new Font(null, Font.BOLD, 20));
-		panel.addRow(y++, name);
-		panel.addRow(y++, new JLabel("Copyright (C) 2007 ORCA Project"));
-		JButton orcasite = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
-		orcasite.addActionListener(new ActionListener() {
+		
+		JLabel version = new JLabel("monsiaj ver." + Messages.getString("application.version"));
+		version.setHorizontalAlignment(SwingConstants.CENTER);
+		version.setFont(new Font(null, Font.BOLD, 20));
+		JLabel copy = new JLabel("Copyright (C) 2007 ORCA Project");
+		copy.setHorizontalAlignment(SwingConstants.CENTER);
+		JButton orcaButton = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
+		orcaButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BareBonesBrowserLaunch.openURL(Messages.getString("ConfigurationPanel.info_orca_url"));
 			}
 		});
-		panel.addRow(y++, orcasite);
-		JButton montsuqisite = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
-		montsuqisite.addActionListener(new ActionListener() {
+		JButton montsuqiButton = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
+		montsuqiButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BareBonesBrowserLaunch.openURL(Messages.getString("ConfigurationPanel.info_montsuqi_url"));
 			}
-		});
-		panel.addRow(y++, montsuqisite);
+		});		
+
+		y = 0;
+		panel.add(version, 
+			createConstraints(0, y, 4, 3, 1.0, 1.0));
+		y += 3;
+		
+		panel.add(copy, 
+			createConstraints(0, y, 4, 1, 1.0, 1.0));
+		y++;
+
+		panel.add(orcaButton, 
+			createConstraints(0, y, 4, 1, 0.0, 1.0));
+		y++;
+
+		panel.add(montsuqiButton, 
+			createConstraints(0, y, 4, 1, 0.0, 1.0));
+		y++;
+
+		if (panelPadding) {
+			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
+				panel.add(new JLabel(" "), 
+				createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
+			}		
+		}
 		return panel;
 	}
 
-	protected void changeLookAndFeel(String className) {
-		try {
-			UIManager.setLookAndFeel(className);
-		} catch (Exception e) {
-			logger.warn(e);
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				Window window = SwingUtilities.windowForComponent(ConfigurationPanel.this);
-				Component root;
-				if (window != null) {
-					root = window;
-				} else {
-					root = ConfigurationPanel.this;
-				}
-				try {
-					SwingUtilities.updateComponentTreeUI(root);
-					if (window != null) {
-						window.pack();
-					}
-					
-				} catch (Exception e) {
-					logger.warn(e);
-				}
-			}
-		});
+	public JPanel getBasicPanel() {
+		return basicPanel;
+	}
+	
+	public JPanel getSSLPanel() {
+		return sslPanel;
+	}
+	
+	public JPanel getOthersPanel() {
+		return othersPanel;
+	}
+	
+	public JPanel getInfoPanel() {
+		return infoPanel;
 	}
 }
