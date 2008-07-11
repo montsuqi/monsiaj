@@ -225,9 +225,9 @@ public class ConfigurationPanel extends JPanel {
 	
 	protected void changeLookAndFeel(String className) {
 		if (doChangeLookAndFeel) {
-			MetalLookAndFeel.setCurrentTheme(systemMetalTheme);
 			try {
 				if ( !SystemEnvironment.isJavaVersionMatch("1.4") ) {
+					MetalLookAndFeel.setCurrentTheme(systemMetalTheme);
 					if ( className.startsWith("com.nilo.plaf.nimrod")) {
 						System.setProperty("nimrodlf.themeFile", lafThemeEntry.getText());
 						UIManager.setLookAndFeel(new NimRODLookAndFeel());
@@ -264,7 +264,9 @@ public class ConfigurationPanel extends JPanel {
 		this.conf = conf;
 		this.doPadding = doPadding;
 		this.doChangeLookAndFeel =  doChangeLookAndFeel;
-		this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
+		if ( !SystemEnvironment.isJavaVersionMatch("1.4") ) {
+			this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
+		}
 		initComponents();
 	}
 	
