@@ -187,6 +187,7 @@
 		<copy todir="${build.dir}/${bin.macosx.name}">
 			<fileset dir="${build.dir}">
 				<include name="${macosx.app.dir}/**"/>
+				<include name="*.theme"/>
 				<include name="README.txt"/>
 				<include name="README.html"/>
 			</fileset>
