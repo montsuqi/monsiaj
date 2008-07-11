@@ -54,6 +54,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -111,6 +113,7 @@ public class ConfigurationPanel extends JPanel {
 	
 	private boolean doPadding;
 	private boolean doChangeLookAndFeel;
+	private MetalTheme systemMetalTheme;
 	
 	/** <p>An action to warn vulnerability of saving password.</p>
 	 */
@@ -221,6 +224,7 @@ public class ConfigurationPanel extends JPanel {
 	
 	protected void changeLookAndFeel(String className) {
 		if (doChangeLookAndFeel) {
+			MetalLookAndFeel.setCurrentTheme(systemMetalTheme);
 			try {
 				if ( !SystemEnvironment.isJavaVersionMatch("1.4") ) {
 					if ( className.startsWith("com.nilo.plaf.nimrod")) {
@@ -255,6 +259,7 @@ public class ConfigurationPanel extends JPanel {
 		this.conf = conf;
 		this.doPadding = doPadding;
 		this.doChangeLookAndFeel =  doChangeLookAndFeel;
+		this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
 		initComponents();
 	}
 	
