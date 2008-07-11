@@ -303,7 +303,7 @@ public class Launcher {
 	}
 
 	protected ConfigurationPanel createConfigurationPanel() {
-		return new ConfigurationPanel(conf, true); 
+		return new ConfigurationPanel(conf, true, true); 
 	}
 
 	protected ConfigurationViewer createConfigurationViewer() {

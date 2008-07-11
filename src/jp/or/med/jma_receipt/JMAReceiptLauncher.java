@@ -41,6 +41,12 @@ public class JMAReceiptLauncher extends Launcher {
 	 */
 	protected JMAReceiptLauncher(String title) {
 		super(title);
+		String [] configNames = conf.getConfigurationNames();
+		for (int i = 0; i < configNames.length; i++) {
+			conf.setApplication(configNames[i], "orca00"); //$NON-NLS-1$
+			conf.setEncoding(configNames[i], "EUC-JP"); //$NON-NLS-1$
+			conf.setProtocolVersion(configNames[i], 1);
+		}
 	}
 	
 		/** <p>Application entry point.</p> */
@@ -52,13 +58,7 @@ public class JMAReceiptLauncher extends Launcher {
 	/** <p>Constructs the configuration panel.</p>
 	 */
 	protected ConfigurationPanel createConfigurationPanel() {
-		String [] configNames = conf.getConfigurationNames();
-		for (int i = 0; i < configNames.length; i++) {
-			conf.setApplication(configNames[i], "orca00"); //$NON-NLS-1$
-			conf.setEncoding(configNames[i], "EUC-JP"); //$NON-NLS-1$
-			conf.setProtocolVersion(configNames[i], 1);
-		}
-		return new JMAReceiptConfigurationPanel(conf, true);
+		return new JMAReceiptConfigurationPanel(conf, true, true);
 	}
 	
 	protected ConfigurationViewer createConfigurationViewer() {

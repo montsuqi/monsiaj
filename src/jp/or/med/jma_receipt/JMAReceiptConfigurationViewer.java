@@ -34,6 +34,6 @@ public class JMAReceiptConfigurationViewer extends ConfigurationViewer {
 	}
 
 	protected ConfigurationPanel createConfigurationPanel(Configuration conf) {
-		return new JMAReceiptConfigurationPanel(conf, false);
+		return new JMAReceiptConfigurationPanel(conf, false, false);
 	}
 }

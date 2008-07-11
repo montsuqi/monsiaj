@@ -172,7 +172,7 @@ public class ConfigurationViewer{
 	}
 	
 	protected ConfigurationPanel createConfigurationPanel(Configuration conf) {
-		return new ConfigurationPanel(conf, false);
+		return new ConfigurationPanel(conf, false, false);
 	}
 	
 	protected void editConfiguration(Dialog parent, String name, boolean flag) {

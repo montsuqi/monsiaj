@@ -34,8 +34,8 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	 * 
 	 * @param conf configuration to read initial values and write result to.
 	 */
-	JMAReceiptConfigurationPanel(Configuration conf, boolean padding) {
-		super(conf, padding);
+	JMAReceiptConfigurationPanel(Configuration conf, boolean doPadding, boolean doChangeLookAndFeel) {
+		super(conf, doPadding, doChangeLookAndFeel);
 	}
 
 	/** <p>Creates components and disable some so users cannot alter preset values.</p>

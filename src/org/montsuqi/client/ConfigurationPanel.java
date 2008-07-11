@@ -109,7 +109,8 @@ public class ConfigurationPanel extends JPanel {
 	private static final int MAX_PANEL_ROWS = 12;
 	private static final int MAX_PANEL_COLUMNS = 4;
 	
-	private boolean panelPadding;
+	private boolean doPadding;
+	private boolean doChangeLookAndFeel;
 	
 	/** <p>An action to warn vulnerability of saving password.</p>
 	 */
@@ -219,41 +220,44 @@ public class ConfigurationPanel extends JPanel {
 	}
 	
 	protected void changeLookAndFeel(String className) {
-		try {
-			if ( !SystemEnvironment.isJavaVersionMatch("1.4") ) {
-				if ( className.startsWith("com.nilo.plaf.nimrod")) {
-					System.setProperty("nimrodlf.themeFile", lafThemeEntry.getText());
-					UIManager.setLookAndFeel(new NimRODLookAndFeel());
+		if (doChangeLookAndFeel) {
+			try {
+				if ( !SystemEnvironment.isJavaVersionMatch("1.4") ) {
+					if ( className.startsWith("com.nilo.plaf.nimrod")) {
+						System.setProperty("nimrodlf.themeFile", lafThemeEntry.getText());
+						UIManager.setLookAndFeel(new NimRODLookAndFeel());
+					} else {
+						UIManager.setLookAndFeel(className);
+					}
 				} else {
 					UIManager.setLookAndFeel(className);
 				}
-			} else {
-				UIManager.setLookAndFeel(className);
+			} catch (Exception e) {
+				logger.warn(e);
 			}
-		} catch (Exception e) {
-			logger.warn(e);
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				Component root = SwingUtilities.getRoot(basicPanel);
-				try {
-					if (root != null) {
-						SwingUtilities.updateComponentTreeUI(root);
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					Component root = SwingUtilities.getRoot(basicPanel);
+					try {
+						if (root != null) {
+							SwingUtilities.updateComponentTreeUI(root);
+						}
+
+					} catch (Exception e) {
+						logger.warn(e);
 					}
-					
-				} catch (Exception e) {
-					logger.warn(e);
 				}
-			}
-		});
+			});
+		}
 	}
 	
-	protected ConfigurationPanel(Configuration conf, boolean padding) {
+	protected ConfigurationPanel(Configuration conf, boolean doPadding, boolean doChangeLookAndFeel) {
 		this.conf = conf;
-		this.panelPadding = padding;
+		this.doPadding = doPadding;
+		this.doChangeLookAndFeel =  doChangeLookAndFeel;
 		initComponents();
 	}
-
+	
 	protected void initComponents() {
 		basicPanel = createBasicPanel();
 		sslPanel = createSSLPanel();
@@ -457,7 +461,7 @@ public class ConfigurationPanel extends JPanel {
 			createConstraints(1, y, 3, 1, 1.0, 0.0));
 		y++;
 
-		if (panelPadding) {
+		if (doPadding) {
 			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
 				panel.add(new JLabel(" "), 
 					createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
@@ -522,7 +526,7 @@ public class ConfigurationPanel extends JPanel {
 			createConstraints(1, y, 3, 1, 0.0, 0.0));
 		y++;
 
-		if (panelPadding) {
+		if (doPadding) {
 			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
 				panel.add(new JLabel(" "), 
 					createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
@@ -542,8 +546,6 @@ public class ConfigurationPanel extends JPanel {
 	protected JPanel createOthersPanel() {		
 		int y;
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
-		final String extension = ".properties"; //$NON-NLS-1$
-		final String description = Messages.getString("ConfigurationPanel.filter_pattern"); //$NON-NLS-1$
 		
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -573,7 +575,7 @@ public class ConfigurationPanel extends JPanel {
 		lafThemeEntry = createTextField();
 		lafThemeButton = new JButton();
 		lafThemeButton.setAction(
-			new ThemeSelectionAction(lafThemeEntry, home,".theme",
+			new ThemeSelectionAction(lafThemeEntry, lafThemeEntry.getText(),".theme",
 				Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 		useLogViewerCheck = new JCheckBox();
 		JPanel timerPanel = new JPanel();
@@ -642,7 +644,7 @@ public class ConfigurationPanel extends JPanel {
 		panel.add(propertiesScroll, 
 			createConstraints(1, y, 3, 4, 1.0, 1.0));
 		y += 4;
-		if (panelPadding) {
+		if (doPadding) {
 			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
 				panel.add(new JLabel(" "), 
 				createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
@@ -691,7 +693,7 @@ public class ConfigurationPanel extends JPanel {
 			createConstraints(0, y, 4, 1, 0.0, 1.0));
 		y++;
 
-		if (panelPadding) {
+		if (doPadding) {
 			for(int i = y ; i < MAX_PANEL_ROWS; i++) {
 				panel.add(new JLabel(" "), 
 				createConstraints(0,i,MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
