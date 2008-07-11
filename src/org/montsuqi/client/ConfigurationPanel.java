@@ -37,6 +37,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.Font;
 import java.io.File;
+import java.util.Enumeration;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory; 
@@ -235,6 +236,10 @@ public class ConfigurationPanel extends JPanel {
 					}
 				} else {
 					UIManager.setLookAndFeel(className);
+				}
+				if ( SystemEnvironment.isMacOSX() 
+				     && (! className.startsWith("javax.swing.plaf.mac"))) {
+				    updateFont(new Font("Osaka", Font.PLAIN, 12));
 				}
 			} catch (Exception e) {
 				logger.warn(e);
@@ -547,7 +552,18 @@ public class ConfigurationPanel extends JPanel {
 		lafThemeEntry.setEnabled(isNimrod);
 		lafThemeButton.setEnabled(isNimrod);
 	}	
-	
+
+	private void updateFont(final Font font) {
+		Enumeration e = UIManager.getDefaults().keys();
+		while(e.hasMoreElements()){
+			Object key = e.nextElement();
+			Object value = UIManager.get(key);
+			if (value instanceof Font){
+			    UIManager.put(key, font);
+			}
+		}
+	}
+
 	protected JPanel createOthersPanel() {		
 		int y;
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$
