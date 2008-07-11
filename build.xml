@@ -130,6 +130,11 @@
 				<exclude name="pandareplay.jar"/>
 			</fileset>
 		</copy>
+		<copy todir="${build.dir}/${bin.name}/theme">
+			<fileset dir="${build.dir}">
+				<include name="*.theme"/>
+			</fileset>
+		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
 		<zip zipfile="${dist.dir}/${bin.name}.zip">
 			<fileset dir="${build.dir}">
@@ -190,6 +195,11 @@
 				<include name="*.theme"/>
 				<include name="README.txt"/>
 				<include name="README.html"/>
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}/${bin.macosx.name}/theme">
+			<fileset dir="${build.dir}">
+				<include name="*.theme"/>
 			</fileset>
 		</copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
