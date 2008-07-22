@@ -30,6 +30,8 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.File;
 import java.io.IOException;
 
@@ -43,6 +45,17 @@ class ImagePreview extends Preview {
 	BufferedImage image;
 	Dimension lastImageSize;
 
+    static final float[][] operator={
+       
+        { 0.11f, 0.11f, 0.11f,     //operator[0]
+          0.11f, 0.12f, 0.11f,
+          0.11f, 0.11f, 0.11f},
+
+        {-0.11f, -0.11f, -0.11f,  //operator[1]
+	 -0.11f,  1.88f, -0.11f,
+         -0.11f, -0.11f, -0.11f},
+    };
+
 	/** <p>Constructs an ImagePreview</p>
 	 */
 	public ImagePreview() {
@@ -50,6 +63,20 @@ class ImagePreview extends Preview {
 	    sourceImage = null;
 	    image = null;
 	    lastImageSize = null;
+	}
+
+    public BufferedImage makeConvolution(
+	 BufferedImage bimg,float[] operator,int type){
+
+	Kernel kernel=new Kernel(3,3,operator);
+	ConvolveOp convop;
+	if(type==1) 
+	    convop=new ConvolveOp(kernel,ConvolveOp.EDGE_ZERO_FILL,null);
+	else
+	    convop=new ConvolveOp(kernel,ConvolveOp.EDGE_NO_OP,null);
+	BufferedImage bimg_dest=convop.filter(bimg,null);
+	return bimg_dest;
+	
     }
 
 	/** <p>Loads a image from file of given name.</p>
@@ -173,7 +200,12 @@ class ImagePreview extends Preview {
 			setPreferredSize(size);
 			flushImage(image);
 			image = new BufferedImage(size.width, size.height, sourceImage.getType());
-	
+			BufferedImage imagetmp = new BufferedImage(size.width, size.height, sourceImage.getType());
+			if ( scale < 0.7 ) {
+			    image = makeConvolution(sourceImage,operator[0],0);
+			} else {
+			    image = sourceImage;
+			}
 			AffineTransform t = new AffineTransform();
 			t.scale(scale, scale);
 			int cx = rotationStep != 1 ? sw / 2 : sh / 2;
@@ -182,8 +214,9 @@ class ImagePreview extends Preview {
 			t.rotate(angle, cx, cy);
 	
 			AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BILINEAR);
-			op.filter(sourceImage, image);
-	
+
+			op.filter(image, imagetmp);
+			image = makeConvolution(imagetmp,operator[1],0);
 			revalidate();
 			repaint();
 		} catch (Exception ex) {
