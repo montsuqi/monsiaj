@@ -26,9 +26,15 @@ package org.montsuqi.widgets;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.im.InputContext;
+import java.awt.im.InputSubset;
+import java.util.Locale;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -53,7 +59,29 @@ public class NumberEntry extends Entry {
 		enableInputMethods(false);
 		setDocument(new NumberDocument());
 		setHorizontalAlignment(SwingConstants.RIGHT);
-	}	
+		initListeners();
+	}
+
+	private void initListeners() {
+		addFocusListener(new FocusListener() {
+		// NOTE only works in japanese environment.
+		// See
+		// <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
+		// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
+		public void focusGained(FocusEvent e) {
+			InputContext ic = getInputContext();
+			ic.setCharacterSubsets(null);
+			ic.endComposition();
+			ic.selectInputMethod(Locale.ENGLISH);
+		}
+		public void focusLost(FocusEvent e) {
+			InputContext ic = getInputContext();
+			ic.setCharacterSubsets(null);
+			ic.endComposition();
+			ic.selectInputMethod(Locale.ENGLISH);
+		}
+		});
+	}
 
 	public void setValue(BigDecimal value) {
 		NumberDocument doc = (NumberDocument)getDocument();
