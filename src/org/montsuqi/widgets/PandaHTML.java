@@ -27,6 +27,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -35,6 +36,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.html.HTML;
+import javax.swing.text.AttributeSet;
+
+import com.centerkey.utils.BareBonesBrowserLaunch;
 
 import org.montsuqi.util.Logger;
 
@@ -59,7 +64,15 @@ public class PandaHTML extends JPanel {
 		editorPane.addHyperlinkListener(new HyperlinkListener() {
 			public void hyperlinkUpdate(HyperlinkEvent event) {
 				if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+				    AttributeSet attribs = event.getSourceElement().getAttributes();
+				    Enumeration attribNames = attribs.getAttributeNames();
+				    AttributeSet tagAttribs = (AttributeSet)attribs.getAttribute(HTML.Tag.A);
+				    String target = (String)tagAttribs.getAttribute(HTML.Attribute.TARGET);
+				    if(target == null) {
 					setURI(event.getURL());
+				    } else {
+					BareBonesBrowserLaunch.openURL(event.getURL().toString());
+				    }
 				}
 			}
 		});
