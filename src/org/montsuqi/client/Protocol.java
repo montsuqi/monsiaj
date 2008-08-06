@@ -46,6 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JViewport;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -232,8 +233,9 @@ public class Protocol extends Connection {
 		}
 		if (type == ScreenType.CLOSE_WINDOW) {
 			logger.debug("closing: {0}", window.getName());
+			clearWidget(window);
+			window.update(window.getGraphics());
 			window.setVisible(false);
-			clearPreview(window);
 		}
 		logger.leave();
 		return null;
@@ -494,19 +496,23 @@ public class Protocol extends Connection {
 		// logger.leave();
 	}
 
-	private synchronized void clearPreview(Component widget) {
+	private synchronized void clearWidget(Component widget) {
 		// logger.enter(widget);
 		if (widget instanceof PandaPreviewPane) {
 			PandaPreviewPane preview = (PandaPreviewPane)widget;
 			preview.clear();
+		} else if (widget instanceof JTextField) {
+			JTextField text = (JTextField)widget;
+			text.setText(null);
 		} else if (widget instanceof Container) {
 			Container container = (Container)widget;
 			for (int i = 0, n = container.getComponentCount(); i < n; i++) {
-				clearPreview(container.getComponent(i));
+				clearWidget(container.getComponent(i));
 			}
 		}
 		// logger.leave();
-	}
+	}	
+	
 	
 	private synchronized void resetScrollPane(Component widget) {
 		if (widget instanceof JScrollPane) {
