@@ -764,7 +764,7 @@ public class Protocol extends Connection {
 			return;
 		}
 		node.getWindow().setVisible(false);
-		clearPreview(node.getWindow());
+		clearWidget(node.getWindow());
 		if (isReceiving()) {
 			logger.leave();
 			return;
