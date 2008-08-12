@@ -83,7 +83,8 @@ public class Entry extends JTextField {
             tf.setCaretPosition(Math.max(0, tf.getText().length()));
         }
        public void focusLost(final FocusEvent e) {
-
+    	   JTextField tf = (JTextField)e.getSource();
+            tf.setCaretPosition(0);
        }        
     }
 }
