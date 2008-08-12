@@ -78,6 +78,7 @@ public class ConfigurationViewer{
 		final PandaCList clist = new PandaCList();
 		clist.setFocusable(true);
 		clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+		clist.setShowGrid(true);
 		updateConfigurationList(clist);
 		clist.setAutoResizeMode(clist.AUTO_RESIZE_LAST_COLUMN);
 
