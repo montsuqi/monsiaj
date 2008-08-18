@@ -177,10 +177,6 @@ class ImagePreview extends Preview {
 			if (scale >= 1.1 || scale <= 0.9 ) {
 			    AffineTransform trans = new AffineTransform();
 			    trans.scale(scale, scale);
-			    int cx = rotationStep != 1 ? sw / 2 : sh / 2;
-			    int cy = rotationStep != 3 ? sh / 2 : sw / 2;
-			    double angle = (Math.PI / 2.0) * rotationStep;
-			    trans.rotate(angle, cx, cy);
 			    AffineTransformOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
 			    op.filter(sourceImage, image);
 			} else {
