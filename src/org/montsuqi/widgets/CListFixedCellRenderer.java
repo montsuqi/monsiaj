@@ -45,7 +45,7 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 	private static final Pattern EXPRESSION_PATTERN;
 
 	static {
-	    NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1); 
+		NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1); 
 		EXPRESSION_PATTERN = Pattern.compile("(?:[ \u3000]+)([0-9\uff10-\uff19]+(?:\u00d7[0-9\uff10-\uff19]+)?)(?:[ \u3000]*)\\z"); //$NON-NLS-1$
 	}
 
@@ -103,7 +103,7 @@ class CListFixedCellRenderer extends Fixed implements TableCellRenderer {
 		}
 
 		String s = value.toString();
-		for (int i = labels.length - 1; i >= 1; i--) {
+		for (int i = labels.length - 1; i >= labels.length - 2 && i >= 1; i--) {
 			Matcher match = EXPRESSION_PATTERN.matcher(s);
 			if ( ! match.find(0)) {
 				break;
