@@ -61,7 +61,12 @@ class ImagePreview extends Preview {
 	 */
 	public void load(String fileName) throws IOException {
 		flushImage(sourceImage);
-		sourceImage = ImageIO.read(new File(fileName));
+		BufferedImage im0 = ImageIO.read(new File(fileName));
+		sourceImage = new BufferedImage(im0.getWidth(),im0.getHeight(), BufferedImage.TYPE_INT_RGB);
+		Graphics g = sourceImage.getGraphics();
+		g.drawImage(im0,0,0,null);
+		g.dispose();
+
 		if (sourceImage != null) {
 			final Dimension imageSize =  new Dimension(sourceImage.getWidth(), sourceImage.getHeight());
 			if (lastImageSize == null || ! lastImageSize.equals(imageSize)) {
@@ -173,7 +178,7 @@ class ImagePreview extends Preview {
 			Dimension size = rotationStep % 2 != 0 ? new Dimension(h, w) : new Dimension(w, h);
 			setPreferredSize(size);
 			flushImage(image);
-			image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+			image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
 			if (scale >= 1.1 || scale <= 0.9 ) {
 			    AffineTransform trans = new AffineTransform();
 			    trans.scale(scale, scale);
