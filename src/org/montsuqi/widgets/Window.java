@@ -122,7 +122,7 @@ public class Window extends JFrame {
 		if (sessionTitle.equals("")) {
 			frame.setTitle(title);			
 		} else {
-			frame.setTitle(sessionTitle + " - " + title);
+			frame.setTitle(title + " - " + sessionTitle);
 		}
 	}
 }
