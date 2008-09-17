@@ -195,7 +195,7 @@ public class ConfigurationPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fileChooser = new JFileChooser(home); //$NON-NLS-1$
+			JFileChooser fileChooser = new JFileChooser(entry.getText()); //$NON-NLS-1$
 			fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
 			int ret = fileChooser.showOpenDialog(null);
 			if (ret == JFileChooser.APPROVE_OPTION) {
