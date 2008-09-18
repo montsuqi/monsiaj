@@ -142,27 +142,24 @@ public class ConfigurationPanel extends JPanel {
 	private final class FileSelectionAction extends AbstractAction {
 
 		private JTextComponent entry;
-		private String home;
 		private String extension;
 		private String description;
 
 		/** <p>Constructs a FileSelectionAction.</p>
 		 * 
 		 * @param entry a text field to which the path of the selected file is set.
-		 * @param home a directory path from which file selection starts.
 		 * @param extension a file name extension passed to an ExtensionFIleFilter.
 		 * @param description ditto.
 		 */
-		FileSelectionAction(JTextComponent entry, String home, String extension, String description) {
+		FileSelectionAction(JTextComponent entry, String extension, String description) {
 			super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
 			this.entry = entry;
-			this.home = home;
 			this.extension = extension;
 			this.description = description;
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser fileChooser = new JFileChooser(home); //$NON-NLS-1$
+			JFileChooser fileChooser = new JFileChooser(entry.getText()) ;
 			fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
 			int ret = fileChooser.showOpenDialog(null);
 			if (ret == JFileChooser.APPROVE_OPTION) {
@@ -175,21 +172,18 @@ public class ConfigurationPanel extends JPanel {
 	private final class ThemeSelectionAction extends AbstractAction {
 
 		private JTextComponent entry;
-		private String home;
 		private String extension;
 		private String description;
 
 		/** <p>Constructs a FileSelectionAction.</p>
 		 * 
 		 * @param entry a text field to which the path of the selected file is set.
-		 * @param home a directory path from which file selection starts.
 		 * @param extension a file name extension passed to an ExtensionFIleFilter.
 		 * @param description ditto.
 		 */
-		ThemeSelectionAction(JTextComponent entry, String home, String extension, String description) {
+		ThemeSelectionAction(JTextComponent entry, String extension, String description) {
 			super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
 			this.entry = entry;
-			this.home = home;
 			this.extension = extension;
 			this.description = description;
 		}
@@ -492,7 +486,6 @@ public class ConfigurationPanel extends JPanel {
 
 	protected JPanel createSSLPanel() {
 		int y;
-		final String home = System.getProperty("user.home"); //$NON-NLS-1$
 		final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
 
 		JPanel panel = new JPanel(new GridBagLayout());
@@ -506,7 +499,7 @@ public class ConfigurationPanel extends JPanel {
 		});
 		clientCertificateEntry = createTextField();
 		clientCertificateButton = new JButton();
-		clientCertificateButton.setAction( new FileSelectionAction(clientCertificateEntry, home, ".p12", clientCertificateDescription));
+		clientCertificateButton.setAction( new FileSelectionAction(clientCertificateEntry, ".p12", clientCertificateDescription));
 		exportPasswordEntry = createPasswordField();
 		saveClientCertificatePasswordCheckbox = new JCheckBox();
 		saveClientCertificatePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(saveClientCertificatePasswordCheckbox));
@@ -568,15 +561,13 @@ public class ConfigurationPanel extends JPanel {
 
 	protected JPanel createOthersPanel() {		
 		int y;
-		final String home = System.getProperty("user.home"); //$NON-NLS-1$
-		
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 		styleEntry = createTextField();
 		JButton styleButton = new JButton();
 		styleButton.setAction(
-			new FileSelectionAction(styleEntry, home, ".properties", 
+			new FileSelectionAction(styleEntry, ".properties", 
 				Messages.getString("ConfigurationPanel.style_filter_pattern")));
 		encodingEntry = createTextField();
 		lafs = UIManager.getInstalledLookAndFeels();
@@ -598,7 +589,7 @@ public class ConfigurationPanel extends JPanel {
 		lafThemeEntry = createTextField();
 		lafThemeButton = new JButton();
 		lafThemeButton.setAction(
-			new ThemeSelectionAction(lafThemeEntry, lafThemeEntry.getText(),".theme",
+			new ThemeSelectionAction(lafThemeEntry, ".theme",
 				Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 		useLogViewerCheck = new JCheckBox();
 		JPanel timerPanel = new JPanel();
