@@ -180,14 +180,10 @@ class ImagePreview extends Preview {
 			setPreferredSize(size);
 			flushImage(image);
 			image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
-			if (scale >= 1.1 || scale <= 0.9 ) {
-			    AffineTransform trans = new AffineTransform();
-			    trans.scale(scale, scale);
-			    AffineTransformOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
-			    op.filter(sourceImage, image);
-			} else {
-			    image = sourceImage;
-			}
+			AffineTransform trans = new AffineTransform();
+			trans.scale(scale, scale);
+			AffineTransformOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
+			op.filter(sourceImage, image);
 	
 			revalidate();
 			repaint();
