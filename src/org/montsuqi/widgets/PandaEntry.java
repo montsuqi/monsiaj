@@ -49,6 +49,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.montsuqi.util.SystemEnvironment;
+
 /** <p>A class that simulates GtkPandaButton widget.</p>
  */
 public class PandaEntry extends Entry {
@@ -101,17 +103,21 @@ public class PandaEntry extends Entry {
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
 			// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
 			public void focusGained(FocusEvent e) {
-				if (ximEnabled) {
-					InputContext ic = getInputContext();
-					ic.setCharacterSubsets(new Character.Subset[] {InputSubset.KANJI});
-					ic.selectInputMethod(Locale.JAPANESE);
+				if (SystemEnvironment.isWindows()) {
+					if (ximEnabled) {
+						InputContext ic = getInputContext();
+						ic.setCharacterSubsets(new Character.Subset[] {InputSubset.KANJI});
+						ic.selectInputMethod(Locale.JAPANESE);
+					}
 				}
 			}
 			public void focusLost(FocusEvent e) {
-				InputContext ic = getInputContext();
-				ic.setCharacterSubsets(null);
-				ic.endComposition();
-				ic.selectInputMethod(Locale.ENGLISH);
+				if (SystemEnvironment.isWindows()) {
+					InputContext ic = getInputContext();
+					ic.setCharacterSubsets(null);
+					ic.endComposition();
+					ic.selectInputMethod(Locale.ENGLISH);
+				}
 			}
 		});
 

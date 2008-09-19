@@ -49,6 +49,7 @@ import javax.swing.text.PlainDocument;
 
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.PrecisionScale;
+import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A class that simulates Gtk+'s NumberEntry.</p>
  */
@@ -69,16 +70,20 @@ public class NumberEntry extends Entry {
 		// <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
 		// <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
 		public void focusGained(FocusEvent e) {
-			InputContext ic = getInputContext();
-			ic.setCharacterSubsets(null);
-			ic.endComposition();
-			ic.selectInputMethod(Locale.ENGLISH);
+			if (SystemEnvironment.isWindows()) {
+				InputContext ic = getInputContext();
+				ic.setCharacterSubsets(null);
+				ic.endComposition();
+				ic.selectInputMethod(Locale.ENGLISH);
+			}
 		}
 		public void focusLost(FocusEvent e) {
-			InputContext ic = getInputContext();
-			ic.setCharacterSubsets(null);
-			ic.endComposition();
-			ic.selectInputMethod(Locale.ENGLISH);
+			if (SystemEnvironment.isWindows()) {
+				InputContext ic = getInputContext();
+				ic.setCharacterSubsets(null);
+				ic.endComposition();
+				ic.selectInputMethod(Locale.ENGLISH);
+			}
 		}
 		});
 	}
