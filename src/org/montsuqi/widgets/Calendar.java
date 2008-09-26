@@ -45,6 +45,7 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.UIManager;
 
 import java.util.Date;
 
@@ -96,7 +97,7 @@ public class Calendar extends JComponent {
 			dateCellPanel.add(dayOfWeek);
 		}
 		Insets margin = new Insets(0, 0, 0, 0);
-		if (SystemEnvironment.isMacOSX() && SystemEnvironment.isJavaVersionMatch("1.6")) {
+		if (UIManager.getLookAndFeel().getName().equals("Mac OS X")) {
 		    margin.set(0, -20, 0, -20);
 		}
 		for (int row = 1; row < 7; row++) {
@@ -104,7 +105,7 @@ public class Calendar extends JComponent {
 				final JButton cell = new JButton();
 				cell.setHorizontalAlignment(SwingConstants.RIGHT);
 
-				cell.setMargin(margin);
+
 				final int finalRow = row;
 				final int finalCol = col;
 				cell.addActionListener(new ActionListener() {
@@ -115,6 +116,8 @@ public class Calendar extends JComponent {
 				});
 				dateCells[row][col] = cell;
 				dateCellPanel.add(cell);
+				cell.setMargin(margin);
+				//cell.setBorder(BorderFactory.createEmptyBorder());
 			}
 		}
 		setCells();
