@@ -26,12 +26,15 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Insets;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
 
+import javax.swing.AbstractButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -44,7 +47,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import javax.swing.UIManager;
-import javax.swing.plaf.FontUIResource;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
@@ -236,7 +238,7 @@ public class WidgetBuilder {
 		if (font != null) {
 			font = creator.modifyFont(font);
 //			font = ScreenScale.scale(font);
-			UIManager.put(key, new FontUIResource(font));
+			UIManager.put(key, font);
 		}
 	}
 
@@ -266,6 +268,7 @@ public class WidgetBuilder {
 			return new JLabel(MessageFormat.format("[a {0}]", args)); //$NON-NLS-1$
 		}
 		try {
+			AbstractButton button;
 			Component widget = builder.buildSelf(xml, parent, info);
 			if (widget instanceof Window) {
 				xml.setTopLevel(widget);
@@ -275,6 +278,12 @@ public class WidgetBuilder {
 			}
 			builder.setCommonParameters(xml, widget, info);
 			builder.setSignals(xml, widget, info);
+			// FIXME; for Mac OS X bug
+			if ( UIManager.getLookAndFeel().getName().equals("Mac OS X") &&
+				widget instanceof AbstractButton ) {
+				button = (AbstractButton)widget;
+				button.setMargin(new Insets(0,-20,0,-20));
+			}
 			return widget;
 		} catch (Exception e) {
 			logger.warn(e);

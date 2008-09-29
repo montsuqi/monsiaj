@@ -232,8 +232,8 @@ public class ConfigurationPanel extends JPanel {
 					UIManager.setLookAndFeel(className);
 				}
 				if ( SystemEnvironment.isMacOSX() 
-				     && (! className.startsWith("javax.swing.plaf.mac"))) {
-				    updateFont(new Font("Osaka", Font.PLAIN, 12));
+				     && (! className.startsWith("apple.laf.AquaLookAndFeel"))) {
+						updateFont(new Font("Osaka", Font.PLAIN, 12));
 				}
 			} catch (Exception e) {
 				logger.warn(e);
@@ -550,7 +550,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private void updateFont(final Font font) {
 		Enumeration e = UIManager.getDefaults().keys();
-		while(e.hasMoreElements()){
+		while(e.hasMoreElements()) {
 			Object key = e.nextElement();
 			Object value = UIManager.get(key);
 			if (value instanceof Font){

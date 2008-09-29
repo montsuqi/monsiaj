@@ -97,6 +97,7 @@ public class Calendar extends JComponent {
 			dateCellPanel.add(dayOfWeek);
 		}
 		Insets margin = new Insets(0, 0, 0, 0);
+		// FIXME; for Mac OS X bug
 		if (UIManager.getLookAndFeel().getName().equals("Mac OS X")) {
 		    margin.set(0, -20, 0, -20);
 		}
