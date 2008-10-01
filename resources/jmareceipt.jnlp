@@ -6,7 +6,7 @@
     <icon href="jma-receipt.jpg"/>
     <description>JMA receipt java client</description>
     <offline-allowed/>
-    <shortcut online="false">
+    <shortcut online="true">
       <desktop/>
     </shortcut>
   </information>
