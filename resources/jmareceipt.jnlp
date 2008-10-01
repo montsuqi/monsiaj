@@ -17,6 +17,7 @@
     <j2se version="1.4+"/>
     <jar href="jmareceipt.jar"/>
     <jar href="pandaclient.jar"/>
+    <jar href="nimrodlf.jar"/>
     <jar href="BareBonesBrowserLaunch.jar"/>
   </resources>
   <resources os="Mac\ OS\ X">
