@@ -206,7 +206,7 @@ Javaのプロパティファイルでは、仕様上、
 
 * LightPastelBlue.theme
 * LightPastelRed.theme
-* LightTobaco.theme
+* LightTabaco.theme
 * Macchya.theme
 * Snow.theme
 * Sumire.theme
