@@ -174,9 +174,6 @@ class NumberDocument extends PlainDocument {
 	}
 
 	synchronized void setValue(BigDecimal v) {
-		if (value.equals(v)) {
-			return;
-		}
 		PrecisionScale ps = new PrecisionScale(originalFormat);
 		String t = formatValue(v.setScale(ps.precision + 1, ps.scale));
 		value = ZERO;
