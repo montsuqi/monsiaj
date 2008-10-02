@@ -34,7 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
 
-import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -268,7 +268,7 @@ public class WidgetBuilder {
 			return new JLabel(MessageFormat.format("[a {0}]", args)); //$NON-NLS-1$
 		}
 		try {
-			AbstractButton button;
+			JButton button;
 			Component widget = builder.buildSelf(xml, parent, info);
 			if (widget instanceof Window) {
 				xml.setTopLevel(widget);
@@ -280,8 +280,8 @@ public class WidgetBuilder {
 			builder.setSignals(xml, widget, info);
 			// FIXME; for Mac OS X bug
 			if ( UIManager.getLookAndFeel().getName().equals("Mac OS X") &&
-				widget instanceof AbstractButton ) {
-				button = (AbstractButton)widget;
+				widget instanceof JButton ) {
+				button = (JButton)widget;
 				button.setMargin(new Insets(0,-20,0,-20));
 			}
 			return widget;
