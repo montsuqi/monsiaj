@@ -41,7 +41,7 @@ public class ToggleButton extends JToggleButton {
 
 	public ToggleButton() {
 		super();
-		setMargin(new Insets(2, 2, 2, 2));
+		setMargin(new Insets(0, -20, 0, -20));
 		initActions();
 	}
 

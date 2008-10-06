@@ -26,7 +26,6 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.Insets;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -34,7 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -268,7 +266,6 @@ public class WidgetBuilder {
 			return new JLabel(MessageFormat.format("[a {0}]", args)); //$NON-NLS-1$
 		}
 		try {
-			JButton button;
 			Component widget = builder.buildSelf(xml, parent, info);
 			if (widget instanceof Window) {
 				xml.setTopLevel(widget);
@@ -278,12 +275,6 @@ public class WidgetBuilder {
 			}
 			builder.setCommonParameters(xml, widget, info);
 			builder.setSignals(xml, widget, info);
-			// FIXME; for Mac OS X bug
-			if ( UIManager.getLookAndFeel().getName().equals("Mac OS X") &&
-				widget instanceof JButton ) {
-				button = (JButton)widget;
-				button.setMargin(new Insets(0,-20,0,-20));
-			}
 			return widget;
 		} catch (Exception e) {
 			logger.warn(e);
