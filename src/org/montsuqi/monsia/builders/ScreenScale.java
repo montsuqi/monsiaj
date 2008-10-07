@@ -72,12 +72,35 @@ final class ScreenScale {
 		frameFreeSize = new Dimension(screenFreeSize);
 		frameFreeSize.width -= frameInsetsSize.width;
 		frameFreeSize.height -= frameInsetsSize.height;
-		frameWidthScale = frameFreeSize.width / (double)screenSize.width;
-		frameHeightScale = frameFreeSize.height / (double)screenSize.height;
-		compWidthScale = frameFreeSize.width / (double)screenFreeSize.width
-			- screenInsetsSize.width / (double)screenSize.width;
-		compHeightScale = frameFreeSize.height / (double)screenFreeSize.height
-			- screenInsetsSize.height / (double)screenSize.height + 0.025; /* TODO Eliminate this magic number! */
+
+		// FIXME; now, use magic number
+		final Dimension preferredSize = new Dimension(1024, 768);
+		
+		if (frameFreeSize.width > preferredSize.width) {
+			if ("true".equals(System.getProperty("expand_screen"))) {
+				frameWidthScale = screenFreeSize.width / (double)preferredSize.width;
+				compWidthScale = frameFreeSize.width / (double)preferredSize.width;
+			} else {
+				compWidthScale = frameWidthScale = 1.0;
+			}
+		} else {
+			frameWidthScale = frameFreeSize.width / (double)screenSize.width;
+			compWidthScale = frameFreeSize.width / (double)screenFreeSize.width
+				- screenInsetsSize.width / (double)screenSize.width;
+		}
+
+		if (frameFreeSize.height > preferredSize.height) {
+			if ("true".equals(System.getProperty("expand_screen"))) {
+				frameHeightScale = screenFreeSize.height / (double)preferredSize.height;
+				compHeightScale = frameFreeSize.height / (double)preferredSize.height;
+			} else {
+				compHeightScale = frameHeightScale = 1.0;
+			}
+		} else {
+			frameHeightScale = frameFreeSize.height / (double)screenSize.height;
+			compHeightScale = frameFreeSize.height / (double)screenFreeSize.height
+				- screenInsetsSize.height / (double)screenSize.height + 0.025;
+		}
 	}
 
 	/** <p>Scale the given size so a frame with that size will fit in the screen insets.</p>
@@ -108,9 +131,10 @@ final class ScreenScale {
 	 * @return translated position
 	 */
 	static Point scaleFrame(Point pos) {
-		final int x = (int)(pos.x * frameWidthScale);
-		final int y = (int)(pos.y * frameHeightScale);
-		return new Point(x, y);
+		return pos;
+//		final int x = (int)(pos.x * frameWidthScale);
+//		final int y = (int)(pos.y * frameHeightScale);
+//		return new Point(x, y);
 	}
 
 	/** <p>Translates the given position so a component at that position will fit in the screen insets.</p>

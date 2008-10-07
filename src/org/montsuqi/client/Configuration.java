@@ -64,6 +64,7 @@ public class Configuration {
 	private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
 	private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
 	private static final String LAF_THEME_KEY = "laf_theme"; //$NON-NLS-1$
+	private static final String EXPAND_SCREEN_KEY = "expand_screen"; //$NON-NLS-1$
 	private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
 	private static final String PROPERTIES_KEY = "properties"; //$NON-NLS-1$
 	private static final String USE_TIMER_KEY = "use_timer"; //$NON-NLS-1$
@@ -132,6 +133,9 @@ public class Configuration {
 
 	/** <p>Default look and feel theme filename: "".</p> */
 	static final String DEFAULT_LAF_THEME = "";
+
+	/** <p>Default value of do expand screen: false.</p> */
+	static final boolean DEFAULT_EXPAND_SCREEN = false;	
 	
 	/** <p>Default value of use log viewer checkbox: false.</p> */
 	static final boolean DEFAULT_USE_LOG_VIEWER = false;
@@ -199,6 +203,7 @@ public class Configuration {
 		setClientCertificateFileName(DEFAULT_CONFIG_NAME, prefs.get(CLIENT_CERTIFICATE_KEY, DEFAULT_CLIENT_CERTIFICATE));
 		setProtocolVersion(DEFAULT_CONFIG_NAME, prefs.getInt(PROTOCOL_VERSION_KEY, DEFAULT_PROTOCOL_VERSION));
 		setLookAndFeelClassName(DEFAULT_CONFIG_NAME, prefs.get(LOOK_AND_FEEL_KEY, DEFAULT_LOOK_AND_FEEL_CLASS_NAME));
+		setExpandScreen(DEFAULT_CONFIG_NAME, prefs.getBoolean(EXPAND_SCREEN_KEY, DEFAULT_EXPAND_SCREEN));
 		setUseLogViewer(DEFAULT_CONFIG_NAME, prefs.getBoolean(USE_LOG_VIEWER_KEY, DEFAULT_USE_LOG_VIEWER));
 		setProperties(DEFAULT_CONFIG_NAME, prefs.get(PROPERTIES_KEY, DEFAULT_PROPERTIES));
 	}
@@ -644,6 +649,24 @@ public class Configuration {
 	public void setLAFThemeFileName(String configName, String styles) {
 		setString(configName, LAF_THEME_KEY, styles);
 	}	
+
+	/** <p>Returns the value of do expand screen.</p>
+	 * 
+	 * @param configName the configuration name.
+	 * @return the value of do expand screen.
+	 */
+	public boolean getExpandScreen(String configName) {
+		return getBoolean(configName, EXPAND_SCREEN_KEY, DEFAULT_EXPAND_SCREEN);
+	}	
+
+	/** <p>Sets the value of do expand screen.</p>
+	 * 
+	 * @param configName the configuration name.
+	 * @param flag new value of do expand screen.
+	 */
+	public void setExpandScreen(String configName, boolean flag) {
+		setBoolean(configName, EXPAND_SCREEN_KEY, flag);
+	}
 	
 	/** <p>Returns the value of use log viewer.</p>
 	 * 

@@ -87,6 +87,7 @@ public class ConfigurationPanel extends JPanel {
 	protected JTextField hostEntry;
 	protected JTextField portEntry;
 	protected JTextField appEntry;
+	protected JRadioButton[] protocolVersionRadios;
 
 	// SSL Tab
 	protected JCheckBox useSSLCheckbox;
@@ -101,7 +102,7 @@ public class ConfigurationPanel extends JPanel {
 	protected JComboBox lookAndFeelCombo;
 	protected JTextField lafThemeEntry;
 	protected JButton lafThemeButton;
-	protected JRadioButton[] protocolVersionRadios;
+	protected JCheckBox expandScreenCheck;
 	protected JCheckBox useLogViewerCheck;
 	protected JCheckBox useTimerCheck;
 	protected JTextField timerPeriodEntry;
@@ -296,6 +297,7 @@ public class ConfigurationPanel extends JPanel {
 		String lafThemeFileName = newFlag ? conf.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
 		int protocolVersion = newFlag ? conf.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
 		boolean useLogViewer = newFlag ? conf.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
+		boolean expandScreen = newFlag ? conf.DEFAULT_EXPAND_SCREEN : conf.getExpandScreen(configName);
 		boolean useTimer = newFlag ? conf.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
 		long timerPeriod = newFlag ? conf.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
 		String properties = newFlag ? conf.DEFAULT_PROPERTIES : conf.getProperties(configName);
@@ -309,6 +311,7 @@ public class ConfigurationPanel extends JPanel {
 		hostEntry.setText(host);
 		portEntry.setText(String.valueOf(port));
 		appEntry.setText(application);
+		protocolVersionRadios[protocolVersion - 1].setSelected(true);
 
 		// SSL Tab
 		useSSLCheckbox.setSelected(useSSL);
@@ -325,7 +328,7 @@ public class ConfigurationPanel extends JPanel {
 				lookAndFeelCombo.setSelectedItem(lafs[i].getName());
 			}
 		}
-		protocolVersionRadios[protocolVersion - 1].setSelected(true);
+		expandScreenCheck.setSelected(expandScreen);
 		useLogViewerCheck.setSelected(useLogViewer);
 		useTimerCheck.setSelected(useTimer);
 		timerPeriodEntry.setText(String.valueOf(timerPeriod));
@@ -361,6 +364,7 @@ public class ConfigurationPanel extends JPanel {
 			}
 		}
 		conf.setLAFThemeFileName(configName, lafThemeEntry.getText());
+		conf.setExpandScreen(configName, expandScreenCheck.isSelected());
 		conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
 		conf.setUseTimer(configName, useTimerCheck.isSelected());
 		conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
@@ -591,7 +595,17 @@ public class ConfigurationPanel extends JPanel {
 		lafThemeButton.setAction(
 			new ThemeSelectionAction(lafThemeEntry, ".theme",
 				Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
+		
+		JPanel checkPanel1 = new JPanel();
+		checkPanel1.setLayout(new BoxLayout(checkPanel1, BoxLayout.X_AXIS));
+		expandScreenCheck = new JCheckBox();
 		useLogViewerCheck = new JCheckBox();
+		checkPanel1.add(expandScreenCheck);
+		JPanel checkPanel1Inner = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		checkPanel1Inner.add(new JLabel(Messages.getString("ConfigurationPanel.use_log_viewer")));
+		checkPanel1Inner.add(useLogViewerCheck);
+		checkPanel1.add(checkPanel1Inner);
+		
 		JPanel timerPanel = new JPanel();
 		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
 		useTimerCheck = new JCheckBox();
@@ -641,11 +655,11 @@ public class ConfigurationPanel extends JPanel {
 			createConstraints(3, y, 1, 1, 0.0, 0.0));
 		y++;
 
-		panel.add(createLabel(Messages.getString("ConfigurationPanel.use_log_viewer")), 
+		panel.add(createLabel(Messages.getString("ConfigurationPanel.expand_screen")), 
 			createConstraints(0, y, 1, 1, 0.0, 1.0));
-		panel.add(useLogViewerCheck, 
+		panel.add(checkPanel1, 
 			createConstraints(1, y, 3, 1, 1.0, 0.0));
-		y++;
+		y++;		
 		
 		panel.add(createLabel(Messages.getString("ConfigurationPanel.use_timer")), 
 			createConstraints(0, y, 1, 1, 0.0, 1.0));

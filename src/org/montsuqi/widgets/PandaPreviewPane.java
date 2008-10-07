@@ -82,7 +82,7 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 
 		JScrollPane scroll = new JScrollPane();
 		scroll.setViewportView(preview);
-		scroll.getVerticalScrollBar().setUnitIncrement(16);
+		scroll.getVerticalScrollBar().setUnitIncrement(32);
 		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		add(scroll, BorderLayout.CENTER);

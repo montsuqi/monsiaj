@@ -128,6 +128,7 @@ public class Client implements Runnable {
 		File cacheRoot = SystemEnvironment.createFilePath(pathElements);
 		int protocolVersion = conf.getProtocolVersion(configName);
 		long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
+		System.setProperty("expand_screen", String.valueOf(conf.getExpandScreen(configName)));
 		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion, timerPeriod);
 
 		String user = conf.getUser(configName);
