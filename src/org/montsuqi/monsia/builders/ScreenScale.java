@@ -35,6 +35,8 @@ import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import javax.swing.JFrame;
 
+import org.montsuqi.util.SystemEnvironment;
+
 /** <p>A class to scale frames and components to fit in screen insets.</p>
  */
 final class ScreenScale {
@@ -91,8 +93,14 @@ final class ScreenScale {
 
 		if (frameFreeSize.height > preferredSize.height) {
 			if ("true".equals(System.getProperty("expand_screen"))) {
-				frameHeightScale = screenFreeSize.height / (double)preferredSize.height;
-				compHeightScale = frameFreeSize.height / (double)preferredSize.height;
+				// FIXME; can't get accurate frameFreeSize on Windows XP
+				if (SystemEnvironment.isWindows()) {
+					frameHeightScale = screenFreeSize.height / (double)preferredSize.height - 0.05;
+					compHeightScale = frameFreeSize.height / (double)preferredSize.height;
+				} else {
+					frameHeightScale = screenFreeSize.height / (double)preferredSize.height;
+					compHeightScale = frameFreeSize.height / (double)preferredSize.height;
+				}
 			} else {
 				compHeightScale = frameHeightScale = 1.0;
 			}
@@ -132,9 +140,6 @@ final class ScreenScale {
 	 */
 	static Point scaleFrame(Point pos) {
 		return pos;
-//		final int x = (int)(pos.x * frameWidthScale);
-//		final int y = (int)(pos.y * frameHeightScale);
-//		return new Point(x, y);
 	}
 
 	/** <p>Translates the given position so a component at that position will fit in the screen insets.</p>
