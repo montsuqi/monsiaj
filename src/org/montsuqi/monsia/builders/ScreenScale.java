@@ -41,6 +41,7 @@ import org.montsuqi.util.SystemEnvironment;
  */
 final class ScreenScale {
 	private static final Insets screenInsets;
+	private static final Dimension preferredSize;
 	private static final Dimension screenSize;
 	private static final Dimension screenFreeSize;
 	private static final Dimension frameFreeSize;
@@ -60,54 +61,47 @@ final class ScreenScale {
 		screenInsets = tk.getScreenInsets(gc);
 		screenSize = tk.getScreenSize();
 		screenInsetsSize = new Dimension(screenInsets.left + screenInsets.right, screenInsets.top + screenInsets.bottom);
+		
 		screenFreeSize = new Dimension(screenSize);
 		screenFreeSize.width -= screenInsetsSize.width;
-		screenFreeSize.height -= screenInsetsSize.height;
-
+		screenFreeSize.height -= screenInsetsSize.height;		
+		
 		final JFrame dummy = new JFrame("DUMMY FRAME FOR METRICS CALCULATION");
 		dummy.addNotify();
 		dummy.setSize(screenFreeSize);
 		frameInsets = dummy.getInsets();
 		dummy.dispose();
 		frameInsetsSize = new Dimension(frameInsets.left + frameInsets.right, frameInsets.top + frameInsets.bottom);
-
+		
 		frameFreeSize = new Dimension(screenFreeSize);
 		frameFreeSize.width -= frameInsetsSize.width;
 		frameFreeSize.height -= frameInsetsSize.height;
 
 		// FIXME; now, use magic number
-		final Dimension preferredSize = new Dimension(1024, 768);
+		preferredSize = new Dimension(1024, 768);
 		
-		if (frameFreeSize.width > preferredSize.width) {
-			if ("true".equals(System.getProperty("expand_screen"))) {
-				frameWidthScale = screenFreeSize.width / (double)preferredSize.width;
-				compWidthScale = frameFreeSize.width / (double)preferredSize.width;
-			} else {
-				compWidthScale = frameWidthScale = 1.0;
-			}
-		} else {
-			frameWidthScale = frameFreeSize.width / (double)screenSize.width;
-			compWidthScale = frameFreeSize.width / (double)screenFreeSize.width
-				- screenInsetsSize.width / (double)screenSize.width;
-		}
+		if ("true".equals(System.getProperty("expand_screen"))) {
+			frameWidthScale = screenFreeSize.width / (double) preferredSize.width;
+			compWidthScale = frameFreeSize.width / (double) preferredSize.width;
+			frameHeightScale = screenFreeSize.height / (double) preferredSize.height;
+			compHeightScale = frameFreeSize.height / (double) preferredSize.height;
 
-		if (frameFreeSize.height > preferredSize.height) {
-			if ("true".equals(System.getProperty("expand_screen"))) {
-				// FIXME; can't get accurate frameFreeSize on Windows XP
-				if (SystemEnvironment.isWindows()) {
-					frameHeightScale = screenFreeSize.height / (double)preferredSize.height - 0.05;
-					compHeightScale = frameFreeSize.height / (double)preferredSize.height;
-				} else {
-					frameHeightScale = screenFreeSize.height / (double)preferredSize.height;
-					compHeightScale = frameFreeSize.height / (double)preferredSize.height;
-				}
-			} else {
-				compHeightScale = frameHeightScale = 1.0;
-			}
 		} else {
-			frameHeightScale = frameFreeSize.height / (double)screenSize.height;
-			compHeightScale = frameFreeSize.height / (double)screenFreeSize.height
-				- screenInsetsSize.height / (double)screenSize.height + 0.025;
+			if (frameFreeSize.width < preferredSize.width) {
+				frameWidthScale = screenFreeSize.width / (double) preferredSize.width;
+				compWidthScale = frameFreeSize.width / (double) preferredSize.width;				
+			} else {
+				frameWidthScale = (preferredSize.width + frameInsetsSize.width) / (double)preferredSize.width;
+				compWidthScale = 1.0;
+			}
+			if (frameFreeSize.height < preferredSize.height) {
+				frameHeightScale = screenFreeSize.height / (double) preferredSize.height;
+				compHeightScale = frameFreeSize.height / (double) preferredSize.height;
+
+			} else {
+				frameHeightScale = (preferredSize.height + frameInsetsSize.height) / (double)preferredSize.height;
+				compHeightScale = 1.0;
+			}
 		}
 	}
 
@@ -117,8 +111,19 @@ final class ScreenScale {
 	 * @return scaled size
 	 */
 	static Dimension scaleFrame(Dimension size) {
-		final int width = (int)(size.width * frameWidthScale) + frameInsetsSize.width;
-		final int height = (int)(size.height * frameHeightScale) + frameInsetsSize.height;
+		final int width;
+		final int height;		
+		if (preferredSize.width <= size.width) {
+			width = (int)(size.width * frameWidthScale);
+		} else {
+			width = (int)(size.width * frameWidthScale) + frameInsetsSize.width;
+		}
+		if (preferredSize.height <= size.height) {
+			height = (int)(size.height * frameHeightScale);
+
+		} else {
+			height = (int)(size.height * frameHeightScale) + frameInsetsSize.height;
+		}
 		return new Dimension(width, height);
 	}
 
@@ -139,7 +144,19 @@ final class ScreenScale {
 	 * @return translated position
 	 */
 	static Point scaleFrame(Point pos) {
-		return pos;
+		final int x;
+		final int y;
+		if (frameFreeSize.width < preferredSize.width) {
+			x = (int)(pos.x *frameWidthScale);
+		} else {
+			x = pos.x;
+		}
+		if (frameFreeSize.height < preferredSize.height) {
+			y = (int)(pos.y *frameHeightScale);
+		} else {
+			y = pos.y;
+		}		
+		return new Point(x,y);
 	}
 
 	/** <p>Translates the given position so a component at that position will fit in the screen insets.</p>
