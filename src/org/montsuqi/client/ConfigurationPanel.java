@@ -414,6 +414,7 @@ public class ConfigurationPanel extends JPanel {
 
 		hostEntry = createTextField();
 		portEntry = createTextField();
+		portEntry.setColumns(5);
 		appEntry = createTextField();
 		String[] versions = { String.valueOf(1), String.valueOf(2) };
 		protocolVersionRadios = new JRadioButton[versions.length];
