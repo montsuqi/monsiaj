@@ -32,6 +32,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Map;
 
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -98,6 +99,14 @@ class FixedBuilder extends ContainerBuilder {
 			bottomMost = Math.max(bottomMost, rect.y + rect.height);
 			rightMost = Math.max(rightMost, rect.x + rect.width);
 			children[i].addFocusListener((FocusListener)parent);
+			if (children[i] instanceof JLabel) {
+				JLabel label = (JLabel)(children[i]);
+				Dimension s = label.getSize();
+				Dimension ps = label.getPreferredSize();
+				s.width = s.width < ps.width ? ps.width : s.width;
+				s.height = s.height < ps.height ? ps.height : s.height;
+				label.setSize(s);
+			}
 		}
 		
 		Insets insets = parent.getInsets();

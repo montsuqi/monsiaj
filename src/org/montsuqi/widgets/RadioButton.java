@@ -25,12 +25,16 @@ package org.montsuqi.widgets;
 
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.awt.Insets;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
+
+import javax.swing.UIManager;
+import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A class that simulates Gtk+'s RadioButton.</p>
  * 
@@ -42,6 +46,13 @@ public class RadioButton extends JRadioButton {
 	public RadioButton() {
 		super();
 		initActions();
+		if (SystemEnvironment.isMacOSX()) {
+			String className = UIManager.getLookAndFeel().getClass().getName();
+			if (className.startsWith("com.nilo.plaf.nimrod") ||
+				className.startsWith("apple.laf.AquaLookAndFeel")) {
+				this.setMargin(new Insets(0, -5, 0, -5));
+			}
+		}
 	}
 
 	private void initActions() {
