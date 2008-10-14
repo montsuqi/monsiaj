@@ -1,0 +1,2 @@
+Main-Class: org.montsuqi.tools.TestGlade
+Class-Path: pandaclient.jar

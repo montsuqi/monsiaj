@@ -141,6 +141,30 @@ public class Interface {
 			throw new InterfaceBuildingException(e);
 		}
 	}
+	
+	public static Interface parseInput(InputStream input) {
+		try {
+			if ( ! (input instanceof BufferedInputStream)) {
+				input = new BufferedInputStream(input);
+			}
+
+			String handlerClassName = System.getProperty("monsia.document.handler"); //$NON-NLS-1$
+			if (handlerClassName == null) {
+				handlerClassName = isNewScreenDefinition(input) ? NEW_HANDLER : OLD_HANDLER;
+			}
+
+			Class handlerClass = Class.forName(handlerClassName);
+			AbstractDocumentHandler handler = (AbstractDocumentHandler)handlerClass.newInstance();
+
+			if (handlerClassName.equals(OLD_HANDLER)) {
+				input = new FakeEncodingInputStream(input);
+			}
+			saxParser.parse(input, handler);
+			return handler.getInterface();
+		} catch (Exception e) {
+			throw new InterfaceBuildingException(e);
+		}
+	}
 
 	private static boolean isNewScreenDefinition(InputStream input) throws IOException {
 		byte[] bytes = new byte[OLD_PROLOGUE_LENGTH];
@@ -162,6 +186,17 @@ public class Interface {
 		this.protocol = protocol;
 		buildWidgetTree(roots);
 		signalAutoConnect();
+	}
+	
+	public Interface(List roots) {
+		widgets = new HashMap();
+		longNames = new HashMap();
+		signals = new ArrayList();
+		buttonGroups = new HashMap();
+		topLevel = null;
+		defaultWidget = null;
+		focusWidget = null;
+		buildWidgetTree(roots);
 	}
 
 	private void signalAutoConnect() {

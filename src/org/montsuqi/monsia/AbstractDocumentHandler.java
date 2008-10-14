@@ -155,6 +155,17 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 		throw new IllegalStateException("parsing is not finished yet"); //$NON-NLS-1$
 	}
+	
+	/** <p>Builds the interface as the result of parsing.</p>
+	 * 
+	 * @return the Interface instance.
+	 */
+	protected Interface getInterface() {
+		if (isFinished()) {
+			return new Interface(topLevels);
+		}
+		throw new IllegalStateException("parsing is not finished yet"); //$NON-NLS-1$
+	}	
 
 	/** <p>SAX handler called at the start of a document.</p>
 	 * <p>Initializes parser state and variables.</p>

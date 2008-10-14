@@ -265,6 +265,12 @@
 				<include name="org/montsuqi/tools/XMLFileFilter.class"/>
 			</fileset>
 		</jar>
+		<jar jarfile="${build.dir}/pandaglade.jar" manifest="${resources.dir}/pandaglade.mf">
+			<fileset dir="${build.dir}">
+				<include name="org/montsuqi/tools/TestGlade.class"/>
+			</fileset>
+		</jar>
+		
 	</target>
 
 	<target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
