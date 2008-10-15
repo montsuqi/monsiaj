@@ -664,16 +664,14 @@ abstract class WidgetPropertySetter {
 		registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1$
 			void set(Interface xml, Container parent, Component widget, String value) {
 				Window window = (Window)widget;
-				window.setResizable(ParameterConverter.toBoolean(value));
+				window.setAllow_Grow(ParameterConverter.toBoolean(value));
 			}
 		});
 
 		registerProperty(Window.class, "allow_shrink", new WidgetPropertySetter() { //$NON-NLS-1$
 			void set(Interface xml, Container parent, Component widget, String value) {
-				boolean allowShrink = ParameterConverter.toBoolean(value);
-				if ( ! allowShrink) {
-					logger.info("not supported: allow_shrink"); //$NON-NLS-1$
-				}
+			        Window window = (Window)widget;
+				window.setAllow_Shrink(ParameterConverter.toBoolean(value));
 			}
 		});
 

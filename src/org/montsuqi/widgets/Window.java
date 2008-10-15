@@ -38,6 +38,8 @@ import javax.swing.JPanel;
 public class Window extends JFrame {
 	
 	private String title = "";
+	private boolean allow_grow;
+	private boolean allow_shrink;
 
 	/** <p>Constructs a Window instance.</p>
 	 */
@@ -124,5 +126,17 @@ public class Window extends JFrame {
 		} else {
 			frame.setTitle(title + " - " + sessionTitle);
 		}
+	}
+	public void setAllow_Grow(boolean value) {
+		this.allow_grow = value;
+	}
+	public boolean getAllow_Grow() {
+		return allow_grow;
+	}
+	public void setAllow_Shrink(boolean value) {
+		this.allow_shrink = value;
+	}
+	public boolean getAllow_Shrink() {
+		return allow_shrink;
 	}
 }

@@ -42,6 +42,15 @@ public class WindowBuilder extends ContainerBuilder {
 		Window w = (Window)c;
 		try {
 			w.setTitleString(info.getProperty("title"));
+			if (!w.getAllow_Grow()) {
+			    w.setMaximumSize(w.getSize());
+			}
+			if (!w.getAllow_Shrink()) {
+			    w.setMinimumSize(w.getSize());
+			}
+			if ((!w.getAllow_Grow()) && (!w.getAllow_Shrink()) ){
+			    w.setResizable(false);
+			}
 			if (info.getClassName().equals("Dialog")) {
 				Method setAlwaysOnTop = Window.class.getMethod("setAlwaysOnTop", new Class[] { Boolean.TYPE });
 				setAlwaysOnTop.invoke(w, new Object[] { Boolean.TRUE });
