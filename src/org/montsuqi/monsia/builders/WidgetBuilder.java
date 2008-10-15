@@ -129,7 +129,7 @@ public class WidgetBuilder {
 		registerWidgetClass("HBox",           HBox.class,          defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("VPaned",         HPaned.class,        defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("HSeparator",     HSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("Label",          JLabel.class,        defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("Label",          JLabel.class,        new LabelBuilder()); //$NON-NLS-1$
 		registerWidgetClass("List",           JList.class,         new ListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Menu",           JMenu.class,         defaultContainerBuilder); //$NON-NLS-1$
 		registerWidgetClass("MenuBar",        JMenuBar.class,      new MenuBarBuilder()); //$NON-NLS-1$
