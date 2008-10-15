@@ -46,12 +46,10 @@ public class CheckBox extends JCheckBox {
 	public CheckBox() {
 		super();
 		initActions();
-		if (SystemEnvironment.isMacOSX()) {
-			String className = UIManager.getLookAndFeel().getClass().getName();
-			if (className.startsWith("com.nilo.plaf.nimrod") ||
-				className.startsWith("apple.laf.AquaLookAndFeel")){
-				this.setMargin(new Insets(0,-5,0,-5));
-			}
+		String className = UIManager.getLookAndFeel().getClass().getName();
+		if (className.startsWith("com.nilo.plaf.nimrod") ||
+			className.startsWith("apple.laf.AquaLookAndFeel")){
+			this.setMargin(new Insets(0,-5,0,-5));
 		}
 	}
 

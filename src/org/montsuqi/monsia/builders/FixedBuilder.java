@@ -30,19 +30,22 @@ import java.awt.event.FocusListener;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+
 import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
-
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.ParameterConverter;
+import org.montsuqi.widgets.CheckBox;
+import org.montsuqi.widgets.RadioButton;
 
 /** <p>A builder to create Fixed widgets.</p>
  */
@@ -104,8 +107,17 @@ class FixedBuilder extends ContainerBuilder {
 				Dimension s = label.getSize();
 				Dimension ps = label.getPreferredSize();
 				s.width = s.width < ps.width ? ps.width : s.width;
-				s.height = s.height < ps.height ? ps.height : s.height;
-				label.setSize(s);
+				label.setSize(s);			
+			} else if (children[i] instanceof RadioButton ||
+					children[i] instanceof CheckBox) {
+				AbstractButton button = (AbstractButton)children[i];
+				if (!button.getText().equals("")) {
+					Dimension s = button.getSize();
+					Dimension ps = button.getPreferredSize();
+					s.width = s.width < ps.width ? ps.width : s.width;
+					button.setPreferredSize(s);
+					button.setSize(s);
+				}
 			}
 		}
 		
