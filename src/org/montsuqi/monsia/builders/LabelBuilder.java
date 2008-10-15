@@ -27,6 +27,7 @@ import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
@@ -47,8 +48,7 @@ public class LabelBuilder extends WidgetBuilder {
 			doWrap = ParameterConverter.toBoolean(info.getProperty("wrap"));
 		}
 		if (doWrap) {
-			WidgetPropertySetter justifySetter = WidgetPropertySetter.getSetter(c.getClass(), "justify");
-			justifySetter.set(xml, parent, c, info.getProperty("justify"));
+			label.setHorizontalAlignment(SwingConstants.LEFT);
 		} else {
 			WidgetPropertySetter xalignSetter = WidgetPropertySetter.getSetter(c.getClass(), "xalign");
 			WidgetPropertySetter yalignSetter = WidgetPropertySetter.getSetter(c.getClass(), "xalign");

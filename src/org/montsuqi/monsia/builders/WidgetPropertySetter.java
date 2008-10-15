@@ -352,22 +352,6 @@ abstract class WidgetPropertySetter {
 				}
 			}
 		});
-		
-		registerProperty(JLabel.class, "justify", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JLabel label = (JLabel)widget;
-				value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
-				if ("CENTER".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.CENTER);
-				} else if ("LEFT".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.LEFT);
-				} else if ("RIGHT".equals(value)) { //$NON-NLS-1$
-					label.setHorizontalAlignment(SwingConstants.RIGHT);
-				} else {
-					warnUnsupportedProperty(value);
-				}
-			}
-		});
 
 		registerProperty(JLabel.class, "wrap", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
