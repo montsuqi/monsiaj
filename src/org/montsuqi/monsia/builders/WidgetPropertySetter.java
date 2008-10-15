@@ -142,7 +142,7 @@ abstract class WidgetPropertySetter {
 		registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 			public void set(Interface xml, Container parent, Component widget, String value) {
 				AbstractButton button = (AbstractButton)widget;
-				button.setText(value);
+				button.setText(value.replaceAll("_",""));
 			}
 		});
 
