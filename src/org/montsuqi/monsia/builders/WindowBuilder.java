@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Window;
 
 /** <p>A builder to create Window(top level) widget.</p>
@@ -46,7 +47,11 @@ public class WindowBuilder extends ContainerBuilder {
 			    w.setMaximumSize(w.getSize());
 			}
 			if (!w.getAllow_Shrink()) {
-			    w.setMinimumSize(w.getSize());
+			    if (SystemEnvironment.isJavaVersionMatch("1.4") || SystemEnvironment.isJavaVersionMatch("1.5")){
+				w.setResizable(false);
+			    } else {
+				w.setMinimumSize(w.getSize());
+			    }
 			}
 			if ((!w.getAllow_Grow()) && (!w.getAllow_Shrink()) ){
 			    w.setResizable(false);

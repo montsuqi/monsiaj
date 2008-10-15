@@ -661,7 +661,7 @@ abstract class WidgetPropertySetter {
 //			}
 //		});
 
-		registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1$
+		registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1
 			void set(Interface xml, Container parent, Component widget, String value) {
 				Window window = (Window)widget;
 				window.setAllow_Grow(ParameterConverter.toBoolean(value));
