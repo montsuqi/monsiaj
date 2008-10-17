@@ -44,7 +44,11 @@ public class WindowBuilder extends ContainerBuilder {
 		try {
 			w.setTitleString(info.getProperty("title"));
 			if (!w.getAllow_Grow()) {
-			    w.setMaximumSize(w.getSize());
+			    if (SystemEnvironment.isJavaVersionMatch("1.4") || SystemEnvironment.isJavaVersionMatch("1.5")){
+				w.setResizable(false);
+			    } else {
+				w.setMaximumSize(w.getSize());
+			    }
 			}
 			if (!w.getAllow_Shrink()) {
 			    if (SystemEnvironment.isJavaVersionMatch("1.4") || SystemEnvironment.isJavaVersionMatch("1.5")){
