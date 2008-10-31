@@ -38,7 +38,8 @@ import org.montsuqi.widgets.PandaPreviewPane;
 class PreviewMarshaller extends WidgetMarshaller {
 
 	private static final String TEMP_PREFIX = "pandapreview"; //$NON-NLS-1$
-	private static final String TEMP_SUFFIX = ".png"; //$NON-NLS-1$
+	private static final String PNG_SUFFIX = ".png"; //$NON-NLS-1$
+	private static final String PDF_SUFFIX = ".pdf";
 	
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
@@ -46,15 +47,26 @@ class PreviewMarshaller extends WidgetMarshaller {
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
-			/* String dummy = */ con.receiveName();
+			String dummy = con.receiveName();
 			byte[] bin = con.receiveBinaryData();
-			File temp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
-			temp.deleteOnExit();
-			OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+			File pngFile = File.createTempFile(TEMP_PREFIX, PNG_SUFFIX);
+			pngFile.deleteOnExit();
+			OutputStream out = new BufferedOutputStream(new FileOutputStream(pngFile));
 			out.write(bin);
 			out.flush();
 			out.close();
-			preview.load(temp.getAbsolutePath());
+			if (con.getServerVersion() == 0) {
+				preview.load(pngFile.getAbsolutePath());				
+			} else {	
+				byte [] bin2 = con.receiveBinaryData();
+				File pdfFile = File.createTempFile(TEMP_PREFIX, PDF_SUFFIX);
+				pdfFile.deleteOnExit();
+				out = new BufferedOutputStream(new FileOutputStream(pdfFile));
+				out.write(bin2);
+				out.flush();
+				out.close();
+				preview.load(pngFile.getAbsolutePath(), pdfFile.getAbsolutePath());
+			}
 		}
 	}
 

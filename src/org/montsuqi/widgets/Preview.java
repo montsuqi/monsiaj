@@ -159,6 +159,21 @@ public abstract class Preview extends JPanel {
 			setRotationStep(rotationStep - 1);
 		}
 	}
+	
+	private final class PrintAction extends AbstractAction {
+		PrintAction() {
+			URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png"); //$NON-NLS-1$
+			if (iconURL != null) {
+				putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+			}
+			putValue(Action.NAME, Messages.getString("PandaPreview.print")); //$NON-NLS-1$
+			putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description")); //$NON-NLS-1$
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			callPrinter();
+		}
+	}
 
 	private final Action fitToSizeAction;
 	private final Action fitToSizeHorizontallyAction;
@@ -167,6 +182,7 @@ public abstract class Preview extends JPanel {
 	private final Action zoomInAction;
 	private final Action rotateClockwiseAction;
 	private final Action rotateCounterClockwiseAction;
+	private final Action printAction;
 
 	/** <p>Constructs a Preview.</p> */
 	public Preview() {
@@ -177,6 +193,7 @@ public abstract class Preview extends JPanel {
 		zoomInAction = new ZoomInAction();
 		rotateClockwiseAction = new RotateClockwiseAction();
 		rotateCounterClockwiseAction = new RotateCounterClockwiseAction();
+		printAction = new PrintAction();
 		ActionMap actionMap = getActionMap();
 		actionMap.put("fitToSize", fitToSizeAction);
 		actionMap.put("fitToSizeHorizontally", fitToSizeHorizontallyAction);
@@ -241,12 +258,25 @@ public abstract class Preview extends JPanel {
 		return rotateCounterClockwiseAction;
 	}
 
+	/** <p>Returns Print action.</p>
+	 */
+	public Action getPrintAction() {
+		return printAction;
+	}
+	
 	/** <p>Loads a preview source from the given file.</p>
 	 * 
 	 * @param fileName the source of preview.
 	 */
 	public abstract void load(String fileName) throws IOException;
 
+	/** <p>Loads a preview source from the given file.</p>
+	 * 
+	 * @param imageFileName the source of preview.
+	 * @param copyFileName the source of copy.
+	 */
+	public abstract void load(String imageFileName, String copyFileName) throws IOException;
+	
 	/** <p>Clears the preview content.</p>
 	 */
 	public abstract void clear();
@@ -303,6 +333,10 @@ public abstract class Preview extends JPanel {
 		newRotationStep = r.intValue();
 		assert 0 <= newRotationStep && newRotationStep < 4;
 		rotationStep = newRotationStep;
+	}
+	
+	protected void callPrinter() {
+		// do nothing
 	}
 
 }

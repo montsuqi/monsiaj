@@ -78,6 +78,7 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 		toolbar.add(preview.getZoomInAction());
 		//toolbar.add(preview.getRotateClockwiseAction());
 		//toolbar.add(preview.getRotateCounterClockwiseAction());
+		toolbar.add(preview.getPrintAction());
 		add(toolbar, BorderLayout.NORTH);
 
 		JScrollPane scroll = new JScrollPane();
@@ -90,8 +91,13 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 
 	public void load(String fileName) throws IOException {
 		preview.load(fileName);
+		preview.getPrintAction().setEnabled(false);
 	}
 
+	public void load(String imageFileName, String copyFileName) throws IOException {
+		preview.load(imageFileName, copyFileName);
+	}
+	
 	public void clear() {
 		preview.clear();
 	}

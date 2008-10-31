@@ -127,8 +127,9 @@ public class Protocol extends Connection {
 	private Interface xml;
 
 	static final Logger logger = Logger.getLogger(Protocol.class);
-	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
-
+	private static final String VERSION = "symbolic:blob:expand:pngpdf:negotiation"; //$NON-NLS-1$
+	private int serverVersion;
+	
 	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
 		this.client = client;
@@ -151,6 +152,7 @@ public class Protocol extends Connection {
 		valueManager = new WidgetValueManager(this, styleMap);
 		this.timerPeriod = timerPeriod;
 		sessionTitle = "";
+		serverVersion = 0;
 	}
 
 	public long getTimerPeriod() {
@@ -629,6 +631,21 @@ public class Protocol extends Connection {
 		sessionTitle = title;
 	}
 
+	synchronized private int parseServerVersion(String vstring) {
+		String [] values = vstring.split(";");
+		if (values.length > 0) {
+			String [] attrs = values[0].split("\\.");
+			if (attrs.length >= 4) {
+				return 100000 * Integer.parseInt(attrs[0]) + 
+					10000 * Integer.parseInt(attrs[1]) +
+					100 * Integer.parseInt(attrs[2]) +
+					Integer.parseInt(attrs[3]);
+			}
+		}
+		
+		return 0;
+	}
+	
 	synchronized void sendConnect(String user, String pass, String app) throws IOException {
 		logger.enter(user, pass, app);
 		sendPacketClass(PacketClass.Connect);
@@ -649,6 +666,9 @@ public class Protocol extends Connection {
 			throw new ConnectException(Messages.getString("Client.authentication_error")); //$NON-NLS-1$
 		case PacketClass.E_APPL:
 			throw new ConnectException(Messages.getString("Client.application_name_invalid")); //$NON-NLS-1$
+		case PacketClass.ServerVersion:
+			serverVersion = parseServerVersion(this.receiveString());
+			break;
 		default:
 			Object[] args = { Integer.toHexString(pc) };
 			throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
@@ -796,5 +816,9 @@ public class Protocol extends Connection {
 		ExceptionDialog.showExceptionDialog(e);
 		logger.leave();
 		client.exitSystem();
+	}
+	
+	public int getServerVersion() {
+		return serverVersion;
 	}
 }
