@@ -26,11 +26,10 @@ package org.montsuqi.client.marshallers;
 import java.awt.Component;
 import java.io.IOException;
 
-import javax.swing.JTabbedPane;
-
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
+import org.montsuqi.widgets.Notebook;
 
 /** <p>A class to send/receive Notebook data.</p>
  */
@@ -38,7 +37,7 @@ class NotebookMarshaller extends WidgetMarshaller {
 
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JTabbedPane tabbed = (JTabbedPane)widget;
+		Notebook note = (Notebook)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
 
@@ -60,16 +59,16 @@ class NotebookMarshaller extends WidgetMarshaller {
 		if (page == -1) {
 			throw new WidgetMarshallingException("notebook page not found"); //$NON-NLS-1$
 		}
-		tabbed.setSelectedIndex(page);
+		note.setSelectedIndex(page);
 	}
 
 	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		JTabbedPane tabbed = (JTabbedPane)widget;
+        Notebook note = (Notebook)widget;
 
 		con.sendPacketClass(PacketClass.ScreenData);
 		ValueAttribute va = manager.getValue(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
-		con.sendIntegerData(va.getType(), tabbed.getSelectedIndex());
+		con.sendIntegerData(va.getType(), note.getPreviousSelectedIndex());
 	}
 }

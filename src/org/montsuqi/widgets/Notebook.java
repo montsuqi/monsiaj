@@ -41,15 +41,21 @@ public class Notebook extends JTabbedPane {
 
 	Map buttons;
 	protected static final Logger logger = Logger.getLogger(Notebook.class);
+    private int index;
+    private int pindex;
 
 	public Notebook() {
 		super();
 
 		buttons = new HashMap();
+        index = 0;
+        pindex = 0;
 
 		addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Integer selected = new Integer(getSelectedIndex());
+                pindex = index;
+                index = selected.intValue();
 				if (buttons.containsKey(selected)) {
 					AbstractButton dummy = (AbstractButton)buttons.get(selected);
 					if (dummy != null) {
@@ -67,4 +73,14 @@ public class Notebook extends JTabbedPane {
 	public void registerTabButton(NotebookDummyButton button) {
 		buttons.put(new Integer(button.getIndex()), button);
 	}
+    
+    public int getPreviousSelectedIndex() {
+        return pindex;
+    }
+
+    public void setSelectedIndex(int index) {
+        super.setSelectedIndex(index);
+        pindex = this.index;
+        this.index = index;
+    }
 }
