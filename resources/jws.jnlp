@@ -17,12 +17,12 @@
     <j2se version="1.4+"/>
     <jar href="jmareceipt.jar"/>
     <jar href="pandaclient.jar"/>
-    <jar href="nimrodlf.jar"/>
-    <jar href="BareBonesBrowserLaunch.jar"/>
+    <jar href="libs/nimrodlf.jar"/>
+    <jar href="libs/BareBonesBrowserLaunch.jar"/>
   </resources>
   <resources os="Mac\ OS\ X">
-    <jar href="WebKit.jar"/>
-    <nativelib href="libwebkitsample.jnilib.jar"/>
+    <jar href="libs/WebKit.jar"/>
+    <nativelib href="libs/libwebkitsample.jnilib.jar"/>
   </resources>
   <application-desc main-class="jp.or.med.jma_receipt.JMAReceiptLauncher"/>
 </jnlp>

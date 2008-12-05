@@ -22,9 +22,12 @@ YYYYMMDDは配布物作成の年月日を表します。
 :README.txt, README.html:説明書(実行には不要です)
 :jmareceipt.jar:日レセ専用ランチャー
 :pandaclient.jar:Javaクライアント本体(汎用ランチャーを含みます)
-:WebKit.jar, libwebkitsample.jnilib, libwebkitsample.jnilib.jar:MacOS Xで使用されるHTML表示モジュール(MacOS X以外では不要です)
-:log4j.jar:ログ出力モジュール(なくても実行可能です)
-:jmareceipt.jnlp:Java Web Start配備用サンプル設定ファイル(実行には不要です)
+:libs/WebKit.jar, libwebkitsample.jnilib, libwebkitsample.jnilib.jar:MacOS Xで使用されるHTML表示モジュール(MacOS X以外では不要です)
+:libs/log4j.jar:ログ出力モジュール(なくても実行可能です)
+:libs/nimrodlf.jar:Nimrodルックアンドフィールモジュール
+:libs/BareBonesBrowserLaunch.jar:外部ブラウザ起動ライブラリ
+:jma-receipt.jpg:日レセ専用ランチャーアイコンファイル
+:jws.jnlp:Java Web Start配備用サンプル設定ファイル(実行には不要です)
 :theme/*.theme:Nimrod用テーマファイル
 
 !!バイナリ配布物(MacOS X アプリケーションバンドル版)の内容

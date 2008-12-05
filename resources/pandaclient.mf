@@ -1,2 +1,2 @@
 Main-Class: org.montsuqi.client.Launcher
-Class-Path: log4j.jar WebKit.jar BareBonesBrowserLaunch.jar nimrodlf.jar
+Class-Path: libs/log4j.jar libs/WebKit.jar libs/BareBonesBrowserLaunch.jar libs/nimrodlf.jar

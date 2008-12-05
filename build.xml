@@ -73,29 +73,35 @@
 		<copy todir="${build.dir}" filtering="true">
 			<fileset dir="${src.dir}">
 				<include name="**/*.properties"/>
-			</fileset>
-			<fileset dir="${resources.dir}">
-				<include name="*.properties"/>
-				<include name="*.theme"/>
-			</fileset>
+                </fileset>
+                <fileset dir="${resources.dir}">
+                    <include name="*.properties"/>
+                    <include name="*.theme"/>
+                </fileset>
 		</copy>
 		<copy todir="${build.dir}" >
 			<fileset dir="${src.dir}">
 				<include name="**/*.jpg"/>
 				<include name="**/*.png"/>
 				<include name="org/montsuqi/tools/*.xml"/>
+                </fileset>
+                <fileset dir="${resources.dir}">
+                    <include name="**/*.jpg"/>
+                    <include name="**/*.png"/>
+                </fileset>
+                <fileset dir=".">
+				<include name="README.txt"/>
+				<include name="README.html"/>
+				<include name="HOWTOBUILD.txt"/>
 			</fileset>
+		</copy>
+		<copy todir="${build.dir}/libs" >
 			<fileset dir="${libs.dir}">
 				<include name="nimrodlf.jar"/>
 				<include name="log4j.jar"/>
 				<include name="BareBonesBrowserLaunch.jar"/>
 				<include name="WebKit.jar"/>
 				<include name="*.jnilib"/>
-			</fileset>
-			<fileset dir=".">
-				<include name="README.txt"/>
-				<include name="README.html"/>
-				<include name="HOWTOBUILD.txt"/>
 			</fileset>
 		</copy>
 		<native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
@@ -125,8 +131,15 @@
 				<include name="*.jnlp"/>
 				<include name="README.txt"/>
 				<include name="README.html"/>
+                <include name="jma-receipt.jpg"/>
 				<exclude name="pandarecord.jar"/>
 				<exclude name="pandareplay.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}/${bin.name}/libs">
+			<fileset dir="${build.dir}/libs">
+                <include name="*.jar"/>
+                <include name="*.jnilib"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${bin.name}/theme">
@@ -180,7 +193,12 @@
 				<include name="*.jnilib"/>
 				<exclude name="pandarecord.jar"/>
 				<exclude name="pandareplay.jar"/>
-				<exclude name="libwebkitsample.jnilib.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java/libs">
+			<fileset dir="${build.dir}/libs">
+                <include name="*.jar"/>
+                <include name="*.jnilib"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/MacOS">
@@ -248,7 +266,7 @@
 				<include name="jp/or/med/jma_receipt/**"/>
 			</fileset>
 		</jar>
-		<jar jarfile="${build.dir}/libwebkitsample.jnilib.jar">
+		<jar jarfile="${build.dir}/libs/libwebkitsample.jnilib.jar">
 			<fileset dir="${libs.dir}">
 				<include name="libwebkitsample.jnilib"/>
 			</fileset>
@@ -278,6 +296,7 @@
 		<signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
 			<fileset dir="${build.dir}">
 				<include name="*.jar"/>
+                <include name="libs/*.jar"/>
 			</fileset>
 		</signjar>
 		<apply executable="jarsigner">
