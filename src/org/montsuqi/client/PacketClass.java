@@ -38,10 +38,6 @@ public interface PacketClass {
 	public static final byte FocusName = 0x09;
 	public static final byte Auth = 0x0A;
 	public static final byte Name = 0x0B;
-	public static final byte Session = 0x0C;
-	public static final byte RidirectName = 0x0D;
-	public static final byte ServerVersion = 0x0E;
-	
 
 	public static final byte OK = (byte)0x80;
 	public static final byte END = (byte)0x81;

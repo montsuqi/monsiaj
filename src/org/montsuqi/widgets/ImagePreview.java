@@ -35,8 +35,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.centerkey.utils.BareBonesBrowserLaunch;
-
 /** <p>Preview component that uses images for implementation.</p>
  */
 class ImagePreview extends Preview {
@@ -44,7 +42,6 @@ class ImagePreview extends Preview {
 	BufferedImage sourceImage;
 	BufferedImage image;
 	Dimension lastImageSize;
-	String copyFileName;
 
 	/** <p>Constructs an ImagePreview</p>
 	 */
@@ -53,7 +50,6 @@ class ImagePreview extends Preview {
 	    sourceImage = null;
 	    image = null;
 	    lastImageSize = null;
-	    copyFileName = null;
     }
 
 	/** <p>Loads a image from file of given name.</p>
@@ -80,26 +76,11 @@ class ImagePreview extends Preview {
 			}
 		}
 		updatePreferredSize();
-		copyFileName = fileName;
 	}
 
-	/** <p>Loads a image from file of given name.</p>
-	 * 
-	 * <p>If the size of newly loaded image is different from that of the old one,
-	 * new image is scaled to the component horizontally.</p>
-	 * 
-	 * @param imageFileName name of the image file.
-	 * @param copyFileName name of the image file.
-	 */
-	public void load(String imageFileName, String copyFileName) throws IOException {
-		load(imageFileName);
-		this.copyFileName = copyFileName;
-	}	
-	
 	/** <p>Clears the preview.</p>
 	 */
 	public void clear() {
-		copyFileName = null;
 		flushImage(sourceImage);
 		sourceImage = null;
 		flushImage(image);
@@ -210,12 +191,6 @@ class ImagePreview extends Preview {
 			ex.printStackTrace();
 			// clear();
 			return;
-		}
-	}
-	
-	protected void callPrinter() {		
-		if (copyFileName != null) {
-			BareBonesBrowserLaunch.openURL("file://" + copyFileName);
 		}
 	}
 }
