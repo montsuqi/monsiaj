@@ -71,7 +71,6 @@ class ImagePreview extends Preview {
 		if (sourceImage != null) {
 			final Dimension imageSize =  new Dimension(sourceImage.getWidth(), sourceImage.getHeight());
 			if (lastImageSize == null || ! lastImageSize.equals(imageSize)) {
-				fitToSizeHorizontally();
 				lastImageSize = imageSize;
 			}
 		}

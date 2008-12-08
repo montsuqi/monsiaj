@@ -49,6 +49,7 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 	private JToolBar toolbar;
 	private Preview preview;
 	private JFormattedTextField scaleField;
+    private boolean isFirstPreview;
 
 	public PandaPreviewPane() {
 		super();
@@ -86,10 +87,15 @@ public class PandaPreviewPane extends JPanel implements PropertyChangeListener {
 		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		add(scroll, BorderLayout.CENTER);
+        isFirstPreview = true;
 	}
 
 	public void load(String fileName) throws IOException {
 		preview.load(fileName);
+        if (isFirstPreview) {
+            isFirstPreview = false;
+            preview.fitToSizeHorizontally();
+        }
 	}
 
 	public void clear() {
