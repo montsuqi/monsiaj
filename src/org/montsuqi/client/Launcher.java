@@ -115,11 +115,18 @@ public class Launcher {
 		}
 		if ( ! configName.equals("") ) {
 			conf.setConfigurationName(configName);
+			/* set properties */
+			conf.getProperties(configName);
 			
 			/* set look and feel */
-			
 			try {
-				UIManager.setLookAndFeel(conf.getLookAndFeelClassName(configName));
+				String cname = conf.getLookAndFeelClassName(configName);
+				if (cname.startsWith("com.nilo.plaf.nimrod")) {
+						System.setProperty("nimrodlf.themeFile", conf.getLAFThemeFileName(configName));
+						UIManager.setLookAndFeel(new NimRODLookAndFeel());
+				} else {
+					UIManager.setLookAndFeel(conf.getLookAndFeelClassName(configName));
+				}
 			} catch (Exception e) {
 				logger.warn(e);
 				return true;
