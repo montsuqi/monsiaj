@@ -28,6 +28,7 @@ import java.awt.Component;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.concurrent.Executor;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -89,7 +90,14 @@ public class PandaHTML extends JPanel {
 	public void setURI(URL uri) {
 		Runnable loader = createLoader(uri);
 		logger.info("loading: {0}", uri); //$NON-NLS-1$
-		SwingUtilities.invokeLater(loader);
+		Executor executor = new ThreadPerTaskExecutor();
+		executor.execute(loader);
+	}
+
+	protected class ThreadPerTaskExecutor implements Executor {
+		public void execute(Runnable r) {
+			new Thread(r, "ThreadPerTaskExecutor").start();
+		}
 	}
 
 	protected Runnable createLoader(final URL uri) {
