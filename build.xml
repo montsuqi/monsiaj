@@ -76,7 +76,6 @@
                 </fileset>
                 <fileset dir="${resources.dir}">
                     <include name="*.properties"/>
-                    <include name="*.theme"/>
                 </fileset>
 		</copy>
 		<copy todir="${build.dir}" >
@@ -84,12 +83,15 @@
 				<include name="**/*.jpg"/>
 				<include name="**/*.png"/>
 				<include name="org/montsuqi/tools/*.xml"/>
-                </fileset>
-                <fileset dir="${resources.dir}">
-                    <include name="**/*.jpg"/>
-                    <include name="**/*.png"/>
-                </fileset>
-                <fileset dir=".">
+			</fileset>
+			<fileset dir="${resources.dir}">
+				<include name="**/*.jpg"/>
+				<include name="**/*.png"/>
+			</fileset>
+			<fileset dir="${resources.dir}/themes">
+				<include name="*.theme"/>
+			</fileset>
+			<fileset dir=".">
 				<include name="README.txt"/>
 				<include name="README.html"/>
 				<include name="HOWTOBUILD.txt"/>
