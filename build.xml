@@ -307,6 +307,7 @@
 			<arg value="${keystore}"/>
 			<fileset dir="${build.dir}">
 				<include name="*.jar"/>
+                <include name="libs/*.jar"/>
 			</fileset>
 		</apply>
 	</target>
