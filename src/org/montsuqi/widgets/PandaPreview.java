@@ -158,8 +158,8 @@ public class PandaPreview extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             zoom = getRealZoom() * SCALE_FACTOR;
-            if (zoom > 4.0) {
-                zoom = 4.0;
+            if (zoom > 3.0) {
+                zoom = 3.0;
             }
             updateCombo();
             setScale();
