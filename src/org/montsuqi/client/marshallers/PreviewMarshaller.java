@@ -31,18 +31,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
-import org.montsuqi.widgets.PandaPreviewPane;
+import org.montsuqi.widgets.PandaPreview;
 
 /** <p>A class to send/receive Preview data.</p>
  */
 class PreviewMarshaller extends WidgetMarshaller {
 
 	private static final String TEMP_PREFIX = "pandapreview"; //$NON-NLS-1$
-	private static final String TEMP_SUFFIX = ".png"; //$NON-NLS-1$
+	private static final String TEMP_SUFFIX = ".pdf"; //$NON-NLS-1$
 	
 	public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
 		Protocol con = manager.getProtocol();
-		PandaPreviewPane preview = (PandaPreviewPane)widget;
+		PandaPreview preview = (PandaPreview)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {

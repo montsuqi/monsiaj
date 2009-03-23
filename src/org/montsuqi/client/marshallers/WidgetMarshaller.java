@@ -48,7 +48,7 @@ import org.montsuqi.widgets.Frame;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaHTML;
-import org.montsuqi.widgets.PandaPreviewPane;
+import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.Window;
@@ -74,7 +74,7 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(JTabbedPane.class, new NotebookMarshaller());
 		registerMarshaller(Calendar.class, new CalendarMarshaller());
 		registerMarshaller(JProgressBar.class, new ProgressBarMarshaller());
-		registerMarshaller(PandaPreviewPane.class, new PreviewMarshaller());
+		registerMarshaller(PandaPreview.class, new PreviewMarshaller());
 		registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
 		registerMarshaller(Frame.class, new FrameMarshaller());
 		registerMarshaller(FileEntry.class, new FileEntryMarshaller());

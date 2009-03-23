@@ -55,7 +55,7 @@ import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.PandaPreviewPane;
+import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
 
@@ -127,7 +127,7 @@ public class Protocol extends Connection {
 	private Interface xml;
 
 	static final Logger logger = Logger.getLogger(Protocol.class);
-	private static final String VERSION = "symbolic:blob:expand"; //$NON-NLS-1$
+	private static final String VERSION = "symbolic:blob:expand:pdf"; //$NON-NLS-1$
 
 	Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
 		super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
@@ -498,8 +498,8 @@ public class Protocol extends Connection {
 
 	private synchronized void clearWidget(Component widget) {
 		// logger.enter(widget);
-		if (widget instanceof PandaPreviewPane) {
-			PandaPreviewPane preview = (PandaPreviewPane)widget;
+		if (widget instanceof PandaPreview) {
+			PandaPreview preview = (PandaPreview)widget;
 			preview.clear();
 		} else if (widget instanceof JTextField) {
 			JTextField text = (JTextField)widget;

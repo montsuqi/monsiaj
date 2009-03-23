@@ -72,7 +72,7 @@ import org.montsuqi.widgets.PandaCombo;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaHTMLWebKit;
-import org.montsuqi.widgets.PandaPreviewPane;
+import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.RadioButton;
@@ -142,7 +142,7 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaCList",     PandaCList.class,    new CListBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaEntry",     PandaEntry.class,    entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaHTML",      PandaHTML.class,     defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("PandaPS",        PandaPreviewPane.class,  defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("PandaPS",        PandaPreview.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Pixmap",         Pixmap.class,        defaultWidgetBuilder); //$NON-NLS-1$

@@ -103,6 +103,7 @@
 				<include name="log4j.jar"/>
 				<include name="BareBonesBrowserLaunch.jar"/>
 				<include name="WebKit.jar"/>
+                <include name="PDFRenderer.jar"/>
 				<include name="*.jnilib"/>
 			</fileset>
 		</copy>
