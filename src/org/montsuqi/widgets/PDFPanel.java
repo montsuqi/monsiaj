@@ -25,7 +25,6 @@ package org.montsuqi.widgets;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -55,19 +54,13 @@ class PDFPanel extends JPanel {
         scale = 1.0;
     }
 
-    /** <p>Loads a image from file of given name.</p>
-     *
-     * <p>If the size of newly loaded image is different from that of the old one,
-     * new image is scaled to the component horizontally.</p>
-     *
-     * @param fileName name of the image file.
-     */
     public void load(String fileName) throws IOException {
-        //load a pdf from a byte buffer
+        load(new File(fileName));
+    }
+
+    public void load(File file) throws IOException {
         page = null;
         pagenum = 0;
-
-        File file = new File(fileName);
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         FileChannel channel = raf.getChannel();
         ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
@@ -108,27 +101,21 @@ class PDFPanel extends JPanel {
     }
 
     private void showPage() {
-        try {
-            if (page == null) {
-                return;
-            }
-
-            double sw = page.getWidth();
-            double sh = page.getHeight();
-
-            int w = (int) (sw * scale);
-            int h = (int) (sh * scale);
-
-            Dimension size = new Dimension(w, h);
-            setPreferredSize(size);
-            image = page.getImage(w, h, null, this);
-            revalidate();
-            repaint();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            // clear();
+        if (page == null) {
             return;
         }
+
+        double sw = page.getWidth();
+        double sh = page.getHeight();
+
+        int w = (int) (sw * scale);
+        int h = (int) (sh * scale);
+
+        Dimension size = new Dimension(w, h);
+        setPreferredSize(size);
+        image = page.getImage(w, h, null, this);
+        revalidate();
+        repaint();
     }
 
     public void paint(Graphics g) {
@@ -137,7 +124,6 @@ class PDFPanel extends JPanel {
         g.fillRect(0, 0, getWidth(), getHeight());
         if (image != null) {
             g.drawImage(image, 0, 0, this);
-
         }
     }
 }

@@ -82,7 +82,7 @@
 			<fileset dir="${src.dir}">
 				<include name="**/*.jpg"/>
 				<include name="**/*.png"/>
-				<include name="org/montsuqi/tools/*.xml"/>
+                <include name="org/montsuqi/tools/*.xml"/>
 			</fileset>
 			<fileset dir="${resources.dir}">
 				<include name="**/*.jpg"/>

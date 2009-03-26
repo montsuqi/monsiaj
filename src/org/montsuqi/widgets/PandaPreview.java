@@ -122,15 +122,15 @@ public class PandaPreview extends JPanel {
             int returnVal = fc.showSaveDialog(PandaPreview.this.getRootPane());
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
-                byte[] b;
-                FileInputStream in = new FileInputStream(fileName);
-                FileOutputStream out = new FileOutputStream(fc.getSelectedFile());
-                b = new byte[in.available()];
-                while (in.read(b) > 0) {
-                    out.write(b);
-                }
-                in.close();
-                out.close();
+                    byte[] b;
+                    FileInputStream in = new FileInputStream(fileName);
+                    FileOutputStream out = new FileOutputStream(fc.getSelectedFile());
+                    b = new byte[in.available()];
+                    while (in.read(b) > 0) {
+                        out.write(b);
+                    }
+                    in.close();
+                    out.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -258,12 +258,10 @@ public class PandaPreview extends JPanel {
     }
 
     public void load(String fileName) throws IOException {
-        try {
-            panel.load(fileName);
-            panel.setVisible(true);
-            this.fileName = fileName;
-        } catch (Exception ex) {
-        }
+        this.fileName = fileName;
+        panel.setVisible(true);
+        panel.load(fileName);
+        this.setScale();
     }
 
     public void clear() {
@@ -301,6 +299,7 @@ public class PandaPreview extends JPanel {
             } else {
                 zoom = 1.0;
             }
+            System.out.println("SCALE_FIT_PAGE:" + zoom);
         } else if (this.zoom == SCALE_FIT_PAGE_WIDTH) {
             double w = panel.getPageWidth();
             if (w > 0) {
@@ -308,6 +307,8 @@ public class PandaPreview extends JPanel {
             } else {
                 zoom = 1.0;
             }
+                        System.out.println("SCALE_FIT_PAGE_WIDTH:" + zoom);
+
         } else {
             zoom = this.zoom;
         }
@@ -316,7 +317,6 @@ public class PandaPreview extends JPanel {
 
     private void setScale() {
         panel.setScale(getRealZoom());
-
     }
 
     public static void main(String[] args) throws IOException {
