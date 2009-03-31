@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="@webstarturl@" href="jmareceipt.jnlp">
+<jnlp spec="1.0+" codebase="@webstarturl@" href="jws.jnlp">
   <information>
     <title>日医標準レセプトソフト</title>
     <vendor>@webstartvendor@</vendor>
@@ -19,10 +19,7 @@
     <jar href="pandaclient.jar"/>
     <jar href="libs/nimrodlf.jar"/>
     <jar href="libs/BareBonesBrowserLaunch.jar"/>
-  </resources>
-  <resources os="Mac\ OS\ X">
-    <jar href="libs/WebKit.jar"/>
-    <nativelib href="libs/libwebkitsample.jnilib.jar"/>
+    <jar href="libs/PDFRenderer.jar"/>
   </resources>
   <application-desc main-class="jp.or.med.jma_receipt.JMAReceiptLauncher"/>
 </jnlp>

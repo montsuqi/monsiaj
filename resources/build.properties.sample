@@ -8,6 +8,8 @@
 #do.sign=yes
 #alias=whatever
 #keystore=/path/to/keystore
+#webstart.url=http://url/to/monsiaj
+#webstart.vendor=vender
 
 # to build binaries without debug info, uncomment this line.
 #

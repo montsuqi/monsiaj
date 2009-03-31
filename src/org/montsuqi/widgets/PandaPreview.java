@@ -258,10 +258,16 @@ public class PandaPreview extends JPanel {
     }
 
     public void load(String fileName) throws IOException {
-        this.fileName = fileName;
-        panel.setVisible(true);
-        panel.load(fileName);
-        this.setScale();
+        try {
+            this.fileName = fileName;
+            panel.setVisible(true);
+            panel.load(fileName);
+            this.setScale();
+        } catch (Exception ex) {
+            if (!ex.getMessage().contains("This may not be a PDF File")) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public void clear() {
@@ -307,8 +313,6 @@ public class PandaPreview extends JPanel {
             } else {
                 zoom = 1.0;
             }
-                        System.out.println("SCALE_FIT_PAGE_WIDTH:" + zoom);
-
         } else {
             zoom = this.zoom;
         }

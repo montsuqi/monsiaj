@@ -102,9 +102,7 @@
 				<include name="nimrodlf.jar"/>
 				<include name="log4j.jar"/>
 				<include name="BareBonesBrowserLaunch.jar"/>
-				<include name="WebKit.jar"/>
                 <include name="PDFRenderer.jar"/>
-				<include name="*.jnilib"/>
 			</fileset>
 		</copy>
 		<native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
@@ -130,7 +128,6 @@
 		<copy todir="${build.dir}/${bin.name}">
 			<fileset dir="${build.dir}">
 				<include name="*.jar"/>
-				<include name="*.jnilib"/>
 				<include name="*.jnlp"/>
 				<include name="README.txt"/>
 				<include name="README.html"/>
@@ -142,7 +139,6 @@
 		<copy todir="${build.dir}/${bin.name}/libs">
 			<fileset dir="${build.dir}/libs">
                 <include name="*.jar"/>
-                <include name="*.jnilib"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${bin.name}/theme">
@@ -193,7 +189,6 @@
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java">
 			<fileset dir="${build.dir}">
 				<include name="*.jar"/>
-				<include name="*.jnilib"/>
 				<exclude name="pandarecord.jar"/>
 				<exclude name="pandareplay.jar"/>
 			</fileset>
@@ -201,7 +196,6 @@
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java/libs">
 			<fileset dir="${build.dir}/libs">
                 <include name="*.jar"/>
-                <include name="*.jnilib"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}/${macosx.app.dir}/Contents/MacOS">
@@ -267,11 +261,6 @@
 		<jar jarfile="${build.dir}/jmareceipt.jar" manifest="${resources.dir}/jmareceipt.mf">
 			<fileset dir="${build.dir}">
 				<include name="jp/or/med/jma_receipt/**"/>
-			</fileset>
-		</jar>
-		<jar jarfile="${build.dir}/libs/libwebkitsample.jnilib.jar">
-			<fileset dir="${libs.dir}">
-				<include name="libwebkitsample.jnilib"/>
 			</fileset>
 		</jar>
 		<jar jarfile="${build.dir}/pandarecord.jar" manifest="${resources.dir}/pandarecord.mf">

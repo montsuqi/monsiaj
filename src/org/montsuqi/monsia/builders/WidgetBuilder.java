@@ -71,7 +71,6 @@ import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.PandaCombo;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
-import org.montsuqi.widgets.PandaHTMLWebKit;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
@@ -158,11 +157,6 @@ public class WidgetBuilder {
 		registerWidgetClass("VSeparator",     VSeparator.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Viewport",       JViewport.class,     new ViewportBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Window",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
-
-		// on MacOS & Java 1.4 replace PandaHTML with PandaHTMLWebKit.
-		if (SystemEnvironment.isMacOSX() && SystemEnvironment.isJavaVersionMatch("1.4")) {
-			registerWidgetClass("PandaHTML", PandaHTMLWebKit.class, defaultWidgetBuilder); //$NON-NLS-1$
-		}
 	}
 
 	// an interface to make a modified font.

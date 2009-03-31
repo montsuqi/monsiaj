@@ -96,7 +96,7 @@ public abstract class WidgetMarshaller {
 	 * @throws IOException on IO error.
 	 */
 	protected boolean handleStateStyle(WidgetValueManager manager, Component widget, String name) throws IOException {
-		Protocol con = manager.getProtocol();
+        Protocol con = manager.getProtocol();
 		if ("state".equals(name)) { //$NON-NLS-1$
 			int state = con.receiveIntData();
 			/* Widget states from gtkenums.h
@@ -120,7 +120,7 @@ public abstract class WidgetMarshaller {
 		} else if ("style".equals(name)) { //$NON-NLS-1$
 			String buff = con.receiveStringData();
 			manager.setStyle(widget, buff);
-			return true;
+            return true;
 		} else {
 			return false;
 		}
