@@ -22,7 +22,7 @@ YYYYMMDDは配布物作成の年月日を表します。
 :README.txt, README.html:説明書(実行には不要です)
 :jmareceipt.jar:日レセ専用ランチャー
 :pandaclient.jar:Javaクライアント本体(汎用ランチャーを含みます)
-:libs/WebKit.jar, libwebkitsample.jnilib, libwebkitsample.jnilib.jar:MacOS Xで使用されるHTML表示モジュール(MacOS X以外では不要です)
+:libs/PDFRenderer.jar:PDF描画ライブラリ
 :libs/log4j.jar:ログ出力モジュール(なくても実行可能です)
 :libs/nimrodlf.jar:Nimrodルックアンドフィールモジュール
 :libs/BareBonesBrowserLaunch.jar:外部ブラウザ起動ライブラリ
@@ -41,6 +41,7 @@ YYYYMMDDは配布物作成の年月日を表します。
 :README.txt, README.html:説明書(実行には不要です)
 :HOWTOBUILD.txt:ビルド方法の説明(実行には不要です)
 :src/ 以下のファイル:ソースコード
+:src/PDFRenderer_src.zip:pdf-rendererの改変後のソースコード
 :libs/ 以下のファイル:各種ライブラリ
 :resources/:画像や設定ファイルなど各種リソース
 :build.xml:antでコンパイルを行うためのビルドファイル
@@ -345,5 +346,4 @@ Webアクセスにプロキシが必要な環境では、以下の設定を行�
 !!! Mac OS X環境
 
 * 日本語変換ソフトの自動切り替え機能が動作しない
-* 受付業務 患者登録の画面でコメント入力部分の下部が隠れてしまう
 * Mac OS Xルック＆フィールにおいて、CLISTのヘッダラベルが完全に表示されない場合がある

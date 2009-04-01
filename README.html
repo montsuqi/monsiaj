@@ -1,9 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-<html>
-<head>
-<title>README.txt</title>
-</head>
-<body>
 <h1>目次</h1>
 <ul>
 <li>配布物の内容</li>
@@ -23,69 +17,32 @@
 <p>YYYYMMDDは配布物作成の年月日を表します。</p>
 <h2>バイナリ配布物の内容</h2>
 <dl>
-<dt>README.txt, README.html</dt>
-<dd>説明書(実行には不要です)
-</dd>
-<dt>jmareceipt.jar</dt>
-<dd>日レセ専用ランチャー
-</dd>
-<dt>pandaclient.jar</dt>
-<dd>Javaクライアント本体(汎用ランチャーを含みます)
-</dd>
-<dt>libs/<a href="WebKit">WebKit</a>.jar, libwebkitsample.jnilib, libwebkitsample.jnilib.jar</dt>
-<dd>MacOS Xで使用されるHTML表示モジュール(MacOS X以外では不要です)
-</dd>
-<dt>libs/log4j.jar</dt>
-<dd>ログ出力モジュール(なくても実行可能です)
-</dd>
-<dt>libs/nimrodlf.jar</dt>
-<dd>Nimrodルックアンドフィールモジュール
-</dd>
-<dt>libs/<a href="BareBonesBrowserLaunch">BareBonesBrowserLaunch</a>.jar</dt>
-<dd>外部ブラウザ起動ライブラリ
-</dd>
-<dt>jma-receipt.jpg</dt>
-<dd>日レセ専用ランチャーアイコンファイル
-</dd>
-<dt>jws.jnlp</dt>
-<dd>Java Web Start配備用サンプル設定ファイル(実行には不要です)
-</dd>
-<dt>theme/*.theme</dt>
-<dd>Nimrod用テーマファイル
-</dd>
+<dt>README.txt, README.html</dt><dd>説明書(実行には不要です)</dd>
+<dt>jmareceipt.jar</dt><dd>日レセ専用ランチャー</dd>
+<dt>pandaclient.jar</dt><dd>Javaクライアント本体(汎用ランチャーを含みます)</dd>
+<dt>libs/PDFRenderer.jar</dt><dd>PDF描画ライブラリ</dd>
+<dt>libs/log4j.jar</dt><dd>ログ出力モジュール(なくても実行可能です)</dd>
+<dt>libs/nimrodlf.jar</dt><dd>Nimrodルックアンドフィールモジュール</dd>
+<dt>libs/BareBonesBrowserLaunch.jar</dt><dd>外部ブラウザ起動ライブラリ</dd>
+<dt>jma-receipt.jpg</dt><dd>日レセ専用ランチャーアイコンファイル</dd>
+<dt>jws.jnlp</dt><dd>Java Web Start配備用サンプル設定ファイル(実行には不要です)</dd>
+<dt>theme/*.theme</dt><dd>Nimrod用テーマファイル</dd>
 </dl>
 <h2>バイナリ配布物(MacOS X アプリケーションバンドル版)の内容</h2>
 <dl>
-<dt>README.txt, README.html</dt>
-<dd>説明書(実行には不要です)
-</dd>
-<dt>JMAReceipt.app</dt>
-<dd>日レセアプリケーションバンドル版
-</dd>
-<dt>theme/*.theme</dt>
-<dd>Nimrod用テーマファイル
-</dd>
+<dt>README.txt, README.html</dt><dd>説明書(実行には不要です)</dd>
+<dt>JMAReceipt.app</dt><dd>日レセアプリケーションバンドル版</dd>
+<dt>theme/*.theme</dt><dd>Nimrod用テーマファイル</dd>
 </dl>
 <h2>ソース配布物の内容</h2>
 <dl>
-<dt>README.txt, README.html</dt>
-<dd>説明書(実行には不要です)
-</dd>
-<dt>HOWTOBUILD.txt</dt>
-<dd>ビルド方法の説明(実行には不要です)
-</dd>
-<dt>src/ 以下のファイル</dt>
-<dd>ソースコード
-</dd>
-<dt>libs/ 以下のファイル</dt>
-<dd>各種ライブラリ
-</dd>
-<dt>resources/</dt>
-<dd>画像や設定ファイルなど各種リソース
-</dd>
-<dt>build.xml</dt>
-<dd>antでコンパイルを行うためのビルドファイル
-</dd>
+<dt>README.txt, README.html</dt><dd>説明書(実行には不要です)</dd>
+<dt>HOWTOBUILD.txt</dt><dd>ビルド方法の説明(実行には不要です)</dd>
+<dt>src/ 以下のファイル</dt><dd>ソースコード</dd>
+<dt>src/PDFRenderer_src.zip</dt><dd>pdf-rendererの改変後のソースコード</dd>
+<dt>libs/ 以下のファイル</dt><dd>各種ライブラリ</dd>
+<dt>resources/</dt><dd>画像や設定ファイルなど各種リソース</dd>
+<dt>build.xml</dt><dd>antでコンパイルを行うためのビルドファイル</dd>
 </dl>
 <h2>ランチャーの起動方法</h2>
 <p>ファイルマネージャ(エクスプローラ、ファインダなど)から、ランチャー(jmareceipt.jar
@@ -106,74 +63,38 @@ jarファイルをダブルクリックして起動します。</p>
 設定項目は3つのタブに分かれています。</p>
 <h3>基本設定タブ</h3>
 <dl>
-<dt>ホスト(ポート)</dt>
-<dd>接続するホストとポート番号を指定します。通常、ポート番号は 8000 です。
-</dd>
-<dt>アプリケーション</dt>
-<dd>実行するアプリケーションを panda:アプリケーション名 の形式で指定します。日レセ専用ランチャーを使用した場合は、panda:orca00 から変更することはできません。
-</dd>
-<dt>ユーザー</dt>
-<dd>ユーザー名を入力します。SSLクライアント認証を使用する場合は、入力しても無視されます。
-</dd>
-<dt>プロトコルバージョン</dt>
-<dd>通信プロトコルのバージョンを指定します。日レセの場合は、1です。それ以外の場合はアプリケーションごとに異なるので確認が必要です。日レセ専用ランチャーの場合、1から変更することはできません。
-</dd>
-<dt>パスワード</dt>
-<dd>パスワードを入力します。入力した文字の代わりに * が表示されます。SSLクライアント認証を使用する場合は、入力しても無視されます。
-</dd>
-<dt>パスワードを保存</dt>
-<dd>チェックすると、パスワードをシステムに保存するようになります。暗号化は行わずそのまま保存するので、セキュリティの観点からは推奨されません。チェックを解除すると、今までシステムに保存していたパスワードは削除されます。
-</dd>
+<dt>ホスト(ポート)</dt><dd>接続するホストとポート番号を指定します。通常、ポート番号は 8000 です。</dd>
+<dt>アプリケーション</dt><dd>実行するアプリケーションを panda:アプリケーション名 の形式で指定します。日レセ専用ランチャーを使用した場合は、panda:orca00 から変更することはできません。</dd>
+<dt>ユーザー</dt><dd>ユーザー名を入力します。SSLクライアント認証を使用する場合は、入力しても無視されます。</dd>
+<dt>プロトコルバージョン</dt><dd>通信プロトコルのバージョンを指定します。日レセの場合は、1です。それ以外の場合はアプリケーションごとに異なるので確認が必要です。日レセ専用ランチャーの場合、1から変更することはできません。</dd>
+<dt>パスワード</dt><dd>パスワードを入力します。入力した文字の代わりに * が表示されます。SSLクライアント認証を使用する場合は、入力しても無視されます。</dd>
+<dt>パスワードを保存</dt><dd>チェックすると、パスワードをシステムに保存するようになります。暗号化は行わずそのまま保存するので、セキュリティの観点からは推奨されません。チェックを解除すると、今までシステムに保存していたパスワードは削除されます。</dd>
 </dl>
 <h3>SSLタブ</h3>
 <dl>
-<dt>SSLを使用</dt>
-<dd>通信にSSLを使用する場合、チェックします。
-</dd>
-<dt>クライアント証明書</dt>
-<dd>クライアント証明書ファイル(PKCS#12形式)を指定します。クライアント認証を使用しない場合は無視されます。
-</dd>
-<dt>証明書パスワード</dt>
-<dd>クライアント証明書のパスワードを入力します。クライアント認証を使用しない場合は無視されます。
-</dd>
-<dt>証明書パスワードを保存</dt>
-<dd>チェックすると、証明書パスワードをシステムに保存するようになります。注意点は基本設定タブのパスワードと同様です。
-</dd>
+<dt>SSLを使用</dt><dd>通信にSSLを使用する場合、チェックします。</dd>
+<dt>クライアント証明書</dt><dd>クライアント証明書ファイル(PKCS#12形式)を指定します。クライアント認証を使用しない場合は無視されます。</dd>
+<dt>証明書パスワード</dt><dd>クライアント証明書のパスワードを入力します。クライアント認証を使用しない場合は無視されます。</dd>
+<dt>証明書パスワードを保存</dt><dd>チェックすると、証明書パスワードをシステムに保存するようになります。注意点は基本設定タブのパスワードと同様です。</dd>
 </dl>
 <h3>その他の設定タブ</h3>
 <dl>
-<dt>スタイル</dt>
-<dd>スタイルファイルを指定します。無指定時には内蔵のスタイルファイルが使用されます。
-</dd>
-<dt>エンコーディング</dt>
-<dd>画面定義ファイルの文字エンコーディングを指定します。通常は EUC-JP です。日レセ専用ランチャーを使用した場合は EUC-JP から変更することはできません。
-</dd>
-<dt>ルック&amp;フィール</dt>
-<dd>画面の外見を指定します。最初に実行した際に、実行環境に合わせたもの(WindowsならWindows風など)が選択されていますが、他の物に変更しても問題ありません。
-</dd>
-<dt>ルック&amp;フィールのテーマ</dt>
-<dd>ルック＆フィールのテーマ(配色)を変更します。
-</dd>
-<dt>ログビューワの使用</dt>
-<dd>チェックすると、ログ表示ウィンドウがアイコン化された状態で現れます。不具合発生時に利用してください。
-</dd>
-<dt>画面の拡大表示</dt>
-<dd>チェックすると、ウィンドウがディスプレイ全体に拡大されます。縦横比はディスプレイにあわせて変化します。フォントのサイズは自動では変化しません。
-</dd>
-<dt>タイマーの使用</dt>
-<dd>チェックすると、入力しながら自動的に検索を絞り込む機能が有効になります。
-</dd>
-<dt>タイマー起動時間</dt>
-<dd>検索を開始するまでに待機する時間を指定します。単位はミリ秒(1000分の1秒)です。
-</dd>
-<dt>追加システムプロパティ</dt>
-<dd>必要に応じて、その他のプロパティを1行に1つの形式で記述します。
-</dd>
+<dt>スタイル</dt><dd>スタイルファイルを指定します。無指定時には内蔵のスタイルファイルが使用されます。</dd>
+<dt>エンコーディング</dt><dd>画面定義ファイルの文字エンコーディングを指定します。通常は EUC-JP です。日レセ専用ランチャーを使用した場合は EUC-JP から変更することはできません。</dd>
+<dt>ルック&amp;フィール</dt><dd>画面の外見を指定します。最初に実行した際に、実行環境に合わせたもの(WindowsならWindows風など)が選択されていますが、他の物に変更しても問題ありません。</dd>
+<dt>ルック&amp;フィールのテーマ</dt><dd>ルック＆フィールのテーマ(配色)を変更します。</dd>
+<dt>ログビューワの使用</dt><dd>チェックすると、ログ表示ウィンドウがアイコン化された状態で現れます。不具合発生時に利用してください。</dd>
+<dt>画面の拡大表示</dt><dd>チェックすると、ウィンドウがディスプレイ全体に拡大されます。縦横比はディスプレイにあわせて変化します。フォントのサイズは自動では変化しません。</dd>
+<dt>タイマーの使用</dt><dd>チェックすると、入力しながら自動的に検索を絞り込む機能が有効になります。</dd>
+<dt>タイマー起動時間</dt><dd>検索を開始するまでに待機する時間を指定します。単位はミリ秒(1000分の1秒)です。</dd>
+<dt>追加システムプロパティ</dt><dd>必要に応じて、その他のプロパティを1行に1つの形式で記述します。</dd>
 </dl>
 <h2>サーバ設定</h2>
 <p>ランチャー上部のサーバ選択コンボボックスでサーバ設定名を選択すると、ランチャーの設定を切替えることができます。
 2008年6月以前のバージョンの設定はdefaultに引き継がれます。</p>
-<pre></pre>
+<pre>
+
+</pre>
 <h3>サーバ設定の登録</h3>
 <ol>
 <li>ランチャー下部の設定ボタンを押してサーバ設定ダイアログを起動します。</li>
@@ -185,7 +106,7 @@ jarファイルをダブルクリックして起動します。</p>
 <ol>
 <li>ランチャー下部の設定ボタンを押してサーバ設定ダイアログを起動します。</li>
 <li>リストから変更したい設定を選択して、編集ボタンを押します。</li>
-<li>編集ダイアログで設定項目を変更します。</li>
+<li>編集ダイアログで設定項目を変更します。 </li>
 <li>設定後、OKボタンを押すと変更完了です。</li>
 </ol>
 <h3>サーバ設定の削除</h3>
@@ -198,19 +119,25 @@ jarファイルをダブルクリックして起動します。</p>
 <h2>システムプロパティについて</h2>
 <p>ランチャーの「その他の設定」タブにある「追加システムプロパティ」欄に記述することで、
 一部の動作をカスタマイズすることが出来ます。</p>
-<pre>プロパティ名=設定値</pre>
+<pre>
+プロパティ名=設定値
+</pre>
 <p>という書式で、1行に1つずつ記述します。</p>
 <h3>設定できるプロパティ</h3>
-<pre></pre>
+<pre>
+
+</pre>
 <h4>monsia.user.font</h4>
 <p>プログラム全体で使用するフォントを指定します。値は「フォント名-書体-サイズ」の形です。</p>
 <p>フォントは、プラットフォーム共通のJava論理フォント名
-(Serif/<a href="SansSerif">SansSerif</a>/Monospaced/Dialog/<a href="DialogInput">DialogInput</a>)、
+(Serif/SansSerif/Monospaced/Dialog/DialogInput)、
 もしくはプラットフォーム固有の物理フォント名を指定します。</p>
 <p>書体はPLAIN/BOLD/ITALIC/BOLDITALIC(大文字小文字の区別はなし)のいずれかです。</p>
 <p>サイズは整数で単位はポイントです。</p>
 <p>例:セリフ付きの18ポイントフォントを使用する。</p>
-<pre>monsia.user.font=Serif-PLAIN-18</pre>
+<pre>
+monsia.user.font=Serif-PLAIN-18
+</pre>
 <h4>monsia.user.font.XXX</h4>
 <p>特定の画面部品タイプ(ボタンなど)に固有のフォントを指定します。XXXの部分には
 以下のものが使用できます。</p>
@@ -225,15 +152,19 @@ jarファイルをダブルクリックして起動します。</p>
 <li>table</li>
 </ul>
 <p>例:ボタンに14ポイント、ラベルに12ポイントのセリフ付きフォントを使用する。</p>
-<pre>monsia.user.font.button=Serif-PLAIN-14
-monsia.user.font.label=Serif-PLAIN-12</pre>
+<pre>
+monsia.user.font.button=Serif-PLAIN-14
+monsia.user.font.label=Serif-PLAIN-12
+</pre>
 <p>monsia.user.fontよりも、これらの値の方が優先されます。</p>
 <h4>monsia.warn.certificate.expiration.before</h4>
 <p>クライアント証明書の有効期限切れの警告を行う日数を指定します。
 単位は日です。</p>
 <p>無指定時は30となっており、有効期限切れの30日前から警告が行われます。</p>
 <p>例:有効期限切れの一週間前から警告を表示する。</p>
-<pre>monsia.warn.certificate.expiration.before=7</pre>
+<pre>
+monsia.warn.certificate.expiration.before=7
+</pre>
 <h4>monsia.logger.factory</h4>
 <p>ログ出力モジュールを変更します。
 デバッグ用です。</p>
@@ -242,9 +173,11 @@ monsia.user.font.label=Serif-PLAIN-12</pre>
 <h3>書式</h3>
 <p>Javaのプロパティファイルです。
 以下のように指定します。</p>
-<pre>スタイル名.font=フォント名-書体-サイズ
+<pre>
+スタイル名.font=フォント名-書体-サイズ
 スタイル名.fg=色指定
-スタイル名.bg=色指定</pre>
+スタイル名.bg=色指定
+</pre>
 <p>フォント名は monsia.user.font プロパティと同様の書式で指定できます。</p>
 <p>色指定の値は # 記号に続けて色のRGB値を表す6桁の16進数を記述します。</p>
 <p>fgの同義語としてかわりに foreground、
@@ -258,9 +191,9 @@ bgの同義語としてかわりに backgroundも使用できます。</p>
 <p>ルック&amp;フィールがNimrodの場合に、ルック＆フィールのテーマにテーマファイルを指定することでGUI部品の配色を変更することができます。
 テーマファイルはパッケージのthemeフォルダ以下にあります。パッケージに含まれているテーマは以下です。</p>
 <ul>
-<li><a href="LightPastelBlue">LightPastelBlue</a>.theme</li>
-<li><a href="LightPastelRed">LightPastelRed</a>.theme</li>
-<li><a href="LightTabaco">LightTabaco</a>.theme</li>
+<li>LightPastelBlue.theme</li>
+<li>LightPastelRed.theme</li>
+<li>LightTabaco.theme</li>
 <li>Macchya.theme</li>
 <li>Snow.theme</li>
 <li>Sumire.theme</li>
@@ -281,8 +214,10 @@ bgの同義語としてかわりに backgroundも使用できます。</p>
 <p>Webアクセスにプロキシが必要な環境では、以下の設定を行ってください。</p>
 <h3>MacOS X以外の場合</h3>
 <p>「その他の設定」タブの「追加システムプロパティ」欄に以下の2行の内容を記述します。</p>
-<pre>http.proxyHost=ホスト名
-http.proxyPort=ポート番号</pre>
+<pre>
+http.proxyHost=ホスト名
+http.proxyPort=ポート番号
+</pre>
 <p>(注) =の左側では、大文字と小文字は区別されます。</p>
 <h3>MacOS Xの場合</h3>
 <ol>
@@ -297,14 +232,17 @@ http.proxyPort=ポート番号</pre>
 <h2>コマンドラインオプションについて</h2>
 <p>コンソールで専用ランチャーまたは汎用ランチャーを起動する際に、コマンドラインオプションを指定出来ます。</p>
 <h3>ヘルプの表示</h3>
-<pre> &gt; java -jar jmareceipt.jar -h
+<pre>
+ &gt; java -jar jmareceipt.jar -h
  USAGE:jp.or.med.jma_receipt.JMAReceiptLauncher &lt;option(s)&gt; files...
  -config : 指定された設定で接続する
   []
  -config-list : 設定リストを表示する
-  [false]</pre>
+  [false]
+</pre>
 <h3>設定リストの表示</h3>
-<pre> &gt; java -jar jmareceipt.jar -config-list
+<pre>
+ &gt; java -jar jmareceipt.jar -config-list
  設定リスト
  ------------------
  192.168.1.51
@@ -316,9 +254,12 @@ http.proxyPort=ポート番号</pre>
     ホスト:                 192.168.1.51
     ポート:                 8000
     アプリケーション:       panda:orca00
-    ユーザ:                 ormaster</pre>
+    ユーザ:                 ormaster
+</pre>
 <h3>設定を指定してサーバへ接続</h3>
-<pre> &gt; java -jar jmareceipt.jar -config=設定名</pre>
+<pre>
+ &gt; java -jar jmareceipt.jar -config=設定名
+</pre>
 <p>設定名に登録してあるサーバ設定を指定します。
 パスワードを保存しない設定の場合、パスワード入力ダイアログが表示されます。</p>
 <h2>ショートカットアイコンの作成について</h2>
@@ -342,19 +283,21 @@ http.proxyPort=ポート番号</pre>
 <li>Info.plist を閉じて、保存します。</li>
 <li>JMAReceiptアイコンをダブルクリックするとサーバに接続します。</li>
 </ol>
-<pre>    ...
+<pre>
+    ...
       &lt;/array&gt;
        &lt;key&gt;Arguments&lt;/key&gt;
        &lt;string&gt;-config=|設定名|&lt;/string&gt;
                ^^^^^^^^^^^^^^^^
        &lt;key&gt;Properties&lt;/key&gt;
        &lt;dict&gt;
-    ...</pre>
+    ...
+</pre>
 <p>※ 複数作成する場合は、アプリケーションバンドルの複製を作成して、複製に対して同様の手順を実行します。</p>
 <h4>共通版を使用する方法</h4>
 <ol>
 <li>monsiaj-bin-YYYYMMDD.zipを展開します。</li>
-<li>Finderより、アプリケーション-&gt;<a href="AppleScript">AppleScript</a>-&gt;スクリプトエディタを起動します。</li>
+<li>Finderより、アプリケーション-&gt;AppleScript-&gt;スクリプトエディタを起動します。</li>
 <li>スクリプト入力欄にスクリプトを記述します(下部参照)。<ul>
 <li>-jarの後に1文字スペースを空けて|jmareceipt.jarのフルパス|を記述します。</li>
 <li>-config=の後に|設定名|を記述します。</li>
@@ -370,14 +313,12 @@ http.proxyPort=ポート番号</pre>
 </ul></li>
 <li>作成したスクリプトのアイコンをダブルクリックするとサーバに接続します。</li>
 </ol>
-<pre>    do shell script "java -jar |jmareceipt.jarへのフルパス| -config=|設定名|"</pre>
+<pre>
+    do shell script "java -jar |jmareceipt.jarへのフルパス| -config=|設定名|"
+</pre>
 <h2>既知の問題</h2>
 <h3>Mac OS X環境</h3>
 <ul>
 <li>日本語変換ソフトの自動切り替え機能が動作しない</li>
-<li>受付業務 患者登録の画面でコメント入力部分の下部が隠れてしまう</li>
 <li>Mac OS Xルック＆フィールにおいて、CLISTのヘッダラベルが完全に表示されない場合がある</li>
 </ul>
-
-</body>
-</html>
