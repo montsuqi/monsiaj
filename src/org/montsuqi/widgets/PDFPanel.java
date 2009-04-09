@@ -100,6 +100,14 @@ class PDFPanel extends JPanel {
         }
     }
 
+    public void clear() {
+        page = null;
+        image = null;
+        setPreferredSize(new Dimension(0,0));
+        revalidate();
+        repaint();
+    }
+
     private void showPage() {
         if (page == null) {
             return;
@@ -111,8 +119,7 @@ class PDFPanel extends JPanel {
         int w = (int) (sw * scale);
         int h = (int) (sh * scale);
 
-        Dimension size = new Dimension(w, h);
-        setPreferredSize(size);
+        setPreferredSize(new Dimension(w, h));
         image = page.getImage(w, h, null, this);
         revalidate();
         repaint();

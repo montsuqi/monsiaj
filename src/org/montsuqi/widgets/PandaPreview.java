@@ -271,6 +271,7 @@ public class PandaPreview extends JPanel {
     }
 
     public void clear() {
+        panel.clear();
         panel.setVisible(false);
     }
 
