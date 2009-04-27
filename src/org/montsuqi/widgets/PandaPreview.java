@@ -333,6 +333,9 @@ public class PandaPreview extends JPanel {
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(preview);
         preview.load(chooser.getSelectedFile().getAbsolutePath());
+        preview.revalidate();
+        preview.repaint();
         f.pack();
+        f.validate();
     }
 }
