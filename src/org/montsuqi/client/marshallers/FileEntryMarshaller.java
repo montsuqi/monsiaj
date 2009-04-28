@@ -50,7 +50,6 @@ class FileEntryMarshaller extends WidgetMarshaller {
 
 		byte[] binary = null;
 		boolean entryReceived = false;
-		StringBuffer entryName = new StringBuffer();
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
@@ -59,7 +58,6 @@ class FileEntryMarshaller extends WidgetMarshaller {
 				manager.registerValue(widget, "objectdata", null);
 			} else {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
-				entryName = widgetName;
 				int offset = widgetName.length();
 				widgetName.replace(offset, widgetName.length(), '.' + name);
 				Component sub =  xml.getWidgetByLongName(widgetName.toString());

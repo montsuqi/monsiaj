@@ -309,8 +309,8 @@ public class WidgetBuilder {
 	}
 
 	protected void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
-		widget.setName(info.getName());
-		xml.setName(info.getName(), widget);
+        widget.setName(info.getLongName());
+        xml.setName(info.getName(), widget);
 		xml.setLongName(info.getLongName(), widget);
 	}
 
