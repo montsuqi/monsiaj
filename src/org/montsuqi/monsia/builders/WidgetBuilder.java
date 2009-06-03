@@ -264,11 +264,11 @@ public class WidgetBuilder {
 			if (widget instanceof Window) {
 				xml.setTopLevel(widget);
 			}
-			if (widget instanceof Container) {
-				builder.buildChildren(xml, (Container)widget, info);
-			}
 			builder.setCommonParameters(xml, widget, info);
 			builder.setSignals(xml, widget, info);
+            if (widget instanceof Container) {
+				builder.buildChildren(xml, (Container)widget, info);
+			}
 			return widget;
 		} catch (Exception e) {
 			logger.warn(e);

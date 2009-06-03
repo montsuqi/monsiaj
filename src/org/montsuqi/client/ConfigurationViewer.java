@@ -38,7 +38,6 @@ import javax.swing.AbstractAction;
 import javax.swing.border.Border;  
 import javax.swing.BorderFactory;  
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -52,6 +51,7 @@ import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.PandaCList;
+import org.montsuqi.widgets.Button;
 
 public class ConfigurationViewer{
 
@@ -92,7 +92,7 @@ public class ConfigurationViewer{
 		bar.setLayout(new FlowLayout());
 		container.add(bar, BorderLayout.SOUTH);
 		
-		JButton newButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { //$NON-NLS-1$
+		Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				editConfiguration(f, "new", true);
 				updateConfigurationList(clist);
@@ -100,7 +100,7 @@ public class ConfigurationViewer{
 		});
 		bar.add(newButton);
 		
-		JButton editButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { //$NON-NLS-1$
+		Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				int selectedRow = clist.getSelectedRow();
 				if ( selectedRow >= 0 ) {
@@ -112,7 +112,7 @@ public class ConfigurationViewer{
 		});
 		bar.add(editButton);
 		
-		JButton deleteButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { //$NON-NLS-1$
+		Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				int selectedRow = clist.getSelectedRow();
 				if ( selectedRow >= 0 ) {
@@ -128,7 +128,7 @@ public class ConfigurationViewer{
 		});
 		bar.add(deleteButton);
 
-		JButton closeButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { //$NON-NLS-1$
+		Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				f.dispose();
 			}
@@ -226,7 +226,7 @@ public class ConfigurationViewer{
 		bar.setLayout(new FlowLayout());
 		container.add(bar, BorderLayout.SOUTH);
 		
-		JButton editOKButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { //$NON-NLS-1$
+		Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				String entryName = configNameEntry.getText();
 				if ( entryName.equals("") ) {
@@ -259,7 +259,7 @@ public class ConfigurationViewer{
 		});
 		bar.add(editOKButton);
 
-		JButton editCancelButton = new JButton(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { //$NON-NLS-1$
+		Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { //$NON-NLS-1$
 			public void actionPerformed(ActionEvent e) {
 				f.dispose();
 			}

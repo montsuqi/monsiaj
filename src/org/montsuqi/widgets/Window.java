@@ -23,6 +23,7 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
@@ -40,6 +41,24 @@ public class Window extends JFrame {
 	private String title = "";
 	private boolean allow_grow;
 	private boolean allow_shrink;
+    private Component child = null;
+
+    public Component getChild() {
+        return child;
+    }
+
+    public void setChild(Component child) {
+        this.child = child;
+    }
+
+    public boolean isDialog() {
+        return isDialog;
+    }
+
+    public void setIsDialog(boolean isDialog) {
+        this.isDialog = isDialog;
+    }
+    private boolean isDialog = false;
 
 	/** <p>Constructs a Window instance.</p>
 	 */

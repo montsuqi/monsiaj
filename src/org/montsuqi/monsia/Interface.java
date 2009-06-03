@@ -243,20 +243,6 @@ public class Interface {
 		return (Component)longNames.get(longName);
 	}
 
-	public String getWidgetLongName(Component widget) {
-		if (widget == null) {
-			throw new NullPointerException("widget is null."); //$NON-NLS-1$
-		}
-		Iterator entries = longNames.entrySet().iterator();
-		while (entries.hasNext()) {
-			Map.Entry e = (Map.Entry)entries.next();
-			if (widget == e.getValue()) {
-				return (String)e.getKey();
-			}
-		}
-		throw new IllegalArgumentException("no long name found: " + widget.getName()); //$NON-NLS-1$
-	}
-
 	public void setButtonGroup(JRadioButton button, String groupName) {
 		JRadioButton none;
 		ButtonGroup group;
@@ -298,7 +284,7 @@ public class Interface {
 		if (widget instanceof Window) {
 			return;
 		}
-		AccelHandler handler = getAccelHandler(topLevel);
+        AccelHandler handler = getAccelHandler(topLevel);
 		handler.addAccels(widget, info.getAccels());
 	}
 
@@ -346,15 +332,15 @@ public class Interface {
 		while (c.getParent() != null) {
 			c = c.getParent();
 		}
-		AccelHandler handler = getAccelHandler(c);
+        AccelHandler handler = getAccelHandler(c);
 		return handler.handleAccel(e);
 	}
 
 	private static AccelHandler getAccelHandler(Component c) {
-		if ( ! accelHandlers.containsKey(c)) {
-			accelHandlers.put(c, new AccelHandler());
+		if ( ! accelHandlers.containsKey(c.getName())) {
+			accelHandlers.put(c.getName(), new AccelHandler());
 		}
-		AccelHandler handler = (AccelHandler)accelHandlers.get(c);
+		AccelHandler handler = (AccelHandler)accelHandlers.get(c.getName());
 		return handler;
 	}
 

@@ -41,7 +41,6 @@ import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -60,7 +59,7 @@ import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.PandaCList;
+import org.montsuqi.widgets.Button;
 
 import com.nilo.plaf.nimrod.*;
 
@@ -247,7 +246,7 @@ public class Launcher {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        JButton run = new JButton(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
+        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent ev) {
                 String configName = (String) configCombo.getSelectedItem();
@@ -259,7 +258,7 @@ public class Launcher {
         });
         bar.add(run);
 
-        JButton cancel = new JButton(new AbstractAction(Messages.getString("Launcher.cancel_label")) { //$NON-NLS-1$
+        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -267,7 +266,7 @@ public class Launcher {
         });
         bar.add(cancel);
 
-        JButton config = new JButton(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
+        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
                 viewer.run(f);
@@ -283,6 +282,7 @@ public class Launcher {
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         f.setVisible(true);
         configPanel.changeLookAndFeel();
+        run.requestFocus();
     }
 
     private void connect() {
@@ -336,7 +336,7 @@ public class Launcher {
         JPanel bar = new JPanel();
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
-        JButton clear = new JButton(new AbstractAction(Messages.getString("Launcher.log_clear")) { //$NON-NLS-1$
+        Button clear = new Button(new AbstractAction(Messages.getString("Launcher.log_clear")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
                 console.setText(""); //$NON-NLS-1$
@@ -344,7 +344,7 @@ public class Launcher {
         });
         bar.add(clear);
 
-        JButton save = new JButton(new AbstractAction(Messages.getString("Launcher.log_save_log_as")) { //$NON-NLS-1$
+        Button save = new Button(new AbstractAction(Messages.getString("Launcher.log_save_log_as")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent ev) {
                 JFileChooser chooser = new JFileChooser();
@@ -363,7 +363,7 @@ public class Launcher {
         });
         bar.add(save);
 
-        JButton quit = new JButton(new AbstractAction(Messages.getString("Launcher.log_quit")) { //$NON-NLS-1$
+        Button quit = new Button(new AbstractAction(Messages.getString("Launcher.log_quit")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
                 client.exitSystem();

@@ -260,9 +260,10 @@ public class PandaPreview extends JPanel {
     public void load(String fileName) throws IOException {
         try {
             this.fileName = fileName;
-            panel.setVisible(true);
+            panel.setVisible(false);
             panel.load(fileName);
             this.setScale();
+            panel.setVisible(true);
         } catch (Exception ex) {
             if (!ex.getMessage().contains("This may not be a PDF File")) {
                 ex.printStackTrace();

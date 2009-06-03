@@ -26,6 +26,7 @@ package org.montsuqi.widgets;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -45,6 +46,12 @@ public class Button extends JButton {
 		initActions();
 		setMargin(new Insets(0, -20, 0, -20));
 	}
+
+    public Button(AbstractAction action) {
+		super(action);
+		initActions();
+		//setMargin(new Insets(0, -20, 0, -20));
+    }
 
 	private void initActions() {
 		ActionMap actions = getActionMap();
