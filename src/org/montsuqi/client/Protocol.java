@@ -221,6 +221,7 @@ public class Protocol extends Connection {
             window.setVisible(true);
             window.hideBusyCursor();
             window.toFront();
+            window.setEnabled(true);
         } else {
             Component child = window.getChild();
             if (child == null) {
@@ -242,6 +243,7 @@ public class Protocol extends Connection {
             ((JComponent) child).repaint();
             topWindow.hideBusyCursor();
             topWindow.toFront();
+            topWindow.setEnabled(true);
             resetTimer(topWindow);
         }
         logger.leave();
@@ -630,27 +632,15 @@ public class Protocol extends Connection {
                 String wName = receiveString();
 
                 node = getNode(window);
-                if (node != null && node.getInterface() != null) {
+                if (node != null && node.getInterface() != null && window.equals(currentWindow)) {
                     Component widget = xml.getWidget(wName);
                     if (widget != null && widget.isFocusable()) {
-                        // JDK 1.5 focus problem: workaround
-                        final String javaVersion = System.getProperty("java.version");
-                        final Pattern pat = Pattern.compile("\\A1\\.5");
-                        final Matcher match = pat.matcher(javaVersion);
-                        if (match.find()) {
-                            SwingUtilities.invokeLater(new FocusRequester(widget));
-                        } else {
-                            widget.requestFocus();
-                        }
+                        // Mac OS X focus problem: workaround
+                        SwingUtilities.invokeLater(new FocusRequester(widget));
+                    //widget.requestFocus();
                     }
                 }
                 c = receivePacketClass();
-            }
-            // reset GtkPandaTimer if exists
-            node = getNode(currentWindow);
-            if (node != null) {
-                final Window w = node.getWindow();
-
             }
         } finally {
             isReceiving = false;
