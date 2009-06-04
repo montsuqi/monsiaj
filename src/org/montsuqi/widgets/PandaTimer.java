@@ -62,14 +62,14 @@ public class PandaTimer extends JComponent {
 		startTimer();
 	}
 
-	private void startTimer() {
+	public void startTimer() {
 		if ( ! timer.isRunning() && timer.getDelay() != 0) {
 			logger.debug("starting timer: {0}", getName()); //$NON-NLS-1$
 			timer.start();
 		}
 	}
 
-	private void stopTimer() {
+	public void stopTimer() {
 		if (timer.isRunning()) {
 			logger.debug("stopping timer: {0}", getName()); //$NON-NLS-1$
 			timer.stop();
@@ -79,7 +79,7 @@ public class PandaTimer extends JComponent {
 	/** <p>Stops and restarts the timer.</p>
 	 */
 	public void reset() {
-		stopTimer();
+        stopTimer();
 		startTimer();
 	}
 

@@ -43,7 +43,7 @@ public class TimerMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			if ("duration".equals(name)) { //$NON-NLS-1$
 				int duration = con.receiveIntData();
-				timer.setDuration(duration);
+                timer.setDuration(duration);
 			}
 		}
 	}

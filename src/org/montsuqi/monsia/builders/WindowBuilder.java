@@ -53,15 +53,10 @@ public class WindowBuilder extends ContainerBuilder {
                 w.setResizable(false);
             }
             if (info.getClassName().equals("Dialog")) {
-                /*
-                Method setAlwaysOnTop = Window.class.getMethod("setAlwaysOnTop", new Class[]{Boolean.TYPE});
-                setAlwaysOnTop.invoke(w, new Object[]{Boolean.TRUE});
-*/                w.setIsDialog(true);
+                w.setIsDialog(true);
             } else {
                 w.setIsDialog(false);
             }
-/*        } catch (NoSuchMethodException e) {
-*/            // ignore
         } catch (Exception e) {
             throw new WidgetBuildingException(e);
         }
@@ -83,9 +78,6 @@ public class WindowBuilder extends ContainerBuilder {
                 xml.setMenuBar((JMenuBar) child);
             } else {
                 w.setChild(child);
-                if (w.isDialog()) {
-                    parent.add(child);
-                }
             }
         }
     }

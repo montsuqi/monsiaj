@@ -34,16 +34,17 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -53,8 +54,8 @@ import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Window;
 
@@ -124,6 +125,7 @@ public class Protocol extends Connection {
     static final Logger logger = Logger.getLogger(Protocol.class);
     private static final String VERSION = "symbolic:blob:expand:pdf"; //$NON-NLS-1$
     private Window topWindow;
+    private List windowStack;
 
     public Window getTopWindow() {
         return topWindow;
@@ -152,6 +154,7 @@ public class Protocol extends Connection {
         this.timerPeriod = timerPeriod;
         sessionTitle = "";
         topWindow = new Window();
+        windowStack = new ArrayList();
     }
 
     public long getTimerPeriod() {
@@ -215,13 +218,45 @@ public class Protocol extends Connection {
         }
         xml = node.getInterface();
         Window window = node.getWindow();
+        window.setSessionTitle(sessionTitle);
+        /*        Window[] windows = Window.getMontsuqiWindows();
+        for (int i = 0; i < windows.length; i++) {
+        Window w = windows[i];
+        if (w != window) {
+        if (w.isDialog()) {
+        JDialog dialog = w.getDialog();
+        if (dialog != null) {
+        dialog.setEnabled(false);
+        }
+        }
+        }
+        }*/
+
+
         if (window.isDialog()) {
-            resetTimer(window);
-            window.setSessionTitle(sessionTitle);
-            window.setVisible(true);
-            window.hideBusyCursor();
-            window.toFront();
-            window.setEnabled(true);
+            Component parent;
+            JDialog dialog;
+
+            topWindow.showBusyCursor();
+            parent = topWindow;
+
+            for (int i = 0; i < windowStack.size(); i++) {
+                parent = ((Component) windowStack.get(i));
+                parent.setEnabled(false);
+                stopTimer(parent);
+            }
+            dialog = window.createDialog(parent);
+            dialog.setLocation(
+                    topWindow.getX() + topWindow.getWidth() / 2 - dialog.getWidth() / 2,
+                    topWindow.getY() + topWindow.getHeight() / 2 - dialog.getHeight() / 2);
+
+            dialog.setVisible(true);
+            dialog.setEnabled(true);
+            dialog.toFront();
+            resetTimer(dialog);
+            if (!windowStack.contains(dialog)) {
+                windowStack.add(dialog);
+            }
         } else {
             Component child = window.getChild();
             if (child == null) {
@@ -233,12 +268,10 @@ public class Protocol extends Connection {
             topWindow.setName(window.getName());
             topWindow.getContentPane().removeAll();
             topWindow.getContentPane().add(child);
-            topWindow.setTitleString(window.getTitle());
-            topWindow.setSessionTitle(sessionTitle);
+            topWindow.setTitle(window.getTitle());
             topWindow.setResizable(window.getAllow_Grow() && window.getAllow_Shrink());
             topWindow.setSize(window.getSize());
             topWindow.setVisible(true);
-            topWindow.setEnabled(true);
             ((JComponent) child).revalidate();
             ((JComponent) child).repaint();
             topWindow.hideBusyCursor();
@@ -259,8 +292,11 @@ public class Protocol extends Connection {
         Window window = node.getWindow();
 
         if (window.isDialog()) {
-            //clearWidget(window.getChild());
-            window.setVisible(false);
+            JDialog dialog = window.getDialog();
+            if (windowStack.contains(dialog)) {
+                windowStack.remove(dialog);
+            }
+            window.destroyDialog();
         } else {
             topWindow.setEnabled(false);
         }
@@ -532,6 +568,18 @@ public class Protocol extends Connection {
         sendString(name);
         logger.leave();
     }
+    private synchronized void stopTimer(Component widget) {
+        // logger.enter(widget);
+        if (widget instanceof PandaTimer) {
+            ((PandaTimer) widget).stopTimer();
+        } else if (widget instanceof Container) {
+            Container container = (Container) widget;
+            for (int i = 0, n = container.getComponentCount(); i < n; i++) {
+                stopTimer(container.getComponent(i));
+            }
+        }
+    // logger.leave();
+    }
 
     private synchronized void resetTimer(Component widget) {
         // logger.enter(widget);
@@ -636,8 +684,11 @@ public class Protocol extends Connection {
                     Component widget = xml.getWidget(wName);
                     if (widget != null && widget.isFocusable()) {
                         // Mac OS X focus problem: workaround
-                        SwingUtilities.invokeLater(new FocusRequester(widget));
-                    //widget.requestFocus();
+                        if (SystemEnvironment.isMacOSX()) {
+                            SwingUtilities.invokeLater(new FocusRequester(widget));
+                        } else {
+                            widget.requestFocus();
+                        }
                     }
                 }
                 c = receivePacketClass();
