@@ -118,7 +118,6 @@ class PDFPanel extends JPanel {
 
         int w = (int) (sw * scale);
         int h = (int) (sh * scale);
-
         setPreferredSize(new Dimension(w, h));
         image = page.getImage(w, h, null, this);
         revalidate();

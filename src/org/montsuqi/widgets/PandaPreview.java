@@ -26,18 +26,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.net.URL;
 
 import javax.swing.Action;
@@ -48,17 +39,15 @@ import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
 
+import javax.swing.SwingUtilities;
 import org.montsuqi.util.ExtensionFileFilter;
 
 /** <p>Preview pane with control buttons and display of current scale.</p>
@@ -158,8 +147,8 @@ public class PandaPreview extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             zoom = getRealZoom() * SCALE_FACTOR;
-            if (zoom > 2.8284271247) {
-                zoom = 2.8284271247;
+            if (zoom > SCALE_VALUE[SCALE_VALUE.length - 1]) {
+                zoom = SCALE_VALUE[SCALE_VALUE.length - 1];
             }
             updateCombo();
             setScale();
@@ -260,10 +249,10 @@ public class PandaPreview extends JPanel {
     public void load(String fileName) throws IOException {
         try {
             this.fileName = fileName;
-            panel.setVisible(false);
+            panel.clear();
+            panel.setVisible(true);
             panel.load(fileName);
             this.setScale();
-            panel.setVisible(true);
         } catch (Exception ex) {
             if (!ex.getMessage().contains("This may not be a PDF File")) {
                 ex.printStackTrace();
@@ -300,23 +289,36 @@ public class PandaPreview extends JPanel {
 
     private double getRealZoom() {
         double zoom;
+
         if (this.zoom == SCALE_FIT_PAGE) {
             double h = panel.getPageHeight();
             if (h > 0) {
-                zoom = scroll.getSize().height * 1.0 / h;
+                if (scroll.isShowing()) {
+                    zoom = scroll.getSize().height * 1.0 / h;
+                } else {
+                    zoom = this.getSize().height * 1.0 / h;
+                }
             } else {
                 zoom = 1.0;
             }
-            System.out.println("SCALE_FIT_PAGE:" + zoom);
         } else if (this.zoom == SCALE_FIT_PAGE_WIDTH) {
             double w = panel.getPageWidth();
             if (w > 0) {
-                zoom = scroll.getSize().width * 1.0 / w;
+                if (scroll.isShowing()) {
+                    zoom = scroll.getSize().width * 1.0 / w;
+                } else {
+
+                    zoom = this.getSize().width * 1.0 / w;
+                }
             } else {
                 zoom = 1.0;
             }
         } else {
             zoom = this.zoom;
+        }
+        if (zoom > SCALE_VALUE[SCALE_VALUE.length - 1] ||
+                zoom <= 0.02) {
+            zoom = 1.0;
         }
         return zoom;
     }
