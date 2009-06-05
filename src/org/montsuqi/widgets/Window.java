@@ -63,16 +63,34 @@ public class Window extends JFrame {
             } else {
                 dialog = new JDialog();
                 dialog.setModal(false);
-                dialog.setTitle(this.getTitle());
             }
+            dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             dialog.setName(this.getName());
             dialog.getContentPane().add(child);
-            dialog.setTitle(this.getTitle());
-            dialog.setResizable(true);
             dialog.setSize(this.getSize());
         }
+        dialog.setTitle(this.getTitle());
+        dialog.setVisible(true);
+        dialog.setEnabled(true);
+        dialog.toFront();
         return dialog;
+    }
+
+    public void putWindow(Window topWindow) {
+        child.setVisible(true);
+        topWindow.setName(this.getName());
+        topWindow.getContentPane().removeAll();
+        topWindow.getContentPane().add(child);
+        topWindow.setTitle(this.getTitle());
+        topWindow.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
+        topWindow.setSize(this.getSize());
+        topWindow.setVisible(true);
+        ((JComponent) child).revalidate();
+        ((JComponent) child).repaint();
+        topWindow.hideBusyCursor();
+        topWindow.toFront();
+        topWindow.setEnabled(true);
     }
 
     public JDialog getDialog() {

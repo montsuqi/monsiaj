@@ -219,27 +219,11 @@ public class Protocol extends Connection {
         xml = node.getInterface();
         Window window = node.getWindow();
         window.setSessionTitle(sessionTitle);
-        /*        Window[] windows = Window.getMontsuqiWindows();
-        for (int i = 0; i < windows.length; i++) {
-        Window w = windows[i];
-        if (w != window) {
-        if (w.isDialog()) {
-        JDialog dialog = w.getDialog();
-        if (dialog != null) {
-        dialog.setEnabled(false);
-        }
-        }
-        }
-        }*/
-
-
         if (window.isDialog()) {
-            Component parent;
+            Component parent = topWindow;
             JDialog dialog;
 
             topWindow.showBusyCursor();
-            parent = topWindow;
-
             for (int i = 0; i < windowStack.size(); i++) {
                 parent = ((Component) windowStack.get(i));
                 parent.setEnabled(false);
@@ -249,34 +233,12 @@ public class Protocol extends Connection {
             dialog.setLocation(
                     topWindow.getX() + topWindow.getWidth() / 2 - dialog.getWidth() / 2,
                     topWindow.getY() + topWindow.getHeight() / 2 - dialog.getHeight() / 2);
-
-            dialog.setVisible(true);
-            dialog.setEnabled(true);
-            dialog.toFront();
             resetTimer(dialog);
             if (!windowStack.contains(dialog)) {
                 windowStack.add(dialog);
             }
         } else {
-            Component child = window.getChild();
-            if (child == null) {
-                logger.warn("window " + name + " does not have child");
-                logger.leave();
-                return;
-            }
-            child.setVisible(true);
-            topWindow.setName(window.getName());
-            topWindow.getContentPane().removeAll();
-            topWindow.getContentPane().add(child);
-            topWindow.setTitle(window.getTitle());
-            topWindow.setResizable(window.getAllow_Grow() && window.getAllow_Shrink());
-            topWindow.setSize(window.getSize());
-            topWindow.setVisible(true);
-            ((JComponent) child).revalidate();
-            ((JComponent) child).repaint();
-            topWindow.hideBusyCursor();
-            topWindow.toFront();
-            topWindow.setEnabled(true);
+            window.putWindow(topWindow);
             resetTimer(topWindow);
         }
         logger.leave();
