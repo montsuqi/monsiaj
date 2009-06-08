@@ -49,6 +49,7 @@ class CListMarshaller extends WidgetMarshaller {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
 
+        widget.setVisible(false);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         TableColumnModel columnModel = table.getColumnModel();
         ListSelectionModel selections = table.getSelectionModel();
@@ -154,6 +155,7 @@ class CListMarshaller extends WidgetMarshaller {
         //tableModel.setColumnIdentifiers(labels);
         // restore selection values
         copySelections(rows, selections, savedSelections);
+        widget.setVisible(true);
     }
 
     private void copySelections(int rows, ListSelectionModel to, ListSelectionModel from) {
