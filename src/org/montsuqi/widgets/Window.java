@@ -71,9 +71,7 @@ public class Window extends JFrame {
             dialog.setSize(this.getSize());
         }
         dialog.setTitle(this.getTitle());
-        dialog.setVisible(true);
         dialog.setEnabled(true);
-        dialog.toFront();
         return dialog;
     }
 

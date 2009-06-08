@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
@@ -222,6 +221,7 @@ public class Protocol extends Connection {
         if (window.isDialog()) {
             Component parent = topWindow;
             JDialog dialog;
+            Point p;
 
             topWindow.showBusyCursor();
             for (int i = 0; i < windowStack.size(); i++) {
@@ -230,9 +230,12 @@ public class Protocol extends Connection {
                 stopTimer(parent);
             }
             dialog = window.createDialog(parent);
+            p = window.getLocation();
             dialog.setLocation(
-                    topWindow.getX() + topWindow.getWidth() / 2 - dialog.getWidth() / 2,
-                    topWindow.getY() + topWindow.getHeight() / 2 - dialog.getHeight() / 2);
+                    topWindow.getX() + p.x,
+                    topWindow.getY() + p.y);
+            dialog.setVisible(true);
+            dialog.toFront();
             resetTimer(dialog);
             if (!windowStack.contains(dialog)) {
                 windowStack.add(dialog);
@@ -530,6 +533,7 @@ public class Protocol extends Connection {
         sendString(name);
         logger.leave();
     }
+
     private synchronized void stopTimer(Component widget) {
         // logger.enter(widget);
         if (widget instanceof PandaTimer) {
