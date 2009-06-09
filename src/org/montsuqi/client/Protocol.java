@@ -264,6 +264,7 @@ public class Protocol extends Connection {
             window.destroyDialog();
         } else {
             topWindow.setEnabled(false);
+            stopTimer(topWindow);
         }
         logger.leave();
     }
