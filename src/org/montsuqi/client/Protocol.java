@@ -124,7 +124,7 @@ public class Protocol extends Connection {
     static final Logger logger = Logger.getLogger(Protocol.class);
     private static final String VERSION = "symbolic:blob:expand:pdf"; //$NON-NLS-1$
     private Window topWindow;
-    private List windowStack;
+    private List dialogStack;
 
     public Window getTopWindow() {
         return topWindow;
@@ -153,7 +153,7 @@ public class Protocol extends Connection {
         this.timerPeriod = timerPeriod;
         sessionTitle = "";
         topWindow = new Window();
-        windowStack = new ArrayList();
+        dialogStack = new ArrayList();
     }
 
     public long getTimerPeriod() {
@@ -224,8 +224,8 @@ public class Protocol extends Connection {
             Point p;
 
             topWindow.showBusyCursor();
-            for (int i = 0; i < windowStack.size(); i++) {
-                parent = ((Component) windowStack.get(i));
+            for (int i = 0; i < dialogStack.size(); i++) {
+                parent = ((Component) dialogStack.get(i));
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
@@ -237,8 +237,8 @@ public class Protocol extends Connection {
             dialog.setVisible(true);
             dialog.toFront();
             resetTimer(dialog);
-            if (!windowStack.contains(dialog)) {
-                windowStack.add(dialog);
+            if (!dialogStack.contains(dialog)) {
+                dialogStack.add(dialog);
             }
         } else {
             window.putWindow(topWindow);
@@ -258,8 +258,8 @@ public class Protocol extends Connection {
 
         if (window.isDialog()) {
             JDialog dialog = window.getDialog();
-            if (windowStack.contains(dialog)) {
-                windowStack.remove(dialog);
+            if (dialogStack.contains(dialog)) {
+                dialogStack.remove(dialog);
             }
             window.destroyDialog();
         } else {
