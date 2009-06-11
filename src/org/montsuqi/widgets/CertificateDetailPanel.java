@@ -69,7 +69,7 @@ public class CertificateDetailPanel extends JPanel {
 	}
 
 	public void setCertificateChain(final X509Certificate[] chain) {
-		this.chain = chain;
+		this.chain = (X509Certificate[])chain.clone();
 		final ListModel listModel = new CertificateListModel();
 		list.setModel(listModel);
 		final ListSelectionModel selection = list.getSelectionModel();

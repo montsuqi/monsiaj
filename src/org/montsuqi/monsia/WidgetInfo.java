@@ -91,7 +91,7 @@ public class WidgetInfo {
 		return properties;
 	}
 
-	public String getProperty(String key) {
+	public synchronized String getProperty(String key) {
 		return (String)properties.get(key);
 	}
 
@@ -108,7 +108,7 @@ public class WidgetInfo {
 		properties.put(key, value);
 	}
 
-	public List getSignals() {
+	public synchronized List getSignals() {
 		return Collections.unmodifiableList(signals);
 	}
 
@@ -117,7 +117,7 @@ public class WidgetInfo {
 		this.signals.addAll(signals);
 	}
 
-	public List getAccels() {
+	synchronized public List getAccels() {
 		return accels;
 	}
 

@@ -110,12 +110,10 @@ public class PandaCombo extends JComboBox {
 class PandaComboBoxEditor extends BasicComboBoxEditor {
 
 	JComboBox combo;
-	int prefixLength;
 
 	public PandaComboBoxEditor(final JComboBox combo) {
 		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
 		this.combo = combo;
-		prefixLength = 0;
 		editor.putClientProperty("panda combo editor", Boolean.TRUE); //$NON-NLS-1$
 	}
 

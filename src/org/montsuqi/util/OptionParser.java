@@ -120,6 +120,7 @@ public class OptionParser {
 					lines.add(line);
 				}
 			}
+            br.close();
 		} catch (IOException e) {
 			throw new OptionParserException(e);
 		}

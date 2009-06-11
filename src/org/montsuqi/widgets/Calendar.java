@@ -135,11 +135,11 @@ public class Calendar extends JComponent {
     }
 
     public Date getDate() {
-        return date;
+        return (Date)date.clone();
     }
 
     public void setDate(Date date, boolean real) {
-        this.date = date;
+        this.date = (Date)date.clone();
         setCells(real);
         setSpinners();
     }
@@ -175,7 +175,7 @@ public class Calendar extends JComponent {
             monthSpinner.setValue(date);
             yearSpinner.setValue(date);
         } catch (IllegalArgumentException e) {
-            logger.warn(e);
+            e.printStackTrace();
         }
     }
 

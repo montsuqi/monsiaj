@@ -98,7 +98,7 @@ public class FileEntry extends JComponent {
         try {
             setFile(file.getCanonicalPath());
         } catch (IOException e) {
-            logger.warn(e);
+            e.printStackTrace();
         }
     }
 

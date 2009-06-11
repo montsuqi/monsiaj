@@ -194,7 +194,7 @@ class NumberDocument extends PlainDocument {
         scale = 0;
     }
 
-    BigDecimal getValue() {
+    synchronized BigDecimal getValue() {
         PrecisionScale ps = new PrecisionScale(originalFormat);
         value = value.setScale(ps.precision, ps.scale);
         return value;

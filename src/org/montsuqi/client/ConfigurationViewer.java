@@ -119,7 +119,6 @@ public class ConfigurationViewer{
 					int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
 					if (result == JOptionPane.YES_OPTION) {
 						String configName = (String)(clist.getValueAt(selectedRow, 0));
-						DefaultTableModel model = (DefaultTableModel)clist.getModel();
 						conf.deleteConfiguration(configName);
 						updateConfigurationList(clist);
 					}

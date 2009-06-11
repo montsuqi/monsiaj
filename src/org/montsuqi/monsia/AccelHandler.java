@@ -33,13 +33,9 @@ import javax.swing.AbstractButton;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.montsuqi.util.Logger;
-
 public class AccelHandler {
 
 	private static boolean enabled = true;
-
-	Logger logger = Logger.getLogger(AccelHandler.class);
 
 	class Pair {
 		Component widget;

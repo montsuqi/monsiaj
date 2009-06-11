@@ -50,7 +50,7 @@ class PixmapEntryMarshaller extends WidgetMarshaller {
 
 		byte[] binary = null;
 		boolean entryReceived = false;
-		StringBuffer entryName = new StringBuffer();
+		StringBuffer entryName;
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();

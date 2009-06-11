@@ -36,11 +36,11 @@ class Option {
 	}
 
 	Option(String name, String message, boolean defaultValue) {
-		this(name, message, new Boolean(defaultValue));
+		this(name, message, Boolean.valueOf(defaultValue));
 	}
 
 	Option(String name, String message, int defaultValue) {
-		this(name, message, new Integer(defaultValue));
+		this(name, message, Integer.valueOf(defaultValue));
 	}
 
 	Option(String name, String message, String defaultValue) {
@@ -106,7 +106,7 @@ class Option {
 		if (value.getClass() != Boolean.class) {
 			throw new IllegalArgumentException("option type mismatch"); //$NON-NLS-1$
 		}
-		value = new Boolean(arg);
+		value = Boolean.valueOf(arg);
 
 	}
 

@@ -125,7 +125,6 @@ class PDFPanel extends JPanel {
     }
 
     public void paint(Graphics g) {
-        Dimension sz = getSize();
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
         if (image != null) {

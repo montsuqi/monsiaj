@@ -52,7 +52,6 @@ public class Fixed extends JComponent
 		if	( parent != null && parent instanceof JViewport) {
 			Rectangle childRect = e.getComponent().getBounds();
 			Rectangle viewRect = ((JViewport)parent).getViewRect();
-			Rectangle thisRect = this.getBounds();
 			Point p = ((JViewport)parent).getViewPosition();
 			int childTop = (int)childRect.getY();			
 			int childBottom = (int)(childRect.getY() + childRect.getHeight());

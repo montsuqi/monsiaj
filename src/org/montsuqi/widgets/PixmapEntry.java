@@ -136,7 +136,7 @@ public class PixmapEntry extends JComponent {
 		try {
 			setFile(file.getCanonicalPath());
 		} catch (IOException e) {
-			logger.warn(e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -181,6 +181,7 @@ public class PixmapEntry extends JComponent {
 			pixmap.setText("");
 			pixmap.setIcon(icon);
 		} catch (Exception e) {
+            e.printStackTrace();
 			return;
 		}
 	}

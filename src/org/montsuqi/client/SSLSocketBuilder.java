@@ -222,7 +222,7 @@ public class SSLSocketBuilder {
 
     TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
         boolean useBrowserSetting = getUseBrowserSetting();
-        logger.debug("use browser setting = {0}", new Boolean(useBrowserSetting));
+        logger.debug("use browser setting = {0}", Boolean.valueOf(useBrowserSetting));
         logger.debug("ignored...");
         // Force false for now.
         useBrowserSetting = false;
@@ -236,6 +236,7 @@ public class SSLSocketBuilder {
             final InputStream is = new FileInputStream(trustStorePath);
             final KeyStore ks = KeyStore.getInstance("KeychainStore", "Apple");
             ks.load(is, null);
+            is.close();
             final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
             tmf.init(ks);
             final TrustManager[] tms = tmf.getTrustManagers();
@@ -253,6 +254,7 @@ public class SSLSocketBuilder {
             final File trustStorePath = getTrustStorePath();
             final InputStream is = new FileInputStream(trustStorePath);
             ks.load(is, null);
+            is.close();
             final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
             tmf.init(ks);
             final TrustManager[] tms = tmf.getTrustManagers();
@@ -308,6 +310,7 @@ public class SSLSocketBuilder {
         try {
             FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
             deploymentProperties.load(fis);
+            fis.close();
             return !"false".equals(deploymentProperties.getProperty("deployment.security.browser.keystore.use"));
         } catch (FileNotFoundException e) {
             logger.info("{0} not fould", deploymentPropertiesFile);

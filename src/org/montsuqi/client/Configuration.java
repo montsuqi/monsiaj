@@ -186,7 +186,6 @@ public class Configuration {
 	 *
 	 */
 	private void copyOldConfig() {
-		Preferences config = prefs.node(CONFIG_NODE + DEFAULT_CONFIG_NAME);
 		setConfigurationName(DEFAULT_CONFIG_NAME);
 		setSavePassword(DEFAULT_CONFIG_NAME, prefs.getBoolean(SAVE_PASSWORD_KEY, DEFAULT_SAVE_PASSWORD));
 		setPassword(DEFAULT_CONFIG_NAME, prefs.get(PASSWORD_KEY, DEFAULT_PASSWORD));

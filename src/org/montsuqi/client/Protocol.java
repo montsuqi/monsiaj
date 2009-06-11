@@ -322,7 +322,7 @@ public class Protocol extends Connection {
     }
 
     synchronized void checkScreens(boolean init) throws IOException {
-        logger.enter(new Boolean(init));
+        logger.enter(Boolean.valueOf(init));
         Window.busyAllWindows();
         while (receivePacketClass() == PacketClass.QueryScreen) {
             String name = checkScreen1();

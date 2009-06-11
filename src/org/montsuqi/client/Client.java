@@ -203,7 +203,7 @@ public class Client implements Runnable {
 
 	/** <p>Dispose connection if it exists.</p>
 	 */
-	public void finalize() {
+	protected void finalize() {
 		if (protocol != null) {
 			exitSystem();
 		}

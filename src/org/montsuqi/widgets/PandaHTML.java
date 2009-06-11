@@ -66,7 +66,6 @@ public class PandaHTML extends JPanel {
 			public void hyperlinkUpdate(HyperlinkEvent event) {
 				if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 				    AttributeSet attribs = event.getSourceElement().getAttributes();
-				    Enumeration attribNames = attribs.getAttributeNames();
 				    AttributeSet tagAttribs = (AttributeSet)attribs.getAttribute(HTML.Tag.A);
 				    String target = (String)tagAttribs.getAttribute(HTML.Attribute.TARGET);
 				    if(target == null) {
@@ -104,7 +103,6 @@ public class PandaHTML extends JPanel {
 		return new Runnable() {
 			public void run() {
 				try {
-					assert html instanceof JEditorPane;
 					JEditorPane editorPane = (JEditorPane)html;
 					editorPane.setPage(uri);
 				} catch (IOException e) {

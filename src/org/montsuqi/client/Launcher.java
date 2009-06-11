@@ -102,7 +102,6 @@ public class Launcher {
         OptionParser options = new OptionParser();
         options.add("config", Messages.getString("Launcher.config_option_message"), "");
         options.add("config-list", Messages.getString("Launcher.config_list_option_message"), false);
-        String[] files = options.parse(this.getClass().getName(), args);
 
         String configName = options.getString("config");
         boolean listConfigFlag = options.getBoolean("config-list");
