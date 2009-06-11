@@ -67,6 +67,7 @@ public class PandaCombo extends JComboBox {
 	public PandaCombo() {
 		super();
 		setEditor(new PandaComboBoxEditor(this));
+		setMaximumRowCount(16);
 		initActions();
 	}
 
