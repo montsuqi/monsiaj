@@ -221,7 +221,6 @@ public class Protocol extends Connection {
         if (window.isDialog()) {
             Component parent = topWindow;
             JDialog dialog;
-            Point p;
 
             topWindow.showBusyCursor();
             for (int i = 0; i < dialogStack.size(); i++) {
@@ -229,11 +228,11 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
+            //System.out.println(window.getName() +  " topWindow [" + topWindow.getX() + "," + topWindow.getY() + "] window [" + window.getX() + "," + window.getY() + "]");
             dialog = window.createDialog(parent);
-            p = window.getLocation();
             dialog.setLocation(
-                    topWindow.getX() + p.x,
-                    topWindow.getY() + p.y);
+                    topWindow.getX() + window.getX(),
+                    topWindow.getY() + window.getY());
             dialog.setVisible(true);
             dialog.toFront();
             resetTimer(dialog);

@@ -50,6 +50,7 @@ public class Window extends JFrame {
         if (dialog != null) {
             dialog.setVisible(false);
             dialog.getContentPane().removeAll();
+            dialog.dispose();
             dialog = null;
         }
     }
@@ -64,10 +65,10 @@ public class Window extends JFrame {
                 dialog = new JDialog();
                 dialog.setModal(false);
             }
-            dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
-            dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             dialog.setName(this.getName());
             dialog.getContentPane().add(child);
+            dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
+            dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             dialog.setSize(this.getSize());
         }
         dialog.setTitle(this.getTitle());
