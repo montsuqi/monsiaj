@@ -38,10 +38,15 @@ public interface PacketClass {
 	public static final byte FocusName = 0x09;
 	public static final byte Auth = 0x0A;
 	public static final byte Name = 0x0B;
+    public static final byte ServerVersion = 0x0E;
+    public static final byte Ping = 0x0F;
+    public static final byte Pong = 0x10;
 
 	public static final byte OK = (byte)0x80;
 	public static final byte END = (byte)0x81;
 	public static final byte NOT = (byte)0x83;
+    public static final byte CONTINUE = (byte)0x84;
+    public static final byte STOP = (byte)0x85;
 
 	public static final byte E_VERSION = (byte)0xF1;
 	public static final byte E_AUTH = (byte)0xF2;

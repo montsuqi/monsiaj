@@ -190,7 +190,9 @@ public abstract class SignalHandler {
                     } else {
                         window = SwingUtilities.windowForComponent(widget);
                     }
-                    assert window != null;
+                    if (window == null || widget == null) {
+                        return;
+                    }
                     String windowName = getWidgetName(window.getName());
                     String widgetName = getWidgetName(widget.getName());
                     String event;

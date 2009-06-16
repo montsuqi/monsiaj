@@ -25,6 +25,8 @@ package org.montsuqi.client;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,6 +46,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -122,9 +125,12 @@ public class Protocol extends Connection {
     private StringBuffer widgetName;
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
-    private static final String VERSION = "symbolic:blob:expand:pdf"; //$NON-NLS-1$
+    private static final String VERSION = "symbolic:blob:expand:pdf:negotiation"; //$NON-NLS-1$
     private Window topWindow;
     private List dialogStack;
+    private boolean enablePing;
+    private static final int PingTimerPeriod = 10 * 1000;
+    private javax.swing.Timer pingTimer;
 
     public Window getTopWindow() {
         return topWindow;
@@ -154,6 +160,7 @@ public class Protocol extends Connection {
         sessionTitle = "";
         topWindow = new Window();
         dialogStack = new ArrayList();
+        enablePing = false;
     }
 
     public long getTimerPeriod() {
@@ -681,6 +688,13 @@ public class Protocol extends Connection {
             case PacketClass.OK:
                 // throw nothing
                 break;
+            case PacketClass.ServerVersion:
+                int version = Integer.parseInt(receiveString().replaceAll("\\.", ""));
+System.out.println("server version:" + version);
+                if (version > 14400) {
+                    enablePing = true;
+                }
+                break;
             case PacketClass.NOT:
                 throw new ConnectException(Messages.getString("Client.cannot_connect_to_server")); //$NON-NLS-1$
             case PacketClass.E_VERSION:
@@ -693,7 +707,35 @@ public class Protocol extends Connection {
                 Object[] args = {Integer.toHexString(pc)};
                 throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
         }
+
+        if (enablePing) {
+            pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        Protocol.this.sendPing();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+            });
+            pingTimer.start();
+        }
+
         logger.leave();
+    }
+
+    private synchronized void sendPing() throws IOException {
+        this.sendPacketClass(PacketClass.Ping);
+        this.receivePacketClass();
+        switch (this.receivePacketClass()) {
+            case PacketClass.CONTINUE:
+                JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                break;
+            case PacketClass.STOP:
+                JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                client.exitSystem();
+                break;
+        }
     }
 
     private synchronized void sendVersionString() throws IOException {
