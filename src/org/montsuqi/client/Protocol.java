@@ -690,7 +690,6 @@ public class Protocol extends Connection {
                 break;
             case PacketClass.ServerVersion:
                 int version = Integer.parseInt(receiveString().replaceAll("\\.", ""));
-System.out.println("server version:" + version);
                 if (version > 14400) {
                     enablePing = true;
                 }
