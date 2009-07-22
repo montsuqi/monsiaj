@@ -102,6 +102,7 @@ public class Launcher {
         OptionParser options = new OptionParser();
         options.add("config", Messages.getString("Launcher.config_option_message"), "");
         options.add("config-list", Messages.getString("Launcher.config_list_option_message"), false);
+        options.parse(this.getClass().getName(), args);
 
         String configName = options.getString("config");
         boolean listConfigFlag = options.getBoolean("config-list");
@@ -228,6 +229,8 @@ public class Launcher {
     }
 
     public void launch(String[] args) {
+        //System.setProperty("sun.java2d.d3d", "false");
+        //System.out.println("d3d:" + System.getProperty("sun.java2d.d3d"));
         if (checkCommandLineOption(args)) {
             return;
         }
@@ -285,7 +288,7 @@ public class Launcher {
     }
 
     private void connect() {
-        conf.save();
+                        conf.save();
         Client client = new Client(conf);
         JFrame logFrame = conf.getUseLogViewer(conf.getConfigurationName()) ? createLogFrame(client) : null;
 

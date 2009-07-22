@@ -691,7 +691,6 @@ public class Configuration {
 	 */
 	public String getProperties(String configName) {
 		final String properties = getString(configName, PROPERTIES_KEY, ""); //$NON-NLS-1$
-		updateSystemProperties(properties);
 		return properties;
 	}
 
