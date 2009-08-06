@@ -832,7 +832,14 @@ public class Protocol extends Connection {
     }
 
     Node getNode(Component component) {
-        return getNode(SwingUtilities.windowForComponent(component).getName());
+        java.awt.Window win;
+        if (component != null) {
+            win = SwingUtilities.windowForComponent(component);
+            if (win != null) {
+                return getNode(win.getName());
+            }
+        }
+        return null;
     }
 
     synchronized void exit() {
