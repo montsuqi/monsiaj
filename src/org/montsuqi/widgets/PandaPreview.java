@@ -47,12 +47,44 @@ import javax.swing.WindowConstants;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
 
-import javax.swing.SwingUtilities;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import javax.swing.JViewport;
+import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
 
 /** <p>Preview pane with control buttons and display of current scale.</p>
  */
 public class PandaPreview extends JPanel {
+
+    class HandScrollListener extends MouseInputAdapter {
+
+        private final Cursor defCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+        private final Cursor hndCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        private final Point pp = new Point();
+
+        public void mouseDragged(final MouseEvent e) {
+            JViewport vport = scroll.getViewport();
+            Point cp = e.getPoint();
+            Point vp = vport.getViewPosition();
+            vp.translate(pp.x - cp.x, pp.y - cp.y);
+            panel.scrollRectToVisible(new Rectangle(vp, vport.getSize()));
+            pp.setLocation(cp);
+        }
+
+        public void mousePressed(MouseEvent e) {
+            panel.setCursor(hndCursor);
+            pp.setLocation(e.getPoint());
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            panel.setCursor(defCursor);
+            panel.repaint();
+        }
+    }
+
 
     private static final double SCALE_FACTOR = 1.2;
     private static final double SCALE_FIT_PAGE = -1.0;
@@ -222,6 +254,9 @@ public class PandaPreview extends JPanel {
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll.getVerticalScrollBar().setUnitIncrement(32);
+        HandScrollListener hsl = new HandScrollListener();
+        scroll.getViewport().addMouseMotionListener(hsl);
+        scroll.getViewport().addMouseListener(hsl);
         add(scroll, BorderLayout.CENTER);
         zoom = SCALE_FIT_PAGE_WIDTH;
 
