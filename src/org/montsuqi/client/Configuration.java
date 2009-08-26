@@ -163,6 +163,7 @@ public class Configuration {
 		prefs = Preferences.userNodeForPackage(clazz);
 		hasDefault = nodeExists(DEFAULT_CONFIG_NAME);
 		if ( !hasDefault ) {
+            newConfiguration(DEFAULT_CONFIG_NAME);
 			copyOldConfig();
 		}
 		pass = DEFAULT_PASSWORD;

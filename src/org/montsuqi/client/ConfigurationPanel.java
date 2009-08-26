@@ -300,7 +300,7 @@ public class ConfigurationPanel extends JPanel {
         hostEntry.setText(host);
         portEntry.setText(String.valueOf(port));
         appEntry.setText(application);
-        protocolVersionRadios[protocolVersion - 1].setSelected(true);
+        protocolVersionRadios[protocolVersion].setSelected(true);
 
         // SSL Tab
         useSSLCheckbox.setSelected(useSSL);
