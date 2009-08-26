@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jma_receipt;
+package jp.or.med.jmareceipt;
 
 import org.montsuqi.client.Configuration;
 import org.montsuqi.client.ConfigurationPanel;

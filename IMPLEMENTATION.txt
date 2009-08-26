@@ -5,7 +5,7 @@
 ランチャーの動作
 ========
 
-クラス: org.montsuqi.client.Launcher(汎用), jp.or.med.jma_receipt.JMAReceiptLauncher(日レセ専用)
+クラス: org.montsuqi.client.Launcher(汎用), jp.or.med.jmareceipt.JMAReceiptLauncher(日レセ専用)
 
 1. 起動。(Launcher.launch)
 2. 設定ダイアログを表示し、Configurationオブジェクト(conf)を生成する。Configurationクラスは実質的にPreferences APIのラッパ。

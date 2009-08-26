@@ -21,19 +21,27 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jma_receipt;
+package jp.or.med.jmareceipt;
 
-import org.montsuqi.client.Configuration;
-import org.montsuqi.client.ConfigurationPanel;
-import org.montsuqi.client.ConfigurationViewer;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class JMAReceiptConfigurationViewer extends ConfigurationViewer {
+public class Messages {
 
-	public JMAReceiptConfigurationViewer(Configuration conf) {
-		super(conf);
+	private static final String BUNDLE_NAME = "jp.or.med.jmareceipt.messages"; //$NON-NLS-1$
+
+	private static final ResourceBundle RESOURCE_BUNDLE =
+		ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private Messages() {
+		// inhibit instantiation
 	}
 
-	protected ConfigurationPanel createConfigurationPanel(Configuration conf) {
-		return new JMAReceiptConfigurationPanel(conf, false, false);
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return org.montsuqi.client.Messages.getString(key);
+		}
 	}
 }

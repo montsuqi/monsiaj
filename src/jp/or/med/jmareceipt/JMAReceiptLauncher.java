@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jma_receipt;
+package jp.or.med.jmareceipt;
 
 import java.net.URL;
 
@@ -68,7 +68,7 @@ public class JMAReceiptLauncher extends Launcher {
 	/** <p>Creates icon to display on the left.</p>
 	 */
 	protected Icon createIcon() {
-		URL iconURL = getClass().getResource("/jp/or/med/jma_receipt/standard60.png"); //$NON-NLS-1$
+		URL iconURL = getClass().getResource("/jp/or/med/jmareceipt/standard60.png"); //$NON-NLS-1$
 		if (iconURL != null) {
 			return new ImageIcon(iconURL);
 		}

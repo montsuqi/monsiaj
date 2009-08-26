@@ -255,12 +255,12 @@
 				<include name="org/montsuqi/**"/>
 				<include name="**/*.png"/>
 				<exclude name="org/montsuqi/tools/**"/>
-				<exclude name="jp/or/med/jma_receipt/**"/>
+				<exclude name="jp/or/med/jmareceipt/**"/>
 			</fileset>
 		</jar>
 		<jar jarfile="${build.dir}/jmareceipt.jar" manifest="${resources.dir}/jmareceipt.mf">
 			<fileset dir="${build.dir}">
-				<include name="jp/or/med/jma_receipt/**"/>
+				<include name="jp/or/med/jmareceipt/**"/>
 			</fileset>
 		</jar>
 		<jar jarfile="${build.dir}/pandarecord.jar" manifest="${resources.dir}/pandarecord.mf">
@@ -305,7 +305,7 @@
 	<target name="javadoc" description="Creates Javadoc documents">
 		<javadoc
 			locale="en"
-			packagenames="org.montsuqi.*,jp.or.med.jma_receipt.*"
+			packagenames="org.montsuqi.*,jp.or.med.jmareceipt.*"
 			excludepackagenames="org.montsuqi.certman.*,org.montsuqi.tools.*,org.montsuqi.widgets.Test*"
 			sourcepath="${src.dir}"
 			source="1.4"
@@ -369,7 +369,7 @@
         </target>
         
         <target name="jmareceipt" depends="compile">
-            <java classname="jp.or.med.jma_receipt.JMAReceiptLauncher">
+            <java classname="jp.or.med.jmareceipt.JMAReceiptLauncher">
                 <classpath>
                     <pathelement path="bin:src" />
                     <fileset dir="libs">
