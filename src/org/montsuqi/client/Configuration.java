@@ -54,7 +54,6 @@ public class Configuration {
 	private static final String CACHE_KEY = "cache"; //$NON-NLS-1$
 	private static final String SAVE_PASSWORD_KEY = "save_pass"; //$NON-NLS-1$
 	private static final String PASSWORD_KEY = "password"; //$NON-NLS-1$
-	private static final String ENCODING_KEY = "encoding"; //$NON-NLS-1$
 	private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
 	private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
 	private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
@@ -98,9 +97,6 @@ public class Configuration {
 
 	/** <p>Default application name: "demo".</p> */
 	static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
-
-	/** <p>Default encoding for the stream: EUC-JP.</p> */
-	static final String DEFAULT_ENCODING = "EUC-JP"; //$NON-NLS-1$
 
 	/** <p>Default cache directory: [value of System property user.home]/.monsiaj/cache</p> */
 	static final String DEFAULT_CACHE_PATH;
@@ -196,7 +192,6 @@ public class Configuration {
 		setHost(DEFAULT_CONFIG_NAME, prefs.get(HOST_KEY, DEFAULT_HOST));
 		setUser(DEFAULT_CONFIG_NAME, prefs.get(USER_KEY, DEFAULT_USER));
 		setCache(DEFAULT_CONFIG_NAME, prefs.get(CACHE_KEY, DEFAULT_CACHE_PATH));
-		setEncoding(DEFAULT_CONFIG_NAME, prefs.get(ENCODING_KEY, DEFAULT_ENCODING));
 		setStyleFileName(DEFAULT_CONFIG_NAME, prefs.get(STYLES_KEY, DEFAULT_STYLES));
 		setApplication(DEFAULT_CONFIG_NAME, prefs.get(APPLICATION_KEY, DEFAULT_APPLICATION));
 		setUseSSL(DEFAULT_CONFIG_NAME, prefs.getBoolean(USE_SSL_KEY, DEFAULT_USE_SSL));
@@ -481,24 +476,6 @@ public class Configuration {
 	 */
 	public void setCache(String configName, String cache) {
 		setString(configName, CACHE_KEY, cache);
-	}
-
-	/** <p>Returns the encoding.</p>
-	 * 
-	 * @param configName the configuration name.
-	 * @return the encoding.
-	 */
-	public String getEncoding(String configName) {
-		return getString(configName, ENCODING_KEY, DEFAULT_ENCODING);
-	}
-
-	/** <p>Sets the encoding.</p>
-	 * 
-	 * @param configName the configuration name.
-	 * @param encoding new value of the encoding.
-	 */
-	public void setEncoding(String configName, String encoding) {
-		setString(configName, ENCODING_KEY, encoding);
 	}
 
 	/** <p>Returns the style URL.</p>

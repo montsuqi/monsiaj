@@ -72,7 +72,6 @@ public class Client implements Runnable {
 		options.add("cache", Messages.getString("Client.cache_directory"), Configuration.DEFAULT_CACHE_PATH); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("user", Messages.getString("Client.user_name"), Configuration.DEFAULT_USER); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		options.add("encoding", Messages.getString("Client.server_character_encoding"), Configuration.DEFAULT_ENCODING); //$NON-NLS-1$ //$NON-NLS-2$
 		options.add("style", Messages.getString("Client.styles"), Configuration.DEFAULT_STYLES); //$NON-NLS-1$ //$NON-NLS-2$
 		int protocolVersion = Configuration.DEFAULT_PROTOCOL_VERSION;
 		options.add("v1", Messages.getString("Client.use_protocol_version_1"), protocolVersion == 1); //$NON-NLS-1$ //$NON-NLS-2$
@@ -88,7 +87,6 @@ public class Client implements Runnable {
 		conf.setCache(configName, options.getString("cache")); //$NON-NLS-1$
 		conf.setUser(configName, options.getString("user")); //$NON-NLS-1$
 		conf.setPassword(configName, options.getString("pass")); //$NON-NLS-1$
-		conf.setEncoding(configName, options.getString("encoding")); //$NON-NLS-1$
 		conf.setStyleFileName(configName, options.getString("style")); //$NON-NLS-1$
 
 		boolean v1 = options.getBoolean("v1"); //$NON-NLS-1$
@@ -118,7 +116,6 @@ public class Client implements Runnable {
 	 */
 	void connect() throws IOException, GeneralSecurityException {
 		String configName = conf.getConfigurationName();
-		String encoding = conf.getEncoding(configName);
 		Map styles = loadStyles();
 		String[] pathElements = {
 			conf.getCache(configName),
@@ -129,7 +126,7 @@ public class Client implements Runnable {
 		int protocolVersion = conf.getProtocolVersion(configName);
 		long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
 		System.setProperty("expand_screen", String.valueOf(conf.getExpandScreen(configName)));
-		protocol = new Protocol(this, encoding, styles, cacheRoot, protocolVersion, timerPeriod);
+		protocol = new Protocol(this, styles, cacheRoot, protocolVersion, timerPeriod);
 
 		String user = conf.getUser(configName);
 		String password = conf.getPassword(configName);

@@ -46,6 +46,14 @@ import org.montsuqi.util.SystemEnvironment;
 class Connection {
 
 	private String encoding;
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
 	private Socket socket;
 	protected DataInput in;
 	protected DataOutput out;
@@ -54,12 +62,11 @@ class Connection {
 	/** <p>Constructs a Connection instance.</p>
 	 * <p>Input/Output streams are initialized correctly by <var>networkByteOrder</var>.
 	 * @param s the socket to communicate.
-	 * @param encoding the encoding to use.
 	 * @param networkByteOrder true if networkByteOrder(Big Endian) is used. false otherwise(Litle Endian).
 	 */
-	Connection(Socket s, String encoding, boolean networkByteOrder) throws IOException {
+	Connection(Socket s, boolean networkByteOrder) throws IOException {
 		this.socket = s;
-		this.encoding = encoding;
+		this.encoding = "EUC-JP";
 		InputStream rawIn = new BufferedInputStream(socket.getInputStream());
 		OutputStream rawOut = new BufferedOutputStream(socket.getOutputStream());
 		if (networkByteOrder) {

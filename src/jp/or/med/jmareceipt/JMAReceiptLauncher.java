@@ -44,7 +44,6 @@ public class JMAReceiptLauncher extends Launcher {
 		String [] configNames = conf.getConfigurationNames();
 		for (int i = 0; i < configNames.length; i++) {
 			conf.setApplication(configNames[i], "orca00"); //$NON-NLS-1$
-			conf.setEncoding(configNames[i], "EUC-JP"); //$NON-NLS-1$
 			conf.setProtocolVersion(configNames[i], 1);
 		}
 	}

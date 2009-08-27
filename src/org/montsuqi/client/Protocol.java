@@ -125,7 +125,7 @@ public class Protocol extends Connection {
     private StringBuffer widgetName;
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
-    private static final String VERSION = "symbolic:blob:expand:pdf:negotiation"; //$NON-NLS-1$
+    private static final String VERSION = "symbolic:blob:expand:pdf:negotiation:i18n";
     private Window topWindow;
     private List dialogStack;
     private boolean enablePing;
@@ -136,8 +136,8 @@ public class Protocol extends Connection {
         return topWindow;
     }
 
-    Protocol(Client client, String encoding, Map styleMap, File cacheRoot, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
-        super(client.createSocket(), encoding, isNetworkByteOrder()); //$NON-NLS-1$
+    Protocol(Client client, Map styleMap, File cacheRoot, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
+        super(client.createSocket(), isNetworkByteOrder()); //$NON-NLS-1$
         this.client = client;
         this.cacheRoot = cacheRoot;
         switch (protocolVersion) {
@@ -235,7 +235,6 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
-            //System.out.println(window.getName() +  " topWindow [" + topWindow.getX() + "," + topWindow.getY() + "] window [" + window.getX() + "," + window.getY() + "]");
             dialog = window.createDialog(parent);
             dialog.setLocation(
                     topWindow.getX() + window.getX(),
@@ -332,11 +331,7 @@ public class Protocol extends Connection {
         logger.enter(Boolean.valueOf(init));
         Window.busyAllWindows();
         while (receivePacketClass() == PacketClass.QueryScreen) {
-            String name = checkScreen1();
-            if (init) {
-//                showWindow(name, ScreenType.NEW_WINDOW);
-                init = false;
-            }
+            checkScreen1();
         }
         logger.leave();
     }
@@ -367,7 +362,7 @@ public class Protocol extends Connection {
         cacheFile.createNewFile();
         final long lastModified = cacheFile.lastModified();
         logger.debug("cache mtime: {0}", new Date(lastModified)); //$NON-NLS-1$
-        final boolean result = lastModified < mtime || lastModified < ctime || cacheFile.length() != size;
+        final boolean result = lastModified < mtime || lastModified < ctime || cacheFile.length() == 0;
         logger.leave();
         return result;
     }
@@ -692,6 +687,7 @@ public class Protocol extends Connection {
                 int version = Integer.parseInt(receiveString().replaceAll("\\.", ""));
                 if (version > 14400) {
                     enablePing = true;
+                    this.setEncoding("UTF-8");
                 }
                 break;
             case PacketClass.NOT:

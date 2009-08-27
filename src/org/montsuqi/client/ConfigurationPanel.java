@@ -95,7 +95,6 @@ public class ConfigurationPanel extends JPanel {
 
     // Others Tab
     protected JTextField styleEntry;
-    protected JTextField encodingEntry;
     protected JComboBox lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
@@ -281,7 +280,6 @@ public class ConfigurationPanel extends JPanel {
 
         // Others tab
         String styleFileName = newFlag ? conf.DEFAULT_STYLES : conf.getStyleFileName(configName);
-        String encoding = newFlag ? conf.DEFAULT_ENCODING : conf.getEncoding(configName);
         String lookAndFeelClassName = newFlag ? conf.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
         String lafThemeFileName = newFlag ? conf.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
         int protocolVersion = newFlag ? conf.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
@@ -310,7 +308,6 @@ public class ConfigurationPanel extends JPanel {
 
         // Others Tab
         styleEntry.setText(styleFileName);
-        encodingEntry.setText(encoding);
         lafThemeEntry.setText(lafThemeFileName);
         for (int i = 0; i < lafs.length; i++) {
             if (lookAndFeelClassName.equals(lafs[i].getClassName())) {
@@ -344,7 +341,6 @@ public class ConfigurationPanel extends JPanel {
 
         // Others Tab
         conf.setStyleFileName(configName, styleEntry.getText());
-        conf.setEncoding(configName, encodingEntry.getText());
         conf.setLookAndFeelClassName(configName, lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
         for (int i = 0; i < protocolVersionRadios.length; i++) {
             if (protocolVersionRadios[i].isSelected()) {
@@ -564,7 +560,6 @@ public class ConfigurationPanel extends JPanel {
         styleButton.setAction(
                 new FileSelectionAction(styleEntry, ".properties",
                 Messages.getString("ConfigurationPanel.style_filter_pattern")));
-        encodingEntry = createTextField();
         lafs = UIManager.getInstalledLookAndFeels();
         String[] lafNames = new String[lafs.length];
         for (int i = 0; i < lafNames.length; i++) {
@@ -626,12 +621,6 @@ public class ConfigurationPanel extends JPanel {
                 createConstraints(1, y, 2, 1, 1.0, 0.0));
         panel.add(styleButton,
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.encoding")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(encodingEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.look_and_feel")),

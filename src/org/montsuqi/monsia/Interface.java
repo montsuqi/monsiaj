@@ -134,7 +134,9 @@ public class Interface {
             AbstractDocumentHandler handler = (AbstractDocumentHandler) handlerClass.newInstance();
 
             if (handlerClassName.equals(OLD_HANDLER)) {
-                input = new FakeEncodingInputStream(input);
+                if (protocol.getEncoding().equals("EUC-JP")) {
+                    input = new FakeEncodingInputStream(input);
+                }
             }
             saxParser.parse(input, handler);
             return handler.getInterface(protocol);

@@ -43,7 +43,6 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	protected void initComponents() {
 		super.initComponents();
 		appEntry.setEditable(false);
-		encodingEntry.setEditable(false);
 		for (int i = 0; i < protocolVersionRadios.length; i++) {
 			protocolVersionRadios[i].setEnabled(false);
 		}
@@ -55,14 +54,12 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	protected void saveConfiguration(String configName) {
 		super.saveConfiguration(configName);
 		conf.setApplication(configName, "orca00"); //$NON-NLS-1$
-		conf.setEncoding(configName, "EUC-JP"); //$NON-NLS-1$
 		conf.setProtocolVersion(configName, 1);
 	}
 
 	protected void loadConfiguration(String configName) {
 		super.loadConfiguration(configName);
 		appEntry.setText("panda:orca00");
-		encodingEntry.setText("EUC-JP");
 		protocolVersionRadios[0].setSelected(true);
 	}
 }
