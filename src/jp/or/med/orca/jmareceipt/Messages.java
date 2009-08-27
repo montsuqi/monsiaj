@@ -21,14 +21,14 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package jp.or.med.jmareceipt;
+package jp.or.med.orca.jmareceipt;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages {
 
-	private static final String BUNDLE_NAME = "jp.or.med.jmareceipt.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "jp.or.med.orca.jmareceipt.messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE =
 		ResourceBundle.getBundle(BUNDLE_NAME);

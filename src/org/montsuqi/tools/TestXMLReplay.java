@@ -37,7 +37,7 @@ public class TestXMLReplay extends XMLTestSuite {
     public TestXMLReplay(String foldername, String filename, String[] args) {
 	    super(filename,  openFile(foldername + File.separator + filename));
 	    XMLRecorder.setReplay(true);
-//	    jp.or.med.jmareceipt.Launcher.main(new String[] {});
+//	    jp.or.med.orca.jmareceipt.Launcher.main(new String[] {});
 //	    String args[] = {"-host=192.168.1.177", "-user=ormaster", "panda:orca00"};
 	    org.montsuqi.client.Client.main(args);
 

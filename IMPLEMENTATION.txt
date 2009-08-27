@@ -5,7 +5,7 @@
 ランチャーの動作
 ========
 
-クラス: org.montsuqi.client.Launcher(汎用), jp.or.med.jmareceipt.JMAReceiptLauncher(日レセ専用)
+クラス: org.montsuqi.client.Launcher(汎用), jp.or.med.orca.jmareceipt.JMAReceiptLauncher(日レセ専用)
 
 1. 起動。(Launcher.launch)
 2. 設定ダイアログを表示し、Configurationオブジェクト(conf)を生成する。Configurationクラスは実質的にPreferences APIのラッパ。
@@ -65,9 +65,4 @@ parseInputでは
 
 1. XMLをSAXパーザで解析して、各画面部品のデータ(WidgetInfo)のツリーを構築する。
 2. buildWidgetTreeメソッドにより、再帰的に画面部品をインスタンス化する。
-3. Gtk+のシグナル情報(SignalInfo)は直接利用できないので、各シグナルに対応したConnectorオブジェクトを用いて、
-Swingのイベントオブジェクト/イベントリスナの対として関連づける。
-4. 生成されたInterfaceインスタンスと、画面を実体化した際の変更がなされた画面部品テーブルをまとめて、Nodeインスタンスを
-生成する。
-
-以上の処理の結果得られたNodeを用いてProtocolオブジェクトがイベント処理・データ通信を行う。
+3. Gtk+のシグナル情報(SignalInfo)�
