@@ -126,7 +126,6 @@ public class Protocol extends Connection {
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
     private static final String VERSION = "symbolic:blob:expand:pdf:negotiation:i18n:agent=monsiaj/" + Messages.getString("application.version");
-;
     private Window topWindow;
     private List dialogStack;
     private boolean enablePing;
