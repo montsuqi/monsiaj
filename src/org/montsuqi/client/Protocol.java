@@ -140,6 +140,13 @@ public class Protocol extends Connection {
         super(client.createSocket(), isNetworkByteOrder()); //$NON-NLS-1$
         this.client = client;
         this.cacheRoot = cacheRoot;
+        File [] list = cacheRoot.listFiles();
+        for (File file:list) {
+            if (file.isFile()) {
+                file.delete();
+            }
+        }
+
         switch (protocolVersion) {
             case 1:
                 protocol1 = true;

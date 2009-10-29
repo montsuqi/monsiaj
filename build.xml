@@ -61,7 +61,7 @@
 
 
 	<target name="compile" depends="prepare,set-javac-options,set-version">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.4"
+		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.5"
 			debug="${javac.debug}" debuglevel="${javac.debuglevel}">
 			<include name="**/*.java"/>
 			<classpath refid="project.class.path"/>
@@ -308,7 +308,7 @@
 			packagenames="org.montsuqi.*,jp.or.med.orca.jmareceipt.*"
 			excludepackagenames="org.montsuqi.certman.*,org.montsuqi.tools.*,org.montsuqi.widgets.Test*"
 			sourcepath="${src.dir}"
-			source="1.4"
+			source="1.5"
 			destdir="${doc.dir}"
 			access="package"
 			classpathref="project.class.path"/>
