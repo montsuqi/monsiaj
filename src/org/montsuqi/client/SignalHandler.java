@@ -20,7 +20,6 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
  */
-
 package org.montsuqi.client;
 
 import java.awt.Component;
@@ -178,39 +177,44 @@ public abstract class SignalHandler {
                     if (con.isReceiving()) {
                         return;
                     }
-                    if (widget instanceof JComponent) {
-                        if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
-                            con.addChangedWidget(widget);
+                    try {
+                        con.setIsReceiving(true);
+                        if (widget instanceof JComponent) {
+                            if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
+                                con.addChangedWidget(widget);
+                            }
                         }
-                    }
-                    Window window = null;
-                    if (widget instanceof JMenuItem) {
-                        JComponent c = (JComponent) widget;
-                        window = (Window) c.getClientProperty("window"); //$NON-NLS-1$
-                    } else {
-                        window = SwingUtilities.windowForComponent(widget);
-                    }
-                    if (window == null || widget == null) {
-                        return;
-                    }
-                    String windowName = getWidgetName(window.getName());
-                    String widgetName = getWidgetName(widget.getName());
-                    String event;
-                    if (userData == null) {
-                        event = widgetName;
-                    } else {
-                        event = userData.toString();
-                        if (event.length() == 0) {
+                        Window window = null;
+                        if (widget instanceof JMenuItem) {
+                            JComponent c = (JComponent) widget;
+                            window = (Window) c.getClientProperty("window"); //$NON-NLS-1$
+                        } else {
+                            window = SwingUtilities.windowForComponent(widget);
+                        }
+                        if (window == null || widget == null) {
+                            return;
+                        }
+                        String windowName = getWidgetName(window.getName());
+                        String widgetName = getWidgetName(widget.getName());
+                        String event;
+                        if (userData == null) {
                             event = widgetName;
+                        } else {
+                            event = userData.toString();
+                            if (event.length() == 0) {
+                                event = widgetName;
+                            }
                         }
-                    }
-                    org.montsuqi.widgets.Window.busyAllWindows();
-                    con.sendEvent(windowName, widgetName, event);
-                    con.sendWindowData();
-                    synchronized (this) {
-                        blockChangedHandlers();
-                        con.getScreenData();
-                        unblockChangedHandlers();
+                        org.montsuqi.widgets.Window.busyAllWindows();
+                        con.sendEvent(windowName, widgetName, event);
+                        con.sendWindowData();
+                        synchronized (this) {
+                            blockChangedHandlers();
+                            con.getScreenData();
+                            unblockChangedHandlers();
+                        }
+                    } finally {
+                        con.setIsReceiving(false);
                     }
                 }
             }

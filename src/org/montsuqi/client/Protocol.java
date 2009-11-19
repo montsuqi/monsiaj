@@ -140,10 +140,12 @@ public class Protocol extends Connection {
         super(client.createSocket(), isNetworkByteOrder()); //$NON-NLS-1$
         this.client = client;
         this.cacheRoot = cacheRoot;
-        File [] list = cacheRoot.listFiles();
-        for (File file:list) {
-            if (file.isFile()) {
-                file.delete();
+        File[] list = cacheRoot.listFiles();
+        if (list != null) {
+            for (File file : list) {
+                if (file.isFile()) {
+                    file.delete();
+                }
             }
         }
 
@@ -553,7 +555,7 @@ public class Protocol extends Connection {
                 stopTimer(container.getComponent(i));
             }
         }
-    // logger.leave();
+        // logger.leave();
     }
 
     private synchronized void resetTimer(Component widget) {
@@ -566,7 +568,7 @@ public class Protocol extends Connection {
                 resetTimer(container.getComponent(i));
             }
         }
-    // logger.leave();
+        // logger.leave();
     }
 
     private synchronized void clearWidget(Component widget) {
@@ -580,7 +582,7 @@ public class Protocol extends Connection {
                 clearWidget(container.getComponent(i));
             }
         }
-    // logger.leave();
+        // logger.leave();
     }
 
     private synchronized void resetScrollPane(Component widget) {
@@ -601,75 +603,70 @@ public class Protocol extends Connection {
         String window = null;
         String currentWindow = null;
         Node node;
-        try {
-            isReceiving = true;
-            checkScreens(false);
-            sendPacketClass(PacketClass.GetData);
-            sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
-            byte c;
-            while ((c = receivePacketClass()) == PacketClass.WindowName) {
-                window = receiveString();
-                logger.debug("window: {0}", window);
-                int type = receiveInt();
+        checkScreens(false);
+        sendPacketClass(PacketClass.GetData);
+        sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
+        byte c;
+        while ((c = receivePacketClass()) == PacketClass.WindowName) {
+            window = receiveString();
+            logger.debug("window: {0}", window);
+            int type = receiveInt();
 
-                node = createWindow(window);
-                if (node != null) {
-                    xml = node.getInterface();
-                }
-                switch (type) {
-                    case ScreenType.END_SESSION:
-                        client.exitSystem();
-                        break;
-                    case ScreenType.CURRENT_WINDOW:
-                    case ScreenType.NEW_WINDOW:
-                    case ScreenType.CHANGE_WINDOW:
-                        currentWindow = window;
-                        widgetName = new StringBuffer(window);
-                        c = receivePacketClass();
-                        if (c == PacketClass.ScreenData) {
-                            receiveValue(widgetName, widgetName.length());
-                        }
-                        if (type != ScreenType.CURRENT_WINDOW && xml != null) {
-                            Component widget = xml.getWidget(window);
-                            if (widget != null) {
-                                resetScrollPane(widget);
-                            }
-                        }
-                        break;
-                    case ScreenType.JOIN_WINDOW:
-                    case ScreenType.CLOSE_WINDOW:
-                    default:
-                        closeWindow(window);
-                        c = receivePacketClass();
-                        break;
-                }
-                if (c == PacketClass.NOT) {
-                    // no screen data
-                } else {
-                    // fatal error
-                }
+            node = createWindow(window);
+            if (node != null) {
+                xml = node.getInterface();
             }
-            showWindow(currentWindow);
-            if (c == PacketClass.FocusName) {
-                window = receiveString();
-                String wName = receiveString();
-
-                node = getNode(window);
-                if (node != null && node.getInterface() != null && window.equals(currentWindow)) {
-                    Component widget = xml.getWidget(wName);
-                    if (widget != null && widget.isFocusable()) {
-                        // Mac OS X focus problem: workaround
-                        if (SystemEnvironment.isMacOSX()) {
-                            SwingUtilities.invokeLater(new FocusRequester(widget));
-                        } else {
-                            widget.requestFocus();
+            switch (type) {
+                case ScreenType.END_SESSION:
+                    client.exitSystem();
+                    break;
+                case ScreenType.CURRENT_WINDOW:
+                case ScreenType.NEW_WINDOW:
+                case ScreenType.CHANGE_WINDOW:
+                    currentWindow = window;
+                    widgetName = new StringBuffer(window);
+                    c = receivePacketClass();
+                    if (c == PacketClass.ScreenData) {
+                        receiveValue(widgetName, widgetName.length());
+                    }
+                    if (type != ScreenType.CURRENT_WINDOW && xml != null) {
+                        Component widget = xml.getWidget(window);
+                        if (widget != null) {
+                            resetScrollPane(widget);
                         }
                     }
-                }
-                c = receivePacketClass();
+                    break;
+                case ScreenType.JOIN_WINDOW:
+                case ScreenType.CLOSE_WINDOW:
+                default:
+                    closeWindow(window);
+                    c = receivePacketClass();
+                    break;
             }
-        } finally {
-            isReceiving = false;
+            if (c == PacketClass.NOT) {
+                // no screen data
+                } else {
+                // fatal error
+                }
+        }
+        showWindow(currentWindow);
+        if (c == PacketClass.FocusName) {
+            window = receiveString();
+            String wName = receiveString();
+
+            node = getNode(window);
+            if (node != null && node.getInterface() != null && window.equals(currentWindow)) {
+                Component widget = xml.getWidget(wName);
+                if (widget != null && widget.isFocusable()) {
+                    // Mac OS X focus problem: workaround
+                    if (SystemEnvironment.isMacOSX()) {
+                        SwingUtilities.invokeLater(new FocusRequester(widget));
+                    } else {
+                        widget.requestFocus();
+                    }
+                }
+            }
+            c = receivePacketClass();
         }
         logger.leave();
     }
@@ -712,6 +709,7 @@ public class Protocol extends Connection {
 
         if (enablePing) {
             pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     try {
                         Protocol.this.sendPing();
@@ -727,16 +725,18 @@ public class Protocol extends Connection {
     }
 
     private synchronized void sendPing() throws IOException {
-        this.sendPacketClass(PacketClass.Ping);
-        this.receivePacketClass();
-        switch (this.receivePacketClass()) {
-            case PacketClass.CONTINUE:
-                JOptionPane.showMessageDialog(topWindow, this.receiveString());
-                break;
-            case PacketClass.STOP:
-                JOptionPane.showMessageDialog(topWindow, this.receiveString());
-                client.exitSystem();
-                break;
+        if (!isReceiving) {
+            this.sendPacketClass(PacketClass.Ping);
+            this.receivePacketClass();
+            switch (this.receivePacketClass()) {
+                case PacketClass.CONTINUE:
+                    JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                    break;
+                case PacketClass.STOP:
+                    JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                    client.exitSystem();
+                    break;
+            }
         }
     }
 
@@ -828,6 +828,10 @@ public class Protocol extends Connection {
 
     public boolean isReceiving() {
         return isReceiving;
+    }
+
+    public void setIsReceiving(boolean isReceiving) {
+        this.isReceiving = isReceiving;
     }
 
     private Node getNode(String name) {
