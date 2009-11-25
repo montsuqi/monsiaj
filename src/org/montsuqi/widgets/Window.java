@@ -76,7 +76,7 @@ public class Window extends JFrame {
         return dialog;
     }
 
-    public void putWindow(Window topWindow) {
+    public void putWindow(Window topWindow, boolean setLocation) {
         child.setVisible(true);
         topWindow.setName(this.getName());
         topWindow.getContentPane().removeAll();
@@ -87,6 +87,9 @@ public class Window extends JFrame {
         topWindow.setVisible(true);
         ((JComponent) child).revalidate();
         ((JComponent) child).repaint();
+        if (setLocation) {
+            topWindow.setLocation(this.getLocation());
+        }
         topWindow.hideBusyCursor();
         topWindow.toFront();
         topWindow.setEnabled(true);

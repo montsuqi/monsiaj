@@ -118,6 +118,7 @@ public class Protocol extends Connection {
     private boolean protocol1;
     private boolean protocol2;
     private boolean isReceiving;
+    private boolean isFirstShowWindow;
     private long timerPeriod;
     private Map nodeTable;
     private WidgetValueManager valueManager;
@@ -163,6 +164,7 @@ public class Protocol extends Connection {
         }
         assert protocol1 ^ protocol2;
         isReceiving = false;
+        isFirstShowWindow = true;
         nodeTable = new HashMap();
         valueManager = new WidgetValueManager(this, styleMap);
         this.timerPeriod = timerPeriod;
@@ -255,7 +257,10 @@ public class Protocol extends Connection {
                 dialogStack.add(dialog);
             }
         } else {
-            window.putWindow(topWindow);
+            window.putWindow(topWindow, isFirstShowWindow);
+            if (isFirstShowWindow) {
+                isFirstShowWindow = false;
+            }
             resetTimer(topWindow);
         }
         logger.leave();
