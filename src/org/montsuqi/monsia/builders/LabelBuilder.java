@@ -49,13 +49,7 @@ public class LabelBuilder extends WidgetBuilder {
 		}
 		if (doWrap) {
 			label.setHorizontalAlignment(SwingConstants.LEFT);
-		} else {
-			WidgetPropertySetter xalignSetter = WidgetPropertySetter.getSetter(c.getClass(), "xalign");
-			WidgetPropertySetter yalignSetter = WidgetPropertySetter.getSetter(c.getClass(), "xalign");
-			xalignSetter.set(xml, parent, c, info.getProperty("xalign"));
-			yalignSetter.set(xml, parent, c, info.getProperty("yalign"));
-		}
-		
+		}		
 		return label;
 	}
 }
