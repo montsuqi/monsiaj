@@ -144,6 +144,11 @@ public class Calendar extends JComponent {
         setSpinners();
     }
 
+    public void setDateFromCalendarSpinner(Date date) {
+        this.date = (Date)date.clone();
+        setCells(false);
+    }
+
     void setCells(boolean real) {
         cal.setTime(date);
         int month = cal.get(java.util.Calendar.MONTH);
@@ -215,8 +220,9 @@ public class Calendar extends JComponent {
             setEditor(editor);
             JTextField textField = editor.getTextField();
             textField.setHorizontalAlignment(SwingConstants.RIGHT);
-            			addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
+            addChangeListener(new ChangeListener() {
+
+                public void stateChanged(ChangeEvent e) {
                     int value;
                     int oldvalue;
                     Date newDate = (Date) getValue();
@@ -228,22 +234,10 @@ public class Calendar extends JComponent {
                     if (value == oldvalue) {
                         return;
                     }
-                    Calendar.this.setDate(cal.getTime(), false);
+                    Calendar.this.setDateFromCalendarSpinner(cal.getTime());
             }
             });
             listeners  = getChangeListeners();
-        }
-
-        public void addChangeListener() {
-            for (int i = 0, n = listeners.length; i < n; i++) {
-                addChangeListener(listeners[i]);
-            }
-        }
-
-        public void removeChangeListener() {
-            for (int i = 0, n = listeners.length; i < n; i++) {
-                removeChangeListener(listeners[i]);
-            }
         }
     }
 
