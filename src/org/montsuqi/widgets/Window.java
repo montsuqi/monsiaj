@@ -35,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A JFrame wrapper.</p>
  */
@@ -84,14 +85,17 @@ public class Window extends JFrame {
         topWindow.setTitle(this.getTitle());
         topWindow.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
         topWindow.setSize(this.getSize());
-        topWindow.setVisible(true);
+        if (!topWindow.isVisible()) {
+            topWindow.setVisible(true);
+        }
         ((JComponent) child).revalidate();
         ((JComponent) child).repaint();
         if (setLocation) {
             topWindow.setLocation(this.getLocation());
         }
         topWindow.hideBusyCursor();
-        topWindow.toFront();
+// is this necessary?
+//        topWindow.toFront();
         topWindow.setEnabled(true);
     }
 
