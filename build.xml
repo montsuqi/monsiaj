@@ -94,7 +94,6 @@
             </fileset>
             <fileset dir=".">
                 <include name="README.txt"/>
-                <include name="README.html"/>
                 <include name="HOWTOBUILD.txt"/>
             </fileset>
         </copy>
@@ -106,6 +105,9 @@
                 <include name="PDFRenderer.jar"/>
             </fileset>
         </copy>
+        <copy file="${build.dir}/README.txt" tofile="${build.dir}/README.windows.txt"/>
+        <copy file="${build.dir}/HOWTOBUILD.txt" tofile="${build.dir}/HOWTOBUILD.windows.txt"/>        
+        <fixcrlf srcDir="${build.dir}" includes="*.windows.txt" eol="crlf" encoding="UTF-8"/>
         <native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
         <filter token="webstarturl" value="${webstart.url}"/>
         <filter token="webstartvendor" value="${webstart.vendor}"/>
@@ -130,8 +132,7 @@
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
                 <include name="*.jnlp"/>
-                <include name="README.txt"/>
-                <include name="README.html"/>
+                <include name="*.txt"/>
                 <include name="jma-receipt.jpg"/>
                 <exclude name="pandarecord.jar"/>
                 <exclude name="pandareplay.jar"/>
@@ -161,8 +162,7 @@
             <fileset dir="${build.dir}">
                 <include name="pandarecord.jar"/>
                 <include name="pandareplay.jar"/>
-                <include name="README.txt"/>
-                <include name="README.html"/>
+                <include name="*.txt"/>
             </fileset>
         </copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
@@ -207,8 +207,7 @@
         <copy todir="${build.dir}/${bin.macosx.name}">
             <fileset dir="${build.dir}">
                 <include name="${macosx.app.dir}/**"/>
-                <include name="README.txt"/>
-                <include name="README.html"/>
+                <include name="*.txt"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}/${bin.macosx.name}/theme">
@@ -235,7 +234,6 @@
                 <include name="libs/**"/>
                 <include name="build.xml"/>
                 <include name="README.txt"/>
-                <include name="README.html"/>
                 <include name="HOWTOBUILD.txt"/>
                 <exclude name="**/CVS"/>
             </fileset>
