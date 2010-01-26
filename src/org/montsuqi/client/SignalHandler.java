@@ -181,7 +181,7 @@ public abstract class SignalHandler {
                         con.setIsReceiving(true);
                         if (widget instanceof JComponent) {
                             if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
-                                con.addChangedWidget(widget);
+                                con._addChangedWidget(widget);
                             }
                         }
                         Window window = null;

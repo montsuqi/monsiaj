@@ -73,9 +73,9 @@ public class Configuration {
     /** <p>Default port: 8000</p> */
     static final int DEFAULT_PORT = 8000;
     /** <p>Default host: localhost</p> */
-    static final String DEFAULT_HOST = "localhost"; //$NON-NLS-1$
+    static final String DEFAULT_HOST = "trial.orca.med.or.jp"; //$NON-NLS-1$
     /** <p>Default user: value of System property user.name.</p> */
-    static final String DEFAULT_USER = System.getProperty("user.name"); //$NON-NLS-1$
+    static final String DEFAULT_USER = "trial"; //$NON-NLS-1$
     /** <p>Default password: empty string.</p> */
     static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
     /** <p>Default client certificate password: empty string.</p> */
@@ -85,7 +85,7 @@ public class Configuration {
     /** <p>Default value of save password checkbox: false.</p> */
     static final boolean DEFAULT_SAVE_PASSWORD = false;
     /** <p>Default application name: "demo".</p> */
-    static final String DEFAULT_APPLICATION = "demo"; //$NON-NLS-1$
+    static final String DEFAULT_APPLICATION = "panda:orca00"; //$NON-NLS-1$
     /** <p>Default cache directory: [value of System property user.home]/.monsiaj/cache</p> */
     static final String DEFAULT_CACHE_PATH;
 
