@@ -107,7 +107,10 @@
         </copy>
         <copy file="${build.dir}/README.txt" tofile="${build.dir}/README.windows.txt"/>
         <copy file="${build.dir}/HOWTOBUILD.txt" tofile="${build.dir}/HOWTOBUILD.windows.txt"/>        
+        <copy file="${build.dir}/README.txt" tofile="${build.dir}/README.mac.txt"/>
+        <copy file="${build.dir}/HOWTOBUILD.txt" tofile="${build.dir}/HOWTOBUILD.mac.txt"/>
         <fixcrlf srcDir="${build.dir}" includes="*.windows.txt" eol="crlf" encoding="UTF-8"/>
+        <fixcrlf srcDir="${build.dir}" includes="*.mac.txt" eol="mac" encoding="UTF-8" outputencoding="MS932"/>
         <native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
         <filter token="webstarturl" value="${webstart.url}"/>
         <filter token="webstartvendor" value="${webstart.vendor}"/>
