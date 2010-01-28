@@ -110,7 +110,7 @@ public class Protocol extends Connection {
                     }
                 }
             }
-            widget.requestFocus();
+            widget.requestFocusInWindow();
         }
     }
     private Client client;
@@ -667,7 +667,7 @@ public class Protocol extends Connection {
                     if (SystemEnvironment.isMacOSX()) {
                         SwingUtilities.invokeLater(new FocusRequester(widget));
                     } else {
-                        widget.requestFocus();
+                        widget.requestFocusInWindow();
                     }
                 }
             }

@@ -35,7 +35,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A JFrame wrapper.</p>
  */
@@ -78,7 +77,9 @@ public class Window extends JFrame {
     }
 
     public void putWindow(Window topWindow, boolean setLocation) {
-        child.setVisible(true);
+        if (!child.isVisible()) {
+            child.setVisible(true);
+        }
         topWindow.setName(this.getName());
         topWindow.getContentPane().removeAll();
         topWindow.getContentPane().add(child);
@@ -97,6 +98,8 @@ public class Window extends JFrame {
 // is this necessary?
 //        topWindow.toFront();
         topWindow.setEnabled(true);
+        topWindow.setChild(child);
+        ((JComponent) child).requestFocusInWindow();
     }
 
     public JDialog getDialog() {
