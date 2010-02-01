@@ -97,6 +97,11 @@
                 <include name="HOWTOBUILD.txt"/>
             </fileset>
         </copy>
+        <copy todir="${build.dir}/com/sun/pdfview/font/res/cmap">
+            <fileset dir="${resources.dir}/cmaps">
+                <include name="*"/>
+            </fileset>
+        </copy>
         <copy todir="${build.dir}/libs" >
             <fileset dir="${libs.dir}">
                 <include name="nimrodlf.jar"/>
@@ -256,6 +261,7 @@
             <fileset dir="${build.dir}">
                 <include name="org/montsuqi/**"/>
                 <include name="**/*.png"/>
+                <include name="com/sun/pdfview/font/res/cmap/*"/>
                 <exclude name="org/montsuqi/tools/**"/>
                 <exclude name="jp/or/med/orca/jmareceipt/**"/>
             </fileset>
