@@ -51,6 +51,7 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
@@ -144,8 +145,16 @@ public class PandaPreview extends JPanel {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
                     byte[] b;
+                    File file;
+                    String outFileName = fc.getSelectedFile().getPath();
+                    if (!outFileName.endsWith(".pdf") && !outFileName.endsWith(".PDF")) {
+                        outFileName += ".pdf";
+                        file = new File(outFileName);
+                    } else {
+                        file = fc.getSelectedFile();
+                    }
                     FileInputStream in = new FileInputStream(fileName);
-                    FileOutputStream out = new FileOutputStream(fc.getSelectedFile());
+                    FileOutputStream out = new FileOutputStream(file);
                     b = new byte[in.available()];
                     while (in.read(b) > 0) {
                         out.write(b);
