@@ -24,6 +24,8 @@ package org.montsuqi.client;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,7 +43,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,9 +57,9 @@ import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.InterfaceBuildingException;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.TopWindow;
 import org.montsuqi.widgets.Window;
 
 /** <p>A class that implements high level operations over client/server connection.</p>
@@ -127,8 +128,8 @@ public class Protocol extends Connection {
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
     private static final String VERSION = "symbolic:blob:expand:pdf:negotiation:i18n:agent=monsiaj/" + Messages.getString("application.version");
-    private Window topWindow;
-    private List dialogStack;
+    private TopWindow topWindow;
+    private ArrayList<Component> dialogStack;
     private boolean enablePing;
     private static final int PingTimerPeriod = 10 * 1000;
     private javax.swing.Timer pingTimer;
@@ -169,8 +170,8 @@ public class Protocol extends Connection {
         valueManager = new WidgetValueManager(this, styleMap);
         this.timerPeriod = timerPeriod;
         sessionTitle = "";
-        topWindow = new Window();
-        dialogStack = new ArrayList();
+        topWindow = new TopWindow();
+        dialogStack = new ArrayList<Component>();
         enablePing = false;
     }
 
@@ -241,8 +242,8 @@ public class Protocol extends Connection {
             JDialog dialog;
 
             topWindow.showBusyCursor();
-            for (int i = 0; i < dialogStack.size(); i++) {
-                parent = ((Component) dialogStack.get(i));
+            for (Component c : dialogStack) {
+                parent = c;
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
@@ -257,11 +258,11 @@ public class Protocol extends Connection {
                 dialogStack.add(dialog);
             }
         } else {
-            window.putWindow(topWindow, isFirstShowWindow);
+            topWindow.showWindow(window, isFirstShowWindow);
             if (isFirstShowWindow) {
                 isFirstShowWindow = false;
             }
-            resetTimer(topWindow);
+            resetTimer(window.getChild());
         }
         logger.leave();
     }
@@ -283,7 +284,7 @@ public class Protocol extends Connection {
             window.destroyDialog();
         } else {
             topWindow.setEnabled(false);
-            stopTimer(topWindow);
+            stopTimer(window.getChild());
         }
         logger.leave();
     }
@@ -661,14 +662,14 @@ public class Protocol extends Connection {
 
             node = getNode(window);
             if (node != null && node.getInterface() != null && window.equals(currentWindow)) {
-                Component widget = xml.getWidget(wName);
+                final Component widget = xml.getWidget(wName);
                 if (widget != null && widget.isFocusable()) {
-                    // Mac OS X focus problem: workaround
-                    if (SystemEnvironment.isMacOSX()) {
-                        SwingUtilities.invokeLater(new FocusRequester(widget));
-                    } else {
-                        widget.requestFocusInWindow();
-                    }
+                    EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+                            widget.requestFocusInWindow();
+                        }
+                    });
                 }
             }
             c = receivePacketClass();

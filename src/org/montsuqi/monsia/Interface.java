@@ -24,6 +24,7 @@ package org.montsuqi.monsia;
 
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
-import javax.swing.FocusManager;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -72,7 +72,7 @@ public class Interface {
 
 
     static {
-        FocusManager.setCurrentManager(new PandaFocusManager());
+        KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
         accelHandlers = new HashMap();
     }
     private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; //$NON-NLS-1$

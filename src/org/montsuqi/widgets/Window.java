@@ -76,32 +76,6 @@ public class Window extends JFrame {
         return dialog;
     }
 
-    public void putWindow(Window topWindow, boolean setLocation) {
-        if (!child.isVisible()) {
-            child.setVisible(true);
-        }
-        topWindow.setName(this.getName());
-        topWindow.getContentPane().removeAll();
-        topWindow.getContentPane().add(child);
-        topWindow.setTitle(this.getTitle());
-        topWindow.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
-        topWindow.setSize(this.getSize());
-        if (!topWindow.isVisible()) {
-            topWindow.setVisible(true);
-        }
-        ((JComponent) child).revalidate();
-        ((JComponent) child).repaint();
-        if (setLocation) {
-            topWindow.setLocation(this.getLocation());
-        }
-        topWindow.hideBusyCursor();
-// is this necessary?
-//        topWindow.toFront();
-        topWindow.setEnabled(true);
-        topWindow.setChild(child);
-        ((JComponent) child).requestFocusInWindow();
-    }
-
     public JDialog getDialog() {
         return dialog;
     }

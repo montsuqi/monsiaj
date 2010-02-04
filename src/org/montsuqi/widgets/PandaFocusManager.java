@@ -24,9 +24,9 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.Component;
+import java.awt.DefaultKeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
-import javax.swing.DefaultFocusManager;
 import javax.swing.SwingUtilities;
 
 import org.montsuqi.monsia.Interface;
@@ -35,7 +35,7 @@ import org.montsuqi.monsia.Interface;
  * 
  * <p>It ignores key events if the window of the component is not active(is busy).</p>
  */
-public class PandaFocusManager extends DefaultFocusManager {
+public class PandaFocusManager extends DefaultKeyboardFocusManager {
 
 	public void processKeyEvent(Component focusedComponent, KeyEvent e) {
 		java.awt.Window w = SwingUtilities.windowForComponent(focusedComponent);
