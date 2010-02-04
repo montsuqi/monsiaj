@@ -65,55 +65,7 @@ import org.montsuqi.widgets.Window;
 /** <p>A class that implements high level operations over client/server connection.</p>
  */
 public class Protocol extends Connection {
-
-    /** A helper class to fix focus problem in JDK1.5.
-     * This class ensures all ancestors of the component to be focused is
-     * visible before issuing focus request.</p>
-     */
-    private final class FocusRequester implements Runnable {
-
-        final class Terminator extends TimerTask {
-
-            public void run() {
-                FocusRequester.this.stop();
-            }
-        }
-        private final Component widget;
-        private boolean running;
-
-        FocusRequester(Component widget) {
-            this.widget = widget;
-            running = false;
-        }
-
-        synchronized void stop() {
-            running = false;
-        }
-
-        public void run() {
-            final int delay = 50;
-            for (Component comp = widget; running && comp != null; comp = comp.getParent()) {
-                running = true;
-                final Timer terminator = new Timer();
-                terminator.schedule(new Terminator(), (long) delay * 3);
-                while (running && !comp.isVisible()) {
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException e) {
-                        // ignore
-                    }
-                }
-                synchronized (this) {
-                    if (running) {
-                        terminator.cancel();
-                    } else {
-                        logger.debug("Timed out waiting {0} to be visible.", comp.getName());
-                    }
-                }
-            }
-            widget.requestFocusInWindow();
-        }
-    }
+    
     private Client client;
     private File cacheRoot;
     private boolean protocol1;
