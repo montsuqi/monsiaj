@@ -29,23 +29,17 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -56,7 +50,6 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.InterfaceBuildingException;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TopWindow;
@@ -67,7 +60,6 @@ import org.montsuqi.widgets.Window;
 public class Protocol extends Connection {
     
     private Client client;
-    private File cacheRoot;
     private boolean protocol1;
     private boolean protocol2;
     private boolean isReceiving;
@@ -90,18 +82,9 @@ public class Protocol extends Connection {
         return topWindow;
     }
 
-    Protocol(Client client, Map styleMap, File cacheRoot, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
+    Protocol(Client client, Map styleMap, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
         super(client.createSocket(), isNetworkByteOrder()); //$NON-NLS-1$
         this.client = client;
-        this.cacheRoot = cacheRoot;
-        File[] list = cacheRoot.listFiles();
-        if (list != null) {
-            for (File file : list) {
-                if (file.isFile()) {
-                    file.delete();
-                }
-            }
-        }
 
         switch (protocolVersion) {
             case 1:
@@ -148,8 +131,8 @@ public class Protocol extends Connection {
         return xml;
     }
 
-    private synchronized boolean receiveFile(String name, File file) throws IOException {
-        logger.enter(name, file);
+    private synchronized boolean receiveFile(String name) throws IOException {
+        logger.enter(name);
         sendPacketClass(PacketClass.GetScreen);
         sendString(name);
         byte pc = receivePacketClass();
@@ -159,24 +142,14 @@ public class Protocol extends Connection {
             logger.leave();
             return false;
         }
-
-        OutputStream cache = new FileOutputStream(file);
         int size = receiveLength();
         byte[] bytes = new byte[size];
         in.readFully(bytes);
-        cache.write(bytes);
-        cache.flush();
-        cache.close();
+        Node node = new Node(Interface.parseInput(new ByteArrayInputStream(bytes), this), name);
+        nodeTable.put(name, node);
+
         logger.leave();
         return true;
-    }
-
-    private Node createWindow(String name) {
-        Node node = getNode(name);
-        if (node == null) {
-            node = createNode(name);
-        }
-        return node;
     }
 
     private void showWindow(String name) {
@@ -265,21 +238,6 @@ public class Protocol extends Connection {
         client.exitSystem();
     }
 
-    private Node createNode(String name) {
-        logger.enter(name);
-        try {
-            File cacheFile = new File(cacheRoot, name);
-            InputStream input = new FileInputStream(cacheFile);
-            Node node = new Node(Interface.parseInput(input, this), name);
-            input.close();
-            nodeTable.put(name, node);
-            logger.leave();
-            return node;
-        } catch (IOException e) {
-            throw new InterfaceBuildingException(e);
-        }
-    }
-
     private void destroyNode(String name) {
         logger.enter(name);
         if (nodeTable.containsKey(name)) {
@@ -306,32 +264,17 @@ public class Protocol extends Connection {
     private synchronized String checkScreen1() throws IOException {
         logger.enter();
         String name = receiveString();
-        logger.debug("checking: {0}", name);
-        File cacheFile = new File(cacheRoot, name);
-        int size = receiveLong();
-        long mtime = receiveLong() * 1000L;
-        long ctime = receiveLong() * 1000L;
+        receiveLong(); // size
+        receiveLong(); // mtime
+        receiveLong(); // ctime
 
-        if (isCacheFileOld(size, mtime, ctime, cacheFile)) {
-            receiveFile(name, cacheFile);
-            destroyNode(name);
+        if (getNode(name) == null) {
+            receiveFile(name);
         } else {
             sendPacketClass(PacketClass.NOT);
         }
         logger.leave();
         return name;
-    }
-
-    private boolean isCacheFileOld(int size, long mtime, long ctime, File cacheFile) throws IOException {
-        logger.enter(new Object[]{new Integer(size), new Date(mtime), new Date(ctime), cacheFile});
-        File parent = cacheFile.getParentFile();
-        parent.mkdirs();
-        cacheFile.createNewFile();
-        final long lastModified = cacheFile.lastModified();
-        logger.debug("cache mtime: {0}", new Date(lastModified)); //$NON-NLS-1$
-        final boolean result = lastModified < mtime || lastModified < ctime || cacheFile.length() == 0;
-        logger.leave();
-        return result;
     }
 
     synchronized boolean receiveWidgetData(Component widget) throws IOException {
@@ -570,7 +513,7 @@ public class Protocol extends Connection {
             logger.debug("window: {0}", window);
             int type = receiveInt();
 
-            node = createWindow(window);
+            node = getNode(window);
             if (node != null) {
                 xml = node.getInterface();
             }

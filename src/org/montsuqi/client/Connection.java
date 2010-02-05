@@ -43,7 +43,7 @@ import org.montsuqi.util.SystemEnvironment;
  * <p>This class implements methods for sending/receiving basic data types such as
  * booleans, integers and strings.</p>
  */
-class Connection {
+public class Connection {
 
 	private String encoding;
 

@@ -117,16 +117,10 @@ public class Client implements Runnable {
 	void connect() throws IOException, GeneralSecurityException {
 		String configName = conf.getConfigurationName();
 		Map styles = loadStyles();
-		String[] pathElements = {
-			conf.getCache(configName),
-			conf.getHost(configName),
-			String.valueOf(conf.getPort(configName))
-		};
-		File cacheRoot = SystemEnvironment.createFilePath(pathElements);
 		int protocolVersion = conf.getProtocolVersion(configName);
 		long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
 		System.setProperty("expand_screen", String.valueOf(conf.getExpandScreen(configName)));
-		protocol = new Protocol(this, styles, cacheRoot, protocolVersion, timerPeriod);
+		protocol = new Protocol(this, styles, protocolVersion, timerPeriod);
 
 		String user = conf.getUser(configName);
 		String password = conf.getPassword(configName);
