@@ -609,7 +609,7 @@ public class ConfigurationPanel extends JPanel {
         timerPeriodEntryPanel.add(timerPeriodEntry);
         timerPanel.add(timerPeriodEntryPanel);
 
-        propertiesText = new JTextArea(4, 30);
+        propertiesText = new JTextArea(10, 30);
         propertiesText.addFocusListener(new TextAreaSelected());
         JScrollPane propertiesScroll = new JScrollPane(propertiesText, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         propertiesScroll.setMinimumSize(new Dimension(0, 100));
@@ -650,10 +650,10 @@ public class ConfigurationPanel extends JPanel {
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.additional_system_properties")),
-                createConstraints(0, y, 1, 4, 0.0, 1.0));
+                createConstraints(0, y, 1, 6, 0.0, 1.0));
         panel.add(propertiesScroll,
-                createConstraints(1, y, 3, 4, 1.0, 1.0));
-        y += 4;
+                createConstraints(1, y, 3, 6, 1.0, 1.0));
+        y += 6;
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
                 panel.add(new JLabel(" "),
