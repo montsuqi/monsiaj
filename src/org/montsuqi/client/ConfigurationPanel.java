@@ -68,6 +68,8 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
 import com.nilo.plaf.nimrod.*;
+import java.awt.Color;
+import java.awt.SystemColor;
 
 public class ConfigurationPanel extends JPanel {
 
@@ -688,6 +690,25 @@ public class ConfigurationPanel extends JPanel {
             }
         });
 
+        JPanel innerPanel = new JPanel();
+        innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
+        innerPanel.setBorder(BorderFactory.createLineBorder((Color)SystemColor.controlDkShadow));
+        JLabel javaVersion = new JLabel(
+                Messages.getString("ConfigurationPanel.info_java_version") +
+                System.getProperty("java.version"));
+        javaVersion.setHorizontalAlignment(SwingConstants.LEFT);
+        JLabel osVersion = new JLabel(
+                Messages.getString("ConfigurationPanel.info_os_version") +
+                System.getProperty("os.name") + "-" +
+                System.getProperty("os.version") + "-" +
+                System.getProperty("os.arch"));
+        osVersion.setHorizontalAlignment(SwingConstants.LEFT);
+        innerPanel.add(javaVersion);
+        innerPanel.add(osVersion);
+        innerPanel.add(new JLabel(" "));
+        innerPanel.add(new JLabel(" "));
+        innerPanel.add(new JLabel(" "));
+
         y = 0;
         panel.add(version,
                 createConstraints(0, y, 4, 3, 1.0, 1.0));
@@ -704,6 +725,11 @@ public class ConfigurationPanel extends JPanel {
         panel.add(montsuqiButton,
                 createConstraints(0, y, 4, 1, 0.0, 1.0));
         y++;
+
+        panel.add(innerPanel,
+                createConstraints(0, y, 4, 1, 1.0, 1.0));
+        y+=1;
+
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
