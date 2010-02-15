@@ -113,7 +113,7 @@ public class Launcher {
         if (!configName.equals("")) {
             conf.setConfigurationName(configName);
             /* set properties */
-            conf.getProperties(configName);
+            conf.applyProperties(configName);
 
             /* set look and feel */
             try {

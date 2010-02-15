@@ -649,6 +649,10 @@ public class Configuration {
         return properties;
     }
 
+    public void applyProperties(String configName) {
+        updateSystemProperties(getString(configName, PROPERTIES_KEY, ""));
+    }
+
     /** <p>Sets other properties.</p>
      *
      * @param configName the configuration name.
