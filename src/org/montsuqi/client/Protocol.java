@@ -42,14 +42,15 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TopWindow;
@@ -58,7 +59,7 @@ import org.montsuqi.widgets.Window;
 /** <p>A class that implements high level operations over client/server connection.</p>
  */
 public class Protocol extends Connection {
-    
+
     private Client client;
     private boolean protocol1;
     private boolean protocol2;
@@ -501,19 +502,19 @@ public class Protocol extends Connection {
 
     synchronized void getScreenData() throws IOException {
         logger.enter();
-        String window = null;
-        String currentWindow = null;
+        String windowName = null;
+        String currentWindowName = null;
         Node node;
         checkScreens(false);
         sendPacketClass(PacketClass.GetData);
         sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
         byte c;
         while ((c = receivePacketClass()) == PacketClass.WindowName) {
-            window = receiveString();
-            logger.debug("window: {0}", window);
+            windowName = receiveString();
+            logger.debug("window: {0}", windowName);
             int type = receiveInt();
 
-            node = getNode(window);
+            node = getNode(windowName);
             if (node != null) {
                 xml = node.getInterface();
             }
@@ -524,14 +525,14 @@ public class Protocol extends Connection {
                 case ScreenType.CURRENT_WINDOW:
                 case ScreenType.NEW_WINDOW:
                 case ScreenType.CHANGE_WINDOW:
-                    currentWindow = window;
-                    widgetName = new StringBuffer(window);
+                    currentWindowName = windowName;
+                    widgetName = new StringBuffer(windowName);
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {
                         receiveValue(widgetName, widgetName.length());
                     }
                     if (type != ScreenType.CURRENT_WINDOW && xml != null) {
-                        Component widget = xml.getWidget(window);
+                        Component widget = xml.getWidget(windowName);
                         if (widget != null) {
                             resetScrollPane(widget);
                         }
@@ -540,7 +541,7 @@ public class Protocol extends Connection {
                 case ScreenType.JOIN_WINDOW:
                 case ScreenType.CLOSE_WINDOW:
                 default:
-                    closeWindow(window);
+                    closeWindow(windowName);
                     c = receivePacketClass();
                     break;
             }
@@ -550,19 +551,22 @@ public class Protocol extends Connection {
                 // fatal error
                 }
         }
-        showWindow(currentWindow);
+        showWindow(currentWindowName);
         if (c == PacketClass.FocusName) {
-            window = receiveString();
-            String wName = receiveString();
-
-            node = getNode(window);
-            if (node != null && node.getInterface() != null && window.equals(currentWindow)) {
-                final Component widget = xml.getWidget(wName);
+            String focusWindowName = receiveString();
+            String focusWidgetName = receiveString();
+            node = getNode(focusWindowName);
+            if (node != null && node.getInterface() != null && focusWindowName.equals(currentWindowName)) {
+                final Component widget = xml.getWidget(focusWidgetName);
                 if (widget != null && widget.isFocusable()) {
                     EventQueue.invokeLater(new Runnable() {
                         public void run() {
-                            KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-                            widget.requestFocusInWindow();
+                            if (SystemEnvironment.isMacOSX()) {
+                                widget.requestFocus();
+                            } else {
+                                KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+                                widget.requestFocusInWindow();
+                            }
                         }
                     });
                 }
