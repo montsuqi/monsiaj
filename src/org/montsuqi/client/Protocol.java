@@ -166,6 +166,7 @@ public class Protocol extends Connection {
         if (window.isDialog()) {
             Component parent = topWindow;
             JDialog dialog;
+            boolean isInit;
 
             topWindow.showBusyCursor();
             for (Component c : dialogStack) {
@@ -173,10 +174,13 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
+            isInit = (window.getDialog() == null);
             dialog = window.createDialog(parent);
-            dialog.setLocation(
-                    topWindow.getX() + window.getX(),
-                    topWindow.getY() + window.getY());
+            if (isInit) {
+                dialog.setLocation(
+                        topWindow.getX() + window.getX(),
+                        topWindow.getY() + window.getY());
+            }
             dialog.setVisible(true);
             dialog.toFront();
             resetTimer(dialog);
@@ -208,6 +212,7 @@ public class Protocol extends Connection {
                 dialogStack.remove(dialog);
             }
             window.destroyDialog();
+            stopTimer(window.getDialog());
         } else {
             topWindow.setEnabled(false);
             stopTimer(window.getChild());

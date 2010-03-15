@@ -31,7 +31,6 @@ import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -49,9 +48,7 @@ public class Window extends JFrame {
     public void destroyDialog() {
         if (dialog != null) {
             dialog.setVisible(false);
-            dialog.getContentPane().removeAll();
-            dialog.dispose();
-            dialog = null;
+            dialog.setEnabled(false);
         }
     }
 
@@ -72,7 +69,8 @@ public class Window extends JFrame {
             dialog.setSize(this.getSize());
         }
         dialog.setTitle(this.getTitle());
-        dialog.setEnabled(true);
+        if (!dialog.isEnabled())dialog.setEnabled(true);
+        if (!dialog.isVisible())dialog.setVisible(true);
         return dialog;
     }
 
