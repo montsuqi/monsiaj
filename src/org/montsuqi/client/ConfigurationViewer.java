@@ -28,7 +28,6 @@ import java.awt.Color;
 import java.awt.SystemColor;
 import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -47,7 +46,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.WindowConstants;
 
-import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.PandaCList;
@@ -80,7 +78,7 @@ public class ConfigurationViewer{
 		clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 		clist.setShowGrid(true);
 		updateConfigurationList(clist);
-		clist.setAutoResizeMode(clist.AUTO_RESIZE_LAST_COLUMN);
+		clist.setAutoResizeMode(PandaCList.AUTO_RESIZE_LAST_COLUMN);
 
 		JScrollPane scroll = new JScrollPane(clist,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -153,7 +151,7 @@ public class ConfigurationViewer{
 		String [] configNames = conf.getConfigurationNames();
 		Object [][] tableData = new Object[configNames.length][ColumnNames.length];
 		for (int i = 0; i < configNames.length; i++) {
-			if ( configNames[i].equals(conf.DEFAULT_CONFIG_NAME) ) {
+			if ( configNames[i].equals(Configuration.DEFAULT_CONFIG_NAME) ) {
 				defaultId = i;
 			}
 			tableData[i][0] = configNames[i];
