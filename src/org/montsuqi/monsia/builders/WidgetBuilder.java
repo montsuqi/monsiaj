@@ -57,7 +57,6 @@ import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.CheckBox;
 import org.montsuqi.widgets.Entry;
 import org.montsuqi.widgets.FileEntry;
-import org.montsuqi.widgets.PixmapEntry;
 import org.montsuqi.widgets.HPaned;
 import org.montsuqi.widgets.Notebook;
 import org.montsuqi.widgets.OptionMenu;
@@ -73,6 +72,7 @@ import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.RadioButton;
 import org.montsuqi.widgets.Table;
@@ -122,7 +122,6 @@ public class WidgetBuilder {
 		registerWidgetClass("Dialog",         Window.class,        new WindowBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Entry",          Entry.class,         entryBuilder); //$NON-NLS-1$
 		registerWidgetClass("FileEntry",      FileEntry.class,     new FileEntryBuilder()); //$NON-NLS-1$
-		registerWidgetClass("PixmapEntry",    PixmapEntry.class,   new PixmapEntryBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Fixed",          Fixed.class,         new FixedBuilder()); //$NON-NLS-1$
 		registerWidgetClass("Frame",          Frame.class,         new FrameBuilder()); //$NON-NLS-1$
 		registerWidgetClass("HBox",           HBox.class,          defaultContainerBuilder); //$NON-NLS-1$
@@ -144,7 +143,8 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaPS",        PandaPreview.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
-		registerWidgetClass("Pixmap",         Pixmap.class,        defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("PandaDownload",  PandaDownload.class, defaultWidgetBuilder); //$NON-NLS-1$
+                registerWidgetClass("Pixmap",         Pixmap.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Placeholder",    JPanel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("RadioButton",    RadioButton.class,   new RadioButtonBuilder()); //$NON-NLS-1$

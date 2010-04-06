@@ -47,7 +47,7 @@ import org.montsuqi.util.Logger;
  */
 public class FileEntry extends JComponent {
 
-    private static Preferences prefs = null;
+    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private JTextField fileEntry;
     private JButton browseButton;
     private Logger logger;
@@ -57,9 +57,6 @@ public class FileEntry extends JComponent {
         initComponents();
         layoutComponents();
         data = new byte[0];
-        if (prefs == null) {
-            prefs = Preferences.userNodeForPackage(this.getClass());
-        }
     }
 
     private void initComponents() {
@@ -121,7 +118,7 @@ public class FileEntry extends JComponent {
         }
 
         public void actionPerformed(ActionEvent e) {
-            final String dir = prefs.get(FileEntry.this.getName(), System.getProperty("user.home"));
+            final String dir = prefs.get(FileEntry.class.getName(), System.getProperty("user.home"));
             final JFileChooser chooser = new JFileChooser(dir);
             chooser.setSelectedFile(getFile());
 
@@ -139,7 +136,7 @@ public class FileEntry extends JComponent {
                     return;
                 }
             }
-            prefs.put(FileEntry.this.getName(), selected.getParent());
+            prefs.put(FileEntry.class.getName(), selected.getParent());
             saveData();
         }
     }
@@ -191,17 +188,17 @@ public class FileEntry extends JComponent {
 
     public byte[] loadData() {
         FileInputStream in;
-        byte[] data = new byte[0];
+        byte[] bytes = new byte[0];
         try {
             int length = (int) getFile().length();
-            data = new byte[length];
+            bytes = new byte[length];
             in = new FileInputStream(getFile());
-            in.read(data, 0, length);
+            in.read(bytes, 0, length);
             in.close();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
-        return data;
+        return bytes;
     }
 
     public JTextField getEntry() {

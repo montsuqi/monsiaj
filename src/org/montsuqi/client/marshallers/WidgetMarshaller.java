@@ -43,13 +43,13 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.FileEntry;
-import org.montsuqi.widgets.PixmapEntry;
 import org.montsuqi.widgets.Frame;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.Window;
 
@@ -78,9 +78,9 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
 		registerMarshaller(Frame.class, new FrameMarshaller());
 		registerMarshaller(FileEntry.class, new FileEntryMarshaller());
-		registerMarshaller(PixmapEntry.class, new PixmapEntryMarshaller());
 		registerMarshaller(PandaTimer.class, new TimerMarshaller());
-		registerMarshaller(Pixmap.class, new PixmapMarshaller());
+		registerMarshaller(PandaDownload.class, new DownloadMarshaller());
+                registerMarshaller(Pixmap.class, new PixmapMarshaller());
 		registerMarshaller(PandaHTML.class, new PandaHTMLMarshaller());
 		registerMarshaller(Window.class, new WindowMarshaller());
 	}

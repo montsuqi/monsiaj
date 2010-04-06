@@ -69,7 +69,6 @@ import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
-import org.montsuqi.widgets.PixmapEntry;
 import org.montsuqi.widgets.UIStock;
 import org.montsuqi.widgets.Window;
 
@@ -732,12 +731,6 @@ abstract class WidgetPropertySetter {
 			}
 		});
 		
-		registerProperty(PixmapEntry.class, "do_preview", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				PixmapEntry pentry = (PixmapEntry)widget;
-				pentry.setPreview(ParameterConverter.toBoolean(value));
-			}
-		});
 	}
 
 	/** <p>Removes given prefix along with "GTK_" and "GTK_".

@@ -72,7 +72,7 @@ public class Protocol extends Connection {
     private StringBuffer widgetName;
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
-    private static final String VERSION = "symbolic:blob:expand:pdf:negotiation:i18n:agent=monsiaj/" + Messages.getString("application.version");
+    private static final String VERSION = "symbolic:download:blob:expand:pdf:negotiation:i18n:agent=monsiaj/" + Messages.getString("application.version");
     private TopWindow topWindow;
     private ArrayList<Component> dialogStack;
     private boolean enablePing;

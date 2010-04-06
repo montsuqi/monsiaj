@@ -332,39 +332,39 @@ public class PandaPreview extends JPanel {
     }
 
     private double getRealZoom() {
-        double zoom;
+        double z;
 
         if (this.zoom == SCALE_FIT_PAGE) {
             double h = panel.getPageHeight();
             if (h > 0) {
                 if (scroll.isShowing()) {
-                    zoom = scroll.getSize().height * 1.0 / h;
+                    z = scroll.getSize().height * 1.0 / h;
                 } else {
-                    zoom = this.getSize().height * 1.0 / h;
+                    z = this.getSize().height * 1.0 / h;
                 }
             } else {
-                zoom = 1.0;
+                z = 1.0;
             }
         } else if (this.zoom == SCALE_FIT_PAGE_WIDTH) {
             double w = panel.getPageWidth();
             if (w > 0) {
                 if (scroll.isShowing()) {
-                    zoom = scroll.getSize().width * 1.0 / w;
+                    z = scroll.getSize().width * 1.0 / w;
                 } else {
 
-                    zoom = this.getSize().width * 1.0 / w;
+                    z = this.getSize().width * 1.0 / w;
                 }
             } else {
-                zoom = 1.0;
+                z = 1.0;
             }
         } else {
-            zoom = this.zoom;
+            z = this.zoom;
         }
-        if (zoom > SCALE_VALUE[SCALE_VALUE.length - 1] ||
-                zoom <= 0.02) {
-            zoom = 1.0;
+        if (z > SCALE_VALUE[SCALE_VALUE.length - 1] ||
+                z <= 0.02) {
+            z = 1.0;
         }
-        return zoom;
+        return z;
     }
 
     private void setScale() {
