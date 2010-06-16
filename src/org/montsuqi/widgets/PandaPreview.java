@@ -55,6 +55,7 @@ import java.io.File;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
+import org.montsuqi.util.PDFPrint;
 
 /** <p>Preview pane with control buttons and display of current scale.</p>
  */
@@ -180,7 +181,11 @@ public class PandaPreview extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            BareBonesBrowserLaunch.openURL("file://" + fileName);
+            try {
+                PDFPrint.print(fileName, true);
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
         }
     }
 
