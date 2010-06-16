@@ -45,8 +45,6 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import com.centerkey.utils.BareBonesBrowserLaunch;
-
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
