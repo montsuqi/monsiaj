@@ -78,6 +78,7 @@ public class Protocol extends Connection {
     private boolean enablePing;
     private static final int PingTimerPeriod = 10 * 1000;
     private javax.swing.Timer pingTimer;
+    private PrintAgent printAgent;
 
     public Window getTopWindow() {
         return topWindow;
@@ -630,8 +631,13 @@ public class Protocol extends Connection {
             });
             pingTimer.start();
         }
-
+        printAgent = new PrintAgent(user,pass);
+        printAgent.start();
         logger.leave();
+    }
+
+    public void addPrintRequest(String url,String title) {
+        printAgent.addRequest(url, title);
     }
 
     private synchronized void sendPing() throws IOException {

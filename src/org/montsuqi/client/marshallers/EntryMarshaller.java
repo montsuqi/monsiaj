@@ -50,7 +50,7 @@ class EntryMarshaller extends WidgetMarshaller {
 			manager.registerValue(entry, name, null);
 			entry.setText(text);
 			entry.setCaretPosition(0);
-		}
+                }
 	}
 
 	public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {

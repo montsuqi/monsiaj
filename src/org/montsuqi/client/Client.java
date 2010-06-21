@@ -23,7 +23,6 @@ copies.
 
 package org.montsuqi.client;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -39,7 +38,6 @@ import java.util.Map;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
-import org.montsuqi.util.SystemEnvironment;
 
 /** <p>The main application class for panda client.</p>
  */

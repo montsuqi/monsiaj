@@ -180,7 +180,7 @@ public class PandaPreview extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                PDFPrint.print(fileName, true);
+                PDFPrint.print(new File(fileName), true);
             } catch (IOException ex) {
                 System.out.println(ex);
             }

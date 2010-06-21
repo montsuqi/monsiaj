@@ -27,13 +27,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.concurrent.Executor;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;

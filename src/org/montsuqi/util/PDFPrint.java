@@ -14,8 +14,7 @@ import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
 public class PDFPrint {
-    public static void print(String filename,boolean showDialog) throws java.io.IOException {
-        File file = new File(filename);
+    public static void print(File file,boolean showDialog) throws java.io.IOException {
         FileInputStream fis = new FileInputStream(file);
         FileChannel fc = fis.getChannel();
         ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
@@ -53,7 +52,7 @@ public class PDFPrint {
     public static void main(String args[]) throws Exception {
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(null);
-        PDFPrint.print(chooser.getSelectedFile().getAbsolutePath(), true);
+        PDFPrint.print(new File(chooser.getSelectedFile().getAbsolutePath()), true);
     }
 
     public static class PDFPrintPage implements Printable {
