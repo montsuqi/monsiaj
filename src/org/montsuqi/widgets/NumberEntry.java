@@ -102,6 +102,10 @@ public class NumberEntry extends Entry {
         setValue(new BigDecimal(value));
     }
 
+    public void setValue(int value) {
+        setValue(new BigDecimal(value));
+    }
+
     public BigDecimal getValue() {
         NumberDocument doc = (NumberDocument) getDocument();
         return doc.getValue();
@@ -131,6 +135,7 @@ public class NumberEntry extends Entry {
         f.setSize(200, 120);
         f.addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
@@ -138,6 +143,7 @@ public class NumberEntry extends Entry {
         f.setVisible(true);
     }
 
+    @Override
     protected void processKeyEvent(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_BACK_SPACE: // fall through

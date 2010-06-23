@@ -149,7 +149,7 @@ public class Calendar extends JComponent {
         setCells(false);
     }
 
-    void setCells(boolean real) {
+    private void setCells(boolean real) {
         cal.setTime(date);
         int month = cal.get(java.util.Calendar.MONTH);
         int day = cal.get(java.util.Calendar.DATE);

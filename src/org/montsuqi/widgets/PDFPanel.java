@@ -60,7 +60,7 @@ class PDFPanel extends JPanel {
 
     public void load(File file) throws IOException {
         page = null;
-        pagenum = 0;
+        pagenum = 1;
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         FileChannel channel = raf.getChannel();
         ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
@@ -74,9 +74,23 @@ class PDFPanel extends JPanel {
         if (pdffile == null) {
             return;
         }
+        if (num < 1 || num > (pdffile.getNumPages())) {
+            num = 1;
+        }
         pagenum = num;
         page = pdffile.getPage(pagenum);
         showPage();
+    }
+
+    public int getPageNum() {
+        return pagenum;
+    }
+
+    public int getNumPages() {
+        if (pdffile == null) {
+            return 0;
+        }
+        return pdffile.getNumPages();
     }
 
     public void setScale(double s) {
@@ -101,15 +115,15 @@ class PDFPanel extends JPanel {
     }
 
     public void clear() {
+        pdffile = null;
         page = null;
         image = null;
         setPreferredSize(new Dimension(0,0));
         revalidate();
         repaint();
     }
-
     private void showPage() {
-        if (page == null) {
+        if (pdffile == null || page == null) {
             return;
         }
 
@@ -124,6 +138,7 @@ class PDFPanel extends JPanel {
         repaint();
     }
 
+    @Override
     public void paint(Graphics g) {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());

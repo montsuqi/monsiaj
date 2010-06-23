@@ -50,6 +50,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.math.BigDecimal;
+import javax.swing.JLabel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
@@ -65,6 +67,7 @@ public class PandaPreview extends JPanel {
         private final Cursor hndCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
         private final Point pp = new Point();
 
+        @Override
         public void mouseDragged(final MouseEvent e) {
             JViewport vport = scroll.getViewport();
             Point cp = e.getPoint();
@@ -74,18 +77,18 @@ public class PandaPreview extends JPanel {
             pp.setLocation(cp);
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             panel.setCursor(hndCursor);
             pp.setLocation(e.getPoint());
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             panel.setCursor(defCursor);
             panel.repaint();
         }
     }
-
-
     private static final double SCALE_FACTOR = 1.2;
     private static final double SCALE_FIT_PAGE = -1.0;
     private static final double SCALE_FIT_PAGE_WIDTH = -2.0;
@@ -114,17 +117,63 @@ public class PandaPreview extends JPanel {
         2.8284271247
     };
     private JToolBar toolbar;
+    private NumberEntry pageEntry;
+    private JLabel pageLabel;
     private JComboBox combo;
     private JScrollPane scroll;
     private double zoom;
     private String fileName;
     private PDFPanel panel;
+    private Action forwardAction;
+    private Action prevAction;
     private Action saveAction;
     private Action printAction;
     private Action zoomInAction;
     private Action zoomOutAction;
     private Action fitPageAction;
     private Action fitPageWidthAction;
+
+    private final class ForwardAction extends AbstractAction {
+
+        public void ForwardAction() {
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/forward.png"); //$NON-NLS-1$
+            if (iconURL != null) {
+                putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+            }
+            putValue(Action.NAME, Messages.getString("PandaPreview.forward")); //$NON-NLS-1$
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.forward_short_description")); //$NON-NLS-1$
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int numPages = panel.getNumPages();
+            int pageNum = panel.getPageNum();
+            if (numPages != 0 && pageNum != numPages) {
+                panel.setPage(pageNum + 1);
+                pageEntry.setValue(pageNum + 1);
+            }
+        }
+    }
+
+    private final class PrevAction extends AbstractAction {
+
+        public void PrevAction() {
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png"); //$NON-NLS-1$
+            if (iconURL != null) {
+                putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
+            }
+            putValue(Action.NAME, Messages.getString("PandaPreview.prev")); //$NON-NLS-1$
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description")); //$NON-NLS-1$
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int numPages = panel.getNumPages();
+            int pageNum = panel.getPageNum();
+            if (numPages != 0 && pageNum != 1) {
+                panel.setPage(pageNum - 1);
+                pageEntry.setValue(pageNum - 1);
+            }
+        }
+    }
 
     private final class SaveAction extends AbstractAction {
 
@@ -161,7 +210,7 @@ public class PandaPreview extends JPanel {
                     in.close();
                     out.close();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    System.out.println(ex);
                 }
             }
         }
@@ -233,6 +282,32 @@ public class PandaPreview extends JPanel {
         super();
         setLayout(new BorderLayout());
 
+        forwardAction = new ForwardAction();
+        prevAction = new PrevAction();
+
+        pageEntry = new NumberEntry();
+        pageEntry.setFormat("----");
+        pageEntry.setMinimumSize(new Dimension(35, 1));
+        pageEntry.setMaximumSize(new Dimension(35, 40));
+        pageEntry.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                int pagenum;
+                try {
+                    pagenum = Integer.parseInt(pageEntry.getText());
+                } catch (Exception ex) {
+                    pagenum = panel.getPageNum();
+                }
+                if (1 <= pagenum && pagenum <= panel.getNumPages()) {
+                    panel.setPage(pagenum);
+                } else {
+                    pageEntry.setValue(panel.getPageNum());
+                }
+            }
+        });
+        pageLabel = new JLabel("/");
+        pageLabel.setMinimumSize(new Dimension(35, 1));
+        pageLabel.setMaximumSize(new Dimension(35, 40));
         saveAction = new SaveAction();
         printAction = new PrintAction();
         zoomInAction = new ZoomInAction();
@@ -243,6 +318,10 @@ public class PandaPreview extends JPanel {
         toolbar = new JToolBar();
         toolbar.setFloatable(false);
 
+        toolbar.add(prevAction);
+        toolbar.add(forwardAction);
+        toolbar.add(pageEntry);
+        toolbar.add(pageLabel);
         toolbar.add(saveAction);
         toolbar.add(printAction);
 
@@ -273,6 +352,8 @@ public class PandaPreview extends JPanel {
         zoom = SCALE_FIT_PAGE_WIDTH;
 
         ActionMap actionMap = getActionMap();
+        actionMap.put("prev", prevAction);
+        actionMap.put("forward", forwardAction);
         actionMap.put("save", saveAction);
         actionMap.put("print", printAction);
         actionMap.put("fitPage", fitPageAction);
@@ -281,6 +362,8 @@ public class PandaPreview extends JPanel {
         actionMap.put("zoomIn", zoomInAction);
 
         InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        inputMap.put(KeyStroke.getKeyStroke("ctrl shift P"), "prev");
+        inputMap.put(KeyStroke.getKeyStroke("ctrl shift F"), "forward");
         inputMap.put(KeyStroke.getKeyStroke("ctrl S"), "save");
         inputMap.put(KeyStroke.getKeyStroke("ctrl P"), "print");
         inputMap.put(KeyStroke.getKeyStroke("ctrl G"), "fitPage");
@@ -299,10 +382,12 @@ public class PandaPreview extends JPanel {
             panel.clear();
             panel.setVisible(true);
             panel.load(fileName);
+            pageLabel.setText("/" + panel.getNumPages());
+            pageEntry.setValue(1);
             this.setScale();
         } catch (Exception ex) {
             if (!ex.getMessage().contains("This may not be a PDF File")) {
-                ex.printStackTrace();
+                System.out.println(ex);
             }
         }
     }
@@ -363,8 +448,8 @@ public class PandaPreview extends JPanel {
         } else {
             z = this.zoom;
         }
-        if (z > SCALE_VALUE[SCALE_VALUE.length - 1] ||
-                z <= 0.02) {
+        if (z > SCALE_VALUE[SCALE_VALUE.length - 1]
+                || z <= 0.02) {
             z = 1.0;
         }
         return z;
