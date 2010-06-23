@@ -50,7 +50,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.math.BigDecimal;
 import javax.swing.JLabel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputAdapter;
@@ -124,7 +123,7 @@ public class PandaPreview extends JPanel {
     private double zoom;
     private String fileName;
     private PDFPanel panel;
-    private Action forwardAction;
+    private Action nextAction;
     private Action prevAction;
     private Action saveAction;
     private Action printAction;
@@ -133,15 +132,15 @@ public class PandaPreview extends JPanel {
     private Action fitPageAction;
     private Action fitPageWidthAction;
 
-    private final class ForwardAction extends AbstractAction {
+    private final class NextAction extends AbstractAction {
 
-        public void ForwardAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/forward.png"); //$NON-NLS-1$
+        NextAction() {
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png"); //$NON-NLS-1$
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.forward")); //$NON-NLS-1$
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.forward_short_description")); //$NON-NLS-1$
+            putValue(Action.NAME, Messages.getString("PandaPreview.next")); //$NON-NLS-1$
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description")); //$NON-NLS-1$
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -156,7 +155,7 @@ public class PandaPreview extends JPanel {
 
     private final class PrevAction extends AbstractAction {
 
-        public void PrevAction() {
+        PrevAction() {
             URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png"); //$NON-NLS-1$
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
@@ -282,7 +281,7 @@ public class PandaPreview extends JPanel {
         super();
         setLayout(new BorderLayout());
 
-        forwardAction = new ForwardAction();
+        nextAction = new NextAction();
         prevAction = new PrevAction();
 
         pageEntry = new NumberEntry();
@@ -319,7 +318,7 @@ public class PandaPreview extends JPanel {
         toolbar.setFloatable(false);
 
         toolbar.add(prevAction);
-        toolbar.add(forwardAction);
+        toolbar.add(nextAction);
         toolbar.add(pageEntry);
         toolbar.add(pageLabel);
         toolbar.add(saveAction);
@@ -353,7 +352,7 @@ public class PandaPreview extends JPanel {
 
         ActionMap actionMap = getActionMap();
         actionMap.put("prev", prevAction);
-        actionMap.put("forward", forwardAction);
+        actionMap.put("forward", nextAction);
         actionMap.put("save", saveAction);
         actionMap.put("print", printAction);
         actionMap.put("fitPage", fitPageAction);
