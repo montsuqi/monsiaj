@@ -112,10 +112,10 @@ public class PrintAgent extends Thread {
             if (n == 0) {
                 JDialog dialog = new JDialog();
                 PandaPreview preview = new PandaPreview();
-                preview.load(file.getAbsolutePath());
                 dialog.setSize(new Dimension(800, 600));
                 dialog.getContentPane().add(preview);
                 dialog.setVisible(true);
+                preview.load(file.getAbsolutePath());
             } else if (n == 1) {
                 String dir = prefs.get(PrintAgent.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);

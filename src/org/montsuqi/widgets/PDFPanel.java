@@ -67,6 +67,9 @@ class PDFPanel extends JPanel {
                 0, channel.size());
         pdffile = new PDFFile(buf);
         page = pdffile.getPage(pagenum);
+        try {
+        page.waitForFinish();
+        } catch (Exception ex) {}
         showPage();
     }
 
@@ -79,6 +82,9 @@ class PDFPanel extends JPanel {
         }
         pagenum = num;
         page = pdffile.getPage(pagenum);
+        try {
+        page.waitForFinish();
+        } catch (Exception ex) {}
         showPage();
     }
 

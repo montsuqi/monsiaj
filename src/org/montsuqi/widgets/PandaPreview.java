@@ -52,6 +52,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.JLabel;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.PDFPrint;
@@ -289,6 +290,7 @@ public class PandaPreview extends JPanel {
         pageEntry.setMinimumSize(new Dimension(35, 1));
         pageEntry.setMaximumSize(new Dimension(35, 40));
         pageEntry.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 int pagenum;
                 try {
