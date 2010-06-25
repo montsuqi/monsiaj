@@ -50,6 +50,7 @@ import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.PandaDownload;
+import org.montsuqi.widgets.PandaPrint;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.Window;
 
@@ -80,6 +81,7 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(FileEntry.class, new FileEntryMarshaller());
 		registerMarshaller(PandaTimer.class, new TimerMarshaller());
 		registerMarshaller(PandaDownload.class, new DownloadMarshaller());
+		registerMarshaller(PandaPrint.class, new PrintMarshaller());
                 registerMarshaller(Pixmap.class, new PixmapMarshaller());
 		registerMarshaller(PandaHTML.class, new PandaHTMLMarshaller());
 		registerMarshaller(Window.class, new WindowMarshaller());

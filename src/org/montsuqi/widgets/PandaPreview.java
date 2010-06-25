@@ -289,7 +289,6 @@ public class PandaPreview extends JPanel {
         pageEntry.setMinimumSize(new Dimension(35, 1));
         pageEntry.setMaximumSize(new Dimension(35, 40));
         pageEntry.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 int pagenum;
                 try {

@@ -73,6 +73,7 @@ import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.PandaDownload;
+import org.montsuqi.widgets.PandaPrint;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.RadioButton;
 import org.montsuqi.widgets.Table;
@@ -144,6 +145,7 @@ public class WidgetBuilder {
 		registerWidgetClass("PandaText",      JTextArea.class,     new TextAreaBuilder()); //$NON-NLS-1$
 		registerWidgetClass("PandaTimer",     PandaTimer.class,    defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("PandaDownload",  PandaDownload.class, defaultWidgetBuilder); //$NON-NLS-1$
+		registerWidgetClass("PandaPrint",     PandaPrint.class,    defaultWidgetBuilder); //$NON-NLS-1$
                 registerWidgetClass("Pixmap",         Pixmap.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("Placeholder",    JPanel.class,        defaultWidgetBuilder); //$NON-NLS-1$
 		registerWidgetClass("ProgressBar",    JProgressBar.class,  defaultWidgetBuilder); //$NON-NLS-1$
