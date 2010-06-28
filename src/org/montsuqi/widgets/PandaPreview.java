@@ -353,7 +353,7 @@ public class PandaPreview extends JPanel {
 
         ActionMap actionMap = getActionMap();
         actionMap.put("prev", prevAction);
-        actionMap.put("forward", nextAction);
+        actionMap.put("next", nextAction);
         actionMap.put("save", saveAction);
         actionMap.put("print", printAction);
         actionMap.put("fitPage", fitPageAction);
@@ -363,7 +363,7 @@ public class PandaPreview extends JPanel {
 
         InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
         inputMap.put(KeyStroke.getKeyStroke("ctrl shift P"), "prev");
-        inputMap.put(KeyStroke.getKeyStroke("ctrl shift F"), "forward");
+        inputMap.put(KeyStroke.getKeyStroke("ctrl shift N"), "next");
         inputMap.put(KeyStroke.getKeyStroke("ctrl S"), "save");
         inputMap.put(KeyStroke.getKeyStroke("ctrl P"), "print");
         inputMap.put(KeyStroke.getKeyStroke("ctrl G"), "fitPage");

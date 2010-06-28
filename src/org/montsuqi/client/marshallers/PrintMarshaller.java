@@ -32,20 +32,29 @@ public class PrintMarshaller extends WidgetMarshaller {
 
     public void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
-        String url = "";
-        String title = "";
 
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if ("url".equals(name)) { //$NON-NLS-1$
-                url  = con.receiveStringData();
-            } else if ("title".equals(name)) {
-                title = con.receiveStringData();
+            if ("item".equals(name)) {
+                con.receiveDataTypeWithCheck(Type.ARRAY);
+                for (int j = 0, n2 = con.receiveInt(); j < n2; j++) {
+                    String url = "";
+                    String title = "";
+                    con.receiveDataTypeWithCheck(Type.RECORD);
+                    for (int k = 0, n3 = con.receiveInt(); k < n3; k++) {
+                        String name2 = con.receiveName();
+                        if ("url".equals(name2)) { //$NON-NLS-1$
+                            url = con.receiveStringData();
+                        } else if ("title".equals(name2)) {
+                            title = con.receiveStringData();
+                        }
+                    }
+                    if (!url.isEmpty() && !title.isEmpty()) {
+                        con.addPrintRequest(url, title);
+                    }
+                }
             }
-        }
-        if (!url.isEmpty() && !title.isEmpty()) {
-            con.addPrintRequest(url, title);
         }
     }
 
