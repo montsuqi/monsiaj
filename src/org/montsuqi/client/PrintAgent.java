@@ -171,12 +171,16 @@ public class PrintAgent extends Thread {
             http.setRequestMethod("GET");
             http.connect();
             BufferedInputStream bis = new BufferedInputStream(http.getInputStream());
-            int data;
+            int data,outsize = 0;
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(temp));
             while ((data = bis.read()) != -1) {
+                outsize += data;
                 bos.write(data);
             }
             bos.close();
+            if (outsize == 0) {
+                return null;
+            }
             return temp;
         } catch (IOException e) {
             System.err.println(e);
