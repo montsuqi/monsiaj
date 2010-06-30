@@ -36,9 +36,10 @@ public class PrintAgent extends Thread {
     private ConcurrentLinkedQueue<PrintRequest> queue;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
-    public PrintAgent(final String user, final  String password) {
+    public PrintAgent(final String user, final String password) {
         queue = new ConcurrentLinkedQueue<PrintRequest>();
         Authenticator.setDefault(new Authenticator() {
+
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(user, password.toCharArray());
@@ -61,11 +62,15 @@ public class PrintAgent extends Thread {
     synchronized public void processRequest() {
         PrintRequest request = queue.poll();
         if (request != null) {
-            File file = download(request);
-            if (file != null) {
-                showDialog(request.getTitle(), file);
-            } else {
-                queue.add(request);
+            try {
+                File file = download(request);
+                if (file != null) {
+                    showDialog(request.getTitle(), file);
+                } else {
+                    queue.add(request);
+                }
+            } catch (IOException ex) {
+                System.out.println(ex);
             }
         }
     }
@@ -162,35 +167,30 @@ public class PrintAgent extends Thread {
         return 0;
     }
 
-    public File download(PrintRequest request) {
-        try {
-            File temp = File.createTempFile("monsiaj_printagent", ".pdf");
-            temp.deleteOnExit();
-            URL url = new URL(request.getUrl());
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            http.setRequestMethod("GET");
-            http.connect();
-            BufferedInputStream bis = new BufferedInputStream(http.getInputStream());
-            int data,outsize = 0;
-            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(temp));
-            while ((data = bis.read()) != -1) {
-                outsize += data;
-                bos.write(data);
-            }
-            bos.close();
-            if (outsize == 0) {
-                return null;
-            }
-            return temp;
-        } catch (IOException e) {
-            System.err.println(e);
+    public File download(PrintRequest request) throws IOException {
+        File temp = File.createTempFile("monsiaj_printagent", ".pdf");
+        temp.deleteOnExit();
+        URL url = new URL(request.getUrl());
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("GET");
+        http.connect();
+        BufferedInputStream bis = new BufferedInputStream(http.getInputStream());
+        int data, outsize = 0;
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(temp));
+        while ((data = bis.read()) != -1) {
+            outsize += data;
+            bos.write(data);
         }
-        return null;
+        bos.close();
+        if (outsize == 0) {
+            return null;
+        }
+        return temp;
     }
 
     static public void main(String[] argv) {
 
-        PrintAgent agent = new PrintAgent("ormaster","ormaster");
+        PrintAgent agent = new PrintAgent("ormaster", "ormaster");
         agent.start();
 
         for (int i = 0; i < argv.length; i++) {
