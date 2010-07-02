@@ -1,7 +1,11 @@
 package org.montsuqi.client;
 
 import com.sun.pdfview.PDFFile;
+import java.awt.BorderLayout;
+
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,11 +21,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.widgets.PandaPreview;
+import org.montsuqi.widgets.Button;
 
 /*
  * Copyright (C) 2010 JMA (Japan Medical Association)
@@ -115,11 +122,22 @@ public class PrintAgent extends Thread {
                 options[3]);
         try {
             if (n == 0) {
-                JDialog dialog = new JDialog();
+                final JDialog dialog = new JDialog();
+                Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) { //$NON-NLS-1$
+
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.dispose();
+                    }
+                });
+                Container container = dialog.getContentPane();
+                container.setLayout(new BorderLayout(5, 5));
                 PandaPreview preview = new PandaPreview();
                 dialog.setSize(new Dimension(800, 600));
-                dialog.getContentPane().add(preview);
+                container.add(preview, BorderLayout.CENTER);
+                container.add(closeButton, BorderLayout.SOUTH);
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 dialog.setVisible(true);
+                closeButton.requestFocus();
                 preview.load(file.getAbsolutePath());
             } else if (n == 1) {
                 String dir = prefs.get(PrintAgent.class.getName(), System.getProperty("user.home"));
