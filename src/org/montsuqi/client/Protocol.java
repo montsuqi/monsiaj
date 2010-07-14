@@ -66,7 +66,7 @@ public class Protocol extends Connection {
     private boolean isReceiving;
     private boolean isFirstShowWindow;
     private long timerPeriod;
-    private Map nodeTable;
+    private HashMap nodeTable;
     private WidgetValueManager valueManager;
     private String sessionTitle;
     private StringBuffer widgetName;
@@ -162,6 +162,8 @@ public class Protocol extends Connection {
             return;
         }
         xml = node.getInterface();
+        topWindow.Scale();
+        xml.scaleWidget(topWindow.getHScale(), topWindow.getVScale(),topWindow.getInsets());
         Window window = node.getWindow();
         window.setSessionTitle(sessionTitle);
         if (window.isDialog()) {
@@ -189,6 +191,7 @@ public class Protocol extends Connection {
                 dialogStack.add(dialog);
             }
         } else {
+            topWindow.setXml(xml);
             topWindow.showWindow(window, isFirstShowWindow);
             if (isFirstShowWindow) {
                 isFirstShowWindow = false;
@@ -553,9 +556,9 @@ public class Protocol extends Connection {
             }
             if (c == PacketClass.NOT) {
                 // no screen data
-                } else {
+            } else {
                 // fatal error
-                }
+            }
         }
         showWindow(currentWindowName);
         if (c == PacketClass.FocusName) {
@@ -566,6 +569,7 @@ public class Protocol extends Connection {
                 final Component widget = xml.getWidget(focusWidgetName);
                 if (widget != null && widget.isFocusable()) {
                     EventQueue.invokeLater(new Runnable() {
+
                         public void run() {
                             if (SystemEnvironment.isMacOSX()) {
                                 widget.requestFocus();
@@ -631,12 +635,12 @@ public class Protocol extends Connection {
             });
             pingTimer.start();
         }
-        printAgent = new PrintAgent(user,pass);
+        printAgent = new PrintAgent(user, pass);
         printAgent.start();
         logger.leave();
     }
 
-    public void addPrintRequest(String url,String title) {
+    public void addPrintRequest(String url, String title) {
         printAgent.addRequest(url, title);
     }
 

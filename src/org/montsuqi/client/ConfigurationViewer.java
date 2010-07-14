@@ -161,6 +161,7 @@ public class ConfigurationViewer{
 			tableData[i][4] = conf.getUser(configNames[i]);
 		}
 		DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {
+            @Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}

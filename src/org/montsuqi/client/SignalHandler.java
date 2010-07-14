@@ -49,6 +49,7 @@ public abstract class SignalHandler {
     protected static final Logger logger = Logger.getLogger(SignalHandler.class);
     private String signalName = ""; //$NON-NLS-1$
 
+    @Override
     public String toString() {
         return getSignalName();
     }
@@ -122,7 +123,7 @@ public abstract class SignalHandler {
         timerBlocked = false;
 
         // In addition to kana/kanji, some special symbols can trigger sendEventWhenIdle.
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("\u3000\uff01\u201d\uff03\uff04\uff05\uff06\u2019"); //$NON-NLS-1$
         buf.append("\uff08\uff09\uff0a\uff0b\uff0c\u30fc\uff0e\uff0f"); //$NON-NLS-1$
         buf.append("\uff10\uff11\uff12\uff13\uff14\uff15\uff16\uff17"); //$NON-NLS-1$
@@ -208,7 +209,7 @@ public abstract class SignalHandler {
                         org.montsuqi.widgets.Window.busyAllWindows();
                         con.sendEvent(windowName, widgetName, event);
                         con.sendWindowData();
-                        synchronized (this) {
+                        synchronized (con) {
                             blockChangedHandlers();
                             con.getScreenData();
                             unblockChangedHandlers();
@@ -410,6 +411,7 @@ public abstract class SignalHandler {
         registerHandler("keypress_filter", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
+System.out.println("keypress_filter" + (String)userData);
                 Component next = con.getInterface().getWidget((String) userData);
                 next.requestFocus();
             }

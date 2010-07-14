@@ -24,6 +24,7 @@ package org.montsuqi.monsia;
 
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
@@ -58,8 +59,9 @@ import org.montsuqi.widgets.PandaFocusManager;
  */
 public class Interface {
 
-    private Map widgets;
-    private Map longNames;
+    private Map<String, Component> widgetNameTable;
+    private Map<String, Component> widgetLongNameTable;
+    private Map<String, Map> propertyTable;
     private Map buttonGroups;
     private Protocol protocol;
     private Component topLevel;
@@ -69,7 +71,6 @@ public class Interface {
     private JMenuBar menuBar;
     private static final Logger logger = Logger.getLogger(Interface.class);
     private static Map accelHandlers;
-
 
     static {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
@@ -87,7 +88,6 @@ public class Interface {
     }
     private static final SAXParser saxParser;
 
-
     static {
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         parserFactory.setNamespaceAware(true);
@@ -99,7 +99,6 @@ public class Interface {
     }
     private static final String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
     private static final int OLD_PROLOGUE_LENGTH;
-
 
     static {
         OLD_PROLOGUE_LENGTH = oldPrologue.getBytes().length;
@@ -178,27 +177,26 @@ public class Interface {
         return head.indexOf("GTK-Interface") < 0; //$NON-NLS-1$
     }
 
-    Interface(List roots, Protocol protocol) {
-        widgets = new HashMap();
-        longNames = new HashMap();
+    private void initMember() {
+        widgetNameTable = new HashMap<String, Component>();
+        widgetLongNameTable = new HashMap<String, Component>();
+        propertyTable = new HashMap<String, Map>();
         signals = new ArrayList();
         buttonGroups = new HashMap();
         topLevel = null;
         defaultWidget = null;
         focusWidget = null;
+    }
+
+    public Interface(List roots, Protocol protocol) {
+        initMember();
         this.protocol = protocol;
         buildWidgetTree(roots);
         signalAutoConnect();
     }
 
     public Interface(List roots) {
-        widgets = new HashMap();
-        longNames = new HashMap();
-        signals = new ArrayList();
-        buttonGroups = new HashMap();
-        topLevel = null;
-        defaultWidget = null;
-        focusWidget = null;
+        initMember();
         buildWidgetTree(roots);
     }
 
@@ -236,14 +234,14 @@ public class Interface {
         if (name == null) {
             throw new NullPointerException("name is null."); //$NON-NLS-1$
         }
-        return (Component) widgets.get(name);
+        return (Component) widgetNameTable.get(name);
     }
 
     public Component getWidgetByLongName(String longName) {
         if (longName == null) {
             throw new NullPointerException("long name is null."); //$NON-NLS-1$
         }
-        return (Component) longNames.get(longName);
+        return (Component) widgetLongNameTable.get(longName);
     }
 
     public void setButtonGroup(JRadioButton button, String groupName) {
@@ -291,7 +289,7 @@ public class Interface {
         handler.addAccels(widget, info.getAccels());
     }
 
-    void buildWidgetTree(List roots) {
+    private void buildWidgetTree(List roots) {
         if (roots == null || roots.isEmpty()) {
             return;
         }
@@ -299,7 +297,6 @@ public class Interface {
         while (i.hasNext()) {
             WidgetInfo info = (WidgetInfo) i.next();
             Component widget = WidgetBuilder.buildWidget(this, info, null);
-            setName(info.getName(), widget);
             assert widget instanceof JFrame;
             JFrame f = (JFrame) widget;
             if (menuBar != null) {
@@ -319,15 +316,54 @@ public class Interface {
         }
     }
 
-    public void setName(String name, Component widget) {
-        widgets.put(name, widget);
+    public void setWidgetNameTable(String name, Component widget) {
+        widgetNameTable.put(name, widget);
     }
 
-    public void setLongName(String longName, Component widget) {
-        if (longNames.containsKey(longName)) {
+    public void setWidgetLongNameTable(String longName, Component widget) {
+        if (widgetLongNameTable.containsKey(longName)) {
             logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName); //$NON-NLS-1$
         }
-        longNames.put(longName, widget);
+        widgetLongNameTable.put(longName, widget);
+    }
+
+    public void setProperties(String longName, Map properties) {
+        this.propertyTable.put(longName, properties);
+    }
+
+    public String getProperty(String longName, String key) {
+        if (!propertyTable.containsKey(longName)) {
+            return null;
+        }
+        return (String) propertyTable.get(longName).get(key);
+    }
+
+    public void scaleWidget(double h, double v,Insets insets) {
+        for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
+            String key = e.getKey();
+            Component component = e.getValue();
+
+            String px = getProperty(key, "x");
+            String py = getProperty(key, "y");
+            String pwidth = getProperty(key, "width");
+            String pheight = getProperty(key, "height");
+            if (px != null && py != null) {
+                int x, y;
+                x = (int) (Integer.parseInt(px) * h);
+                y = (int) (Integer.parseInt(py) * v);
+                component.setLocation(x, y);
+            }
+            if (pwidth != null && pheight != null) {
+                int width, height;
+                width = (int) (Integer.parseInt(pwidth) * h);
+                height = (int) (Integer.parseInt(pheight) * v);
+                if (component instanceof Window) {
+                    width += insets.right + insets.left;
+                    height += insets.top + insets.bottom;
+                }
+                component.setSize(width, height);
+            }
+        }
     }
 
     public static boolean handleAccels(KeyEvent e) {

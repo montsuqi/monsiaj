@@ -51,7 +51,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected final StringBuffer content;
 	protected final Map widgets;
 	protected final List topLevels;
-	protected final Map properties;
+	protected final HashMap properties;
 	protected final List signals;
 	protected final List accels;
 
@@ -170,6 +170,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	/** <p>SAX handler called at the start of a document.</p>
 	 * <p>Initializes parser state and variables.</p>
 	 */
+    @Override
 	public void startDocument() throws SAXException {
 		state = startState;
 		unknownDepth = 0;
@@ -183,6 +184,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	/** <p>SAX handler called at te end of a document.</p>
 	 */
+    @Override
 	public void endDocument() throws SAXException {
 		if (unknownDepth != 0) {
 			warnNotZero("unknownDepth", unknownDepth); //$NON-NLS-1$
@@ -195,6 +197,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	/** <p>SAX handler called at the start of an element.</p.
 	 * <p>This method delegates its work to current <var>state</var>'s startElement.</p>
 	 */
+    @Override
 	public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 		state.startElement(uri, localName, qName, attrs);
 		clearContent();
@@ -203,6 +206,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	/** <p>SAX handler called at the end of an element.</p>
 	 * <p>This method delegates its work to current <var>state</var>'s endElement.</p>
 	 */
+    @Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		state.endElement(uri, localName, qName);
 	}
@@ -239,14 +243,17 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		}
 	};
 
+    @Override
 	public void warning(SAXParseException e) throws SAXException {
 		logger.warn(e);
 	}
 
+    @Override
 	public void error(SAXParseException e) throws SAXException {
 		logger.fatal(e);
 	}
 
+    @Override
 	public void fatalError(SAXParseException e) throws SAXException {
 		logger.fatal(e);
 	}
@@ -258,7 +265,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		if (propertyType == PropertyType.NONE) {
 			// do nothing
 		} else if (propertyType == PropertyType.WIDGET) {
-			if (widget.getProperties().size() != 0) {
+			if (!widget.getProperties().isEmpty()) {
 				logger.warn("we already read all the props for this key, leaking"); //$NON-NLS-1$
 			}
 			widget.setProperties(properties);
@@ -266,7 +273,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		} else if (propertyType == PropertyType.ATK) {
 			properties.clear();
 		} else if (propertyType == PropertyType.CHILD) {
-			if (widget.getChildren().size() == 0) {
+			if (widget.getChildren().isEmpty()) {
 				logger.warn("no children, but have child properties"); //$NON-NLS-1$
 			} else {
 				ChildInfo info = widget.getLastChild();
@@ -418,6 +425,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	/** <p>A SAX hander called on character chunks.</p>
 	 */
+    @Override
 	public void characters(char[] chars, int start, int length) throws SAXException {
 		if (shouldAppendCharactersToContent()) {
 			content.append(chars, start, length);

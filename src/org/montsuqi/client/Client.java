@@ -79,7 +79,7 @@ public class Client implements Runnable {
 		String[] files = options.parse(Client.class.getName(), args);
 		
 		Configuration conf = new Configuration(Client.class);
-		String configName = conf.DEFAULT_CONFIG_NAME;
+		String configName = Configuration.DEFAULT_CONFIG_NAME;
 		conf.setPort(configName, options.getInt("port")); //$NON-NLS-1$
 		conf.setHost(configName, options.getString("host")); //$NON-NLS-1$
 		conf.setCache(configName, options.getString("cache")); //$NON-NLS-1$
@@ -117,7 +117,6 @@ public class Client implements Runnable {
 		Map styles = loadStyles();
 		int protocolVersion = conf.getProtocolVersion(configName);
 		long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
-		System.setProperty("expand_screen", String.valueOf(conf.getExpandScreen(configName)));
 		protocol = new Protocol(this, styles, protocolVersion, timerPeriod);
 
 		String user = conf.getUser(configName);

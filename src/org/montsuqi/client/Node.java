@@ -31,7 +31,7 @@ import java.util.Map;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.Window;
 
-class Node {
+public class Node {
 
 	private Interface xml;
 	private String name;

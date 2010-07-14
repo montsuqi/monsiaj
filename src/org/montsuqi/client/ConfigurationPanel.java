@@ -87,20 +87,17 @@ public class ConfigurationPanel extends JPanel {
     protected JTextField portEntry;
     protected JTextField appEntry;
     protected JRadioButton[] protocolVersionRadios;
-
     // SSL Tab
     protected JCheckBox useSSLCheckbox;
     protected JButton clientCertificateButton;
     protected JTextField clientCertificateEntry;
     protected JPasswordField exportPasswordEntry;
     protected JCheckBox saveClientCertificatePasswordCheckbox;
-
     // Others Tab
     protected JTextField styleEntry;
     protected JComboBox lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
-    protected JCheckBox expandScreenCheck;
     protected JCheckBox useLogViewerCheck;
     protected JCheckBox useTimerCheck;
     protected JTextField timerPeriodEntry;
@@ -199,6 +196,7 @@ public class ConfigurationPanel extends JPanel {
 
     final class TextAreaSelected extends FocusAdapter {
 
+        @Override
         public void focusGained(FocusEvent e) {
             Object o = e.getSource();
             if (!(o instanceof JTextComponent)) {
@@ -252,44 +250,38 @@ public class ConfigurationPanel extends JPanel {
         this.doPadding = doPadding;
         this.doChangeLookAndFeel = doChangeLookAndFeel;
         this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
-        initComponents();
-    }
-
-    protected void initComponents() {
         basicPanel = createBasicPanel();
         sslPanel = createSSLPanel();
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
-        loadConfiguration("");
     }
 
-    protected void loadConfiguration(String configName) {
+    public void loadConfiguration(String configName) {
         boolean newFlag = configName.equals("");
 
         // Basic tab
-        String user = newFlag ? conf.DEFAULT_USER : conf.getUser(configName);
-        String password = newFlag ? conf.DEFAULT_PASSWORD : conf.getPassword(configName);
-        boolean savePassword = newFlag ? conf.DEFAULT_SAVE_PASSWORD : conf.getSavePassword(configName);
-        String host = newFlag ? conf.DEFAULT_HOST : conf.getHost(configName);
-        int port = newFlag ? conf.DEFAULT_PORT : conf.getPort(configName);
-        String application = newFlag ? conf.DEFAULT_APPLICATION : conf.getApplication(configName);
+        String user = newFlag ? Configuration.DEFAULT_USER : conf.getUser(configName);
+        String password = newFlag ? Configuration.DEFAULT_PASSWORD : conf.getPassword(configName);
+        boolean savePassword = newFlag ? Configuration.DEFAULT_SAVE_PASSWORD : conf.getSavePassword(configName);
+        String host = newFlag ? Configuration.DEFAULT_HOST : conf.getHost(configName);
+        int port = newFlag ? Configuration.DEFAULT_PORT : conf.getPort(configName);
+        String application = newFlag ? Configuration.DEFAULT_APPLICATION : conf.getApplication(configName);
 
         // SSL tab
-        boolean useSSL = newFlag ? conf.DEFAULT_USE_SSL : conf.getUseSSL(configName);
-        String clientCertificate = newFlag ? conf.DEFAULT_CLIENT_CERTIFICATE : conf.getClientCertificateFileName(configName);
-        boolean saveClientCertificatePassword = newFlag ? conf.DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD : conf.getSaveClientCertificatePassword(configName);
-        String clientCertificatePassword = newFlag ? conf.DEFAULT_CLIENT_CERTIFICATE_PASSWORD : conf.getClientCertificatePassword(configName);
+        boolean useSSL = newFlag ? Configuration.DEFAULT_USE_SSL : conf.getUseSSL(configName);
+        String clientCertificate = newFlag ? Configuration.DEFAULT_CLIENT_CERTIFICATE : conf.getClientCertificateFileName(configName);
+        boolean saveClientCertificatePassword = newFlag ? Configuration.DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD : conf.getSaveClientCertificatePassword(configName);
+        String clientCertificatePassword = newFlag ? Configuration.DEFAULT_CLIENT_CERTIFICATE_PASSWORD : conf.getClientCertificatePassword(configName);
 
         // Others tab
-        String styleFileName = newFlag ? conf.DEFAULT_STYLES : conf.getStyleFileName(configName);
-        String lookAndFeelClassName = newFlag ? conf.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
-        String lafThemeFileName = newFlag ? conf.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
-        int protocolVersion = newFlag ? conf.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
-        boolean useLogViewer = newFlag ? conf.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
-        boolean expandScreen = newFlag ? conf.DEFAULT_EXPAND_SCREEN : conf.getExpandScreen(configName);
-        boolean useTimer = newFlag ? conf.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
-        long timerPeriod = newFlag ? conf.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
-        String properties = newFlag ? conf.DEFAULT_PROPERTIES : conf.getProperties(configName);
+        String styleFileName = newFlag ? Configuration.DEFAULT_STYLES : conf.getStyleFileName(configName);
+        String lookAndFeelClassName = newFlag ? Configuration.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
+        String lafThemeFileName = newFlag ? Configuration.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
+        int protocolVersion = newFlag ? Configuration.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
+        boolean useLogViewer = newFlag ? Configuration.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
+        boolean useTimer = newFlag ? Configuration.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
+        long timerPeriod = newFlag ? Configuration.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
+        String properties = newFlag ? Configuration.DEFAULT_PROPERTIES : conf.getProperties(configName);
 
         // Basic Tab
         userEntry.setText(user);
@@ -316,7 +308,6 @@ public class ConfigurationPanel extends JPanel {
                 lookAndFeelCombo.setSelectedItem(lafs[i].getName());
             }
         }
-        expandScreenCheck.setSelected(expandScreen);
         useLogViewerCheck.setSelected(useLogViewer);
         useTimerCheck.setSelected(useTimer);
         timerPeriodEntry.setText(String.valueOf(timerPeriod));
@@ -351,7 +342,6 @@ public class ConfigurationPanel extends JPanel {
             }
         }
         conf.setLAFThemeFileName(configName, lafThemeEntry.getText());
-        conf.setExpandScreen(configName, expandScreenCheck.isSelected());
         conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
         conf.setUseTimer(configName, useTimerCheck.isSelected());
         conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
@@ -394,7 +384,7 @@ public class ConfigurationPanel extends JPanel {
         return pf;
     }
 
-    protected JPanel createBasicPanel() {
+    private JPanel createBasicPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -476,7 +466,7 @@ public class ConfigurationPanel extends JPanel {
         saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
     }
 
-    protected JPanel createSSLPanel() {
+    private JPanel createSSLPanel() {
         int y;
         final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
 
@@ -552,7 +542,7 @@ public class ConfigurationPanel extends JPanel {
         }
     }
 
-    protected JPanel createOthersPanel() {
+    private JPanel createOthersPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -585,15 +575,7 @@ public class ConfigurationPanel extends JPanel {
                 new ThemeSelectionAction(lafThemeEntry, ".theme",
                 Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 
-        JPanel checkPanel1 = new JPanel();
-        checkPanel1.setLayout(new BoxLayout(checkPanel1, BoxLayout.X_AXIS));
-        expandScreenCheck = new JCheckBox();
         useLogViewerCheck = new JCheckBox();
-        checkPanel1.add(expandScreenCheck);
-        JPanel checkPanel1Inner = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        checkPanel1Inner.add(new JLabel(Messages.getString("ConfigurationPanel.use_log_viewer")));
-        checkPanel1Inner.add(useLogViewerCheck);
-        checkPanel1.add(checkPanel1Inner);
 
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
@@ -639,9 +621,9 @@ public class ConfigurationPanel extends JPanel {
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
 
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.expand_screen")),
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_log_viewer")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(checkPanel1,
+        panel.add(useLogViewerCheck,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
@@ -665,7 +647,7 @@ public class ConfigurationPanel extends JPanel {
         return panel;
     }
 
-    protected JPanel createInfoPanel() {
+    private JPanel createInfoPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -692,16 +674,16 @@ public class ConfigurationPanel extends JPanel {
 
         JPanel innerPanel = new JPanel();
         innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
-        innerPanel.setBorder(BorderFactory.createLineBorder((Color)SystemColor.controlDkShadow));
+        innerPanel.setBorder(BorderFactory.createLineBorder((Color) SystemColor.controlDkShadow));
         JLabel javaVersion = new JLabel(
-                Messages.getString("ConfigurationPanel.info_java_version") +
-                System.getProperty("java.version"));
+                Messages.getString("ConfigurationPanel.info_java_version")
+                + System.getProperty("java.version"));
         javaVersion.setHorizontalAlignment(SwingConstants.LEFT);
         JLabel osVersion = new JLabel(
-                Messages.getString("ConfigurationPanel.info_os_version") +
-                System.getProperty("os.name") + "-" +
-                System.getProperty("os.version") + "-" +
-                System.getProperty("os.arch"));
+                Messages.getString("ConfigurationPanel.info_os_version")
+                + System.getProperty("os.name") + "-"
+                + System.getProperty("os.version") + "-"
+                + System.getProperty("os.arch"));
         osVersion.setHorizontalAlignment(SwingConstants.LEFT);
         innerPanel.add(javaVersion);
         innerPanel.add(osVersion);
@@ -728,7 +710,7 @@ public class ConfigurationPanel extends JPanel {
 
         panel.add(innerPanel,
                 createConstraints(0, y, 4, 1, 1.0, 1.0));
-        y+=1;
+        y += 1;
 
 
         if (doPadding) {

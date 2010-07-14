@@ -23,12 +23,31 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.Component;
-
+import java.awt.Insets;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.util.prefs.Preferences;
 import javax.swing.JComponent;
+import org.montsuqi.monsia.Interface;
 
 /** <p>A JFrame wrapper.</p>
  */
-public class TopWindow extends Window {
+public class TopWindow extends Window implements ComponentListener {
+
+    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    private final int DEFAULT_WIDTH = 1024;
+    private final int DEFAULT_HEIGHT = 768;
+    private double hScale = 1.0;
+    private double vScale = 1.0;
+    private Interface xml;
+
+    public double getHScale() {
+        return hScale;
+    }
+
+    public double getVScale() {
+        return vScale;
+    }
 
     public void showWindow(Window window, boolean setLocation) {
         Component child = window.getChild();
@@ -39,27 +58,67 @@ public class TopWindow extends Window {
         this.getContentPane().removeAll();
         this.getContentPane().add(child);
         this.setTitle(window.getTitle());
-        this.setResizable(window.getAllow_Grow() && window.getAllow_Shrink());
-        this.setSize(window.getSize());
+        this.setResizable(true);
+
         if (!this.isVisible()) {
             this.setVisible(true);
         }
         ((JComponent) child).revalidate();
         ((JComponent) child).repaint();
-        if (setLocation) {
-            this.setLocation(window.getLocation());
-        }
+
         this.hideBusyCursor();
-// is this necessary?
-//        this.toFront();
         this.setEnabled(true);
         this.setChild(child);
         ((JComponent) child).requestFocusInWindow();
+        this.addComponentListener(this);
     }
 
     /** <p>Constructs a Window instance.</p>
      */
     public TopWindow() {
         super();
+
+        int x, y, width, height;
+        x = prefs.getInt(this.getClass().getName() + ".x", 0);
+        y = prefs.getInt(this.getClass().getName() + ".y", 0);
+        width = prefs.getInt(this.getClass().getName() + ".width", DEFAULT_WIDTH);
+        height = prefs.getInt(this.getClass().getName() + ".height", DEFAULT_HEIGHT);
+        this.setLocation(x, y);
+        this.setSize(width, height);
+    }
+
+    public void Scale() {
+        Insets insets = this.getInsets();
+        hScale = (this.getWidth() * 1.0 - insets.left - insets.right) / (DEFAULT_WIDTH * 1.0);
+        // the bottom 24 pixel is not visible in glade
+        vScale = (this.getHeight() * 1.0 - insets.top - insets.bottom) / (DEFAULT_HEIGHT * 1.0 - 24);
+    }
+
+    public void ReScale() {
+        Scale();
+        this.xml.scaleWidget(hScale, vScale,this.getInsets());
+    }
+
+    public void setXml(Interface xml) {
+        this.xml = xml;
+    }
+
+    public void componentResized(ComponentEvent ce) {
+        ReScale();
+        prefs.putInt(this.getClass().getName() + ".width", this.getWidth());
+        prefs.putInt(this.getClass().getName() + ".height", this.getHeight());
+    }
+
+    public void componentMoved(ComponentEvent ce) {
+        prefs.putInt(this.getClass().getName() + ".x", this.getX());
+        prefs.putInt(this.getClass().getName() + ".y", this.getY());
+    }
+
+    public void componentShown(ComponentEvent ce) {
+        // do nothing
+    }
+
+    public void componentHidden(ComponentEvent ce) {
+        // do nothing
     }
 }

@@ -37,7 +37,7 @@ public class WidgetInfo {
 	private String className;
 	private String name;
 	private WidgetInfo parent;
-	private final Map properties; // <Property>
+	private final HashMap properties; // <Property>
 	private final List signals; // <SignalInfo>
 	private final List accels; // <Accel>
 	private final LinkedList children; // <ChildInfo> public Object getChildren;

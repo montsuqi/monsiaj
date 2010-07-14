@@ -61,7 +61,6 @@ public class Configuration {
     private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
     private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
     private static final String LAF_THEME_KEY = "laf_theme"; //$NON-NLS-1$
-    private static final String EXPAND_SCREEN_KEY = "expand_screen"; //$NON-NLS-1$
     private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
     private static final String PROPERTIES_KEY = "properties"; //$NON-NLS-1$
     private static final String USE_TIMER_KEY = "use_timer"; //$NON-NLS-1$
@@ -112,8 +111,6 @@ public class Configuration {
     static final String DEFAULT_LOOK_AND_FEEL_CLASS_NAME = UIManager.getSystemLookAndFeelClassName();
     /** <p>Default look and feel theme filename: "".</p> */
     static final String DEFAULT_LAF_THEME = "";
-    /** <p>Default value of do expand screen: false.</p> */
-    static final boolean DEFAULT_EXPAND_SCREEN = false;
     /** <p>Default value of use log viewer checkbox: false.</p> */
     static final boolean DEFAULT_USE_LOG_VIEWER = false;
     /** <p>Default value of properties: false.</p> */
@@ -176,7 +173,7 @@ public class Configuration {
             }
             newPref.flush();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println(ex);
         }
     }
 
@@ -243,7 +240,7 @@ public class Configuration {
                 Preferences newConfig = prefs.node(CONFIG_NODE + newName);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 oldConfig.exportNode(out);
-                newConfig.importPreferences(new ByteArrayInputStream(out.toByteArray()));
+                Preferences.importPreferences(new ByteArrayInputStream(out.toByteArray()));
                 newConfig.flush();
                 deleteConfiguration(oldName);
                 save();
@@ -604,24 +601,6 @@ public class Configuration {
         setString(configName, LAF_THEME_KEY, styles);
     }
 
-    /** <p>Returns the value of do expand screen.</p>
-     *
-     * @param configName the configuration name.
-     * @return the value of do expand screen.
-     */
-    public boolean getExpandScreen(String configName) {
-        return getBoolean(configName, EXPAND_SCREEN_KEY, DEFAULT_EXPAND_SCREEN);
-    }
-
-    /** <p>Sets the value of do expand screen.</p>
-     *
-     * @param configName the configuration name.
-     * @param flag new value of do expand screen.
-     */
-    public void setExpandScreen(String configName, boolean flag) {
-        setBoolean(configName, EXPAND_SCREEN_KEY, flag);
-    }
-
     /** <p>Returns the value of use log viewer.</p>
      *
      * @param configName the configuration name.
@@ -854,7 +833,7 @@ public class Configuration {
         }
     }
 
-    protected boolean nodeExists(String configName) {
+    private boolean nodeExists(String configName) {
         boolean ret = false;
         try {
             ret = prefs.nodeExists(CONFIG_NODE + configName);

@@ -36,12 +36,6 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	 */
 	JMAReceiptConfigurationPanel(Configuration conf, boolean doPadding, boolean doChangeLookAndFeel) {
 		super(conf, doPadding, doChangeLookAndFeel);
-	}
-
-	/** <p>Creates components and disable some so users cannot alter preset values.</p>
-	 */
-	protected void initComponents() {
-		super.initComponents();
 		appEntry.setEditable(false);
 		for (int i = 0; i < protocolVersionRadios.length; i++) {
 			protocolVersionRadios[i].setEnabled(false);
@@ -51,13 +45,15 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	/** <p>Updates configuration ofject using values set to UI.</p>
 	 * <p>It also ensures some configuration remain preset values.</p>
 	 */
+    @Override
 	protected void saveConfiguration(String configName) {
 		super.saveConfiguration(configName);
 		conf.setApplication(configName, "orca00"); //$NON-NLS-1$
 		conf.setProtocolVersion(configName, 1);
 	}
 
-	protected void loadConfiguration(String configName) {
+    @Override
+	public void loadConfiguration(String configName) {
 		super.loadConfiguration(configName);
 		appEntry.setText("panda:orca00");
 		protocolVersionRadios[0].setSelected(true);
