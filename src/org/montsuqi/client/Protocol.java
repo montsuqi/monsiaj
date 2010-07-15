@@ -175,14 +175,6 @@ public class Protocol extends Connection {
                 stopTimer(parent);
             }
             dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
-/*
-            dialog.setLocation(
-                    topWindow.getX() + window.getX(),
-                    topWindow.getY() + window.getY());
-            if (!dialog.isVisible()) {
-                dialog.setVisible(true);
-            }
-*/
             dialog.toFront();
             resetTimer(dialog);
             if (!dialogStack.contains(dialog)) {
