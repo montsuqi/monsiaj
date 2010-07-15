@@ -163,13 +163,12 @@ public class Protocol extends Connection {
         }
         xml = node.getInterface();
         topWindow.Scale();
-        xml.scaleWidget(topWindow.getHScale(), topWindow.getVScale(),topWindow.getInsets());
+        xml.scaleWidget(topWindow.getHScale(), topWindow.getVScale(), topWindow.getInsets());
         Window window = node.getWindow();
         window.setSessionTitle(sessionTitle);
         if (window.isDialog()) {
             Component parent = topWindow;
             JDialog dialog;
-            boolean isInit;
 
             topWindow.showBusyCursor();
             for (Component c : dialogStack) {
@@ -177,14 +176,14 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
-            isInit = (window.getDialog() == null);
             dialog = window.createDialog(parent);
-            if (isInit) {
-                dialog.setLocation(
-                        topWindow.getX() + window.getX(),
-                        topWindow.getY() + window.getY());
+            dialog.setLocation(
+                    topWindow.getX() + window.getX(),
+                    topWindow.getY() + window.getY());
+            if (!dialog.isVisible()) {
+                dialog.setVisible(true);
             }
-            dialog.setVisible(true);
+
             dialog.toFront();
             resetTimer(dialog);
             if (!dialogStack.contains(dialog)) {
