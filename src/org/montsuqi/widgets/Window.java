@@ -52,7 +52,7 @@ public class Window extends JFrame {
         }
     }
 
-    public JDialog createDialog(Component parent) {
+    public JDialog createDialog(Component parent,int tx, int ty) {
         if (dialog == null) {
             if (parent instanceof Frame) {
                 dialog = new JDialog((Frame) parent, this.getTitle(), false);
@@ -66,6 +66,7 @@ public class Window extends JFrame {
             dialog.getContentPane().add(child);
             dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            dialog.setLocation(tx + this.getX(),ty + this.getY());
         }
         dialog.setSize(this.getSize());
         dialog.setTitle(this.getTitle());

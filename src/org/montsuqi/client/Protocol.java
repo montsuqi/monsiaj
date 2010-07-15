@@ -64,7 +64,6 @@ public class Protocol extends Connection {
     private boolean protocol1;
     private boolean protocol2;
     private boolean isReceiving;
-    private boolean isFirstShowWindow;
     private long timerPeriod;
     private HashMap nodeTable;
     private WidgetValueManager valueManager;
@@ -102,7 +101,6 @@ public class Protocol extends Connection {
         }
         assert protocol1 ^ protocol2;
         isReceiving = false;
-        isFirstShowWindow = true;
         nodeTable = new HashMap();
         valueManager = new WidgetValueManager(this, styleMap);
         this.timerPeriod = timerPeriod;
@@ -176,14 +174,15 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
-            dialog = window.createDialog(parent);
+            dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
+/*
             dialog.setLocation(
                     topWindow.getX() + window.getX(),
                     topWindow.getY() + window.getY());
             if (!dialog.isVisible()) {
                 dialog.setVisible(true);
             }
-
+*/
             dialog.toFront();
             resetTimer(dialog);
             if (!dialogStack.contains(dialog)) {
@@ -191,10 +190,8 @@ public class Protocol extends Connection {
             }
         } else {
             topWindow.setXml(xml);
-            topWindow.showWindow(window, isFirstShowWindow);
-            if (isFirstShowWindow) {
-                isFirstShowWindow = false;
-            }
+            topWindow.showWindow(window);
+            topWindow.ReScale();
             resetTimer(window.getChild());
         }
         logger.leave();

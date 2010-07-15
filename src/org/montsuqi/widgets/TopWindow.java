@@ -49,7 +49,7 @@ public class TopWindow extends Window implements ComponentListener {
         return vScale;
     }
 
-    public void showWindow(Window window, boolean setLocation) {
+    public void showWindow(Window window) {
         Component child = window.getChild();
         if (!child.isVisible()) {
             child.setVisible(true);
