@@ -52,7 +52,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.JLabel;
 import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.PDFPrint;
@@ -322,8 +321,6 @@ public class PandaPreview extends JPanel {
         toolbar.add(nextAction);
         toolbar.add(pageEntry);
         toolbar.add(pageLabel);
-        toolbar.add(saveAction);
-        toolbar.add(printAction);
 
         combo = new JComboBox(SCALE_STRING);
         combo.setSelectedIndex(1);
@@ -337,6 +334,10 @@ public class PandaPreview extends JPanel {
         final Dimension preferredSize = combo.getPreferredSize();
         combo.setMaximumSize(preferredSize);
         toolbar.add(combo);
+
+        toolbar.add(saveAction);
+        toolbar.add(printAction);
+
         add(toolbar, BorderLayout.NORTH);
 
         panel = new PDFPanel();
