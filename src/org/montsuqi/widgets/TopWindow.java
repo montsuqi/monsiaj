@@ -37,6 +37,7 @@ public class TopWindow extends Window implements ComponentListener {
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private final int DEFAULT_WIDTH = 1024;
     private final int DEFAULT_HEIGHT = 768;
+    private final int FOOTER = 24;
     private double hScale = 1.0;
     private double vScale = 1.0;
     private Interface xml;
@@ -82,16 +83,23 @@ public class TopWindow extends Window implements ComponentListener {
         x = prefs.getInt(this.getClass().getName() + ".x", 0);
         y = prefs.getInt(this.getClass().getName() + ".y", 0);
         width = prefs.getInt(this.getClass().getName() + ".width", DEFAULT_WIDTH);
-        height = prefs.getInt(this.getClass().getName() + ".height", DEFAULT_HEIGHT);
+        height = prefs.getInt(this.getClass().getName() + ".height", DEFAULT_HEIGHT - FOOTER);
+
+        if (System.getProperty("monsia.window.default_size") != null) {
+            width = DEFAULT_WIDTH;
+            height = DEFAULT_HEIGHT - FOOTER;
+        }
+
         this.setLocation(x, y);
         this.setSize(width, height);
     }
 
     public void Scale() {
         Insets insets = this.getInsets();
-        hScale = (this.getWidth() * 1.0 - insets.left - insets.right) / (DEFAULT_WIDTH * 1.0);
+        hScale = (this.getWidth() * 1.0 - insets.left - insets.right) / (DEFAULT_WIDTH);
         // the bottom 24 pixel is not visible in glade
-        vScale = (this.getHeight() * 1.0 - insets.top - insets.bottom) / (DEFAULT_HEIGHT * 1.0 - 24);
+        vScale = (this.getHeight() * 1.0 - insets.top - insets.bottom) / 
+                (DEFAULT_HEIGHT - FOOTER);
     }
 
     public void ReScale() {
