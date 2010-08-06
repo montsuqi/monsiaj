@@ -23,7 +23,6 @@ copies.
 package org.montsuqi.monsia;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -44,6 +43,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.xml.parsers.SAXParser;
@@ -54,6 +55,7 @@ import org.montsuqi.client.SignalHandler;
 import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.OptionMenu;
+import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaFocusManager;
 
 /** <p>An class that represents the result of parsing Glade's interface definition.
@@ -339,7 +341,7 @@ public class Interface {
         return (String) propertyTable.get(longName).get(key);
     }
 
-    public void scaleWidget(double h, double v,Insets insets) {
+    public void scaleWidget(double h, double v, Insets insets) {
         for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
             String key = e.getKey();
             Component component = e.getValue();
@@ -352,7 +354,17 @@ public class Interface {
                 int x, y;
                 x = (int) (Integer.parseInt(px) * h);
                 y = (int) (Integer.parseInt(py) * v);
-                component.setLocation(x, y);
+                if (component instanceof JTextArea || component instanceof PandaCList) {
+                    Component parent = component.getParent();
+                    if (parent != null) {
+                        Component grandParent = parent.getParent();
+                        if (grandParent != null && grandParent instanceof JScrollPane) {
+                            grandParent.setLocation(x, y);
+                        }
+                    }
+                } else {
+                    component.setLocation(x, y);
+                }
             }
             if (pwidth != null && pheight != null) {
                 int width, height;
@@ -362,8 +374,19 @@ public class Interface {
                     width += insets.right + insets.left;
                     height += insets.top + insets.bottom;
                 }
-                component.setSize(width, height);
-                component.validate();
+                if (component instanceof JTextArea || component instanceof PandaCList) {
+                    Component parent = component.getParent();
+                    if (parent != null) {
+                        Component grandParent = parent.getParent();
+                        if (grandParent != null && grandParent instanceof JScrollPane) {
+                            grandParent.setSize(width, height);
+                            grandParent.validate();
+                        }
+                    }
+                } else {
+                    component.setSize(width, height);
+                    component.validate();
+                }
             }
         }
     }

@@ -80,9 +80,10 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 	}
 
 	public PandaCList() {
+                super();
 		setFocusable(false);
 		addPropertyChangeListener("model", this); //$NON-NLS-1$
-		setAutoResizeMode(AUTO_RESIZE_OFF);
+		setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
 		setAutoscrolls(true);
 		initActions();
 		this.setShowGrid(false);
@@ -131,6 +132,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		}
 	}
 
+    @Override
 	public void createDefaultColumnsFromModel() {
 		TableColumnModel model = getColumnModel();
 		int n = getColumnCount();
@@ -150,16 +152,19 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		}
 	}
 
+    @Override
 	protected TableColumnModel createDefaultColumnModel() {
 		TableColumnModel model = super.createDefaultColumnModel();
 		model.setSelectionModel(createDefaultSelectionModel());
 		return model;
 	}
 
+    @Override
 	protected ListSelectionModel createDefaultSelectionModel() {
 		return new PandaCListSelectionModel();
 	}
 
+    @Override
 	public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
 		super.changeSelection(rowIndex, columnIndex, true, extend);
 	}
@@ -170,6 +175,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		column.setHeaderRenderer(renderer);
 	}
 
+    @Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
 		TableCellRenderer headerRenderer = columnModel.getColumn(column).getHeaderRenderer();
 		if (headerRenderer != null && headerRenderer instanceof CListHeaderRenderer) {
@@ -204,12 +210,14 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		}
 	}
 
+    @Override
 	public void tableChanged(TableModelEvent e) {
 		super.tableChanged(e);
 		TableModel model = getModel();
 		setFocusable(model != null && model.getRowCount() != 0 && model.getColumnCount() != 0);
 	}
 
+    @Override
 	public void setFocusable(boolean focusable) {
 		super.setFocusable(focusable);
 		final Container parent = getParent();
