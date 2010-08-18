@@ -36,15 +36,19 @@ public class VSeparator extends JSeparator {
 		super(SwingConstants.VERTICAL);
 	}
 
+    @Override
 	public void setBounds(int x, int y, int width, int height) {
 		// displacement to fit Gtk+'s way of placeing separators
 		x += width / 2;
+                width = 1;
 		super.setBounds(x, y, width, height);
 	}
 
+    @Override
 	public void setBounds(Rectangle r) {
 		// displacement to fit Gtk+'s way of placeing separators
 		r.x += r.width / 2;
+                r.width = 1;
 		super.setBounds(r);
 	}
 }

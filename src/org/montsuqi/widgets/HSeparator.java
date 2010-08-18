@@ -36,15 +36,19 @@ public class HSeparator extends JSeparator {
 		super(SwingConstants.HORIZONTAL);
 	}
 
+    @Override
 	public void setBounds(int x, int y, int width, int height) {
 		// displacement to fit Gtk+'s way of placeing separators
 		y += height / 2;
+                height = 1;
 		super.setBounds(x, y, width, height);
 	}
 
+    @Override
 	public void setBounds(Rectangle r) {
 		// displacement to fit Gtk+'s way of placeing separators
 		r.y += r.height / 2;
+                r.height = 1;
 		super.setBounds(r);
 	}
 }
