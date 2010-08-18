@@ -71,6 +71,10 @@ public class WidgetInfo {
 		return getParent().getLongName() + '.' + getName();
 	}
 
+        public void removeProperty(String key) {
+            properties.remove(key);
+        }
+
 	public String getClassName() {
 		return className;
 	}

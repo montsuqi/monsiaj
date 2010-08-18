@@ -23,6 +23,7 @@ copies.
 package org.montsuqi.monsia;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -382,12 +383,13 @@ public class Interface {
                             grandParent.setSize(width, height);
                             grandParent.validate();
                         }
+                        parent.validate();
                     }
                 } else {
                     component.setSize(width, height);
-                    component.validate();
                 }
             }
+            component.validate();
         }
     }
 

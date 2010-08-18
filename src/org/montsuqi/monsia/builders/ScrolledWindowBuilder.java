@@ -36,6 +36,7 @@ import org.montsuqi.monsia.WidgetInfo;
 /** <p>A builder to create ScrolledWindow widgets.</p>
  */
 class ScrolledWindowBuilder extends ContainerBuilder {
+    @Override
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		if (info.getChildren().size() != 1) {
 			throw new WidgetBuildingException("only one child for a ScrolledWindow"); //$NON-NLS-1$
@@ -43,6 +44,8 @@ class ScrolledWindowBuilder extends ContainerBuilder {
 		JScrollPane scroll = (JScrollPane)parent;
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
+                wInfo.removeProperty("width");
+                wInfo.removeProperty("height");
 		Component child = buildWidget(xml, wInfo, parent);
 		if (child != null && child instanceof JViewport) {
 			scroll.setViewport((JViewport)child);
