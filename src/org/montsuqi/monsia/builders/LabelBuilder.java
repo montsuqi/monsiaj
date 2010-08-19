@@ -25,6 +25,7 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
+import javax.swing.BorderFactory;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -37,11 +38,12 @@ import org.montsuqi.util.ParameterConverter;
  */
 public class LabelBuilder extends WidgetBuilder {
 
+    @Override
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		// In Gtk+ entry widgets, can_focus property is set false by default.
 		// To simulate Gtk+ behavior, temporally set can_focus to false.
 		final Component c = super.buildSelf(xml, parent, info);
-		final JLabel label = (JLabel)c;	
+		final JLabel label = (JLabel)c;
 
 		boolean doWrap = false;
 		if (info.getProperty("wrap") != null) {

@@ -31,8 +31,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
+import javax.swing.BorderFactory;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -273,6 +275,11 @@ public class WidgetBuilder {
             if (widget instanceof Container) {
                 builder.buildChildren(xml, (Container) widget, info);
             }
+           if (System.getProperty("monsia.debug.widget.border") != null) {
+            if (widget instanceof JComponent) {
+                ((JComponent)widget).setBorder(BorderFactory.createEtchedBorder());
+            }
+        }
             return widget;
         } catch (Exception e) {
             logger.warn(e);
