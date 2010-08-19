@@ -322,9 +322,10 @@ public class WidgetBuilder {
     protected void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
         String name = info.getName();
 
-        while(xml.containWidgetNameTable(name)) {
+        while(xml.containWidgetLongNameTable(info.getLongName())) {
             name += "_";
             info.setName(name);
+            System.out.println("name overlap! rename to " + info.getLongName());
         }
 
         widget.setName(info.getLongName());

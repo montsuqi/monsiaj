@@ -323,8 +323,8 @@ public class Interface {
         widgetNameTable.put(name, widget);
     }
 
-    public boolean containWidgetNameTable(String name) {
-        return widgetNameTable.containsKey(name);
+    public boolean containWidgetLongNameTable(String name) {
+        return widgetLongNameTable.containsKey(name);
     }
 
     public void setWidgetLongNameTable(String longName, Component widget) {
