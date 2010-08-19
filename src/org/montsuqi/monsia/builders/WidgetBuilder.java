@@ -275,11 +275,14 @@ public class WidgetBuilder {
             if (widget instanceof Container) {
                 builder.buildChildren(xml, (Container) widget, info);
             }
-           if (System.getProperty("monsia.debug.widget.border") != null) {
-            if (widget instanceof JComponent) {
-                ((JComponent)widget).setBorder(BorderFactory.createEtchedBorder());
+            if (System.getProperty("monsia.debug.widget.border") != null) {
+                if (widget instanceof JComponent) {
+                    JComponent jcomponent = (JComponent) widget;
+                    if (jcomponent.getBorder() == null) {
+                        jcomponent.setBorder(BorderFactory.createEtchedBorder());
+                    }
+                }
             }
-        }
             return widget;
         } catch (Exception e) {
             logger.warn(e);
@@ -322,7 +325,7 @@ public class WidgetBuilder {
     protected void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
         String name = info.getName();
 
-        while(xml.containWidgetLongNameTable(info.getLongName())) {
+        while (xml.containWidgetLongNameTable(info.getLongName())) {
             name += "_";
             info.setName(name);
             System.out.println("name overlap! rename to " + info.getLongName());
@@ -331,7 +334,7 @@ public class WidgetBuilder {
         widget.setName(info.getLongName());
         xml.setWidgetNameTable(info.getName(), widget);
         xml.setWidgetLongNameTable(info.getLongName(), widget);
-        xml.setProperties(info.getLongName(),info.getProperties());
+        xml.setProperties(info.getLongName(), info.getProperties());
     }
 
     protected void setSignals(Interface xml, Component widget, WidgetInfo info) {
