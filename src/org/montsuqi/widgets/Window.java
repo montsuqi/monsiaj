@@ -68,7 +68,6 @@ public class Window extends JFrame {
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             dialog.setLocation(tx + this.getX(),ty + this.getY());
         }
-        dialog.setSize(this.getSize());
         dialog.setTitle(this.getTitle());
         if (!dialog.isEnabled()) {
             dialog.setEnabled(true);
@@ -76,6 +75,8 @@ public class Window extends JFrame {
         if (!dialog.isVisible()) {
             dialog.setVisible(true);
         }
+        dialog.setSize(this.getSize());
+        dialog.validate();
         return dialog;
     }
 

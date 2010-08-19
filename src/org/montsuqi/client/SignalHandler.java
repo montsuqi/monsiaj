@@ -411,7 +411,6 @@ public abstract class SignalHandler {
         registerHandler("keypress_filter", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
-System.out.println("keypress_filter" + (String)userData);
                 Component next = con.getInterface().getWidget((String) userData);
                 next.requestFocus();
             }
