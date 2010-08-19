@@ -320,6 +320,13 @@ public class WidgetBuilder {
     }
 
     protected void setCommonParameters(Interface xml, Component widget, WidgetInfo info) {
+        String name = info.getName();
+
+        while(xml.containWidgetNameTable(name)) {
+            name += "_";
+            info.setName(name);
+        }
+
         widget.setName(info.getLongName());
         xml.setWidgetNameTable(info.getName(), widget);
         xml.setWidgetLongNameTable(info.getLongName(), widget);

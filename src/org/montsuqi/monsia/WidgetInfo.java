@@ -87,7 +87,7 @@ public class WidgetInfo {
 		this.className = className;
 	}
 
-	void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 

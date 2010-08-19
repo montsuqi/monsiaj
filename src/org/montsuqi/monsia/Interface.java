@@ -23,7 +23,6 @@ copies.
 package org.montsuqi.monsia;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
@@ -322,6 +321,10 @@ public class Interface {
 
     public void setWidgetNameTable(String name, Component widget) {
         widgetNameTable.put(name, widget);
+    }
+
+    public boolean containWidgetNameTable(String name) {
+        return widgetNameTable.containsKey(name);
     }
 
     public void setWidgetLongNameTable(String longName, Component widget) {
