@@ -175,8 +175,9 @@ public class Protocol extends Connection {
                 stopTimer(parent);
             }
             dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
-            dialog.toFront();
             resetTimer(dialog);
+            dialog.toFront();
+            dialog.validate();
             if (!dialogStack.contains(dialog)) {
                 dialogStack.add(dialog);
             }
@@ -185,6 +186,7 @@ public class Protocol extends Connection {
             topWindow.showWindow(window);
             topWindow.ReScale();
             resetTimer(window.getChild());
+            topWindow.validate();
         }
         logger.leave();
     }

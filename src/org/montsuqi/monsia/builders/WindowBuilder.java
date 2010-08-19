@@ -24,7 +24,6 @@ package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.lang.reflect.Method;
 
 import java.util.Iterator;
 import javax.swing.JMenuBar;
@@ -32,7 +31,7 @@ import javax.swing.RootPaneContainer;
 import org.montsuqi.monsia.ChildInfo;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.WidgetInfo;
-import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.widgets.Fixed;
 import org.montsuqi.widgets.Window;
 
 /** <p>A builder to create Window(top level) widget.</p>
@@ -41,6 +40,7 @@ import org.montsuqi.widgets.Window;
  */
 public class WindowBuilder extends ContainerBuilder {
 
+    @Override
     Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
         Component c = super.buildSelf(xml, parent, info);
         Window w = (Window) c;
@@ -63,6 +63,7 @@ public class WindowBuilder extends ContainerBuilder {
         return c;
     }
 
+    @Override
     void buildChildren(Interface xml, Container parent, WidgetInfo info) {
         Window w = (Window) parent;
         Iterator i = info.getChildren().iterator();
@@ -78,6 +79,10 @@ public class WindowBuilder extends ContainerBuilder {
                 xml.setMenuBar((JMenuBar) child);
             } else {
                 w.setChild(child);
+            }
+            if (child instanceof Fixed) {
+                wInfo.setProperty("width", "1024");
+                wInfo.setProperty("height", "768");
             }
         }
     }

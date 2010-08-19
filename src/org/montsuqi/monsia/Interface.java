@@ -383,13 +383,11 @@ public class Interface {
                             grandParent.setSize(width, height);
                             grandParent.validate();
                         }
-                        parent.validate();
                     }
                 } else {
                     component.setSize(width, height);
                 }
             }
-            component.validate();
         }
     }
 

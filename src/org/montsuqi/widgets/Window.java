@@ -76,7 +76,7 @@ public class Window extends JFrame {
             dialog.setVisible(true);
         }
         dialog.setSize(this.getSize());
-        dialog.validate();
+//        dialog.validate();
         return dialog;
     }
 
