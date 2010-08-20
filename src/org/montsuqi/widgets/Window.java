@@ -47,12 +47,14 @@ public class Window extends JFrame {
 
     public void destroyDialog() {
         if (dialog != null) {
-            dialog.setEnabled(false);
+            child.setVisible(false);
+            child.setEnabled(false);
             dialog.setVisible(false);
+            dialog.setEnabled(false);
         }
     }
 
-    public JDialog createDialog(Component parent,int tx, int ty) {
+    public JDialog createDialog(Component parent) {
         if (dialog == null) {
             if (parent instanceof Frame) {
                 dialog = new JDialog((Frame) parent, this.getTitle(), false);
@@ -66,16 +68,13 @@ public class Window extends JFrame {
             dialog.getContentPane().add(child);
             dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-            dialog.setLocation(tx + this.getX(),ty + this.getY());
+            dialog.setSize(this.getSize());
         }
-        dialog.setSize(this.getSize());
         dialog.setTitle(this.getTitle());
-        if (!dialog.isEnabled()) {
-            dialog.setEnabled(true);
-        }
-        if (!dialog.isVisible()) {
-            dialog.setVisible(true);
-        }
+        if (!dialog.isEnabled())dialog.setEnabled(true);
+        if (!dialog.isVisible())dialog.setVisible(true);
+        if (!child.isEnabled())child.setEnabled(true);
+        if (!child.isVisible())child.setVisible(true);
         return dialog;
     }
 
@@ -124,7 +123,7 @@ public class Window extends JFrame {
                 });
             }
         });
-        getGlassPane().setVisible(false);
+        hideBusyCursor();
     }
 
     /** <p>Show the window is busy by changing the mouse cursor to wait cursor.
@@ -145,7 +144,6 @@ public class Window extends JFrame {
      *
      * @return true if this window is active. false otherwise.
      */
-    @Override
     public boolean isActive() {
         return !getGlassPane().isVisible();
     }
