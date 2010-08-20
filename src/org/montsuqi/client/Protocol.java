@@ -527,7 +527,6 @@ public class Protocol extends Connection {
                 case ScreenType.NEW_WINDOW:
                 case ScreenType.CHANGE_WINDOW:
                     this.windowName = wName;
-System.out.println("current new change:"+wName);
                     widgetName = new StringBuffer(wName);
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {
