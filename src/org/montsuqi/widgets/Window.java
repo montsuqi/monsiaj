@@ -47,6 +47,8 @@ public class Window extends JFrame {
 
     public void destroyDialog() {
         if (dialog != null) {
+            child.setVisible(false);
+            child.setVisible(true);
             dialog.setEnabled(false);
             dialog.setVisible(false);
         }
@@ -75,8 +77,14 @@ public class Window extends JFrame {
         if (!dialog.isVisible()) {
             dialog.setVisible(true);
         }
+        if (!child.isEnabled()) {
+            child.setEnabled(true);
+        }
+        if (!child.isVisible()) {
+            child.setVisible(true);
+        }
         dialog.setSize(this.getSize());
-//        dialog.validate();
+        dialog.requestFocus();
         return dialog;
     }
 

@@ -235,7 +235,6 @@ public class WidgetBuilder {
         Font font = (Font) UIManager.get(key);
         if (font != null) {
             font = creator.modifyFont(font);
-//			font = ScreenScale.scale(font);
             UIManager.put(key, font);
         }
     }
@@ -277,9 +276,11 @@ public class WidgetBuilder {
             }
             if (System.getProperty("monsia.debug.widget.border") != null) {
                 if (widget instanceof JComponent) {
-                    JComponent jcomponent = (JComponent) widget;
-                    if (jcomponent.getBorder() == null) {
-                        jcomponent.setBorder(BorderFactory.createEtchedBorder());
+                    if (!(widget instanceof JViewport)) {
+                        JComponent jcomponent = (JComponent) widget;
+                        if (jcomponent.getBorder() == null) {
+                            jcomponent.setBorder(BorderFactory.createEtchedBorder());
+                        }
                     }
                 }
             }

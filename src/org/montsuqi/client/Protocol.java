@@ -78,6 +78,11 @@ public class Protocol extends Connection {
     private static final int PingTimerPeriod = 10 * 1000;
     private javax.swing.Timer pingTimer;
     private PrintAgent printAgent;
+    private String windowName;
+
+    public String getWindowName() {
+        return windowName;
+    }
 
     public Window getTopWindow() {
         return topWindow;
@@ -176,7 +181,7 @@ public class Protocol extends Connection {
             }
             dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
             resetTimer(dialog);
-            dialog.toFront();
+//            dialog.toFront();
             dialog.validate();
             if (!dialogStack.contains(dialog)) {
                 dialogStack.add(dialog);
@@ -501,19 +506,18 @@ public class Protocol extends Connection {
 
     synchronized void getScreenData() throws IOException {
         logger.enter();
-        String windowName = null;
-        String currentWindowName = null;
+        String wName = null;
         Node node;
         checkScreens(false);
         sendPacketClass(PacketClass.GetData);
         sendLong(0); // get all data // In Java: int=>32bit, long=>64bit
         byte c;
         while ((c = receivePacketClass()) == PacketClass.WindowName) {
-            windowName = receiveString();
-            logger.debug("window: {0}", windowName);
+            wName = receiveString();
+            logger.debug("window: {0}", wName);
             int type = receiveInt();
 
-            node = getNode(windowName);
+            node = getNode(wName);
             if (node != null) {
                 xml = node.getInterface();
             }
@@ -524,14 +528,14 @@ public class Protocol extends Connection {
                 case ScreenType.CURRENT_WINDOW:
                 case ScreenType.NEW_WINDOW:
                 case ScreenType.CHANGE_WINDOW:
-                    currentWindowName = windowName;
-                    widgetName = new StringBuffer(windowName);
+                    this.windowName = wName;
+                    widgetName = new StringBuffer(wName);
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {
                         receiveValue(widgetName, widgetName.length());
                     }
                     if (type != ScreenType.CURRENT_WINDOW && xml != null) {
-                        Component widget = xml.getWidget(windowName);
+                        Component widget = xml.getWidget(wName);
                         if (widget != null) {
                             resetScrollPane(widget);
                         }
@@ -540,7 +544,7 @@ public class Protocol extends Connection {
                 case ScreenType.JOIN_WINDOW:
                 case ScreenType.CLOSE_WINDOW:
                 default:
-                    closeWindow(windowName);
+                    closeWindow(wName);
                     c = receivePacketClass();
                     break;
             }
@@ -550,12 +554,12 @@ public class Protocol extends Connection {
                 // fatal error
             }
         }
-        showWindow(currentWindowName);
+        showWindow(this.windowName);
         if (c == PacketClass.FocusName) {
             String focusWindowName = receiveString();
             String focusWidgetName = receiveString();
             node = getNode(focusWindowName);
-            if (node != null && node.getInterface() != null && focusWindowName.equals(currentWindowName)) {
+            if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
                 final Component widget = xml.getWidget(focusWidgetName);
                 if (widget != null && widget.isFocusable()) {
                     EventQueue.invokeLater(new Runnable() {
@@ -740,8 +744,12 @@ public class Protocol extends Connection {
         return isReceiving;
     }
 
-    public void setIsReceiving(boolean isReceiving) {
-        this.isReceiving = isReceiving;
+    public void beginReceiving() {
+        this.isReceiving = true;
+    }
+
+    public void endReceiving() {
+        this.isReceiving = false;
     }
 
     private Node getNode(String name) {

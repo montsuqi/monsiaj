@@ -179,7 +179,7 @@ public abstract class SignalHandler {
                         return;
                     }
                     try {
-                        con.setIsReceiving(true);
+                        con.beginReceiving();
                         if (widget instanceof JComponent) {
                             if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
                                 con._addChangedWidget(widget);
@@ -193,6 +193,9 @@ public abstract class SignalHandler {
                             window = SwingUtilities.windowForComponent(widget);
                         }
                         if (window == null || widget == null) {
+                            return;
+                        }
+                        if (!window.getName().equals(con.getWindowName())) {
                             return;
                         }
                         String windowName = getWidgetName(window.getName());
@@ -215,7 +218,7 @@ public abstract class SignalHandler {
                             unblockChangedHandlers();
                         }
                     } finally {
-                        con.setIsReceiving(false);
+                        con.endReceiving();
                     }
                 }
             }
