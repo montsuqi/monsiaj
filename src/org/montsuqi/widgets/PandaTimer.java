@@ -60,6 +60,7 @@ public class PandaTimer extends JComponent {
 		});
 		timer.setRepeats(true);
 		startTimer();
+                this.setFocusable(false);
 	}
 
 	public void startTimer() {
@@ -131,6 +132,7 @@ public class PandaTimer extends JComponent {
 		}
 	}
 
+    @Override
 	protected void finalize() throws Throwable {
 		stopTimer();
 		super.finalize();

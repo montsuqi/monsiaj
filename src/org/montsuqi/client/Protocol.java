@@ -181,7 +181,6 @@ public class Protocol extends Connection {
             }
             dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
             resetTimer(dialog);
-//            dialog.toFront();
             dialog.validate();
             if (!dialogStack.contains(dialog)) {
                 dialogStack.add(dialog);
@@ -210,11 +209,12 @@ public class Protocol extends Connection {
             if (dialogStack.contains(dialog)) {
                 dialogStack.remove(dialog);
             }
-            window.destroyDialog();
             stopTimer(window.getDialog());
+            window.destroyDialog();
+            topWindow.requestFocusInWindow();
         } else {
-            topWindow.setEnabled(false);
             stopTimer(window.getChild());
+            topWindow.setEnabled(false);
         }
         logger.leave();
     }
