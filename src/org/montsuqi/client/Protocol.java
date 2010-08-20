@@ -181,7 +181,6 @@ public class Protocol extends Connection {
             }
             dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
             resetTimer(dialog);
-            dialog.validate();
             if (!dialogStack.contains(dialog)) {
                 dialogStack.add(dialog);
             }
@@ -211,7 +210,6 @@ public class Protocol extends Connection {
             }
             stopTimer(window.getDialog());
             window.destroyDialog();
-            topWindow.requestFocusInWindow();
         } else {
             stopTimer(window.getChild());
             topWindow.setEnabled(false);
@@ -529,6 +527,7 @@ public class Protocol extends Connection {
                 case ScreenType.NEW_WINDOW:
                 case ScreenType.CHANGE_WINDOW:
                     this.windowName = wName;
+System.out.println("current new change:"+wName);
                     widgetName = new StringBuffer(wName);
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {

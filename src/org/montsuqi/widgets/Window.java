@@ -51,6 +51,9 @@ public class Window extends JFrame {
             child.setVisible(false);
             dialog.setEnabled(false);
             dialog.setVisible(false);
+            //dialog.removeAll();
+            //dialog.dispose();
+            //dialog = null;
         }
     }
 
@@ -84,7 +87,7 @@ public class Window extends JFrame {
             child.setVisible(true);
         }
         dialog.setSize(this.getSize());
-        dialog.requestFocusInWindow();
+        dialog.validate();
         return dialog;
     }
 
@@ -141,7 +144,6 @@ public class Window extends JFrame {
      */
     public void showBusyCursor() {
         getGlassPane().setVisible(true);
-        getGlassPane().requestFocus();
     }
 
     /** <p>Cancel the busy state of this window.</p>
