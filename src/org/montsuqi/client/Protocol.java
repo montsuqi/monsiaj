@@ -621,7 +621,7 @@ public class Protocol extends Connection {
                     try {
                         Protocol.this.sendPing();
                     } catch (IOException ioe) {
-                        ioe.printStackTrace();
+                        System.out.println(ioe);
                     }
                 }
             });

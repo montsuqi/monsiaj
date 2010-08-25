@@ -33,6 +33,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -169,6 +171,24 @@ public abstract class SignalHandler {
          */
         final SignalHandler sendEvent = new SignalHandler() {
 
+            private String getTitle(Window window) {
+                String title = "";
+                if (window instanceof JFrame) {
+                    title = ((JFrame) window).getTitle();
+                } else if (window instanceof JDialog) {
+                    title = ((JDialog) window).getTitle();
+                }
+                return title;
+            }
+
+            private void setTitle(Window window,String title) {
+                if (window instanceof JFrame) {
+                    ((JFrame) window).setTitle(title);
+                } else if (window instanceof JDialog) {
+                    ((JDialog) window).setTitle(title);
+                }
+            }
+
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 synchronized (con) {
                     if (timerTask != null) {
@@ -198,6 +218,10 @@ public abstract class SignalHandler {
                         if (!window.getName().equals(con.getWindowName())) {
                             return;
                         }
+
+                        String oldTitle = getTitle(window);
+                        setTitle(window,Messages.getString("Client.loading"));
+
                         String windowName = getWidgetName(window.getName());
                         String widgetName = getWidgetName(widget.getName());
                         String event;
@@ -217,6 +241,11 @@ public abstract class SignalHandler {
                             con.getScreenData();
                             unblockChangedHandlers();
                         }
+
+                        if (Messages.getString("Client.loading").equals(getTitle(window))) {
+                            setTitle(window,oldTitle);
+                        }
+
                     } finally {
                         con.endReceiving();
                     }
