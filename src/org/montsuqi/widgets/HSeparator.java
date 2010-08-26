@@ -23,7 +23,10 @@ copies.
 
 package org.montsuqi.widgets;
 
+import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.SystemColor;
+import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
 
@@ -42,7 +45,8 @@ public class HSeparator extends JSeparator {
 		y += height / 2;
                 height = 1;
 		super.setBounds(x, y, width, height);
-	}
+                this.setBorder(BorderFactory.createLineBorder((Color)SystemColor.controlShadow));
+    }
 
     @Override
 	public void setBounds(Rectangle r) {
@@ -50,5 +54,6 @@ public class HSeparator extends JSeparator {
 		r.y += r.height / 2;
                 r.height = 1;
 		super.setBounds(r);
+                this.setBorder(BorderFactory.createLineBorder((Color)SystemColor.controlShadow));
 	}
 }
