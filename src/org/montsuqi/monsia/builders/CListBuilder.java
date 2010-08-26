@@ -37,6 +37,7 @@ import org.montsuqi.widgets.PandaCList;
  */
 class CListBuilder extends ContainerBuilder {
 
+    @Override
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		final Component widget = super.buildSelf(xml, parent, info);
 		PandaCList clist = (PandaCList)widget;
@@ -44,12 +45,14 @@ class CListBuilder extends ContainerBuilder {
 		return widget;
 	}
 
+    @Override
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		int cCount = info.getChildren().size();
 
 		PandaCList clist = (PandaCList)parent;
 		// make all cells uneditable.
 		clist.setModel(new DefaultTableModel(0, cCount) {
+            @Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}

@@ -34,20 +34,14 @@ import javax.swing.table.TableCellRenderer;
 class CListHeaderRenderer implements TableCellRenderer {
 
 	private Component component;
-	private TableCellRenderer fixedCellRenderer;
 
 	public CListHeaderRenderer(JComponent c) {
 		c.setBorder(UIManager.getBorder("TableHeader.cellBorder")); //$NON-NLS-1$
 		c.setOpaque(true);
 		this.component = c;
-		fixedCellRenderer = c instanceof Fixed ? new CListFixedCellRenderer((Fixed)c) : null;
 	}
 
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		return component;
-	}
-
-	TableCellRenderer getFixedCellRenderer() {
-		return fixedCellRenderer;
 	}
 }

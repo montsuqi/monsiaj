@@ -175,7 +175,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 		column.setHeaderRenderer(renderer);
 	}
 
-    @Override
+/*    @Override
 	public TableCellRenderer getCellRenderer(int row, int column) {
 		TableCellRenderer headerRenderer = columnModel.getColumn(column).getHeaderRenderer();
 		if (headerRenderer != null && headerRenderer instanceof CListHeaderRenderer) {
@@ -186,7 +186,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
 			}
 		}
 		return super.getCellRenderer(row, column);
-	}
+	}*/
 
 	public void addActionListener(ActionListener listener) {
 		listenerList.add(ActionListener.class, listener);
