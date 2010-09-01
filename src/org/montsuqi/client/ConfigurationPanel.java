@@ -256,9 +256,7 @@ public class ConfigurationPanel extends JPanel {
         infoPanel = createInfoPanel();
     }
 
-    public void loadConfiguration(String configName) {
-        boolean newFlag = configName.equals("");
-
+    public void loadConfiguration(String configName,boolean newFlag) {
         // Basic tab
         String user = newFlag ? Configuration.DEFAULT_USER : conf.getUser(configName);
         String password = newFlag ? Configuration.DEFAULT_PASSWORD : conf.getPassword(configName);
@@ -344,6 +342,12 @@ public class ConfigurationPanel extends JPanel {
         conf.setLAFThemeFileName(configName, lafThemeEntry.getText());
         conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
         conf.setUseTimer(configName, useTimerCheck.isSelected());
+        long period;
+        try {
+            period = Long.parseLong(timerPeriodEntry.getText());
+        } catch (java.lang.NumberFormatException ex) {
+            period = Configuration.DEFAULT_TIMER_PERIOD;
+        }
         conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
         conf.setProperties(configName, propertiesText.getText());
     }

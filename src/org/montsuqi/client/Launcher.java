@@ -170,11 +170,11 @@ public class Launcher {
         configCombo.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent evt) {
-                configPanel.loadConfiguration((String) configCombo.getSelectedItem());
+                configPanel.loadConfiguration((String) configCombo.getSelectedItem(),false);
             }
         });
         configPanel = createConfigurationPanel();
-        configPanel.loadConfiguration(conf.getConfigurationName());
+        configPanel.loadConfiguration(conf.getConfigurationName(),false);
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$

@@ -53,8 +53,8 @@ public class JMAReceiptConfigurationPanel extends ConfigurationPanel {
 	}
 
     @Override
-	public void loadConfiguration(String configName) {
-		super.loadConfiguration(configName);
+	public void loadConfiguration(String configName,boolean newFlag) {
+		super.loadConfiguration(configName,newFlag);
 		appEntry.setText("panda:orca00");
 		protocolVersionRadios[0].setSelected(true);
 	}
