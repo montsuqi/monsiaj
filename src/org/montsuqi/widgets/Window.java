@@ -51,9 +51,9 @@ public class Window extends JFrame {
             child.setVisible(false);
             dialog.setEnabled(false);
             dialog.setVisible(false);
-            //dialog.removeAll();
-            //dialog.dispose();
-            //dialog = null;
+            dialog.removeAll();
+            dialog.dispose();
+            dialog = null;
         }
     }
 
