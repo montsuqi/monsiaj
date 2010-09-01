@@ -85,9 +85,17 @@ public class TopWindow extends Window implements ComponentListener {
         width = prefs.getInt(this.getClass().getName() + ".width", DEFAULT_WIDTH);
         height = prefs.getInt(this.getClass().getName() + ".height", DEFAULT_HEIGHT - FOOTER);
 
-        if (System.getProperty("monsia.window.default_size") != null) {
-            width = DEFAULT_WIDTH;
-            height = DEFAULT_HEIGHT - FOOTER;
+        if (System.getProperty("monsia.topwindow.width") != null) {
+            width = Integer.parseInt(System.getProperty("monsia.topwindow.width"));
+        }
+        if (System.getProperty("monsia.topwindow.height") != null) {
+            height = Integer.parseInt(System.getProperty("monsia.topwindow.height"));
+        }
+        if (System.getProperty("monsia.topwindow.x") != null) {
+            x = Integer.parseInt(System.getProperty("monsia.topwindow.x"));
+        }
+        if (System.getProperty("monsia.topwindow.y") != null) {
+            y = Integer.parseInt(System.getProperty("monsia.topwindow.y"));
         }
 
         this.setLocation(x, y);
