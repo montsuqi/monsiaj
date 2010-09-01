@@ -134,7 +134,7 @@ public class Window extends JFrame {
      */
     public void showBusyCursor() {
         getGlassPane().setVisible(true);
-        //getGlassPane().requestFocus();
+        getGlassPane().requestFocus();
     }
 
     /** <p>Cancel the busy state of this window.</p>
