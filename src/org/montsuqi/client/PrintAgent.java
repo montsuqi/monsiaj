@@ -42,9 +42,11 @@ public class PrintAgent extends Thread {
     private final int DELAY = 1000;
     private ConcurrentLinkedQueue<PrintRequest> queue;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    private String port;
 
-    public PrintAgent(final String user, final String password) {
+    public PrintAgent(String port,final String user, final String password) {
         queue = new ConcurrentLinkedQueue<PrintRequest>();
+        this.port = port;
         Authenticator.setDefault(new Authenticator() {
 
             @Override
@@ -188,7 +190,7 @@ public class PrintAgent extends Thread {
     public File download(PrintRequest request) throws IOException {
         File temp = File.createTempFile("monsiaj_printagent", ".pdf");
         temp.deleteOnExit();
-        URL url = new URL(request.getUrl());
+        URL url = new URL("http://" + port + "/" + request.getPath());
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("GET");
         http.connect();
@@ -208,21 +210,21 @@ public class PrintAgent extends Thread {
 
     static public void main(String[] argv) {
 
-        PrintAgent agent = new PrintAgent("ormaster", "ormaster");
+        PrintAgent agent = new PrintAgent(argv[0],"ormaster", "ormaster");
         agent.start();
 
-        for (int i = 0; i < argv.length; i++) {
+        for (int i = 1; i < argv.length; i++) {
             agent.addRequest(argv[i], argv[i]);
         }
     }
 
     public class PrintRequest {
 
-        private String url;
+        private String path;
         private String title;
 
         public PrintRequest(String url, String title) {
-            this.url = url;
+            this.path = url;
             this.title = title;
         }
 
@@ -234,12 +236,12 @@ public class PrintAgent extends Thread {
             this.title = title;
         }
 
-        public String getUrl() {
-            return url;
+        public String getPath() {
+            return path;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public void setPath(String url) {
+            this.path = url;
         }
     }
 }

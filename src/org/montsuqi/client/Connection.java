@@ -54,7 +54,7 @@ public class Connection {
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
-	private Socket socket;
+	protected Socket socket;
 	protected DataInput in;
 	protected DataOutput out;
 	private int dataType;

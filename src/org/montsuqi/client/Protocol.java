@@ -627,13 +627,15 @@ public class Protocol extends Connection {
             });
             pingTimer.start();
         }
-        printAgent = new PrintAgent(user, pass);
+
+        String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
+        printAgent = new PrintAgent(port,user, pass);
         printAgent.start();
         logger.leave();
     }
 
-    public void addPrintRequest(String url, String title) {
-        printAgent.addRequest(url, title);
+    public void addPrintRequest(String path, String title) {
+        printAgent.addRequest(path, title);
     }
 
     private synchronized void sendPing() throws IOException {
