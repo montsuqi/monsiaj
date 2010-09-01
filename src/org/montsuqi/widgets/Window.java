@@ -34,6 +34,7 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A JFrame wrapper.</p>
  */
@@ -150,6 +151,9 @@ public class Window extends JFrame {
      */
     public void hideBusyCursor() {
         getGlassPane().setVisible(false);
+        if (SystemEnvironment.isWindows() || SystemEnvironment.isMacOSX()) {
+            getGlassPane().requestFocus();
+        }
     }
 
     /** <p>Test if this window is active(=accpets input)</p>
