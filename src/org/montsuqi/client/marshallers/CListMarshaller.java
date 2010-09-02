@@ -140,8 +140,8 @@ class CListMarshaller extends WidgetMarshaller {
                 BoundedRangeModel model = vScroll.getModel();
                 int max = model.getMaximum();
                 int min = model.getMinimum();
-                if ((count - from) > 0) {
-                    int value = (int) (((row - 1) * 1.0 / (count - from)) * (max - min)) + min;
+                if ((count - from) > 0 && row != 0) {
+                    int value = (int) (((row) * 1.0 / (count - from)) * (max - min)) + min;
                     model.setValue(value);
                 }
             }
