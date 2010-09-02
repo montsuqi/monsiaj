@@ -58,16 +58,7 @@ public class PDFPrint {
     public static class PDFPrintPage implements Printable {
     
         /** The PDFFile to be printed */
-        private PDFFile file;
-        /** The PrinterJob for this print job */
-        private PrinterJob pjob;
-        /** A dialog box indicating printing status, with cancel button */
-        private JDialog pd;
-        /** The text in the progress dialog indicating the current page */
-        private JLabel pagenumlabel;
-        /** The cancel button in the progress dialog */
-        private JButton cancel;
-    
+        private PDFFile file;    
         /**
          * Create a new PDFPrintPage object for a particular PDFFile.
          * @param file the PDFFile to be printed.
@@ -84,11 +75,6 @@ public class PDFPrint {
     
             // don't bother if the page number is out of range.
             if ((pagenum >= 1) && (pagenum <= file.getNumPages())) {
-    
-                // update the page number in the progress dialog
-                if (pagenumlabel != null) {
-                    pagenumlabel.setText(String.valueOf(pagenum));
-                }
     
                 // fit the PDFPage into the printing area
                 Graphics2D g2 = (Graphics2D) g;
