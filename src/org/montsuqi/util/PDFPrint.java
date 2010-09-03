@@ -73,13 +73,24 @@ public class PDFPrint {
         // to draw into, the page format, and the page number.
         public int print(Graphics g, PageFormat format, int index)
                 throws PrinterException {
+            Graphics2D g2 = (Graphics2D) g;
+
+            if (System.getProperty("monsia.util.PDFPrint.test") != null) {
+                g2.setColor(Color.black);
+                for (int i = 0; i < 80; i++) {
+                    for (int j = 0; j < 80; j++) {
+                        g2.drawRect(j * 100, i * 100, 100, 100);
+                        g2.drawString("(" + j + "," + i + ")", j * 100, i * 100);
+                    }
+                }
+            }
+
             int pagenum = index + 1;
 
             // don't bother if the page number is out of range.
             if ((pagenum >= 1) && (pagenum <= file.getNumPages())) {
 
                 // fit the PDFPage into the printing area
-                Graphics2D g2 = (Graphics2D) g;
                 PDFPage page = file.getPage(pagenum);
                 int width = (int) page.getWidth();
                 int height = (int) page.getHeight();
