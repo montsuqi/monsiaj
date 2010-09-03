@@ -34,7 +34,6 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A JFrame wrapper.</p>
  */
