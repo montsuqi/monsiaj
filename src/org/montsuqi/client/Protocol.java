@@ -212,7 +212,7 @@ public class Protocol extends Connection {
             window.destroyDialog();
         } else {
             stopTimer(window.getChild());
-            topWindow.setEnabled(false);
+            window.getChild().setEnabled(false);
         }
         logger.leave();
     }

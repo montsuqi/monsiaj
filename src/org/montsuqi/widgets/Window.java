@@ -144,13 +144,24 @@ public class Window extends JFrame {
      * Accepts no input.</p>
      */
     public void showBusyCursor() {
-        getGlassPane().setVisible(true);
+        if (!getGlassPane().isEnabled()) {
+            getGlassPane().setEnabled(true);
+        }
+        if (!getGlassPane().isVisible()) {
+            getGlassPane().setVisible(true);
+        }
+
     }
 
     /** <p>Cancel the busy state of this window.</p>
      */
     public void hideBusyCursor() {
-        getGlassPane().setVisible(false);
+        if (getGlassPane().isEnabled()) {
+            getGlassPane().setEnabled(false);
+        }
+        if (getGlassPane().isVisible()) {
+            getGlassPane().setVisible(false);
+        }
         if (SystemEnvironment.isWindows() || SystemEnvironment.isMacOSX()) {
             getGlassPane().requestFocus();
         }
@@ -171,7 +182,7 @@ public class Window extends JFrame {
         Window[] windows = getMontsuqiWindows();
         for (int i = 0; i < windows.length; i++) {
             Window w = windows[i];
-            w.showBusyCursor();
+//            w.showBusyCursor();
         }
     }
 

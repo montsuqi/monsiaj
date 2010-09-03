@@ -59,7 +59,9 @@ public class TopWindow extends Window implements ComponentListener {
         this.getContentPane().removeAll();
         this.getContentPane().add(child);
         this.setTitle(window.getTitle());
-        this.setResizable(true);
+        if (!this.isResizable()) {
+            this.setResizable(true);
+        }
 
         if (!this.isVisible()) {
             this.setVisible(true);
@@ -68,10 +70,12 @@ public class TopWindow extends Window implements ComponentListener {
         ((JComponent) child).repaint();
 
         this.hideBusyCursor();
-        this.setEnabled(true);
+        if (!this.isEnabled()) {
+            this.setEnabled(true);
+        }
         this.setChild(child);
         ((JComponent) child).requestFocusInWindow();
-        this.addComponentListener(this);
+//        this.requestFocus();
     }
 
     /** <p>Constructs a Window instance.</p>
@@ -100,6 +104,7 @@ public class TopWindow extends Window implements ComponentListener {
 
         this.setLocation(x, y);
         this.setSize(width, height);
+        this.addComponentListener(this);
     }
 
     public void Scale() {
