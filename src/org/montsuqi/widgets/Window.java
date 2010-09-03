@@ -162,9 +162,6 @@ public class Window extends JFrame {
         if (getGlassPane().isVisible()) {
             getGlassPane().setVisible(false);
         }
-        if (SystemEnvironment.isWindows() || SystemEnvironment.isMacOSX()) {
-            getGlassPane().requestFocus();
-        }
     }
 
     /** <p>Test if this window is active(=accpets input)</p>
@@ -182,7 +179,7 @@ public class Window extends JFrame {
         Window[] windows = getMontsuqiWindows();
         for (int i = 0; i < windows.length; i++) {
             Window w = windows[i];
-//            w.showBusyCursor();
+            w.showBusyCursor();
         }
     }
 
