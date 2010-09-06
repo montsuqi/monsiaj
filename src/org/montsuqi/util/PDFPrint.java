@@ -1,7 +1,6 @@
 package org.montsuqi.util;
 
 import java.awt.*;
-import java.awt.geom.*;
 import java.awt.print.*;
 import javax.swing.*;
 import java.nio.channels.FileChannel;
@@ -9,9 +8,13 @@ import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.io.File;
 
-import com.sun.pdfview.PDFRenderer;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
+import com.sun.pdfview.PDFRenderer;
+import java.awt.geom.AffineTransform;
+import javax.print.attribute.Attribute;
+import javax.print.PrintService;
+import javax.print.attribute.PrintServiceAttributeSet;
 
 public class PDFPrint {
 
@@ -42,6 +45,18 @@ public class PDFPrint {
 
         book.append(pages, pfDefault, pdfFile.getNumPages());
         pjob.setPageable(book);
+
+        if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
+            PrintService service = pjob.getPrintService();
+            System.out.println("PrintService:" + service);
+            PrintServiceAttributeSet myAset = service.getAttributes();
+            Attribute[] attr = myAset.toArray();
+            int loop = attr.length;
+            System.out.println("Attributes set:");
+            for (int i = 0; i < attr.length; i++) {
+                System.out.println("   " + attr[i]);
+            }
+        }
 
         try {
             pjob.print();
@@ -75,7 +90,9 @@ public class PDFPrint {
                 throws PrinterException {
             Graphics2D g2 = (Graphics2D) g;
 
-            if (System.getProperty("monsia.util.PDFPrint.test") != null) {
+            if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
+                System.out.println("PageFormat.orientation(land:" + PageFormat.LANDSCAPE + ",port:" + PageFormat.PORTRAIT + "):" + format.getOrientation());
+                System.out.println("PageFormat Imageable:[" + format.getImageableX() + "," + format.getImageableY() + "],[" + format.getImageableWidth() + "," + format.getImageableHeight() + "]");
                 g2.setColor(Color.black);
                 for (int i = 0; i < 80; i++) {
                     for (int j = 0; j < 80; j++) {
