@@ -182,7 +182,7 @@ public class PDFPrint {
         }
     }
 
-    private static double MMtoInchPer72(double mm) {
+    private static double MMto72DPI(double mm) {
         if (mm == 0.0) {
             return 0.0;
         }
@@ -190,14 +190,14 @@ public class PDFPrint {
     }
 
     private static double GetPrintOption(String property) {
-        double ret = 0.0;
+        double _72dpi = 0.0;
         if (System.getProperty(property) != null) {
-            double mmvalue = Double.valueOf(System.getProperty(property));
-            ret = PDFPrint.MMtoInchPer72(mmvalue);
+            double mm = Double.valueOf(System.getProperty(property));
+            _72dpi = PDFPrint.MMto72DPI(mm);
             if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
-                System.out.println(property + ":" + mmvalue + "mm " + ret + "inch/72");
+                System.out.println(property + ":" + mm + "(mm) " + _72dpi + "(72dpi)");
             }
         }
-        return ret;
+        return _72dpi;
     }
 }
