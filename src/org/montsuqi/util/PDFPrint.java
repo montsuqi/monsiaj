@@ -195,7 +195,7 @@ public class PDFPrint {
             double mmvalue = Double.valueOf(System.getProperty(property));
             ret = PDFPrint.MMtoInchPer72(mmvalue);
             if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
-                System.out.println(property + ":" + mmvalue + "mm " + ret + "1/72 inch");
+                System.out.println(property + ":" + mmvalue + "mm " + ret + "inch/72");
             }
         }
         return ret;
