@@ -12,6 +12,7 @@ import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFRenderer;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
 import javax.print.attribute.PrintServiceAttributeSet;
@@ -89,19 +90,53 @@ public class PDFPrint {
         public int print(Graphics g, PageFormat format, int index)
                 throws PrinterException {
             Graphics2D g2 = (Graphics2D) g;
+            Rectangle2D.Double pageable;
+            double hmargin = GetPrintOption("monsia.util.PDFPrint.hmargin");
+            double vmargin = GetPrintOption("monsia.util.PDFPrint.vmargin");
+            double hoffset = GetPrintOption("monsia.util.PDFPrint.hoffset");
+            double voffset = GetPrintOption("monsia.util.PDFPrint.voffset");
+            double scale = 1.0;
+            double hratio = 1.0;
+            double vratio = 1.0;
+
+            if (hmargin != 0.0) {
+                hratio = hmargin / format.getImageableWidth();
+            }
+            if (vmargin != 0.0) {
+                vratio = vmargin / format.getImageableHeight();
+            }
+            if (hratio != 1.0 || vratio != 1.0) {
+                if (hratio < vratio) {
+                    vmargin = hratio * format.getImageableHeight();
+                } else {
+                    hmargin = vratio * format.getImageableWidth();
+                }
+            }
+            hoffset += hmargin;
+            voffset += vmargin;
+            pageable = new Rectangle2D.Double(hoffset, voffset,
+                    format.getImageableWidth() - hmargin * 2,
+                    format.getImageableHeight() - vmargin * 2);
 
             if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
-                System.out.println("PageFormat.orientation(land:" + PageFormat.LANDSCAPE + ",port:" + PageFormat.PORTRAIT + "):" + format.getOrientation());
-                System.out.println("PageFormat Imageable:[" + format.getImageableX() + "," + format.getImageableY() + "],[" + format.getImageableWidth() + "," + format.getImageableHeight() + "]");
-                g2.setColor(Color.black);
+                System.out.println("PageFormat.orientation(land:" + PageFormat.LANDSCAPE
+                        + ",port:" + PageFormat.PORTRAIT + "):" + format.getOrientation());
+                System.out.println("PageFormat Imageable:[" + format.getImageableX()
+                        + "," + format.getImageableY()
+                        + "],[" + format.getImageableWidth()
+                        + "," + format.getImageableHeight() + "]");
+                g2.setColor(Color.LIGHT_GRAY);
                 for (int i = 0; i < 80; i++) {
                     for (int j = 0; j < 80; j++) {
                         g2.drawRect(j * 100, i * 100, 100, 100);
                         g2.drawString("(" + j + "," + i + ")", j * 100, i * 100);
                     }
                 }
+                System.out.println("pageable:" + pageable);
+                g2.setColor(Color.BLACK);
+                g2.drawRect((int) pageable.x, (int) pageable.y,
+                        (int) pageable.width, (int) pageable.height);
             }
-
             int pagenum = index + 1;
 
             // don't bother if the page number is out of range.
@@ -113,13 +148,24 @@ public class PDFPrint {
                 int height = (int) page.getHeight();
 
                 if (format.getOrientation() == PageFormat.PORTRAIT) {
-                    if (width > height) {
-                        g2.transform(new AffineTransform(0f, -1f, 1f, 0f, 0, width));
+                    if (height > width) {
+                        scale = pageable.width / (1.0d * width);
+                        g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
+                    } else {
+                        scale = pageable.width / (1.0d * height);
+                        g2.transform(new AffineTransform(0f, -1.0 * scale, scale, 0f, voffset, -hoffset + width));
                     }
                 } else if (format.getOrientation() == PageFormat.LANDSCAPE) {
-                    if (height > width) {
-                        g2.transform(new AffineTransform(0f, 1f, -1f, 0f, height, 0));
+                    if (width > height) {
+                        scale = pageable.width / (1.0d * width);
+                        g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
+                    } else {
+                        scale = pageable.width / (1.0d * height);
+                        g2.transform(new AffineTransform(0f, scale, -1.0 * scale, 0f, -voffset + height, hoffset));
                     }
+                }
+                if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
+                    System.out.println("scale:" + scale);
                 }
 
                 // render the page
@@ -134,5 +180,24 @@ public class PDFPrint {
                 return NO_SUCH_PAGE;
             }
         }
+    }
+
+    private static double MMtoInchPer72(double mm) {
+        if (mm == 0.0) {
+            return 0.0;
+        }
+        return (mm / 25.4) * 72.0;
+    }
+
+    private static double GetPrintOption(String property) {
+        double ret = 0.0;
+        if (System.getProperty(property) != null) {
+            double mmvalue = Double.valueOf(System.getProperty(property));
+            ret = PDFPrint.MMtoInchPer72(mmvalue);
+            if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
+                System.out.println(property + ":" + mmvalue + "mm " + ret + "1/72 inch");
+            }
+        }
+        return ret;
     }
 }
