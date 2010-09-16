@@ -19,7 +19,7 @@ import javax.print.attribute.PrintServiceAttributeSet;
 
 public class PDFPrint {
 
-    public static void print(File file, boolean showDialog) throws java.io.IOException {
+    public static void print(File file) throws java.io.IOException {
         FileInputStream fis = new FileInputStream(file);
         FileChannel fc = fis.getChannel();
         ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
@@ -31,7 +31,7 @@ public class PDFPrint {
 
         pjob.setJobName(file.getName());
 
-        if (showDialog) {
+        if (System.getProperty("monsia.util.PDFPrint.use_default_setting") == null) {
             if (!pjob.printDialog()) {
                 return;
             }
@@ -69,7 +69,7 @@ public class PDFPrint {
     public static void main(String args[]) throws Exception {
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(null);
-        PDFPrint.print(new File(chooser.getSelectedFile().getAbsolutePath()), true);
+        PDFPrint.print(new File(chooser.getSelectedFile().getAbsolutePath()));
     }
 
     public static class PDFPrintPage implements Printable {

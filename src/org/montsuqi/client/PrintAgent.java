@@ -164,7 +164,7 @@ public class PrintAgent extends Thread {
                     destChannel.close();
                 }
             } else if (n == 2) {
-                PDFPrint.print(file, System.getProperty(PrintAgent.class.getName() + ".no_page_setup") == null);
+                PDFPrint.print(file);
             }
         } catch (Exception ex) {
             System.out.println(ex);
