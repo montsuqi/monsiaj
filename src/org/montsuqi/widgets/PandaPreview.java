@@ -285,9 +285,9 @@ public class PandaPreview extends JPanel {
         prevAction = new PrevAction();
 
         pageEntry = new NumberEntry();
-        pageEntry.setFormat("----");
-        pageEntry.setMinimumSize(new Dimension(35, 1));
-        pageEntry.setMaximumSize(new Dimension(35, 40));
+        pageEntry.setFormat("------");
+        pageEntry.setMinimumSize(new Dimension(55, 1));
+        pageEntry.setMaximumSize(new Dimension(55, 40));
         pageEntry.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -305,8 +305,8 @@ public class PandaPreview extends JPanel {
             }
         });
         pageLabel = new JLabel("/");
-        pageLabel.setMinimumSize(new Dimension(35, 1));
-        pageLabel.setMaximumSize(new Dimension(35, 40));
+        pageLabel.setMinimumSize(new Dimension(55, 1));
+        pageLabel.setMaximumSize(new Dimension(55, 40));
         saveAction = new SaveAction();
         printAction = new PrintAction();
         zoomInAction = new ZoomInAction();
