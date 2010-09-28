@@ -13,63 +13,76 @@ import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFRenderer;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
 import javax.print.attribute.PrintServiceAttributeSet;
 
-public class PDFPrint {
+public class PDFPrint extends Thread {
 
-    public static void print(File file) throws java.io.IOException {
-        FileInputStream fis = new FileInputStream(file);
-        FileChannel fc = fis.getChannel();
-        ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-        PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
+    private File file;
 
-        PDFPrintPage pages = new PDFPrintPage(pdfFile);
+    public PDFPrint(File file) {
+        this.file = file;
+    }
 
-        PrinterJob pjob = PrinterJob.getPrinterJob();
-
-        pjob.setJobName(file.getName());
-
-        if (System.getProperty("monsia.util.PDFPrint.use_default_setting") == null) {
-            if (!pjob.printDialog()) {
-                return;
-            }
-        }
-        // validate the page against the chosen printer to correct
-        // paper settings and margins
-        PageFormat pfDefault = pjob.validatePage(pjob.defaultPage());
-        Paper paper = pfDefault.getPaper();
-        paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-        pfDefault.setPaper(paper);
-        Book book = new Book();
-
-        book.append(pages, pfDefault, pdfFile.getNumPages());
-        pjob.setPageable(book);
-
-        if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
-            PrintService service = pjob.getPrintService();
-            System.out.println("PrintService:" + service);
-            PrintServiceAttributeSet myAset = service.getAttributes();
-            Attribute[] attr = myAset.toArray();
-            int loop = attr.length;
-            System.out.println("Attributes set:");
-            for (int i = 0; i < attr.length; i++) {
-                System.out.println("   " + attr[i]);
-            }
-        }
-
+    @Override
+    public void run() {
         try {
-            pjob.print();
-        } catch (PrinterException exc) {
-            System.out.println(exc);
+            FileInputStream fis = new FileInputStream(file);
+            FileChannel fc = fis.getChannel();
+            ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
+
+            PDFPrintPage pages = new PDFPrintPage(pdfFile);
+
+            PrinterJob pjob = PrinterJob.getPrinterJob();
+
+            pjob.setJobName(file.getName());
+
+            if (System.getProperty("monsia.util.PDFPrint.use_default_setting") == null) {
+                if (!pjob.printDialog()) {
+                    return;
+                }
+            }
+            // validate the page against the chosen printer to correct
+            // paper settings and margins
+            PageFormat pfDefault = pjob.validatePage(pjob.defaultPage());
+            Paper paper = pfDefault.getPaper();
+            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+            pfDefault.setPaper(paper);
+            Book book = new Book();
+
+            book.append(pages, pfDefault, pdfFile.getNumPages());
+            pjob.setPageable(book);
+
+            if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
+                PrintService service = pjob.getPrintService();
+                System.out.println("PrintService:" + service);
+                PrintServiceAttributeSet myAset = service.getAttributes();
+                Attribute[] attr = myAset.toArray();
+                int loop = attr.length;
+                System.out.println("Attributes set:");
+                for (int i = 0; i < attr.length; i++) {
+                    System.out.println("   " + attr[i]);
+                }
+            }
+
+            try {
+                pjob.print();
+            } catch (PrinterException exc) {
+                System.out.println(exc);
+            }
+        } catch (java.io.IOException ex) {
+            System.out.println(ex);
         }
     }
 
     public static void main(String args[]) throws Exception {
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(null);
-        PDFPrint.print(new File(chooser.getSelectedFile().getAbsolutePath()));
+        PDFPrint printer = new PDFPrint(new File(chooser.getSelectedFile().getAbsolutePath()));
+        printer.start();
     }
 
     public static class PDFPrintPage implements Printable {

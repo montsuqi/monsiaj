@@ -227,11 +227,8 @@ public class PandaPreview extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            try {
-                PDFPrint.print(new File(fileName));
-            } catch (IOException ex) {
-                System.out.println(ex);
-            }
+            PDFPrint printer = new PDFPrint(new File(fileName));
+            printer.start();
         }
     }
 
