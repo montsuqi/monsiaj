@@ -1,59 +1,61 @@
-= ant��p�����r���h���@
+= antを用いたビルド方法
 
-== �����Ƃ��P���ȃr���h
+== もっとも単純なビルド
 
-�R�}���h���C������A
+コマンドラインから、
 
  $ ant [ENTER]
 
-�����s���܂��B
+を実行します。
 
-�^�[�Q�b�g dist �����s����Adist/�f�B���N�g���̉���
+ターゲット dist が実行され、dist/ディレクトリの下に
 * dist/monsiaj-bin-YYYYMMDD.zip
 * dist/monsiaj-bin-macosx-YYYYMMDD.zip
 * dist/monsiaj-src-YYYYMMDD.zip
-����������܂��B(YYYYNNDD=�r���h���̓��t)
+が生成されます。(YYYYNNDD=ビルド時の日付)
 
-���̃r���h�̏ꍇ�A
-* �����͍s���܂���B
-* �N���X�t�@�C���ɂ̓f�o�b�O��񂪊܂܂�܂��B
+このビルドの場合、
+* 署名は行われません。
+* クラスファイルにはデバッグ情報が含まれます。
 
-== �r���h�̃J�X�^�}�C�Y
+== ビルドのカスタマイズ
 
-�r���h�̓�����J�X�^�}�C�Y����ɂ́A�v���p�e�B�t�@�C����p���܂��B
+ビルドの動作をカスタマイズするには、プロパティファイルを用います。
 
-�e�L�X�g�t�@�C�� build.properties(���O�͔C��) ���쐬���āA
-�ړI�ɉ������v���p�e�B�̐ݒ���L�q���A
+テキストファイル build.properties(名前は任意) を作成して、
+目的に応じたプロパティの設定を記述し、
 
  $ ant -propertyfile build.properties dist
 
-�̂悤�Ɏ��s���Ă��������B
+のように実行してください。
 
-=== �������s���ꍇ
+=== 署名を行う場合
 
-�v���p�e�B�t�@�C���ɁA
+プロパティファイルに、
 
  do.sign=true
- alias=�������錮�̃G�C���A�X
- keystore=�L�[�X�g�A�t�@�C����
+ alias=署名する鍵のエイリアス
+ keystore=キーストアファイル名
+ webstart.url=http://... jwsを設置するURL
+ webstart.vendor=ベンダー名
 
-��3��ݒ肵�Ď��s���܂��B�r���Ńp�X���[�h�𕷂����̂œ����܂����A
-��ʂɃG�R�[�o�b�N(�\��)�����̂ň��S�ɗ��ӂ��Ă��������B
+を設定して実行します。途中でパスワードを聞かれるので答えますが、
+画面にエコーバック(表示)されるので安全に留意してください。
 
-do.sign�v���p�e�B��ݒ肵�Ă���ꍇ�Adist/ �ɒu���ꂽ�t�@�C������
-jar�t�@�C���͏����ς݂̂��̂ƂȂ�܂��B
+do.signプロパティを設定してある場合、dist/ に置かれたファイル内の
+jarファイルは署名済みのものとなります。
 
-=== �f�o�b�O�I�v�V�������O���ꍇ
+=== デバッグオプションを外す場合
 
-�f�t�H���g�ł́A�R���p�C���̓f�o�b�O�I�v�V�����t���ƂȂ�܂��B
-������O�����߂ɂ́A�v���p�e�B�t�@�C����
+デフォルトでは、コンパイルはデバッグオプション付きとなります。
+これを外すためには、プロパティファイルに
 
  javac.debug=no
 
-��ݒ肵�Ă��������B
+を設定してください。
 
-�܂߂�f�o�b�O���̎�ʂ́A
+含めるデバッグ情報の種別は、
 
  javac.debuglevel=lines,vars,source
 
-�̂悤�ɁA�܂߂������̂��R���}�ŋ�؂��Ďw�肵�܂��B
+のように、含めたいものをコンマで区切って指定します。
