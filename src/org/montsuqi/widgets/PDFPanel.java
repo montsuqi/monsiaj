@@ -69,7 +69,7 @@ class PDFPanel extends JPanel {
         page = pdffile.getPage(pagenum);
         try {
         page.waitForFinish();
-        } catch (Exception ex) {}
+        } catch (Exception ex) {System.out.println(ex);}
         showPage();
     }
 

@@ -1,26 +1,25 @@
 /*      PANDA -- a simple transaction monitor
 
 Copyright (C) 1998-1999 Ogochan.
-              2000-2003 Ogochan & JMA (Japan Medical Association).
-              2002-2006 OZAWA Sakuro.
+2000-2003 Ogochan & JMA (Japan Medical Association).
+2002-2006 OZAWA Sakuro.
 
 This module is part of PANDA.
 
-		PANDA is distributed in the hope that it will be useful, but
+PANDA is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
 to anyone for the consequences of using it or for whether it serves
 any particular purpose or works at all, unless he says so in writing.
 Refer to the GNU General Public License for full details.
 
-		Everyone is granted permission to copy, modify and redistribute
+Everyone is granted permission to copy, modify and redistribute
 PANDA, but only under the conditions described in the GNU General
 Public License.  A copy of this license is supposed to have been given
 to you along with PANDA so you can know your rights and
 responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
-*/
-
+ */
 package org.montsuqi.monsia.builders;
 
 import java.awt.Component;
@@ -79,536 +78,582 @@ import org.montsuqi.widgets.Window;
  */
 abstract class WidgetPropertySetter {
 
-	/** <p>This method does the actual work of setting a property.
-	 * Subclasses must implement this method.</p>
-	 * @param xml glade screen definition
-	 * @param parent parent widget of the target widget.
-	 * @param widget target widget.
-	 * @param value the value to set in String.
-	 */
-	abstract void set(Interface xml, Container parent, Component widget, String value);
+    /** <p>This method does the actual work of setting a property.
+     * Subclasses must implement this method.</p>
+     * @param xml glade screen definition
+     * @param parent parent widget of the target widget.
+     * @param widget target widget.
+     * @param value the value to set in String.
+     */
+    abstract void set(Interface xml, Container parent, Component widget, String value);
+    protected static final Logger logger = Logger.getLogger(WidgetPropertySetter.class);
 
-	protected static final Logger logger = Logger.getLogger(WidgetPropertySetter.class);
+    protected void warnUnsupportedProperty(String value) {
+        logger.debug("not supported: {0}", value); //$NON-NLS-1$
+    }
+    private static Map propertyMap;
+    private static final WidgetPropertySetter nullWidgetPropertySetter;
 
-	protected void warnUnsupportedProperty(String value) {
-		logger.debug("not supported: {0}", value); //$NON-NLS-1$
-	}
-
-	private static Map propertyMap;
-
-	private static final WidgetPropertySetter nullWidgetPropertySetter;
-
-	/** <p>Looks up a property setter for given class or its ancestors and
-	 * property name.</p>
-	 * <p>When no setter is found, nullWidgetPropertySetter, which does nothing,
-	 * is returned.</p>
-	 * @param clazz class of the widget whose property is to be set.
-	 * @param name the proeprty name to be set.
-	 * @return a setter.
-	 */
-	static WidgetPropertySetter getSetter(Class clazz, String name) {
-		for (/**/; clazz != null; clazz = clazz.getSuperclass()) {
-			Map map = (Map)propertyMap.get(clazz);
-			if (map == null || ! map.containsKey(name)) {
-				continue;
-			}
-			WidgetPropertySetter setter = (WidgetPropertySetter)map.get(name);
-			if (setter != null) {
-				return setter;
-			}
-		}
-		return nullWidgetPropertySetter;
-	}
-
-	private static void registerProperty(Class clazz, String propertyName, WidgetPropertySetter setter) {
-		if ( ! propertyMap.containsKey(clazz)) {
-			propertyMap.put(clazz, new HashMap());
-		}
-		Map map = (Map)propertyMap.get(clazz);
-		map.put(propertyName, setter);
-	}
-
-	static {
-		propertyMap = new HashMap();
-
-		nullWidgetPropertySetter = new WidgetPropertySetter() {
-			void set(Interface xml, Container parent, Component widget, String value) {
-				// do nothing
-			}
-		};
-
-		registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				AbstractButton button = (AbstractButton)widget;
-				button.setText(value.replaceAll("_",""));
-			}
-		});
-
-		registerProperty(Component.class, "width_request", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				Dimension size = widget.getSize();
-				try {
-					size.width = Integer.parseInt(value);
-					int height = size.height;
-					size.height = height;
-					widget.setSize(size);
-				} catch (NumberFormatException e) {
-					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
-				}
-			} 
-		});
-		registerProperty(Component.class, "width", getSetter(Component.class, "width_request")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		registerProperty(Component.class, "height_request", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				Dimension size = widget.getSize();
-				try {
-					size.height = Integer.parseInt(value);
-					int width = size.width;
-					size.width = width;
-					widget.setSize(size);
-				} catch (NumberFormatException e) {
-					throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
-				}
-			}
-		});
-		registerProperty(Component.class, "height", getSetter(Component.class, "height_request")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		registerProperty(Component.class, "visible", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				boolean visible = ParameterConverter.toBoolean(value);
-				widget.setVisible(visible);
-			}
-		});
-
-		registerProperty(Component.class, "tooltip", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JComponent c = (JComponent)widget;
-				c.setToolTipText(value);
-			}
-		});
-
-		registerProperty(Component.class, "has_default", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				if (ParameterConverter.toBoolean(value)) {
-					xml.setDefaultWidget(widget);
-				}
-			}
-		});
-
-		registerProperty(Component.class, "has_focus", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				if (ParameterConverter.toBoolean(value)) {
-					xml.setFocusWidget(widget);
-				}
-			}
-		});
-
-		registerProperty(java.awt.Frame.class, "title", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				java.awt.Frame frame = (java.awt.Frame)widget;
-				frame.setTitle(value);
-			}
-		});
-
-		registerProperty(JLabel.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JLabel label = (JLabel)widget;
-				value = value.replaceFirst("\\s+\\z", ""); //$NON-NLS-1$ //$NON-NLS-2$
-				label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value); //$NON-NLS-1$
-			}
-
-			// convert multi-line label value into HTML
-			private String makeHTML(String value) {
-				StringBuffer buf = new StringBuffer("<html>"); //$NON-NLS-1$
-				StringTokenizer tokens = new StringTokenizer(value, "\n\"<>&", true); //$NON-NLS-1$
-				while (tokens.hasMoreTokens()) {
-					String token = tokens.nextToken();
-					if ("\n".equals(token)) { //$NON-NLS-1$
-						buf.append("<br>"); //$NON-NLS-1$
-					} else if ("\"".equals(token)) { //$NON-NLS-1$
-						buf.append("&dquot;"); //$NON-NLS-1$
-					} else if ("<".equals(token)) { //$NON-NLS-1$
-						buf.append("&lt;"); //$NON-NLS-1$
-					} else if (">".equals(token)) { //$NON-NLS-1$
-						buf.append("&gt;"); //$NON-NLS-1$
-					} else if ("&".equals(token)) { //$NON-NLS-1$
-						buf.append("&amp;"); //$NON-NLS-1$
-					} else {
-						buf.append(token);
-					}
-				}
-				buf.append("</html>"); //$NON-NLS-1$
-				value = buf.toString();
-				return value;
-			}
-		});
-
-		registerProperty(JLabel.class, "xalign", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JLabel label = (JLabel)widget;
-				double align = Double.parseDouble(value);
-				if (align < 0.5) {
-					label.setHorizontalAlignment(SwingConstants.LEFT);
-				} else if (0.5 < align) {
-					label.setHorizontalAlignment(SwingConstants.RIGHT);
-				} else {
-					label.setHorizontalAlignment(SwingConstants.CENTER);
-				}
-			}
-		});
-
-		registerProperty(JLabel.class, "yalign", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JLabel label = (JLabel)widget;
-				double align = Double.parseDouble(value);
-				if (align < 0.5) {
-					label.setVerticalAlignment(SwingConstants.TOP);
-				} else if (0.5 < align) {
-					label.setVerticalAlignment(SwingConstants.BOTTOM);
-				} else {
-					label.setVerticalAlignment(SwingConstants.CENTER);
-				}
-			}
-		});
-
-		registerProperty(JList.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JList list = (JList)widget;
-				value = normalize(value, "SELECTION_"); //$NON-NLS-1$
-				if ("SINGLE".equals(value)) { //$NON-NLS-1$
-					list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
-					list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-				} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
-					warnUnsupportedProperty(value);
-				} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
-					warnUnsupportedProperty(value);
-				} else {
-					throw new IllegalArgumentException("invalid selection mode"); //$NON-NLS-1$
-				}
-			}
-		});
-
-		registerProperty(JTextComponent.class, "editable", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTextComponent text = (JTextComponent)widget;
-				final boolean flag = ParameterConverter.toBoolean(value);
-				text.setEditable(flag);
-				text.setFocusable(flag);
-			}
-		});
-
-		registerProperty(JTextComponent.class, "can_focus", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTextComponent text = (JTextComponent)widget;
-				final boolean flag = ParameterConverter.toBoolean(value);
-				text.setEditable(flag);
-				text.setFocusable(flag);
-			}
-		});
-
-		registerProperty(JTextComponent.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTextComponent text = (JTextComponent)widget;
-				text.setText(value);
-			}
-		});
-
-		registerProperty(JTextArea.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTextArea text = (JTextArea)widget;
-				text.setText(value);
-				if ( ! text.isEditable()) {
-					text.setCaretPosition(0);
-				}
-			}
-		});
-
-		registerProperty(JTextField.class, "justify", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTextField text = (JTextField)widget;
-				value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
-				if ("CENTER".equals(value)) { //$NON-NLS-1$
-					text.setHorizontalAlignment(SwingConstants.CENTER);
-				} else if ("LEFT".equals(value)) { //$NON-NLS-1$
-					text.setHorizontalAlignment(SwingConstants.LEFT);
-				} else if ("RIGHT".equals(value)) { //$NON-NLS-1$
-					text.setHorizontalAlignment(SwingConstants.RIGHT);
-				} else {
-					warnUnsupportedProperty(value);
-				}
-			}
-		});
-
-		registerProperty(JLabel.class, "wrap", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JLabel label = (JLabel)widget;
-				// wrap=true is converted to left alighnemt
-				if (ParameterConverter.toBoolean(value)) {
-					label.setHorizontalAlignment(SwingConstants.LEFT);
-				}
-			}
-		});
-
-		registerProperty(JPasswordField.class, "invisible_char", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JPasswordField password = (JPasswordField)widget;
-				password.setEchoChar(value.charAt(0));
-			}
-		});
-
-		registerProperty(NumberEntry.class, "format", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				NumberEntry entry = (NumberEntry)widget;
-				entry.setFormat(value);		
-			}
-		});
-
-		registerProperty(PandaEntry.class, "input_mode", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				PandaEntry entry = (PandaEntry)widget;
-				if (value.equals("ASCII")) { //$NON-NLS-1$
-					entry.setInputMode(PandaEntry.ASCII);
-				} else if (value.equals("KANA")) { //$NON-NLS-1$
-					entry.setInputMode(PandaEntry.KANA);
-				} else if (value.equals("XIM")) { //$NON-NLS-1$
-					entry.setInputMode(PandaEntry.XIM);
-				} else {
-					throw new IllegalArgumentException("invalid input mode"); //$NON-NLS-1$
-				}
-			}
-		});
-
-		registerProperty(Entry.class, "text_max_length", new WidgetPropertySetter() {
-			void set(Interface xml, Container parent, Component widget, String value) {
-				final Entry entry = (Entry)widget;
-				final int limit = ParameterConverter.toInteger(value);
-				entry.setLimit(limit);
+    /** <p>Looks up a property setter for given class or its ancestors and
+     * property name.</p>
+     * <p>When no setter is found, nullWidgetPropertySetter, which does nothing,
+     * is returned.</p>
+     * @param clazz class of the widget whose property is to be set.
+     * @param name the proeprty name to be set.
+     * @return a setter.
+     */
+    static WidgetPropertySetter getSetter(Class clazz, String name) {
+        for (/**/; clazz != null; clazz = clazz.getSuperclass()) {
+            Map map = (Map) propertyMap.get(clazz);
+            if (map == null || !map.containsKey(name)) {
+                continue;
             }
-		});
+            WidgetPropertySetter setter = (WidgetPropertySetter) map.get(name);
+            if (setter != null) {
+                return setter;
+            }
+        }
+        return nullWidgetPropertySetter;
+    }
 
-		registerProperty(PandaEntry.class, "xim_enabled", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				PandaEntry entry = (PandaEntry)widget;
-				entry.setXIMEnabled(ParameterConverter.toBoolean(value));
-			}
-		});
+    private static void registerProperty(Class clazz, String propertyName, WidgetPropertySetter setter) {
+        if (!propertyMap.containsKey(clazz)) {
+            propertyMap.put(clazz, new HashMap());
+        }
+        Map map = (Map) propertyMap.get(clazz);
+        map.put(propertyName, setter);
+    }
 
-		registerProperty(JProgressBar.class, "lower", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JProgressBar progress = (JProgressBar)widget;
-				BoundedRangeModel model = progress.getModel();
-				model.setMinimum(ParameterConverter.toInteger(value));
-			}
-		});
+    static {
+        propertyMap = new HashMap();
 
-		registerProperty(JProgressBar.class, "upper", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JProgressBar progress = (JProgressBar)widget;
-				BoundedRangeModel model = progress.getModel();
-				model.setMaximum(ParameterConverter.toInteger(value));
-			}
-		});
+        nullWidgetPropertySetter = new WidgetPropertySetter() {
 
-		registerProperty(JProgressBar.class, "value", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JProgressBar progress = (JProgressBar)widget;
-				BoundedRangeModel model = progress.getModel();
-				model.setValue(ParameterConverter.toInteger(value));
-			}
-		});
+            void set(Interface xml, Container parent, Component widget, String value) {
+                // do nothing
+            }
+        };
 
-		registerProperty(JProgressBar.class, "orientation", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JProgressBar progress = (JProgressBar)widget;
-				value = normalize(value, "PROGRESS_"); //$NON-NLS-1$
-				if ("LEFT_TO_RIGHT".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(SwingConstants.HORIZONTAL);
-				} else if ("RIGHT_TO_LEFT".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(SwingConstants.HORIZONTAL);
-				} else if ("TOP_TO_BOTTOM".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(SwingConstants.VERTICAL);
-				} else if ("BOTTOM_TO_TOP".equals(value)) { //$NON-NLS-1$
-					progress.setOrientation(SwingConstants.VERTICAL);
-				}
-			}
-		});
+        registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(JProgressBar.class, "show_text", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JProgressBar progress = (JProgressBar)widget;
-				progress.setStringPainted(ParameterConverter.toBoolean(value));
-			}
-		});
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                AbstractButton button = (AbstractButton) widget;
+                button.setText(value.replaceAll("_", ""));
+            }
+        });
 
-		registerProperty(JTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTable table = (JTable)widget;
-				TableColumnModel model = table.getColumnModel();
-				int columns = ParameterConverter.toInteger(value);
-				while (model.getColumnCount() < columns) {
-					model.addColumn(new TableColumn());
-				}
-			}
-		});
+        registerProperty(Component.class, "width_request", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTable table = (JTable)widget;
-				TableColumnModel model = table.getColumnModel();				
-				StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
-				int columns = tokens.countTokens();
-				if (model.getColumnCount() < columns) {
-					WidgetPropertySetter setter = getSetter(JTable.class, "columns"); //$NON-NLS-1$
-					setter.set(xml, parent, widget, String.valueOf(columns));
-				}
-				assert columns == model.getColumnCount();
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                Dimension size = widget.getSize();
+                try {
+                    size.width = Integer.parseInt(value);
+                    int height = size.height;
+                    size.height = height;
+                    widget.setSize(size);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
+                }
+            }
+        });
+        registerProperty(Component.class, "width", getSetter(Component.class, "width_request")); //$NON-NLS-1$ //$NON-NLS-2$
 
-				int totalWidth = 0;
-				for (int i = 0; tokens.hasMoreTokens(); i++) {
-					TableColumn column = model.getColumn(i);
-					int width = ParameterConverter.toInteger(tokens.nextToken());
-					width += 8; // FIXME do not use immediate value like this
-					column.setPreferredWidth(width);
-					column.setWidth(width);
-					totalWidth += width;
-				}
+        registerProperty(Component.class, "height_request", new WidgetPropertySetter() { //$NON-NLS-1$
 
-				int parentWidth = table.getWidth();
-				if (parent instanceof JScrollPane) {
-					JScrollPane scroll = (JScrollPane)parent;
-					parentWidth = scroll.getWidth();
-					Insets insets = scroll.getInsets();
-					parentWidth -= insets.left + insets.right;
-					JScrollBar vScrollBar = scroll.getVerticalScrollBar();
-					if (vScrollBar != null) {
-						ComponentUI ui = vScrollBar.getUI();
-						parentWidth -= ui.getPreferredSize(vScrollBar).getWidth();
-					}
-				}
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                Dimension size = widget.getSize();
+                try {
+                    size.height = Integer.parseInt(value);
+                    int width = size.width;
+                    size.width = width;
+                    widget.setSize(size);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
+                }
+            }
+        });
+        registerProperty(Component.class, "height", getSetter(Component.class, "height_request")); //$NON-NLS-1$ //$NON-NLS-2$
 
-				if (totalWidth < parentWidth) {
-					TableColumn lastColumn = model.getColumn(columns - 1);
-					int width = lastColumn.getPreferredWidth();
-					width += parentWidth - totalWidth;
-					lastColumn.setPreferredWidth(width);
-					lastColumn.setWidth(width);
-				}
-			}
-		});
+        registerProperty(Component.class, "visible", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(JTable.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTable table = (JTable)widget;
-				value = normalize(value, "SELECTION_"); //$NON-NLS-1$
-				if ("SINGLE".equals(value)) { //$NON-NLS-1$
-					table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				} else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
-					table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-				} else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
-					warnUnsupportedProperty(value);
-				} else if ("BROWSE".equals(value)) { //$NON-NLS-1$
-					warnUnsupportedProperty(value);
-				} else {
-					throw new IllegalArgumentException(value);
-				}
-			}
-		});
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                boolean visible = ParameterConverter.toBoolean(value);
+                widget.setVisible(visible);
+            }
+        });
 
-		registerProperty(JTable.class, "show_titles", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JTable table = (JTable)widget;
-				JTableHeader header = table.getTableHeader();
-				header.setVisible(ParameterConverter.toBoolean(value));
-			}
-		});
+        registerProperty(Component.class, "tooltip", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(PandaHTML.class, "uri", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				PandaHTML pane = (PandaHTML)widget;
-				try {
-					if (value.length() == 0) return; 
-					URL uri = new URL(value);
-					pane.setURI(uri);
-				} catch (MalformedURLException e) {
-					logger.warn(e);
-				}
-			}
-		});
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JComponent c = (JComponent) widget;
+                c.setToolTipText(value);
+            }
+        });
 
-		registerProperty(PandaTimer.class, "duration", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				PandaTimer timer = (PandaTimer)widget;
-				timer.setDuration(ParameterConverter.toInteger(value));
-			}
-		});
+        registerProperty(Component.class, "has_default", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(org.montsuqi.widgets.Frame.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame)widget;
-				frame.setBorder(BorderFactory.createTitledBorder(value));
-			}
-		});
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                if (ParameterConverter.toBoolean(value)) {
+                    xml.setDefaultWidget(widget);
+                }
+            }
+        });
 
-		registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JScrollPane scroll = (JScrollPane)widget;
-				value = normalize(value, "POLICY_"); //$NON-NLS-1$
-				if ("ALWAYS".equals(value)) { //$NON-NLS-1$
-					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-				} else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
-					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				} else if ("NEVER".equals(value)) { //$NON-NLS-1$
-					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-				} else {
-					throw new IllegalArgumentException(value);
-				}
-			}
-		});
+        registerProperty(Component.class, "has_focus", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
-			public void set(Interface xml, Container parent, Component widget, String value) {
-				JScrollPane scroll = (JScrollPane)widget;
-				value = normalize(value, "POLICY_"); //$NON-NLS-1$
-				if ("ALWAYS".equals(value)) { //$NON-NLS-1$
-					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-				} else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
-					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-				} else if ("NEVER".equals(value)) { //$NON-NLS-1$
-					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-				} else {
-					throw new IllegalArgumentException(value);
-				}
-			}
-		});
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                if (ParameterConverter.toBoolean(value)) {
+                    xml.setFocusWidget(widget);
+                }
+            }
+        });
 
-		registerProperty(JMenuItem.class, "stock_item", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				JMenuItem item = (JMenuItem)widget;
-				value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
-				UIStock stock = UIStock.get(value);
-				if (stock == null) {
-					return;
-				}
-				String oldText = item.getText();
-				String newText = stock.getText();
-				assert newText != null;
-				if (oldText == null || oldText.length() == 0) {
-					item.setText(newText);
-				}
-				Icon oldIcon = item.getIcon();
-				Icon newIcon = stock.getIcon();
-				if (oldIcon == null && newIcon != null) {
-					item.setIcon(newIcon);
-				}
-				KeyStroke oldAccelerator = item.getAccelerator();
-				KeyStroke newAccelerator = stock.getAccelerator();
-				if (oldAccelerator == null && newAccelerator != null) {
-					item.setAccelerator(newAccelerator);
-				}
-			}
-		});
+        registerProperty(AbstractButton.class, "can_focus", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                final boolean flag = ParameterConverter.toBoolean(value);
+                widget.setFocusable(flag);
+            }
+        });
+
+        registerProperty(java.awt.Frame.class, "title", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                java.awt.Frame frame = (java.awt.Frame) widget;
+                frame.setTitle(value);
+            }
+        });
+
+        registerProperty(JLabel.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JLabel label = (JLabel) widget;
+                value = value.replaceFirst("\\s+\\z", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value); //$NON-NLS-1$
+            }
+
+            // convert multi-line label value into HTML
+            private String makeHTML(String value) {
+                StringBuffer buf = new StringBuffer("<html>"); //$NON-NLS-1$
+                StringTokenizer tokens = new StringTokenizer(value, "\n\"<>&", true); //$NON-NLS-1$
+                while (tokens.hasMoreTokens()) {
+                    String token = tokens.nextToken();
+                    if ("\n".equals(token)) { //$NON-NLS-1$
+                        buf.append("<br>"); //$NON-NLS-1$
+                    } else if ("\"".equals(token)) { //$NON-NLS-1$
+                        buf.append("&dquot;"); //$NON-NLS-1$
+                    } else if ("<".equals(token)) { //$NON-NLS-1$
+                        buf.append("&lt;"); //$NON-NLS-1$
+                    } else if (">".equals(token)) { //$NON-NLS-1$
+                        buf.append("&gt;"); //$NON-NLS-1$
+                    } else if ("&".equals(token)) { //$NON-NLS-1$
+                        buf.append("&amp;"); //$NON-NLS-1$
+                    } else {
+                        buf.append(token);
+                    }
+                }
+                buf.append("</html>"); //$NON-NLS-1$
+                value = buf.toString();
+                return value;
+            }
+        });
+
+        registerProperty(JLabel.class, "xalign", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JLabel label = (JLabel) widget;
+                double align = Double.parseDouble(value);
+                if (align < 0.5) {
+                    label.setHorizontalAlignment(SwingConstants.LEFT);
+                } else if (0.5 < align) {
+                    label.setHorizontalAlignment(SwingConstants.RIGHT);
+                } else {
+                    label.setHorizontalAlignment(SwingConstants.CENTER);
+                }
+            }
+        });
+
+        registerProperty(JLabel.class, "yalign", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JLabel label = (JLabel) widget;
+                double align = Double.parseDouble(value);
+                if (align < 0.5) {
+                    label.setVerticalAlignment(SwingConstants.TOP);
+                } else if (0.5 < align) {
+                    label.setVerticalAlignment(SwingConstants.BOTTOM);
+                } else {
+                    label.setVerticalAlignment(SwingConstants.CENTER);
+                }
+            }
+        });
+
+        registerProperty(JList.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JList list = (JList) widget;
+                value = normalize(value, "SELECTION_"); //$NON-NLS-1$
+                if ("SINGLE".equals(value)) { //$NON-NLS-1$
+                    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                } else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
+                    list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                } else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
+                    warnUnsupportedProperty(value);
+                } else if ("BROWSE".equals(value)) { //$NON-NLS-1$
+                    warnUnsupportedProperty(value);
+                } else {
+                    throw new IllegalArgumentException("invalid selection mode"); //$NON-NLS-1$
+                }
+            }
+        });
+
+        registerProperty(JTextComponent.class, "editable", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTextComponent text = (JTextComponent) widget;
+                final boolean flag = ParameterConverter.toBoolean(value);
+                text.setEditable(flag);
+                text.setFocusable(flag);
+            }
+        });
+
+        registerProperty(JTextComponent.class, "can_focus", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTextComponent text = (JTextComponent) widget;
+                final boolean flag = ParameterConverter.toBoolean(value);
+                text.setEditable(flag);
+                text.setFocusable(flag);
+            }
+        });
+
+        registerProperty(JTextComponent.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTextComponent text = (JTextComponent) widget;
+                text.setText(value);
+            }
+        });
+
+        registerProperty(JTextArea.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTextArea text = (JTextArea) widget;
+                text.setText(value);
+                if (!text.isEditable()) {
+                    text.setCaretPosition(0);
+                }
+            }
+        });
+
+        registerProperty(JTextField.class, "justify", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTextField text = (JTextField) widget;
+                value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
+                if ("CENTER".equals(value)) { //$NON-NLS-1$
+                    text.setHorizontalAlignment(SwingConstants.CENTER);
+                } else if ("LEFT".equals(value)) { //$NON-NLS-1$
+                    text.setHorizontalAlignment(SwingConstants.LEFT);
+                } else if ("RIGHT".equals(value)) { //$NON-NLS-1$
+                    text.setHorizontalAlignment(SwingConstants.RIGHT);
+                } else {
+                    warnUnsupportedProperty(value);
+                }
+            }
+        });
+
+        registerProperty(JLabel.class, "wrap", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JLabel label = (JLabel) widget;
+                // wrap=true is converted to left alighnemt
+                if (ParameterConverter.toBoolean(value)) {
+                    label.setHorizontalAlignment(SwingConstants.LEFT);
+                }
+            }
+        });
+
+        registerProperty(JPasswordField.class, "invisible_char", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JPasswordField password = (JPasswordField) widget;
+                password.setEchoChar(value.charAt(0));
+            }
+        });
+
+        registerProperty(NumberEntry.class, "format", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                NumberEntry entry = (NumberEntry) widget;
+                entry.setFormat(value);
+            }
+        });
+
+        registerProperty(PandaEntry.class, "input_mode", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaEntry entry = (PandaEntry) widget;
+                if (value.equals("ASCII")) { //$NON-NLS-1$
+                    entry.setInputMode(PandaEntry.ASCII);
+                } else if (value.equals("KANA")) { //$NON-NLS-1$
+                    entry.setInputMode(PandaEntry.KANA);
+                } else if (value.equals("XIM")) { //$NON-NLS-1$
+                    entry.setInputMode(PandaEntry.XIM);
+                } else {
+                    throw new IllegalArgumentException("invalid input mode"); //$NON-NLS-1$
+                }
+            }
+        });
+
+        registerProperty(Entry.class, "text_max_length", new WidgetPropertySetter() {
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                final Entry entry = (Entry) widget;
+                final int limit = ParameterConverter.toInteger(value);
+                entry.setLimit(limit);
+            }
+        });
+
+        registerProperty(PandaEntry.class, "xim_enabled", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaEntry entry = (PandaEntry) widget;
+                entry.setXIMEnabled(ParameterConverter.toBoolean(value));
+            }
+        });
+
+        registerProperty(JProgressBar.class, "lower", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JProgressBar progress = (JProgressBar) widget;
+                BoundedRangeModel model = progress.getModel();
+                model.setMinimum(ParameterConverter.toInteger(value));
+            }
+        });
+
+        registerProperty(JProgressBar.class, "upper", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JProgressBar progress = (JProgressBar) widget;
+                BoundedRangeModel model = progress.getModel();
+                model.setMaximum(ParameterConverter.toInteger(value));
+            }
+        });
+
+        registerProperty(JProgressBar.class, "value", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JProgressBar progress = (JProgressBar) widget;
+                BoundedRangeModel model = progress.getModel();
+                model.setValue(ParameterConverter.toInteger(value));
+            }
+        });
+
+        registerProperty(JProgressBar.class, "orientation", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JProgressBar progress = (JProgressBar) widget;
+                value = normalize(value, "PROGRESS_"); //$NON-NLS-1$
+                if ("LEFT_TO_RIGHT".equals(value)) { //$NON-NLS-1$
+                    progress.setOrientation(SwingConstants.HORIZONTAL);
+                } else if ("RIGHT_TO_LEFT".equals(value)) { //$NON-NLS-1$
+                    progress.setOrientation(SwingConstants.HORIZONTAL);
+                } else if ("TOP_TO_BOTTOM".equals(value)) { //$NON-NLS-1$
+                    progress.setOrientation(SwingConstants.VERTICAL);
+                } else if ("BOTTOM_TO_TOP".equals(value)) { //$NON-NLS-1$
+                    progress.setOrientation(SwingConstants.VERTICAL);
+                }
+            }
+        });
+
+        registerProperty(JProgressBar.class, "show_text", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JProgressBar progress = (JProgressBar) widget;
+                progress.setStringPainted(ParameterConverter.toBoolean(value));
+            }
+        });
+
+        registerProperty(JTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTable table = (JTable) widget;
+                TableColumnModel model = table.getColumnModel();
+                int columns = ParameterConverter.toInteger(value);
+                while (model.getColumnCount() < columns) {
+                    model.addColumn(new TableColumn());
+                }
+            }
+        });
+
+        registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTable table = (JTable) widget;
+                TableColumnModel model = table.getColumnModel();
+                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
+                int columns = tokens.countTokens();
+                if (model.getColumnCount() < columns) {
+                    WidgetPropertySetter setter = getSetter(JTable.class, "columns"); //$NON-NLS-1$
+                    setter.set(xml, parent, widget, String.valueOf(columns));
+                }
+                assert columns == model.getColumnCount();
+
+                int totalWidth = 0;
+                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                    TableColumn column = model.getColumn(i);
+                    int width = ParameterConverter.toInteger(tokens.nextToken());
+                    width += 8; // FIXME do not use immediate value like this
+                    column.setPreferredWidth(width);
+                    column.setWidth(width);
+                    totalWidth += width;
+                }
+
+                int parentWidth = table.getWidth();
+                if (parent instanceof JScrollPane) {
+                    JScrollPane scroll = (JScrollPane) parent;
+                    parentWidth = scroll.getWidth();
+                    Insets insets = scroll.getInsets();
+                    parentWidth -= insets.left + insets.right;
+                    JScrollBar vScrollBar = scroll.getVerticalScrollBar();
+                    if (vScrollBar != null) {
+                        ComponentUI ui = vScrollBar.getUI();
+                        parentWidth -= ui.getPreferredSize(vScrollBar).getWidth();
+                    }
+                }
+
+                if (totalWidth < parentWidth) {
+                    TableColumn lastColumn = model.getColumn(columns - 1);
+                    int width = lastColumn.getPreferredWidth();
+                    width += parentWidth - totalWidth;
+                    lastColumn.setPreferredWidth(width);
+                    lastColumn.setWidth(width);
+                }
+            }
+        });
+
+        registerProperty(JTable.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTable table = (JTable) widget;
+                value = normalize(value, "SELECTION_"); //$NON-NLS-1$
+                if ("SINGLE".equals(value)) { //$NON-NLS-1$
+                    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                } else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
+                    table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                } else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
+                    warnUnsupportedProperty(value);
+                } else if ("BROWSE".equals(value)) { //$NON-NLS-1$
+                    warnUnsupportedProperty(value);
+                } else {
+                    throw new IllegalArgumentException(value);
+                }
+            }
+        });
+
+        registerProperty(JTable.class, "show_titles", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JTable table = (JTable) widget;
+                JTableHeader header = table.getTableHeader();
+                header.setVisible(ParameterConverter.toBoolean(value));
+            }
+        });
+
+        registerProperty(PandaHTML.class, "uri", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaHTML pane = (PandaHTML) widget;
+                try {
+                    if (value.length() == 0) {
+                        return;
+                    }
+                    URL uri = new URL(value);
+                    pane.setURI(uri);
+                } catch (MalformedURLException e) {
+                    logger.warn(e);
+                }
+            }
+        });
+
+        registerProperty(PandaTimer.class, "duration", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaTimer timer = (PandaTimer) widget;
+                timer.setDuration(ParameterConverter.toInteger(value));
+            }
+        });
+
+        registerProperty(org.montsuqi.widgets.Frame.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame) widget;
+                frame.setBorder(BorderFactory.createTitledBorder(value));
+            }
+        });
+
+        registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JScrollPane scroll = (JScrollPane) widget;
+                value = normalize(value, "POLICY_"); //$NON-NLS-1$
+                if ("ALWAYS".equals(value)) { //$NON-NLS-1$
+                    scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+                } else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
+                    scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                } else if ("NEVER".equals(value)) { //$NON-NLS-1$
+                    scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                } else {
+                    throw new IllegalArgumentException(value);
+                }
+            }
+        });
+
+        registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                JScrollPane scroll = (JScrollPane) widget;
+                value = normalize(value, "POLICY_"); //$NON-NLS-1$
+                if ("ALWAYS".equals(value)) { //$NON-NLS-1$
+                    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+                } else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
+                    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                } else if ("NEVER".equals(value)) { //$NON-NLS-1$
+                    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                } else {
+                    throw new IllegalArgumentException(value);
+                }
+            }
+        });
+
+        registerProperty(JMenuItem.class, "stock_item", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                JMenuItem item = (JMenuItem) widget;
+                value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
+                UIStock stock = UIStock.get(value);
+                if (stock == null) {
+                    return;
+                }
+                String oldText = item.getText();
+                String newText = stock.getText();
+                assert newText != null;
+                if (oldText == null || oldText.length() == 0) {
+                    item.setText(newText);
+                }
+                Icon oldIcon = item.getIcon();
+                Icon newIcon = stock.getIcon();
+                if (oldIcon == null && newIcon != null) {
+                    item.setIcon(newIcon);
+                }
+                KeyStroke oldAccelerator = item.getAccelerator();
+                KeyStroke newAccelerator = stock.getAccelerator();
+                if (oldAccelerator == null && newAccelerator != null) {
+                    item.setAccelerator(newAccelerator);
+                }
+            }
+        });
 
 //		registerProperty(Table.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
@@ -649,98 +694,107 @@ abstract class WidgetPropertySetter {
 //			}
 //		});
 
-		registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1
-			void set(Interface xml, Container parent, Component widget, String value) {
-				Window window = (Window)widget;
-				window.setAllow_Grow(ParameterConverter.toBoolean(value));
-			}
-		});
+        registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1
 
-		registerProperty(Window.class, "allow_shrink", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-			        Window window = (Window)widget;
-				window.setAllow_Shrink(ParameterConverter.toBoolean(value));
-			}
-		});
+            void set(Interface xml, Container parent, Component widget, String value) {
+                Window window = (Window) widget;
+                window.setAllow_Grow(ParameterConverter.toBoolean(value));
+            }
+        });
 
-		registerProperty(java.awt.Window.class, "position", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				value = normalize(value, null);
-				if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
-					java.awt.Window window = (java.awt.Window)widget;
-                                        window.setLocationRelativeTo(null);
-				}
-			}
-		});
+        registerProperty(Window.class, "allow_shrink", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(java.awt.Window.class, "x", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				java.awt.Window window = (java.awt.Window)widget;
-				int x = ParameterConverter.toInteger(value);
-				int y = window.getY();
-				window.setLocation(x,y);
-			}
-		});
+            void set(Interface xml, Container parent, Component widget, String value) {
+                Window window = (Window) widget;
+                window.setAllow_Shrink(ParameterConverter.toBoolean(value));
+            }
+        });
 
-		registerProperty(java.awt.Window.class, "y", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				java.awt.Window window = (java.awt.Window)widget;
-				int x = window.getX();
-				int y = ParameterConverter.toInteger(value);
-				window.setLocation(x,y);
-			}
-		});
+        registerProperty(java.awt.Window.class, "position", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(JDialog.class, "modal", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				JDialog dialog = (JDialog)widget;
-				dialog.setModal(ParameterConverter.toBoolean(value));
-				dialog.setModal(false);
-			}
-		});
+            void set(Interface xml, Container parent, Component widget, String value) {
+                value = normalize(value, null);
+                if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
+                    java.awt.Window window = (java.awt.Window) widget;
+                    window.setLocationRelativeTo(null);
+                }
+            }
+        });
 
-		registerProperty(Pixmap.class, "scaled", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				Pixmap pixmap = (Pixmap)widget;
-				pixmap.setScaled(ParameterConverter.toBoolean(value));
-			}
-		});
+        registerProperty(java.awt.Window.class, "x", new WidgetPropertySetter() { //$NON-NLS-1$
 
-		registerProperty(Pixmap.class, "scaled_width", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				Pixmap pixmap = (Pixmap)widget;
-				pixmap.setScaledWidth(ParameterConverter.toInteger(value));
-			}
-		});
+            void set(Interface xml, Container parent, Component widget, String value) {
+                java.awt.Window window = (java.awt.Window) widget;
+                int x = ParameterConverter.toInteger(value);
+                int y = window.getY();
+                window.setLocation(x, y);
+            }
+        });
 
-		registerProperty(Pixmap.class, "scaled_height", new WidgetPropertySetter() { //$NON-NLS-1$
-			void set(Interface xml, Container parent, Component widget, String value) {
-				Pixmap pixmap = (Pixmap)widget;
-				pixmap.setScaledHeight(ParameterConverter.toInteger(value));
-			}
-		});
-		
-	}
+        registerProperty(java.awt.Window.class, "y", new WidgetPropertySetter() { //$NON-NLS-1$
 
-	/** <p>Removes given prefix along with "GTK_" and "GTK_".
-	 * </p>
-	 * @param value target string to be normalized.
-	 * @param prefixToRemove a prefix to remove. Ignored if it is null or its length is zero.
-	 * @return normalized string.
-	 */
-	static String normalize(String value, String prefixToRemove) {
-		if (value.startsWith("GDK_")) { //$NON-NLS-1$
-			value = value.substring("GDK_".length()); //$NON-NLS-1$
-		}
-		if (value.startsWith("GTK_")) { //$NON-NLS-1$
-			value = value.substring("GTK_".length()); //$NON-NLS-1$
-		}
-		if (prefixToRemove != null) {
-			int length = prefixToRemove.length();
-			if (length > 0 && value.startsWith(prefixToRemove)) {
-				value = value.substring(length);
-			}
-		}
-		return value;
-	}
+            void set(Interface xml, Container parent, Component widget, String value) {
+                java.awt.Window window = (java.awt.Window) widget;
+                int x = window.getX();
+                int y = ParameterConverter.toInteger(value);
+                window.setLocation(x, y);
+            }
+        });
+
+        registerProperty(JDialog.class, "modal", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                JDialog dialog = (JDialog) widget;
+                dialog.setModal(ParameterConverter.toBoolean(value));
+                dialog.setModal(false);
+            }
+        });
+
+        registerProperty(Pixmap.class, "scaled", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                Pixmap pixmap = (Pixmap) widget;
+                pixmap.setScaled(ParameterConverter.toBoolean(value));
+            }
+        });
+
+        registerProperty(Pixmap.class, "scaled_width", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                Pixmap pixmap = (Pixmap) widget;
+                pixmap.setScaledWidth(ParameterConverter.toInteger(value));
+            }
+        });
+
+        registerProperty(Pixmap.class, "scaled_height", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                Pixmap pixmap = (Pixmap) widget;
+                pixmap.setScaledHeight(ParameterConverter.toInteger(value));
+            }
+        });
+
+    }
+
+    /** <p>Removes given prefix along with "GTK_" and "GTK_".
+     * </p>
+     * @param value target string to be normalized.
+     * @param prefixToRemove a prefix to remove. Ignored if it is null or its length is zero.
+     * @return normalized string.
+     */
+    static String normalize(String value, String prefixToRemove) {
+        if (value.startsWith("GDK_")) { //$NON-NLS-1$
+            value = value.substring("GDK_".length()); //$NON-NLS-1$
+        }
+        if (value.startsWith("GTK_")) { //$NON-NLS-1$
+            value = value.substring("GTK_".length()); //$NON-NLS-1$
+        }
+        if (prefixToRemove != null) {
+            int length = prefixToRemove.length();
+            if (length > 0 && value.startsWith(prefixToRemove)) {
+                value = value.substring(length);
+            }
+        }
+        return value;
+    }
 }
