@@ -13,7 +13,6 @@ import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFRenderer;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
 import javax.print.attribute.PrintServiceAttributeSet;
