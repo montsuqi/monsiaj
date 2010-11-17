@@ -40,7 +40,7 @@ public class PDFPrint extends Thread {
 
             pjob.setJobName(file.getName());
 
-            if (System.getProperty("monsia.util.PDFPrint.use_default_setting") == null) {
+            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") == null) {
                 if (!pjob.printDialog()) {
                     return;
                 }
