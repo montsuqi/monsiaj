@@ -137,18 +137,24 @@ public class PDFPrint extends Thread {
                         + "," + format.getImageableY()
                         + "],[" + format.getImageableWidth()
                         + "," + format.getImageableHeight() + "]");
-                g2.setColor(Color.LIGHT_GRAY);
+                g2.setColor(Color.BLACK);
+                float dash[] = {1.0f};
+                BasicStroke dashStroke = new BasicStroke(1.0f,
+                        BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_MITER,
+                        1.0f,
+                        dash,
+                        0.0f);
+                g2.setStroke(dashStroke);
+                g2.setStroke(new BasicStroke(0.1f));
                 int mm = 10;
-                int unit = (int)Math.round(PDFPrint.MMto72DPI(mm));
                 for (int i = 0; i < 100; i++) {
-                    for (int j = 0; j < 100; j++) {
-                        int x = (int)Math.round((j * PDFPrint.MMto72DPI(mm)));
-                        int y = (int)Math.round((i * PDFPrint.MMto72DPI(mm)));
-                        g2.drawRect(x, y, unit, unit);
-                    }
+                        int p = (int) Math.floor((i * PDFPrint.MMto72DPI(mm)));
+                        g2.drawLine(p, 0, p, 2000);
+                        g2.drawLine(0, p, 2000, p);
                 }
                 System.out.println("pageable:" + pageable);
-                g2.setColor(Color.BLACK);
+                g2.setStroke(new BasicStroke(2.0f));
                 g2.drawRect((int) pageable.x, (int) pageable.y,
                         (int) pageable.width, (int) pageable.height);
             }
