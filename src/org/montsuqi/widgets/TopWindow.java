@@ -24,8 +24,10 @@ package org.montsuqi.widgets;
 
 import java.awt.Component;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.net.URL;
 import java.util.prefs.Preferences;
 import javax.swing.JComponent;
 import org.montsuqi.monsia.Interface;
@@ -82,6 +84,9 @@ public class TopWindow extends Window implements ComponentListener {
      */
     public TopWindow() {
         super();
+
+        URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/orca.png");
+        setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
 
         int x, y, width, height;
         x = prefs.getInt(this.getClass().getName() + ".x", 0);

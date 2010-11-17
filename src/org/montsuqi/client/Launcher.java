@@ -62,6 +62,8 @@ import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.Button;
 
 import com.nilo.plaf.nimrod.*;
+import java.awt.Toolkit;
+import java.net.URL;
 
 public class Launcher {
 
@@ -70,7 +72,6 @@ public class Launcher {
     protected Configuration conf;
     protected ConfigurationPanel configPanel;
     protected JComboBox configCombo;
-
 
     static {
         if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -141,9 +142,9 @@ public class Launcher {
                 }
             }
             /* confirm certificate password when the certificate password not preserved */
-            if (conf.getUseSSL(configName) &&
-                    !conf.getClientCertificateFileName(configName).equals("") &&
-                    !conf.getSaveClientCertificatePassword(configName)) {
+            if (conf.getUseSSL(configName)
+                    && !conf.getClientCertificateFileName(configName).equals("")
+                    && !conf.getSaveClientCertificatePassword(configName)) {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_certificate_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_certificate_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -170,11 +171,11 @@ public class Launcher {
         configCombo.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent evt) {
-                configPanel.loadConfiguration((String) configCombo.getSelectedItem(),false);
+                configPanel.loadConfiguration((String) configCombo.getSelectedItem(), false);
             }
         });
         configPanel = createConfigurationPanel();
-        configPanel.loadConfiguration(conf.getConfigurationName(),false);
+        configPanel.loadConfiguration(conf.getConfigurationName(), false);
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$
@@ -241,6 +242,9 @@ public class Launcher {
         final ConfigurationViewer viewer = createConfigurationViewer();
         container.add(mainPanel, BorderLayout.CENTER);
 
+        URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/orca.png");
+        f.setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
+
         JLabel iconLabel = new JLabel("", createIcon(), JLabel.CENTER);
         container.add(iconLabel, BorderLayout.WEST);
 
@@ -288,16 +292,16 @@ public class Launcher {
     }
 
     private void connect() {
-                        conf.save();
+        conf.save();
         Client client = new Client(conf);
         JFrame logFrame = conf.getUseLogViewer(conf.getConfigurationName()) ? createLogFrame(client) : null;
 
         try {
             client.connect();
             client.run();
-        //Thread t = new Thread(client);
-        //t.start();
-        //t.join();
+            //Thread t = new Thread(client);
+            //t.start();
+            //t.join();
         } catch (Exception e) {
             logger.fatal(e);
             ExceptionDialog.showExceptionDialog(e);
