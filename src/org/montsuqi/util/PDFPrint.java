@@ -138,10 +138,13 @@ public class PDFPrint extends Thread {
                         + "],[" + format.getImageableWidth()
                         + "," + format.getImageableHeight() + "]");
                 g2.setColor(Color.LIGHT_GRAY);
-                for (int i = 0; i < 80; i++) {
-                    for (int j = 0; j < 80; j++) {
-                        g2.drawRect(j * 100, i * 100, 100, 100);
-                        g2.drawString("(" + j + "," + i + ")", j * 100, i * 100);
+                int mm = 10;
+                int unit = (int)Math.round(PDFPrint.MMto72DPI(mm));
+                for (int i = 0; i < 100; i++) {
+                    for (int j = 0; j < 100; j++) {
+                        int x = (int)Math.round((j * PDFPrint.MMto72DPI(mm)));
+                        int y = (int)Math.round((i * PDFPrint.MMto72DPI(mm)));
+                        g2.drawRect(x, y, unit, unit);
                     }
                 }
                 System.out.println("pageable:" + pageable);
