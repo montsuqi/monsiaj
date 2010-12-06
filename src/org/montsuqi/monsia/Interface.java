@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -44,9 +45,12 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.MenuElement;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -54,6 +58,7 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.Logger;
+import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaFocusManager;
@@ -345,7 +350,7 @@ public class Interface {
         return (String) propertyTable.get(longName).get(key);
     }
 
-    public void scaleWidget(double h, double v, Insets insets) {
+    public void scaleWidget(double hscale, double vscale, Insets insets) {
         for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
             String key = e.getKey();
             Component component = e.getValue();
@@ -356,8 +361,8 @@ public class Interface {
             String pheight = getProperty(key, "height");
             if (px != null && py != null) {
                 int x, y;
-                x = (int) (Integer.parseInt(px) * h);
-                y = (int) (Integer.parseInt(py) * v);
+                x = (int) (Integer.parseInt(px) * hscale);
+                y = (int) (Integer.parseInt(py) * vscale);
                 if (component instanceof JTextArea || component instanceof PandaCList) {
                     Component parent = component.getParent();
                     if (parent != null) {
@@ -372,8 +377,8 @@ public class Interface {
             }
             if (pwidth != null && pheight != null) {
                 int width, height;
-                width = (int) (Integer.parseInt(pwidth) * h);
-                height = (int) (Integer.parseInt(pheight) * v);
+                width = (int) (Integer.parseInt(pwidth) * hscale);
+                height = (int) (Integer.parseInt(pheight) * vscale);
                 if (component instanceof Window) {
                     width += insets.right + insets.left;
                     height += insets.top + insets.bottom;
@@ -389,6 +394,20 @@ public class Interface {
                     }
                 } else {
                     component.setSize(width, height);
+                }
+            }
+
+            String column_widths = getProperty(key, "column_widths");
+            if (column_widths != null && component instanceof PandaCList) {
+                StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
+                TableColumnModel model = ((JTable) component).getColumnModel();
+                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                    TableColumn column = model.getColumn(i);
+                    int width = ParameterConverter.toInteger(tokens.nextToken());
+                    width += 8;// FIXME do not use immediate value like this
+                    width = (int) (width * hscale);
+                    column.setPreferredWidth(width);
+                    column.setWidth(width);
                 }
             }
         }
