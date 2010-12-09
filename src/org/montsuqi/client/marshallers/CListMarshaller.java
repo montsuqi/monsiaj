@@ -138,6 +138,7 @@ class CListMarshaller extends WidgetMarshaller {
             JScrollBar vScroll = getVerticalScrollBar(table);
             if (vScroll != null) {
                 BoundedRangeModel model = vScroll.getModel();
+                row += rowattrw * model.getExtent();
                 int max = model.getMaximum();
                 int min = model.getMinimum();
                 if ((count - from) > 0 && row != 0) {
