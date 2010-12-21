@@ -179,7 +179,7 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
-            dialog = window.createDialog(parent,topWindow.getX(),topWindow.getY());
+            dialog = window.createDialog(parent, topWindow.getX(), topWindow.getY());
             resetTimer(dialog);
             if (!dialogStack.contains(dialog)) {
                 dialogStack.add(dialog);
@@ -560,22 +560,24 @@ public class Protocol extends Connection {
             if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
                 final Component widget = xml.getWidget(focusWidgetName);
                 if (widget != null && widget.isFocusable()) {
-                    EventQueue.invokeLater(new Runnable() {
+                    if (SystemEnvironment.isMacOSX()) {
+                        EventQueue.invokeLater(new Runnable() {
 
-                        public void run() {
-                            if (SystemEnvironment.isMacOSX()) {
+                            public void run() {
                                 widget.requestFocus();
-                            } else {
-                                KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-                                widget.requestFocusInWindow();
+
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+                        widget.requestFocusInWindow();
+
+                    }
                 }
+                c = receivePacketClass();
             }
-            c = receivePacketClass();
+            logger.leave();
         }
-        logger.leave();
     }
 
     public synchronized void setSessionTitle(String title) {
@@ -629,7 +631,7 @@ public class Protocol extends Connection {
         }
 
         String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
-        printAgent = new PrintAgent(port,user, pass);
+        printAgent = new PrintAgent(port, user, pass);
         printAgent.start();
         logger.leave();
     }

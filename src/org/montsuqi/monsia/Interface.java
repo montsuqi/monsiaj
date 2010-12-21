@@ -350,6 +350,13 @@ public class Interface {
         return (String) propertyTable.get(longName).get(key);
     }
 
+    public void setProperty(String longName, String key, String value) {
+        if (!propertyTable.containsKey(longName)) {
+            return;
+        }
+        propertyTable.get(longName).put(key,value);
+    }
+
     public void scaleWidget(double hscale, double vscale, Insets insets) {
         for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
             String key = e.getKey();

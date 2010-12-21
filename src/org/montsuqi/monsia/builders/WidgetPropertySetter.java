@@ -529,6 +529,9 @@ abstract class WidgetPropertySetter {
                     width += parentWidth - totalWidth;
                     lastColumn.setPreferredWidth(width);
                     lastColumn.setWidth(width);
+                    // replace column_withs property
+                    String new_column_widths = value.substring(0, value.lastIndexOf(",")) + "," + width;
+                    xml.setProperty(widget.getName(), "column_widths", new_column_widths);
                 }
             }
         });

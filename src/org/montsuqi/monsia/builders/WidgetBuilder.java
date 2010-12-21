@@ -269,7 +269,6 @@ public class WidgetBuilder {
             if (widget instanceof Window) {
                 xml.setTopLevel(widget);
             }
-            builder.setCommonParameters(xml, widget, info);
             builder.setSignals(xml, widget, info);
             if (widget instanceof Container) {
                 builder.buildChildren(xml, (Container) widget, info);
@@ -307,6 +306,7 @@ public class WidgetBuilder {
         }
         try {
             Component widget = (Component) clazz.newInstance();
+            setCommonParameters(xml, widget, info);
             setProperties(xml, parent, widget, info.getProperties());
             xml.addAccels(widget, info);
             return widget;
