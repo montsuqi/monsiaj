@@ -327,6 +327,8 @@ public class Launcher {
 
     private JFrame createLogFrame(final Client client) {
         final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); //$NON-NLS-1$
+        URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/orca.png");
+        f.setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout());
         final ConsolePane console = new ConsolePane();
@@ -386,6 +388,7 @@ public class Launcher {
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         f.addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosed(WindowEvent e) {
                 client.exitSystem();
             }
