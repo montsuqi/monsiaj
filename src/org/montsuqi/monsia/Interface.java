@@ -417,6 +417,7 @@ public class Interface {
                     column.setWidth(width);
                 }
             }
+            component.validate();
         }
     }
 
