@@ -504,6 +504,7 @@ public class Protocol extends Connection {
 
     synchronized void getScreenData() throws IOException {
         logger.enter();
+        Interface showXml = null;
         String wName = null;
         Node node;
         checkScreens(false);
@@ -528,6 +529,7 @@ public class Protocol extends Connection {
                 case ScreenType.CHANGE_WINDOW:
                     this.windowName = wName;
                     widgetName = new StringBuffer(wName);
+                    showXml = xml;
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {
                         receiveValue(widgetName, widgetName.length());
@@ -557,8 +559,8 @@ public class Protocol extends Connection {
             String focusWindowName = receiveString();
             String focusWidgetName = receiveString();
             node = getNode(focusWindowName);
-            if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
-                final Component widget = xml.getWidget(focusWidgetName);
+            if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName) && showXml != null) {
+                final Component widget = showXml.getWidget(focusWidgetName);
                 if (widget != null && widget.isFocusable()) {
                     if (SystemEnvironment.isMacOSX()) {
                         EventQueue.invokeLater(new Runnable() {

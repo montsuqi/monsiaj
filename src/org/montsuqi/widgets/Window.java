@@ -88,6 +88,7 @@ public class Window extends JFrame {
         }
         dialog.setSize(this.getSize());
         dialog.validate();
+        dialog.requestFocus();
         return dialog;
     }
 
