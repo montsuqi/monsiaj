@@ -530,7 +530,12 @@ abstract class WidgetPropertySetter {
                     lastColumn.setPreferredWidth(width);
                     lastColumn.setWidth(width);
                     // replace column_withs property
-                    String new_column_widths = value.substring(0, value.lastIndexOf(",")) + "," + width;
+                                        String new_column_widths;
+                    if (value.contains(",")) {
+                        new_column_widths = value.substring(0, value.lastIndexOf(",")) + "," + width;
+                    } else {
+                        new_column_widths = "" + width;
+                    }
                     xml.setProperty(widget.getName(), "column_widths", new_column_widths);
                 }
             }
