@@ -179,7 +179,7 @@ public class Protocol extends Connection {
                 parent.setEnabled(false);
                 stopTimer(parent);
             }
-            dialog = window.createDialog(parent, topWindow.getX(), topWindow.getY());
+            dialog = window.createDialog(parent, topWindow);
             resetTimer(dialog);
             if (!dialogStack.contains(dialog)) {
                 dialogStack.add(dialog);

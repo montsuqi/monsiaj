@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class Window extends JFrame {
         }
     }
 
-    public JDialog createDialog(Component parent,int tx, int ty) {
+    public JDialog createDialog(Component parent, TopWindow tw) {
         if (dialog == null) {
             if (parent instanceof Frame) {
                 dialog = new JDialog((Frame) parent, this.getTitle(), false);
@@ -71,7 +72,22 @@ public class Window extends JFrame {
             dialog.getContentPane().add(child);
             dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-            dialog.setLocation(tx + this.getX(),ty + this.getY());
+            int x = tw.getX() + (int) (this.getX() * tw.getHScale());
+            int y = tw.getY() + (int) (this.getY() * tw.getVScale());
+            Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            if (x + this.getWidth() > scrBounds.width) {
+                x += scrBounds.width - (x + this.getWidth());
+            }
+            if (y + this.getHeight() > scrBounds.height) {
+                y +=  scrBounds.height - (y + this.getHeight());
+            }
+            if (x < 0) {
+                x = 0;
+            }
+            if (y < 0) {
+                y = 0;
+            }
+            dialog.setLocation(x, y);
         }
         dialog.setTitle(this.getTitle());
         if (!dialog.isEnabled()) {
