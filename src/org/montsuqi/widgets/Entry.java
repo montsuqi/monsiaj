@@ -69,6 +69,9 @@ public class Entry extends JTextField {
 
 	public void setLimit(int limit) {
 		LengthLimitableDocument doc = (LengthLimitableDocument)getDocument();
+                if (limit <= 0) {
+                    limit = Integer.MAX_VALUE;
+                }
 		doc.setLimit(limit);
 	}
 
