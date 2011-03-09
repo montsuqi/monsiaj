@@ -25,6 +25,7 @@ package org.montsuqi.monsia.builders;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -53,7 +54,6 @@ import org.montsuqi.monsia.SignalData;
 import org.montsuqi.monsia.SignalInfo;
 import org.montsuqi.monsia.WidgetInfo;
 import org.montsuqi.util.Logger;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.CheckBox;
 import org.montsuqi.widgets.Entry;
@@ -169,6 +169,7 @@ public class WidgetBuilder {
 
     // set up UI resources
     static {
+        String[] fontlist = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         String[] classes = {
             "Button", //$NON-NLS-1$
             "ToggleButton", //$NON-NLS-1$
@@ -192,8 +193,18 @@ public class WidgetBuilder {
         for (int i = 0; i < classes.length; i++) {
             String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); //$NON-NLS-1$
             if (userFontSpec == null) {
-                userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1$
+                userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1
             }
+            if (userFontSpec == null) {
+                for (String f : fontlist) {
+                    if (f == null ? "メイリオ" == null : f.equals("メイリオ")) {
+                        userFontSpec = f + "-PLAIN-12";
+                    } else if (f == null ? "ＭＳ ゴシック" == null : f.equals("ＭＳ ゴシック")) {
+                        userFontSpec = f + "-PLAIN-12";
+                    }
+                }
+            }
+
             if (userFontSpec == null) {
                 // remove boldness
                 modifyFont(classes[i], new FontModifier() {
@@ -210,22 +221,6 @@ public class WidgetBuilder {
                         return userFont;
                     }
                 });
-            }
-        }
-        // Use Osaka font on Mac.
-        if (SystemEnvironment.isMacOSX() && SystemEnvironment.isJavaVersionMatch("1.4")) {
-            classes = new String[]{
-                        "TextField", //$NON-NLS-1$
-                        "ComboBox" //$NON-NLS-1$
-                    };
-            FontModifier makeOsakaFont = new FontModifier() {
-
-                public Font modifyFont(Font font) {
-                    return new Font("Osaka", Font.PLAIN, font.getSize()); //$NON-NLS-1$
-                }
-            };
-            for (int i = 0; i < classes.length; i++) {
-                modifyFont(classes[i], makeOsakaFont);
             }
         }
     }
