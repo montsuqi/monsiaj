@@ -201,6 +201,8 @@ public class WidgetBuilder {
                         userFontSpec = f + "-PLAIN-12";
                     } else if (f == null ? "ＭＳ ゴシック" == null : f.equals("ＭＳ ゴシック")) {
                         userFontSpec = f + "-PLAIN-12";
+                    } else if (f == null ? "Monospaced" == null : f.equals("Monospaced")) {
+                        userFontSpec = f + "-PLAIN-12";
                     }
                 }
             }
