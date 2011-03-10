@@ -134,17 +134,23 @@ class CListMarshaller extends WidgetMarshaller {
                     }
                 }
             }
+        }
 
-            JScrollBar vScroll = getVerticalScrollBar(table);
-            if (vScroll != null) {
-                BoundedRangeModel model = vScroll.getModel();
-                row += rowattrw * model.getExtent();
-                int max = model.getMaximum();
-                int min = model.getMinimum();
-                if ((count - from) > 0 && row != 0) {
-                    int value = (int) (((row) * 1.0 / (count - from)) * (max - min)) + min;
-                    model.setValue(value);
+        JScrollBar vScroll = getVerticalScrollBar(table);
+        if (vScroll != null) {
+            BoundedRangeModel model = vScroll.getModel();
+            int max = model.getMaximum();
+            int min = model.getMinimum();
+            if ((count - from) > 0 && row != 0) {
+                int value = (int) (((row - 1) * 1.0 / (count - from)) * (max - min)) + min;
+                if (rowattrw == 1.0) {
+                    value += (int) ((1.0 / (count - from)) * (max - min));
                 }
+                value -= rowattrw * model.getExtent();
+                if (value < 0) {
+                    value = 0;
+                }
+                model.setValue(value);
             }
         }
 
@@ -212,4 +218,3 @@ class CListMarshaller extends WidgetMarshaller {
         return null;
     }
 }
-
