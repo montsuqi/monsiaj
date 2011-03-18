@@ -644,15 +644,19 @@ public class Protocol extends Connection {
 
     private synchronized void sendPing() throws IOException {
         if (!isReceiving) {
+            this.beginReceiving();
             this.sendPacketClass(PacketClass.Ping);
             this.receivePacketClass();
             switch (this.receivePacketClass()) {
                 case PacketClass.CONTINUE:
+                    this.endReceiving();
                     JOptionPane.showMessageDialog(topWindow, this.receiveString());
                     break;
                 case PacketClass.STOP:
                     JOptionPane.showMessageDialog(topWindow, this.receiveString());
                     client.exitSystem();
+                default:
+                    this.endReceiving();
                     break;
             }
         }
