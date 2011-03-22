@@ -75,7 +75,7 @@ public class Protocol extends Connection {
     private TopWindow topWindow;
     private ArrayList<Component> dialogStack;
     private boolean enablePing;
-    private static final int PingTimerPeriod = 10 * 1000;
+    private static final int PingTimerPeriod = 3 * 1000;
     private javax.swing.Timer pingTimer;
     private PrintAgent printAgent;
     private String windowName;
