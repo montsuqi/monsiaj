@@ -109,6 +109,13 @@ public class PandaEntry extends Entry {
                             ic.setCharacterSubsets(new Character.Subset[]{InputSubset.KANJI});
                             ic.selectInputMethod(Locale.JAPANESE);
                         }
+                    } else {
+                        InputContext ic = getInputContext();
+                        if (ic != null) {
+                            ic.setCharacterSubsets(null);
+                            ic.endComposition();
+                            ic.selectInputMethod(Locale.ENGLISH);
+                        }
                     }
                 }
             }
@@ -416,7 +423,7 @@ class PandaDocument extends LengthLimitableDocument {
 class RuleEntry {
 
     final String prefix;
-    final String a,  i,  u,  e,  o;
+    final String a, i, u, e, o;
 
     RuleEntry(String prefix, String a, String i, String u, String e, String o) {
         this.prefix = prefix;
@@ -427,4 +434,3 @@ class RuleEntry {
         this.o = o;
     }
 }
-
