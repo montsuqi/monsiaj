@@ -105,12 +105,7 @@ public class Interface {
             throw new ExceptionInInitializerError(e);
         }
     }
-    private static final String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
-    private static final int OLD_PROLOGUE_LENGTH;
-
-    static {
-        OLD_PROLOGUE_LENGTH = oldPrologue.getBytes().length;
-    }
+    private static final int OLD_PROLOGUE_LENGTH = 128;
 
     /** <p>A factory method that builds an Interface instance.</p>
      * <p>This method takes its source XML from <var>input</var> InputStream and parses

@@ -336,6 +336,14 @@ public abstract class SignalHandler {
                 sendEvent.handle(con, widget, "SELECT"); //$NON-NLS-1$
             }
         });
+        
+        registerHandler("table_send_event", new SignalHandler() { //$NON-NLS-1$
+
+            public void handle(Protocol con, Component widget, Object userData) throws IOException {
+                con.addChangedWidget(widget);
+                sendEvent.handle(con, widget, userData);
+            }
+        });        
 
         /** <p>A signal handler which sends an "ACTIVATE".</p>
          */

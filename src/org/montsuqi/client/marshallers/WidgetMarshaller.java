@@ -34,7 +34,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
@@ -46,11 +45,13 @@ import org.montsuqi.widgets.FileEntry;
 import org.montsuqi.widgets.Frame;
 import org.montsuqi.widgets.NumberEntry;
 import org.montsuqi.widgets.OptionMenu;
+import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.PandaPrint;
+import org.montsuqi.widgets.PandaTable;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.Window;
 
@@ -69,7 +70,6 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(JTextArea.class, new TextMarshaller());
 		registerMarshaller(JLabel.class, new LabelMarshaller());
 		registerMarshaller(JComboBox.class, new ComboMarshaller());
-		registerMarshaller(JTable.class, new CListMarshaller());
 		registerMarshaller(AbstractButton.class, new ButtonMarshaller());
 		registerMarshaller(JList.class, new ListMarshaller());
 		registerMarshaller(JTabbedPane.class, new NotebookMarshaller());
@@ -84,6 +84,8 @@ public abstract class WidgetMarshaller {
 		registerMarshaller(PandaPrint.class, new PrintMarshaller());
                 registerMarshaller(Pixmap.class, new PixmapMarshaller());
 		registerMarshaller(PandaHTML.class, new PandaHTMLMarshaller());
+      		registerMarshaller(PandaCList.class, new CListMarshaller());
+		registerMarshaller(PandaTable.class, new PandaTableMarshaller());                
 		registerMarshaller(Window.class, new WindowMarshaller());
 	}
 

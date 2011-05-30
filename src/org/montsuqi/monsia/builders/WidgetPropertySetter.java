@@ -63,8 +63,10 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.Entry;
 import org.montsuqi.widgets.NumberEntry;
+import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
+import org.montsuqi.widgets.PandaTable;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.UIStock;
@@ -475,7 +477,48 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
+        /* PandaTable */
+        registerProperty(PandaTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaTable table = (PandaTable)widget;
+                table.setColumns(ParameterConverter.toInteger(value));
+            }
+        });        
+        
+        registerProperty(PandaTable.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaTable table = (PandaTable)widget;
+                table.setRows(ParameterConverter.toInteger(value));
+            }
+        });
+
+        registerProperty(PandaTable.class, "column_types", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaTable table = (PandaTable)widget;                
+                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
+                String[] types = new String[tokens.countTokens()];
+                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                    types[i] = tokens.nextToken();
+                }
+                table.setTypes(types);
+            }
+        });        
+
+        registerProperty(PandaTable.class, "column_titles", new WidgetPropertySetter() { //$NON-NLS-1$
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaTable table = (PandaTable)widget;                
+                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
+                String[] titles = new String[tokens.countTokens()];
+                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                    titles[i] = tokens.nextToken();
+                }
+                table.setTitles(titles);
+            }
+        });
+        
+        /* PandaCList */
+        registerProperty(PandaCList.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTable table = (JTable) widget;
@@ -487,6 +530,7 @@ abstract class WidgetPropertySetter {
             }
         });
 
+        /* PandaCList,PandaTable */
         registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
@@ -499,9 +543,9 @@ abstract class WidgetPropertySetter {
                     setter.set(xml, parent, widget, String.valueOf(columns));
                 }
                 assert columns == model.getColumnCount();
-
+                
                 int totalWidth = 0;
-                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                for (int i = 0; i < model.getColumnCount() && tokens.hasMoreTokens(); i++) {
                     TableColumn column = model.getColumn(i);
                     int width = ParameterConverter.toInteger(tokens.nextToken());
                     width += 8; // FIXME do not use immediate value like this

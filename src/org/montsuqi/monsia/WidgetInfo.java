@@ -25,7 +25,7 @@ package org.montsuqi.monsia;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +37,14 @@ public class WidgetInfo {
 	private String className;
 	private String name;
 	private WidgetInfo parent;
-	private final HashMap properties; // <Property>
+	private final LinkedHashMap properties; // <Property>
 	private final List signals; // <SignalInfo>
 	private final List accels; // <Accel>
 	private final LinkedList children; // <ChildInfo> public Object getChildren;
 
 	WidgetInfo() {
 		parent = null;
-		properties = new HashMap();
+		properties = new LinkedHashMap();
 		signals = new ArrayList();
 		accels = new ArrayList();
 		children = new LinkedList();

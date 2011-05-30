@@ -102,6 +102,11 @@
                 <include name="*"/>
             </fileset>
         </copy>
+        <copy todir="${build.dir}/org/montsuqi/widgets">
+            <fileset dir="${resources.dir}">
+                <include name="rgb.txt"/>
+            </fileset>
+        </copy>        
         <copy todir="${build.dir}/libs" >
             <fileset dir="${libs.dir}">
                 <include name="nimrodlf.jar"/>
