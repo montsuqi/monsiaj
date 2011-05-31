@@ -180,7 +180,11 @@ public class Protocol extends Connection {
                     parent.setEnabled(false);
                     stopTimer(parent);
                 }
-                dialog = window.createDialog(parent, topWindow);
+                if (SystemEnvironment.isWindows()) {
+                    dialog = window.createDialog(topWindow, topWindow);
+                } else {
+                    dialog = window.createDialog(parent, topWindow);
+                }
                 dialogStack.add(dialog);
             } else {
                 window.createDialog(parent, topWindow);
