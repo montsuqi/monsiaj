@@ -171,19 +171,21 @@ public class Protocol extends Connection {
         window.setSessionTitle(sessionTitle);
         if (window.isDialog()) {
             Component parent = topWindow;
-            JDialog dialog;
+            JDialog dialog = window.getDialog();
 
             topWindow.showBusyCursor();
-            for (Component c : dialogStack) {
-                parent = c;
-                parent.setEnabled(false);
-                stopTimer(parent);
-            }
-            dialog = window.createDialog(parent, topWindow);
-            resetTimer(dialog);
             if (!dialogStack.contains(dialog)) {
+                for (Component c : dialogStack) {
+                    parent = c;
+                    parent.setEnabled(false);
+                    stopTimer(parent);
+                }
+                dialog = window.createDialog(parent, topWindow);
                 dialogStack.add(dialog);
+            } else {
+                window.createDialog(parent, topWindow);
             }
+            resetTimer(dialog);
         } else {
             topWindow.setXml(xml);
             topWindow.showWindow(window);
