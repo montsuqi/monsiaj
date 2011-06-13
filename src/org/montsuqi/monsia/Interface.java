@@ -79,6 +79,8 @@ public class Interface {
     private JMenuBar menuBar;
     private static final Logger logger = Logger.getLogger(Interface.class);
     private static Map accelHandlers;
+	private double phScale = 1.0;
+	private double pvScale = 1.0;
 
     static {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
@@ -105,7 +107,12 @@ public class Interface {
             throw new ExceptionInInitializerError(e);
         }
     }
-    private static final int OLD_PROLOGUE_LENGTH = 128;
+    private static final String oldPrologue = "<?xml version=\"1.0\"?>\n<GTK-Interface>\n"; //$NON-NLS-1$
+    private static final int OLD_PROLOGUE_LENGTH;
+
+    static {
+        OLD_PROLOGUE_LENGTH = oldPrologue.getBytes().length;
+    }
 
     /** <p>A factory method that builds an Interface instance.</p>
      * <p>This method takes its source XML from <var>input</var> InputStream and parses
@@ -353,6 +360,13 @@ public class Interface {
     }
 
     public void scaleWidget(double hscale, double vscale, Insets insets) {
+        if (hscale == phScale && vscale == pvScale ) {
+            return;
+        }
+        
+        phScale = hscale;
+        pvScale = vscale;
+
         for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
             String key = e.getKey();
             Component component = e.getValue();
