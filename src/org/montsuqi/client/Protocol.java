@@ -50,6 +50,8 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.util.GtkStockIcon;
+import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaTimer;
@@ -71,7 +73,7 @@ public class Protocol extends Connection {
     private StringBuffer widgetName;
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
-    private static final String VERSION = "symbolic:download:blob:expand:pdf:negotiation:i18n:agent=monsiaj/" + Messages.getString("application.version");
+    private static final String VERSION = "version:blob:expand:pdf:negotiation:download:v47:i18n:agent=monsiaj/" + Messages.getString("application.version");
     private TopWindow topWindow;
     private ArrayList<Component> dialogStack;
     private boolean enablePing;
@@ -79,6 +81,7 @@ public class Protocol extends Connection {
     private javax.swing.Timer pingTimer;
     private PrintAgent printAgent;
     private String windowName;
+    private int serverVersion;
 
     public String getWindowName() {
         return windowName;
@@ -165,8 +168,9 @@ public class Protocol extends Connection {
             return;
         }
         xml = node.getInterface();
-        topWindow.Scale();
-        xml.scaleWidget(topWindow.getHScale(), topWindow.getVScale(), topWindow.getInsets());
+        topWindow.setXml(xml);
+        topWindow.ReScale();
+
         Window window = node.getWindow();
         window.setSessionTitle(sessionTitle);
         if (window.isDialog()) {
@@ -191,9 +195,7 @@ public class Protocol extends Connection {
             }
             resetTimer(dialog);
         } else {
-            topWindow.setXml(xml);
             topWindow.showWindow(window);
-            topWindow.ReScale();
             resetTimer(window.getChild());
             topWindow.validate();
         }
@@ -605,8 +607,8 @@ public class Protocol extends Connection {
                 // throw nothing
                 break;
             case PacketClass.ServerVersion:
-                int version = Integer.parseInt(receiveString().replaceAll("\\.", ""));
-                if (version > 14400) {
+                serverVersion = Integer.parseInt(receiveString().replaceAll("\\.", ""));
+                if (serverVersion > 14400) {
                     enablePing = true;
                     this.setEncoding("UTF-8");
                 }
@@ -644,26 +646,54 @@ public class Protocol extends Connection {
         logger.leave();
     }
 
-    public void addPrintRequest(String path, String title) {
-        printAgent.addRequest(path, title);
+    public int getServerVersion() {
+        return serverVersion;
+    }
+
+    public void addPrintRequest(String path, String title,int retry,boolean showDialog) {
+        printAgent.addRequest(path, title,retry,showDialog);
     }
 
     private synchronized void sendPing() throws IOException {
         if (!isReceiving) {
-            this.beginReceiving();
-            this.sendPacketClass(PacketClass.Ping);
-            this.receivePacketClass();
-            switch (this.receivePacketClass()) {
-                case PacketClass.CONTINUE:
-                    this.endReceiving();
-                    JOptionPane.showMessageDialog(topWindow, this.receiveString());
-                    break;
-                case PacketClass.STOP:
-                    JOptionPane.showMessageDialog(topWindow, this.receiveString());
-                    client.exitSystem();
-                default:
-                    this.endReceiving();
-                    break;
+            // for orca 4.7
+            if (serverVersion >= 14700) {
+                this.beginReceiving();
+                this.sendPacketClass(PacketClass.Ping);
+                switch (this.receivePacketClass()) {
+                    case PacketClass.PongPopup:
+                        this.endReceiving();
+                        PopupNotify.popup(Messages.getString("Protocol.message_notify_summary"), this.receiveString(), GtkStockIcon.get("gtk-dialog-info"), 0);
+                        break;
+                    case PacketClass.PongDialog:
+                        this.endReceiving();
+                        JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                        break;
+                    case PacketClass.PongAbort:
+                        JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                        client.exitSystem();
+                        break;
+                    default:
+                        this.endReceiving();
+                        break;
+                }
+            } else {
+                // for orca 4.6, 4.5
+                this.beginReceiving();
+                this.sendPacketClass(PacketClass.Ping);
+                this.receivePacketClass();
+                switch (this.receivePacketClass()) {
+                    case PacketClass.CONTINUE:
+                        this.endReceiving();
+                        JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                        break;
+                    case PacketClass.STOP:
+                        JOptionPane.showMessageDialog(topWindow, this.receiveString());
+                        client.exitSystem();
+                    default:
+                        this.endReceiving();
+                        break;
+                }
             }
         }
     }

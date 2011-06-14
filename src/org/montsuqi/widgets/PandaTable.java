@@ -16,7 +16,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
@@ -40,6 +39,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.montsuqi.util.GtkColorMap;
+import org.montsuqi.util.GtkStockIcon;
 
 public class PandaTable extends JTable {
 
@@ -184,10 +184,9 @@ public class PandaTable extends JTable {
             if (0 <= row && row < this.getRowCount()) {
                 for (int i = 0; i < this.getColumnCount(); i++) {
                     if (types[i].equals("icon")) {
-                        URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/stock-icons/" + rowdata[i] + ".png");
-                        if (iconURL != null) {
+                        Icon icon = GtkStockIcon.get(rowdata[i]);
+                        if (icon != null) {
                             int margin = 4;
-                            ImageIcon icon = new ImageIcon(iconURL);
                             setValueAt(icon, row, i);
                             PandaTable.this.setRowHeight(row,icon.getIconHeight()+margin);
                         } else {

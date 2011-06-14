@@ -26,7 +26,9 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
+import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
+import org.montsuqi.util.PopupNotify;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.Button;
 
@@ -39,12 +41,12 @@ import org.montsuqi.widgets.Button;
  */
 public class PrintAgent extends Thread {
 
-    private final int DELAY = 1000;
+    private final int DELAY = 3000;
     private ConcurrentLinkedQueue<PrintRequest> queue;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private String port;
 
-    public PrintAgent(String port,final String user, final String password) {
+    public PrintAgent(String port, final String user, final String password) {
         queue = new ConcurrentLinkedQueue<PrintRequest>();
         this.port = port;
         Authenticator.setDefault(new Authenticator() {
@@ -74,18 +76,46 @@ public class PrintAgent extends Thread {
             try {
                 File file = download(request);
                 if (file != null) {
-                    showDialog(request.getTitle(), file);
+                    if (request.isShowdialog()) {
+                        showDialog(request.getTitle(), file);
+                    } else {
+                        PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                                Messages.getString("PrintAgent.notify_print_start") + "\n\n"
+                                + Messages.getString("PrintAgent.title") + request.getTitle(),
+                                GtkStockIcon.get("gtk-print"), 0);
+                        PDFPrint printer = new PDFPrint(file, false);
+                        printer.start();
+                    }
                 } else {
-                    queue.add(request);
+                    int retry = request.getRetry();
+                    switch (retry) {
+                        case 0:
+                            queue.add(request);
+                            break;
+                        case 1:
+                            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                                    Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                                    + Messages.getString("PrintAgent.title") + request.getTitle(),
+                                    GtkStockIcon.get("gtk-dialog-error"), 0);
+                            break;
+                        default:
+                            retry -= 1;
+                            request.setRetry(retry);
+                            queue.add(request);
+                            break;
+                    }
                 }
             } catch (IOException ex) {
-                System.out.println(ex);
+                PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                        Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                        + Messages.getString("PrintAgent.title") + request.getTitle(),
+                        GtkStockIcon.get("gtk-dialog-error"), 0);
             }
         }
     }
 
-    synchronized public void addRequest(String url, String title) {
-        queue.add(new PrintRequest(url, title));
+    synchronized public void addRequest(String url, String title, int retry, boolean showDialog) {
+        queue.add(new PrintRequest(url, title, retry, showDialog));
     }
 
     private String displaySize(long size) {
@@ -164,7 +194,7 @@ public class PrintAgent extends Thread {
                     destChannel.close();
                 }
             } else if (n == 2) {
-                PDFPrint printer = new PDFPrint(file);
+                PDFPrint printer = new PDFPrint(file, true);
                 printer.start();
             }
         } catch (Exception ex) {
@@ -195,6 +225,9 @@ public class PrintAgent extends Thread {
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("GET");
         http.connect();
+        if (http.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new IOException("http download failure");
+        }
         BufferedInputStream bis = new BufferedInputStream(http.getInputStream());
         int data, outsize = 0;
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(temp));
@@ -211,11 +244,11 @@ public class PrintAgent extends Thread {
 
     static public void main(String[] argv) {
 
-        PrintAgent agent = new PrintAgent(argv[0],"ormaster", "ormaster");
+        PrintAgent agent = new PrintAgent(argv[0], "ormaster", "ormaster");
         agent.start();
 
         for (int i = 1; i < argv.length; i++) {
-            agent.addRequest(argv[i], argv[i]);
+            agent.addRequest(argv[i], argv[i], 100, true);
         }
     }
 
@@ -223,10 +256,26 @@ public class PrintAgent extends Thread {
 
         private String path;
         private String title;
+        private int retry;
+        private boolean showDialog;
 
-        public PrintRequest(String url, String title) {
+        public PrintRequest(String url, String title, int retry, boolean showdialog) {
             this.path = url;
             this.title = title;
+            this.retry = retry;
+            this.showDialog = showdialog;
+        }
+
+        public void setRetry(int retry) {
+            this.retry = retry;
+        }
+
+        public int getRetry() {
+            return retry;
+        }
+
+        public boolean isShowdialog() {
+            return showDialog;
         }
 
         public String getTitle() {

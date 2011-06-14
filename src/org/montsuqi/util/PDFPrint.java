@@ -20,11 +20,13 @@ import javax.print.attribute.PrintServiceAttributeSet;
 public class PDFPrint extends Thread {
 
     private File file;
-
-    public PDFPrint(File file) {
+    private boolean showDialog;
+    
+    public PDFPrint(File file,boolean showDialog) {
         this.file = file;
+        this.showDialog = showDialog;
     }
-
+    
     @Override
     public void run() {
         try {
@@ -39,7 +41,7 @@ public class PDFPrint extends Thread {
 
             pjob.setJobName(file.getName());
 
-            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") == null) {
+            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") == null && showDialog) {
                 if (!pjob.printDialog()) {
                     return;
                 }
@@ -80,7 +82,7 @@ public class PDFPrint extends Thread {
     public static void main(String args[]) throws Exception {
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(null);
-        PDFPrint printer = new PDFPrint(new File(chooser.getSelectedFile().getAbsolutePath()));
+        PDFPrint printer = new PDFPrint(new File(chooser.getSelectedFile().getAbsolutePath()),true);
         printer.start();
     }
 

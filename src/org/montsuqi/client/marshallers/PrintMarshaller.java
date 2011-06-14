@@ -41,17 +41,23 @@ public class PrintMarshaller extends WidgetMarshaller {
                 for (int j = 0, n2 = con.receiveInt(); j < n2; j++) {
                     String path = "";
                     String title = "";
+                    int retry = 0;
+                    boolean showDialog = true;
                     con.receiveDataTypeWithCheck(Type.RECORD);
                     for (int k = 0, n3 = con.receiveInt(); k < n3; k++) {
                         String name2 = con.receiveName();
-                        if ("path".equals(name2)) { //$NON-NLS-1$
+                        if ("path".equals(name2)) { //$NON-NLS-1$                            
                             path = con.receiveStringData();
                         } else if ("title".equals(name2)) {
                             title = con.receiveStringData();
+                        } else if ("nretry".equals(name2)) {
+                            retry = con.receiveIntData();
+                        } else if ("showdialog".equals(name2)) {
+                            showDialog = con.receiveIntData() == 1;
                         }
                     }
                     if (!path.isEmpty() && !title.isEmpty()) {
-                        con.addPrintRequest(path, title);
+                        con.addPrintRequest(path, title, retry, showDialog);
                     }
                 }
             }

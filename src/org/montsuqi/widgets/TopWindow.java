@@ -112,17 +112,17 @@ public class TopWindow extends Window implements ComponentListener {
         this.addComponentListener(this);
     }
 
-    public void Scale() {
+    private void Scale() {
         Insets insets = this.getInsets();
         hScale = (this.getWidth() * 1.0 - insets.left - insets.right) / (DEFAULT_WIDTH);
         // the bottom 24 pixel is not visible in glade
-        vScale = (this.getHeight() * 1.0 - insets.top - insets.bottom) / 
-                (DEFAULT_HEIGHT - FOOTER);
+        vScale = (this.getHeight() * 1.0 - insets.top - insets.bottom)
+                / (DEFAULT_HEIGHT - FOOTER);
     }
 
     public void ReScale() {
         Scale();
-        this.xml.scaleWidget(hScale, vScale,this.getInsets());
+        this.xml.scaleWidget(hScale, vScale, this.getInsets());
     }
 
     public void setXml(Interface xml) {

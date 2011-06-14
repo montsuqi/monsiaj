@@ -79,6 +79,8 @@ public class Interface {
     private JMenuBar menuBar;
     private static final Logger logger = Logger.getLogger(Interface.class);
     private static Map accelHandlers;
+    private double phScale = 1.0;
+    private double pvScale = 1.0;
 
     static {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
@@ -352,7 +354,15 @@ public class Interface {
         propertyTable.get(longName).put(key,value);
     }
 
-    public void scaleWidget(double hscale, double vscale, Insets insets) {
+    public void scaleWidget(double hScale, double vScale, Insets insets) {
+        
+        if (hScale == phScale && vScale == pvScale ) {
+            return;
+        }
+        
+        phScale = hScale;
+        pvScale = vScale;
+        
         for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
             String key = e.getKey();
             Component component = e.getValue();
@@ -363,8 +373,8 @@ public class Interface {
             String pheight = getProperty(key, "height");
             if (px != null && py != null) {
                 int x, y;
-                x = (int) (Integer.parseInt(px) * hscale);
-                y = (int) (Integer.parseInt(py) * vscale);
+                x = (int) (Integer.parseInt(px) * hScale);
+                y = (int) (Integer.parseInt(py) * vScale);
                 if (component instanceof JTextArea || component instanceof PandaCList) {
                     Component parent = component.getParent();
                     if (parent != null) {
@@ -379,8 +389,8 @@ public class Interface {
             }
             if (pwidth != null && pheight != null) {
                 int width, height;
-                width = (int) (Integer.parseInt(pwidth) * hscale);
-                height = (int) (Integer.parseInt(pheight) * vscale);
+                width = (int) (Integer.parseInt(pwidth) * hScale);
+                height = (int) (Integer.parseInt(pheight) * vScale);
                 if (component instanceof Window) {
                     width += insets.right + insets.left;
                     height += insets.top + insets.bottom;
@@ -407,7 +417,7 @@ public class Interface {
                     TableColumn column = model.getColumn(i);
                     int width = ParameterConverter.toInteger(tokens.nextToken());
                     width += 8;// FIXME do not use immediate value like this
-                    width = (int) (width * hscale);
+                    width = (int) (width * hScale);
                     column.setPreferredWidth(width);
                     column.setWidth(width);
                 }
