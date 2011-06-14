@@ -135,6 +135,7 @@ public class PandaEntry extends Entry {
         // When this component hides a button under itself, propagete mouse click to the button.
         addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 Component source = (Component) e.getSource();
                 Point p = e.getPoint();
@@ -159,7 +160,6 @@ public class PandaEntry extends Entry {
         PandaDocument doc = (PandaDocument) getDocument();
         doc.setInputMode(mode);
         setEnterMode();
-        enableInputMethods(mode != ASCII);
     }
 
     /** <p>When the input mode == KANA and xim is not enabled,
@@ -187,7 +187,6 @@ public class PandaEntry extends Entry {
     public void setXIMEnabled(boolean enabled) {
         ximEnabled = enabled;
         setEnterMode();
-        enableInputMethods(enabled);
     }
 
     /** <p>Gets xim enabled.</p>
