@@ -7,15 +7,10 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -64,14 +59,30 @@ public class PopupNotify {
                 dialog.add(panel);
                 dialog.pack();
                 Rectangle rect = panel.getBounds();
+                int scrWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+                int scrHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
                 int y = 0;
-                for (JDialog d : dialogs) {
+                int x = scrWidth - rect.width;
+                if (dialogs.size() > 0) {
+                    for (JDialog d2 : dialogs) {
+                        if (d2.getBounds().x < x) {
+                            x = d2.getBounds().x;
+                        }
+                    }
+                    JDialog d = dialogs.get(dialogs.size() - 1);
                     Rectangle r = d.getBounds();
-                    if (r.y + r.height > y) {
-                        y = r.y + r.height;
+                    y = r.y + r.height;
+                    if (y + rect.height > scrHeight) {
+                        y = 0;
+                        x -= rect.width;
+                    }
+                    if (x < 0) {
+                        y = 0;
+                        x = scrWidth - rect.width;
+                        dialogs.clear();
                     }
                 }
-                dialog.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width - rect.width, y + 5);
+                dialog.setLocation(x, y);
                 dialog.setVisible(true);
                 dialog.setFocusable(false);
                 dialog.setFocusableWindowState(false);
@@ -83,26 +94,21 @@ public class PopupNotify {
             @Override
             public Void doInBackground() {
                 try {
-                    final int defaultTimeout = 10;
-                    int current = 0;
-                    int lengthOfTask;
+                    int to = 10000;
                     if (timeout > 0) {
-                        lengthOfTask = timeout * 10;
-                    } else {
-                        lengthOfTask = defaultTimeout * 10;
+                        to = timeout * 1000;
                     }
-                    while (current < lengthOfTask && !isCancelled()) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ie) {
-                            ie.printStackTrace();
-                            return null;
-                        }
-                        setProgress(100 * current++ / lengthOfTask);
+                    try {
+                        Thread.sleep(to);
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                        return null;
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+
+
                 return null;
             }
 
@@ -112,48 +118,26 @@ public class PopupNotify {
                 dialog.dispose();
             }
         };
-        /*
-        worker.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-        
-        @Override
-        public void propertyChange(java.beans.PropertyChangeEvent e) {
-        if ("progress".equals(e.getPropertyName())) {
-        int v = (Integer)e.getNewValue();
-        if (v > 90) {
-        AWTUtilities.setWindowOpacity(dialog, 1f - (v-90)*0.1f);                        
-        }
-        }
-        }
-        });*/
+
         worker.execute();
     }
 
     public static void main(String[] args) {
-        PopupNotify.popup("1", "\n\n\n\n\n\n\n\n1111111111111111111",
-                GtkStockIcon.get("gtk-dialog-info"), 5);
-        
-        try {
-            Thread.sleep(1000); //3000ミリ秒Sleepする
-        } catch (InterruptedException e) {
-        };
 
-        PopupNotify.popup("2", "\n\n\2",
+        PopupNotify.popup("Warning", "警告警告",
                 GtkStockIcon.get("gtk-dialog-error"), 5);
+        PopupNotify.popup("Warning", "とーーーーーーーーーてもながーーーーーーーーいの",
+                GtkStockIcon.get("gtk-dialog-error"), 60);
+        PopupNotify.popup("Warning", "まあふつう\n\n\n\n\n\n\n\n\n\n\n",
+                GtkStockIcon.get("gtk-dialog-error"), 10);
 
-        try {
-            Thread.sleep(10000); //3000ミリ秒Sleepする
-        } catch (InterruptedException e) {
-        };
-
-        PopupNotify.popup("3", "333333333\n3333333333333\n\n\n\n",
-                GtkStockIcon.get("gtk-dialog-error"), 5);
-        
-        try {
-            Thread.sleep(1000); //3000ミリ秒Sleepする
-        } catch (InterruptedException e) {
-        };
-
-        PopupNotify.popup("4", "33444443333\n333333433333\n\n\n\n",
-                GtkStockIcon.get("gtk-dialog-error"), 5);        
+        for (int i = 0; i < 100; i++) {
+            PopupNotify.popup("Warning", "警告警告",
+                    GtkStockIcon.get("gtk-dialog-error"), 2);
+            try {
+                Thread.sleep(100); //3000ミリ秒Sleepする
+            } catch (InterruptedException e) {
+            };
+        }
     }
 }
