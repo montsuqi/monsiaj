@@ -242,6 +242,13 @@ public class Interface {
         return (Component) widgetNameTable.get(name);
     }
 
+    public Component getAnyWidget() {
+        for (Component c: widgetNameTable.values()) {
+            return c;
+        }
+        return null;
+    }
+    
     public Component getWidgetByLongName(String longName) {
         if (longName == null) {
             throw new NullPointerException("long name is null."); //$NON-NLS-1$
