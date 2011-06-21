@@ -566,20 +566,23 @@ public class Protocol extends Connection {
             String focusWidgetName = receiveString();
             node = getNode(focusWindowName);
             if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName) && showXml != null) {
-                final Component widget = showXml.getWidget(focusWidgetName);
-                if (widget != null && widget.isFocusable()) {
+                Component widget = showXml.getWidget(focusWidgetName);
+                if (widget == null) {
+                    widget = showXml.getAnyWidget();
+                }
+                final Component focusWidget = widget;
+                if (focusWidget != null) {
                     if (SystemEnvironment.isMacOSX()) {
                         EventQueue.invokeLater(new Runnable() {
 
                             public void run() {
-                                widget.requestFocus();
+                                focusWidget.requestFocus();
 
                             }
                         });
                     } else {
                         KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-                        widget.requestFocusInWindow();
-
+                        focusWidget.requestFocusInWindow();
                     }
                 }
                 c = receivePacketClass();
