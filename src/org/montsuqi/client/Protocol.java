@@ -629,6 +629,13 @@ public class Protocol extends Connection {
                 throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
         }
 
+        String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
+        printAgent = new PrintAgent(port, user, pass);
+        printAgent.start();
+        logger.leave();
+    }
+
+    public void startPing() {
         if (enablePing) {
             pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
 
@@ -642,19 +649,14 @@ public class Protocol extends Connection {
             });
             pingTimer.start();
         }
-
-        String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
-        printAgent = new PrintAgent(port, user, pass);
-        printAgent.start();
-        logger.leave();
     }
 
     public int getServerVersion() {
         return serverVersion;
     }
 
-    public void addPrintRequest(String path, String title,int retry,boolean showDialog) {
-        printAgent.addRequest(path, title,retry,showDialog);
+    public void addPrintRequest(String path, String title, int retry, boolean showDialog) {
+        printAgent.addRequest(path, title, retry, showDialog);
     }
 
     private synchronized void sendPing() throws IOException {
