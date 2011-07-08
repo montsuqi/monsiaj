@@ -63,15 +63,18 @@ public class PrintAgent extends Thread {
         while (true) {
             try {
                 Thread.sleep(DELAY);
-                processRequest();
-            } catch (InterruptedException e) {
+                for(PrintRequest request:queue) {
+                    if (processRequest(request)) {
+                        queue.remove(request);
+                    }
+                }
+           } catch (InterruptedException e) {
                 System.out.println(e);
             }
         }
     }
 
-    synchronized public void processRequest() {
-        PrintRequest request = queue.poll();
+    synchronized boolean processRequest(PrintRequest request) {
         if (request != null) {
             try {
                 File file = download(request);
@@ -90,8 +93,7 @@ public class PrintAgent extends Thread {
                     int retry = request.getRetry();
                     switch (retry) {
                         case 0:
-                            queue.add(request);
-                            break;
+                            return false;
                         case 1:
                             PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
                                     Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
@@ -101,8 +103,7 @@ public class PrintAgent extends Thread {
                         default:
                             retry -= 1;
                             request.setRetry(retry);
-                            queue.add(request);
-                            break;
+                            return false;
                     }
                 }
             } catch (IOException ex) {
@@ -114,6 +115,7 @@ public class PrintAgent extends Thread {
                 }
             }
         }
+        return true;
     }
 
     synchronized public void addRequest(String url, String title, int retry, boolean showDialog) {
