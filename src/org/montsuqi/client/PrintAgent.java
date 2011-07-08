@@ -106,10 +106,12 @@ public class PrintAgent extends Thread {
                     }
                 }
             } catch (IOException ex) {
-                PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                        Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
-                        + Messages.getString("PrintAgent.title") + request.getTitle(),
-                        GtkStockIcon.get("gtk-dialog-error"), 0);
+                if (!ex.getMessage().equals("204")) {
+                    PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                            Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                            + Messages.getString("PrintAgent.title") + request.getTitle(),
+                            GtkStockIcon.get("gtk-dialog-error"), 0);
+                }
             }
         }
     }
@@ -226,7 +228,7 @@ public class PrintAgent extends Thread {
         http.setRequestMethod("GET");
         http.connect();
         if (http.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IOException("http download failure");
+            throw new IOException("" + http.getResponseCode());
         }
         BufferedInputStream bis = new BufferedInputStream(http.getInputStream());
         int data, outsize = 0;
