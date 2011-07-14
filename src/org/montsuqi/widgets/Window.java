@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
@@ -39,15 +40,17 @@ import javax.swing.JPanel;
 /** <p>A JFrame wrapper.</p>
  */
 public class Window extends JFrame {
-
+    
     private String title = "";
     private boolean allow_grow;
     private boolean allow_shrink;
     private Component child = null;
     private JDialog dialog = null;
-
+    private Point location = null;
+    
     public void destroyDialog() {
         if (dialog != null) {
+            location = dialog.getLocation();            
             child.setEnabled(false);
             child.setVisible(false);
             dialog.setEnabled(false);
@@ -57,7 +60,7 @@ public class Window extends JFrame {
             dialog = null;
         }
     }
-
+    
     public JDialog createDialog(Component parent, TopWindow tw) {
         if (dialog == null) {
             if (parent instanceof Frame) {
@@ -72,22 +75,26 @@ public class Window extends JFrame {
             dialog.getContentPane().add(child);
             dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-            int x = tw.getX() + (int) (this.getX() * tw.getHScale());
-            int y = tw.getY() + (int) (this.getY() * tw.getVScale());
-            Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-            if (x + this.getWidth() > scrBounds.width) {
-                x += scrBounds.width - (x + this.getWidth());
+            if (location != null) {
+                dialog.setLocation(location);
+            } else {
+                int x = tw.getX() + (int) (this.getX() * tw.getHScale());
+                int y = tw.getY() + (int) (this.getY() * tw.getVScale());
+                Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+                if (x + this.getWidth() > scrBounds.width) {
+                    x += scrBounds.width - (x + this.getWidth());
+                }
+                if (y + this.getHeight() > scrBounds.height) {
+                    y += scrBounds.height - (y + this.getHeight());
+                }
+                if (x < 0) {
+                    x = 0;
+                }
+                if (y < 0) {
+                    y = 0;
+                }
+                dialog.setLocation(x, y);
             }
-            if (y + this.getHeight() > scrBounds.height) {
-                y +=  scrBounds.height - (y + this.getHeight());
-            }
-            if (x < 0) {
-                x = 0;
-            }
-            if (y < 0) {
-                y = 0;
-            }
-            dialog.setLocation(x, y);
         }
         dialog.setTitle(this.getTitle());
         if (!dialog.isEnabled()) {
@@ -107,23 +114,23 @@ public class Window extends JFrame {
         dialog.requestFocus();
         return dialog;
     }
-
+    
     public JDialog getDialog() {
         return dialog;
     }
-
+    
     public Component getChild() {
         return child;
     }
-
+    
     public void setChild(Component child) {
         this.child = child;
     }
-
+    
     public boolean isDialog() {
         return isDialog;
     }
-
+    
     public void setIsDialog(boolean isDialog) {
         this.isDialog = isDialog;
     }
@@ -139,7 +146,7 @@ public class Window extends JFrame {
         // This pane is usually invisible, but is visible and gains focus to
         // disalbe this window when it is busy.
         setGlassPane(new JPanel() {
-
+            
             {
                 // Make the pane transparent.
                 setOpaque(false);
@@ -166,7 +173,7 @@ public class Window extends JFrame {
         if (!getGlassPane().isVisible()) {
             getGlassPane().setVisible(true);
         }
-
+        
     }
 
     /** <p>Cancel the busy state of this window.</p>
@@ -214,11 +221,11 @@ public class Window extends JFrame {
         }
         return (Window[]) list.toArray(new Window[list.size()]);
     }
-
+    
     public void setTitleString(String title) {
         this.title = title;
     }
-
+    
     public void setSessionTitle(String sessionTitle) {
         Frame frame = (Frame) this;
         if (sessionTitle.equals("")) {
@@ -227,19 +234,19 @@ public class Window extends JFrame {
             frame.setTitle(title + " - " + sessionTitle);
         }
     }
-
+    
     public void setAllow_Grow(boolean value) {
         this.allow_grow = value;
     }
-
+    
     public boolean getAllow_Grow() {
         return allow_grow;
     }
-
+    
     public void setAllow_Shrink(boolean value) {
         this.allow_shrink = value;
     }
-
+    
     public boolean getAllow_Shrink() {
         return allow_shrink;
     }
