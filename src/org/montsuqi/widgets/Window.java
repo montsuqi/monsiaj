@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
@@ -45,9 +46,11 @@ public class Window extends JFrame {
     private boolean allow_shrink;
     private Component child = null;
     private JDialog dialog = null;
+    private Point location = null;
 
     public void destroyDialog() {
         if (dialog != null) {
+            location = dialog.getLocation();            
             child.setEnabled(false);
             child.setVisible(false);
             dialog.setEnabled(false);
@@ -72,6 +75,9 @@ public class Window extends JFrame {
             dialog.getContentPane().add(child);
             dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            if (location != null) {
+                dialog.setLocation(location);
+            } else {
             int x = tw.getX() + (int) (this.getX() * tw.getHScale());
             int y = tw.getY() + (int) (this.getY() * tw.getVScale());
             Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -79,7 +85,7 @@ public class Window extends JFrame {
                 x += scrBounds.width - (x + this.getWidth());
             }
             if (y + this.getHeight() > scrBounds.height) {
-                y +=  scrBounds.height - (y + this.getHeight());
+                    y += scrBounds.height - (y + this.getHeight());
             }
             if (x < 0) {
                 x = 0;
@@ -88,6 +94,7 @@ public class Window extends JFrame {
                 y = 0;
             }
             dialog.setLocation(x, y);
+        }
         }
         dialog.setTitle(this.getTitle());
         if (!dialog.isEnabled()) {
