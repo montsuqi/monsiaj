@@ -45,7 +45,7 @@ class LabelMarshaller extends WidgetMarshaller {
 				continue;
 			}
 			manager.registerValue(widget, name, null);
-			String text = con.receiveStringData();
+			String text = "<html>" + con.receiveStringData() + "</html>";
 			label.setText(text);
 		}
 	}
