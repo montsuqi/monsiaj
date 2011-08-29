@@ -262,10 +262,12 @@ public class PandaTable extends JTable {
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        actions.put("startEditing", new StartEditingAction());
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
+        //actions.put("startEditing", new StartEditingAction());
+        //inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
         actions.put("toggleCheck", new ToggleCheckAction());
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "toggleCheck");
+        actions.put("toggleCheck", new ToggleCheckAction());
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "toggleCheck");        
     }
 
     public String getStringValueAt(int row, int col) {
