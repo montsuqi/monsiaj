@@ -166,7 +166,9 @@ public class Client implements Runnable {
 	public void run() {
 		try {
 			protocol.checkScreens(true);
+                        protocol.startReceiving();                        
 			protocol.getScreenData();
+                        protocol.stopReceiving();
 			protocol.startPing();
 		} catch (IOException e) {
 			protocol.exceptionOccured(e);

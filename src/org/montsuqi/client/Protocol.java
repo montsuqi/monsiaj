@@ -663,15 +663,15 @@ public class Protocol extends Connection {
         if (!isReceiving) {
             // for orca 4.7
             if (serverVersion >= 14700) {
-                this.beginReceiving();
+                this.startReceiving();
                 this.sendPacketClass(PacketClass.Ping);
                 switch (this.receivePacketClass()) {
                     case PacketClass.PongPopup:
-                        this.endReceiving();
+                        this.stopReceiving();
                         PopupNotify.popup(Messages.getString("Protocol.message_notify_summary"), this.receiveString(), GtkStockIcon.get("gtk-dialog-info"), 0);
                         break;
                     case PacketClass.PongDialog:
-                        this.endReceiving();
+                        this.stopReceiving();
                         JOptionPane.showMessageDialog(topWindow, this.receiveString());
                         break;
                     case PacketClass.PongAbort:
@@ -679,24 +679,24 @@ public class Protocol extends Connection {
                         client.exitSystem();
                         break;
                     default:
-                        this.endReceiving();
+                        this.stopReceiving();
                         break;
                 }
             } else {
                 // for orca 4.6, 4.5
-                this.beginReceiving();
+                this.startReceiving();
                 this.sendPacketClass(PacketClass.Ping);
                 this.receivePacketClass();
                 switch (this.receivePacketClass()) {
                     case PacketClass.CONTINUE:
-                        this.endReceiving();
+                        this.stopReceiving();
                         JOptionPane.showMessageDialog(topWindow, this.receiveString());
                         break;
                     case PacketClass.STOP:
                         JOptionPane.showMessageDialog(topWindow, this.receiveString());
                         client.exitSystem();
                     default:
-                        this.endReceiving();
+                        this.stopReceiving();
                         break;
                 }
             }
@@ -793,11 +793,11 @@ public class Protocol extends Connection {
         return isReceiving;
     }
 
-    public void beginReceiving() {
+    public void startReceiving() {
         this.isReceiving = true;
     }
 
-    public void endReceiving() {
+    public void stopReceiving() {
         this.isReceiving = false;
     }
 

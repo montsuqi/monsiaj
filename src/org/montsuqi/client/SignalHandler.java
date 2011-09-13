@@ -199,7 +199,7 @@ public abstract class SignalHandler {
                         return;
                     }
                     try {
-                        con.beginReceiving();
+                        con.startReceiving();
                         if (widget instanceof JComponent) {
                             if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
                                 con._addChangedWidget(widget);
@@ -247,7 +247,7 @@ public abstract class SignalHandler {
                         }
 
                     } finally {
-                        con.endReceiving();
+                        con.stopReceiving();
                     }
                 }
             }
