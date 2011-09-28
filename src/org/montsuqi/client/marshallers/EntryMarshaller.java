@@ -46,7 +46,10 @@ class EntryMarshaller extends WidgetMarshaller {
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
-			String text = con.receiveStringData();
+			if (handleEditable(manager, widget, name)) {
+				continue;
+			}
+                        String text = con.receiveStringData();
 			manager.registerValue(entry, name, null);
 			entry.setText(text);
 			entry.setCaretPosition(0);

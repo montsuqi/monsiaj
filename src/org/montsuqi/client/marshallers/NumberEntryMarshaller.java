@@ -46,6 +46,9 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 			if (handleStateStyle(manager, widget, name)) {
 				continue;
 			}
+			if (handleEditable(manager, widget, name)) {
+				continue;
+			}                        
 			BigDecimal val = con.receiveFixedData();
 			manager.registerValue(entry, name, val);
 			entry.setValue(val);
