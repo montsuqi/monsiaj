@@ -89,6 +89,12 @@ class CListMarshaller extends WidgetMarshaller {
                     case 2: // MIDDLE
                         rowattrw = 0.5;
                         break;
+                    case 3: // QUATER
+                        rowattrw = 0.25;
+                        break;
+                    case 4: // THREE QUATER
+                        rowattrw = 0.75;
+                        break;                        
                     default:
                         rowattrw = 0.0; // [0] TOP
                         break;
