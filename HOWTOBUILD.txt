@@ -39,8 +39,15 @@
  webstart.url=http://... jwsを設置するURL
  webstart.vendor=ベンダー名
 
-を設定して実行します。途中でパスワードを聞かれるので答えますが、
+を設定して実行します。途中でキーストアのパスワードと鍵パスワードを
+聞かれるので答えますが、
 画面にエコーバック(表示)されるので安全に留意してください。
+
+sign-jars:
+    [input] Input the store password
+XXXXXXX[Return]
+    [input] Input the key password
+XXXXXXX[Return]
 
 do.signプロパティを設定してある場合、dist/ に置かれたファイル内の
 jarファイルは署名済みのものとなります。
