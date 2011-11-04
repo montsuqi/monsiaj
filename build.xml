@@ -102,11 +102,6 @@
                 <include name="*"/>
             </fileset>
         </copy>
-        <copy todir="${build.dir}/org/montsuqi/widgets">
-            <fileset dir="${resources.dir}">
-                <include name="rgb.txt"/>
-            </fileset>
-        </copy>        
         <copy todir="${build.dir}/libs" >
             <fileset dir="${libs.dir}">
                 <include name="nimrodlf.jar"/>
@@ -298,7 +293,8 @@
 
     <target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
         <input message="Input the store password" addproperty="storepass"/>
-        <signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
+        <input message="Input the key password" addproperty="keypass"/>
+        <signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}" keypass="${keypass}">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
                 <include name="libs/*.jar"/>
