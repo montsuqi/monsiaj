@@ -293,8 +293,7 @@
 
     <target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
         <input message="Input the store password" addproperty="storepass"/>
-        <input message="Input the key password" addproperty="keypass"/>
-        <signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}" keypass="${keypass}">
+        <signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
                 <include name="libs/*.jar"/>
