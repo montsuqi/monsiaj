@@ -196,7 +196,7 @@ class CListMarshaller extends WidgetMarshaller {
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);
                 con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
-                con.sendIntegerData(Type.INT, i);
+                con.sendIntegerData(Type.INT, i + 1);
                 visibleRow = true;
             }
         }
