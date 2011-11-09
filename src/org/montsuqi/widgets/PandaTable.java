@@ -253,7 +253,11 @@ public class PandaTable extends JTable {
         this.setModel(model);
         
         /* magic number*/
-        this.setRowHeight(25);
+        int rowheight = 25;
+        if (System.getProperty("monsia.pandatable.rowheight") != null) {
+            rowheight = Integer.parseInt(System.getProperty("monsia.pandatable.rowheight"));
+        }        
+        this.setRowHeight(rowheight);
 
         this.setSurrendersFocusOnKeystroke(true);
         this.setFocusable(true);
