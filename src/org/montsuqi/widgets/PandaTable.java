@@ -251,6 +251,9 @@ public class PandaTable extends JTable {
 
         model = new PandaTableModel();
         this.setModel(model);
+        
+        /* magic number*/
+        this.setRowHeight(25);
 
         this.setSurrendersFocusOnKeystroke(true);
         this.setFocusable(true);
