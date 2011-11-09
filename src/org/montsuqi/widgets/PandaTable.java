@@ -324,15 +324,17 @@ public class PandaTable extends JTable {
         }
     }
 
-    public void setFGColor(int row, String color) {
+    public void setFGColor(int row, String _color) {
         if (0 <= row && row < model.getRowCount()) {
-            fgColors[row] = GtkColorMap.getColor(color);
+            Color color = GtkColorMap.getColor(_color);
+            fgColors[row] = color != null ? color : Color.BLACK;
         }
     }
 
-    public void setBGColor(int row, String color) {
+    public void setBGColor(int row, String _color) {
         if (0 <= row && row < model.getRowCount()) {
-            bgColors[row] = GtkColorMap.getColor(color);
+            Color color = GtkColorMap.getColor(_color);
+            bgColors[row] = color != null ? color : Color.WHITE;
         }
     }
 

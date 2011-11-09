@@ -51,15 +51,12 @@ public class GtkColorMap {
                 }
             }
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
     
     static public Color getColor(String colorName) {
         Color color = colorMap.get(colorName);
-        if (color == null) {
-            color = Color.WHITE;
-        }
         return color;
     }
 }
