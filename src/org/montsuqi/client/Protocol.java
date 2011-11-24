@@ -22,6 +22,7 @@ copies.
  */
 package org.montsuqi.client;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
@@ -193,9 +194,11 @@ public class Protocol extends Connection {
             } else {
                 window.createDialog(parent, topWindow);
             }
+            dialog.setBackground(topWindow.getBackground());
             resetTimer(dialog);
         } else {
             topWindow.showWindow(window);
+            window.getChild().setBackground(topWindow.getBackground());
             resetTimer(window.getChild());
             topWindow.validate();
         }

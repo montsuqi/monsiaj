@@ -22,6 +22,7 @@ copies.
  */
 package org.montsuqi.client.marshallers;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
 
@@ -29,16 +30,19 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PopupNotify;
+import org.montsuqi.util.GtkColorMap;
+import org.montsuqi.widgets.Window;
 
 /** <p>A class to send/receive Window data.</p>
  */
 public class WindowMarshaller extends WidgetMarshaller {
 
     public void receive(WidgetValueManager manager, Component widget) throws IOException {
-        String summary,body,icon;
+        Protocol con = manager.getProtocol();
+        String summary, body, icon;
+
         int timeout = 0;
         summary = body = icon = null;
-        Protocol con = manager.getProtocol();
         StringBuffer widgetName = con.getWidgetNameBuffer();
         int offset = widgetName.length();
         con.receiveDataTypeWithCheck(Type.RECORD);
@@ -50,6 +54,14 @@ public class WindowMarshaller extends WidgetMarshaller {
             if ("title".equals(name)) { //$NON-NLS-1$
                 String title = con.receiveStringData();
                 con.setSessionTitle(title);
+            } else if ("bgcolor".equals(name)) {
+                String bgcolor = con.receiveStringData();
+                Color color = GtkColorMap.getColor(bgcolor);
+                if (color != null) {
+                    con.getTopWindow().setBackground(color);
+                } else {
+                    con.getTopWindow().setBackground(null);
+                }
             } else if ("popup_summary".equals(name)) {
                 summary = con.receiveStringData();
             } else if ("popup_body".equals(name)) {
@@ -57,14 +69,14 @@ public class WindowMarshaller extends WidgetMarshaller {
             } else if ("popup_icon".equals(name)) {
                 icon = con.receiveStringData();
             } else if ("popup_timeout".equals(name)) {
-                timeout = con.receiveIntData();                
+                timeout = con.receiveIntData();
             } else {
                 widgetName.replace(offset, widgetName.length(), '.' + name);
                 con.receiveValue(widgetName, offset + name.length() + 1);
             }
         }
-        if (summary != null && summary.length() > 0 &&
-                body != null && body.length() > 0) {
+        if (summary != null && summary.length() > 0
+                && body != null && body.length() > 0) {
             PopupNotify.popup(summary, body, GtkStockIcon.get(icon), timeout);
         }
     }

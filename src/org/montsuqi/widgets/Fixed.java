@@ -30,14 +30,13 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.Point;
-import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JViewport;
-import javax.swing.SwingConstants;
 import org.montsuqi.util.Logger;
 
 /** <p>A container that lays out components in fixed position and size.</p>
  */
-public class Fixed extends JComponent 
+public class Fixed extends JPanel
 						implements FocusListener {
 
 	public Fixed() {
