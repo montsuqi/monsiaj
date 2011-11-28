@@ -234,7 +234,7 @@ public class Window extends JFrame {
             frame.setTitle(title + " - " + sessionTitle);
         }
     }
-    
+      
     public void setAllow_Grow(boolean value) {
         this.allow_grow = value;
     }

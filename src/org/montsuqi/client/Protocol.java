@@ -51,6 +51,7 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.util.GtkColorMap;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
@@ -71,6 +72,7 @@ public class Protocol extends Connection {
     private HashMap nodeTable;
     private WidgetValueManager valueManager;
     private String sessionTitle;
+    private Color sessionBGColor;
     private StringBuffer widgetName;
     private Interface xml;
     static final Logger logger = Logger.getLogger(Protocol.class);
@@ -114,6 +116,7 @@ public class Protocol extends Connection {
         valueManager = new WidgetValueManager(this, styleMap);
         this.timerPeriod = timerPeriod;
         sessionTitle = "";
+        sessionBGColor = null;
         topWindow = new TopWindow();
         dialogStack = new ArrayList<Component>();
         enablePing = false;
@@ -174,6 +177,7 @@ public class Protocol extends Connection {
 
         Window window = node.getWindow();
         window.setSessionTitle(sessionTitle);
+
         if (window.isDialog()) {
             Component parent = topWindow;
             JDialog dialog = window.getDialog();
@@ -194,11 +198,12 @@ public class Protocol extends Connection {
             } else {
                 window.createDialog(parent, topWindow);
             }
-            dialog.setBackground(topWindow.getBackground());
+            window.getChild().setBackground(this.sessionBGColor);
+            dialog.validate();
             resetTimer(dialog);
         } else {
             topWindow.showWindow(window);
-            window.getChild().setBackground(topWindow.getBackground());
+            window.getChild().setBackground(this.sessionBGColor);
             resetTimer(window.getChild());
             topWindow.validate();
         }
@@ -598,6 +603,10 @@ public class Protocol extends Connection {
 
     public synchronized void setSessionTitle(String title) {
         sessionTitle = title;
+    }
+
+    public synchronized void setSessionBGColor(Color color) {
+        sessionBGColor = color;
     }
 
     synchronized void sendConnect(String user, String pass, String app) throws IOException {

@@ -54,14 +54,10 @@ public class WindowMarshaller extends WidgetMarshaller {
             if ("title".equals(name)) { //$NON-NLS-1$
                 String title = con.receiveStringData();
                 con.setSessionTitle(title);
-            } else if ("bgcolor".equals(name)) {
+            } else if ("bgcolor".equals(name)) {                
                 String bgcolor = con.receiveStringData();
-                Color color = GtkColorMap.getColor(bgcolor);
-                if (color != null) {
-                    con.getTopWindow().setBackground(color);
-                } else {
-                    con.getTopWindow().setBackground(null);
-                }
+                Color color = GtkColorMap.getColor(bgcolor);                
+                con.setSessionBGColor(color);
             } else if ("popup_summary".equals(name)) {
                 summary = con.receiveStringData();
             } else if ("popup_body".equals(name)) {
