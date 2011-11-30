@@ -149,7 +149,9 @@ class PDFPanel extends JPanel {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
         if (image != null) {
-            g.drawImage(image, 0, 0, this);
+            int cx = (int)((this.getWidth()/2.0) - (image.getWidth(this)/2.0));
+            int cy =  (int)((this.getHeight()/2.0) - (image.getHeight(this)/2.0));
+            g.drawImage(image, cx,cy, this);
         }
     }
 }
