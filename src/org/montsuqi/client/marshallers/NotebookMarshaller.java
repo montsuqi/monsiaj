@@ -46,7 +46,7 @@ class NotebookMarshaller extends WidgetMarshaller {
 		int page = -1;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			} else if ("pageno".equals(name)) { //$NON-NLS-1$
 				page = con.receiveIntData();

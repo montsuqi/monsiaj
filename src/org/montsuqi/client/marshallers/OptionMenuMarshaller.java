@@ -49,7 +49,7 @@ public class OptionMenuMarshaller extends WidgetMarshaller {
 
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();

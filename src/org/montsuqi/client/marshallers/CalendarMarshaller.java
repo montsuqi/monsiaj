@@ -47,7 +47,7 @@ class CalendarMarshaller extends WidgetMarshaller {
 		int year = 0;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			} else if ("year".equals(name)) { //$NON-NLS-1$
 				year = con.receiveIntData();

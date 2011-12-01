@@ -61,6 +61,9 @@ public class PrintMarshaller extends WidgetMarshaller {
                     }
                 }
             }
+            if (handleCommonAttribute(manager, widget, name)) {
+                continue;
+            }
         }
     }
 

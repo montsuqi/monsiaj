@@ -98,7 +98,7 @@ public abstract class WidgetMarshaller {
      * @return true if handled(name was "state" or "style".
      * @throws IOException on IO error.
      */
-    protected boolean handleStateStyle(WidgetValueManager manager, Component widget, String name) throws IOException {
+    protected boolean handleCommonAttribute(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
         if ("state".equals(name)) { //$NON-NLS-1$
             int state = con.receiveIntData();
@@ -124,6 +124,11 @@ public abstract class WidgetMarshaller {
             String buff = con.receiveStringData();
             manager.setStyle(widget, buff);
             return true;
+        } else if ("visible".equals(name)) { //$NON-NLS-1$
+            boolean visible = con.receiveBooleanData();
+            widget.setEnabled(visible);
+            widget.setVisible(visible);
+            return true;            
         } else {
             return false;
         }

@@ -72,7 +72,7 @@ class CListMarshaller extends WidgetMarshaller {
             Component sub = xml.getWidgetByLongName(label.toString());
             if (sub != null) {
                 con.receiveValue(label, offset + 1 + name.length());
-            } else if (handleStateStyle(manager, widget, name)) {
+            } else if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             } else if ("count".equals(name)) { //$NON-NLS-1$
                 count = con.receiveIntData();

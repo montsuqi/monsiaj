@@ -57,6 +57,7 @@ public class WindowBuilder extends ContainerBuilder {
             } else {
                 w.setIsDialog(false);
             }
+            w.setVisible(false);
         } catch (Exception e) {
             throw new WidgetBuildingException(e);
         }

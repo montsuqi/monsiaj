@@ -68,7 +68,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
 
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if (handleStateStyle(manager, widget, name)) {
+            if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             } else if ("trow".equals(name)) { //$NON-NLS-1$
                 trow = con.receiveIntData() - 1;

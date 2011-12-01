@@ -41,7 +41,7 @@ class ButtonMarshaller extends WidgetMarshaller {
 		con.receiveDataTypeWithCheck(Type.RECORD);
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			}
 			if ("label".equals(name)) { //$NON-NLS-1$

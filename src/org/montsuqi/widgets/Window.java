@@ -141,7 +141,7 @@ public class Window extends JFrame {
     public Window() {
         super();
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
+        this.setVisible(false);
         // Prepare a glass pane with wait cursor.
         // This pane is usually invisible, but is visible and gains focus to
         // disalbe this window when it is busy.

@@ -56,6 +56,8 @@ class FileEntryMarshaller extends WidgetMarshaller {
 			if ("objectdata".equals(name)) { //$NON-NLS-1$
 				binary = con.receiveBinaryData();
 				manager.registerValue(widget, "objectdata", null);
+                        } else if (handleCommonAttribute(manager, widget, name)) {
+				continue;
 			} else {
 				StringBuffer widgetName = con.getWidgetNameBuffer();
 				int offset = widgetName.length();

@@ -44,7 +44,7 @@ class FrameMarshaller extends WidgetMarshaller {
 		int offset = widgetName.length();
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			} else if ("label".equals(name)) { //$NON-NLS-1$
 				manager.registerValue(widget, name, null);

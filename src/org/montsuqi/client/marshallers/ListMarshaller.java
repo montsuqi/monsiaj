@@ -50,7 +50,7 @@ class ListMarshaller extends WidgetMarshaller {
 		int from = 0;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			}
 			if ("count".equals(name)) { //$NON-NLS-1$

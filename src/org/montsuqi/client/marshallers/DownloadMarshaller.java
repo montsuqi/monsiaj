@@ -50,10 +50,12 @@ public class DownloadMarshaller extends WidgetMarshaller {
                 binary = con.receiveBinaryData();
             } else if ("filename".equals(name)) {
                 fileName = con.receiveStringData();
+            } else if (handleCommonAttribute(manager, widget, name)) {
+                continue;
             }
         }
         if (binary != null && binary.length > 0) {
-            File temp = File.createTempFile("PandaDownload",fileName);
+            File temp = File.createTempFile("PandaDownload", fileName);
             temp.deleteOnExit();
             OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
             out.write(binary);

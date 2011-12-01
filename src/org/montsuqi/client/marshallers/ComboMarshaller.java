@@ -24,7 +24,6 @@ copies.
 package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ class ComboMarshaller extends WidgetMarshaller {
 		int count = 0;
 		for (int i = 0, n = con.receiveInt(); i < n; i++) {
 			String name = con.receiveName();
-			if (handleStateStyle(manager, widget, name)) {
+			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();

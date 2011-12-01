@@ -31,7 +31,6 @@ import org.montsuqi.client.Type;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.GtkColorMap;
-import org.montsuqi.widgets.Window;
 
 /** <p>A class to send/receive Window data.</p>
  */
@@ -48,9 +47,11 @@ public class WindowMarshaller extends WidgetMarshaller {
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if (handleStateStyle(manager, widget, name)) {
+            /*
+            if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             }
+             */
             if ("title".equals(name)) { //$NON-NLS-1$
                 String title = con.receiveStringData();
                 con.setSessionTitle(title);
