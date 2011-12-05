@@ -520,7 +520,7 @@ public class Protocol extends Connection {
 
     synchronized void getScreenData() throws IOException {
         logger.enter();
-        Interface showXml = null;
+
         String wName = null;
         Node node;
         checkScreens(false);
@@ -545,7 +545,6 @@ public class Protocol extends Connection {
                 case ScreenType.CHANGE_WINDOW:
                     this.windowName = wName;
                     widgetName = new StringBuffer(wName);
-                    showXml = xml;
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {
                         receiveValue(widgetName, widgetName.length());
@@ -570,34 +569,45 @@ public class Protocol extends Connection {
                 // fatal error
             }
         }
-        showWindow(this.windowName);
+        boolean isDummy = this.widgetName.toString().startsWith("_");
+        if (!isDummy) {
+            showWindow(this.windowName);
+        }
         if (c == PacketClass.FocusName) {
             String focusWindowName = receiveString();
             String focusWidgetName = receiveString();
-            node = getNode(focusWindowName);
-            if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName) && showXml != null) {
-                Component widget = showXml.getWidget(focusWidgetName);
-                if (widget == null) {
-                    widget = showXml.getAnyWidget();
-                }
-                final Component focusWidget = widget;
-                if (focusWidget != null) {
-                    if (SystemEnvironment.isMacOSX()) {
-                        EventQueue.invokeLater(new Runnable() {
-
-                            public void run() {
-                                focusWidget.requestFocus();
-
-                            }
-                        });
-                    } else {
-                        KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-                        focusWidget.requestFocusInWindow();
-                    }
-                }
-                c = receivePacketClass();
+            if (!isDummy) {
+                setFocus(focusWindowName,focusWidgetName);
             }
-            logger.leave();
+            c = receivePacketClass();
+        }
+        logger.leave();
+    }
+
+    private synchronized void setFocus(String focusWindowName, String focusWidgetName) {
+        Node node = getNode(focusWindowName);
+
+        if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
+            Interface thisXML = node.getInterface();
+            Component widget = thisXML.getWidget(focusWidgetName);
+            if (widget == null) {
+                widget = thisXML.getAnyWidget();
+            }
+            final Component focusWidget = widget;
+            if (focusWidget != null) {
+                if (SystemEnvironment.isMacOSX()) {
+                    EventQueue.invokeLater(new Runnable() {
+
+                        public void run() {
+                            focusWidget.requestFocus();
+
+                        }
+                    });
+                } else {
+                    KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+                    focusWidget.requestFocusInWindow();
+                }
+            }
         }
     }
 

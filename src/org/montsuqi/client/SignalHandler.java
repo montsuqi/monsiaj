@@ -181,7 +181,7 @@ public abstract class SignalHandler {
                 return title;
             }
 
-            private void setTitle(Window window,String title) {
+            private void setTitle(Window window, String title) {
                 if (window instanceof JFrame) {
                     ((JFrame) window).setTitle(title);
                 } else if (window instanceof JDialog) {
@@ -220,7 +220,7 @@ public abstract class SignalHandler {
                         }
 
                         String oldTitle = getTitle(window);
-                        setTitle(window,Messages.getString("Client.loading"));
+                        setTitle(window, Messages.getString("Client.loading"));
 
                         String windowName = getWidgetName(window.getName());
                         String widgetName = getWidgetName(widget.getName());
@@ -243,7 +243,14 @@ public abstract class SignalHandler {
                         }
 
                         if (Messages.getString("Client.loading").equals(getTitle(window))) {
-                            setTitle(window,oldTitle);
+                            setTitle(window, oldTitle);
+                        }
+
+                        if (con.getWindowName().startsWith("_")) {
+                            con.sendEvent(con.getWindowName(), con.getWindowName(), "DummyEvent");
+                            con.sendWindowData();
+                            con.getScreenData();
+
                         }
 
                     } finally {
@@ -336,14 +343,14 @@ public abstract class SignalHandler {
                 sendEvent.handle(con, widget, "SELECT"); //$NON-NLS-1$
             }
         });
-        
+
         registerHandler("table_send_event", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
                 sendEvent.handle(con, widget, userData);
             }
-        });        
+        });
 
         /** <p>A signal handler which sends an "ACTIVATE".</p>
          */
