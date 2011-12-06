@@ -246,11 +246,10 @@ public abstract class SignalHandler {
                             setTitle(window, oldTitle);
                         }
 
-                        if (con.getWindowName().startsWith("_")) {
+                        while (con.getWindowName().startsWith("_")) {
                             con.sendEvent(con.getWindowName(), con.getWindowName(), "DummyEvent");
                             con.sendWindowData();
                             con.getScreenData();
-
                         }
 
                     } finally {
