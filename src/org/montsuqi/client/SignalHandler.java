@@ -251,7 +251,6 @@ public abstract class SignalHandler {
                             con.sendWindowData();
                             con.getScreenData();
                         }
-
                     } finally {
                         con.stopReceiving();
                     }
