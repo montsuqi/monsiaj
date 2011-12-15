@@ -347,3 +347,14 @@ Webアクセスにプロキシが必要な環境では、以下の設定を行�
 
 * 日本語変換ソフトの自動切り替え機能が動作しない
 * Mac OS Xルック＆フィールにおいて、CLISTのヘッダラベルが完全に表示されない場合がある
+
+!!! 設定の保存先
+
+monsiajの設定の保存先はOSによって異なります。
+
+*Window XP/Vista/7
+**レジストリ HKEY_CURRENT_USER\Software\JavaSoft\Prefs\jp\or\med\orca\jmareceipt\config\
+*Linux
+**~/.java/.userPrefs/jp/or/med/orca/jmareceipt/config/
+*Mac OS X
+**~/Library/Preferences/jp.or.med.plist
