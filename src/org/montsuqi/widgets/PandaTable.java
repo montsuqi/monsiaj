@@ -8,53 +8,18 @@ package org.montsuqi.widgets;
  *
  * @author mihara
  */
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.DefaultCellEditor;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.montsuqi.util.GtkColorMap;
-import org.montsuqi.util.GtkStockIcon;
 
 public class PandaTable extends JTable {
-
-    private class ToggleCheckAction extends AbstractAction {
-
-        public void actionPerformed(ActionEvent e) {
-            PandaTable table = (PandaTable) e.getSource();
-            int row = table.getSelectedRow();
-            int column = table.getSelectedColumn();
-            Object object = table.getModel().getValueAt(row, column);
-            if (object instanceof Boolean) {
-                table.getModel().setValueAt(!((Boolean) object).booleanValue(), row, column);
-            }
-        }
-    }
 
     private class StartEditingAction extends AbstractAction {
 
@@ -73,39 +38,6 @@ public class PandaTable extends JTable {
                     table.getCellEditor(row, column).stopCellEditing();
                 }
             }
-        }
-    }
-
-    public class IconRenderer extends JLabel
-            implements TableCellRenderer {
-
-        private final DefaultTableCellRenderer adaptee =
-                new DefaultTableCellRenderer();
-
-        public IconRenderer() {
-            this.setIconTextGap(0);
-            this.setHorizontalAlignment(CENTER);
-        }
-
-        public Component getTableCellRendererComponent(
-                JTable table, Object obj, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            // set the colours, etc. using the standard for that platform
-            adaptee.getTableCellRendererComponent(table, obj,
-                    isSelected, hasFocus, row, column);
-            setForeground(adaptee.getForeground());
-            setBackground(adaptee.getBackground());
-            setBorder(adaptee.getBorder());
-            setOpaque(true);
-            if (obj != null) {
-                if (obj instanceof Icon) {
-                    Icon icon = (Icon) obj;
-                    setIcon(icon);
-                }
-            } else {
-                setIcon(null);
-            }
-            return this;
         }
     }
 
@@ -144,17 +76,7 @@ public class PandaTable extends JTable {
             for (int i = 0; i < rows; i++) {
                 int cols = this.getColumnCount();
                 for (int j = 0; j < cols; j++) {
-                    if (types[j].equals("icon")) {
-                        /*
-                        URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png");
-                        rowData[j] = new ImageIcon(iconURL);
-                         */
-                        this.setValueAt(null, i, j);
-                    } else if (types[j].equals("check")) {
-                        this.setValueAt(false, i, j);
-                    } else {
-                        this.setValueAt("", i, j);
-                    }
+                    this.setValueAt("", i, j);
                 }
             }
         }
@@ -183,32 +105,14 @@ public class PandaTable extends JTable {
         public void setRow(int row, String[] rowdata) {
             if (0 <= row && row < this.getRowCount()) {
                 for (int i = 0; i < this.getColumnCount(); i++) {
-                    if (types[i].equals("icon")) {
-                        Icon icon = GtkStockIcon.get(rowdata[i]);
-                        if (icon != null) {
-                            int margin = 4;
-                            setValueAt(icon, row, i);
-                            PandaTable.this.setRowHeight(row,icon.getIconHeight()+margin);
-                        } else {
-                            setValueAt(null, row, i);
-                        }
-                    } else if (types[i].equals("check")) {
-                        if (rowdata[i].startsWith("T")) {
-                            setValueAt(true, row, i);
-                        } else {
-                            setValueAt(false, row, i);
-                        }
-                    } else {
-                        setValueAt(rowdata[i], row, i);
-                    }
+                    setValueAt(rowdata[i], row, i);
                 }
             }
         }
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            if (this.types[col].equals("text")
-                    || this.types[col].equals("check")) {
+            if (this.types[col].equals("text")) {
                 return true;
             }
             return false;
@@ -221,19 +125,6 @@ public class PandaTable extends JTable {
             } else {
                 return "";
             }
-        }
-
-        @Override
-        public Class<?> getColumnClass(int column) {
-            if (types[column].equals("icon")) {
-                return ImageIcon.class;
-            } else if (types[column].equals("text")
-                    || types[column].equals("label")) {
-                return String.class;
-            } else if (types[column].equals("check")) {
-                return Boolean.class;
-            }
-            return String.class;
         }
     }
     private Color[] fgColors;
@@ -251,12 +142,14 @@ public class PandaTable extends JTable {
 
         model = new PandaTableModel();
         this.setModel(model);
-        
-        /* magic number*/
+
+        /*
+         * magic number
+         */
         int rowheight = 25;
         if (System.getProperty("monsia.pandatable.rowheight") != null) {
             rowheight = Integer.parseInt(System.getProperty("monsia.pandatable.rowheight"));
-        }        
+        }
         this.setRowHeight(rowheight);
 
         this.setSurrendersFocusOnKeystroke(true);
@@ -266,25 +159,18 @@ public class PandaTable extends JTable {
         ce.setClickCountToStart(1);
 
         // action setting
-        ActionMap actions = getActionMap();
-        InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        //ActionMap actions = getActionMap();
+        //InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         //actions.put("startEditing", new StartEditingAction());
         //inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
-        actions.put("toggleCheck", new ToggleCheckAction());
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "toggleCheck");
-        actions.put("toggleCheck", new ToggleCheckAction());
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "toggleCheck");        
+
     }
 
     public String getStringValueAt(int row, int col) {
         Object obj = getModel().getValueAt(row, col);
         if (obj == null) {
             return "";
-        } else if (obj == java.lang.Boolean.TRUE) {
-            return "TRUE";
-        } else if (obj == java.lang.Boolean.FALSE) {
-            return "FALSE";
         } else {
             return obj.toString();
         }
@@ -322,13 +208,6 @@ public class PandaTable extends JTable {
 
     public void setTypes(String[] types) {
         model.setTypes(types);
-        String[] t = model.getTypes();
-        for (int i = 0; i < t.length; i++) {
-            String s = t[i];
-            if (s.equals("icon")) {
-                columnModel.getColumn(i).setCellRenderer(new IconRenderer());
-            }
-        }
     }
 
     public void setFGColor(int row, String _color) {
@@ -372,19 +251,21 @@ public class PandaTable extends JTable {
         Container container = frame.getContentPane();
         container.setLayout(new BorderLayout(10, 5));
 
-        String[] types = {"icon", "text", "label", "check"};
-        String[] titles = {"Icon", "Text", "Label", "Check"};
+        String[] types = {"text", "label"};
+        String[] titles = {"Text", "Label"};
         final PandaTable table = new PandaTable();
         table.setRows(100);
-        table.setColumns(4);
+        table.setColumns(2);
         table.setTitles(titles);
         table.setTypes(types);
-        String[] str = {"aaa-zoom-in", "text", "label", "T"};
-        table.setRow(10, str);
-        table.setBGColor(10, "plum1");
-        table.setFGColor(10, "red");
-        String[] str2 = {"gtk-yes", "text", "label", "T"};
-        table.setRow(10, str2);
+        String[] str = {"text", "label"};
+        table.setRow(0, str);
+        table.setBGColor(0, "plum1");
+        table.setFGColor(0, "red");
+        String[] str2 = {"text", "label"};
+        table.setRow(1, str2);
+        table.setBGColor(1, "green");
+        table.setFGColor(1, "blue");        
 
         table.getModel().addTableModelListener(
                 new TableModelListener() {
@@ -411,7 +292,7 @@ public class PandaTable extends JTable {
 
             public void actionPerformed(ActionEvent ev) {
                 System.out.println("----");
-                String[] str2 = {"gtk-yes", "text", "label", "T"};
+                String[] str2 = { "text", "label"};
                 table.setRow(3, str2);
             }
         });

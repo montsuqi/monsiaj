@@ -22,34 +22,16 @@ copies.
  */
 package org.montsuqi.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.SystemColor;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SwingConstants;
+import java.util.Date;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.UIManager;
-
-import java.util.Date;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.montsuqi.util.Logger;
 
 /** <p>A class that simulates Gtk+'s Calendar widget.</p>

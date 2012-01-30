@@ -31,46 +31,16 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JPasswordField;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
-
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
-import org.montsuqi.widgets.Entry;
-import org.montsuqi.widgets.NumberEntry;
-import org.montsuqi.widgets.PandaCList;
-import org.montsuqi.widgets.PandaEntry;
-import org.montsuqi.widgets.PandaHTML;
-import org.montsuqi.widgets.PandaTable;
-import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.Pixmap;
-import org.montsuqi.widgets.UIStock;
-import org.montsuqi.widgets.Window;
+import org.montsuqi.widgets.*;
 
 /** <p>WidgetPropertySetter is a class to help assigning properties to widgets.</p>
  * <p>These setters exist one for a class(and subclass) and property name.</p>
