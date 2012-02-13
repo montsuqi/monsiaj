@@ -25,17 +25,9 @@ package org.montsuqi.client.marshallers;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.IOException;
-
-import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JViewport;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;

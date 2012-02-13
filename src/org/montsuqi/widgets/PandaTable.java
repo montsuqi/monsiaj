@@ -112,10 +112,10 @@ public class PandaTable extends JTable {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            if (this.types[col].equals("text")) {
-                return true;
+            if (this.types[col].equals("label")) {
+                return false;
             }
-            return false;
+            return true;
         }
 
         @Override

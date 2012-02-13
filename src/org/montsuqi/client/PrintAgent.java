@@ -2,17 +2,10 @@ package org.montsuqi.client;
 
 import com.sun.pdfview.PDFFile;
 import java.awt.BorderLayout;
-
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
@@ -21,16 +14,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.prefs.Preferences;
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
-import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.Button;
+import org.montsuqi.widgets.PandaPreview;
 
 /*
  * Copyright (C) 2010 JMA (Japan Medical Association)
