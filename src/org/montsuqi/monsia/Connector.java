@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.monsia;
 
@@ -80,7 +80,8 @@ import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TimerEvent;
 import org.montsuqi.widgets.TimerListener;
 
-/** <p>A class to connect Gtk+ signal names to signal hender objects.</p>
+/**
+ * <p>A class to connect Gtk+ signal names to signal hender objects.</p>
  */
 abstract class Connector {
 
@@ -102,9 +103,11 @@ abstract class Connector {
         return connector;
     }
 
-    /** <p>A helper method which invokes handler's handle method.</p>
-     * <p>This method wraps the sequence of invocation of a handler's handle method and
-     * its eception handling. All IOExceptions are catched and notified via exceptionOccured.</p>
+    /**
+     * <p>A helper method which invokes handler's handle method.</p> <p>This
+     * method wraps the sequence of invocation of a handler's handle method and
+     * its eception handling. All IOExceptions are catched and notified via
+     * exceptionOccured.</p>
      */
     static void invoke(final Protocol con, final SignalHandler handler, final Component target, final Object other) {
         logger.enter(new Object[]{handler, target, other});
@@ -600,12 +603,15 @@ abstract class Connector {
 
                                 public void tableChanged(TableModelEvent te) {
                                     logger.enter();
-                                    int row = te.getLastRow();
-                                    int col = te.getColumn();
-                                    table.changedRow = te.getLastRow();
-                                    table.changedColumn = te.getColumn();
-                                    table.changedValue = table.getStringValueAt(row, col);
-                                    invoke(con, handler, target, other);
+                                    if (table.isEnterPressed()) {
+                                        int row = te.getLastRow();
+                                        int col = te.getColumn();
+                                        table.changedRow = te.getLastRow();
+                                        table.changedColumn = te.getColumn();
+                                        table.changedValue = table.getStringValueAt(row, col);
+                                        invoke(con, handler, target, other);
+                                    }
+                                    table.setEnterPressed(false);
                                     logger.leave();
                                 }
                             });

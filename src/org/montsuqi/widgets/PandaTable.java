@@ -10,6 +10,8 @@ package org.montsuqi.widgets;
  */
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -33,8 +35,8 @@ public class PandaTable extends JTable {
                 table.getModel().setValueAt(!((Boolean) object).booleanValue(), row, column);
             } else {
                 if (!table.isEditing()) {
+                    table.setEnterPressed(true);                    
                     table.editCellAt(row, column);
-                } else {
                     table.getCellEditor(row, column).stopCellEditing();
                 }
             }
@@ -130,6 +132,15 @@ public class PandaTable extends JTable {
     private Color[] fgColors;
     private Color[] bgColors;
     private PandaTableModel model;
+    private boolean enterPressed;
+
+    public boolean isEnterPressed() {
+        return enterPressed;
+    }
+
+    public void setEnterPressed(boolean enterPressed) {
+        this.enterPressed = enterPressed;
+    }
     public int changedRow;
     public int changedColumn;
     public String changedValue;
@@ -154,16 +165,32 @@ public class PandaTable extends JTable {
 
         this.setSurrendersFocusOnKeystroke(true);
         this.setFocusable(true);
+        
+        enterPressed = false;
 
         DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
         ce.setClickCountToStart(1);
+        ce.getComponent().addKeyListener(new KeyListener() {
+
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                    PandaTable.this.setEnterPressed(true);
+                }
+            }
+
+            public void keyReleased(KeyEvent e) {
+            }
+
+            public void keyTyped(KeyEvent e) {
+            }
+        });
 
         // action setting
-        //ActionMap actions = getActionMap();
-        //InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actions = getActionMap();
+        InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        //actions.put("startEditing", new StartEditingAction());
-        //inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
+        actions.put("startEditing", new StartEditingAction());
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
 
     }
 
@@ -265,7 +292,7 @@ public class PandaTable extends JTable {
         String[] str2 = {"text", "label"};
         table.setRow(1, str2);
         table.setBGColor(1, "green");
-        table.setFGColor(1, "blue");        
+        table.setFGColor(1, "blue");
 
         table.getModel().addTableModelListener(
                 new TableModelListener() {
@@ -292,7 +319,7 @@ public class PandaTable extends JTable {
 
             public void actionPerformed(ActionEvent ev) {
                 System.out.println("----");
-                String[] str2 = { "text", "label"};
+                String[] str2 = {"text", "label"};
                 table.setRow(3, str2);
             }
         });
