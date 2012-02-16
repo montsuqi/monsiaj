@@ -35,7 +35,7 @@ public class PandaTable extends JTable {
                 table.getModel().setValueAt(!((Boolean) object).booleanValue(), row, column);
             } else {
                 if (!table.isEditing()) {
-                    table.setEnterPressed(true);                    
+                    table.setEnterPressed(true);
                     table.editCellAt(row, column);
                     table.getCellEditor(row, column).stopCellEditing();
                 }
@@ -129,8 +129,8 @@ public class PandaTable extends JTable {
             }
         }
     }
-    private Color[] fgColors;
-    private Color[] bgColors;
+    private Color[][] fgColors;
+    private Color[][] bgColors;
     private PandaTableModel model;
     private boolean enterPressed;
 
@@ -165,7 +165,7 @@ public class PandaTable extends JTable {
 
         this.setSurrendersFocusOnKeystroke(true);
         this.setFocusable(true);
-        
+
         enterPressed = false;
 
         DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
@@ -173,7 +173,7 @@ public class PandaTable extends JTable {
         ce.getComponent().addKeyListener(new KeyListener() {
 
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     PandaTable.this.setEnterPressed(true);
                 }
             }
@@ -208,12 +208,15 @@ public class PandaTable extends JTable {
     }
 
     public void setRows(int rows) {
+        int columns = model.getColumnCount();
         model.setRows(rows);
-        fgColors = new Color[rows];
-        bgColors = new Color[rows];
+        fgColors = new Color[rows][columns];
+        bgColors = new Color[rows][columns];
         for (int i = 0; i < rows; i++) {
-            fgColors[i] = Color.BLACK;
-            bgColors[i] = Color.WHITE;
+            for (int j=0;j<columns;j++) {
+            fgColors[i][j] = Color.BLACK;
+            bgColors[i][j] = Color.WHITE;
+            }
         }
     }
 
@@ -237,30 +240,32 @@ public class PandaTable extends JTable {
         model.setTypes(types);
     }
 
-    public void setFGColor(int row, String _color) {
-        if (0 <= row && row < model.getRowCount()) {
+    public void setFGColor(int row, int column, String _color) {
+        if (0 <= row && row < model.getRowCount()
+                && 0 <= column && column < model.getColumnCount()) {
             Color color = GtkColorMap.getColor(_color);
-            fgColors[row] = color != null ? color : Color.BLACK;
+            fgColors[row][column] = color != null ? color : Color.BLACK;
         }
     }
 
-    public void setBGColor(int row, String _color) {
-        if (0 <= row && row < model.getRowCount()) {
+    public void setBGColor(int row, int column, String _color) {
+        if (0 <= row && row < model.getRowCount()
+                && 0 <= column && column < model.getColumnCount()) {
             Color color = GtkColorMap.getColor(_color);
-            bgColors[row] = color != null ? color : Color.WHITE;
+            bgColors[row][column] = color != null ? color : Color.WHITE;
         }
     }
 
-    public void setRow(int row, String[] rowdata) {
-        model.setRow(row, rowdata);
+    public void setCell(int row,int col,String data) {
+        model.setValueAt(data, row, col);
     }
 
     @Override
     public Component prepareEditor(
             TableCellEditor editor, int row, int column) {
         Component c = super.prepareEditor(editor, row, column);
-        c.setBackground(bgColors[row]);
-        c.setForeground(fgColors[row]);
+        c.setBackground(bgColors[row][column]);
+        c.setForeground(fgColors[row][column]);
         return c;
     }
 
@@ -268,8 +273,8 @@ public class PandaTable extends JTable {
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
-        c.setBackground(bgColors[row]);
-        c.setForeground(fgColors[row]);
+        c.setBackground(bgColors[row][column]);
+        c.setForeground(fgColors[row][column]);
         return c;
     }
 
@@ -285,14 +290,6 @@ public class PandaTable extends JTable {
         table.setColumns(2);
         table.setTitles(titles);
         table.setTypes(types);
-        String[] str = {"text", "label"};
-        table.setRow(0, str);
-        table.setBGColor(0, "plum1");
-        table.setFGColor(0, "red");
-        String[] str2 = {"text", "label"};
-        table.setRow(1, str2);
-        table.setBGColor(1, "green");
-        table.setFGColor(1, "blue");
 
         table.getModel().addTableModelListener(
                 new TableModelListener() {
@@ -318,9 +315,6 @@ public class PandaTable extends JTable {
         JButton button3 = new JButton(new AbstractAction("output") {
 
             public void actionPerformed(ActionEvent ev) {
-                System.out.println("----");
-                String[] str2 = {"text", "label"};
-                table.setRow(3, str2);
             }
         });
 

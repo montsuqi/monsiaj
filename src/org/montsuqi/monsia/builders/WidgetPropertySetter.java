@@ -452,6 +452,7 @@ abstract class WidgetPropertySetter {
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTable table = (PandaTable)widget;
                 table.setColumns(ParameterConverter.toInteger(value));
+                table.setRows(table.getRows());
             }
         });        
         

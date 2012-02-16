@@ -88,34 +88,36 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 /*
                  * String dummy =
                  */ con.receiveStringData();
-            } else if ("fgcolors".equals(name)) { //$NON-NLS-1$
+            } else if ("rowdata".equals(name)) { //$NON-NLS-1$                
                 con.receiveDataTypeWithCheck(Type.ARRAY);
-                int num = con.receiveInt();
-                for (int j = 0; j < num; j++) {
-                    String color = con.receiveStringData();
-                    table.setFGColor(j, color);
-                }
-            } else if ("bgcolors".equals(name)) { //$NON-NLS-1$
-                con.receiveDataTypeWithCheck(Type.ARRAY);
-                int num = con.receiveInt();
-                for (int j = 0; j < num; j++) {
-                    String color = con.receiveStringData();
-                    table.setBGColor(j, color);
-                }
-            } else if ("tdata".equals(name)) { //$NON-NLS-1$                
-                con.receiveDataTypeWithCheck(Type.ARRAY);
-                int num = con.receiveInt();
+                int nrows = con.receiveInt();                               
                 ArrayList cellNameList = new ArrayList<String>();
-                for (int j = 0; j < num; j++) {
+                for (int j = 0; j < nrows; j++) {
                     con.receiveDataTypeWithCheck(Type.RECORD);
-                    int cols = con.receiveInt();
-                    String[] rdata = new String[cols];
-                    for (int k = 0; k < cols; k++) {
-                        String cellName = widget.getName() + ".tdata["+j+"]." + con.receiveString();
-                        cellNameList.add(cellName);
-                        rdata[k] = con.receiveStringData();
+                    int ncols = con.receiveInt();                   
+                    for (int k = 0; k < ncols; k++) {
+                        String colName = con.receiveName();                      
+                        con.receiveDataTypeWithCheck(Type.RECORD);
+                        int nitems = con.receiveInt();                          
+                        for (int l = 0; l < nitems; l++) {
+                            String itemName = con.receiveName();                                               
+                            if ("celldata".equals(itemName)) {
+                                String data = con.receiveStringData();
+                                table.setCell(j, k, data);
+                                String cellName = widget.getName() + ".rowdata[" + j + "]." + colName + ".celldata";
+                                cellNameList.add(cellName);                          
+                            } else if ("fgcolor".equals(itemName)) {
+                                String color = con.receiveStringData();
+                                table.setFGColor(j, k, color);
+                            } else if ("bgcolor".equals(itemName)) {
+                                String color = con.receiveStringData();
+                                table.setBGColor(j, k, color);                                
+                            } else {
+                                con.receiveStringData();                                
+                                System.out.println("does not reach here");
+                            }
+                        }
                     }
-                    table.setRow(j, rdata);
                 }
                 manager.registerValue(widget, name, cellNameList);
             }
@@ -168,7 +170,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 if (cellName != null) {
                     con.sendPacketClass(PacketClass.ScreenData);
                     con.sendName(cellName);
-                    con.sendStringData(Type.VARCHAR, (String)tableModel.getValueAt(i, j));
+                    con.sendStringData(Type.VARCHAR, (String) tableModel.getValueAt(i, j));
                 }
                 k += 1;
             }
