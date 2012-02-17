@@ -26,28 +26,14 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.im.InputContext;
 import java.awt.im.InputSubset;
 import java.util.Locale;
-
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.InputMap;
-import javax.swing.JFrame;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-
 import org.montsuqi.util.SystemEnvironment;
 
 /** <p>A class that simulates GtkPandaButton widget.</p>

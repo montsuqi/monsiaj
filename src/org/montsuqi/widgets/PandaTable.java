@@ -12,6 +12,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.im.InputContext;
+import java.awt.im.InputSubset;
+import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -31,14 +34,8 @@ public class PandaTable extends JTable {
             int row = table.getSelectedRow();
             int column = table.getSelectedColumn();
             Object object = table.getModel().getValueAt(row, column);
-            if (object instanceof Boolean) {
-                table.getModel().setValueAt(!((Boolean) object).booleanValue(), row, column);
-            } else {
-                if (!table.isEditing()) {
-                    table.setEnterPressed(true);
-                    table.editCellAt(row, column);
-                    table.getCellEditor(row, column).stopCellEditing();
-                }
+            if (!table.isEditing()) {
+                table.editCellAt(row, column);
             }
         }
     }
@@ -191,7 +188,20 @@ public class PandaTable extends JTable {
 
         actions.put("startEditing", new StartEditingAction());
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
+    }
 
+    @Override
+    protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+        boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
+        if (getInputContext().isCompositionEnabled() && !isEditing()
+                && !pressed && !ks.isOnKeyRelease()) {
+            int selectedRow = getSelectedRow();
+            int selectedColumn = getSelectedColumn();
+            if (selectedRow != -1 && selectedColumn != -1 && !editCellAt(selectedRow, selectedColumn)) {
+                return retValue;
+            }
+        }
+        return retValue;
     }
 
     public String getStringValueAt(int row, int col) {
@@ -208,14 +218,14 @@ public class PandaTable extends JTable {
     }
 
     public void setRows(int rows) {
-        int columns = model.getColumnCount();
         model.setRows(rows);
+        int columns = model.getColumnCount();
         fgColors = new Color[rows][columns];
         bgColors = new Color[rows][columns];
         for (int i = 0; i < rows; i++) {
-            for (int j=0;j<columns;j++) {
-            fgColors[i][j] = Color.BLACK;
-            bgColors[i][j] = Color.WHITE;
+            for (int j = 0; j < columns; j++) {
+                fgColors[i][j] = Color.BLACK;
+                bgColors[i][j] = Color.WHITE;
             }
         }
     }
@@ -226,6 +236,15 @@ public class PandaTable extends JTable {
 
     public void setColumns(int cols) {
         model.setColumns(cols);
+        int rows = model.getRowCount();
+        fgColors = new Color[rows][cols];
+        bgColors = new Color[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                fgColors[i][j] = Color.BLACK;
+                bgColors[i][j] = Color.WHITE;
+            }
+        }
     }
 
     public void setTitles(String[] titles) {
@@ -256,7 +275,7 @@ public class PandaTable extends JTable {
         }
     }
 
-    public void setCell(int row,int col,String data) {
+    public void setCell(int row, int col, String data) {
         model.setValueAt(data, row, col);
     }
 
@@ -264,8 +283,10 @@ public class PandaTable extends JTable {
     public Component prepareEditor(
             TableCellEditor editor, int row, int column) {
         Component c = super.prepareEditor(editor, row, column);
-        c.setBackground(bgColors[row][column]);
-        c.setForeground(fgColors[row][column]);
+        if (fgColors != null && bgColors != null) {
+            c.setBackground(bgColors[row][column]);
+            c.setForeground(fgColors[row][column]);
+        }
         return c;
     }
 
@@ -273,8 +294,10 @@ public class PandaTable extends JTable {
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
-        c.setBackground(bgColors[row][column]);
-        c.setForeground(fgColors[row][column]);
+        if (fgColors != null && bgColors != null) {
+            c.setBackground(bgColors[row][column]);
+            c.setForeground(fgColors[row][column]);
+        }
         return c;
     }
 
