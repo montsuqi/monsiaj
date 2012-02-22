@@ -26,19 +26,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.prefs.Preferences;
-
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
+import javax.swing.*;
 import org.montsuqi.util.Logger;
 
 /** <p>A class that simulates Gtk+'s FileEntry.</p>
@@ -95,7 +87,7 @@ public class FileEntry extends JComponent {
         try {
             setFile(file.getCanonicalPath());
         } catch (IOException e) {
-            e.printStackTrace();
+           System.out.println(e);
         }
     }
 
@@ -148,7 +140,7 @@ public class FileEntry extends JComponent {
         }
 
         public void actionPerformed(ActionEvent e) {
-            final String dir = prefs.get(FileEntry.this.getName(), System.getProperty("user.home"));
+            final String dir = prefs.get(FileEntry.class.getName(), System.getProperty("user.home"));
             final JFileChooser chooser = new JFileChooser(dir);
             chooser.setSelectedFile(getFile());
 
@@ -157,7 +149,7 @@ public class FileEntry extends JComponent {
             }
             File selected = chooser.getSelectedFile();
             setFile(selected);
-            prefs.put(FileEntry.this.getName(), selected.getParent());
+            prefs.put(FileEntry.class.getName(), selected.getParent());
             fileEntry.postActionEvent();
         }
     }

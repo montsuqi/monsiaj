@@ -29,69 +29,45 @@ import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.widgets.FileEntry;
+import org.montsuqi.widgets.FileChooserButton;
 
 /**
- * <p>A class to send/receive FileEntry data.</p>
+ * <p>A class to send/receive FileChooserButton data.</p>
  */
-class FileEntryMarshaller extends WidgetMarshaller {
-
-    private WidgetMarshaller entryMarshaller;
-
-    FileEntryMarshaller() {
-        entryMarshaller = new EntryMarshaller();
-    }
+class FileChooserButtonMarshaller extends WidgetMarshaller {
 
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
-        FileEntry fe = (FileEntry) widget;
-        Interface xml = con.getInterface();
+        FileChooserButton fcb = (FileChooserButton) widget;        
+        con._addChangedWidget(widget);
 
-        byte[] binary = null;
-        boolean entryReceived = false;
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
             if ("objectdata".equals(name)) { //$NON-NLS-1$
-                binary = con.receiveBinaryData();
-                manager.registerValue(widget, "objectdata", null);
+                con.receiveBinaryData();
             } else if (handleCommonAttribute(manager, widget, name)) {
                 continue;
+            } else if ("filename".equals(name)) {
+                con.receiveStringData();
             } else {
-                StringBuffer widgetName = con.getWidgetNameBuffer();
-                int offset = widgetName.length();
-                widgetName.replace(offset, widgetName.length(), '.' + name);
-                Component sub = xml.getWidgetByLongName(widgetName.toString());
-                if (sub != null) {
-                    JTextField dummy = (JTextField) sub;
-                    entryMarshaller.receive(manager, dummy);
-                    entryReceived = true;
-                } else {
-                    throw new WidgetMarshallingException("subwidget not found"); //$NON-NLS-1$
-                }
+                throw new WidgetMarshallingException("does not reach here"); //$NON-NLS-1$
             }
         }
-        if (binary != null && binary.length > 0) {
-            fe.setSaveAction();
-            fe.setData(binary);
-            if (entryReceived) {
-                fe.getBrowseButton().doClick();
-            }
-        } else {
-            fe.setLoadAction();
-        }
+        fcb.setFile(null);
+        
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
-        FileEntry fe = (FileEntry) widget;
-        byte[] binary = fe.loadData();
-        if (binary.length <= 0) {
-            return;
-        }
+        FileChooserButton fcb = (FileChooserButton) widget;
+        byte[] binary = fcb.loadData();
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
-        con.sendName(va.getValueName() + '.' + va.getNameSuffix());
-        con.sendBinaryData(va.getType(), binary);
+        con.sendName(widget.getName()+".objectdata");
+        con.sendBinaryData(Type.OBJECT, binary);
+        
+        con.sendPacketClass(PacketClass.ScreenData);
+        con.sendName(widget.getName()+".filename");
+        con.sendStringData(Type.VARCHAR, fcb.getFileName());        
     }
 }

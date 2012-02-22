@@ -26,64 +26,15 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Iterator;
-import javax.swing.BorderFactory;
-
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JViewport;
-import javax.swing.UIManager;
-
-import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.InterfaceBuildingException;
-import org.montsuqi.monsia.SignalData;
-import org.montsuqi.monsia.SignalInfo;
-import org.montsuqi.monsia.WidgetInfo;
+import javax.swing.*;
+import org.montsuqi.monsia.*;
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.Button;
-import org.montsuqi.widgets.CheckBox;
-import org.montsuqi.widgets.Entry;
-import org.montsuqi.widgets.FileEntry;
-import org.montsuqi.widgets.HPaned;
-import org.montsuqi.widgets.Notebook;
-import org.montsuqi.widgets.OptionMenu;
-import org.montsuqi.widgets.PandaCList;
-import org.montsuqi.widgets.Calendar;
-import org.montsuqi.widgets.Fixed;
-import org.montsuqi.widgets.Frame;
-import org.montsuqi.widgets.HBox;
-import org.montsuqi.widgets.HSeparator;
-import org.montsuqi.widgets.NumberEntry;
-import org.montsuqi.widgets.PandaCombo;
-import org.montsuqi.widgets.PandaEntry;
-import org.montsuqi.widgets.PandaHTML;
-import org.montsuqi.widgets.PandaPreview;
-import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.PandaDownload;
-import org.montsuqi.widgets.PandaPrint;
-import org.montsuqi.widgets.PandaTable;
-import org.montsuqi.widgets.Pixmap;
-import org.montsuqi.widgets.RadioButton;
-import org.montsuqi.widgets.Table;
-import org.montsuqi.widgets.ToggleButton;
-import org.montsuqi.widgets.VBox;
-import org.montsuqi.widgets.VPaned;
-import org.montsuqi.widgets.VSeparator;
-import org.montsuqi.widgets.Window;
+import org.montsuqi.widgets.*;
 
 /** <p>Super class for all widget builders.</p>
  * 
@@ -123,6 +74,7 @@ public class WidgetBuilder {
         registerWidgetClass("CList", PandaCList.class, new CListBuilder()); //$NON-NLS-1$
         registerWidgetClass("Dialog", Window.class, new WindowBuilder()); //$NON-NLS-1$
         registerWidgetClass("Entry", Entry.class, entryBuilder); //$NON-NLS-1$
+        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder); //$NON-NLS-1$        
         registerWidgetClass("FileEntry", FileEntry.class, new FileEntryBuilder()); //$NON-NLS-1$
         registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); //$NON-NLS-1$
         registerWidgetClass("Frame", Frame.class, new FrameBuilder()); //$NON-NLS-1$

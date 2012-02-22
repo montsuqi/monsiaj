@@ -26,33 +26,11 @@ import java.awt.Component;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.AbstractButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JProgressBar;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
-
 import org.montsuqi.client.Protocol;
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.Calendar;
-import org.montsuqi.widgets.FileEntry;
-import org.montsuqi.widgets.Frame;
-import org.montsuqi.widgets.NumberEntry;
-import org.montsuqi.widgets.OptionMenu;
-import org.montsuqi.widgets.PandaCList;
-import org.montsuqi.widgets.PandaHTML;
-import org.montsuqi.widgets.PandaPreview;
-import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.PandaDownload;
-import org.montsuqi.widgets.PandaPrint;
-import org.montsuqi.widgets.PandaTable;
-import org.montsuqi.widgets.Pixmap;
-import org.montsuqi.widgets.Window;
+import org.montsuqi.widgets.*;
 
 /** <p>Superclass for all widget marshallers.</p>
  */
@@ -77,6 +55,7 @@ public abstract class WidgetMarshaller {
         registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
         registerMarshaller(Frame.class, new FrameMarshaller());
         registerMarshaller(FileEntry.class, new FileEntryMarshaller());
+        registerMarshaller(FileChooserButton.class, new FileChooserButtonMarshaller());
         registerMarshaller(PandaTimer.class, new TimerMarshaller());
         registerMarshaller(PandaDownload.class, new DownloadMarshaller());
         registerMarshaller(PandaPrint.class, new PrintMarshaller());
