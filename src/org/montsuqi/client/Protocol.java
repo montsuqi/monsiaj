@@ -1,33 +1,28 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.EventQueue;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -36,23 +31,13 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
-import org.montsuqi.util.Logger;
+import java.util.*;
+import javax.swing.*;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.util.GtkColorMap;
 import org.montsuqi.util.GtkStockIcon;
+import org.montsuqi.util.Logger;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
@@ -60,7 +45,9 @@ import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TopWindow;
 import org.montsuqi.widgets.Window;
 
-/** <p>A class that implements high level operations over client/server connection.</p>
+/**
+ * <p>A class that implements high level operations over client/server
+ * connection.</p>
  */
 public class Protocol extends Connection {
 
@@ -88,6 +75,11 @@ public class Protocol extends Connection {
 
     public String getWindowName() {
         return windowName;
+    }
+    
+    public String getWindowName(Component widget) {
+        String name = widget.getName();
+        return name.substring(0, name.indexOf("."));
     }
 
     public Window getTopWindow() {
@@ -521,7 +513,7 @@ public class Protocol extends Connection {
     synchronized void getScreenData() throws IOException {
         logger.enter();
 
-        String wName = null;
+        String wName;
         Node node;
         checkScreens(false);
         sendPacketClass(PacketClass.GetData);
@@ -577,9 +569,9 @@ public class Protocol extends Connection {
             String focusWindowName = receiveString();
             String focusWidgetName = receiveString();
             if (!isDummy) {
-                setFocus(focusWindowName,focusWidgetName);
+                setFocus(focusWindowName, focusWidgetName);
             }
-            c = receivePacketClass();
+            receivePacketClass();
         }
         logger.leave();
     }
@@ -761,11 +753,13 @@ public class Protocol extends Connection {
         logger.enter(windowName);
         sendPacketClass(PacketClass.WindowName);
         sendString(windowName);
-        Node node = getNode(windowName);
-        Iterator i = node.getChangedWidgets().entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry e = (Map.Entry) i.next();
-            sendWidgetData((String) e.getKey(), (Component) e.getValue());
+        Map<String, Component> changedMap = getNode(windowName).getChangedWidgets();
+        for (Map.Entry<String, Component> e : changedMap.entrySet()) {
+            sendWidgetData(e.getKey(), e.getValue());
+        }
+        Map<String, Component> alwaysSendMap = getNode(windowName).getAlwaysSendWidgets();
+        for (Map.Entry<String, Component> e : alwaysSendMap.entrySet()) {
+            sendWidgetData(e.getKey(), e.getValue());
         }
         sendPacketClass(PacketClass.END);
         logger.leave();
@@ -811,6 +805,19 @@ public class Protocol extends Connection {
         logger.leave();
     }
 
+    public void addAlwaysSendWidget(Component widget) {
+        logger.enter(widget);
+        Node node = getNode(widget);
+        if (node != null) {
+            try {
+                node.addAlwaysSendWidget(widget.getName(), widget);
+            } catch (IllegalArgumentException e) {
+                logger.warn(e);
+            }
+        }
+        logger.leave();
+    }
+
     public boolean isReceiving() {
         return isReceiving;
     }
@@ -828,14 +835,7 @@ public class Protocol extends Connection {
     }
 
     Node getNode(Component component) {
-        java.awt.Window win;
-        if (component != null) {
-            win = SwingUtilities.windowForComponent(component);
-            if (win != null) {
-                return getNode(win.getName());
-            }
-        }
-        return null;
+        return getNode(getWindowName(component));
     }
 
     synchronized void exit() {

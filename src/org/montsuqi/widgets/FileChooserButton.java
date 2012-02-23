@@ -80,6 +80,10 @@ public class FileChooserButton extends JComponent {
         gbc.fill = GridBagConstraints.NONE;
         gbl.addLayoutComponent(browseButton, gbc);
     }
+    
+    public JButton getBrowseButton() {
+        return browseButton;
+    }
 
     public void setLoadAction() {
         browseButton.setAction(new BrowseActionForLoad());

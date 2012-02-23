@@ -24,11 +24,9 @@ package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
-import javax.swing.JTextField;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
-import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.FileChooserButton;
 
 /**
@@ -38,8 +36,7 @@ class FileChooserButtonMarshaller extends WidgetMarshaller {
 
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
-        FileChooserButton fcb = (FileChooserButton) widget;        
-        con._addChangedWidget(widget);
+        FileChooserButton fcb = (FileChooserButton) widget;
 
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
@@ -55,7 +52,7 @@ class FileChooserButtonMarshaller extends WidgetMarshaller {
             }
         }
         fcb.setFile(null);
-        
+        con.addAlwaysSendWidget(widget);
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {

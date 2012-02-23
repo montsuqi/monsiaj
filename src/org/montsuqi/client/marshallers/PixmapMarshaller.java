@@ -24,10 +24,8 @@ package org.montsuqi.client.marshallers;
 
 import java.awt.Component;
 import java.io.IOException;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.widgets.Pixmap;

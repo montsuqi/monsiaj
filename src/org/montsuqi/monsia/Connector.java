@@ -24,61 +24,19 @@ package org.montsuqi.monsia;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
-import javax.swing.ComboBoxModel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButton;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeSelectionModel;
-
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.Calendar;
-import org.montsuqi.widgets.PandaCombo;
-import org.montsuqi.widgets.PandaCList;
-import org.montsuqi.widgets.PandaTable;
-import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.TimerEvent;
-import org.montsuqi.widgets.TimerListener;
+import org.montsuqi.widgets.*;
 
 /**
  * <p>A class to connect Gtk+ signal names to signal hender objects.</p>
@@ -582,6 +540,23 @@ abstract class Connector {
                 if (target instanceof JMenuItem) {
                     JMenuItem item = (JMenuItem) target;
                     item.addActionListener(new ActionListener() {
+
+                        public void actionPerformed(ActionEvent event) {
+                            logger.enter();
+                            invoke(con, handler, target, other);
+                            logger.leave();
+                        }
+                    });
+                }
+            }
+        });
+
+        registerConnector("file_set", new Connector() { //$NON-NLS-1$
+
+            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+                if (target instanceof FileChooserButton) {
+                    FileChooserButton fcb = (FileChooserButton) target;
+                    fcb.getBrowseButton().addActionListener(new ActionListener() {
 
                         public void actionPerformed(ActionEvent event) {
                             logger.enter();
