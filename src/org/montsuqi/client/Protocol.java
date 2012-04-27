@@ -76,7 +76,7 @@ public class Protocol extends Connection {
     public String getWindowName() {
         return windowName;
     }
-    
+
     public String getWindowName(Component widget) {
         String name = widget.getName();
         return name.substring(0, name.indexOf("."));

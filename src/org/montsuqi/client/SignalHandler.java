@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
@@ -36,7 +36,8 @@ import javax.swing.text.JTextComponent;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.FileEntry;
 
-/** <p>Class to perform an action for a widget.</p>
+/**
+ * <p>Class to perform an action for a widget.</p>
  */
 public abstract class SignalHandler {
 
@@ -58,8 +59,10 @@ public abstract class SignalHandler {
 
     public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
 
-    /** <p>Returns signal handler for the given name. If such handler could not be found,
-     * returns the fallback handler, which does nothing.</p>
+    /**
+     * <p>Returns signal handler for the given name. If such handler could not
+     * be found, returns the fallback handler, which does nothing.</p>
+     *
      * @param handlerName name of a signal handler.
      * @return a SignalHandler instance.
      */
@@ -130,7 +133,8 @@ public abstract class SignalHandler {
         buf.append("\uff5d\uffe3"); //$NON-NLS-1$
         SYMBOLS = buf.toString();
 
-        /** <p>A signal handler which does nothing.</p>
+        /**
+         * <p>A signal handler which does nothing.</p>
          */
         registerHandler(null, new SignalHandler() {
 
@@ -139,7 +143,8 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler which selects all text on a text field.</p>
+        /**
+         * <p>A signal handler which selects all text on a text field.</p>
          */
         registerHandler("select_all", new SignalHandler() { //$NON-NLS-1$
 
@@ -149,7 +154,8 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler which unselect all text on a text field.</p>
+        /**
+         * <p>A signal handler which unselect all text on a text field.</p>
          */
         registerHandler("unselect_all", new SignalHandler() { //$NON-NLS-1$
 
@@ -159,7 +165,8 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler which sends event and parameters.</p>
+        /**
+         * <p>A signal handler which sends event and parameters.</p>
          */
         final SignalHandler sendEvent = new SignalHandler() {
 
@@ -197,7 +204,7 @@ public abstract class SignalHandler {
                                 con._addChangedWidget(widget);
                             }
                         }
-                        Window window = null;
+                        Window window;
                         if (widget instanceof JMenuItem) {
                             JComponent c = (JComponent) widget;
                             window = (Window) c.getClientProperty("window"); //$NON-NLS-1$
@@ -250,7 +257,9 @@ public abstract class SignalHandler {
             }
         };
 
-        /** <p>A signal handler which registers the target widget as "changed."</p>
+        /**
+         * <p>A signal handler which registers the target widget as
+         * "changed."</p>
          */
         final SignalHandler changed = new SignalHandler() {
 
@@ -259,8 +268,10 @@ public abstract class SignalHandler {
             }
         };
 
-        /** <p>A signal handler which sends event only while no other action is performed.</p>
-         * <p>System property monsia.send.event.delay can control this behavior.</p>
+        /**
+         * <p>A signal handler which sends event only while no other action is
+         * performed.</p> <p>System property monsia.send.event.delay can control
+         * this behavior.</p>
          */
         SignalHandler sendEventWhenIdle = new SignalHandler() {
 
@@ -323,7 +334,8 @@ public abstract class SignalHandler {
         registerHandler("send_event_when_idle", sendEventWhenIdle); //$NON-NLS-1$
         registerHandler("send_event_on_focus_out", sendEvent); //$NON-NLS-1$
 
-        /** <p>A signal handler which registers the taret widget as "changed" and
+        /**
+         * <p>A signal handler which registers the taret widget as "changed" and
          * sends "SELECT" event.</p>
          */
         registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
@@ -333,7 +345,15 @@ public abstract class SignalHandler {
                 sendEvent.handle(con, widget, "SELECT"); //$NON-NLS-1$
             }
         });
+        
+        registerHandler("notebook_send_event", new SignalHandler() { //$NON-NLS-1$
 
+            public void handle(Protocol con, Component widget, Object userData) throws IOException {
+                con.addChangedWidget(widget);
+                sendEvent.handle(con, widget, "SWITCH"); //$NON-NLS-1$
+            }
+        });
+        
         registerHandler("table_send_event", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
@@ -342,7 +362,8 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler which sends an "ACTIVATE".</p>
+        /**
+         * <p>A signal handler which sends an "ACTIVATE".</p>
          */
         registerHandler("activate_widget", new SignalHandler() { //$NON-NLS-1$
 
@@ -351,7 +372,9 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler which moves the focus to the widget of given name.</p>
+        /**
+         * <p>A signal handler which moves the focus to the widget of given
+         * name.</p>
          */
         registerHandler("entry_next_focus", new SignalHandler() { //$NON-NLS-1$
 
@@ -396,7 +419,9 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler which removes all changed widgets from all windows.</p>
+        /**
+         * <p>A signal handler which removes all changed widgets from all
+         * windows.</p>
          */
         registerHandler("map_event", new SignalHandler() { //$NON-NLS-1$
 
@@ -405,7 +430,9 @@ public abstract class SignalHandler {
             }
         });
 
-        /** do nothing for now */
+        /**
+         * do nothing for now
+         */
         registerHandler("set_focus", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
@@ -414,7 +441,9 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler to close the window on which target widget is.</p>
+        /**
+         * <p>A signal handler to close the window on which target widget
+         * is.</p>
          */
         registerHandler("window_close", new SignalHandler() { //$NON-NLS-1$
 
@@ -430,7 +459,9 @@ public abstract class SignalHandler {
             }
         });
 
-        /** <p>A signal handler to open the given URL on target JTextPane widget.</p>
+        /**
+         * <p>A signal handler to open the given URL on target JTextPane
+         * widget.</p>
          */
         registerHandler("open_browser", new SignalHandler() { //$NON-NLS-1$
 
