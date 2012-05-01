@@ -59,6 +59,15 @@ class NotebookMarshaller extends WidgetMarshaller {
             throw new WidgetMarshallingException("notebook page not found"); //$NON-NLS-1$
         }
         note.setSelectedIndex(page);
+        if (!note.isSwitchPage()) {
+            for(int i=0;i<note.getTabCount();i++) {
+                if (i==page) {
+                    note.setEnabledAt(i, true);
+                } else {
+                    note.setEnabledAt(i, false);
+                }
+            }
+        }
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {

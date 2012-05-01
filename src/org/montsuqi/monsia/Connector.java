@@ -42,12 +42,12 @@ import org.montsuqi.widgets.*;
  * <p>A class to connect Gtk+ signal names to signal hender objects.</p>
  */
 abstract class Connector {
-
+    
     private static Map connectors;
     protected static final Logger logger = Logger.getLogger(Connector.class);
-
+    
     abstract void connect(Protocol con, Component target, SignalHandler handler, Object other);
-
+    
     public static Connector getConnector(String signalName) {
         logger.enter(signalName);
         if (connectors.containsKey(signalName)) {
@@ -76,23 +76,23 @@ abstract class Connector {
         }
         logger.leave();
     }
-
+    
     private static void registerConnector(String signalName, Connector connector) {
         logger.enter(signalName, connector);
         connectors.put(signalName, connector);
         logger.leave();
     }
-
+    
     static {
         connectors = new HashMap();
-
+        
         registerConnector(null, new Connector() {
-
+            
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 // do nothing
             }
         });
-
+        
         registerConnector("clicked", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -105,7 +105,7 @@ abstract class Connector {
                 }
                 AbstractButton button = (AbstractButton) target;
                 button.addActionListener(new ActionListener() {
-
+                    
                     public void actionPerformed(ActionEvent event) {
                         logger.enter();
                         invoke(con, handler, target, other);
@@ -114,14 +114,14 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("button_press_event", getConnector("clicked")); //$NON-NLS-1$ //$NON-NLS-2$
 
         registerConnector("key_press_event", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addKeyListener(new KeyAdapter() {
-
+                    
                     @Override
                     public void keyPressed(KeyEvent e) {
                         logger.enter();
@@ -133,7 +133,7 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("changed", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -142,23 +142,23 @@ abstract class Connector {
                     ComboBoxModel model = combo.getModel();
                     final Component c = combo.getEditor().getEditorComponent();
                     model.addListDataListener(new ListDataListener() {
-
+                        
                         public void contentsChanged(ListDataEvent e) {
                             logger.enter();
                             invoke(con, handler, c, other);
                             logger.leave();
                         }
-
+                        
                         public void intervalAdded(ListDataEvent e) {
                             // do nothing
                         }
-
+                        
                         public void intervalRemoved(ListDataEvent e) {
                             // do nothing
                         }
                     });
                     combo.addItemListener(new ItemListener() {
-
+                        
                         public void itemStateChanged(ItemEvent e) {
                             logger.enter();
                             invoke(con, handler, c, other);
@@ -168,19 +168,19 @@ abstract class Connector {
                 } else if (target instanceof JTextComponent) {
                     final JTextComponent text = (JTextComponent) target;
                     text.getDocument().addDocumentListener(new DocumentListener() {
-
+                        
                         public void insertUpdate(DocumentEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
                             logger.leave();
                         }
-
+                        
                         public void removeUpdate(DocumentEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
                             logger.leave();
                         }
-
+                        
                         public void changedUpdate(DocumentEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
@@ -190,7 +190,7 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("activate", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -201,7 +201,7 @@ abstract class Connector {
                 } else if (target instanceof JTextField) {
                     final JTextField textField = (JTextField) target;
                     textField.addActionListener(new ActionListener() {
-
+                        
                         public void actionPerformed(ActionEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
@@ -211,7 +211,7 @@ abstract class Connector {
                 } else if (target instanceof JMenuItem) {
                     JMenuItem item = (JMenuItem) target;
                     item.addActionListener(new ActionListener() {
-
+                        
                         public void actionPerformed(ActionEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
@@ -221,14 +221,14 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("enter", getConnector("activate")); //$NON-NLS-1$ //$NON-NLS-2$
 
         registerConnector("focus_in_event", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
-
+                    
                     @Override
                     public void focusGained(FocusEvent e) {
                         logger.enter();
@@ -238,12 +238,12 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("focus_out_event", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
-
+                    
                     @Override
                     public void focusLost(FocusEvent e) {
                         logger.enter();
@@ -253,14 +253,14 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("map_event", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
                     Window window = (Window) target;
                     window.addWindowListener(new WindowAdapter() {
-
+                        
                         @Override
                         public void windowOpened(WindowEvent e) {
                             logger.enter();
@@ -270,7 +270,7 @@ abstract class Connector {
                     });
                 } else {
                     target.addComponentListener(new ComponentAdapter() {
-
+                        
                         @Override
                         public void componentShown(ComponentEvent e) {
                             logger.enter();
@@ -281,14 +281,14 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("delete_event", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
                     Window window = (Window) target;
                     window.addWindowListener(new WindowAdapter() {
-
+                        
                         @Override
                         public void windowClosing(WindowEvent e) {
                             logger.enter();
@@ -298,7 +298,7 @@ abstract class Connector {
                     });
                 } else {
                     target.addComponentListener(new ComponentAdapter() {
-
+                        
                         @Override
                         public void componentHidden(ComponentEvent e) {
                             logger.enter();
@@ -309,14 +309,14 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("destroy", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
                     Window window = (Window) target;
                     window.addWindowListener(new WindowAdapter() {
-
+                        
                         @Override
                         public void windowClosed(WindowEvent e) {
                             logger.enter();
@@ -326,7 +326,7 @@ abstract class Connector {
                     });
                 } else {
                     target.addComponentListener(new ComponentAdapter() {
-
+                        
                         @Override
                         public void componentHidden(ComponentEvent e) {
                             logger.enter();
@@ -337,12 +337,12 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("set_focus", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
-
+                    
                     @Override
                     public void focusGained(FocusEvent e) {
                         logger.enter();
@@ -352,7 +352,7 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("select_row", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -360,7 +360,7 @@ abstract class Connector {
                     JTree tree = (JTree) target;
                     TreeSelectionModel model = tree.getSelectionModel();
                     model.addTreeSelectionListener(new TreeSelectionListener() {
-
+                        
                         public void valueChanged(TreeSelectionEvent e) {
                             logger.enter();
                             invoke(con, handler, target, other);
@@ -369,7 +369,7 @@ abstract class Connector {
                     });
                 } else {
                     ListSelectionListener listener = new ListSelectionListener() {
-
+                        
                         public void valueChanged(ListSelectionEvent e) {
                             logger.enter();
                             if (!e.getValueIsAdjusting()) {
@@ -387,7 +387,7 @@ abstract class Connector {
                         ListSelectionModel model = table.getSelectionModel();
                         model.addListSelectionListener(listener);
                         table.addActionListener(new ActionListener() {
-
+                            
                             public void actionPerformed(ActionEvent arg0) {
                                 logger.enter();
                                 invoke(con, handler, target, other);
@@ -398,7 +398,7 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("unselect_row", new Connector() { //$NON-NLS-1$
 
             public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
@@ -408,7 +408,7 @@ abstract class Connector {
                 // connectSelectRow(target, handler, other);
             }
         });
-
+        
         registerConnector("selection_changed", getConnector("select_row")); //$NON-NLS-1$ //$NON-NLS-2$
 
         registerConnector("click_column", new Connector() { //$NON-NLS-1$
@@ -418,16 +418,23 @@ abstract class Connector {
                 logger.debug("click_column: target={0}, handler={1}, other={2}", args); //$NON-NLS-1$
             }
         });
-
+        
         registerConnector("switch_page", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof JTabbedPane)) {
                     return;
                 }
+                
+                if (handler.getSignalName().equals("no_switch_page")) {
+                    Notebook notebook = (Notebook) target;
+                    notebook.setSwitchPage(false);
+                    return;
+                }
+                
                 JTabbedPane tabbedPane = (JTabbedPane) target;
                 tabbedPane.addChangeListener(new ChangeListener() {
-
+                    
                     public void stateChanged(ChangeEvent event) {
                         logger.enter();
                         invoke(con, handler, target, other);
@@ -436,18 +443,18 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("toggled", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof JToggleButton)) {
                     return;
                 }
-
+                
                 final JToggleButton toggle = (JToggleButton) target;
                 if (target instanceof JRadioButton) {
                     toggle.addMouseListener(new MouseAdapter() {
-
+                        
                         @Override
                         public void mousePressed(MouseEvent e) {
                             logger.enter();
@@ -476,7 +483,7 @@ abstract class Connector {
                             SignalHandler sendEvent = SignalHandler.getSignalHandler("send_event"); //$NON-NLS-1$
                             assert sendEvent != null;
                             invoke(con, sendEvent, deselected, o);
-
+                            
                             toggle.setSelected(true);
                             invoke(con, handler, target, o);
                             invoke(con, sendEvent, target, o);
@@ -485,7 +492,7 @@ abstract class Connector {
                     });
                 } else {
                     toggle.addChangeListener(new ChangeListener() {
-
+                        
                         public void stateChanged(ChangeEvent e) {
                             logger.enter();
                             if (toggle.isSelected()) {
@@ -497,7 +504,7 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("timeout", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -506,7 +513,7 @@ abstract class Connector {
                 }
                 PandaTimer timer = (PandaTimer) target;
                 timer.addTimerListener(new TimerListener() {
-
+                    
                     public void timerSignaled(TimerEvent e) {
                         logger.enter();
                         invoke(con, handler, target, other);
@@ -515,7 +522,7 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("day_selected", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -524,7 +531,7 @@ abstract class Connector {
                 }
                 Calendar cal = (Calendar) target;
                 cal.addChangeListener(new ChangeListener() {
-
+                    
                     public void stateChanged(ChangeEvent e) {
                         logger.enter();
                         invoke(con, handler, target, other);
@@ -533,14 +540,14 @@ abstract class Connector {
                 });
             }
         });
-
+        
         registerConnector("selection_get", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof JMenuItem) {
                     JMenuItem item = (JMenuItem) target;
                     item.addActionListener(new ActionListener() {
-
+                        
                         public void actionPerformed(ActionEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
@@ -550,14 +557,14 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("file_set", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof FileChooserButton) {
                     FileChooserButton fcb = (FileChooserButton) target;
                     fcb.getBrowseButton().addActionListener(new ActionListener() {
-
+                        
                         public void actionPerformed(ActionEvent event) {
                             logger.enter();
                             invoke(con, handler, target, other);
@@ -567,7 +574,7 @@ abstract class Connector {
                 }
             }
         });
-
+        
         registerConnector("cell_edited", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
@@ -575,7 +582,7 @@ abstract class Connector {
                     final PandaTable table = (PandaTable) target;
                     table.getModel().addTableModelListener(
                             new TableModelListener() {
-
+                                
                                 public void tableChanged(TableModelEvent te) {
                                     logger.enter();
                                     if (table.isEnterPressed()) {

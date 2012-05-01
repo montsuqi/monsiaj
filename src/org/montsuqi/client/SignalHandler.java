@@ -397,7 +397,8 @@ public abstract class SignalHandler {
         registerHandler("click_column", changed); //$NON-NLS-1$
         registerHandler("day_selected", changed); //$NON-NLS-1$
         registerHandler("switch_page", changed); //$NON-NLS-1$
-
+        registerHandler("no_switch_page", changed); //$NON-NLS-1$        
+        
         registerHandler("fileentry_changed", new SignalHandler() {
 
             public void handle(Protocol con, Component widget, Object userData) {

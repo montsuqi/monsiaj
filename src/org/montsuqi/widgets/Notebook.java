@@ -42,6 +42,15 @@ public class Notebook extends JTabbedPane {
     protected static final Logger logger = Logger.getLogger(Notebook.class);
     private int index;
     private int pindex;
+    private boolean switchPage;
+
+    public boolean isSwitchPage() {
+        return switchPage;
+    }
+
+    public void setSwitchPage(boolean swichPage) {
+        this.switchPage = swichPage;
+    }
 
     public Notebook() {
         super();
@@ -49,6 +58,7 @@ public class Notebook extends JTabbedPane {
         buttons = new HashMap();
         index = 0;
         pindex = 0;
+        switchPage = true;
 
         addChangeListener(new ChangeListener() {
 
