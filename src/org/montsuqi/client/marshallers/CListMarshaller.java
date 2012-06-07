@@ -54,7 +54,7 @@ class CListMarshaller extends WidgetMarshaller {
         StringBuffer label = new StringBuffer(widgetName.toString());
         int offset = label.length();
         Interface xml = con.getInterface();
-        int row = 0;
+        int row = 1;
         double rowattrw = 0.0;
         int count = -1;
         int from = 0;
@@ -71,7 +71,7 @@ class CListMarshaller extends WidgetMarshaller {
             } else if ("from".equals(name)) { //$NON-NLS-1$
                 from = con.receiveIntData();
             } else if ("row".equals(name)) { //$NON-NLS-1$
-                row = con.receiveIntData();
+                row = con.receiveIntData();                
             } else if ("rowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
@@ -139,7 +139,10 @@ class CListMarshaller extends WidgetMarshaller {
             BoundedRangeModel model = vScroll.getModel();
             int max = model.getMaximum();
             int min = model.getMinimum();
-            if ((count - from) > 0 && row != 0) {
+            if (row <= 0) {
+                row = 1;
+            }
+            if ((count - from) > 0) {
                 int value = (int) (((row - 1) * 1.0 / (count - from)) * (max - min)) + min;
                 if (rowattrw == 1.0) {
                     value += (int) ((1.0 / (count - from)) * (max - min));
@@ -149,6 +152,8 @@ class CListMarshaller extends WidgetMarshaller {
                     value = 0;
                 }
                 model.setValue(value);
+            } else {
+                model.setValue(0);
             }
         }
 
