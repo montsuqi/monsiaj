@@ -1,21 +1,9 @@
 package org.montsuqi.util;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 
 /*
  * To change this template, choose Tools | Templates
@@ -44,7 +32,7 @@ public class PopupNotify {
                 textPanel.setBackground((Color) SystemColor.menu);
 
                 JLabel summaryLabel = new JLabel(summary);
-                summaryLabel.setFont(new Font("Seif", Font.BOLD, 16));
+                summaryLabel.setFont(new Font("Serif", Font.BOLD, 16));
                 JTextPane bodyText = new JTextPane();
                 bodyText.setText(body);
                 bodyText.setOpaque(false);

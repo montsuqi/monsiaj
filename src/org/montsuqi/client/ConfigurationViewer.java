@@ -22,33 +22,15 @@ copies.
  */
 package org.montsuqi.client;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.SystemColor;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.FlowLayout;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.GridBagLayout;
-
-import javax.swing.AbstractAction;
+import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.WindowConstants;
-
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
-import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.Button;
+import org.montsuqi.widgets.PandaCList;
 
 public class ConfigurationViewer {
 

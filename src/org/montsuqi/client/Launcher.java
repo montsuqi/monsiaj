@@ -1,69 +1,44 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
-import java.awt.event.ActionListener;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
+import com.nilo.plaf.nimrod.NimRODLookAndFeel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-
+import java.net.URL;
+import javax.swing.*;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.Button;
-
-import com.nilo.plaf.nimrod.*;
-import java.awt.Toolkit;
-import java.net.URL;
 
 public class Launcher {
 
@@ -113,10 +88,14 @@ public class Launcher {
         }
         if (!configName.equals("")) {
             conf.setConfigurationName(configName);
-            /* set properties */
+            /*
+             * set properties
+             */
             conf.applyProperties(configName);
 
-            /* set look and feel */
+            /*
+             * set look and feel
+             */
             try {
                 String cname = conf.getLookAndFeelClassName(configName);
                 if (cname.startsWith("com.nilo.plaf.nimrod")) {
@@ -130,7 +109,9 @@ public class Launcher {
                 return true;
             }
 
-            /* confirm password when the password not preserved */
+            /*
+             * confirm password when the password not preserved
+             */
             if (!conf.getSavePassword(configName)) {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_password_message"), pwd};
@@ -141,7 +122,10 @@ public class Launcher {
                     return true;
                 }
             }
-            /* confirm certificate password when the certificate password not preserved */
+            /*
+             * confirm certificate password when the certificate password not
+             * preserved
+             */
             if (conf.getUseSSL(configName)
                     && !conf.getClientCertificateFileName(configName).equals("")
                     && !conf.getSaveClientCertificatePassword(configName)) {
