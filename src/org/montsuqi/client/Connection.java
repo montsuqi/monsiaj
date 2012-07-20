@@ -355,7 +355,8 @@ public class Connection {
         int slen = receiveLength();
         String value = receiveString();
         if (value == null) {
-            throw new IllegalArgumentException("empty Fixed value"); //$NON-NLS-1$
+            System.out.println("empty Fixed value");
+            return ZERO;
         }
         value = value.trim();
         if (value.length() == 0) {
@@ -377,9 +378,8 @@ public class Connection {
             }
             return v.movePointLeft(slen);
         } catch (NumberFormatException e) {
-            IllegalArgumentException iae = new IllegalArgumentException();
-            iae.initCause(e);
-            throw iae;
+            System.out.println(e);
+            return ZERO;
         }
     }
 
