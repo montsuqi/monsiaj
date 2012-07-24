@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client.marshallers;
 
@@ -33,7 +33,8 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.monsia.Interface;
 
-/** <p>A class to send/receive CList data.</p>
+/**
+ * <p>A class to send/receive CList data.</p>
  */
 class CListMarshaller extends WidgetMarshaller {
 
@@ -57,7 +58,6 @@ class CListMarshaller extends WidgetMarshaller {
         int row = 1;
         double rowattrw = 0.0;
         int count = -1;
-        int from = 0;
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
             label.replace(offset, label.length(), '.' + name);
@@ -68,10 +68,8 @@ class CListMarshaller extends WidgetMarshaller {
                 continue;
             } else if ("count".equals(name)) { //$NON-NLS-1$
                 count = con.receiveIntData();
-            } else if ("from".equals(name)) { //$NON-NLS-1$
-                from = con.receiveIntData();
             } else if ("row".equals(name)) { //$NON-NLS-1$
-                row = con.receiveIntData();                
+                row = con.receiveIntData();
             } else if ("rowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
@@ -86,13 +84,15 @@ class CListMarshaller extends WidgetMarshaller {
                         break;
                     case 4: // THREE QUATER
                         rowattrw = 0.75;
-                        break;                        
+                        break;
                     default:
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
             } else if ("column".equals(name)) { //$NON-NLS-1$
-				/* int dummy = */ con.receiveIntData();
+				/*
+                 * int dummy =
+                 */ con.receiveIntData();
             } else if ("item".equals(name)) { //$NON-NLS-1$
                 while (tableModel.getRowCount() > 0) {
                     tableModel.removeRow(0);
@@ -107,27 +107,29 @@ class CListMarshaller extends WidgetMarshaller {
                     int rows = con.receiveInt();
                     Object[] rdata = new String[rows];
                     for (int k = 0; k < rows; k++) {
-                        /* String dummy = */ con.receiveString();
+                        /*
+                         * String dummy =
+                         */ con.receiveString();
                         rdata[k] = con.receiveStringData();
                     }
-                    if (0 <= j - from && j - from < count) {
+                    if (j < count) {
                         tableModel.addRow(rdata);
                     }
                 }
             } else {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
-                manager.registerValue(widget, name, new Integer(from));
+                manager.registerValue(widget, name, null);
                 int num = con.receiveInt();
                 if (count < 0) {
                     count = num;
                 }
                 for (int j = 0; j < num; j++) {
                     boolean selected = con.receiveBooleanData();
-                    if (0 <= j - from && j - from < count) {
+                    if (j < count) {
                         if (selected) {
-                            selections.addSelectionInterval(j - from, j - from);
+                            selections.addSelectionInterval(j, j);
                         } else {
-                            selections.removeSelectionInterval(j - from, j - from);
+                            selections.removeSelectionInterval(j, j);
                         }
                     }
                 }
@@ -142,10 +144,10 @@ class CListMarshaller extends WidgetMarshaller {
             if (row <= 0) {
                 row = 1;
             }
-            if ((count - from) > 0) {
-                int value = (int) (((row - 1) * 1.0 / (count - from)) * (max - min)) + min;
+            if (count > 0) {
+                int value = (int) (((row - 1) * 1.0 / count) * (max - min)) + min;
                 if (rowattrw == 1.0) {
-                    value += (int) ((1.0 / (count - from)) * (max - min));
+                    value += (int) ((1.0 / count) * (max - min));
                 }
                 value -= rowattrw * model.getExtent();
                 if (value < 0) {
@@ -185,10 +187,9 @@ class CListMarshaller extends WidgetMarshaller {
         ListSelectionModel selections = table.getSelectionModel();
         boolean visibleRow = false;
         int rows = table.getRowCount();
-        int opt = ((Integer) va.getOpt()).intValue();
         for (int i = 0; i < rows; i++) {
             con.sendPacketClass(PacketClass.ScreenData);
-            con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i + opt) + ']');
+            con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i) + ']');
             con.sendBooleanData(Type.BOOL, selections.isSelectedIndex(i));
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);

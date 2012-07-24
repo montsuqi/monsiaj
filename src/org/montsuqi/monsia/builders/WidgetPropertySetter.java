@@ -623,7 +623,7 @@ abstract class WidgetPropertySetter {
                 value = normalize(value, "POLICY_"); //$NON-NLS-1$
                 if ("ALWAYS".equals(value)) { //$NON-NLS-1$
                     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-                } else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
+                } else if (value.startsWith("AUTO")) { //$NON-NLS-1$
                     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 } else if ("NEVER".equals(value)) { //$NON-NLS-1$
                     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -640,7 +640,7 @@ abstract class WidgetPropertySetter {
                 value = normalize(value, "POLICY_"); //$NON-NLS-1$
                 if ("ALWAYS".equals(value)) { //$NON-NLS-1$
                     scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                } else if ("AUTOMATIC".equals(value)) { //$NON-NLS-1$
+                } else if (value.startsWith("AUTO")) { //$NON-NLS-1$
                     scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
                 } else if ("NEVER".equals(value)) { //$NON-NLS-1$
                     scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
