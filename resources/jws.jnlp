@@ -14,7 +14,7 @@
     <all-permissions/>
   </security>
   <resources>
-    <j2se version="1.5+"/>
+    <j2se version="1.6+"/>
     <jar href="jmareceipt.jar"/>
     <jar href="pandaclient.jar"/>
     <jar href="libs/nimrodlf.jar"/>
