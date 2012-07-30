@@ -23,53 +23,22 @@ copies.
 package org.montsuqi.client;
 
 import com.centerkey.utils.BareBonesBrowserLaunch;
-
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
+import com.nilo.plaf.nimrod.NimRODLookAndFeel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.Font;
 import java.io.File;
 import java.util.Enumeration;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.text.JTextComponent;
-
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
-
-import com.nilo.plaf.nimrod.*;
-import java.awt.Color;
-import java.awt.SystemColor;
 
 public class ConfigurationPanel extends JPanel {
 
