@@ -25,7 +25,6 @@ YYYYMMDDは配布物作成の年月日を表します。
 :libs/PDFRenderer.jar:PDF描画ライブラリ
 :libs/log4j.jar:ログ出力モジュール(なくても実行可能です)
 :libs/nimrodlf.jar:Nimrodルックアンドフィールモジュール
-:libs/BareBonesBrowserLaunch.jar:外部ブラウザ起動ライブラリ
 :jma-receipt.jpg:日レセ専用ランチャーアイコンファイル
 :jws.jnlp:Java Web Start配備用サンプル設定ファイル(実行には不要です)
 :theme/*.theme:Nimrod用テーマファイル
