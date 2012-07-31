@@ -17,8 +17,7 @@
     <j2se version="1.6+"/>
     <jar href="jmareceipt.jar"/>
     <jar href="pandaclient.jar"/>
-    <jar href="libs/nimrodlf.jar"/>
-    <jar href="libs/BareBonesBrowserLaunch.jar"/>
+    <jar href="libs/nimrodlf-1.2.jar"/>
     <jar href="libs/PDFRenderer.jar"/>
   </resources>
   <application-desc main-class="jp.or.med.orca.jmareceipt.JMAReceiptLauncher"/>

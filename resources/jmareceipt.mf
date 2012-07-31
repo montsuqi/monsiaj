@@ -1,2 +1,2 @@
 Main-Class: jp.or.med.orca.jmareceipt.JMAReceiptLauncher
-Class-Path: pandaclient.jar libs/log4j.jar libs/BareBonesBrowserLaunch.jar libs/nimrodlf.jar
+Class-Path: pandaclient.jar libs/log4j.jar

@@ -31,7 +31,6 @@
             <string>$JAVAROOT/jmareceipt.jar</string>
             <string>$JAVAROOT/pandaclient.jar</string>
             <string>$JAVAROOT/libs/log4j.jar</string>
-            <string>$JAVAROOT/libs/BareBonesBrowserLaunch.jar</string>
             <string>$JAVAROOT/libs/PDFRenderer.jar</string>
         </array>
         <key>Arguments</key>

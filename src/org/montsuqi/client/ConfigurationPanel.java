@@ -1,28 +1,27 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
-import com.centerkey.utils.BareBonesBrowserLaunch;
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -30,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
+import java.net.URI;
 import java.util.Enumeration;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -78,7 +78,8 @@ public class ConfigurationPanel extends JPanel {
     private boolean doChangeLookAndFeel;
     private MetalTheme systemMetalTheme;
 
-    /** <p>An action to warn vulnerability of saving password.</p>
+    /**
+     * <p>An action to warn vulnerability of saving password.</p>
      */
     private final class ConfirmSavePasswordAction implements ActionListener {
 
@@ -98,9 +99,10 @@ public class ConfigurationPanel extends JPanel {
         }
     }
 
-    /** <p>An action to pop a fiel selection dialog.</p>
-     * <p>When a file is selected, the path of the selected file is set to specified
-     * text field.</p>
+    /**
+     * <p>An action to pop a fiel selection dialog.</p> <p>When a file is
+     * selected, the path of the selected file is set to specified text
+     * field.</p>
      */
     private final class FileSelectionAction extends AbstractAction {
 
@@ -108,10 +110,13 @@ public class ConfigurationPanel extends JPanel {
         private String extension;
         private String description;
 
-        /** <p>Constructs a FileSelectionAction.</p>
+        /**
+         * <p>Constructs a FileSelectionAction.</p>
          *
-         * @param entry a text field to which the path of the selected file is set.
-         * @param extension a file name extension passed to an ExtensionFIleFilter.
+         * @param entry a text field to which the path of the selected file is
+         * set.
+         * @param extension a file name extension passed to an
+         * ExtensionFIleFilter.
          * @param description ditto.
          */
         FileSelectionAction(JTextComponent entry, String extension, String description) {
@@ -138,10 +143,13 @@ public class ConfigurationPanel extends JPanel {
         private String extension;
         private String description;
 
-        /** <p>Constructs a FileSelectionAction.</p>
+        /**
+         * <p>Constructs a FileSelectionAction.</p>
          *
-         * @param entry a text field to which the path of the selected file is set.
-         * @param extension a file name extension passed to an ExtensionFIleFilter.
+         * @param entry a text field to which the path of the selected file is
+         * set.
+         * @param extension a file name extension passed to an
+         * ExtensionFIleFilter.
          * @param description ditto.
          */
         ThemeSelectionAction(JTextComponent entry, String extension, String description) {
@@ -225,7 +233,7 @@ public class ConfigurationPanel extends JPanel {
         infoPanel = createInfoPanel();
     }
 
-    public void loadConfiguration(String configName,boolean newFlag) {
+    public void loadConfiguration(String configName, boolean newFlag) {
         // Basic tab
         String user = newFlag ? Configuration.DEFAULT_USER : conf.getUser(configName);
         String password = newFlag ? Configuration.DEFAULT_PASSWORD : conf.getPassword(configName);
@@ -634,14 +642,28 @@ public class ConfigurationPanel extends JPanel {
         orcaButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                BareBonesBrowserLaunch.openURL(Messages.getString("ConfigurationPanel.info_orca_url"));
+                Desktop d = Desktop.getDesktop();
+                if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        d.browse(new URI(Messages.getString("ConfigurationPanel.info_orca_url")));
+                    } catch (Exception ex) {
+                        System.out.println(ex);
+                    }
+                }
             }
         });
         JButton montsuqiButton = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
         montsuqiButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                BareBonesBrowserLaunch.openURL(Messages.getString("ConfigurationPanel.info_montsuqi_url"));
+                Desktop d = Desktop.getDesktop();
+                if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        d.browse(new URI(Messages.getString("ConfigurationPanel.info_montsuqi_url")));
+                    } catch (Exception ex) {
+                        System.out.println(ex);
+                    }
+                }                
             }
         });
 

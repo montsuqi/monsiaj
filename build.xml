@@ -111,7 +111,6 @@
             <fileset dir="${libs.dir}">
                 <include name="nimrodlf-1.2.jar"/>
                 <include name="log4j.jar"/>
-                <include name="BareBonesBrowserLaunch.jar"/>
                 <include name="PDFRenderer.jar"/>
             </fileset>
         </copy>

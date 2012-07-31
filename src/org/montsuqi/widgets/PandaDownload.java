@@ -22,8 +22,9 @@
  */
 package org.montsuqi.widgets;
 
-import com.centerkey.utils.BareBonesBrowserLaunch;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +35,6 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.Logger;
-import org.montsuqi.util.SystemEnvironment;
 
 /**
  * <p>A component that holds a timer to fire events periodically.</p>
@@ -101,18 +101,13 @@ public class PandaDownload extends JComponent {
         Button openButton = new Button(new AbstractAction(Messages.getString("PandaDownload.open")) {
 
             public void actionPerformed(ActionEvent e) {
-                if (SystemEnvironment.isJavaVersionMatch("1.5")) {
-                    BareBonesBrowserLaunch.openURL("file://" + file.getAbsolutePath());
-                } else {
-                    Desktop d = Desktop.getDesktop();
-                    if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.OPEN)) {
-                        try {
-                            d.open(file);
-                        } catch (IOException ex) {
-                            BareBonesBrowserLaunch.openURL("file://" + file.getAbsolutePath());
-                        }
-                    } else {
-                        BareBonesBrowserLaunch.openURL("file://" + file.getAbsolutePath());
+                Desktop d = Desktop.getDesktop();
+                if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.OPEN)) {
+                    try {
+                        d.open(file);
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                        JOptionPane.showMessageDialog(null, Messages.getString("PandaDownload.open_failure_message"), Messages.getString("PandaDownload.error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
