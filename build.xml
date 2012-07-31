@@ -109,7 +109,7 @@
         </copy>
         <copy todir="${build.dir}/libs" >
             <fileset dir="${libs.dir}">
-                <include name="nimrodlf-1.2.jar"/>
+                <include name="nimrodlf.jar"/>
                 <include name="log4j.jar"/>
                 <include name="PDFRenderer.jar"/>
             </fileset>

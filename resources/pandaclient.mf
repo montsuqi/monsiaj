@@ -1,2 +1,2 @@
 Main-Class: org.montsuqi.client.Launcher
-Class-Path: libs/log4j.jar libs/nimrodlf-1.2.jar libs/PDFRenderer.jar
+Class-Path: libs/log4j.jar libs/nimrodlf.jar libs/PDFRenderer.jar
