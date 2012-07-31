@@ -1,2 +1,2 @@
 Main-Class: org.montsuqi.tools.TestXMLReplay
-Class-Path: libs/junit.jar libs/jfcunit.jar libs/pandaclient.jar libs/xercesImpl.jar libs/xmlParserAPIs.jar libs/xerces.jar
+Class-Path: libs/junit.jar libs/jfcunit.jar pandaclient.jar libs/regexp.jar
