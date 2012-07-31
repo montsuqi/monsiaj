@@ -1,2 +1,0 @@
-Main-Class: org.montsuqi.tools.TestXMLReplay
-Class-Path: libs/junit.jar libs/jfcunit.jar pandaclient.jar libs/regexp.jar

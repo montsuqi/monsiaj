@@ -109,9 +109,6 @@
         </copy>
         <copy todir="${build.dir}/libs" >
             <fileset dir="${libs.dir}">
-                <include name="regexp.jar"/>                                
-                <include name="junit.jar"/>                
-                <include name="jfcunit.jar"/>                
                 <include name="nimrodlf.jar"/>
                 <include name="log4j.jar"/>
                 <include name="PDFRenderer.jar"/>
@@ -139,7 +136,7 @@
         <native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8" reverse="true"/>
     </target>
 
-    <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-bin-replay,dist-src"/>
+    <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-src"/>
 
     <target name="dist-bin" depends="create-jars,copy-files,set-version">
         <property name="bin.name" value="monsiaj-bin-${version}"/>
@@ -149,8 +146,6 @@
                 <include name="*.jnlp"/>
                 <include name="*.txt"/>
                 <include name="jma-receipt.jpg"/>
-                <exclude name="pandarecord.jar"/>
-                <exclude name="pandareplay.jar"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}/${bin.name}/libs">
@@ -167,23 +162,6 @@
         <zip zipfile="${dist.dir}/${bin.name}.zip">
             <fileset dir="${build.dir}">
                 <include name="${bin.name}/**"/>
-            </fileset>
-        </zip>
-    </target>
-
-    <target name="dist-bin-replay" depends="create-jars,copy-files,set-version">
-        <property name="replay.name" value="monsiaj-replay-${version}"/>
-        <copy todir="${build.dir}/${replay.name}">
-            <fileset dir="${build.dir}">
-                <include name="pandarecord.jar"/>
-                <include name="pandareplay.jar"/>
-                <include name="*.txt"/>
-            </fileset>
-        </copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
-        <zip zipfile="${dist.dir}/${replay.name}.zip">
-            <fileset dir="${build.dir}">
-                <include name="${replay.name}/**"/>
             </fileset>
         </zip>
     </target>
@@ -276,18 +254,6 @@
         <jar jarfile="${build.dir}/jmareceipt.jar" manifest="${resources.dir}/jmareceipt.mf">
             <fileset dir="${build.dir}">
                 <include name="jp/or/med/orca/jmareceipt/**"/>
-            </fileset>
-        </jar>
-        <jar jarfile="${build.dir}/pandarecord.jar" manifest="${resources.dir}/pandarecord.mf">
-            <fileset dir="${build.dir}">
-                <include name="org/montsuqi/tools/TestXMLRecording.class"/>
-                <include name="org/montsuqi/tools/*.xml"/>
-            </fileset>
-        </jar>
-        <jar jarfile="${build.dir}/pandareplay.jar" manifest="${resources.dir}/pandareplay.mf">
-            <fileset dir="${build.dir}">
-                <include name="org/montsuqi/tools/TestXMLReplay.class"/>
-                <include name="org/montsuqi/tools/XMLFileFilter.class"/>
             </fileset>
         </jar>
         <jar jarfile="${build.dir}/pandaglade.jar" manifest="${resources.dir}/pandaglade.mf">
