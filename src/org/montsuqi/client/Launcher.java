@@ -69,6 +69,7 @@ public class Launcher {
     private void installLookAndFeels() {
         try {
             UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
+            UIManager.installLookAndFeel("InfoNode","net.infonode.gui.laf.InfoNodeLookAndFeel");   
         } catch (Exception e) {
             logger.warn(e);
         }
