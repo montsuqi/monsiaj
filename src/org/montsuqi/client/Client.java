@@ -56,6 +56,7 @@ public class Client implements Runnable {
 	public Client(Configuration conf) {
 		this.conf = conf;
 		logger = Logger.getLogger(Client.class);
+		JarSignersHardLinker.go();
 	}
 
 	/** <p>A factory method to construct a Client instance initialized by the command line.</p>
