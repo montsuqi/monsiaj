@@ -611,7 +611,7 @@ public class Protocol extends Connection {
         sessionBGColor = color;
     }
 
-    synchronized void sendConnect(String user, String pass, String app) throws IOException {
+    synchronized void sendConnect(String user, String pass, String app) throws IOException,GeneralSecurityException {
         logger.enter(user, pass, app);
         sendPacketClass(PacketClass.Connect);
         sendVersionString();
@@ -644,7 +644,7 @@ public class Protocol extends Connection {
         }
 
         String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
-        printAgent = new PrintAgent(port, user, pass);
+        printAgent = new PrintAgent(port, user, pass, this.client.createSSLSocketFactory());
         printAgent.start();
         logger.leave();
     }

@@ -14,6 +14,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.prefs.Preferences;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.*;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
@@ -34,10 +36,12 @@ public class PrintAgent extends Thread {
     private ConcurrentLinkedQueue<PrintRequest> queue;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private String port;
+    private SSLSocketFactory sslSocketFactory;
 
-    public PrintAgent(String port, final String user, final String password) {
+    public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
         queue = new ConcurrentLinkedQueue<PrintRequest>();
         this.port = port;
+        this.sslSocketFactory = sslSocketFactory;
         Authenticator.setDefault(new Authenticator() {
 
             @Override
@@ -45,6 +49,7 @@ public class PrintAgent extends Thread {
                 return new PasswordAuthentication(user, password.toCharArray());
             }
         });
+
     }
 
     @Override
@@ -52,12 +57,12 @@ public class PrintAgent extends Thread {
         while (true) {
             try {
                 Thread.sleep(DELAY);
-                for(PrintRequest request:queue) {
+                for (PrintRequest request : queue) {
                     if (processRequest(request)) {
                         queue.remove(request);
                     }
                 }
-           } catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 System.out.println(e);
             }
         }
@@ -214,14 +219,18 @@ public class PrintAgent extends Thread {
     public File download(PrintRequest request) throws IOException {
         File temp = File.createTempFile("monsiaj_printagent", ".pdf");
         temp.deleteOnExit();
-        URL url = new URL("http://" + port + "/" + request.getPath());
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("GET");
-        http.connect();
-        if (http.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IOException("" + http.getResponseCode());
+        String scheme = sslSocketFactory == null ? "http" : "https";
+        URL url = new URL(scheme + "://" + port + "/" + request.getPath());
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        if (sslSocketFactory != null) {
+            ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
         }
-        BufferedInputStream bis = new BufferedInputStream(http.getInputStream());
+        con.setRequestMethod("GET");
+        con.connect();
+        if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new IOException("" + con.getResponseCode());
+        }
+        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
         int data, outsize = 0;
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(temp));
         while ((data = bis.read()) != -1) {
@@ -232,12 +241,13 @@ public class PrintAgent extends Thread {
         if (outsize == 0) {
             return null;
         }
+
         return temp;
     }
 
     static public void main(String[] argv) {
 
-        PrintAgent agent = new PrintAgent(argv[0], "ormaster", "ormaster");
+        PrintAgent agent = new PrintAgent(argv[0], "ormaster", "ormaster", null);
         agent.start();
 
         for (int i = 1; i < argv.length; i++) {

@@ -77,6 +77,10 @@ public class SSLSocketBuilder {
     private final KeyManager[] keyManagers;
     final TrustManager[] trustManagers;
 
+    public SSLSocketFactory getFactory() {
+        return factory;
+    }    
+    
     public SSLSocketBuilder(String fileName, String password) throws IOException {
         logger = Logger.getLogger(this.getClass());
         boolean keyManagerIsReady = false;
@@ -93,9 +97,9 @@ public class SSLSocketBuilder {
             String missingFileName;
             // we cannot check keyManagers != null here, since it may not be initialized.
             if (keyManagerIsReady) {
-                missingFileName = getTrustStorePath().getName();
+                missingFileName = getTrustStorePath().getAbsolutePath();
             } else {
-                missingFileName = new File(fileName).getName();
+                missingFileName = new File(fileName).getAbsolutePath();
             }
             final String format = Messages.getString("Client.file_not_found_format");
             Object[] args = {missingFileName};
