@@ -106,6 +106,7 @@ public class SSLSocketBuilder {
             final String message = MessageFormat.format(format, args);
             throw new IOException(message);
         } catch (IOException e) {
+            System.out.println(e);
             final Throwable t = e.getCause();
             if (isMissingPassphraseMessage(e.getMessage())) {
                 final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
@@ -117,12 +118,7 @@ public class SSLSocketBuilder {
                 final SSLException ssle = new SSLException(message);
                 throw ssle;
             }
-            final File file = new File(fileName);
-            final Object[] args = {file.getAbsolutePath()};
-            final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
-            final String message = MessageFormat.format(format, args);
-            final SSLException ssle = new SSLException(message);
-            throw ssle;
+            throw e;
         } catch (GeneralSecurityException e) {
             final String message = e.getMessage();
             final SSLException ssle = new SSLException(message);
@@ -338,8 +334,13 @@ public class SSLSocketBuilder {
 
         } else if (SystemEnvironment.isMacOSX()) {
             return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "Library", "keychains"}),
+                    SystemEnvironment.createFilePath(new String[]{home, "Library", "Keychains"}),
                     "login.keychain");
+            /*
+            return new File(
+                    SystemEnvironment.createFilePath(new String[]{home, "Library", "keychains"}),
+                    "login.keychain");             
+             */
         } else {
             return new File(
                     SystemEnvironment.createFilePath(new String[]{home, ".java", "deployment", "security"}),
