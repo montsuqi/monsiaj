@@ -118,7 +118,7 @@ public class SSLSocketBuilder {
                 throw ssle;
             }
             final File file = new File(fileName);
-            final Object[] args = {file.getName()};
+            final Object[] args = {file.getAbsolutePath()};
             final String format = Messages.getString("Client.not_pkcs12_certificate_format"); //$NON-NLS-1$
             final String message = MessageFormat.format(format, args);
             final SSLException ssle = new SSLException(message);
