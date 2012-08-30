@@ -74,7 +74,8 @@ public class WidgetBuilder {
         registerWidgetClass("CList", PandaCList.class, new CListBuilder()); //$NON-NLS-1$
         registerWidgetClass("Dialog", Window.class, new WindowBuilder()); //$NON-NLS-1$
         registerWidgetClass("Entry", Entry.class, entryBuilder); //$NON-NLS-1$
-        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder); //$NON-NLS-1$        
+        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder); //$NON-NLS-1$       
+        registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder); //$NON-NLS-1$               
         registerWidgetClass("FileEntry", FileEntry.class, new FileEntryBuilder()); //$NON-NLS-1$
         registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); //$NON-NLS-1$
         registerWidgetClass("Frame", Frame.class, new FrameBuilder()); //$NON-NLS-1$

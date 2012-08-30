@@ -56,6 +56,7 @@ public abstract class WidgetMarshaller {
         registerMarshaller(Frame.class, new FrameMarshaller());
         registerMarshaller(FileEntry.class, new FileEntryMarshaller());
         registerMarshaller(FileChooserButton.class, new FileChooserButtonMarshaller());
+        registerMarshaller(ColorButton.class, new ColorButtonMarshaller());        
         registerMarshaller(PandaTimer.class, new TimerMarshaller());
         registerMarshaller(PandaDownload.class, new DownloadMarshaller());
         registerMarshaller(PandaPrint.class, new PrintMarshaller());

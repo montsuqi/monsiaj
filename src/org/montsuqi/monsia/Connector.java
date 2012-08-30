@@ -574,6 +574,23 @@ abstract class Connector {
                 }
             }
         });
+
+        registerConnector("color_set", new Connector() { //$NON-NLS-1$
+
+            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+                if (target instanceof ColorButton) {
+                    ColorButton cb = (ColorButton) target;
+                    cb.addActionListener(new ActionListener() {
+                        
+                        public void actionPerformed(ActionEvent event) {
+                            logger.enter();
+                            invoke(con, handler, target, other);
+                            logger.leave();
+                        }
+                    });
+                }
+            }
+        });
         
         registerConnector("cell_edited", new Connector() { //$NON-NLS-1$
 

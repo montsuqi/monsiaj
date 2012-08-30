@@ -85,10 +85,6 @@ public class FileChooserButton extends JComponent {
         return browseButton;
     }
 
-    public void setLoadAction() {
-        browseButton.setAction(new BrowseActionForLoad());
-    }
-
     private class BrowseActionForLoad extends AbstractAction {
         
         public void actionPerformed(ActionEvent e) {
