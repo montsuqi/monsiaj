@@ -19,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import org.montsuqi.util.GtkColorMap;
+import org.montsuqi.util.SafeColorDecoder;
 
 public class PandaTable extends JTable {
 
@@ -259,7 +259,7 @@ public class PandaTable extends JTable {
     public void setFGColor(int row, int column, String _color) {
         if (0 <= row && row < model.getRowCount()
                 && 0 <= column && column < model.getColumnCount()) {
-            Color color = GtkColorMap.getColor(_color);
+            Color color = SafeColorDecoder.decode(_color);
             fgColors[row][column] = color != null ? color : Color.BLACK;
         }
     }
@@ -267,7 +267,7 @@ public class PandaTable extends JTable {
     public void setBGColor(int row, int column, String _color) {
         if (0 <= row && row < model.getRowCount()
                 && 0 <= column && column < model.getColumnCount()) {
-            Color color = GtkColorMap.getColor(_color);
+            Color color = SafeColorDecoder.decode(_color);
             bgColors[row][column] = color != null ? color : Color.WHITE;
         }
     }

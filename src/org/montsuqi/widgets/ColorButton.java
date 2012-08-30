@@ -25,6 +25,7 @@ package org.montsuqi.widgets;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.montsuqi.util.SafeColorDecoder;
 
 /**
  * <p>A class that simulates Gtk+'s ColorButton.</p>
@@ -82,7 +83,7 @@ public class ColorButton extends JButton {
     
     public void setColorStr(String colorStr) 
     {
-        this.color = Color.decode(colorStr);
+        this.color = SafeColorDecoder.decode(colorStr);
         this.validate();
     }
 
@@ -106,6 +107,8 @@ public class ColorButton extends JButton {
         });
 
         buttonPanel.add(button3);
+        
+        cb.setColorStr("");
 
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);

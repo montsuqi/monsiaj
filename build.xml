@@ -70,12 +70,7 @@
     </target>
 
     <target name="copy-files" depends="prepare">
-        <filter token="version" value="${version}"/>
-        <copy todir="${build.dir}/org/montsuqi/widgets/" filtering="true">
-            <fileset dir="${resources.dir}">
-                <include name="rgb.txt"/>
-            </fileset>
-        </copy>        
+        <filter token="version" value="${version}"/>       
         <copy todir="${build.dir}" filtering="true">
             <fileset dir="${src.dir}">
                 <include name="**/*.properties"/>

@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import org.montsuqi.util.SafeColorDecoder;
 
 public class Style {
 
@@ -89,10 +90,10 @@ public class Style {
 				Font font = Font.decode(value);
 				style.setFont(font);
 			} else if ("foreground".equals(attribute) || "fg".equals(attribute)) { //$NON-NLS-1$ //$NON-NLS-2$
-				Color fg = Color.decode(value);
+				Color fg = SafeColorDecoder.decode(value);
 				style.setForeground(fg);
 			} else if ("background".equals(attribute) || "bg".equals(attribute)) { //$NON-NLS-1$ //$NON-NLS-2$
-				Color bg = Color.decode(value);
+				Color bg = SafeColorDecoder.decode(value);
 				style.setBackground(bg);
 			}
 		}

@@ -30,7 +30,7 @@ import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PopupNotify;
-import org.montsuqi.util.GtkColorMap;
+import org.montsuqi.util.SafeColorDecoder;
 
 /** <p>A class to send/receive Window data.</p>
  */
@@ -57,7 +57,7 @@ public class WindowMarshaller extends WidgetMarshaller {
                 con.setSessionTitle(title);
             } else if ("bgcolor".equals(name)) {                
                 String bgcolor = con.receiveStringData();
-                Color color = GtkColorMap.getColor(bgcolor);                
+                Color color = SafeColorDecoder.decode(bgcolor);                
                 con.setSessionBGColor(color);
             } else if ("popup_summary".equals(name)) {
                 summary = con.receiveStringData();
