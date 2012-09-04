@@ -139,11 +139,19 @@
         <copy todir="${build.dir}/${bin.name}">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
-                <include name="*.jnlp"/>
-                <include name="*.txt"/>
-                <include name="jma-receipt.jpg"/>
             </fileset>
         </copy>
+        <copy todir="${build.dir}/${bin.name}/misc">
+            <fileset dir="${build.dir}">
+                <include name="*.jnlp"/>
+                <include name="jma-receipt.jpg"/>                
+            </fileset>
+        </copy>          
+        <copy todir="${build.dir}/${bin.name}/doc">
+            <fileset dir="${build.dir}">
+                <include name="*.txt"/>
+            </fileset>
+        </copy>        
         <copy todir="${build.dir}/${bin.name}/libs">
             <fileset dir="${build.dir}/libs">
                 <include name="*.jar"/>
@@ -179,8 +187,6 @@
         <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
-                <exclude name="pandarecord.jar"/>
-                <exclude name="pandareplay.jar"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java/libs">
