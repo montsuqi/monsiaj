@@ -75,7 +75,7 @@ public class PandaDownload extends JComponent {
         return displaySize;
     }
 
-    public void showDialog(java.awt.Frame parent, String fileName, final File file) throws IOException {
+    public void showDialog(java.awt.Frame parent, final String fileName, final File file) throws IOException {
         final JDialog dialog = new JDialog(parent, Messages.getString("PandaDownload.title"), true);
         JPanel panel = new JPanel(new BorderLayout(5, 5));
 
@@ -119,7 +119,7 @@ public class PandaDownload extends JComponent {
             public void actionPerformed(ActionEvent e) {
                 String dir = prefs.get(PandaDownload.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);
-                chooser.setSelectedFile(file);
+                chooser.setSelectedFile(new File(fileName));
 
                 if (chooser.showSaveDialog(dialog) != JFileChooser.APPROVE_OPTION) {
                     return;
