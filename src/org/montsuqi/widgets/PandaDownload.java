@@ -119,6 +119,7 @@ public class PandaDownload extends JComponent {
             public void actionPerformed(ActionEvent e) {
                 String dir = prefs.get(PandaDownload.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);
+                chooser.setSelectedFile(file);
 
                 if (chooser.showSaveDialog(dialog) != JFileChooser.APPROVE_OPTION) {
                     return;
