@@ -213,13 +213,6 @@ public class PandaCList extends JTable implements PropertyChangeListener {
     }
 
     @Override
-    public void tableChanged(TableModelEvent e) {
-        super.tableChanged(e);
-        TableModel model = getModel();
-        setFocusable(model != null && model.getRowCount() != 0 && model.getColumnCount() != 0);
-    }
-
-    @Override
     public void setFocusable(boolean focusable) {
         super.setFocusable(focusable);
         final Container parent = getParent();

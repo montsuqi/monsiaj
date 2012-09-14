@@ -42,7 +42,6 @@ class CListMarshaller extends WidgetMarshaller {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
 
-        widget.setVisible(false);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         TableColumnModel columnModel = table.getColumnModel();
         ListSelectionModel selections = table.getSelectionModel();
