@@ -138,12 +138,12 @@
         <property name="bin.name" value="monsiaj-bin-${version}"/>
         <copy todir="${build.dir}/${bin.name}">
             <fileset dir="${build.dir}">
+                <include name="*.jnlp"/>                
                 <include name="*.jar"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}/${bin.name}/misc">
             <fileset dir="${build.dir}">
-                <include name="*.jnlp"/>
                 <include name="jma-receipt.jpg"/>                
             </fileset>
         </copy>          
