@@ -75,16 +75,22 @@ public class PandaDownload extends JComponent {
         return displaySize;
     }
 
-    public void showDialog(java.awt.Frame parent, final String fileName, final File file) throws IOException {
+    public void showDialog(java.awt.Frame parent, final String fileName, final String description, final File file) throws IOException {
         final JDialog dialog = new JDialog(parent, Messages.getString("PandaDownload.title"), true);
         JPanel panel = new JPanel(new BorderLayout(5, 5));
+        String descLine = "";
 
+        if (description.length() > 0) {
+            descLine = Messages.getString("PandaDownload.description") + description + "\n";
+        }
+        
         JPanel textPanel = new JPanel(new BorderLayout(5, 5));
         textPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JTextPane bodyText = new JTextPane();
         bodyText.setText(Messages.getString("PandaDownload.question") + "\n\n"
                 + Messages.getString("PandaDownload.filename") + fileName + "\n"
+                + descLine
                 + Messages.getString("PandaDownload.size") + displaySize(file.length()) + "\n");
         bodyText.setOpaque(false);
         bodyText.setEditable(false);
@@ -164,12 +170,12 @@ public class PandaDownload extends JComponent {
     }
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            System.out.println("PandaDownload <file>");
+        if (args.length < 2) {
+            System.out.println("PandaDownload <file> <description>");
             System.exit(1);
         }
         File file = new File(args[0]);
         PandaDownload pd = new PandaDownload();
-        pd.showDialog(null, file.getName(), file);
+        pd.showDialog(null, file.getName(), args[1],file);
     }
 }
