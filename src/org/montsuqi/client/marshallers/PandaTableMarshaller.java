@@ -143,6 +143,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
             table.changeSelection(trow, tcolumn, false, true);
         }
         widget.setVisible(true);
+        con.addAlwaysSendWidget(widget);
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
@@ -152,15 +153,15 @@ class PandaTableMarshaller extends WidgetMarshaller {
 
         con.sendPacketClass(PacketClass.ScreenData);
         con.sendName(name + ".trow"); //$NON-NLS-1$
-        con.sendIntegerData(Type.INT, table.changedRow + 1);
+        con.sendIntegerData(Type.INT, table.getChangedRow() + 1);
 
         con.sendPacketClass(PacketClass.ScreenData);
         con.sendName(name + ".tcolumn"); //$NON-NLS-1$
-        con.sendIntegerData(Type.INT, table.changedColumn + 1);
+        con.sendIntegerData(Type.INT, table.getChangedColumn() + 1);
 
         con.sendPacketClass(PacketClass.ScreenData);
         con.sendName(name + ".tvalue"); //$NON-NLS-1$
-        con.sendStringData(Type.VARCHAR, table.changedValue);
+        con.sendStringData(Type.VARCHAR, table.getChangedValue());
 
         int k = 0;
         ArrayList<String> cellNameList = (ArrayList<String>) manager.getValueOpt(name);

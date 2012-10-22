@@ -127,7 +127,34 @@ public class PandaTable extends JTable {
     private Color[][] bgColors;
     private PandaTableModel model;
     private boolean enterPressed;
+    private int changedRow;
+    private int changedColumn;
+    private String changedValue;
 
+    public int getChangedColumn() {
+        return changedColumn;
+    }
+
+    public int getChangedRow() {
+        return changedRow;
+    }
+
+    public String getChangedValue() {
+        return changedValue;
+    }
+
+    public void setChangedColumn(int changedColumn) {
+        this.changedColumn = changedColumn;
+    }
+
+    public void setChangedRow(int changedRow) {
+        this.changedRow = changedRow;
+    }
+
+    public void setChangedValue(String changedValue) {
+        this.changedValue = changedValue;
+    }
+    
     public boolean isEnterPressed() {
         return enterPressed;
     }
@@ -135,9 +162,7 @@ public class PandaTable extends JTable {
     public void setEnterPressed(boolean enterPressed) {
         this.enterPressed = enterPressed;
     }
-    public int changedRow;
-    public int changedColumn;
-    public String changedValue;
+
 
     public PandaTable() {
         this.setRowSelectionAllowed(false);
@@ -185,6 +210,10 @@ public class PandaTable extends JTable {
 
         actions.put("startEditing", new StartEditingAction());
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
+        
+        changedRow = 0;
+        changedColumn = 0;
+        changedValue = "";
     }
 
     @Override
