@@ -52,8 +52,6 @@ import org.montsuqi.widgets.Window;
 public class Protocol extends Connection {
 
     private Client client;
-    private boolean protocol1;
-    private boolean protocol2;
     private boolean isReceiving;
     private long timerPeriod;
     private HashMap nodeTable;
@@ -86,23 +84,9 @@ public class Protocol extends Connection {
         return topWindow;
     }
 
-    Protocol(Client client, Map styleMap, int protocolVersion, long timerPeriod) throws IOException, GeneralSecurityException {
+    Protocol(Client client, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
         super(client.createSocket(), isNetworkByteOrder()); //$NON-NLS-1$
         this.client = client;
-
-        switch (protocolVersion) {
-            case 1:
-                protocol1 = true;
-                protocol2 = false;
-                break;
-            case 2:
-                protocol1 = false;
-                protocol2 = true;
-                break;
-            default:
-                throw new IllegalArgumentException("invalid protocol version: " + protocolVersion); //$NON-NLS-1$
-        }
-        assert protocol1 ^ protocol2;
         isReceiving = false;
         nodeTable = new HashMap();
         valueManager = new WidgetValueManager(this, styleMap);
@@ -317,18 +301,8 @@ public class Protocol extends Connection {
     private synchronized void receiveValueSkip() throws IOException {
         logger.enter();
         int type = Type.NULL;
-        if (protocol1) {
-            receiveDataType();
-            type = getLastDataType();
-        } else if (protocol2) {
-            type = getLastDataType();
-            if (type == Type.NULL) {
-                receiveDataType();
-                type = getLastDataType();
-            }
-        } else {
-            assert false;
-        }
+        receiveDataType();
+        type = getLastDataType();
         switch (type) {
             case Type.INT:
                 receiveInt();
@@ -360,12 +334,8 @@ public class Protocol extends Connection {
         logger.leave();
     }
 
-    public synchronized void receiveValue(StringBuffer longName, int offset) throws IOException {
+    public synchronized void receiveNodeValue(StringBuffer longName, int offset) throws IOException {
         logger.enter(longName, new Integer(offset));
-        if (!receiveValueNeedTrace(longName)) {
-            logger.leave();
-            return;
-        }
         switch (receiveDataType()) {
             case Type.RECORD:
                 receiveRecordValue(longName, offset);
@@ -376,6 +346,20 @@ public class Protocol extends Connection {
             default:
                 receiveValueSkip();
                 break;
+        }
+        logger.leave();
+    }
+
+    public synchronized void receiveValue(StringBuffer longName, int offset) throws IOException {
+        logger.enter(longName, new Integer(offset));
+        Component widget = xml.getWidgetByLongName(longName.toString());
+        if (widget != null) {
+            if (receiveWidgetData(widget)) {
+            } else {
+                receiveNodeValue(longName, offset);
+            }
+        } else {
+            receiveValueSkip();
         }
         logger.leave();
     }
@@ -398,50 +382,6 @@ public class Protocol extends Connection {
             receiveValue(longName, offset + name.length());
         }
         logger.leave();
-    }
-
-    private synchronized boolean receiveValueNeedTrace(StringBuffer longName) throws IOException {
-        logger.enter(longName);
-        boolean done = false;
-        boolean needTrace = true;
-        if (protocol1) {
-            Component widget = xml.getWidgetByLongName(longName.toString());
-            if (widget != null) {
-                if (receiveWidgetData(widget)) {
-                    needTrace = false;
-                }
-                done = true;
-            } else {
-                if (!protocol2) {
-                    needTrace = false; // fatal error
-                    done = true;
-                    receiveValueSkip();
-                }
-            }
-        }
-
-        if (protocol2) {
-            if (!done) {
-                String dataName = longName.toString();
-                int dot = dataName.indexOf('.');
-                if (dot >= 0) {
-                    dataName = dataName.substring(dot + 1);
-                }
-                Component widget = xml.getWidget(dataName);
-                if (widget != null) {
-                    if (receiveWidgetData(widget)) {
-                        needTrace = false;
-                    }
-                    done = true;
-                }
-            }
-        }
-        if (!done) {
-            needTrace = true;
-        }
-
-        logger.leave();
-        return needTrace;
     }
 
     public synchronized String receiveName() throws IOException {
@@ -611,7 +551,7 @@ public class Protocol extends Connection {
         sessionBGColor = color;
     }
 
-    synchronized void sendConnect(String user, String pass, String app) throws IOException,GeneralSecurityException {
+    synchronized void sendConnect(String user, String pass, String app) throws IOException, GeneralSecurityException {
         logger.enter(user, pass, app);
         sendPacketClass(PacketClass.Connect);
         sendVersionString();

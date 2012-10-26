@@ -74,9 +74,6 @@ public class Client implements Runnable {
         options.add("user", Messages.getString("Client.user_name"), Configuration.DEFAULT_USER); //$NON-NLS-1$ //$NON-NLS-2$
         options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         options.add("style", Messages.getString("Client.styles"), Configuration.DEFAULT_STYLES); //$NON-NLS-1$ //$NON-NLS-2$
-        int protocolVersion = Configuration.DEFAULT_PROTOCOL_VERSION;
-        options.add("v1", Messages.getString("Client.use_protocol_version_1"), protocolVersion == 1); //$NON-NLS-1$ //$NON-NLS-2$
-        options.add("v2", Messages.getString("Client.use_protocol_version_2"), protocolVersion == 2); //$NON-NLS-1$ //$NON-NLS-2$
         options.add("useSSL", "SSL", Configuration.DEFAULT_USE_SSL); //$NON-NLS-1$ //$NON-NLS-2$
 
         String[] files = options.parse(Client.class.getName(), args);
@@ -89,19 +86,6 @@ public class Client implements Runnable {
         conf.setUser(configName, options.getString("user")); //$NON-NLS-1$
         conf.setPassword(configName, options.getString("pass")); //$NON-NLS-1$
         conf.setStyleFileName(configName, options.getString("style")); //$NON-NLS-1$
-
-        boolean v1 = options.getBoolean("v1"); //$NON-NLS-1$
-        boolean v2 = options.getBoolean("v2"); //$NON-NLS-1$
-        if (!(v1 ^ v2)) {
-            throw new IllegalArgumentException("specify -v1 or -v2, not both."); //$NON-NLS-1$
-        }
-        if (v1) {
-            conf.setProtocolVersion(configName, 1);
-        } else if (v2) {
-            conf.setProtocolVersion(configName, 2);
-        } else {
-            assert false : "-v1 or -v2 should have been given."; //$NON-NLS-1$
-        }
 
         conf.setUseSSL(configName, options.getBoolean("useSSL")); //$NON-NLS-1$
 
@@ -121,9 +105,8 @@ public class Client implements Runnable {
     void connect() throws IOException, GeneralSecurityException {
         String configName = conf.getConfigurationName();
         Map styles = loadStyles();
-        int protocolVersion = conf.getProtocolVersion(configName);
         long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
-        protocol = new Protocol(this, styles, protocolVersion, timerPeriod);
+        protocol = new Protocol(this, styles, timerPeriod);
 
         String user = conf.getUser(configName);
         String password = conf.getPassword(configName);

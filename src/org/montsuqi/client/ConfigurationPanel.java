@@ -55,7 +55,6 @@ public class ConfigurationPanel extends JPanel {
     protected JTextField hostEntry;
     protected JTextField portEntry;
     protected JTextField appEntry;
-    protected JRadioButton[] protocolVersionRadios;
     // SSL Tab
     protected JCheckBox useSSLCheckbox;
     protected JButton clientCertificateButton;
@@ -252,7 +251,6 @@ public class ConfigurationPanel extends JPanel {
         String styleFileName = newFlag ? Configuration.DEFAULT_STYLES : conf.getStyleFileName(configName);
         String lookAndFeelClassName = newFlag ? Configuration.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
         String lafThemeFileName = newFlag ? Configuration.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
-        int protocolVersion = newFlag ? Configuration.DEFAULT_PROTOCOL_VERSION : conf.getProtocolVersion(configName);
         boolean useLogViewer = newFlag ? Configuration.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
         boolean useTimer = newFlag ? Configuration.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
         long timerPeriod = newFlag ? Configuration.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
@@ -267,7 +265,6 @@ public class ConfigurationPanel extends JPanel {
         hostEntry.setText(host);
         portEntry.setText(String.valueOf(port));
         appEntry.setText(application);
-        protocolVersionRadios[protocolVersion - 1].setSelected(true);
 
         // SSL Tab
         useSSLCheckbox.setSelected(useSSL);
@@ -310,12 +307,6 @@ public class ConfigurationPanel extends JPanel {
         // Others Tab
         conf.setStyleFileName(configName, styleEntry.getText());
         conf.setLookAndFeelClassName(configName, lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
-        for (int i = 0; i < protocolVersionRadios.length; i++) {
-            if (protocolVersionRadios[i].isSelected()) {
-                conf.setProtocolVersion(configName, Integer.parseInt(protocolVersionRadios[i].getText()));
-                break;
-            }
-        }
         conf.setLAFThemeFileName(configName, lafThemeEntry.getText());
         conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
         conf.setUseTimer(configName, useTimerCheck.isSelected());
@@ -374,18 +365,6 @@ public class ConfigurationPanel extends JPanel {
         portEntry = createTextField();
         portEntry.setColumns(5);
         appEntry = createTextField();
-        String[] versions = {String.valueOf(1), String.valueOf(2)};
-        protocolVersionRadios = new JRadioButton[versions.length];
-        ButtonGroup group = new ButtonGroup();
-        JPanel protocolVersionPanel = new JPanel();
-        protocolVersionPanel.setLayout(new GridLayout(1, versions.length));
-        for (int i = 0; i < versions.length; i++) {
-            JRadioButton radio = new JRadioButton(versions[i]);
-            radio.setSelected(versions[i].equals(versions[0]));
-            group.add(radio);
-            protocolVersionPanel.add(radio);
-            protocolVersionRadios[i] = radio;
-        }
         userEntry = createTextField();
         passwordEntry = createPasswordField();
         savePasswordCheckbox = new JCheckBox();
@@ -403,12 +382,6 @@ public class ConfigurationPanel extends JPanel {
         panel.add(createLabel(Messages.getString("ConfigurationPanel.application")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(appEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.protocol_version")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(protocolVersionPanel,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 

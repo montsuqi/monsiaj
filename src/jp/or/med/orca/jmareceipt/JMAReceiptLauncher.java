@@ -24,10 +24,8 @@ copies.
 package jp.or.med.orca.jmareceipt;
 
 import java.net.URL;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
 import org.montsuqi.client.ConfigurationPanel;
 import org.montsuqi.client.ConfigurationViewer;
 import org.montsuqi.client.Launcher;
@@ -44,7 +42,6 @@ public class JMAReceiptLauncher extends Launcher {
 		String [] configNames = conf.getConfigurationNames();
 		for (int i = 0; i < configNames.length; i++) {
 			conf.setApplication(configNames[i], "orca00"); //$NON-NLS-1$
-			conf.setProtocolVersion(configNames[i], 1);
 		}
 	}
 	

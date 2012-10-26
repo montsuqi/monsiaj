@@ -1,33 +1,28 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.BackingStoreException;
@@ -36,10 +31,11 @@ import javax.swing.UIManager;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
-/** <p>A class to manage configuration settings of the application.</p>
+/**
+ * <p>A class to manage configuration settings of the application.</p>
  * <p>Configuration is stored using the Preferences API. On Unix based systems,
- * it is stored in XML files somewhere in user's home directory. On Windows,
- * it is stored in the registry.</p>
+ * it is stored in XML files somewhere in user's home directory. On Windows, it
+ * is stored in the registry.</p>
  */
 public class Configuration {
 
@@ -58,7 +54,6 @@ public class Configuration {
     private static final String SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY = "save_client_certificate_pass"; //$NON-NLS-1$
     private static final String CLIENT_CERTIFICATE_KEY = "client_certificate"; //$NON-NLS-1$
     private static final String CLIENT_CERTIFICATE_PASSWORD_KEY = "client_certificate_password"; //$NON-NLS-1$
-    private static final String PROTOCOL_VERSION_KEY = "protocol_version"; //$NON-NLS-1$
     private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
     private static final String LAF_THEME_KEY = "laf_theme"; //$NON-NLS-1$
     private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
@@ -69,25 +64,43 @@ public class Configuration {
     private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
     private static final String CONFIG_NODE_BASE = "config"; //$NON-NLS-1$
     private static final String CONFIG_NODE = CONFIG_NODE_BASE + "/"; //$NON-NLS-1$
-    /** <p>Default port: 8000</p> */
+    /**
+     * <p>Default port: 8000</p>
+     */
     static final int DEFAULT_PORT = 8000;
-    /** <p>Default host: localhost</p> */
+    /**
+     * <p>Default host: localhost</p>
+     */
     static final String DEFAULT_HOST = "trial.orca.med.or.jp"; //$NON-NLS-1$
-    /** <p>Default user: value of System property user.name.</p> */
+    /**
+     * <p>Default user: value of System property user.name.</p>
+     */
     static final String DEFAULT_USER = "trial"; //$NON-NLS-1$
-    /** <p>Default password: empty string.</p> */
+    /**
+     * <p>Default password: empty string.</p>
+     */
     static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
-    /** <p>Default client certificate password: empty string.</p> */
+    /**
+     * <p>Default client certificate password: empty string.</p>
+     */
     static final String DEFAULT_CLIENT_CERTIFICATE_PASSWORD = ""; //$NON-NLS-1$
-    /** <p>Default client certificate path: empty string.</p> */
+    /**
+     * <p>Default client certificate path: empty string.</p>
+     */
     static final String DEFAULT_CLIENT_CERTIFICATE = ""; //$NON-NLS-1$
-    /** <p>Default value of save password checkbox: false.</p> */
+    /**
+     * <p>Default value of save password checkbox: false.</p>
+     */
     static final boolean DEFAULT_SAVE_PASSWORD = false;
-    /** <p>Default application name: "demo".</p> */
+    /**
+     * <p>Default application name: "demo".</p>
+     */
     static final String DEFAULT_APPLICATION = "panda:orca00"; //$NON-NLS-1$
-    /** <p>Default cache directory: [value of System property user.home]/.monsiaj/cache</p> */
+    /**
+     * <p>Default cache directory: [value of System property
+     * user.home]/.monsiaj/cache</p>
+     */
     static final String DEFAULT_CACHE_PATH;
-
 
     static {
         String[] pathElements = {
@@ -97,43 +110,64 @@ public class Configuration {
         };
         DEFAULT_CACHE_PATH = SystemEnvironment.createFilePath(pathElements).getAbsolutePath();
     }
-    /** <p>Default style definitions: empty string.</p> */
+    /**
+     * <p>Default style definitions: empty string.</p>
+     */
     static final String DEFAULT_STYLES = ""; //$NON-NLS-1$
-    /** <p>Default style resource name: /org/montsuqi/client/style.properteis.</p> */
+    /**
+     * <p>Default style resource name:
+     * /org/montsuqi/client/style.properteis.</p>
+     */
     static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties"; //$NON-NLS-1$
-    /** <p>Default value of use SSL checkbox: false.</p> */
+    /**
+     * <p>Default value of use SSL checkbox: false.</p>
+     */
     static final boolean DEFAULT_USE_SSL = false;
-    /** <p>Default value of save client certificate password checkbox: false.</p> */
+    /**
+     * <p>Default value of save client certificate password checkbox: false.</p>
+     */
     static final boolean DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD = false;
-    /** <p>Default protocol version: 1.</p> */
-    static final int DEFAULT_PROTOCOL_VERSION = 1;
-    /** <p>Default look and feel class name: system look and feel.</p> */
+    /**
+     * <p>Default look and feel class name: system look and feel.</p>
+     */
     static final String DEFAULT_LOOK_AND_FEEL_CLASS_NAME = UIManager.getSystemLookAndFeelClassName();
-    /** <p>Default look and feel theme filename: "".</p> */
+    /**
+     * <p>Default look and feel theme filename: "".</p>
+     */
     static final String DEFAULT_LAF_THEME = "";
-    /** <p>Default value of use log viewer checkbox: false.</p> */
+    /**
+     * <p>Default value of use log viewer checkbox: false.</p>
+     */
     static final boolean DEFAULT_USE_LOG_VIEWER = false;
-    /** <p>Default value of properties: false.</p> */
+    /**
+     * <p>Default value of properties: false.</p>
+     */
     static final String DEFAULT_PROPERTIES = "";
-    /** <p>Default value of use timer: false.</p> */
+    /**
+     * <p>Default value of use timer: false.</p>
+     */
     static final boolean DEFAULT_USE_TIMER = true;
-    /** <p>Default value of timer period(ms): 1000.</p> */
+    /**
+     * <p>Default value of timer period(ms): 1000.</p>
+     */
     static final long DEFAULT_TIMER_PERIOD = 1000;
-    /** <p>Default value of default config name.</p> */
+    /**
+     * <p>Default value of default config name.</p>
+     */
     static final String DEFAULT_CONFIG_NAME = "default";
     protected static final Logger logger = Logger.getLogger(Configuration.class);
 
-    /** <p>Constructs a configuration object.</p>
+    /**
+     * <p>Constructs a configuration object.</p>
      *
      * @param clazz class object used to obtain user preference node.
      */
     public Configuration(Class clazz) {
-        boolean hasDefault = false;
         prefs = Preferences.userNodeForPackage(clazz);
-        hasDefault = nodeExists(DEFAULT_CONFIG_NAME);
+        boolean hasDefault = nodeExists(DEFAULT_CONFIG_NAME);
         if (!hasDefault) {
             newConfiguration(DEFAULT_CONFIG_NAME);
-			copyOldConfig(Preferences.userRoot().node("/jp/or/med/jma_receipt"),
+            copyOldConfig(Preferences.userRoot().node("/jp/or/med/jma_receipt"),
                     Preferences.userNodeForPackage(clazz));
         }
         pass = DEFAULT_PASSWORD;
@@ -153,7 +187,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Copy old version's configuration.</p>
+    /**
+     * <p>Copy old version's configuration.</p>
      *
      */
     private void copyOldConfig(Preferences oldPref, Preferences newPref) {
@@ -168,8 +203,8 @@ public class Configuration {
             children = oldPref.childrenNames();
             for (i = 0; i < children.length; i++) {
                 copyOldConfig(
-                    oldPref.node(oldPref.absolutePath()+ "/" + children[i]),
-                    newPref.node(newPref.absolutePath()+ "/" + children[i]));
+                        oldPref.node(oldPref.absolutePath() + "/" + children[i]),
+                        newPref.node(newPref.absolutePath() + "/" + children[i]));
             }
             newPref.flush();
         } catch (Exception ex) {
@@ -177,7 +212,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Ensures the configuration is saved.</p>
+    /**
+     * <p>Ensures the configuration is saved.</p>
      */
     protected void save() {
         try {
@@ -187,11 +223,12 @@ public class Configuration {
         }
     }
 
-    /** <p>New configuration.</p>
+    /**
+     * <p>New configuration.</p>
      *
      * @param configName Configuration Name.
      */
-    public boolean newConfiguration(String configName) {
+    final boolean newConfiguration(String configName) {
         if (!nodeExists(configName)) {
             prefs.node(CONFIG_NODE + configName);
             return true;
@@ -199,7 +236,8 @@ public class Configuration {
         return false;
     }
 
-    /** <p>Remove configuration.</p>
+    /**
+     * <p>Remove configuration.</p>
      *
      * @param configName Configuration Name.
      */
@@ -212,7 +250,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Get configuration name list.</p>
+    /**
+     * <p>Get configuration name list.</p>
      *
      * @return configuration name.
      */
@@ -226,7 +265,8 @@ public class Configuration {
         return null;
     }
 
-    /** <p>rename configuration.</p>
+    /**
+     * <p>rename configuration.</p>
      *
      * @param oldName Old configuration name.
      * @param newName New configuration name.
@@ -234,8 +274,8 @@ public class Configuration {
      */
     public boolean renameConfiguration(String oldName, String newName) {
         try {
-            if (nodeExists(oldName) &&
-                    !nodeExists(newName)) {
+            if (nodeExists(oldName)
+                    && !nodeExists(newName)) {
                 Preferences oldConfig = prefs.node(CONFIG_NODE + oldName);
                 Preferences newConfig = prefs.node(CONFIG_NODE + newName);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -256,7 +296,8 @@ public class Configuration {
         return false;
     }
 
-    /** <p>Get current configuration.</p>
+    /**
+     * <p>Get current configuration.</p>
      *
      * @return Current configuration name.
      */
@@ -269,7 +310,8 @@ public class Configuration {
         return configName;
     }
 
-    /** <p>Set current configuration.</p>
+    /**
+     * <p>Set current configuration.</p>
      *
      * @param configName Current configuration name.
      */
@@ -281,9 +323,11 @@ public class Configuration {
         }
     }
 
-    /** <p>Returns the password.</p>
-     * <p>If save password is set to false, it always returns DEFAULT_PASSWORD("").</p>
-     * @params configName the configuration name.
+    /**
+     * <p>Returns the password.</p> <p>If save password is set to false, it
+     * always returns DEFAULT_PASSWORD("").</p> @params configName the
+     * configuration name.
+     *
      * @return the password or empty string.
      */
     public String getPassword(String configName) {
@@ -294,10 +338,12 @@ public class Configuration {
         }
     }
 
-    /** <p>Sets the password.</p>
-     * <p>It stores the new password into the member field.</p>
-     * <p>If save password is set to true, it also store the password into the configuration,
-     * otherwise it sets the DEFAULT_PASSWORD("") to clear it.</p>
+    /**
+     * <p>Sets the password.</p> <p>It stores the new password into the member
+     * field.</p> <p>If save password is set to true, it also store the password
+     * into the configuration, otherwise it sets the DEFAULT_PASSWORD("") to
+     * clear it.</p>
+     *
      * @param configName the configuration name.
      * @param pass the new password.
      */
@@ -310,7 +356,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Returns the value of save password.</p>
+    /**
+     * <p>Returns the value of save password.</p>
      *
      * @param configName the configuration name.
      * @return value of save password.</p>
@@ -319,7 +366,8 @@ public class Configuration {
         return getBoolean(configName, SAVE_PASSWORD_KEY, DEFAULT_SAVE_PASSWORD);
     }
 
-    /** <p>Sets the value of save password.</p>
+    /**
+     * <p>Sets the value of save password.</p>
      *
      * @param configName the configuration name.
      * @param flag new value of save password.
@@ -331,8 +379,10 @@ public class Configuration {
         }
     }
 
-    /** <p>Returns the client certificate password.</p>
-     * <p>If save password is set to false, it always returns DEFAULT_PASSWORD("").</p>
+    /**
+     * <p>Returns the client certificate password.</p> <p>If save password is
+     * set to false, it always returns DEFAULT_PASSWORD("").</p>
+     *
      * @param configName the configuration name.
      * @return the password or empty string.
      */
@@ -344,10 +394,12 @@ public class Configuration {
         }
     }
 
-    /** <p>Sets the client certificate password.</p>
-     * <p>It stores the new password into the member field.</p>
-     * <p>If save client password is set to true, it also store the password into the configuration,
-     * otherwise it sets the DEFAULT_PASSWORD("") to clear it.</p>
+    /**
+     * <p>Sets the client certificate password.</p> <p>It stores the new
+     * password into the member field.</p> <p>If save client password is set to
+     * true, it also store the password into the configuration, otherwise it
+     * sets the DEFAULT_PASSWORD("") to clear it.</p>
+     *
      * @param configName the configuration name.
      * @param pass the new password.
      */
@@ -360,7 +412,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Returns the value of save client certificate password.</p>
+    /**
+     * <p>Returns the value of save client certificate password.</p>
      *
      * @param configName the configuration name.
      * @return value of save client certificate password.</p>
@@ -369,9 +422,11 @@ public class Configuration {
         return getBoolean(configName, SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY, DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD);
     }
 
-    /** <p>Sets the value of save client certificate password.</p>
+    /**
+     * <p>Sets the value of save client certificate password.</p>
      *
      * @configName the configuration name.
+     *
      * @param flag new value of save client certificate password.
      */
     public void setSaveClientCertificatePassword(String configName, boolean flag) {
@@ -381,7 +436,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Returns the port.</p>
+    /**
+     * <p>Returns the port.</p>
      *
      * @param configName the configuration name.
      * @return the port number.
@@ -390,7 +446,8 @@ public class Configuration {
         return getInt(configName, PORT_KEY, DEFAULT_PORT);
     }
 
-    /** <p>Sets the port.</p>
+    /**
+     * <p>Sets the port.</p>
      *
      * @param configName the configuration name.
      * @param port new value of the port.
@@ -399,7 +456,8 @@ public class Configuration {
         setInt(configName, PORT_KEY, port);
     }
 
-    /** <p>Returns the host.</p>
+    /**
+     * <p>Returns the host.</p>
      *
      * @param configName the configuration name.
      * @return the host.
@@ -408,7 +466,8 @@ public class Configuration {
         return getString(configName, HOST_KEY, DEFAULT_HOST);
     }
 
-    /** <p>Sets the host.</p>
+    /**
+     * <p>Sets the host.</p>
      *
      * @param configName the configuration name.
      * @param host new value of the host.
@@ -417,7 +476,9 @@ public class Configuration {
         setString(configName, HOST_KEY, host);
     }
 
-    /** <p>Returns the user.</p>
+    /**
+     * <p>Returns the user.</p>
+     *
      * @param configName the configuration name.
      * @return the user.
      */
@@ -425,7 +486,8 @@ public class Configuration {
         return getString(configName, USER_KEY, DEFAULT_USER);
     }
 
-    /** <p>Sets the user.</p>
+    /**
+     * <p>Sets the user.</p>
      *
      * @param configName configuration name.
      * @param user new value of the user.
@@ -434,7 +496,8 @@ public class Configuration {
         setString(configName, USER_KEY, user);
     }
 
-    /** <p>Returns the cache directory.</p>
+    /**
+     * <p>Returns the cache directory.</p>
      *
      * @param configName the configuration name.
      * @return the cache directory.
@@ -443,7 +506,8 @@ public class Configuration {
         return getString(configName, CACHE_KEY, DEFAULT_CACHE_PATH);
     }
 
-    /** <p>Sets the cache directory.</p>
+    /**
+     * <p>Sets the cache directory.</p>
      *
      * @param configName the configuration name.
      * @param cache new value of the cache directory.
@@ -452,9 +516,11 @@ public class Configuration {
         setString(configName, CACHE_KEY, cache);
     }
 
-    /** <p>Returns the style URL.</p>
-     * <p>It first tries converting style file name specified in the configuration to URL.
-     * If it fails it falls back to default style resource.</p>
+    /**
+     * <p>Returns the style URL.</p> <p>It first tries converting style file
+     * name specified in the configuration to URL. If it fails it falls back to
+     * default style resource.</p>
+     *
      * @param configName the configuration name.
      * @return the style URL.
      */
@@ -471,7 +537,8 @@ public class Configuration {
         return Configuration.class.getResource(DEFAULT_STYLE_RESOURCE_NAME);
     }
 
-    /** <p>Returns the style file name.</p>
+    /**
+     * <p>Returns the style file name.</p>
      *
      * @param configName the configuration name.
      * @return the style file name.
@@ -480,7 +547,9 @@ public class Configuration {
         return getString(configName, STYLES_KEY, DEFAULT_STYLES);
     }
 
-    /** <p>Sets the style file name.</p>
+    /**
+     * <p>Sets the style file name.</p>
+     *
      * @param configName the configuration name.
      * @param styles new value of style file name.
      */
@@ -488,7 +557,8 @@ public class Configuration {
         setString(configName, STYLES_KEY, styles);
     }
 
-    /** <p>Returns the name of the application.</p>
+    /**
+     * <p>Returns the name of the application.</p>
      *
      * @param configName the configuration name.
      * @return the name of the application.
@@ -497,7 +567,9 @@ public class Configuration {
         return getString(configName, APPLICATION_KEY, DEFAULT_APPLICATION);
     }
 
-    /** <p>Sets the name of the application.</p>
+    /**
+     * <p>Sets the name of the application.</p>
+     *
      * @param configName the configuration name.
      * @param app new value of the name of the pplication.
      */
@@ -510,7 +582,9 @@ public class Configuration {
         setString(configName, APPLICATION_KEY, app);
     }
 
-    /** <p>Returns the value of use SSL.</p>
+    /**
+     * <p>Returns the value of use SSL.</p>
+     *
      * @param configName the configuration name.
      * @return true if using SSL. false otherwise.
      */
@@ -518,7 +592,8 @@ public class Configuration {
         return getBoolean(configName, USE_SSL_KEY, DEFAULT_USE_SSL);
     }
 
-    /** <p>Sets the value of use SSL.</p>
+    /**
+     * <p>Sets the value of use SSL.</p>
      *
      * @param configName the configuration name.
      * @param flag new value of use SSL.
@@ -527,7 +602,8 @@ public class Configuration {
         setBoolean(configName, USE_SSL_KEY, flag);
     }
 
-    /** <p>Returns the name of client certificate file.</p>
+    /**
+     * <p>Returns the name of client certificate file.</p>
      *
      * @param configName the configuration name.
      * @return the name of client certificate.
@@ -536,7 +612,8 @@ public class Configuration {
         return getString(configName, CLIENT_CERTIFICATE_KEY, DEFAULT_CLIENT_CERTIFICATE);
     }
 
-    /** <p>Sets the name of client certificate file.</p>
+    /**
+     * <p>Sets the name of client certificate file.</p>
      *
      * @param configName the configuration name.
      * @param fileName new name of client certificate file.
@@ -545,28 +622,8 @@ public class Configuration {
         setString(configName, CLIENT_CERTIFICATE_KEY, fileName);
     }
 
-    /** <p>Returns the protocol version.</p>
-     *
-     * @param configName the configuration name.
-     * @return protocol version.
-     */
-    public int getProtocolVersion(String configName) {
-        return getInt(configName, PROTOCOL_VERSION_KEY, DEFAULT_PROTOCOL_VERSION);
-    }
-
-    /** <p>Sets the protocol version.</p>
-     *
-     * @param configName the configuration name.
-     * @param version version number(1 or 2).
-     */
-    public void setProtocolVersion(String configName, int version) {
-        if (version != 1 && version != 2) {
-            throw new IllegalArgumentException("only protocol version 1 and 2 are acceptable."); //$NON-NLS-1$
-        }
-        setInt(configName, PROTOCOL_VERSION_KEY, version);
-    }
-
-    /** <p>Returns the look and feel class name.</p>
+    /**
+     * <p>Returns the look and feel class name.</p>
      *
      * @param configName the configuration name,
      * @return look and feel class name.
@@ -575,7 +632,8 @@ public class Configuration {
         return getString(configName, LOOK_AND_FEEL_KEY, DEFAULT_LOOK_AND_FEEL_CLASS_NAME);
     }
 
-    /** <p>Sets the look and feel class name.</p>
+    /**
+     * <p>Sets the look and feel class name.</p>
      *
      * @param configName the configuration name.
      * @param className look and feel class name.
@@ -584,7 +642,8 @@ public class Configuration {
         setString(configName, LOOK_AND_FEEL_KEY, className);
     }
 
-    /** <p>Returns the laf theme file name.</p>
+    /**
+     * <p>Returns the laf theme file name.</p>
      *
      * @param configName the configuration name.
      * @return the laf theme file name.
@@ -593,7 +652,9 @@ public class Configuration {
         return getString(configName, LAF_THEME_KEY, DEFAULT_LAF_THEME);
     }
 
-    /** <p>Sets the LAF theme file name.</p>
+    /**
+     * <p>Sets the LAF theme file name.</p>
+     *
      * @param configName the configuration name.
      * @param styles new value of laf theme file name.
      */
@@ -601,7 +662,8 @@ public class Configuration {
         setString(configName, LAF_THEME_KEY, styles);
     }
 
-    /** <p>Returns the value of use log viewer.</p>
+    /**
+     * <p>Returns the value of use log viewer.</p>
      *
      * @param configName the configuration name.
      * @return the value of use log viewer.
@@ -610,7 +672,8 @@ public class Configuration {
         return getBoolean(configName, USE_LOG_VIEWER_KEY, DEFAULT_USE_LOG_VIEWER);
     }
 
-    /** <p>Sets the value of use log viewer.</p>
+    /**
+     * <p>Sets the value of use log viewer.</p>
      *
      * @param configName the configuration name.
      * @param flag new value of use log viewer.
@@ -619,7 +682,9 @@ public class Configuration {
         setBoolean(configName, USE_LOG_VIEWER_KEY, flag);
     }
 
-    /** <p>Returns other properties as string.</p>
+    /**
+     * <p>Returns other properties as string.</p>
+     *
      * @param configName the configuration value.
      * @return properties.
      */
@@ -632,7 +697,8 @@ public class Configuration {
         updateSystemProperties(getString(configName, PROPERTIES_KEY, ""));
     }
 
-    /** <p>Sets other properties.</p>
+    /**
+     * <p>Sets other properties.</p>
      *
      * @param configName the configuration name.
      * @param properties new line separated property assignments.
@@ -666,16 +732,19 @@ public class Configuration {
         }
     }
 
-    /** <p>Returns the timer period.</p>>
-     * @params configName the configuration name.
+    /**
+     * <p>Returns the timer period.</p>> @params configName the configuration
+     * name.
+     *
      * @return the timer period.
      */
     public long getTimerPeriod(String configName) {
         return getLong(configName, TIMER_PERIOD_KEY, DEFAULT_TIMER_PERIOD);
     }
 
-    /** <p>Sets the timer period.</p>
-     * <p>It stores the timer period.</p>
+    /**
+     * <p>Sets the timer period.</p> <p>It stores the timer period.</p>
+     *
      * @param configName the configuration name.
      * @param period the timer period.
      */
@@ -683,7 +752,8 @@ public class Configuration {
         setLong(configName, TIMER_PERIOD_KEY, period);
     }
 
-    /** <p>Returns the value of use timer.</p>
+    /**
+     * <p>Returns the value of use timer.</p>
      *
      * @param configName the configuration name.
      * @return value of use timer.</p>
@@ -692,7 +762,8 @@ public class Configuration {
         return getBoolean(configName, USE_TIMER_KEY, DEFAULT_USE_TIMER);
     }
 
-    /** <p>Sets the value of use timer.</p>
+    /**
+     * <p>Sets the value of use timer.</p>
      *
      * @param configName the configuration name.
      * @param flag the use timer flag.
@@ -701,11 +772,13 @@ public class Configuration {
         setBoolean(configName, USE_TIMER_KEY, flag);
     }
 
-    /** <p>Returns configuration value(String).</p>
+    /**
+     * <p>Returns configuration value(String).</p>
      *
      * @param configName the configuration name.
      * @param key configuration key.
-     * @param defaultValue value if the configuration for the given key is missing.
+     * @param defaultValue value if the configuration for the given key is
+     * missing.
      * @return the configuration value.
      */
     protected String getString(String configName, String key, String defaultValue) {
@@ -719,11 +792,13 @@ public class Configuration {
         return ret;
     }
 
-    /** <p>Returns configuration value(int).</p>
+    /**
+     * <p>Returns configuration value(int).</p>
      *
      * @param configName the configuration name.
      * @param key configuration key.
-     * @param defaultValue value if the configuration for the given key is missing.
+     * @param defaultValue value if the configuration for the given key is
+     * missing.
      * @return the configuration value.
      */
     protected int getInt(String configName, String key, int defaultValue) {
@@ -737,11 +812,13 @@ public class Configuration {
         return ret;
     }
 
-    /** <p>Returns configuration value(long).</p>
+    /**
+     * <p>Returns configuration value(long).</p>
      *
      * @param configName the configuration name.
      * @param key configuration key.
-     * @param defaultValue value if the configuration for the given key is missing.
+     * @param defaultValue value if the configuration for the given key is
+     * missing.
      * @return the configuration value.
      */
     protected long getLong(String configName, String key, long defaultValue) {
@@ -755,11 +832,13 @@ public class Configuration {
         return ret;
     }
 
-    /** <p>Returns configuration value(boolean).</p>
+    /**
+     * <p>Returns configuration value(boolean).</p>
      *
      * @param configName the configuration name.
      * @param key configuration key.
-     * @param defaultValue value if the configuration for the given key is missing.
+     * @param defaultValue value if the configuration for the given key is
+     * missing.
      * @return the configuration value.
      */
     protected boolean getBoolean(String configName, String key, boolean defaultValue) {
@@ -773,7 +852,8 @@ public class Configuration {
         return ret;
     }
 
-    /** <p>Sets configuration value(String).</p>
+    /**
+     * <p>Sets configuration value(String).</p>
      *
      * @param configName configuration key.
      * @param key configuration key.
@@ -788,7 +868,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Sets configuration value(int).</p>
+    /**
+     * <p>Sets configuration value(int).</p>
      *
      * @param configName configuration name.
      * @param key configuration key.
@@ -803,7 +884,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Sets configuration value(long).</p>
+    /**
+     * <p>Sets configuration value(long).</p>
      *
      * @param configName configuration name.
      * @param key configuration key.
@@ -818,7 +900,8 @@ public class Configuration {
         }
     }
 
-    /** <p>Sets configuration value(boolean).</p>
+    /**
+     * <p>Sets configuration value(boolean).</p>
      *
      * @param configName the configuration name.
      * @param key configuration key.
