@@ -35,28 +35,28 @@ public class ColorButton extends JButton {
 
     private class ColorIcon implements Icon {
 
-        private int width;
-        private int height;
-
         public ColorIcon(int w, int h) {
-            width = w;
-            height = h;
         }
 
         public int getIconHeight() {
-            return width;
+            return ColorButton.this.getBounds().height;
         }
 
         public int getIconWidth() {
-            return height;
+            return ColorButton.this.getBounds().width;
         }
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
+            Rectangle rect = ColorButton.this.getBounds();
+            int xx = (int)(rect.width*0.2);
+            int yy = (int)(rect.height*0.2);
+            int w = (int)(rect.width*0.6);
+            int h = (int)(rect.height*0.6);
             Graphics2D g2 = (Graphics2D) g;
-            g2.translate(x, y);
+            g2.translate(xx, yy);
             g2.setColor(color);
-            g2.fillRect(0, 0, width, height);
-            g2.translate(-x, -y);
+            g2.fillRect(0,0, w, h);
+            g2.translate(-xx, -yy);
         }
     }
     private Color color;
@@ -76,7 +76,11 @@ public class ColorButton extends JButton {
     private class ColorChooseAction extends AbstractAction {
 
         public void actionPerformed(ActionEvent e) {
-            color = JColorChooser.showDialog(ColorButton.this, Messages.getString("ColorButton.dialog_title"), Color.RED);
+            Color color;
+            color = JColorChooser.showDialog(null, Messages.getString("ColorButton.dialog_title"), ColorButton.this.color);
+            if (color != null) {
+                ColorButton.this.color = color;
+            }
             ColorButton.this.validate();
         }
     }
@@ -112,7 +116,7 @@ public class ColorButton extends JButton {
 
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.setSize(100, 150);
+        frame.setSize(200, 100);
         frame.setVisible(true);
     }
 }
