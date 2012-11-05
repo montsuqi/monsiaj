@@ -90,7 +90,7 @@ public class PrintAgent extends Thread {
                             return false;
                         case 1:
                             PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                                    Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                                    Messages.getString("PrintAgent.notify_print_fail_retry_over") + "\n\n"
                                     + Messages.getString("PrintAgent.title") + request.getTitle(),
                                     GtkStockIcon.get("gtk-dialog-error"), 0);
                             break;
@@ -102,6 +102,7 @@ public class PrintAgent extends Thread {
                 }
             } catch (IOException ex) {
                 if (!ex.getMessage().equals("204")) {
+                    ex.printStackTrace();
                     PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
                             Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
                             + Messages.getString("PrintAgent.title") + request.getTitle(),
