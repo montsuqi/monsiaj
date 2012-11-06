@@ -51,6 +51,7 @@ class ColorButtonMarshaller extends WidgetMarshaller {
                 button.setColorStr(text);
             }
         }
+        con.addAlwaysSendWidget(widget);
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
