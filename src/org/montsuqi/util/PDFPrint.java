@@ -2,7 +2,6 @@ package org.montsuqi.util;
 
 import java.awt.*;
 import java.awt.print.*;
-import javax.swing.*;
 import java.nio.channels.FileChannel;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
@@ -15,18 +14,21 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
+import org.montsuqi.util.PDFPrint.PDFPrintPage;
 
 public class PDFPrint extends Thread {
 
     private File file;
     private boolean showDialog;
-    
-    public PDFPrint(File file,boolean showDialog) {
+
+    public PDFPrint(File file, boolean showDialog) {
         this.file = file;
         this.showDialog = showDialog;
     }
-    
+
     @Override
     public void run() {
         try {
@@ -34,6 +36,7 @@ public class PDFPrint extends Thread {
             FileChannel fc = fis.getChannel();
             ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
+            PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
 
             PDFPrintPage pages = new PDFPrintPage(pdfFile);
 
@@ -42,19 +45,20 @@ public class PDFPrint extends Thread {
             pjob.setJobName(file.getName());
 
             if (System.getProperty("monsia.util.PDFPrint.force_default_printer") == null && showDialog) {
-                if (!pjob.printDialog()) {
+                if (!pjob.printDialog(reqset)) {
                     return;
                 }
             }
             // validate the page against the chosen printer to correct
             // paper settings and margins
-            PageFormat pfDefault = pjob.validatePage(pjob.defaultPage());
-            Paper paper = pfDefault.getPaper();
+            PageFormat pf = pjob.getPageFormat(reqset);
+            Paper paper = pf.getPaper();
+
             paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-            pfDefault.setPaper(paper);
+            pf.setPaper(paper);
             Book book = new Book();
 
-            book.append(pages, pfDefault, pdfFile.getNumPages());
+            book.append(pages, pf, pdfFile.getNumPages());
             pjob.setPageable(book);
 
             if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
@@ -80,19 +84,20 @@ public class PDFPrint extends Thread {
     }
 
     public static void main(String args[]) throws Exception {
-        JFileChooser chooser = new JFileChooser();
-        chooser.showOpenDialog(null);
-        PDFPrint printer = new PDFPrint(new File(chooser.getSelectedFile().getAbsolutePath()),true);
+        PDFPrint printer = new PDFPrint(new File(args[0]), true);
         printer.start();
     }
 
     public static class PDFPrintPage implements Printable {
 
-        /** The PDFFile to be printed */
+        /**
+         * The PDFFile to be printed
+         */
         private PDFFile file;
 
         /**
          * Create a new PDFPrintPage object for a particular PDFFile.
+         *
          * @param file the PDFFile to be printed.
          */
         public PDFPrintPage(PDFFile file) {
@@ -109,7 +114,6 @@ public class PDFPrint extends Thread {
             double vmargin = GetPrintOption("monsia.util.PDFPrint.vmargin");
             double hoffset = GetPrintOption("monsia.util.PDFPrint.hoffset");
             double voffset = GetPrintOption("monsia.util.PDFPrint.voffset");
-            double scale = 1.0;
             double hratio = 1.0;
             double vratio = 1.0;
 
@@ -151,9 +155,9 @@ public class PDFPrint extends Thread {
                 g2.setStroke(new BasicStroke(0.1f));
                 int mm = 10;
                 for (int i = 0; i < 100; i++) {
-                        int p = (int) Math.floor((i * PDFPrint.MMto72DPI(mm)));
-                        g2.drawLine(p, 0, p, 2000);
-                        g2.drawLine(0, p, 2000, p);
+                    int p = (int) Math.floor((i * PDFPrint.MMto72DPI(mm)));
+                    g2.drawLine(p, 0, p, 2000);
+                    g2.drawLine(0, p, 2000, p);
                 }
                 System.out.println("pageable:" + pageable);
                 g2.setStroke(new BasicStroke(2.0f));
@@ -170,20 +174,18 @@ public class PDFPrint extends Thread {
                 int width = (int) page.getWidth();
                 int height = (int) page.getHeight();
 
+                double scale = 1.0;
+
                 if (format.getOrientation() == PageFormat.PORTRAIT) {
                     if (height > width) {
-                        scale = pageable.width / (1.0d * width);
                         g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
                     } else {
-                        scale = pageable.width / (1.0d * height);
                         g2.transform(new AffineTransform(0f, -1.0 * scale, scale, 0f, voffset, -hoffset + width));
                     }
                 } else if (format.getOrientation() == PageFormat.LANDSCAPE) {
                     if (width > height) {
-                        scale = pageable.width / (1.0d * width);
                         g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
                     } else {
-                        scale = pageable.width / (1.0d * height);
                         g2.transform(new AffineTransform(0f, scale, -1.0 * scale, 0f, -voffset + height, hoffset));
                     }
                 }
