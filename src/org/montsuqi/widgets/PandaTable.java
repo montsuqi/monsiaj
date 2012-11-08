@@ -154,7 +154,7 @@ public class PandaTable extends JTable {
     public void setChangedValue(String changedValue) {
         this.changedValue = changedValue;
     }
-    
+
     public boolean isEnterPressed() {
         return enterPressed;
     }
@@ -162,7 +162,6 @@ public class PandaTable extends JTable {
     public void setEnterPressed(boolean enterPressed) {
         this.enterPressed = enterPressed;
     }
-
 
     public PandaTable() {
         this.setRowSelectionAllowed(false);
@@ -189,6 +188,7 @@ public class PandaTable extends JTable {
 
         DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
         ce.setClickCountToStart(1);
+
         ce.getComponent().addKeyListener(new KeyListener() {
 
             public void keyPressed(KeyEvent e) {
@@ -204,13 +204,14 @@ public class PandaTable extends JTable {
             }
         });
 
+
         // action setting
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         actions.put("startEditing", new StartEditingAction());
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
-        
+
         changedRow = 0;
         changedColumn = 0;
         changedValue = "";
@@ -219,11 +220,18 @@ public class PandaTable extends JTable {
     @Override
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
         boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
+        if (KeyStroke.getKeyStroke('\t').equals(ks) || KeyStroke.getKeyStroke('\n').equals(ks)) {
+System.out.println("here");            
+            return retValue;
+        }
+System.out.println("ks:" + ks + " CompositionEnabled:" + getInputContext().isCompositionEnabled() + " isEditing:"+isEditing() + " pressed:"+pressed + " OnKeyRelease:"+ ks.isOnKeyRelease());        
         if (getInputContext().isCompositionEnabled() && !isEditing()
                 && !pressed && !ks.isOnKeyRelease()) {
             int selectedRow = getSelectedRow();
             int selectedColumn = getSelectedColumn();
+System.out.println("row:"+selectedRow + " column:"+selectedColumn);            
             if (selectedRow != -1 && selectedColumn != -1 && !editCellAt(selectedRow, selectedColumn)) {
+System.out.println("editcell?");                
                 return retValue;
             }
         }

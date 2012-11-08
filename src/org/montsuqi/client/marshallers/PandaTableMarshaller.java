@@ -32,7 +32,6 @@ import javax.swing.table.TableColumnModel;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
-import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.PandaTable;
 
 /**
@@ -63,8 +62,14 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 continue;
             } else if ("trow".equals(name)) { //$NON-NLS-1$
                 trow = con.receiveIntData() - 1;
+                if (trow < 0) {
+                    trow = 0;
+                }
             } else if ("tcolumn".equals(name)) { //$NON-NLS-1$
                 tcolumn = con.receiveIntData() - 1;
+                if (tcolumn < 0) {
+                    tcolumn = 0;
+                }
             } else if ("trowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
@@ -90,30 +95,30 @@ class PandaTableMarshaller extends WidgetMarshaller {
                  */ con.receiveStringData();
             } else if ("rowdata".equals(name)) { //$NON-NLS-1$                
                 con.receiveDataTypeWithCheck(Type.ARRAY);
-                int nrows = con.receiveInt();                               
+                int nrows = con.receiveInt();
                 ArrayList cellNameList = new ArrayList<String>();
                 for (int j = 0; j < nrows; j++) {
                     con.receiveDataTypeWithCheck(Type.RECORD);
-                    int ncols = con.receiveInt();                   
+                    int ncols = con.receiveInt();
                     for (int k = 0; k < ncols; k++) {
-                        String colName = con.receiveName();                      
+                        String colName = con.receiveName();
                         con.receiveDataTypeWithCheck(Type.RECORD);
-                        int nitems = con.receiveInt();                          
+                        int nitems = con.receiveInt();
                         for (int l = 0; l < nitems; l++) {
-                            String itemName = con.receiveName();                                               
+                            String itemName = con.receiveName();
                             if ("celldata".equals(itemName)) {
                                 String data = con.receiveStringData();
                                 table.setCell(j, k, data);
                                 String cellName = widget.getName() + ".rowdata[" + j + "]." + colName + ".celldata";
-                                cellNameList.add(cellName);                          
+                                cellNameList.add(cellName);
                             } else if ("fgcolor".equals(itemName)) {
                                 String color = con.receiveStringData();
                                 table.setFGColor(j, k, color);
                             } else if ("bgcolor".equals(itemName)) {
                                 String color = con.receiveStringData();
-                                table.setBGColor(j, k, color);                                
+                                table.setBGColor(j, k, color);
                             } else {
-                                con.receiveStringData();                                
+                                con.receiveStringData();
                                 System.out.println("does not reach here");
                             }
                         }
@@ -122,7 +127,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 manager.registerValue(widget, name, cellNameList);
             }
         }
-
+        System.out.println("trow:" + trow + " tcolumn:" + tcolumn);
         if (trow >= 0 && tcolumn >= 0) {
             JScrollBar vScroll = getVerticalScrollBar(table);
             if (vScroll != null) {
@@ -140,7 +145,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 }
                 model.setValue(value);
             }
-            table.changeSelection(trow, tcolumn, false, true);
+            table.changeSelection(trow, tcolumn, false, false);
         }
         widget.setVisible(true);
         con.addAlwaysSendWidget(widget);
