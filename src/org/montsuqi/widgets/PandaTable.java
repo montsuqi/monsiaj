@@ -313,9 +313,11 @@ public class PandaTable extends JTable {
     public Component prepareEditor(
             TableCellEditor editor, int row, int column) {
         Component c = super.prepareEditor(editor, row, column);
-        if (fgColors != null && bgColors != null) {
-            c.setBackground(bgColors[row][column]);
+        if (fgColors != null) {
             c.setForeground(fgColors[row][column]);
+        }
+        if (bgColors != null) {
+            c.setBackground(bgColors[row][column]);
         }
         return c;
     }
@@ -324,9 +326,23 @@ public class PandaTable extends JTable {
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
-        if (fgColors != null && bgColors != null) {
-            c.setBackground(bgColors[row][column]);
+        int selectedRow = this.getSelectedRow();
+        int selectedColumn = this.getSelectedColumn();
+        if (fgColors != null) {
             c.setForeground(fgColors[row][column]);
+        }
+        if (bgColors != null) {
+            if (row == selectedRow && column == selectedColumn) {
+                int r = bgColors[row][column].getRed();
+                int g = bgColors[row][column].getGreen();
+                int b = bgColors[row][column].getBlue();
+                r = r - 0x0F < 0 ? 0 : r - 0x0F;
+                g = g - 0x0F < 0 ? 0 : g - 0x0F;
+                b = b - 0x0F < 0 ? 0 : b - 0x0F;
+                c.setBackground(new Color(r, g, b));
+            } else {
+                c.setBackground(bgColors[row][column]);
+            }
         }
         return c;
     }
