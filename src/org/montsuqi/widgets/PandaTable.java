@@ -221,17 +221,13 @@ public class PandaTable extends JTable {
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
         boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
         if (KeyStroke.getKeyStroke('\t').equals(ks) || KeyStroke.getKeyStroke('\n').equals(ks)) {
-System.out.println("here");            
             return retValue;
         }
-System.out.println("ks:" + ks + " CompositionEnabled:" + getInputContext().isCompositionEnabled() + " isEditing:"+isEditing() + " pressed:"+pressed + " OnKeyRelease:"+ ks.isOnKeyRelease());        
         if (getInputContext().isCompositionEnabled() && !isEditing()
                 && !pressed && !ks.isOnKeyRelease()) {
             int selectedRow = getSelectedRow();
             int selectedColumn = getSelectedColumn();
-System.out.println("row:"+selectedRow + " column:"+selectedColumn);            
             if (selectedRow != -1 && selectedColumn != -1 && !editCellAt(selectedRow, selectedColumn)) {
-System.out.println("editcell?");                
                 return retValue;
             }
         }

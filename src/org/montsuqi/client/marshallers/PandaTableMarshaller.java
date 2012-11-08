@@ -127,7 +127,6 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 manager.registerValue(widget, name, cellNameList);
             }
         }
-        System.out.println("trow:" + trow + " tcolumn:" + tcolumn);
         if (trow >= 0 && tcolumn >= 0) {
             JScrollBar vScroll = getVerticalScrollBar(table);
             if (vScroll != null) {
