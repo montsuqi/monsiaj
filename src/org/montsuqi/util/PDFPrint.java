@@ -75,11 +75,11 @@ public class PDFPrint extends Thread {
 
             try {
                 pjob.print();
-            } catch (PrinterException exc) {
-                System.out.println(exc);
+            } catch (PrinterException ex) {
+                ex.printStackTrace();
             }
         } catch (java.io.IOException ex) {
-            System.out.println(ex);
+            ex.printStackTrace();
         }
     }
 
