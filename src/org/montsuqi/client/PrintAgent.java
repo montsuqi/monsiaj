@@ -31,27 +31,27 @@ import org.montsuqi.widgets.PandaPreview;
  * @author mihara
  */
 public class PrintAgent extends Thread {
-
+    
     private final int DELAY = 3000;
     private ConcurrentLinkedQueue<PrintRequest> queue;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private String port;
     private SSLSocketFactory sslSocketFactory;
-
+    
     public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
         queue = new ConcurrentLinkedQueue<PrintRequest>();
         this.port = port;
         this.sslSocketFactory = sslSocketFactory;
         Authenticator.setDefault(new Authenticator() {
-
+            
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(user, password.toCharArray());
             }
         });
-
+        
     }
-
+    
     @Override
     public void run() {
         while (true) {
@@ -67,7 +67,7 @@ public class PrintAgent extends Thread {
             }
         }
     }
-
+    
     synchronized boolean processRequest(PrintRequest request) {
         if (request != null) {
             try {
@@ -112,11 +112,11 @@ public class PrintAgent extends Thread {
         }
         return true;
     }
-
+    
     synchronized public void addRequest(String url, String title, int retry, boolean showDialog) {
         queue.add(new PrintRequest(url, title, retry, showDialog));
     }
-
+    
     private String displaySize(long size) {
         String displaySize;
         final long ONE_KB = 1024;
@@ -133,7 +133,7 @@ public class PrintAgent extends Thread {
         }
         return displaySize;
     }
-
+    
     public void showDialog(String title, File file) {
         Object[] options = {Messages.getString("PrintAgent.preview_button"),
             Messages.getString("PrintAgent.save_button"),
@@ -173,7 +173,7 @@ public class PrintAgent extends Thread {
             } else if (n == 1) {
                 String dir = prefs.get(PrintAgent.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);
-
+                
                 if (chooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
                     return;
                 }
@@ -200,7 +200,7 @@ public class PrintAgent extends Thread {
             System.out.println(ex);
         }
     }
-
+    
     int getNumOfPages(File file) {
         try {
             RandomAccessFile raf = new RandomAccessFile(file, "r");
@@ -216,7 +216,7 @@ public class PrintAgent extends Thread {
         }
         return 0;
     }
-
+    
     public File download(PrintRequest request) throws IOException {
         File temp = File.createTempFile("monsiaj_printagent", ".pdf");
         temp.deleteOnExit();
@@ -225,6 +225,7 @@ public class PrintAgent extends Thread {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         if (sslSocketFactory != null) {
             ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+            ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
         }
         con.setRequestMethod("GET");
         con.connect();
@@ -242,58 +243,58 @@ public class PrintAgent extends Thread {
         if (outsize == 0) {
             return null;
         }
-
+        
         return temp;
     }
-
+    
     static public void main(String[] argv) {
-
+        
         PrintAgent agent = new PrintAgent(argv[0], "ormaster", "ormaster", null);
         agent.start();
-
+        
         for (int i = 1; i < argv.length; i++) {
             agent.addRequest(argv[i], argv[i], 100, true);
         }
     }
-
+    
     public class PrintRequest {
-
+        
         private String path;
         private String title;
         private int retry;
         private boolean showDialog;
-
+        
         public PrintRequest(String url, String title, int retry, boolean showdialog) {
             this.path = url;
             this.title = title;
             this.retry = retry;
             this.showDialog = showdialog;
         }
-
+        
         public void setRetry(int retry) {
             this.retry = retry;
         }
-
+        
         public int getRetry() {
             return retry;
         }
-
+        
         public boolean isShowdialog() {
             return showDialog;
         }
-
+        
         public String getTitle() {
             return title;
         }
-
+        
         public void setTitle(String title) {
             this.title = title;
         }
-
+        
         public String getPath() {
             return path;
         }
-
+        
         public void setPath(String url) {
             this.path = url;
         }

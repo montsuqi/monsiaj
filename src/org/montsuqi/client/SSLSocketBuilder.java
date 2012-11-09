@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
@@ -50,6 +50,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.BadPaddingException;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -76,11 +77,25 @@ public class SSLSocketBuilder {
     private final SSLSocketFactory factory;
     private final KeyManager[] keyManagers;
     final TrustManager[] trustManagers;
+    public static final HostnameVerifier CommonNameVerifier = new CommonNameVerifier();
+
+    public static class CommonNameVerifier implements HostnameVerifier {
+
+        public boolean verify(String hostname, SSLSession session) {
+            try {
+                SSLSocketBuilder.validatePeerCertificates(session.getPeerCertificates(), hostname);
+                return true;
+            } catch (SSLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
 
     public SSLSocketFactory getFactory() {
         return factory;
-    }    
-    
+    }
+
     public SSLSocketBuilder(String fileName, String password) throws IOException {
         logger = Logger.getLogger(this.getClass());
         boolean keyManagerIsReady = false;
@@ -152,16 +167,16 @@ public class SSLSocketBuilder {
         }
     }
 
-    private void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
+    private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
         final Certificate serverCertificate = certificates[0];
         if (serverCertificate instanceof X509Certificate) {
             checkHostNameInCertificate((X509Certificate) serverCertificate, host);
         } else {
-            logger.warn("Server Certificate is not a X.509 Certificate");
+            System.out.println("Server Certificate is not a X.509 Certificate");
         }
     }
 
-    private void checkHostNameInCertificate(final X509Certificate certificate, final String host) throws SSLPeerUnverifiedException {
+    private static void checkHostNameInCertificate(final X509Certificate certificate, final String host) throws SSLPeerUnverifiedException {
         // no check against these hostnames.
         if ("localhost".equalsIgnoreCase(host) // $NON-NLS-1$
                 || "127.0.0.1".equals(host) // $NON-NLS-1$
@@ -172,7 +187,7 @@ public class SSLSocketBuilder {
         try {
             final Collection subjectAlternativeNames = certificate.getSubjectAlternativeNames();
             if (subjectAlternativeNames == null) {
-                logger.info("Server certificate does not have subjectAlternativeNames.");
+                System.out.println("Server certificate does not have subjectAlternativeNames.");
             } else {
                 final Iterator i = subjectAlternativeNames.iterator();
                 while (i.hasNext()) {
@@ -181,7 +196,7 @@ public class SSLSocketBuilder {
                     if (type.intValue() == 2) { // dNSName == 2. Symbolic names not defined :/
                         final String value = (String) alternativeName.get(1);
                         if (value.equalsIgnoreCase(host)) {
-                            logger.info("One of subjectAlternativeNames matches.");
+                            System.out.println("One of subjectAlternativeNames matches.");
                             return;
                         }
                     }
@@ -204,17 +219,19 @@ public class SSLSocketBuilder {
             final String message = MessageFormat.format(format, args);
             throw new SSLPeerUnverifiedException(message);
         }
-        logger.info("CN matches.");
+        System.out.println("CN matches.");
     }
 
-    /** <p>Test if the given message means that passphrase is missing.</p>
+    /**
+     * <p>Test if the given message means that passphrase is missing.</p>
      */
     private boolean isMissingPassphraseMessage(String message) {
         return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
                 message.indexOf("/ by zero") >= 0; //$NON-NLS-1$
     }
 
-    /** <p>Test if the given message means broken pipe.</p>
+    /**
+     * <p>Test if the given message means broken pipe.</p>
      */
     private boolean isBrokenPipeMessage(String message) {
         return message != null && message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
@@ -323,9 +340,8 @@ public class SSLSocketBuilder {
 
     private File getTrustStorePath() {
         String home = System.getProperty("user.home");
-        if (System.getProperty("os.name").toLowerCase().contains("windows vista") ||
-            System.getProperty("os.name").toLowerCase().contains("windows 7")
-        ) {
+        if (System.getProperty("os.name").toLowerCase().contains("windows vista")
+                || System.getProperty("os.name").toLowerCase().contains("windows 7")) {
             return new File(
                     SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
         } else if (SystemEnvironment.isWindows()) {
@@ -337,9 +353,8 @@ public class SSLSocketBuilder {
                     SystemEnvironment.createFilePath(new String[]{home, "Library", "Keychains"}),
                     "login.keychain");
             /*
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "Library", "keychains"}),
-                    "login.keychain");             
+             * return new File( SystemEnvironment.createFilePath(new
+             * String[]{home, "Library", "keychains"}), "login.keychain");
              */
         } else {
             return new File(
