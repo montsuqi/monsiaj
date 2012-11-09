@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -38,6 +39,12 @@ import org.montsuqi.widgets.PandaTable;
  * <p>A class to send/receive CList data.</p>
  */
 class PandaTableMarshaller extends WidgetMarshaller {
+
+    private static List widgetList;
+
+    static {
+        widgetList = new ArrayList();
+    }
 
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
@@ -127,7 +134,19 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 manager.registerValue(widget, name, cellNameList);
             }
         }
+        widget.validate();
         if (trow >= 0 && tcolumn >= 0) {
+
+            /* Windows7+Java 1.7で初回表示時にセル指定すると微妙にスクロールする問題のため
+             * 初回だけ0,0にセル指定する
+             */
+            if (widgetList.contains(widget.getName())) {
+                table.changeSelection(trow, tcolumn, false, false);
+            } else {
+                widgetList.add(widget.getName());
+                table.changeSelection(0, 0, false, false);
+            }
+
             JScrollBar vScroll = getVerticalScrollBar(table);
             if (vScroll != null) {
                 BoundedRangeModel model = vScroll.getModel();
@@ -142,12 +161,13 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 if (value < 0) {
                     value = 0;
                 }
+                System.out.println(value);
                 model.setValue(value);
+                System.out.println(vScroll.getValue());
             }
-            table.changeSelection(trow, tcolumn, false, false);
         }
-        widget.setVisible(true);
         con.addAlwaysSendWidget(widget);
+        widget.setVisible(true);
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
