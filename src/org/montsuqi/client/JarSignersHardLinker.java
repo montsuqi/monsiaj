@@ -127,7 +127,8 @@ public class JarSignersHardLinker {
 
         boolean isHardLinkerDisabled = false;  //change this to use whatever mechanism you use to enable or disable the preloader
 
-        return !isHardLinkerDisabled && isRunningOnJre1_6_0_19OrHigher() && isRunningOnWebstart();
+//        return !isHardLinkerDisabled && isRunningOnJre1_6_0_19OrHigher() && isRunningOnWebstart();
+        return !isHardLinkerDisabled && isRunningOnJre1_6_0_19OrHigher();        
     }
 
     /**
@@ -169,6 +170,9 @@ public class JarSignersHardLinker {
                 //then unable to determine updatedate level
                 return false;
             }
+        }
+        if (javaVersion.startsWith("1.7")) {
+            return true;
         }
 
         //all other cases
