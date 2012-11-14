@@ -34,7 +34,7 @@ public class JarSignersHardLinker {
 
     protected static void makeHardSignersRef(JarFile jar) throws java.io.IOException {
 
-        System.out.println("Making hard refs for: " + jar);
+        //System.out.println("Making hard refs for: " + jar);
 
         if (jar != null && jar.getClass().getName().equals("com.sun.deploy.cache.CachedJarFile")) {
 
@@ -66,7 +66,7 @@ public class JarSignersHardLinker {
      */
     private static void makeHardLink(String fieldName, Object instance) {
 
-        System.out.println("attempting hard ref to " + instance.getClass().getName() + "." + fieldName);
+        //System.out.println("attempting hard ref to " + instance.getClass().getName() + "." + fieldName);
 
         try {
             Field signersRef = instance.getClass().getDeclaredField(fieldName);
@@ -97,7 +97,7 @@ public class JarSignersHardLinker {
      * @param instance
      */
     private static void callNoArgMethod(String methodName, Object instance) {
-        System.out.println("calling noarg method hard ref to " + instance.getClass().getName() + "." + methodName + "()");
+        //System.out.println("calling noarg method hard ref to " + instance.getClass().getName() + "." + methodName + "()");
         try {
             Method m = instance.getClass().getDeclaredMethod(methodName);
             m.setAccessible(true);
@@ -251,7 +251,7 @@ public class JarSignersHardLinker {
             return;
         }
 
-        System.out.println("Starting Resource Preloader Hardlinker");
+        //System.out.println("Starting Resource Preloader Hardlinker");
 
         Thread t = new Thread(new Runnable() {
 
