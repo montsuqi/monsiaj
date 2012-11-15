@@ -9,9 +9,10 @@ package org.montsuqi.widgets;
  * @author mihara
  */
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.awt.im.InputContext;
+import java.awt.im.InputSubset;
+import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -20,6 +21,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.montsuqi.util.SafeColorDecoder;
+import org.montsuqi.util.SystemEnvironment;
 
 public class PandaTable extends JTable {
 
@@ -215,6 +217,28 @@ public class PandaTable extends JTable {
         changedRow = 0;
         changedColumn = 0;
         changedValue = "";
+        
+       addFocusListener(new FocusListener() {
+            // NOTE only works in japanese environment.
+            // See
+            // <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
+            // <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
+
+            public void focusGained(FocusEvent e) {
+                // do nothing
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (SystemEnvironment.isWindows()) {
+                    InputContext ic = getInputContext();
+                    if (ic != null) {
+                        ic.setCharacterSubsets(null);
+                        ic.endComposition();
+                        ic.selectInputMethod(Locale.ENGLISH);
+                    }
+                }
+            }
+        });        
     }
 
     @Override
