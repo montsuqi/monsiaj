@@ -309,6 +309,7 @@ public class PandaTable extends JTable {
         model.setValueAt(data, row, col);
     }
 
+    /*
     @Override
     public Component prepareEditor(
             TableCellEditor editor, int row, int column) {
@@ -321,6 +322,7 @@ public class PandaTable extends JTable {
         }
         return c;
     }
+    */
 
     @Override
     public Component prepareRenderer(
