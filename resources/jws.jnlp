@@ -3,7 +3,7 @@
     <information>
         <title>日医標準レセプトソフト</title>
         <vendor>@webstartvendor@</vendor>
-        <icon href="jma-receipt.jpg"/>
+        <icon href="misc/jma-receipt.jpg"/>
         <description>JMA receipt java client</description>
         <offline-allowed/>
         <shortcut online="true">
