@@ -341,11 +341,11 @@ public class SSLSocketBuilder {
     private File getTrustStorePath() {
         String home = System.getProperty("user.home");
         String osName = System.getProperty("os.name").toLowerCase();        
-        if (osName.contains("windows vista")
-                || osName.contains("windows 7")
-                || osName.contains("windows 8")
-                || osName.contains("windows 9")
-                || osName.contains("windows 10")
+        if (osName.startsWith("windows vista")
+                || osName.startsWith("windows 7")
+                || osName.startsWith("windows 8")
+                || osName.startsWith("windows 9")
+                || osName.startsWith("windows 10")
                 ) {
             return new File(
                     SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
