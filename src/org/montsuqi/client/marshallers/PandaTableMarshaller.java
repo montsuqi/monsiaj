@@ -161,9 +161,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 if (value < 0) {
                     value = 0;
                 }
-                System.out.println(value);
                 model.setValue(value);
-                System.out.println(vScroll.getValue());
             }
         }
         con.addAlwaysSendWidget(widget);

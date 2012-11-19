@@ -340,11 +340,12 @@ public class SSLSocketBuilder {
 
     private File getTrustStorePath() {
         String home = System.getProperty("user.home");
-        if (System.getProperty("os.name").toLowerCase().contains("windows vista")
-                || System.getProperty("os.name").toLowerCase().contains("windows 7")
-                || System.getProperty("os.name").toLowerCase().contains("windows 8")
-                || System.getProperty("os.name").toLowerCase().contains("windows 9")
-                || System.getProperty("os.name").toLowerCase().contains("windows 10")
+        String osName = System.getProperty("os.name").toLowerCase();        
+        if (osName.contains("windows vista")
+                || osName.contains("windows 7")
+                || osName.contains("windows 8")
+                || osName.contains("windows 9")
+                || osName.contains("windows 10")
                 ) {
             return new File(
                     SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
