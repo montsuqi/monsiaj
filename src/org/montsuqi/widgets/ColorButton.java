@@ -73,7 +73,7 @@ public class ColorButton extends JButton {
         if (color != null) {
             return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
         } else {
-            return String.format("#%02X%02X%02X", 255,255,255);
+            return String.format("#%02X%02X%02X", 0,0,0);
         }
     }
 
