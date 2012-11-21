@@ -29,7 +29,7 @@ import org.montsuqi.util.SafeColorDecoder;
 
 /**
  * <p>A class that simulates Gtk+'s ColorButton.</p>
- * 
+ *
  */
 public class ColorButton extends JButton {
 
@@ -48,14 +48,14 @@ public class ColorButton extends JButton {
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Rectangle rect = ColorButton.this.getBounds();
-            int xx = (int)(rect.width*0.2);
-            int yy = (int)(rect.height*0.2);
-            int w = (int)(rect.width*0.6);
-            int h = (int)(rect.height*0.6);
+            int xx = (int) (rect.width * 0.2);
+            int yy = (int) (rect.height * 0.2);
+            int w = (int) (rect.width * 0.6);
+            int h = (int) (rect.height * 0.6);
             Graphics2D g2 = (Graphics2D) g;
             g2.translate(xx, yy);
             g2.setColor(color);
-            g2.fillRect(0,0, w, h);
+            g2.fillRect(0, 0, w, h);
             g2.translate(-xx, -yy);
         }
     }
@@ -70,7 +70,11 @@ public class ColorButton extends JButton {
     }
 
     public String getColorStr() {
-        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+        if (color != null) {
+            return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+        } else {
+            return String.format("#%02X%02X%02X", 255,255,255);
+        }
     }
 
     private class ColorChooseAction extends AbstractAction {
@@ -84,9 +88,8 @@ public class ColorButton extends JButton {
             ColorButton.this.validate();
         }
     }
-    
-    public void setColorStr(String colorStr) 
-    {
+
+    public void setColorStr(String colorStr) {
         this.color = SafeColorDecoder.decode(colorStr);
         this.validate();
     }
@@ -111,7 +114,7 @@ public class ColorButton extends JButton {
         });
 
         buttonPanel.add(button3);
-        
+
         cb.setColorStr("");
 
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
