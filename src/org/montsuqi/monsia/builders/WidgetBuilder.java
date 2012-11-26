@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.monsia.builders;
 
@@ -27,17 +27,16 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import javax.swing.*;
 import org.montsuqi.monsia.*;
 import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.*;
+import org.montsuqi.widgets.Calendar;
 
-/** <p>Super class for all widget builders.</p>
- * 
+/**
+ * <p>Super class for all widget builders.</p>
+ *
  * <p>A widget builder is a class which provides methods to create instances of
  * a specific class.</p>
  */
@@ -47,11 +46,16 @@ public class WidgetBuilder {
     private static Map classMap;
     private static Map builderMap;
 
-    /** <p>Maps a generic(toolkit independent) widget class name, to actual Java class
-     * and widget builder.</p>
-     * @param genericClassName a toolkit independent widget type like 'Button' or 'List'.
-     * @param clazz a class adopted to perform as the given generic class in Java.
-     * @param builder a widget builder which will build the given type of widgets.
+    /**
+     * <p>Maps a generic(toolkit independent) widget class name, to actual Java
+     * class and widget builder.</p>
+     *
+     * @param genericClassName a toolkit independent widget type like 'Button'
+     * or 'List'.
+     * @param clazz a class adopted to perform as the given generic class in
+     * Java.
+     * @param builder a widget builder which will build the given type of
+     * widgets.
      */
     private static void registerWidgetClass(String genericClassName, Class clazz, WidgetBuilder builder) {
         classMap.put(genericClassName, clazz);
@@ -151,14 +155,13 @@ public class WidgetBuilder {
                 userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1
             }
             if (userFontSpec == null) {
-                for (String f : fontlist) {
-                    if (f == null ? "メイリオ" == null : f.equals("メイリオ")) {
-                        userFontSpec = f + "-PLAIN-12";
-                    } else if (f == null ? "ＭＳ ゴシック" == null : f.equals("ＭＳ ゴシック")) {
-                        userFontSpec = f + "-PLAIN-12";
-                    } else if (f == null ? "Monospaced" == null : f.equals("Monospaced")) {
-                        userFontSpec = f + "-PLAIN-12";
-                    }
+                Arrays.sort(fontlist);
+                if (Arrays.binarySearch(fontlist, "メイリオ") >= 0) {
+                    userFontSpec = "メイリオ-PLAIN-12";
+                } else if (Arrays.binarySearch(fontlist, "ＭＳ ゴシック") >= 0) {
+                    userFontSpec = "ＭＳ ゴシック-PLAIN-12";
+                } else {
+                    userFontSpec = "Monospaced-PLAIN-12";
                 }
             }
 
@@ -191,18 +194,18 @@ public class WidgetBuilder {
         }
     }
 
-    /** <p>Builds a widget.</p>
+    /**
+     * <p>Builds a widget.</p>
      *
      *
-     * <p>A widget is build in following steps:</p>
-     * <ol>
-     * <li>Build Self.  Build the widget itself using the widget info and other stuff. This is performed by
-     * buildSelf method.  Properties in widget info are set. Accelerators are set too.</li>
-     * <li>Build Children.  Build children widgets in it.  This is performed by buildChildren method.
-     * Basic procedure of building children is defined in ContainerBuilder widget builder.</li>
-     * <li>Names are assigned.</li>
-     * <li>Signals are set.</li>
-     * </ol>
+     * <p>A widget is build in following steps:</p> <ol> <li>Build Self. Build
+     * the widget itself using the widget info and other stuff. This is
+     * performed by buildSelf method. Properties in widget info are set.
+     * Accelerators are set too.</li> <li>Build Children. Build children widgets
+     * in it. This is performed by buildChildren method. Basic procedure of
+     * building children is defined in ContainerBuilder widget builder.</li>
+     * <li>Names are assigned.</li> <li>Signals are set.</li> </ol>
+     *
      * @param xml glade interface definition.
      * @param info widget info for the target widget.
      * @param parent parent component of the target widget.
@@ -242,9 +245,10 @@ public class WidgetBuilder {
         }
     }
 
-    /** <p>Instantiate a specific component.</p>
-     * <p>When one is created successfuly, properties are set
-     * and accelerators are assigned.</p>
+    /**
+     * <p>Instantiate a specific component.</p> <p>When one is created
+     * successfuly, properties are set and accelerators are assigned.</p>
+     *
      * @param xml glade screen definition.
      * @param parent parent widget.
      * @param info widget info.
