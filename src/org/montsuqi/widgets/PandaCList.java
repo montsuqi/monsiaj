@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.widgets;
 
@@ -177,18 +177,17 @@ public class PandaCList extends JTable implements PropertyChangeListener {
         column.setHeaderRenderer(renderer);
     }
 
-    /*    @Override
-    public TableCellRenderer getCellRenderer(int row, int column) {
-    TableCellRenderer headerRenderer = columnModel.getColumn(column).getHeaderRenderer();
-    if (headerRenderer != null && headerRenderer instanceof CListHeaderRenderer) {
-    CListHeaderRenderer clistHeaderRenderer = (CListHeaderRenderer)headerRenderer;
-    TableCellRenderer renderer = clistHeaderRenderer.getFixedCellRenderer();
-    if (renderer != null) {
-    return renderer;
+    /*
+     * @Override public TableCellRenderer getCellRenderer(int row, int column) {
+     * TableCellRenderer headerRenderer =
+     * columnModel.getColumn(column).getHeaderRenderer(); if (headerRenderer !=
+     * null && headerRenderer instanceof CListHeaderRenderer) {
+     * CListHeaderRenderer clistHeaderRenderer =
+     * (CListHeaderRenderer)headerRenderer; TableCellRenderer renderer =
+     * clistHeaderRenderer.getFixedCellRenderer(); if (renderer != null) {
+     * return renderer; } } return super.getCellRenderer(row, column);
     }
-    }
-    return super.getCellRenderer(row, column);
-    }*/
+     */
     public void addActionListener(ActionListener listener) {
         listenerList.add(ActionListener.class, listener);
     }
@@ -210,6 +209,13 @@ public class PandaCList extends JTable implements PropertyChangeListener {
         if (newModel != null) {
             newModel.addTableModelListener(this);
         }
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        super.tableChanged(e);
+        TableModel model = getModel();
+        setFocusable(model != null && model.getRowCount() != 0 && model.getColumnCount() != 0);
     }
 
     @Override
