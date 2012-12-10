@@ -11,14 +11,12 @@ package org.montsuqi.widgets;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.im.InputContext;
-import java.awt.im.InputSubset;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.montsuqi.util.SafeColorDecoder;
 import org.montsuqi.util.SystemEnvironment;
@@ -188,11 +186,11 @@ public class PandaTable extends JTable {
 
         enterPressed = false;
 
-        DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
+        final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
         ce.setClickCountToStart(1);
 
+        /* Enterでの更新はSendEventするため */
         ce.getComponent().addKeyListener(new KeyListener() {
-
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     PandaTable.this.setEnterPressed(true);
@@ -203,6 +201,17 @@ public class PandaTable extends JTable {
             }
 
             public void keyTyped(KeyEvent e) {
+            }
+        });
+        /* エディタをフォーカスアウトしたらセル編集キャンセルするため */
+        ce.getComponent().addFocusListener(new FocusListener() {
+
+            public void focusGained(FocusEvent e) {
+                // do nothing
+            }
+
+            public void focusLost(FocusEvent e) {
+                ce.cancelCellEditing();
             }
         });
 
@@ -217,13 +226,10 @@ public class PandaTable extends JTable {
         changedRow = 0;
         changedColumn = 0;
         changedValue = "";
-        
-       addFocusListener(new FocusListener() {
-            // NOTE only works in japanese environment.
-            // See
-            // <a href="http://java-house.jp/ml/archive/j-h-b/024510.html">JHB:24510</a>
-            // <a href="http://java-house.jp/ml/archive/j-h-b/024682.html">JHB:24682</a>
 
+        /* 遷移後のPandaEntryで日本語入力ONになるのを防ぐため */
+        addFocusListener(new FocusListener() {
+            
             public void focusGained(FocusEvent e) {
                 // do nothing
             }
@@ -238,7 +244,7 @@ public class PandaTable extends JTable {
                     }
                 }
             }
-        });        
+        });
     }
 
     @Override
@@ -334,20 +340,12 @@ public class PandaTable extends JTable {
     }
 
     /*
-    @Override
-    public Component prepareEditor(
-            TableCellEditor editor, int row, int column) {
-        Component c = super.prepareEditor(editor, row, column);
-        if (fgColors != null) {
-            c.setForeground(fgColors[row][column]);
-        }
-        if (bgColors != null) {
-            c.setBackground(bgColors[row][column]);
-        }
-        return c;
-    }
-    */
-
+     * @Override public Component prepareEditor( TableCellEditor editor, int
+     * row, int column) { Component c = super.prepareEditor(editor, row,
+     * column); if (fgColors != null) { c.setForeground(fgColors[row][column]);
+     * } if (bgColors != null) { c.setBackground(bgColors[row][column]); }
+     * return c; }
+     */
     @Override
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
