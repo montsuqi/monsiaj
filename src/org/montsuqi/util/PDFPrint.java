@@ -66,7 +66,6 @@ public class PDFPrint extends Thread {
                 System.out.println("PrintService:" + service);
                 PrintServiceAttributeSet myAset = service.getAttributes();
                 Attribute[] attr = myAset.toArray();
-                int loop = attr.length;
                 System.out.println("Attributes set:");
                 for (int i = 0; i < attr.length; i++) {
                     System.out.println("   " + attr[i]);
