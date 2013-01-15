@@ -18,6 +18,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import org.montsuqi.util.SafeColorDecoder;
 import org.montsuqi.util.SystemEnvironment;
 
@@ -187,10 +188,15 @@ public class PandaTable extends JTable {
         enterPressed = false;
 
         final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
+        /* シングルクリックではフォーカスロスト時のCancelEditCellと干渉する(Java 1.6)
         ce.setClickCountToStart(1);
+        */
 
-        /* Enterでの更新はSendEventするため */
+        /*
+         * Enterでの更新はSendEventするため
+         */
         ce.getComponent().addKeyListener(new KeyListener() {
+
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     PandaTable.this.setEnterPressed(true);
@@ -203,19 +209,19 @@ public class PandaTable extends JTable {
             public void keyTyped(KeyEvent e) {
             }
         });
-        /* エディタをフォーカスアウトしたらセル編集キャンセルするため */
+        /*
+         * エディタをフォーカスアウトしたらセル編集キャンセルするため
+         */
         ce.getComponent().addFocusListener(new FocusListener() {
 
             public void focusGained(FocusEvent e) {
                 // do nothing
             }
 
-            public void focusLost(FocusEvent e) {
+            public void focusLost(FocusEvent e) {        
                 ce.cancelCellEditing();
             }
         });
-
-
         // action setting
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -227,9 +233,11 @@ public class PandaTable extends JTable {
         changedColumn = 0;
         changedValue = "";
 
-        /* 遷移後のPandaEntryで日本語入力ONになるのを防ぐため */
+        /*
+         * 遷移後のPandaEntryで日本語入力ONになるのを防ぐため
+         */
         addFocusListener(new FocusListener() {
-            
+
             public void focusGained(FocusEvent e) {
                 // do nothing
             }

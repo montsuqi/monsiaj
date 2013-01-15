@@ -50,6 +50,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
         Protocol con = manager.getProtocol();
         PandaTable table = (PandaTable) widget;
 
+        widget.setFocusable(true);
         widget.setVisible(false);
         TableColumnModel columnModel = table.getColumnModel();
         String[] labels = new String[columnModel.getColumnCount()];
@@ -137,8 +138,8 @@ class PandaTableMarshaller extends WidgetMarshaller {
         widget.validate();
         if (trow >= 0 && tcolumn >= 0) {
 
-            /* Windows7+Java 1.7で初回表示時にセル指定すると微妙にスクロールする問題のため
-             * 初回だけ0,0にセル指定する
+            /*
+             * Windows7+Java 1.7で初回表示時にセル指定すると微妙にスクロールする問題のため 初回だけ0,0にセル指定する
              */
             if (widgetList.contains(widget.getName())) {
                 table.changeSelection(trow, tcolumn, false, false);
@@ -198,6 +199,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 k += 1;
             }
         }
+        table.setFocusable(false);
     }
 
     private JScrollBar getVerticalScrollBar(JTable table) {
