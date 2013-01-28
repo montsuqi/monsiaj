@@ -400,7 +400,7 @@ public class Interface {
             if (column_widths != null && component instanceof PandaCList) {
                 StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
                 TableColumnModel model = ((JTable) component).getColumnModel();
-                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                for (int i = 0; tokens.hasMoreTokens() && i < model.getColumnCount(); i++) {
                     TableColumn column = model.getColumn(i);
                     int width = ParameterConverter.toInteger(tokens.nextToken());
                     width += 8;// FIXME do not use immediate value like this

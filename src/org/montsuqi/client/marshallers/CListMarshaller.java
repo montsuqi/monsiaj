@@ -22,6 +22,7 @@
  */
 package org.montsuqi.client.marshallers;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.IOException;
@@ -32,6 +33,8 @@ import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
 import org.montsuqi.monsia.Interface;
+import org.montsuqi.util.SafeColorDecoder;
+import org.montsuqi.widgets.PandaCList;
 
 /**
  * <p>A class to send/receive CList data.</p>
@@ -41,6 +44,7 @@ class CListMarshaller extends WidgetMarshaller {
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
+        PandaCList clist = (PandaCList) widget;
 
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         TableColumnModel columnModel = table.getColumnModel();
@@ -115,6 +119,26 @@ class CListMarshaller extends WidgetMarshaller {
                         tableModel.addRow(rdata);
                     }
                 }
+            } else if ("bgcolor".equals(name)) {
+                Color[] bgcolors;
+                con.receiveDataTypeWithCheck(Type.ARRAY);
+                int num = con.receiveInt();
+                bgcolors = new Color[num];
+                for (int j = 0; j < num; j++) {
+                    Color color = SafeColorDecoder.decode(con.receiveStringData());
+                    bgcolors[j] = color != null ? color : Color.WHITE;
+                }
+                clist.setBGColors(bgcolors);
+            } else if ("fgcolor".equals(name)) {
+                Color[] fgcolors;
+                con.receiveDataTypeWithCheck(Type.ARRAY);
+                int num = con.receiveInt();
+                fgcolors = new Color[num];
+                for (int j = 0; j < num; j++) {
+                    Color color = SafeColorDecoder.decode(con.receiveStringData());
+                    fgcolors[j] = color != null ? color : Color.BLACK;
+                }
+                clist.setFGColors(fgcolors);
             } else {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 manager.registerValue(widget, name, null);

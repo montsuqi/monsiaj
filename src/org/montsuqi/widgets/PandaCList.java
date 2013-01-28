@@ -22,6 +22,8 @@
  */
 package org.montsuqi.widgets;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,17 +31,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JViewport;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -76,6 +68,16 @@ public class PandaCList extends JTable implements PropertyChangeListener {
             selections.setNotifySelectionChange(notify);
             return selected;
         }
+    }
+    private Color[] bgColors;
+    private Color[] fgColors;
+
+    public void setBGColors(Color[] bgColors) {
+        this.bgColors = bgColors;
+    }
+
+    public void setFGColors(Color[] fgColors) {
+        this.fgColors = fgColors;
     }
 
     public PandaCList() {
@@ -135,6 +137,29 @@ public class PandaCList extends JTable implements PropertyChangeListener {
     }
 
     @Override
+    public Component prepareRenderer(
+            TableCellRenderer renderer, int row, int column) {
+        Component c = super.prepareRenderer(renderer, row, column);
+        if (fgColors != null && row < fgColors.length && fgColors[row] != null) {
+            c.setForeground(fgColors[row]);
+        }
+        if (bgColors != null && row < bgColors.length && bgColors[row] != null) {
+            if (this.isRowSelected(row)) {
+                int r = bgColors[row].getRed();
+                int g = bgColors[row].getGreen();
+                int b = bgColors[row].getBlue();
+                r = r - 0x30 < 0 ? 0 : r - 0x30;
+                g = g - 0x30 < 0 ? 0 : g - 0x30;
+                b = b - 0x30 < 0 ? 0 : b - 0x30;
+                c.setBackground(new Color(r, g, b));
+            } else {
+                c.setBackground(bgColors[row]);
+            }            
+        }
+        return c;
+    }
+
+    @Override
     public void createDefaultColumnsFromModel() {
         TableColumnModel model = getColumnModel();
         int n = getColumnCount();
@@ -185,8 +210,7 @@ public class PandaCList extends JTable implements PropertyChangeListener {
      * CListHeaderRenderer clistHeaderRenderer =
      * (CListHeaderRenderer)headerRenderer; TableCellRenderer renderer =
      * clistHeaderRenderer.getFixedCellRenderer(); if (renderer != null) {
-     * return renderer; } } return super.getCellRenderer(row, column);
-    }
+     * return renderer; } } return super.getCellRenderer(row, column); }
      */
     public void addActionListener(ActionListener listener) {
         listenerList.add(ActionListener.class, listener);
