@@ -234,38 +234,4 @@ public class PandaCList extends JTable implements PropertyChangeListener {
             newModel.addTableModelListener(this);
         }
     }
-
-    @Override
-    public void tableChanged(TableModelEvent e) {
-        super.tableChanged(e);
-        TableModel model = getModel();
-        setFocusable(model != null && model.getRowCount() != 0 && model.getColumnCount() != 0);
-    }
-
-    @Override
-    public void setFocusable(boolean focusable) {
-        super.setFocusable(focusable);
-        final Container parent = getParent();
-        setParentFocusable(parent, focusable);
-    }
-
-    public void setParentFocusable(Container parent, boolean focusable) {
-        if (!(parent instanceof JScrollPane)) {
-            return;
-        }
-        parent.setFocusable(focusable);
-        final JScrollPane scroll = (JScrollPane) parent;
-        final JScrollBar vScroll = scroll.getVerticalScrollBar();
-        if (vScroll != null) {
-            vScroll.setFocusable(focusable);
-        }
-        final JScrollBar hScroll = scroll.getHorizontalScrollBar();
-        if (hScroll != null) {
-            hScroll.setFocusable(focusable);
-        }
-        final JViewport view = scroll.getViewport();
-        if (view != null) {
-            view.setFocusable(focusable);
-        }
-    }
 }
