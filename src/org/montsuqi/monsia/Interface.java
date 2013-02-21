@@ -224,7 +224,9 @@ public class Interface {
 
     public Component getAnyWidget() {
         for (Component c: widgetNameTable.values()) {
-            return c;
+            if (c.isFocusable()) {
+                return c;
+            }
         }
         return null;
     }
