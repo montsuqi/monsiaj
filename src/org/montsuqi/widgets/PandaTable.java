@@ -217,8 +217,16 @@ public class PandaTable extends JTable {
                 // do nothing
             }
 
-            public void focusLost(FocusEvent e) {        
-                ce.cancelCellEditing();
+            public void focusLost(FocusEvent e) {
+                if (SystemEnvironment.isWindows()) {
+                    InputContext ic = getInputContext();
+                    if (ic != null) {
+                        ic.setCharacterSubsets(null);
+                        ic.endComposition();
+                        ic.selectInputMethod(Locale.ENGLISH);
+                    }
+                }                 
+                ce.cancelCellEditing();               
             }
         });
         // action setting
@@ -231,27 +239,6 @@ public class PandaTable extends JTable {
         changedRow = 0;
         changedColumn = 0;
         changedValue = "";
-
-        /*
-         * 遷移後のPandaEntryで日本語入力ONになるのを防ぐため
-         */
-        addFocusListener(new FocusListener() {
-
-            public void focusGained(FocusEvent e) {
-                // do nothing
-            }
-
-            public void focusLost(FocusEvent e) {
-                if (SystemEnvironment.isWindows()) {
-                    InputContext ic = getInputContext();
-                    if (ic != null) {
-                        ic.setCharacterSubsets(null);
-                        ic.endComposition();
-                        ic.selectInputMethod(Locale.ENGLISH);
-                    }
-                }
-            }
-        });
     }
 
     @Override
