@@ -40,9 +40,7 @@ import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
-import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.TopWindow;
+import org.montsuqi.widgets.*;
 import org.montsuqi.widgets.Window;
 
 /**
@@ -522,11 +520,11 @@ public class Protocol extends Connection {
         if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
             Interface thisXML = node.getInterface();
             Component widget = thisXML.getWidget(focusWidgetName);
-            if (widget == null) {
+            if (widget == null || !widget.isFocusable()) {
                 widget = thisXML.getAnyWidget();
             }
             final Component focusWidget = widget;
-            if (focusWidget != null) {
+            if (focusWidget != null && focusWidget.isFocusable()) {
                 if (SystemEnvironment.isMacOSX()) {
                     EventQueue.invokeLater(new Runnable() {
 

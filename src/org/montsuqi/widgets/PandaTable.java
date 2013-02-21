@@ -18,6 +18,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import org.montsuqi.util.SafeColorDecoder;
 import org.montsuqi.util.SystemEnvironment;
 
@@ -217,8 +218,16 @@ public class PandaTable extends JTable {
                 // do nothing
             }
 
-            public void focusLost(FocusEvent e) {        
-                ce.cancelCellEditing();
+            public void focusLost(FocusEvent e) {
+                if (SystemEnvironment.isWindows()) {
+                    InputContext ic = getInputContext();
+                    if (ic != null) {
+                        ic.setCharacterSubsets(null);
+                        ic.endComposition();
+                        ic.selectInputMethod(Locale.ENGLISH);
+                    }
+                }                 
+                ce.cancelCellEditing();               
             }
         });
         // action setting
@@ -231,27 +240,6 @@ public class PandaTable extends JTable {
         changedRow = 0;
         changedColumn = 0;
         changedValue = "";
-
-        /*
-         * 遷移後のPandaEntryで日本語入力ONになるのを防ぐため
-         */
-        addFocusListener(new FocusListener() {
-
-            public void focusGained(FocusEvent e) {
-                // do nothing
-            }
-
-            public void focusLost(FocusEvent e) {
-                if (SystemEnvironment.isWindows()) {
-                    InputContext ic = getInputContext();
-                    if (ic != null) {
-                        ic.setCharacterSubsets(null);
-                        ic.endComposition();
-                        ic.selectInputMethod(Locale.ENGLISH);
-                    }
-                }
-            }
-        });
     }
 
     @Override
@@ -390,7 +378,6 @@ public class PandaTable extends JTable {
         table.setColumns(2);
         table.setTitles(titles);
         table.setTypes(types);
-        table.setCell(0, 1,"hoge\nmoge\noge");
 
         table.getModel().addTableModelListener(
                 new TableModelListener() {

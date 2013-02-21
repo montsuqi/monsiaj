@@ -224,7 +224,9 @@ public class Interface {
 
     public Component getAnyWidget() {
         for (Component c: widgetNameTable.values()) {
-            return c;
+            if (c.isFocusable()) {
+                return c;
+            }
         }
         return null;
     }
@@ -400,7 +402,7 @@ public class Interface {
             if (column_widths != null && component instanceof PandaCList) {
                 StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
                 TableColumnModel model = ((JTable) component).getColumnModel();
-                for (int i = 0; tokens.hasMoreTokens() && i < model.getColumnCount(); i++) {
+                for (int i = 0; tokens.hasMoreTokens(); i++) {
                     TableColumn column = model.getColumn(i);
                     int width = ParameterConverter.toInteger(tokens.nextToken());
                     width += 8;// FIXME do not use immediate value like this
