@@ -233,8 +233,11 @@ public class PandaTable extends JTable {
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        actions.put("startEditing", new StartEditingAction());
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
+        /* MacOSでカーソル表示後日本語変換できなくなるため */
+        if (!SystemEnvironment.isMacOSX()) {
+            actions.put("startEditing", new StartEditingAction());
+            inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
+        }
 
         changedRow = 0;
         changedColumn = 0;
@@ -244,6 +247,9 @@ public class PandaTable extends JTable {
     @Override
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
         boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
+        if (!SystemEnvironment.isWindows()) {
+            return retValue;
+        }
         if (KeyStroke.getKeyStroke('\t').equals(ks) || KeyStroke.getKeyStroke('\n').equals(ks)) {
             return retValue;
         }
