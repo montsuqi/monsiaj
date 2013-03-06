@@ -33,6 +33,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import javax.swing.*;
+import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
@@ -69,7 +70,7 @@ public class Launcher {
     private void installLookAndFeels() {
         try {
             UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
-            UIManager.installLookAndFeel("InfoNode","net.infonode.gui.laf.InfoNodeLookAndFeel");   
+            UIManager.installLookAndFeel("InfoNode", "net.infonode.gui.laf.InfoNodeLookAndFeel");
         } catch (Exception e) {
             logger.warn(e);
         }
@@ -214,9 +215,53 @@ public class Launcher {
         configCombo.setSelectedItem(conf.getConfigurationName());
     }
 
+    private void checkJavaVersion() {
+        String ver = System.getProperty("java.version");
+        boolean isOld = false;
+        if (ver.startsWith("1.7")) {
+            if (ver.compareToIgnoreCase("1.7.0_17") < 0) {
+                isOld = true;
+            }
+        } else if (ver.startsWith("1.6")) {
+            if (ver.compareToIgnoreCase("1.6.0_43") < 0) {
+                isOld = true;
+            }
+        }
+        if (isOld) {
+            String contents = "";
+            contents += "脆弱性のあるJavaを使用しています\n";
+            contents += "\n";
+            contents += "使用中のバージョン:" + ver + "\n\n";
+            contents += "Javaをアップデートしてください";
+            
+            Color bgcolor = new Color(240,240,30);
+            JPanel panel = new JPanel(new BorderLayout(5, 5));
+            panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            panel.setBackground(bgcolor);
+
+            JPanel textPanel = new JPanel(new BorderLayout(5, 5));
+            textPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            textPanel.setBackground(bgcolor);
+
+            JLabel summaryLabel = new JLabel("monsiajセキュリティ警告");
+            summaryLabel.setFont(new Font("Suns", Font.BOLD, 20));
+            JTextPane bodyText = new JTextPane();
+            bodyText.setFont(new Font("Suns",Font.PLAIN,16));
+            bodyText.setText(contents);
+            bodyText.setOpaque(false);
+            bodyText.setEditable(false);
+
+            textPanel.add(summaryLabel, BorderLayout.NORTH);
+            textPanel.add(bodyText, BorderLayout.CENTER);
+            panel.add(new JLabel(GtkStockIcon.get("gtk-dialog-warning")), BorderLayout.WEST);
+            panel.add(textPanel, BorderLayout.CENTER);
+
+            JOptionPane.showMessageDialog(null, panel, "monsiajセキュリティ警告", JOptionPane.PLAIN_MESSAGE);
+        }
+    }
+
     public void launch(String[] args) {
-        //System.setProperty("sun.java2d.d3d", "false");
-        //System.out.println("d3d:" + System.getProperty("sun.java2d.d3d"));
+        checkJavaVersion();
         if (checkCommandLineOption(args)) {
             return;
         }
