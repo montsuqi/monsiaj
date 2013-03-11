@@ -23,20 +23,6 @@ import org.montsuqi.util.SystemEnvironment;
 
 public class PandaTable extends JTable {
 
-    private class StartEditingAction extends AbstractAction {
-
-        public void actionPerformed(ActionEvent e) {
-            PandaTable table = (PandaTable) e.getSource();
-            table.setSurrendersFocusOnKeystroke(true);
-            int row = table.getSelectedRow();
-            int column = table.getSelectedColumn();
-            Object object = table.getModel().getValueAt(row, column);
-            if (!table.isEditing()) {
-                table.editCellAt(row, column);
-            }
-        }
-    }
-
     private class PandaTableModel extends DefaultTableModel {
 
         private final int MAX_COLS = 100;
@@ -187,9 +173,6 @@ public class PandaTable extends JTable {
         enterPressed = false;
 
         final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
-        /* シングルクリックではフォーカスロスト時のCancelEditCellと干渉する(Java 1.6)
-        ce.setClickCountToStart(1);
-        */
 
         /*
          * Enterでの更新はSendEventするため
@@ -199,6 +182,13 @@ public class PandaTable extends JTable {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     PandaTable.this.setEnterPressed(true);
+                } else if (e.getKeyCode() == KeyEvent.VK_DOWN
+                        || e.getKeyCode() == KeyEvent.VK_UP
+                        || e.getKeyCode() == KeyEvent.VK_TAB) {
+                    Component parent = ((Component) e.getSource()).getParent();
+                    KeyEvent pass = new KeyEvent(parent, e.getID(), e.getWhen(), e.getModifiers(), e.getKeyCode(), e.getKeyChar());
+                    parent.dispatchEvent(pass);
+                    e.consume();
                 }
             }
 
@@ -225,43 +215,53 @@ public class PandaTable extends JTable {
                         ic.endComposition();
                         ic.selectInputMethod(Locale.ENGLISH);
                     }
-                }                 
-                ce.cancelCellEditing();               
+                }
+                ce.cancelCellEditing();
             }
         });
-        // action setting
-        ActionMap actions = getActionMap();
-        InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        /* MacOSでカーソル表示後日本語変換できなくなるため */
-        if (!SystemEnvironment.isMacOSX()) {
-            actions.put("startEditing", new StartEditingAction());
-            inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "startEditing");
-        }
+        addFocusListener(new FocusListener() {
+
+            public void focusGained(FocusEvent e) {
+                //pns フォーカスを取ったら必ず編集する
+                editCell();
+            }
+
+            public void focusLost(FocusEvent e) {
+                // do nothing
+            }
+        });
 
         changedRow = 0;
         changedColumn = 0;
         changedValue = "";
     }
 
+    //pns 選択が起きたら必ず編集する
     @Override
-    protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
-        boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
-        if (!SystemEnvironment.isWindows()) {
-            return retValue;
+    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+        super.changeSelection(rowIndex, columnIndex, toggle, extend);
+        if (isEditing()) {
+            // selection が変わったので前の editor は消す
+            getCellEditor().cancelCellEditing();
+        } else {
+            // 非編集状態なら editor を立ち上げる
+            editCell();
         }
-        if (KeyStroke.getKeyStroke('\t').equals(ks) || KeyStroke.getKeyStroke('\n').equals(ks)) {
-            return retValue;
-        }
-        if (getInputContext().isCompositionEnabled() && !isEditing()
-                && !pressed && !ks.isOnKeyRelease()) {
-            int selectedRow = getSelectedRow();
-            int selectedColumn = getSelectedColumn();
-            if (selectedRow != -1 && selectedColumn != -1 && !editCellAt(selectedRow, selectedColumn)) {
-                return retValue;
+    }
+
+    //pns セル編集時に CellEditor にフォーカスさせる editCell
+    private void editCell() {
+        editCellAt(getSelectedRow(), getSelectedColumn());
+
+        final DefaultCellEditor ce = (DefaultCellEditor) getDefaultEditor(Object.class);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                ce.getComponent().requestFocusInWindow();
             }
-        }
-        return retValue;
+        });
     }
 
     public String getStringValueAt(int row, int col) {
@@ -383,7 +383,7 @@ public class PandaTable extends JTable {
         table.setColumns(2);
         table.setTitles(titles);
         table.setTypes(types);
-        table.setCell(0, 1,"hoge\nmoge\noge");
+        table.setCell(0, 1, "hoge\nmoge\noge");
 
         table.getModel().addTableModelListener(
                 new TableModelListener() {
