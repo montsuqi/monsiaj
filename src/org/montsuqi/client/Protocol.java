@@ -175,16 +175,12 @@ public class Protocol extends Connection {
             window.getChild().setBackground(this.sessionBGColor);
             dialog.validate();
             resetTimer(dialog);
-            if (focusWindowName != null && focusWidgetName != null) {
-                setFocus(focusWindowName, focusWidgetName);
-            }
+            setFocus(focusWindowName, focusWidgetName);
         } else {
             topWindow.showWindow(window);
             window.getChild().setBackground(this.sessionBGColor);
             resetTimer(window.getChild());
-            if (focusWindowName != null && focusWidgetName != null) {
-                setFocus(focusWindowName, focusWidgetName);
-            }
+            setFocus(focusWindowName, focusWidgetName);
             topWindow.validate();
         }
         logger.leave();
@@ -521,6 +517,9 @@ public class Protocol extends Connection {
     }
 
     private synchronized void setFocus(String focusWindowName, String focusWidgetName) {
+        if (focusWindowName == null || focusWidgetName == null) {
+            return;
+        }
         Node node = getNode(focusWindowName);
 
         if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
