@@ -168,9 +168,6 @@ public class PandaTable extends JTable {
         }
         this.setRowHeight(rowheight);
 
-        this.setSurrendersFocusOnKeystroke(true);
-        this.setFocusable(true);
-
         enterPressed = false;
 
         final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
