@@ -138,7 +138,7 @@ public class Protocol extends Connection {
         return true;
     }
 
-    private void showWindow(String name) {
+    private void showWindow(String name, String focusWindowName, String focusWidgetName) {
         logger.enter(name);
         Node node = getNode(name);
         if (node == null) {
@@ -175,10 +175,16 @@ public class Protocol extends Connection {
             window.getChild().setBackground(this.sessionBGColor);
             dialog.validate();
             resetTimer(dialog);
+            if (focusWindowName != null && focusWidgetName != null) {
+                setFocus(focusWindowName, focusWidgetName);
+            }
         } else {
             topWindow.showWindow(window);
             window.getChild().setBackground(this.sessionBGColor);
             resetTimer(window.getChild());
+            if (focusWindowName != null && focusWidgetName != null) {
+                setFocus(focusWindowName, focusWidgetName);
+            }
             topWindow.validate();
         }
         logger.leave();
@@ -451,6 +457,8 @@ public class Protocol extends Connection {
     synchronized void getScreenData() throws IOException {
         logger.enter();
 
+        String focusWindowName = null;
+        String focusWidgetName = null;
         String wName;
         Node node;
         checkScreens(false);
@@ -500,17 +508,15 @@ public class Protocol extends Connection {
             }
         }
         boolean isDummy = this.widgetName.toString().startsWith("_");
-        if (!isDummy) {
-            showWindow(this.windowName);
-        }
         if (c == PacketClass.FocusName) {
-            String focusWindowName = receiveString();
-            String focusWidgetName = receiveString();
-            if (!isDummy) {
-                setFocus(focusWindowName, focusWidgetName);
-            }
+            focusWindowName = receiveString();
+            focusWidgetName = receiveString();
             receivePacketClass();
         }
+        if (!isDummy) {
+            showWindow(this.windowName, focusWindowName, focusWidgetName);
+        }
+
         logger.leave();
     }
 
@@ -534,7 +540,6 @@ public class Protocol extends Connection {
                         }
                     });
                 } else {
-                    KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
                     focusWidget.requestFocusInWindow();
                 }
             }

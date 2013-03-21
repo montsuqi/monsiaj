@@ -50,8 +50,6 @@ class PandaTableMarshaller extends WidgetMarshaller {
         Protocol con = manager.getProtocol();
         PandaTable table = (PandaTable) widget;
 
-        widget.setFocusable(true);
-        widget.setVisible(false);
         TableColumnModel columnModel = table.getColumnModel();
         String[] labels = new String[columnModel.getColumnCount()];
         for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
@@ -166,7 +164,6 @@ class PandaTableMarshaller extends WidgetMarshaller {
             }
         }
         con.addAlwaysSendWidget(widget);
-        widget.setVisible(true);
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
@@ -199,7 +196,6 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 k += 1;
             }
         }
-        table.setFocusable(false);
     }
 
     private JScrollBar getVerticalScrollBar(JTable table) {

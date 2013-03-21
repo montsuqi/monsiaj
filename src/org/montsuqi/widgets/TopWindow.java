@@ -77,9 +77,8 @@ public class TopWindow extends Window implements ComponentListener {
         }
         this.setChild(child);
         ((JComponent) child).requestFocusInWindow();
-//        this.requestFocus();
     }
-
+    
     /** <p>Constructs a Window instance.</p>
      */
     public TopWindow() {
