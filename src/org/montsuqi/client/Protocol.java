@@ -684,14 +684,14 @@ public class Protocol extends Connection {
         logger.enter();
         Iterator i = nodeTable.keySet().iterator();
         while (i.hasNext()) {
-            sendWndowData1((String) i.next());
+            _sendWndowData((String) i.next());
         }
         sendPacketClass(PacketClass.END);
         clearWindowTable();
         logger.leave();
     }
 
-    private synchronized void sendWndowData1(String windowName) throws IOException {
+    private synchronized void _sendWndowData(String windowName) throws IOException {
         logger.enter(windowName);
         sendPacketClass(PacketClass.WindowName);
         sendString(windowName);
