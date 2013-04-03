@@ -47,7 +47,7 @@ class ColorButtonMarshaller extends WidgetMarshaller {
                 continue;
             } else {
                 String text = con.receiveStringData();
-                manager.registerValue(button, name, null);
+                manager.registerAttribute(button, name, null);
                 button.setColorStr(text);
             }
         }
@@ -59,7 +59,7 @@ class ColorButtonMarshaller extends WidgetMarshaller {
         ColorButton button = (ColorButton) widget;
 
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         con.sendName(va.getValueName() + '.' + va.getNameSuffix());
         String text = button.getColorStr();
         con.sendStringData(va.getType(), text);

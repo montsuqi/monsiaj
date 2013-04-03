@@ -50,7 +50,7 @@ class EntryMarshaller extends WidgetMarshaller {
                 continue;
             }
             String text = con.receiveStringData();
-            manager.registerValue(entry, name, null);
+            manager.registerAttribute(entry, name, null);
             entry.setText(text);
             entry.setCaretPosition(0);
         }
@@ -61,7 +61,7 @@ class EntryMarshaller extends WidgetMarshaller {
         JTextField entry = (JTextField) widget;
 
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         con.sendName(va.getValueName() + '.' + va.getNameSuffix());
         String text = entry.getText();
         con.sendStringData(va.getType(), text);

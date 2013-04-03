@@ -49,7 +49,7 @@ class NotebookMarshaller extends WidgetMarshaller {
                 continue;
             } else if ("pageno".equals(name)) { //$NON-NLS-1$
                 page = con.receiveIntData();
-                manager.registerValue(widget, name, null);
+                manager.registerAttribute(widget, name, null);
             } else {
                 widgetName.replace(offset, widgetName.length(), '.' + name);
                 con.receiveValue(widgetName, offset + name.length() + 1);
@@ -77,7 +77,7 @@ class NotebookMarshaller extends WidgetMarshaller {
         Notebook note = (Notebook) widget;
 
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         con.sendName(va.getValueName() + '.' + va.getNameSuffix());
         if (con.getServerVersion() >= 14700) {
             con.sendIntegerData(va.getType(), note.getSelectedIndex());

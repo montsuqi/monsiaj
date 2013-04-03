@@ -48,7 +48,7 @@ class ButtonMarshaller extends WidgetMarshaller {
                 button.setText(label);
             } else {
                 boolean selected = con.receiveBooleanData();
-                manager.registerValue(button, name, null);
+                manager.registerAttribute(button, name, null);
                 button.setSelected(selected);
             }
         }
@@ -59,7 +59,7 @@ class ButtonMarshaller extends WidgetMarshaller {
         AbstractButton button = (AbstractButton) widget;
 
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         con.sendName(va.getValueName() + '.' + va.getNameSuffix());
         boolean selected = button.isSelected();
         con.sendBooleanData(va.getType(), selected);

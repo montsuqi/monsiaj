@@ -392,9 +392,6 @@ public class PandaTable extends JTable {
                     }
                 });
 
-        //final URL iconURL = table.getClass().getResource("orca.png");
-        //final ImageIcon icon = new ImageIcon(iconURL);
-
         JScrollPane scroll = new JScrollPane(table);
         scroll.setPreferredSize(new Dimension(400, 300));
         container.add(scroll, BorderLayout.CENTER);
@@ -417,6 +414,5 @@ public class PandaTable extends JTable {
         frame.setVisible(true);
 
         table.changeSelection(2, 2, false, true);
-
     }
 }

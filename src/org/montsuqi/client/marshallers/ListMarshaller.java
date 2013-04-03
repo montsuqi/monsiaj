@@ -76,7 +76,7 @@ class ListMarshaller extends WidgetMarshaller {
 				}
 			} else {
 				con.receiveDataTypeWithCheck(Type.ARRAY);
-				manager.registerValue(widget, name, new Integer(from));
+				manager.registerAttribute(widget, name, new Integer(from));
 				int num = con.receiveInt();
 				if (count < 0) {
 					count = num;
@@ -101,7 +101,7 @@ class ListMarshaller extends WidgetMarshaller {
 		JList list = (JList)widget;
 
 		ListSelectionModel model = list.getSelectionModel();
-		ValueAttribute va = manager.getValue(name);
+		ValueAttribute va = manager.getAttribute(name);
 		int opt = ((Integer)va.getOpt()).intValue();
 		for (int i = 0, n = list.getModel().getSize(); i < n; i++) {
 			con.sendPacketClass(PacketClass.ScreenData);

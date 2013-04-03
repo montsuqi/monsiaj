@@ -44,7 +44,7 @@ class LabelMarshaller extends WidgetMarshaller {
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			}
-			manager.registerValue(widget, name, null);
+			manager.registerAttribute(widget, name, null);
 			String text = "<html>" + con.receiveStringData() + "</html>";
 			label.setText(text);
 		}

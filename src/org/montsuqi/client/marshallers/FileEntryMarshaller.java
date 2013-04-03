@@ -54,7 +54,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
             String name = con.receiveName();
             if ("objectdata".equals(name)) { //$NON-NLS-1$
                 binary = con.receiveBinaryData();
-                manager.registerValue(widget, "objectdata", null);
+                manager.registerAttribute(widget, "objectdata", null);
             } else if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             } else {
@@ -90,7 +90,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
             return;
         }
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         con.sendName(va.getValueName() + '.' + va.getNameSuffix());
         con.sendBinaryData(va.getType(), binary);
     }

@@ -41,7 +41,7 @@ class CalendarMarshaller extends WidgetMarshaller {
 		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		manager.registerValue(widget, "", null); //$NON-NLS-1$
+		manager.registerAttribute(widget, "", null); //$NON-NLS-1$
 
 		Calendar calendar = Calendar.getInstance();
 		int year = 0;
@@ -75,7 +75,7 @@ class CalendarMarshaller extends WidgetMarshaller {
 		Date date = calendarWidget.getDate();
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		ValueAttribute va = manager.getValue(name);
+		ValueAttribute va = manager.getAttribute(name);
 
 		con.sendPacketClass(PacketClass.ScreenData);
 		con.sendName(va.getValueName() + ".year"); //$NON-NLS-1$

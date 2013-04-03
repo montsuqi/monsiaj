@@ -56,7 +56,7 @@ public class TimerMarshaller extends WidgetMarshaller {
         PandaTimer timer = (PandaTimer) widget;
 
         con.sendPacketClass(PacketClass.ScreenData);
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         con.sendName(va.getValueName() + '.' + va.getNameSuffix());
         con.sendIntegerData(va.getType(), timer.getDuration());
     }

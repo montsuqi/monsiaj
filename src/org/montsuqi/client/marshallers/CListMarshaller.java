@@ -141,7 +141,7 @@ class CListMarshaller extends WidgetMarshaller {
                 clist.setFGColors(fgcolors);
             } else {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
-                manager.registerValue(widget, name, null);
+                manager.registerAttribute(widget, name, null);
                 int num = con.receiveInt();
                 if (count < 0) {
                     count = num;
@@ -206,7 +206,7 @@ class CListMarshaller extends WidgetMarshaller {
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
-        ValueAttribute va = manager.getValue(name);
+        ValueAttribute va = manager.getAttribute(name);
         ListSelectionModel selections = table.getSelectionModel();
         boolean visibleRow = false;
         int rows = table.getRowCount();

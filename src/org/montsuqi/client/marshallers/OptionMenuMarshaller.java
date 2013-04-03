@@ -54,7 +54,7 @@ public class OptionMenuMarshaller extends WidgetMarshaller {
 			} else if ("count".equals(name)) { //$NON-NLS-1$
 				count = con.receiveIntData();
 			} else if ("select".equals(name)) { //$NON-NLS-1$
-				manager.registerValue(widget, name, null);
+				manager.registerAttribute(widget, name, null);
 				choice = con.receiveIntData();
 			} else if ("item".equals(name)) { //$NON-NLS-1$
 				con.receiveDataTypeWithCheck(Type.ARRAY);
@@ -97,7 +97,7 @@ public class OptionMenuMarshaller extends WidgetMarshaller {
 		Protocol con = manager.getProtocol();
 		OptionMenu optionMenu = (OptionMenu)widget;
 
-		ValueAttribute va = manager.getValue(name);
+		ValueAttribute va = manager.getAttribute(name);
 		con.sendPacketClass(PacketClass.ScreenData);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendIntegerData(va.getType(), optionMenu.getSelectedIndex());

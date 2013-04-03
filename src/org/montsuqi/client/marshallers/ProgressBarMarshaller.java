@@ -47,7 +47,7 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			} else if ("value".equals(name)) { //$NON-NLS-1$
-				manager.registerValue(widget, name, null);
+				manager.registerAttribute(widget, name, null);
 				progress.setValue(con.receiveIntData());
 			}
 		}
@@ -58,7 +58,7 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 		JProgressBar progress = (JProgressBar)widget;
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		ValueAttribute va = manager.getValue(name);
+		ValueAttribute va = manager.getAttribute(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendIntegerData(va.getType(), progress.getValue());
 	}

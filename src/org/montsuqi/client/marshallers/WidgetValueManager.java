@@ -35,27 +35,39 @@ public final class WidgetValueManager {
     protected static final Logger logger = Logger.getLogger(WidgetValueManager.class);
     private Protocol con;
     private Map styles;
+    private Map attrTable;
     private Map valueTable;
 
     public WidgetValueManager(Protocol con, Map styles) {
         this.con = con;
         this.styles = styles;
+        attrTable = new HashMap();
         valueTable = new HashMap();
     }
 
     Protocol getProtocol() {
         return con;
     }
+    
+    void registerValue(Component widget,String name,Object obj) {
+        String key = widget.getName() + "." + name;
+        valueTable.put(key,obj);
+    }
+    
+    Object getValue(Component widget,String name) {
+        String key = widget.getName() + "." + name;
+        return valueTable.get(key);
+    }
 
-    void registerValue(Component widget, String valueName, Object opt) {
+    void registerAttribute(Component widget, String valueName, Object opt) {
         String longName = widget.getName();
         ValueAttribute va;
-        if (!valueTable.containsKey(longName)) {
+        if (!attrTable.containsKey(longName)) {
             String widgetName = con.getWidgetNameBuffer().toString();
             va = new ValueAttribute(longName, valueName, widgetName, con.getLastDataType(), opt);
-            valueTable.put(va.getKey(), va);
+            attrTable.put(va.getKey(), va);
         } else {
-            va = (ValueAttribute) valueTable.get(longName);
+            va = (ValueAttribute) attrTable.get(longName);
             va.setNameSuffix(valueName);
         }
         int lastType = con.getLastDataType();
@@ -63,18 +75,18 @@ public final class WidgetValueManager {
         va.setOpt(opt);
     }
 
-    Object getValueOpt(String name) {
-        if (valueTable.containsKey(name)) {
-            ValueAttribute va = (ValueAttribute) valueTable.get(name);
+    Object getAttributeOpt(String name) {
+        if (attrTable.containsKey(name)) {
+            ValueAttribute va = (ValueAttribute) attrTable.get(name);
             return va.getOpt();
         }
         Object[] args = {name};
         throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$        
     }
 
-    ValueAttribute getValue(String name) {
-        if (valueTable.containsKey(name)) {
-            return (ValueAttribute) valueTable.get(name);
+    ValueAttribute getAttribute(String name) {
+        if (attrTable.containsKey(name)) {
+            return (ValueAttribute) attrTable.get(name);
         }
         Object[] args = {name};
         throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$

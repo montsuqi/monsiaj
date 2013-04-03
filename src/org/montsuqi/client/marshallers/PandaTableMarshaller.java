@@ -103,6 +103,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 int nrows = con.receiveInt();
                 ArrayList cellNameList = new ArrayList<String>();
+                ArrayList cellDataList = new ArrayList<String>();
                 for (int j = 0; j < nrows; j++) {
                     con.receiveDataTypeWithCheck(Type.RECORD);
                     int ncols = con.receiveInt();
@@ -115,6 +116,7 @@ class PandaTableMarshaller extends WidgetMarshaller {
                             if ("celldata".equals(itemName)) {
                                 String data = con.receiveStringData();
                                 table.setCell(j, k, data);
+                                cellDataList.add(data);
                                 String cellName = widget.getName() + ".rowdata[" + j + "]." + colName + ".celldata";
                                 cellNameList.add(cellName);
                             } else if ("fgcolor".equals(itemName)) {
@@ -130,7 +132,8 @@ class PandaTableMarshaller extends WidgetMarshaller {
                         }
                     }
                 }
-                manager.registerValue(widget, name, cellNameList);
+                manager.registerValue(widget, "cellNameList", cellNameList);
+                manager.registerValue(widget, "cellDataList", cellDataList);                
             }
         }
         widget.validate();
@@ -183,15 +186,20 @@ class PandaTableMarshaller extends WidgetMarshaller {
         con.sendName(name + ".tvalue"); //$NON-NLS-1$
         con.sendStringData(Type.VARCHAR, table.getChangedValue());
 
+System.out.println("-----");                        
         int k = 0;
-        ArrayList<String> cellNameList = (ArrayList<String>) manager.getValueOpt(name);
+        ArrayList<String> cellNameList = (ArrayList<String>) manager.getValue(widget,"cellNameList");
+        ArrayList<String> cellDataList = (ArrayList<String>) manager.getValue(widget,"cellDataList");
         for (int i = 0; i < table.getRows(); i++) {
             for (int j = 0; j < table.getColumns(); j++) {
                 String cellName = cellNameList.get(k);
-                if (cellName != null) {
+                String cellData = cellDataList.get(k);
+                String value = (String) tableModel.getValueAt(i, j);
+                if (cellName != null && cellData != null && !value.equals(cellData)) {
                     con.sendPacketClass(PacketClass.ScreenData);
                     con.sendName(cellName);
-                    con.sendStringData(Type.VARCHAR, (String) tableModel.getValueAt(i, j));
+                    con.sendStringData(Type.VARCHAR, value);
+System.out.println(cellName + ":" + value);                
                 }
                 k += 1;
             }

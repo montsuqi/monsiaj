@@ -50,7 +50,7 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 				continue;
 			}                        
 			BigDecimal val = con.receiveFixedData();
-			manager.registerValue(entry, name, val);
+			manager.registerAttribute(entry, name, val);
 			entry.setValue(val);
 		}
 	}
@@ -60,7 +60,7 @@ class NumberEntryMarshaller extends WidgetMarshaller {
 		NumberEntry entry = (NumberEntry)widget;
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		ValueAttribute va = manager.getValue(name);
+		ValueAttribute va = manager.getAttribute(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		BigDecimal value = entry.getValue();
 		va.setOpt(value);

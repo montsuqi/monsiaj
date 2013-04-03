@@ -47,7 +47,7 @@ class TextMarshaller extends WidgetMarshaller {
 				continue;
 			}
 			String value = con.receiveStringData();
-			manager.registerValue(widget, name, null);
+			manager.registerAttribute(widget, name, null);
 			text.setText(value);
 			if ( ! text.isEditable()) {
 				text.setCaretPosition(0);
@@ -60,7 +60,7 @@ class TextMarshaller extends WidgetMarshaller {
 		JTextComponent text = (JTextComponent)widget; 
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		ValueAttribute va = manager.getValue(name);
+		ValueAttribute va = manager.getAttribute(name);
 		con.sendName(va.getValueName() + '.' + va.getNameSuffix());
 		con.sendStringData(va.getType(), text.getText());
 	}
