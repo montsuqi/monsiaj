@@ -22,36 +22,16 @@ copies.
  */
 package org.montsuqi.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
-
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import javax.swing.JLabel;
-import javax.swing.JViewport;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.PDFPrint;
@@ -311,14 +291,6 @@ public class PandaPreview extends JPanel {
         fitPageAction = new FitPageAction();
         fitPageWidthAction = new FitPageWidthAction();
 
-        toolbar = new JToolBar();
-        toolbar.setFloatable(false);
-
-        toolbar.add(prevAction);
-        toolbar.add(nextAction);
-        toolbar.add(pageEntry);
-        toolbar.add(pageLabel);
-
         combo = new JComboBox(SCALE_STRING);
         combo.setSelectedIndex(1);
         combo.addActionListener(new ActionListener() {
@@ -329,9 +301,22 @@ public class PandaPreview extends JPanel {
             }
         });
         final Dimension preferredSize = combo.getPreferredSize();
-        combo.setMaximumSize(preferredSize);
-        toolbar.add(combo);
+        combo.setMaximumSize(preferredSize);                
+        
+        toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+        
+        toolbar.add(prevAction);
+        toolbar.add(nextAction);
+        toolbar.addSeparator();        
+        
+        toolbar.add(pageEntry);
+        toolbar.add(pageLabel);
+        toolbar.addSeparator();        
 
+        toolbar.add(combo);
+        toolbar.addSeparator();        
+        
         toolbar.add(saveAction);
         toolbar.add(printAction);
 

@@ -136,68 +136,26 @@ public class PrintAgent extends Thread {
     }
 
     public void showDialog(String title, File file) {
-        Object[] options = {Messages.getString("PrintAgent.preview_button"),
-            Messages.getString("PrintAgent.save_button"),
-            Messages.getString("PrintAgent.print_button"),
-            Messages.getString("PrintAgent.cancel_button")
-        };
-        int n = JOptionPane.showOptionDialog(null,
-                Messages.getString("PrintAgent.question") + "\n\n"
-                + Messages.getString("PrintAgent.title") + title + "\n"
-                + Messages.getString("PrintAgnet.num_of_pages") + getNumOfPages(file) + "\n"
-                + Messages.getString("PrintAgent.size") + displaySize(file.length()) + "\n",
-                Messages.getString("PrintAgent.dialog_title"),
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[3]);
         try {
-            if (n == 0) {
-                final JDialog dialog = new JDialog();
-                Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) { //$NON-NLS-1$
+            final JDialog dialog = new JDialog();
+            Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) { //$NON-NLS-1$
 
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.dispose();
-                    }
-                });
-                Container container = dialog.getContentPane();
-                container.setLayout(new BorderLayout(5, 5));
-                PandaPreview preview = new PandaPreview();
-                dialog.setSize(new Dimension(800, 600));
-                container.add(preview, BorderLayout.CENTER);
-                container.add(closeButton, BorderLayout.SOUTH);
-                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                dialog.setVisible(true);
-                closeButton.requestFocus();
-                preview.load(file.getAbsolutePath());
-            } else if (n == 1) {
-                String dir = prefs.get(PrintAgent.class.getName(), System.getProperty("user.home"));
-                JFileChooser chooser = new JFileChooser(dir);
-                chooser.setFileFilter(new FileNameExtensionFilter("PDF", "pdf"));
-                chooser.setSelectedFile(new File(title+".pdf"));
-                if (chooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
-                    return;
+                public void actionPerformed(ActionEvent e) {
+                    dialog.dispose();
                 }
-                File selected = chooser.getSelectedFile();
-                if (selected.exists() && selected.canWrite()) {
-                    if (JOptionPane.showConfirmDialog(null, Messages.getString("FileEntry.ask_overwrite"), Messages.getString("FileEntry.question"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) { //$NON-NLS-1$ //$NON-NLS-2$
-                        return;
-                    }
-                }
-                prefs.put(PrintAgent.class.getName(), selected.getParent());
-                FileChannel srcChannel = new FileInputStream(file).getChannel();
-                FileChannel destChannel = new FileOutputStream(selected).getChannel();
-                try {
-                    srcChannel.transferTo(0, srcChannel.size(), destChannel);
-                } finally {
-                    srcChannel.close();
-                    destChannel.close();
-                }
-            } else if (n == 2) {
-                PDFPrint printer = new PDFPrint(file, true);
-                printer.start();
-            }
+            });
+            Container container = dialog.getContentPane();
+            container.setLayout(new BorderLayout(5, 5));
+            PandaPreview preview = new PandaPreview();
+            dialog.setSize(new Dimension(800, 600));
+            dialog.setLocationRelativeTo(null);
+            dialog.setTitle(Messages.getString("PrintAgent.title") + title);
+            container.add(preview, BorderLayout.CENTER);
+            container.add(closeButton, BorderLayout.SOUTH);
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            dialog.setVisible(true);
+            closeButton.requestFocus();
+            preview.load(file.getAbsolutePath());
         } catch (Exception ex) {
             System.out.println(ex);
         }
