@@ -256,14 +256,14 @@ public class Launcher {
             textPanel.add(summaryLabel, BorderLayout.NORTH);
             textPanel.add(bodyText, BorderLayout.CENTER);
 
-            boolean checked = prefs.get(Launcher.class.getName()+".security_risk_agreement","false").startsWith("true");
+            boolean checked = prefs.get(Launcher.class.getName()+".security_risk_agreement","no").startsWith("yes");
             final JCheckBox checkBox = new JCheckBox("危険性を理解した上で使用する");
             checkBox.setFont(new Font("Suns", Font.PLAIN, 16));
             checkBox.setBackground(bgcolor);
             checkBox.setSelected(checked);
             checkBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    prefs.put(Launcher.class.getName()+".security_risk_agreement",checkBox.isSelected()?"true":"false");
+                    prefs.put(Launcher.class.getName()+".security_risk_agreement",checkBox.isSelected()?"yes":"no");
                 }
             });
             textPanel.add(checkBox, BorderLayout.SOUTH);
