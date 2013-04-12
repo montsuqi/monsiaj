@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.Logger;
@@ -48,6 +49,7 @@ public class Launcher {
     protected Configuration conf;
     protected ConfigurationPanel configPanel;
     protected JComboBox configCombo;
+    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     static {
         if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -232,9 +234,9 @@ public class Launcher {
             contents += "脆弱性のあるJavaを使用しています\n";
             contents += "\n";
             contents += "使用中のバージョン:" + ver + "\n\n";
-            contents += "Javaをアップデートしてください";
-            
-            Color bgcolor = new Color(240,240,30);
+            contents += "Javaをアップデートしてください\n";
+
+            Color bgcolor = new Color(240, 240, 30);
             JPanel panel = new JPanel(new BorderLayout(5, 5));
             panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             panel.setBackground(bgcolor);
@@ -246,17 +248,33 @@ public class Launcher {
             JLabel summaryLabel = new JLabel("monsiajセキュリティ警告");
             summaryLabel.setFont(new Font("Suns", Font.BOLD, 20));
             JTextPane bodyText = new JTextPane();
-            bodyText.setFont(new Font("Suns",Font.PLAIN,16));
+            bodyText.setFont(new Font("Suns", Font.PLAIN, 16));
             bodyText.setText(contents);
             bodyText.setOpaque(false);
             bodyText.setEditable(false);
 
             textPanel.add(summaryLabel, BorderLayout.NORTH);
             textPanel.add(bodyText, BorderLayout.CENTER);
+
+            boolean checked = prefs.get(Launcher.class.getName()+".security_risk_agreement","false").startsWith("true");
+            final JCheckBox checkBox = new JCheckBox("危険性を理解した上で使用する");
+            checkBox.setFont(new Font("Suns", Font.PLAIN, 16));
+            checkBox.setBackground(bgcolor);
+            checkBox.setSelected(checked);
+            checkBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    prefs.put(Launcher.class.getName()+".security_risk_agreement",checkBox.isSelected()?"true":"false");
+                }
+            });
+            textPanel.add(checkBox, BorderLayout.SOUTH);
+
             panel.add(new JLabel(GtkStockIcon.get("gtk-dialog-warning")), BorderLayout.WEST);
             panel.add(textPanel, BorderLayout.CENTER);
 
             JOptionPane.showMessageDialog(null, panel, "monsiajセキュリティ警告", JOptionPane.PLAIN_MESSAGE);
+            if (!checkBox.isSelected()) {
+                System.exit(0);
+            } 
         }
     }
 
