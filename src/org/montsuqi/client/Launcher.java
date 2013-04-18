@@ -221,11 +221,11 @@ public class Launcher {
         String ver = System.getProperty("java.version");
         boolean isOld = false;
         if (ver.startsWith("1.7")) {
-            if (ver.compareToIgnoreCase("1.7.0_17") < 0) {
+            if (ver.compareToIgnoreCase("1.7.0_21") < 0) {
                 isOld = true;
             }
         } else if (ver.startsWith("1.6")) {
-            if (ver.compareToIgnoreCase("1.6.0_43") < 0) {
+            if (ver.compareToIgnoreCase("1.6.0_45") < 0) {
                 isOld = true;
             }
         }
