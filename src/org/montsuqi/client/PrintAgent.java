@@ -16,8 +16,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.prefs.Preferences;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.AbstractAction;
+import javax.swing.JDialog;
+import javax.swing.WindowConstants;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
@@ -153,9 +154,12 @@ public class PrintAgent extends Thread {
             container.add(preview, BorderLayout.CENTER);
             container.add(closeButton, BorderLayout.SOUTH);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            preview.setSize(800,600);
+            preview.load(file.getAbsolutePath());
+            preview.setVisible(true);
+            dialog.setModal(true);
             dialog.setVisible(true);
             closeButton.requestFocus();
-            preview.load(file.getAbsolutePath());
         } catch (Exception ex) {
             System.out.println(ex);
         }
