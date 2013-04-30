@@ -59,6 +59,7 @@ public abstract class WidgetMarshaller {
         registerMarshaller(ColorButton.class, new ColorButtonMarshaller());        
         registerMarshaller(PandaTimer.class, new TimerMarshaller());
         registerMarshaller(PandaDownload.class, new DownloadMarshaller());
+        registerMarshaller(PandaDownload2.class, new Download2Marshaller());        
         registerMarshaller(PandaPrint.class, new PrintMarshaller());
         registerMarshaller(Pixmap.class, new PixmapMarshaller());
         registerMarshaller(PandaHTML.class, new PandaHTMLMarshaller());

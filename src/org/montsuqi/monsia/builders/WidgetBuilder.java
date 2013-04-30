@@ -31,8 +31,8 @@ import java.util.*;
 import javax.swing.*;
 import org.montsuqi.monsia.*;
 import org.montsuqi.util.Logger;
-import org.montsuqi.widgets.*;
 import org.montsuqi.widgets.Calendar;
+import org.montsuqi.widgets.*;
 
 /**
  * <p>Super class for all widget builders.</p>
@@ -71,53 +71,54 @@ public class WidgetBuilder {
         WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
         WidgetBuilder entryBuilder = new EntryBuilder();
 
-        registerWidgetClass("Button", Button.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("Calendar", Calendar.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("CheckButton", CheckBox.class, new CheckButtonBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Combo", JComboBox.class, new ComboBuilder()); //$NON-NLS-1$
-        registerWidgetClass("CList", PandaCList.class, new CListBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Dialog", Window.class, new WindowBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Entry", Entry.class, entryBuilder); //$NON-NLS-1$
-        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder); //$NON-NLS-1$       
-        registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder); //$NON-NLS-1$               
-        registerWidgetClass("FileEntry", FileEntry.class, new FileEntryBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Frame", Frame.class, new FrameBuilder()); //$NON-NLS-1$
-        registerWidgetClass("HBox", HBox.class, defaultContainerBuilder); //$NON-NLS-1$
-        registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder); //$NON-NLS-1$
-        registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("Label", JLabel.class, new LabelBuilder()); //$NON-NLS-1$
-        registerWidgetClass("List", JList.class, new ListBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder); //$NON-NLS-1$
-        registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder()); //$NON-NLS-1$
-        registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder()); //$NON-NLS-1$
-        registerWidgetClass("PixmapMenuItem", JMenuItem.class, new MenuItemBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Notebook", Notebook.class, new NotebookBuilder()); //$NON-NLS-1$
-        registerWidgetClass("NumberEntry", NumberEntry.class, entryBuilder); //$NON-NLS-1$
-        registerWidgetClass("OptionMenu", OptionMenu.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaCombo", PandaCombo.class, new PandaComboBuilder()); //$NON-NLS-1$
-        registerWidgetClass("PandaCList", PandaCList.class, new CListBuilder()); //$NON-NLS-1$
-        registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaHTML", PandaHTML.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaPS", PandaPreview.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaText", JTextArea.class, new TextAreaBuilder()); //$NON-NLS-1$
-        registerWidgetClass("PandaTimer", PandaTimer.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaDownload", PandaDownload.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaPrint", PandaPrint.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("PandaTable", PandaTable.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("Pixmap", Pixmap.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("Placeholder", JPanel.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("ProgressBar", JProgressBar.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("RadioButton", RadioButton.class, new RadioButtonBuilder()); //$NON-NLS-1$
-        registerWidgetClass("ScrolledWindow", JScrollPane.class, new ScrolledWindowBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Table", Table.class, new TableBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Text", JTextArea.class, new TextAreaBuilder()); //$NON-NLS-1$
-        registerWidgetClass("ToggleButton", ToggleButton.class, defaultContainerBuilder); //$NON-NLS-1$
-        registerWidgetClass("VBox", VBox.class, defaultContainerBuilder); //$NON-NLS-1$
-        registerWidgetClass("VPaned", VPaned.class, defaultContainerBuilder); //$NON-NLS-1$
-        registerWidgetClass("VSeparator", VSeparator.class, defaultWidgetBuilder); //$NON-NLS-1$
-        registerWidgetClass("Viewport", JViewport.class, new ViewportBuilder()); //$NON-NLS-1$
-        registerWidgetClass("Window", Window.class, new WindowBuilder()); //$NON-NLS-1$
+        registerWidgetClass("Button", Button.class, defaultWidgetBuilder); 
+        registerWidgetClass("Calendar", Calendar.class, defaultWidgetBuilder); 
+        registerWidgetClass("CheckButton", CheckBox.class, new CheckButtonBuilder()); 
+        registerWidgetClass("Combo", JComboBox.class, new ComboBuilder()); 
+        registerWidgetClass("CList", PandaCList.class, new CListBuilder()); 
+        registerWidgetClass("Dialog", Window.class, new WindowBuilder()); 
+        registerWidgetClass("Entry", Entry.class, entryBuilder); 
+        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder);        
+        registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder);                
+        registerWidgetClass("FileEntry", FileEntry.class, new FileEntryBuilder()); 
+        registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); 
+        registerWidgetClass("Frame", Frame.class, new FrameBuilder()); 
+        registerWidgetClass("HBox", HBox.class, defaultContainerBuilder); 
+        registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder); 
+        registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder); 
+        registerWidgetClass("Label", JLabel.class, new LabelBuilder()); 
+        registerWidgetClass("List", JList.class, new ListBuilder()); 
+        registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder); 
+        registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder()); 
+        registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder()); 
+        registerWidgetClass("PixmapMenuItem", JMenuItem.class, new MenuItemBuilder()); 
+        registerWidgetClass("Notebook", Notebook.class, new NotebookBuilder()); 
+        registerWidgetClass("NumberEntry", NumberEntry.class, entryBuilder); 
+        registerWidgetClass("OptionMenu", OptionMenu.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaCombo", PandaCombo.class, new PandaComboBuilder()); 
+        registerWidgetClass("PandaCList", PandaCList.class, new CListBuilder()); 
+        registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder); 
+        registerWidgetClass("PandaHTML", PandaHTML.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaPS", PandaPreview.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaText", JTextArea.class, new TextAreaBuilder()); 
+        registerWidgetClass("PandaTimer", PandaTimer.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaDownload", PandaDownload.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaDownload2", PandaDownload2.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaPrint", PandaPrint.class, defaultWidgetBuilder); 
+        registerWidgetClass("PandaTable", PandaTable.class, defaultWidgetBuilder); 
+        registerWidgetClass("Pixmap", Pixmap.class, defaultWidgetBuilder); 
+        registerWidgetClass("Placeholder", JPanel.class, defaultWidgetBuilder); 
+        registerWidgetClass("ProgressBar", JProgressBar.class, defaultWidgetBuilder); 
+        registerWidgetClass("RadioButton", RadioButton.class, new RadioButtonBuilder()); 
+        registerWidgetClass("ScrolledWindow", JScrollPane.class, new ScrolledWindowBuilder()); 
+        registerWidgetClass("Table", Table.class, new TableBuilder()); 
+        registerWidgetClass("Text", JTextArea.class, new TextAreaBuilder()); 
+        registerWidgetClass("ToggleButton", ToggleButton.class, defaultContainerBuilder); 
+        registerWidgetClass("VBox", VBox.class, defaultContainerBuilder); 
+        registerWidgetClass("VPaned", VPaned.class, defaultContainerBuilder); 
+        registerWidgetClass("VSeparator", VSeparator.class, defaultWidgetBuilder); 
+        registerWidgetClass("Viewport", JViewport.class, new ViewportBuilder()); 
+        registerWidgetClass("Window", Window.class, new WindowBuilder()); 
     }
 
     // an interface to make a modified font.
@@ -130,27 +131,27 @@ public class WidgetBuilder {
     static {
         String[] fontlist = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         String[] classes = {
-            "Button", //$NON-NLS-1$
-            "ToggleButton", //$NON-NLS-1$
-            "RadioButton", //$NON-NLS-1$
-            "ComboBox", //$NON-NLS-1$
-            "CheckBox", //$NON-NLS-1$
-            "RadioButton", //$NON-NLS-1$
-            "TabbedPane", //$NON-NLS-1$
-            "Label", //$NON-NLS-1$
-            "TextField", //$NON-NLS-1$
-            "FormattedTextField", //$NON-NLS-1$
-            "TextArea", //$NON-NLS-1$
-            "Table", //$NON-NLS-1$
-            "ToolBar", //$NON-NLS-1$
-            "TitledBorder", //$NON-NLS-1$
-            "ToolTip", //$NON-NLS-1$
-            "ProgressBar", //$NON-NLS-1$
-            "List", //$NON-NLS-1$
+            "Button", 
+            "ToggleButton", 
+            "RadioButton", 
+            "ComboBox", 
+            "CheckBox", 
+            "RadioButton", 
+            "TabbedPane", 
+            "Label", 
+            "TextField", 
+            "FormattedTextField", 
+            "TextArea", 
+            "Table", 
+            "ToolBar", 
+            "TitledBorder", 
+            "ToolTip", 
+            "ProgressBar", 
+            "List", 
         };
 
         for (int i = 0; i < classes.length; i++) {
-            String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); //$NON-NLS-1$
+            String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); 
             if (userFontSpec == null) {
                 userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1
             }
@@ -186,7 +187,7 @@ public class WidgetBuilder {
     }
 
     private static void modifyFont(String className, FontModifier creator) {
-        String key = className + ".font"; //$NON-NLS-1$
+        String key = className + ".font"; 
         Font font = (Font) UIManager.get(key);
         if (font != null) {
             font = creator.modifyFont(font);
@@ -215,9 +216,9 @@ public class WidgetBuilder {
         String genericClassName = info.getClassName();
         WidgetBuilder builder = (WidgetBuilder) builderMap.get(genericClassName);
         if (builder == null) {
-            logger.warn("unknown widget class: {0}", genericClassName); //$NON-NLS-1$
+            logger.warn("unknown widget class: {0}", genericClassName); 
             Object[] args = {genericClassName};
-            return new JLabel(MessageFormat.format("[a {0}]", args)); //$NON-NLS-1$
+            return new JLabel(MessageFormat.format("[a {0}]", args)); 
         }
         try {
             Component widget = builder.buildSelf(xml, parent, info);
@@ -309,7 +310,7 @@ public class WidgetBuilder {
             Map.Entry ent = (Map.Entry) i.next();
             String name = (String) ent.getKey();
             String value = (String) ent.getValue();
-            if ("position".equals(name)) { //$NON-NLS-1$
+            if ("position".equals(name)) { 
                 positionValue = value;
                 continue; // set position after size of this window is determined.
             }
@@ -317,7 +318,7 @@ public class WidgetBuilder {
             setter.set(xml, parent, widget, value);
         }
         if (positionValue != null) {
-            WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, "position"); //$NON-NLS-1$
+            WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, "position"); 
             setter.set(xml, parent, widget, positionValue);
         }
     }

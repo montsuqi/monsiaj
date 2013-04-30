@@ -60,7 +60,7 @@ public class DownloadMarshaller extends WidgetMarshaller {
             out.write(binary);
             out.flush();
             out.close();
-            download.showDialog(null, fileName, description, temp);
+            download.showDialog(fileName, description, temp);
         }
     }
 

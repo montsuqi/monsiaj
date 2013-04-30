@@ -23,6 +23,7 @@ import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.widgets.Button;
+import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.PandaPreview;
 
 /*
@@ -35,13 +36,13 @@ import org.montsuqi.widgets.PandaPreview;
 public class PrintAgent extends Thread {
 
     private final int DELAY = 3000;
-    private ConcurrentLinkedQueue<PrintRequest> queue;
+    private ConcurrentLinkedQueue<PrintRequest> printQ;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private String port;
     private SSLSocketFactory sslSocketFactory;
 
     public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
-        queue = new ConcurrentLinkedQueue<PrintRequest>();
+        printQ = new ConcurrentLinkedQueue<PrintRequest>();
         this.port = port;
         this.sslSocketFactory = sslSocketFactory;
         Authenticator.setDefault(new Authenticator() {
@@ -59,9 +60,9 @@ public class PrintAgent extends Thread {
         while (true) {
             try {
                 Thread.sleep(DELAY);
-                for (PrintRequest request : queue) {
+                for (PrintRequest request : printQ) {
                     if (processRequest(request)) {
-                        queue.remove(request);
+                        printQ.remove(request);
                     }
                 }
             } catch (InterruptedException e) {
@@ -71,75 +72,46 @@ public class PrintAgent extends Thread {
     }
 
     synchronized boolean processRequest(PrintRequest request) {
-        if (request != null) {
-            try {
-                File file = download(request);
-                if (file != null) {
-                    if (request.isShowdialog()) {
-                        showDialog(request.getTitle(), file);
-                    } else {
-                        PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                                Messages.getString("PrintAgent.notify_print_start") + "\n\n"
-                                + Messages.getString("PrintAgent.title") + request.getTitle(),
-                                GtkStockIcon.get("gtk-print"), 0);
-                        PDFPrint printer = new PDFPrint(file, false);
-                        printer.start();
-                    }
-                } else {
-                    int retry = request.getRetry();
-                    switch (retry) {
-                        case 0:
-                            return false;
-                        case 1:
-                            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                                    Messages.getString("PrintAgent.notify_print_fail_retry_over") + "\n\n"
-                                    + Messages.getString("PrintAgent.title") + request.getTitle(),
-                                    GtkStockIcon.get("gtk-dialog-error"), 0);
-                            break;
-                        default:
-                            retry -= 1;
-                            request.setRetry(retry);
-                            return false;
-                    }
+        if (request == null) {
+            return true;
+        }
+        try {
+            File file = download(request.path,request.filename);
+            if (file != null) {
+                request.action(file);
+            } else {
+                switch (request.getRetry()) {
+                    case 0:
+                        return false;
+                    case 1:
+                        request.showRetryError();
+                        return true;
+                    default:
+                        request.setRetry(request.getRetry()-1);
+                        return false;
                 }
-            } catch (IOException ex) {
-                if (!ex.getMessage().equals("204")) {
-                    ex.printStackTrace();
-                    PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                            Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
-                            + Messages.getString("PrintAgent.title") + request.getTitle(),
-                            GtkStockIcon.get("gtk-dialog-error"), 0);
-                }
+            }
+        } catch (IOException ex) {
+            if (!ex.getMessage().equals("204")) {
+                ex.printStackTrace();
+                request.showOtherError();
             }
         }
         return true;
     }
 
-    synchronized public void addRequest(String url, String title, int retry, boolean showDialog) {
-        queue.add(new PrintRequest(url, title, retry, showDialog));
+    synchronized public void addPrintRequest(String url, String title, int retry, boolean showDialog) {
+        printQ.add(new PrintRequest(url, title, retry, showDialog));
     }
 
-    private String displaySize(long size) {
-        String displaySize;
-        final long ONE_KB = 1024;
-        final long ONE_MB = ONE_KB * ONE_KB;
-        final long ONE_GB = ONE_MB * ONE_MB;
-        if (size / ONE_GB > 0) {
-            displaySize = String.valueOf(size / ONE_GB) + " GB";
-        } else if (size / ONE_MB > 0) {
-            displaySize = String.valueOf(size / ONE_MB) + " MB";
-        } else if (size / ONE_KB > 0) {
-            displaySize = String.valueOf(size / ONE_KB) + " KB";
-        } else {
-            displaySize = String.valueOf(size) + " bytes";
-        }
-        return displaySize;
+    synchronized public void addDLRequest(String url, String filename, String desc, int retry) {
+        printQ.add(new DLRequest(url, filename, desc, retry));
     }
 
     public void showDialog(String title, File file) {
         try {
             final JDialog dialog = new JDialog();
-            Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) { //$NON-NLS-1$
+            Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) { 
 
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
@@ -154,7 +126,7 @@ public class PrintAgent extends Thread {
             container.add(preview, BorderLayout.CENTER);
             container.add(closeButton, BorderLayout.SOUTH);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            preview.setSize(800,600);
+            preview.setSize(800, 600);
             preview.load(file.getAbsolutePath());
             preview.setVisible(true);
             dialog.setModal(true);
@@ -181,11 +153,11 @@ public class PrintAgent extends Thread {
         return 0;
     }
 
-    public File download(PrintRequest request) throws IOException {
-        File temp = File.createTempFile("monsiaj_printagent", ".pdf");
+    public File download(String path,String filename) throws IOException {
+        File temp = File.createTempFile("monsiaj_printagent_", "__"+filename);
         temp.deleteOnExit();
         String scheme = sslSocketFactory == null ? "http" : "https";
-        URL url = new URL(scheme + "://" + port + "/" + request.getPath());
+        URL url = new URL(scheme + "://" + port + "/" + path);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         if (sslSocketFactory != null) {
             ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
@@ -217,7 +189,48 @@ public class PrintAgent extends Thread {
         agent.start();
 
         for (int i = 1; i < argv.length; i++) {
-            agent.addRequest(argv[i], argv[i], 100, true);
+            agent.addPrintRequest(argv[i], argv[i], 100, true);
+        }
+    }
+
+    public class DLRequest extends PrintRequest {
+
+        private String description;
+
+        public DLRequest(String url, String filename, String desc, int retry) {
+            super(url, "", retry, false);
+            this.filename = filename;
+            this.description = desc;
+        }
+
+        @Override
+        public void action(File file) {
+            try {
+                PandaDownload pd = new PandaDownload();
+                pd.setName("PrintAgent.PandaDownload");
+                pd.showDialog(this.filename, this.description, file);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                this.showOtherError();
+            }
+        }
+
+        @Override
+        public void showRetryError() {
+            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                    Messages.getString("PrintAgent.notify_download_fail_retry_over") + "\n\n"
+                    + Messages.getString("PrintAgent.filename") + this.filename + "\n"
+                    + Messages.getString("PrintAgent.description") + this.description,
+                    GtkStockIcon.get("gtk-dialog-error"), 0);
+        }
+
+        @Override
+        public void showOtherError() {
+            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                    Messages.getString("PrintAgent.notify_download_fail") + "\n\n"
+                    + Messages.getString("PrintAgent.filename") + this.filename + "\n"
+                    + Messages.getString("PrintAgent.description") + this.description,
+                    GtkStockIcon.get("gtk-dialog-error"), 0);
         }
     }
 
@@ -225,6 +238,7 @@ public class PrintAgent extends Thread {
 
         private String path;
         private String title;
+        protected String filename;
         private int retry;
         private boolean showDialog;
 
@@ -233,6 +247,34 @@ public class PrintAgent extends Thread {
             this.title = title;
             this.retry = retry;
             this.showDialog = showdialog;
+            this.filename = "print.pdf";
+        }
+
+        public void action(File file) {
+            if (this.isShowdialog()) {
+                showDialog(this.getTitle(), file);
+            } else {
+                PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                        Messages.getString("PrintAgent.notify_print_start") + "\n\n"
+                        + Messages.getString("PrintAgent.title") + this.getTitle(),
+                        GtkStockIcon.get("gtk-print"), 0);
+                PDFPrint printer = new PDFPrint(file, false);
+                printer.start();
+            }
+        }
+
+        public void showRetryError() {
+            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                    Messages.getString("PrintAgent.notify_print_fail_retry_over") + "\n\n"
+                    + Messages.getString("PrintAgent.title") + this.getTitle(),
+                    GtkStockIcon.get("gtk-dialog-error"), 0);
+        }
+
+        public void showOtherError() {
+            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                    Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                    + Messages.getString("PrintAgent.title") + this.getTitle(),
+                    GtkStockIcon.get("gtk-dialog-error"), 0);
         }
 
         public void setRetry(int retry) {

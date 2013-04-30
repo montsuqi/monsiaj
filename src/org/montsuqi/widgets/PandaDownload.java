@@ -75,8 +75,8 @@ public class PandaDownload extends JComponent {
         return displaySize;
     }
 
-    public void showDialog(java.awt.Frame parent, final String fileName, final String description, final File file) throws IOException {
-        final JDialog dialog = new JDialog(parent, Messages.getString("PandaDownload.title"), true);
+    public void showDialog(final String fileName, final String description, final File file) throws IOException {
+        final JDialog dialog = new JDialog((JFrame)null, Messages.getString("PandaDownload.title"), true);
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         String descLine = "";
 
@@ -164,7 +164,7 @@ public class PandaDownload extends JComponent {
         dialog.add(panel);
         dialog.pack();
         dialog.setResizable(false);
-        dialog.setLocationRelativeTo(parent);
+        dialog.setLocationRelativeTo((JFrame)null);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
@@ -176,6 +176,6 @@ public class PandaDownload extends JComponent {
         }
         File file = new File(args[0]);
         PandaDownload pd = new PandaDownload();
-        pd.showDialog(null, file.getName(), args[1],file);
+        pd.showDialog(file.getName(), args[1],file);
     }
 }

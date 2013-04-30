@@ -40,7 +40,9 @@ import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
-import org.montsuqi.widgets.*;
+import org.montsuqi.widgets.ExceptionDialog;
+import org.montsuqi.widgets.PandaTimer;
+import org.montsuqi.widgets.TopWindow;
 import org.montsuqi.widgets.Window;
 
 /**
@@ -612,7 +614,11 @@ public class Protocol extends Connection {
     }
 
     public void addPrintRequest(String path, String title, int retry, boolean showDialog) {
-        printAgent.addRequest(path, title, retry, showDialog);
+        printAgent.addPrintRequest(path, title, retry, showDialog);
+    }
+
+    public void addDLRequest(String path, String filename, String description, int retry) {
+        printAgent.addDLRequest(path, filename,description, retry);
     }
 
     private synchronized void sendPing() throws IOException {
