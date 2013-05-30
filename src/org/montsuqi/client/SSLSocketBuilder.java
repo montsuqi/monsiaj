@@ -112,7 +112,7 @@ public class SSLSocketBuilder {
             String missingFileName;
             // we cannot check keyManagers != null here, since it may not be initialized.
             if (keyManagerIsReady) {
-                missingFileName = getTrustStorePath().getAbsolutePath();
+                missingFileName = null;
             } else {
                 missingFileName = new File(fileName).getAbsolutePath();
             }
@@ -246,45 +246,18 @@ public class SSLSocketBuilder {
         if (useBrowserSetting) {
             return null;
         }
-        if (SystemEnvironment.isMacOSX()) {
-            System.setProperty("javax.net.ssl.trustStoreType", "KeychainStore");
-            System.setProperty("javax.net.ssl.trustStoreProvider", "Apple");
-            final File trustStorePath = getTrustStorePath();
-            final InputStream is = new FileInputStream(trustStorePath);
-            final KeyStore ks = KeyStore.getInstance("KeychainStore", "Apple");
-            ks.load(is, null);
-            is.close();
-            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            tmf.init(ks);
-            final TrustManager[] tms = tmf.getTrustManagers();
-            for (int i = 0; i < tms.length; i++) {
-                if (tms[i] instanceof X509TrustManager) {
-                    final X509TrustManager delegatee = (X509TrustManager) tms[i];
-                    final TrustManager tm = new MyTrustManager(delegatee);
-                    return new TrustManager[]{tm};
-                }
-            }
-            return tms;
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init((KeyStore) null);
 
-        } else {
-            final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-            final File trustStorePath = getTrustStorePath();
-            final InputStream is = new FileInputStream(trustStorePath);
-            ks.load(is, null);
-            is.close();
-            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            tmf.init(ks);
-            final TrustManager[] tms = tmf.getTrustManagers();
-            for (int i = 0; i < tms.length; i++) {
-                if (tms[i] instanceof X509TrustManager) {
-                    final X509TrustManager delegatee = (X509TrustManager) tms[i];
-                    final TrustManager tm = new MyTrustManager(delegatee);
-                    return new TrustManager[]{tm};
-                }
+        System.out.println("JVM Default Trust Managers:");
+        for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+            if (trustManager instanceof X509TrustManager) {
+                X509TrustManager delegatee = (X509TrustManager) trustManager;
+                TrustManager tm = new MyTrustManager(delegatee);
+                return new TrustManager[]{tm};   
             }
-            return tms;
-
         }
+        return null;
     }
 
     private KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
@@ -335,36 +308,6 @@ public class SSLSocketBuilder {
         } catch (IOException e) {
             logger.info("{0} could not be read", deploymentPropertiesFile);
             return false;
-        }
-    }
-
-    private File getTrustStorePath() {
-        String home = System.getProperty("user.home");
-        String osName = System.getProperty("os.name").toLowerCase();        
-        if (osName.startsWith("windows vista")
-                || osName.startsWith("windows 7")
-                || osName.startsWith("windows 8")
-                || osName.startsWith("windows 9")
-                || osName.startsWith("windows 10")
-                ) {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
-        } else if (SystemEnvironment.isWindows()) {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "Application Data", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
-
-        } else if (SystemEnvironment.isMacOSX()) {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "Library", "Keychains"}),
-                    "login.keychain");
-            /*
-             * return new File( SystemEnvironment.createFilePath(new
-             * String[]{home, "Library", "keychains"}), "login.keychain");
-             */
-        } else {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, ".java", "deployment", "security"}),
-                    "trusted.jssecacerts");
         }
     }
 
