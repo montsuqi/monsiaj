@@ -249,7 +249,6 @@ public class SSLSocketBuilder {
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init((KeyStore) null);
 
-        System.out.println("JVM Default Trust Managers:");
         for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
             if (trustManager instanceof X509TrustManager) {
                 X509TrustManager delegatee = (X509TrustManager) trustManager;
