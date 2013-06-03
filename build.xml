@@ -132,7 +132,7 @@
         <native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8" reverse="true"/>
     </target>
 
-    <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-src"/>
+    <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-loader,dist-src"/>
 
     <target name="dist-bin" depends="create-jars,copy-files,set-version">
         <property name="bin.name" value="monsiaj-bin-${version}"/>
@@ -140,6 +140,7 @@
             <fileset dir="${build.dir}">
                 <include name="*.jnlp"/>                
                 <include name="*.jar"/>
+                <exclude name="monsiaj.jar"/>                
             </fileset>
         </copy>
         <copy todir="${build.dir}/${bin.name}/misc">
@@ -169,6 +170,21 @@
             </fileset>
         </zip>
     </target>
+    
+    <target name="dist-loader" depends="create-jars,copy-files,set-version">
+        <property name="loader.name" value="monsiaj-${version}"/>
+        <copy todir="${build.dir}/${loader.name}">
+            <fileset dir="${build.dir}">           
+                <include name="monsiaj.jar"/>
+            </fileset>
+        </copy>
+		<!-- ant 1.5.x should use destfile instead of zipfile-->
+        <zip zipfile="${dist.dir}/${loader.name}.zip">
+            <fileset dir="${build.dir}">
+                <include name="${loader.name}/**"/>
+            </fileset>
+        </zip>
+    </target>    
 
     <target name="dist-bin-mac" depends="create-jars,copy-files,set-version">
         <property name="bin.macosx.name" value="monsiaj-bin-macosx-${version}"/>
@@ -187,6 +203,7 @@
         <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
+                <exclude name="monsiaj.jar"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java/libs">
@@ -244,26 +261,25 @@
     <target name="create-jars" depends="create-unsigned-jars,sign-jars"/>
 
     <target name="create-unsigned-jars" depends="compile,copy-files">
-        <jar jarfile="${build.dir}/pandaclient.jar" manifest="${resources.dir}/pandaclient.mf">
+        <jar jarfile="${build.dir}/jmareceipt.jar" manifest="${resources.dir}/jmareceipt.mf">
             <fileset dir="${build.dir}">
                 <include name="org/montsuqi/**"/>
                 <include name="**/*.png"/>
                 <include name="com/sun/pdfview/font/res/cmap/*"/>
-                <exclude name="org/montsuqi/tools/**"/>
-                <exclude name="jp/or/med/orca/jmareceipt/**"/>
+                <include name="jp/or/med/orca/jmareceipt/**"/>  
+                <exclude name="org/montsuqi/tools/**"/>                
             </fileset>
         </jar>
-        <jar jarfile="${build.dir}/jmareceipt.jar" manifest="${resources.dir}/jmareceipt.mf">
+        <jar jarfile="${build.dir}/monsiaj.jar" manifest="${resources.dir}/monsiaj.mf">
             <fileset dir="${build.dir}">
-                <include name="jp/or/med/orca/jmareceipt/**"/>
+                <include name="jp/or/med/orca/monsiaj/**"/>
             </fileset>
-        </jar>
+        </jar>        
         <jar jarfile="${build.dir}/pandaglade.jar" manifest="${resources.dir}/pandaglade.mf">
             <fileset dir="${build.dir}">
                 <include name="org/montsuqi/tools/TestGlade.class"/>
             </fileset>
         </jar>
-		
     </target>
 
     <target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
@@ -318,8 +334,7 @@
             <batchtest todir="${report.dir}">
                 <fileset dir="${src.dir}">
                     <include name="**/Test*.java"/>
-                    <exclude name="**/TestXMLRecording.java"/>
-                    <exclude name="**/TestXMLReplay.java"/>
+                    <exclude name="**/TestGlade.java"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -358,6 +373,14 @@
                 <fileset dir="libs">
                     <include name="**/*.jar"/>
                 </fileset>
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="monsiaj" depends="compile">
+        <java classname="jp.or.med.orca.monsiaj.Loader">
+            <classpath>
+                <pathelement path="bin:src" />
             </classpath>
         </java>
     </target>
