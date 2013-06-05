@@ -37,7 +37,7 @@ public class JMAReceiptLauncher extends Launcher {
      *
      * @param title title of the launcher dialog.
      */
-    protected JMAReceiptLauncher(String title) {
+    public JMAReceiptLauncher(String title) {
         super(title);
     }
 

@@ -64,6 +64,8 @@
         <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.6"
                target="1.6"
                debug="${javac.debug}" debuglevel="${javac.debuglevel}">
+            <compilerarg value="-Xlint:deprecation"/>                   
+            <compilerarg value="-Xlint:unchecked"/>
             <include name="**/*.java"/>
             <classpath refid="project.class.path"/>
         </javac>
@@ -104,6 +106,7 @@
         </copy>
         <copy todir="${build.dir}/libs" >
             <fileset dir="${libs.dir}">
+                <include name="commons-io-2.4.jar"/>                
                 <include name="ilf-gpl.jar"/>
                 <include name="nimrodlf.jar"/>
                 <include name="log4j.jar"/>
@@ -273,6 +276,7 @@
         <jar jarfile="${build.dir}/monsiaj.jar" manifest="${resources.dir}/monsiaj.mf">
             <fileset dir="${build.dir}">
                 <include name="jp/or/med/orca/monsiaj/**"/>
+                <include name="org/montsuqi/util/**"/>                
             </fileset>
         </jar>        
         <jar jarfile="${build.dir}/pandaglade.jar" manifest="${resources.dir}/pandaglade.mf">

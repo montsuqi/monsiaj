@@ -20,6 +20,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.GtkStockIcon;
+import org.montsuqi.util.HttpClient;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.widgets.Button;
@@ -156,30 +157,18 @@ public class PrintAgent extends Thread {
     public File download(String path,String filename) throws IOException {
         File temp = File.createTempFile("monsiaj_printagent_", "__"+filename);
         temp.deleteOnExit();
-        String scheme = sslSocketFactory == null ? "http" : "https";
-        URL url = new URL(scheme + "://" + port + "/" + path);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        if (sslSocketFactory != null) {
-            ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-            ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
+        String url = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
+        BufferedInputStream in = new BufferedInputStream(HttpClient.get(url, sslSocketFactory));
+        int length, size = 0;
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+        while ((length = in.read()) != -1) {
+            size += length;
+            out.write(length);
         }
-        con.setRequestMethod("GET");
-        con.connect();
-        if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IOException("" + con.getResponseCode());
-        }
-        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-        int data, outsize = 0;
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(temp));
-        while ((data = bis.read()) != -1) {
-            outsize += data;
-            bos.write(data);
-        }
-        bos.close();
-        if (outsize == 0) {
+        out.close();
+        if (size == 0) {
             return null;
         }
-
         return temp;
     }
 

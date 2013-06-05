@@ -48,7 +48,7 @@ public class JarVerifier {
                 }                
                 return true;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                // do nothing
             }
         }
         return false;

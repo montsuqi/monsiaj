@@ -69,7 +69,6 @@ public class Client implements Runnable {
         OptionParser options = new OptionParser();
         options.add("port", Messages.getString("Client.port_number"), Configuration.DEFAULT_PORT); //$NON-NLS-1$ //$NON-NLS-2$
         options.add("host", Messages.getString("Client.host_name"), Configuration.DEFAULT_HOST); //$NON-NLS-1$ //$NON-NLS-2$
-        options.add("cache", Messages.getString("Client.cache_directory"), Configuration.DEFAULT_CACHE_PATH); //$NON-NLS-1$ //$NON-NLS-2$
         options.add("user", Messages.getString("Client.user_name"), Configuration.DEFAULT_USER); //$NON-NLS-1$ //$NON-NLS-2$
         options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         options.add("style", Messages.getString("Client.styles"), Configuration.DEFAULT_STYLES); //$NON-NLS-1$ //$NON-NLS-2$
@@ -81,7 +80,6 @@ public class Client implements Runnable {
         String configName = Configuration.DEFAULT_CONFIG_NAME;
         conf.setPort(configName, options.getInt("port")); //$NON-NLS-1$
         conf.setHost(configName, options.getString("host")); //$NON-NLS-1$
-        conf.setCache(configName, options.getString("cache")); //$NON-NLS-1$
         conf.setUser(configName, options.getString("user")); //$NON-NLS-1$
         conf.setPassword(configName, options.getString("pass")); //$NON-NLS-1$
         conf.setStyleFileName(configName, options.getString("style")); //$NON-NLS-1$

@@ -45,7 +45,6 @@ public class Configuration {
     private static final String PORT_KEY = "port"; //$NON-NLS-1$
     private static final String HOST_KEY = "host"; //$NON-NLS-1$
     private static final String USER_KEY = "user"; //$NON-NLS-1$
-    private static final String CACHE_KEY = "cache"; //$NON-NLS-1$
     private static final String SAVE_PASSWORD_KEY = "save_pass"; //$NON-NLS-1$
     private static final String PASSWORD_KEY = "password"; //$NON-NLS-1$
     private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
@@ -96,20 +95,6 @@ public class Configuration {
      * <p>Default application name: "demo".</p>
      */
     static final String DEFAULT_APPLICATION = "panda:orca00"; //$NON-NLS-1$
-    /**
-     * <p>Default cache directory: [value of System property
-     * user.home]/.monsiaj/cache</p>
-     */
-    static final String DEFAULT_CACHE_PATH;
-
-    static {
-        String[] pathElements = {
-            System.getProperty("user.home"), //$NON-NLS-1$
-            ".monsiaj", //$NON-NLS-1$
-            "cache" //$NON-NLS-1$
-        };
-        DEFAULT_CACHE_PATH = SystemEnvironment.createFilePath(pathElements).getAbsolutePath();
-    }
     /**
      * <p>Default style definitions: empty string.</p>
      */
@@ -494,26 +479,6 @@ public class Configuration {
      */
     public void setUser(String configName, String user) {
         setString(configName, USER_KEY, user);
-    }
-
-    /**
-     * <p>Returns the cache directory.</p>
-     *
-     * @param configName the configuration name.
-     * @return the cache directory.
-     */
-    public String getCache(String configName) {
-        return getString(configName, CACHE_KEY, DEFAULT_CACHE_PATH);
-    }
-
-    /**
-     * <p>Sets the cache directory.</p>
-     *
-     * @param configName the configuration name.
-     * @param cache new value of the cache directory.
-     */
-    public void setCache(String configName, String cache) {
-        setString(configName, CACHE_KEY, cache);
     }
 
     /**
