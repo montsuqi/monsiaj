@@ -140,6 +140,9 @@ public class Loader {
         log.debug("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
+        /* 起動時以降はproxyを解除、クライアント印刷などのHTTPアクセスをproxy経由にしないため */
+        System.clearProperty("proxyHost");
+        System.clearProperty("proxyPort");
         loader.launch(args);
         log.debug("---- Loader end");
     }
