@@ -179,7 +179,9 @@
         <copy todir="${build.dir}/${loader.name}">
             <fileset dir="${build.dir}">           
                 <include name="monsiaj.jar"/>
-             
+            </fileset>
+            <fileset dir="${resources.dir}">           
+                <include name="monsiaj.png"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}/${loader.name}/libs">
