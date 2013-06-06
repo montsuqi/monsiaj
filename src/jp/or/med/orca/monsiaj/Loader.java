@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 import java.util.prefs.Preferences;
+import org.apache.log4j.Logger;
 import org.montsuqi.util.FileUtils;
 import org.montsuqi.util.HttpClient;
 import org.montsuqi.util.SystemEnvironment;
@@ -22,20 +23,21 @@ import org.montsuqi.util.ZipUtils;
  */
 public class Loader {
 
+    private static Logger log = Logger.getLogger(Loader.class);
     private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client/version.txt";
     private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client/";
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-    private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj"};
+    private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj","cache"};
     private final String CACHE_DIR = SystemEnvironment.createFilePath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
 
     private void updateCache(String version) throws IOException {
-        System.out.println("updateCache");
+        log.debug("-- updateCache");
         /*
          * キャッシュディレクトリの削除と作成
          */
         File cacheDir = new File(CACHE_DIR);
         FileUtils.deleteDirectory(cacheDir);
-        if (!cacheDir.mkdir()) {
+        if (!cacheDir.mkdirs()) {
             throw new IOException("cant make cachedir");
         }
 
@@ -44,6 +46,7 @@ public class Loader {
          */
         String url = DOWNLOAD_URL + "monsiaj-bin-" + version + ".zip";
         InputStream is = HttpClient.get(url, null);
+        log.info("download " + url);
         File tmp = File.createTempFile("monsiaj-bin-" + version + "-", ".zip");
         tmp.deleteOnExit();
         BufferedInputStream in = new BufferedInputStream(is);
@@ -55,7 +58,7 @@ public class Loader {
         out.close();
         ZipUtils.unzip(tmp, cacheDir);
         tmp.delete();
-        System.out.println("updateCache succeed");
+        log.debug("-- updateCache end");
     }
 
     private String getVersion() throws IOException {
@@ -66,21 +69,23 @@ public class Loader {
 
     private void checkCache() {
         try {
+            log.debug("-- checkCache start");
             String cacheVersion = prefs.get("cacheVersion", null);
             String serverVersion = getVersion();
 
-            System.out.println("cacheVersion:" + cacheVersion);
-            System.out.println("serverVersion:" + serverVersion);
+            log.info("cacheVersion : " + cacheVersion);
+            log.info("serverVersion: " + serverVersion);
 
             if (cacheVersion == null || !cacheVersion.equals(serverVersion)) {
                 updateCache(serverVersion);
                 prefs.put("cacheVersion", serverVersion);
             } else {
-                System.out.println("use cache");
+                log.info("use cache");
             }
+            log.debug("-- checkCache end");
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("checkCache failure");
+            log.error("checkCache failure");
+            log.error(ex.getMessage(), ex);
         }
     }
 
@@ -98,7 +103,7 @@ public class Loader {
                     m.setAccessible(true);
                     m.invoke(loader, new Object[]{u});
                 } else {
-                    System.out.println("invalid jar(code sign verification error) : " + file.getName());
+                    throw new Exception("invalid jar(code sign verification error) : " + file.getName());
                 }
             }
         }
@@ -121,17 +126,21 @@ public class Loader {
 
     private void launch(String[] args) throws Exception {
         try {
+            log.debug("-- launch start");
             loadCache(new File(CACHE_DIR));
             invokeLauncher(args);
         } catch (Exception ex) {
             prefs.remove("cacheVersion");
-            throw ex;
+            log.error(ex.getMessage(),ex);
+            log.info("remove cacheVersion");
         }
     }
 
     public static void main(String[] args) throws Exception {
+        log.debug("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
         loader.launch(args);
+        log.debug("---- Loader end");
     }
 }

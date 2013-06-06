@@ -179,7 +179,13 @@
         <copy todir="${build.dir}/${loader.name}">
             <fileset dir="${build.dir}">           
                 <include name="monsiaj.jar"/>
+             
             </fileset>
+        </copy>
+        <copy todir="${build.dir}/${loader.name}/libs">
+            <fileset dir="${build.dir}/libs">
+                <include name="log4j.jar"/>   
+            </fileset>         
         </copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
         <zip zipfile="${dist.dir}/${loader.name}.zip">
@@ -276,7 +282,8 @@
         <jar jarfile="${build.dir}/monsiaj.jar" manifest="${resources.dir}/monsiaj.mf">
             <fileset dir="${build.dir}">
                 <include name="jp/or/med/orca/monsiaj/**"/>
-                <include name="org/montsuqi/util/**"/>                
+                <include name="org/montsuqi/util/**"/>
+                <include name="log4j.properties"/>
             </fileset>
         </jar>        
         <jar jarfile="${build.dir}/pandaglade.jar" manifest="${resources.dir}/pandaglade.mf">

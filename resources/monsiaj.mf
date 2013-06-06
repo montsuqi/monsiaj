@@ -1,1 +1,2 @@
 Main-Class: jp.or.med.orca.monsiaj.Loader
+Class-Path: libs libs/log4j.jar
