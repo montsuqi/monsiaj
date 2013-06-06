@@ -137,6 +137,7 @@ public class Loader {
     }
 
     public static void main(String[] args) throws Exception {
+        log.debug("");
         log.debug("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
