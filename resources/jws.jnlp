@@ -14,7 +14,7 @@
         <all-permissions/>
     </security>
     <resources>
-        <j2se version="1.7+"/>
+        <j2se version="1.6+"/>
         <jar href="jmareceipt.jar"/>
         <jar href="libs/log4j.jar"/>
         <jar href="libs/ilf-gpl.jar"/>        
