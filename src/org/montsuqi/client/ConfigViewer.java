@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.client;
 
@@ -32,10 +32,10 @@ import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.PandaCList;
 
-public class ConfigurationViewer {
+public class ConfigViewer {
 
     protected static final Logger logger = Logger.getLogger(Launcher.class);
-    protected Configuration conf;
+    protected Config conf;
 
     static {
         if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
@@ -46,7 +46,7 @@ public class ConfigurationViewer {
         }
     }
 
-    public ConfigurationViewer(Configuration conf) {
+    public ConfigViewer(Config conf) {
         this.conf = conf;
     }
 
@@ -58,7 +58,7 @@ public class ConfigurationViewer {
         clist.setFocusable(true);
         clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         clist.setShowGrid(true);
-        updateConfigurationList(clist);
+        updateConfigList(clist);
         clist.setAutoResizeMode(PandaCList.AUTO_RESIZE_LAST_COLUMN);
 
         JScrollPane scroll = new JScrollPane(clist,
@@ -74,8 +74,9 @@ public class ConfigurationViewer {
         Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
-                editConfiguration(f, "new", true);
-                updateConfigurationList(clist);
+                int num = conf.getNext();
+                editConfig(f, num, true);
+                updateConfigList(clist);
             }
         });
         bar.add(newButton);
@@ -85,9 +86,9 @@ public class ConfigurationViewer {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = clist.getSelectedRow();
                 if (selectedRow >= 0) {
-                    String configName = (String) (clist.getValueAt(selectedRow, 0));
-                    editConfiguration(f, configName, false);
-                    updateConfigurationList(clist);
+                    int num = conf.getList().get(selectedRow);
+                    editConfig(f, num, false);
+                    updateConfigList(clist);
                 }
             }
         });
@@ -101,8 +102,8 @@ public class ConfigurationViewer {
                     int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
                         String configName = (String) (clist.getValueAt(selectedRow, 0));
-                        conf.deleteConfiguration(configName);
-                        updateConfigurationList(clist);
+                        conf.deleteConfig(conf.getConfigByDescription(configName));
+                        updateConfigList(clist);
                     }
                 }
             }
@@ -123,8 +124,7 @@ public class ConfigurationViewer {
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    private void updateConfigurationList(PandaCList clist) {
-        int defaultId = -1;
+    private void updateConfigList(PandaCList clist) {
         final String[] ColumnNames = {
             Messages.getString("ConfigurationViewer.config_name"),
             Messages.getString("ConfigurationViewer.host"),
@@ -132,54 +132,49 @@ public class ConfigurationViewer {
             Messages.getString("ConfigurationViewer.application"),
             Messages.getString("ConfigurationViewer.user")
         };
-        String[] configNames = conf.getConfigurationNames();
-        Object[][] tableData = new Object[configNames.length][ColumnNames.length];
-        for (int i = 0; i < configNames.length; i++) {
-            if (configNames[i].equals(Configuration.DEFAULT_CONFIG_NAME)) {
-                defaultId = i;
-            }
-            tableData[i][0] = configNames[i];
-            tableData[i][1] = conf.getHost(configNames[i]);
-            tableData[i][2] = String.valueOf(conf.getPort(configNames[i]));
-            tableData[i][3] = conf.getApplication(configNames[i]);
-            tableData[i][4] = conf.getUser(configNames[i]);
+
+        java.util.List<Integer> list = conf.getList();
+        Object[][] tableData = new Object[list.size()][ColumnNames.length];
+        int j = 0;
+        for (int i : list) {            
+            tableData[j][0] = conf.getDescription(i);
+            tableData[j][1] = conf.getHost(i);
+            tableData[j][2] = Integer.toString(conf.getPort(i));
+            tableData[j][3] = conf.getApplication(i);
+            tableData[j][4] = conf.getUser(i);
+            j++;
         }
         DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {
-
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        if (defaultId >= 0) {
-            model.removeRow(defaultId);
-        }
         clist.setModel(model);
     }
 
-    protected ConfigurationPanel createConfigurationPanel(Configuration conf) {
-        return new ConfigurationPanel(conf, false, false);
+    protected ConfigPanel createConfigPanel(Config conf) {
+        return new ConfigPanel(conf, false, false);
     }
 
-    protected void editConfiguration(Dialog parent, String name, final boolean newFlag) {
-        final String configName = name;
+    protected void editConfig(Dialog parent, final int num, final boolean newFlag) {
         String title = newFlag ? Messages.getString("ConfigurationViewer.new") : Messages.getString("ConfigurationViewer.edit");
         final JDialog f = new JDialog(parent, title, true); //$NON-NLS-1$
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout());
 
-        final ConfigurationPanel configPanel = createConfigurationPanel(conf);
+        final ConfigPanel configPanel = createConfigPanel(conf);
 
-        configPanel.loadConfiguration(name, newFlag);
+        configPanel.loadConfig(num);
 
         JPanel configNamePanel = new JPanel(new GridBagLayout());
         configNamePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        configNamePanel.add(ConfigurationPanel.createLabel(Messages.getString("ConfigurationPanel.config_name")),
-                ConfigurationPanel.createConstraints(0, 0, 1, 1, 0.0, 1.0));
-        final JTextField configNameEntry = ConfigurationPanel.createTextField();
-        configNameEntry.setText(name);
+        configNamePanel.add(ConfigPanel.createLabel(Messages.getString("ConfigurationPanel.config_name")),
+                ConfigPanel.createConstraints(0, 0, 1, 1, 0.0, 1.0));
+        final JTextField configNameEntry = ConfigPanel.createTextField();
+        configNameEntry.setText(conf.getDescription(num));
         configNamePanel.add(configNameEntry,
-                ConfigurationPanel.createConstraints(1, 0, 1, 4, 1.0, 0.0));
+                ConfigPanel.createConstraints(1, 0, 1, 4, 1.0, 0.0));
 
         JPanel basicPanel = configPanel.getBasicPanel();
         JPanel sslPanel = configPanel.getSSLPanel();
@@ -219,25 +214,7 @@ public class ConfigurationViewer {
                     JOptionPane.showMessageDialog(f, message, "", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                if (newFlag) {
-                    // new configuration
-                    if (!conf.newConfiguration(entryName)) {
-                        String message = Messages.getString("ConfigurationViewer.edit_config_exist_error_message") + entryName;
-                        logger.warn(message);
-                        JOptionPane.showMessageDialog(f, message, "", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                }
-                if (!newFlag && !configName.equals(entryName)) {
-                    // rename configuration
-                    if (!conf.renameConfiguration(configName, entryName)) {
-                        String message = Messages.getString("ConfigurationViewer.edit_rename_error_message");
-                        logger.warn(message);
-                        JOptionPane.showMessageDialog(f, message, "", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                }
-                configPanel.saveConfiguration(entryName);
+                configPanel.saveConfig(num);
                 f.dispose();
             }
         });

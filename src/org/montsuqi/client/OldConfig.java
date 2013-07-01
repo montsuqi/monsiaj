@@ -29,7 +29,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.UIManager;
 import org.montsuqi.util.Logger;
-import org.montsuqi.util.SystemEnvironment;
 
 /**
  * <p>A class to manage configuration settings of the application.</p>
@@ -37,7 +36,7 @@ import org.montsuqi.util.SystemEnvironment;
  * it is stored in XML files somewhere in user's home directory. On Windows, it
  * is stored in the registry.</p>
  */
-public class Configuration {
+public class OldConfig {
 
     private String pass;
     private String clientCertificatePass;
@@ -60,6 +59,7 @@ public class Configuration {
     private static final String USE_TIMER_KEY = "use_timer"; //$NON-NLS-1$
     private static final String TIMER_PERIOD_KEY = "timer_period"; //$NON-NLS-1$
     private static final String CURRENT_CONFIG_KEY = "current_config"; //$NON-NLS-1$
+    
     private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
     private static final String CONFIG_NODE_BASE = "config"; //$NON-NLS-1$
     private static final String CONFIG_NODE = CONFIG_NODE_BASE + "/"; //$NON-NLS-1$
@@ -140,23 +140,28 @@ public class Configuration {
      * <p>Default value of default config name.</p>
      */
     static final String DEFAULT_CONFIG_NAME = "default";
-    protected static final Logger logger = Logger.getLogger(Configuration.class);
+    protected static final Logger logger = Logger.getLogger(OldConfig.class);
 
     /**
      * <p>Constructs a configuration object.</p>
      *
      * @param clazz class object used to obtain user preference node.
      */
-    public Configuration(Class clazz) {
-        prefs = Preferences.userNodeForPackage(clazz);
+    public OldConfig() {
+        prefs = Preferences.userNodeForPackage(jp.or.med.orca.jmareceipt.JMAReceiptLauncher.class);
         boolean hasDefault = nodeExists(DEFAULT_CONFIG_NAME);
         if (!hasDefault) {
             newConfiguration(DEFAULT_CONFIG_NAME);
-            copyOldConfig(Preferences.userRoot().node("/jp/or/med/jma_receipt"),
-                    Preferences.userNodeForPackage(clazz));
         }
         pass = DEFAULT_PASSWORD;
         clientCertificatePass = DEFAULT_CLIENT_CERTIFICATE_PASSWORD;
+    }
+
+    public void delete() {
+        try {
+            prefs.clear();
+        } catch (Exception ex) {
+        }
     }
 
     public void listConfiguration() {
@@ -169,31 +174,6 @@ public class Configuration {
             System.out.println(Messages.getString("Configuration.list_port") + getPort(configNames[i]));
             System.out.println(Messages.getString("Configuration.list_application") + getApplication(configNames[i]));
             System.out.println(Messages.getString("Configuration.list_user") + getUser(configNames[i]));
-        }
-    }
-
-    /**
-     * <p>Copy old version's configuration.</p>
-     *
-     */
-    private void copyOldConfig(Preferences oldPref, Preferences newPref) {
-        try {
-            String[] keys;
-            String[] children;
-            int i;
-            keys = oldPref.keys();
-            for (i = 0; i < keys.length; i++) {
-                newPref.put(keys[i], oldPref.get(keys[i], ""));
-            }
-            children = oldPref.childrenNames();
-            for (i = 0; i < children.length; i++) {
-                copyOldConfig(
-                        oldPref.node(oldPref.absolutePath() + "/" + children[i]),
-                        newPref.node(newPref.absolutePath() + "/" + children[i]));
-            }
-            newPref.flush();
-        } catch (Exception ex) {
-            System.out.println(ex);
         }
     }
 
@@ -499,7 +479,7 @@ public class Configuration {
                 logger.warn(e);
             }
         }
-        return Configuration.class.getResource(DEFAULT_STYLE_RESOURCE_NAME);
+        return OldConfig.class.getResource(DEFAULT_STYLE_RESOURCE_NAME);
     }
 
     /**

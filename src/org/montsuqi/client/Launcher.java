@@ -46,8 +46,8 @@ public class Launcher {
 
     protected static final Logger logger = Logger.getLogger(Launcher.class);
     protected String title;
-    protected Configuration conf;
-    protected ConfigurationPanel configPanel;
+    protected Config conf;
+    protected ConfigPanel configPanel;
     protected JComboBox configCombo;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
@@ -65,7 +65,7 @@ public class Launcher {
     public Launcher(String title) {
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
-        conf = new Configuration(this.getClass());
+        conf = new Config();
         installLookAndFeels();
     }
 
@@ -87,26 +87,26 @@ public class Launcher {
         String configName = options.getString("config");
         boolean listConfigFlag = options.getBoolean("config-list");
         if (listConfigFlag) {
-            conf.listConfiguration();
+            conf.listConfig();
             return true;
         }
         if (!configName.equals("")) {
-            conf.setConfigurationName(configName);
+            conf.setCurrentByDescription(configName);
             /*
              * set properties
              */
-            conf.applyProperties(configName);
+            conf.applySystemProperties(conf.getCurrent());
 
             /*
              * set look and feel
              */
             try {
-                String cname = conf.getLookAndFeelClassName(configName);
+                String cname = conf.getLookAndFeel(conf.getCurrent());
                 if (cname.startsWith("com.nilo.plaf.nimrod")) {
-                    System.setProperty("nimrodlf.themeFile", conf.getLAFThemeFileName(configName));
+                    System.setProperty("nimrodlf.themeFile", conf.getLookAndFeelThemeFile(conf.getCurrent()));
                     UIManager.setLookAndFeel(new NimRODLookAndFeel());
                 } else {
-                    UIManager.setLookAndFeel(conf.getLookAndFeelClassName(configName));
+                    UIManager.setLookAndFeel(cname);
                 }
             } catch (Exception e) {
                 logger.warn(e);
@@ -116,13 +116,11 @@ public class Launcher {
             /*
              * confirm password when the password not preserved
              */
-            if (!conf.getSavePassword(configName)) {
+            if (!conf.getSavePassword(conf.getCurrent())) {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (resp == JOptionPane.OK_OPTION) {
-                    conf.setPassword(configName, String.valueOf(pwd.getPassword()));
-                } else {
+                if (resp != JOptionPane.OK_OPTION) {
                     return true;
                 }
             }
@@ -130,15 +128,13 @@ public class Launcher {
              * confirm certificate password when the certificate password not
              * preserved
              */
-            if (conf.getUseSSL(configName)
-                    && !conf.getClientCertificateFileName(configName).equals("")
-                    && !conf.getSaveClientCertificatePassword(configName)) {
+            if (conf.getUseSSL(conf.getCurrent())
+                    && !conf.getClientCertificateFile(conf.getCurrent()).equals("")
+                    && !conf.getSaveClientCertificatePassword(conf.getCurrent())) {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_certificate_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_certificate_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (resp == JOptionPane.OK_OPTION) {
-                    conf.setClientCertificatePassword(configName, String.valueOf(pwd.getPassword()));
-                } else {
+                if (resp != JOptionPane.OK_OPTION) {
                     return true;
                 }
             }
@@ -159,11 +155,14 @@ public class Launcher {
         configCombo.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent evt) {
-                configPanel.loadConfiguration((String) configCombo.getSelectedItem(), false);
+                java.util.List<Integer> list = conf.getList();
+                int current = list.get(configCombo.getSelectedIndex());
+                conf.setCurrent(current);
+                configPanel.loadConfig(current);
             }
         });
         configPanel = createConfigurationPanel();
-        configPanel.loadConfiguration(conf.getConfigurationName(), false);
+        configPanel.loadConfig(conf.getCurrent());
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$
@@ -206,15 +205,14 @@ public class Launcher {
         for (int i = 0; i < listeners.length; i++) {
             configCombo.removeActionListener(listeners[i]);
         }
-        String[] configNames = conf.getConfigurationNames();
         configCombo.removeAllItems();
-        for (int i = 0; i < configNames.length; i++) {
-            configCombo.addItem(configNames[i]);
+        for (int i : conf.getList()) {
+            configCombo.addItem(conf.getDescription(i));
         }
         for (int i = 0; i < listeners.length; i++) {
             configCombo.addActionListener(listeners[i]);
         }
-        configCombo.setSelectedItem(conf.getConfigurationName());
+        configCombo.setSelectedItem(conf.getDescription(conf.getCurrent()));
     }
 
     private void checkJavaVersion() {
@@ -256,14 +254,15 @@ public class Launcher {
             textPanel.add(summaryLabel, BorderLayout.NORTH);
             textPanel.add(bodyText, BorderLayout.CENTER);
 
-            boolean checked = prefs.get(Launcher.class.getName()+".security_risk_agreement","no").startsWith("yes");
+            boolean checked = prefs.get(Launcher.class.getName() + ".security_risk_agreement", "no").startsWith("yes");
             final JCheckBox checkBox = new JCheckBox("危険性を理解した上で使用する");
             checkBox.setFont(new Font("Suns", Font.PLAIN, 16));
             checkBox.setBackground(bgcolor);
             checkBox.setSelected(checked);
             checkBox.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
-                    prefs.put(Launcher.class.getName()+".security_risk_agreement",checkBox.isSelected()?"yes":"no");
+                    prefs.put(Launcher.class.getName() + ".security_risk_agreement", checkBox.isSelected() ? "yes" : "no");
                 }
             });
             textPanel.add(checkBox, BorderLayout.SOUTH);
@@ -274,7 +273,7 @@ public class Launcher {
             JOptionPane.showMessageDialog(null, panel, "monsiajセキュリティ警告", JOptionPane.PLAIN_MESSAGE);
             if (!checkBox.isSelected()) {
                 System.exit(0);
-            } 
+            }
         }
     }
 
@@ -287,7 +286,7 @@ public class Launcher {
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout(10, 5));
         final JPanel mainPanel = createMainPanel();
-        final ConfigurationViewer viewer = createConfigurationViewer();
+        final ConfigViewer viewer = createConfigurationViewer();
         container.add(mainPanel, BorderLayout.CENTER);
 
         URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/orca.png");
@@ -303,9 +302,9 @@ public class Launcher {
         Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent ev) {
-                String configName = (String) configCombo.getSelectedItem();
-                configPanel.saveConfiguration(configName);
-                conf.setConfigurationName(configName);
+                int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
+                configPanel.saveConfig(num);
+                conf.setCurrent(num);
                 connect();
                 f.dispose();
             }
@@ -342,7 +341,6 @@ public class Launcher {
     private void connect() {
         conf.save();
         Client client = new Client(conf);
-        JFrame logFrame = conf.getUseLogViewer(conf.getConfigurationName()) ? createLogFrame(client) : null;
 
         try {
             client.connect();
@@ -353,94 +351,19 @@ public class Launcher {
         } catch (Exception e) {
             logger.fatal(e);
             ExceptionDialog.showExceptionDialog(e);
-            if (logFrame != null) {
-                logFrame.setExtendedState(Frame.NORMAL);
-            } else {
-                client.exitSystem();
-            }
+            client.exitSystem();
         }
     }
 
-    protected ConfigurationPanel createConfigurationPanel() {
-        return new ConfigurationPanel(conf, true, true);
+    protected ConfigPanel createConfigurationPanel() {
+        return new ConfigPanel(conf, true, true);
     }
 
-    protected ConfigurationViewer createConfigurationViewer() {
-        return new ConfigurationViewer(conf);
+    protected ConfigViewer createConfigurationViewer() {
+        return new ConfigViewer(conf);
     }
 
     protected Icon createIcon() {
         return null;
-    }
-
-    private JFrame createLogFrame(final Client client) {
-        final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); //$NON-NLS-1$
-        URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/orca.png");
-        f.setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
-        Container container = f.getContentPane();
-        container.setLayout(new BorderLayout());
-        final ConsolePane console = new ConsolePane();
-        System.setOut(console.getOut());
-        System.setErr(console.getErr());
-
-        JScrollPane scroll = new JScrollPane(console);
-        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        scroll.setPreferredSize(new Dimension(640, 480));
-        container.add(scroll, BorderLayout.CENTER);
-
-        JPanel bar = new JPanel();
-        bar.setLayout(new FlowLayout());
-        container.add(bar, BorderLayout.SOUTH);
-        Button clear = new Button(new AbstractAction(Messages.getString("Launcher.log_clear")) { //$NON-NLS-1$
-
-            public void actionPerformed(ActionEvent e) {
-                console.setText(""); //$NON-NLS-1$
-            }
-        });
-        bar.add(clear);
-
-        Button save = new Button(new AbstractAction(Messages.getString("Launcher.log_save_log_as")) { //$NON-NLS-1$
-
-            public void actionPerformed(ActionEvent ev) {
-                JFileChooser chooser = new JFileChooser();
-                int ret = chooser.showSaveDialog(f);
-                if (ret == JFileChooser.APPROVE_OPTION) {
-                    File file = chooser.getSelectedFile();
-                    try {
-                        FileWriter fw = new FileWriter(file);
-                        fw.write(console.getText());
-                        fw.close();
-                    } catch (IOException e) {
-                        logger.warn(e);
-                    }
-                }
-            }
-        });
-        bar.add(save);
-
-        Button quit = new Button(new AbstractAction(Messages.getString("Launcher.log_quit")) { //$NON-NLS-1$
-
-            public void actionPerformed(ActionEvent e) {
-                client.exitSystem();
-            }
-        });
-        bar.add(quit);
-
-        f.setSize(640, 480);
-        int state = f.getExtendedState();
-        f.setExtendedState(state | Frame.ICONIFIED);
-        f.setVisible(true);
-
-        f.setLocationRelativeTo(null);
-        f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        f.addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-                client.exitSystem();
-            }
-        });
-        return f;
     }
 }

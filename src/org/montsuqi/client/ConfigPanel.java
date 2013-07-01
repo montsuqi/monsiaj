@@ -40,10 +40,10 @@ import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
-public class ConfigurationPanel extends JPanel {
+public class ConfigPanel extends JPanel {
 
-    protected static final Logger logger = Logger.getLogger(ConfigurationPanel.class);
-    protected Configuration conf;
+    protected static final Logger logger = Logger.getLogger(ConfigPanel.class);
+    protected Config conf;
     protected JPanel basicPanel;
     protected JPanel sslPanel;
     protected JPanel othersPanel;
@@ -66,7 +66,6 @@ public class ConfigurationPanel extends JPanel {
     protected JComboBox lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
-    protected JCheckBox useLogViewerCheck;
     protected JCheckBox useTimerCheck;
     protected JTextField timerPeriodEntry;
     protected JTextArea propertiesText;
@@ -90,7 +89,7 @@ public class ConfigurationPanel extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             if (checkbox.isSelected()) {
-                int result = JOptionPane.showConfirmDialog(ConfigurationPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+                int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                 if (result != JOptionPane.YES_OPTION) {
                     checkbox.setSelected(false);
                 }
@@ -221,7 +220,7 @@ public class ConfigurationPanel extends JPanel {
         }
     }
 
-    protected ConfigurationPanel(Configuration conf, boolean doPadding, boolean doChangeLookAndFeel) {
+    protected ConfigPanel(Config conf, boolean doPadding, boolean doChangeLookAndFeel) {
         this.conf = conf;
         this.doPadding = doPadding;
         this.doChangeLookAndFeel = doChangeLookAndFeel;
@@ -232,29 +231,28 @@ public class ConfigurationPanel extends JPanel {
         infoPanel = createInfoPanel();
     }
 
-    public void loadConfiguration(String configName, boolean newFlag) {
+    public void loadConfig(int num) {
         // Basic tab
-        String user = newFlag ? Configuration.DEFAULT_USER : conf.getUser(configName);
-        String password = newFlag ? Configuration.DEFAULT_PASSWORD : conf.getPassword(configName);
-        boolean savePassword = newFlag ? Configuration.DEFAULT_SAVE_PASSWORD : conf.getSavePassword(configName);
-        String host = newFlag ? Configuration.DEFAULT_HOST : conf.getHost(configName);
-        int port = newFlag ? Configuration.DEFAULT_PORT : conf.getPort(configName);
-        String application = newFlag ? Configuration.DEFAULT_APPLICATION : conf.getApplication(configName);
+        String user = conf.getUser(num);
+        String password = conf.getPassword(num);
+        boolean savePassword = conf.getSavePassword(num);
+        String host = conf.getHost(num);
+        int port = conf.getPort(num);
+        String application = conf.getApplication(num);
 
         // SSL tab
-        boolean useSSL = newFlag ? Configuration.DEFAULT_USE_SSL : conf.getUseSSL(configName);
-        String clientCertificate = newFlag ? Configuration.DEFAULT_CLIENT_CERTIFICATE : conf.getClientCertificateFileName(configName);
-        boolean saveClientCertificatePassword = newFlag ? Configuration.DEFAULT_SAVE_CLIENT_CERTIFICATE_PASSWORD : conf.getSaveClientCertificatePassword(configName);
-        String clientCertificatePassword = newFlag ? Configuration.DEFAULT_CLIENT_CERTIFICATE_PASSWORD : conf.getClientCertificatePassword(configName);
+        boolean useSSL = conf.getUseSSL(num);
+        String clientCertificateFile = conf.getClientCertificateFile(num);
+        boolean saveClientCertificatePassword = conf.getSaveClientCertificatePassword(num);
+        String clientCertificatePassword = conf.getClientCertificatePassword(num);
 
         // Others tab
-        String styleFileName = newFlag ? Configuration.DEFAULT_STYLES : conf.getStyleFileName(configName);
-        String lookAndFeelClassName = newFlag ? Configuration.DEFAULT_LOOK_AND_FEEL_CLASS_NAME : conf.getLookAndFeelClassName(configName);
-        String lafThemeFileName = newFlag ? Configuration.DEFAULT_LAF_THEME : conf.getLAFThemeFileName(configName);
-        boolean useLogViewer = newFlag ? Configuration.DEFAULT_USE_LOG_VIEWER : conf.getUseLogViewer(configName);
-        boolean useTimer = newFlag ? Configuration.DEFAULT_USE_TIMER : conf.getUseTimer(configName);
-        long timerPeriod = newFlag ? Configuration.DEFAULT_TIMER_PERIOD : conf.getTimerPeriod(configName);
-        String properties = newFlag ? Configuration.DEFAULT_PROPERTIES : conf.getProperties(configName);
+        String styleFile = conf.getStyleFile(num);
+        String lookAndFeel = conf.getLookAndFeel(num);
+        String lookAndFeelThemeFile = conf.getLookAndFeelThemeFile(num);
+        boolean useTimer =  conf.getUseTimer(num);
+        long timerPeriod = conf.getTimerPeriod(num);
+        String systemProperties = conf.getSystemProperties(num);
 
         // Basic Tab
         userEntry.setText(user);
@@ -268,56 +266,49 @@ public class ConfigurationPanel extends JPanel {
 
         // SSL Tab
         useSSLCheckbox.setSelected(useSSL);
-        clientCertificateEntry.setText(clientCertificate);
+        clientCertificateEntry.setText(clientCertificateFile);
         exportPasswordEntry.setText(clientCertificatePassword);
         saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
 
         // Others Tab
-        styleEntry.setText(styleFileName);
-        lafThemeEntry.setText(lafThemeFileName);
+        styleEntry.setText(styleFile);
+        lafThemeEntry.setText(lookAndFeelThemeFile);
         for (int i = 0; i < lafs.length; i++) {
-            if (lookAndFeelClassName.equals(lafs[i].getClassName())) {
+            if (lookAndFeel.equals(lafs[i].getClassName())) {
                 lookAndFeelCombo.setSelectedItem(lafs[i].getName());
             }
         }
-        useLogViewerCheck.setSelected(useLogViewer);
         useTimerCheck.setSelected(useTimer);
         timerPeriodEntry.setText(String.valueOf(timerPeriod));
-        propertiesText.setText(properties);
+        propertiesText.setText(systemProperties);
         updateSSLPanelComponentsEnabled();
     }
 
-    protected void saveConfiguration(String configName) {
+    protected void saveConfig(int num) {
         // Basic Tab
-        conf.setUser(configName, userEntry.getText());
+        conf.setUser(num, userEntry.getText());
         // Save save_pass check field before the password itself,
         // since setPass fetches its value from the preferences internally.
-        conf.setSavePassword(configName, savePasswordCheckbox.isSelected());
-        conf.setPassword(configName, new String(passwordEntry.getPassword()));
-        conf.setHost(configName, hostEntry.getText());
-        conf.setPort(configName, Integer.parseInt(portEntry.getText()));
-        conf.setApplication(configName, appEntry.getText());
+        conf.setSavePassword(num, savePasswordCheckbox.isSelected());
+        conf.setPassword(num, new String(passwordEntry.getPassword()));
+        conf.setHost(num, hostEntry.getText());
+        conf.setPort(num, Integer.parseInt(portEntry.getText()));
+        conf.setApplication(num, appEntry.getText());
 
         // SSL Tab
-        conf.setUseSSL(configName, useSSLCheckbox.isSelected());
-        conf.setClientCertificateFileName(configName, clientCertificateEntry.getText());
-        conf.setClientCertificatePassword(configName, new String(exportPasswordEntry.getPassword()));
-        conf.setSaveClientCertificatePassword(configName, saveClientCertificatePasswordCheckbox.isSelected());
+        conf.setUseSSL(num, useSSLCheckbox.isSelected());
+        conf.setClientCertificateFile(num, clientCertificateEntry.getText());
+        conf.setClientCertificatePassword(num, new String(exportPasswordEntry.getPassword()));
+        conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
 
         // Others Tab
-        conf.setStyleFileName(configName, styleEntry.getText());
-        conf.setLookAndFeelClassName(configName, lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
-        conf.setLAFThemeFileName(configName, lafThemeEntry.getText());
-        conf.setUseLogViewer(configName, useLogViewerCheck.isSelected());
-        conf.setUseTimer(configName, useTimerCheck.isSelected());
-        long period;
-        try {
-            period = Long.parseLong(timerPeriodEntry.getText());
-        } catch (java.lang.NumberFormatException ex) {
-            period = Configuration.DEFAULT_TIMER_PERIOD;
-        }
-        conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
-        conf.setProperties(configName, propertiesText.getText());
+        conf.setStyleFile(num, styleEntry.getText());
+        conf.setLookAndFeel(num, lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
+        conf.setLookAndFeelThemeFile(num, lafThemeEntry.getText());
+        conf.setUseTimer(num, useTimerCheck.isSelected());
+        conf.setTimerPeriod(num, Integer.valueOf(timerPeriodEntry.getText()));
+        conf.setSystemProperties(num, propertiesText.getText());
+        conf.save();
     }
 
     public static GridBagConstraints createConstraints(int x, int y, int width, int height, double weightx, double weighty) {
@@ -529,8 +520,6 @@ public class ConfigurationPanel extends JPanel {
                 new ThemeSelectionAction(lafThemeEntry, ".theme",
                 Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 
-        useLogViewerCheck = new JCheckBox();
-
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
         useTimerCheck = new JCheckBox();
@@ -573,12 +562,6 @@ public class ConfigurationPanel extends JPanel {
                 createConstraints(1, y, 2, 1, 1.0, 0.0));
         panel.add(lafThemeButton,
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_log_viewer")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(useLogViewerCheck,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_timer")),

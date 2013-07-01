@@ -30,20 +30,18 @@ import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import javax.net.ssl.SSLSocketFactory;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.util.Logger;
-import org.montsuqi.util.OptionParser;
 
 /**
  * <p>The main application class for panda client.</p>
  */
 public class Client implements Runnable {
 
-    private Configuration conf;
+    private Config conf;
     Logger logger;
     private Protocol protocol;
     private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
@@ -53,43 +51,11 @@ public class Client implements Runnable {
      *
      * @param conf configuration.
      */
-    public Client(Configuration conf) {
+    public Client(Config conf) {
         this.conf = conf;
         logger = Logger.getLogger(Client.class);
     }
 
-    /**
-     * <p>A factory method to construct a Client instance initialized by the
-     * command line.</p>
-     *
-     * @param args command line arguments.
-     * @return a client.
-     */
-    private static Client parseCommandLine(String[] args) {
-        OptionParser options = new OptionParser();
-        options.add("port", Messages.getString("Client.port_number"), Configuration.DEFAULT_PORT); //$NON-NLS-1$ //$NON-NLS-2$
-        options.add("host", Messages.getString("Client.host_name"), Configuration.DEFAULT_HOST); //$NON-NLS-1$ //$NON-NLS-2$
-        options.add("user", Messages.getString("Client.user_name"), Configuration.DEFAULT_USER); //$NON-NLS-1$ //$NON-NLS-2$
-        options.add("pass", Messages.getString("Client.password"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        options.add("style", Messages.getString("Client.styles"), Configuration.DEFAULT_STYLES); //$NON-NLS-1$ //$NON-NLS-2$
-        options.add("useSSL", "SSL", Configuration.DEFAULT_USE_SSL); //$NON-NLS-1$ //$NON-NLS-2$
-
-        String[] files = options.parse(Client.class.getName(), args);
-
-        Configuration conf = new Configuration(Client.class);
-        String configName = Configuration.DEFAULT_CONFIG_NAME;
-        conf.setPort(configName, options.getInt("port")); //$NON-NLS-1$
-        conf.setHost(configName, options.getString("host")); //$NON-NLS-1$
-        conf.setUser(configName, options.getString("user")); //$NON-NLS-1$
-        conf.setPassword(configName, options.getString("pass")); //$NON-NLS-1$
-        conf.setStyleFileName(configName, options.getString("style")); //$NON-NLS-1$
-
-        conf.setUseSSL(configName, options.getBoolean("useSSL")); //$NON-NLS-1$
-
-        conf.setApplication(configName, files.length > 0 ? files[0] : null);
-
-        return new Client(conf);
-    }
 
     /**
      * <p>Connects to the server using protocol, user, password and application
@@ -100,19 +66,19 @@ public class Client implements Runnable {
      * failure.
      */
     void connect() throws IOException, GeneralSecurityException {
-        String configName = conf.getConfigurationName();
+        int num = conf.getCurrent();
         Map styles = loadStyles();
-        long timerPeriod = conf.getUseTimer(configName) ? conf.getTimerPeriod(configName) : 0;
+        long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
         protocol = new Protocol(this, styles, timerPeriod);
 
-        String user = conf.getUser(configName);
-        String password = conf.getPassword(configName);
-        String application = conf.getApplication(configName);
+        String user = conf.getUser(num);
+        String password = conf.getPassword(num);
+        String application = conf.getApplication(num);
         protocol.sendConnect(user, password, application);
     }
 
     private Map loadStyles() {
-        URL url = conf.getStyleURL(conf.getConfigurationName());
+        URL url = conf.getStyleURL(conf.getCurrent());
         try {
             logger.info("loading styles from URL: {0}", url); //$NON-NLS-1$
             InputStream in = url.openStream();
@@ -134,18 +100,18 @@ public class Client implements Runnable {
      * failure.
      */
     Socket createSocket() throws IOException, GeneralSecurityException {
-        String configName = conf.getConfigurationName();
-        String host = conf.getHost(configName);
-        int port = conf.getPort(configName);
+        int num = conf.getCurrent();
+        String host = conf.getHost(num);
+        int port = conf.getPort(num);
         SocketAddress address = new InetSocketAddress(host, port);
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(address);
         Socket socket = socketChannel.socket();
-        if (!conf.getUseSSL(configName)) {
+        if (!conf.getUseSSL(num)) {
             return socket;
         } else {
-            String fileName = conf.getClientCertificateFileName(configName);
-            String password = conf.getClientCertificatePassword(configName);
+            String fileName = conf.getClientCertificateFile(num);
+            String password = conf.getClientCertificatePassword(num);
             SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
             return builder.createSSLSocket(socket, host, port);
         }
@@ -158,12 +124,12 @@ public class Client implements Runnable {
      * @throws GeneralSecurityException 
      */
     SSLSocketFactory createSSLSocketFactory() throws IOException, GeneralSecurityException {
-        String configName = conf.getConfigurationName();
-        if (!conf.getUseSSL(configName)) {
+        int num = conf.getCurrent();
+        if (!conf.getUseSSL(num)) {
             return null;
         } else {
-            String fileName = conf.getClientCertificateFileName(configName);
-            String password = conf.getClientCertificatePassword(configName);
+            String fileName = conf.getClientCertificateFile(num);
+            String password = conf.getClientCertificatePassword(num);
             SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
             return builder.getFactory();
         }
@@ -208,20 +174,6 @@ public class Client implements Runnable {
     protected void finalize() {
         if (protocol != null) {
             exitSystem();
-        }
-    }
-
-    public static void main(String[] args) {
-        Object[] params = {CLIENT_VERSION};
-        System.out.println(MessageFormat.format(Messages.getString("Client.banner_format"), params)); //$NON-NLS-1$
-
-        Client client = Client.parseCommandLine(args);
-        try {
-            client.connect();
-            Thread t = new Thread(client);
-            t.start();
-        } catch (Exception e) {
-            throw new Error(e);
         }
     }
 }
