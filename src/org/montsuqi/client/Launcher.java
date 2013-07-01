@@ -364,6 +364,10 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); //$NON-NLS-1$
+        if (iconURL != null) {
+            return new ImageIcon(iconURL);
+        }
         return null;
     }
 }

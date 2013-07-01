@@ -592,7 +592,7 @@ public class ConfigPanel extends JPanel {
         JLabel version = new JLabel("monsiaj ver." + Messages.getString("application.version"));
         version.setHorizontalAlignment(SwingConstants.CENTER);
         version.setFont(new Font(null, Font.BOLD, 20));
-        JLabel copy = new JLabel("Copyright (C) 2007 ORCA Project");
+        JLabel copy = new JLabel("Copyright (C) 2013 ORCA Project");
         copy.setHorizontalAlignment(SwingConstants.CENTER);
         JButton orcaButton = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
         orcaButton.addActionListener(new ActionListener() {
