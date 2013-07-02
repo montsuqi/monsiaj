@@ -9,8 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Properties;
 import java.util.jar.JarFile;
-import java.util.prefs.Preferences;
 import org.apache.log4j.Logger;
 import org.montsuqi.util.FileUtils;
 import org.montsuqi.util.HttpClient;
@@ -26,9 +26,43 @@ public class Loader {
     private static Logger log = Logger.getLogger(Loader.class);
     private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client/version.txt";
     private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client/";
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-    private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj","cache"};
+    private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "cache"};
     private final String CACHE_DIR = SystemEnvironment.createFilePath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
+    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader.properties"};
+    private static final String PROP_PATH = SystemEnvironment.createFilePath(PROP_PATH_ELEM).getAbsolutePath();
+    private Properties prop;
+
+    private String loadCacheVersion() {
+        prop = new Properties();
+        try {
+            prop.load(new FileInputStream(PROP_PATH));
+        } catch (IOException ex) {
+            // initial
+        }
+        if (prop.containsKey("cacheVersion")) {
+            return prop.getProperty("cacheVersion");
+        } else {
+            return null;
+        }
+    }
+
+    private void saveCacheVersion(String v) {
+        prop.setProperty("cacheVersion", v);
+        try {
+            prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
+        } catch (IOException ex) {
+            log.error(ex.getMessage(), ex);
+        }
+    }
+
+    private void removeCacheVersion() {
+        prop.clear();
+        try {
+            prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
+        } catch (IOException ex) {
+            log.error(ex.getMessage(), ex);
+        }
+    }
 
     private void updateCache(String version) throws IOException {
         log.debug("-- updateCache");
@@ -70,7 +104,7 @@ public class Loader {
     private void checkCache() {
         try {
             log.debug("-- checkCache start");
-            String cacheVersion = prefs.get("cacheVersion", null);
+            String cacheVersion = loadCacheVersion();
             String serverVersion = getVersion();
 
             log.info("cacheVersion : " + cacheVersion);
@@ -78,7 +112,7 @@ public class Loader {
 
             if (cacheVersion == null || !cacheVersion.equals(serverVersion)) {
                 updateCache(serverVersion);
-                prefs.put("cacheVersion", serverVersion);
+                saveCacheVersion(serverVersion);
             } else {
                 log.info("use cache");
             }
@@ -110,7 +144,7 @@ public class Loader {
     }
 
     private void invokeLauncher(String[] args) throws Exception {
-        String cacheVersion = prefs.get("cacheVersion", null);
+        String cacheVersion = loadCacheVersion();
         File file = new File(CACHE_DIR + "monsiaj-bin-" + cacheVersion + "/jmareceipt.jar");
         URLClassLoader loader = new URLClassLoader(new URL[]{file.toURL()});
         Class cobj = loader.loadClass("jp.or.med.orca.jmareceipt.JMAReceiptLauncher");
@@ -130,8 +164,8 @@ public class Loader {
             loadCache(new File(CACHE_DIR));
             invokeLauncher(args);
         } catch (Exception ex) {
-            prefs.remove("cacheVersion");
-            log.error(ex.getMessage(),ex);
+            removeCacheVersion();
+            log.error(ex.getMessage(), ex);
             log.info("remove cacheVersion");
         }
     }
@@ -141,7 +175,9 @@ public class Loader {
         log.debug("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
-        /* 起動時以降はproxyを解除、クライアント印刷などのHTTPアクセスをproxy経由にしないため */
+        /*
+         * 起動時以降はproxyを解除、クライアント印刷などのHTTPアクセスをproxy経由にしないため
+         */
         System.clearProperty("proxyHost");
         System.clearProperty("proxyPort");
         loader.launch(args);
