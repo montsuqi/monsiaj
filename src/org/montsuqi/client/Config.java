@@ -18,7 +18,7 @@ import org.montsuqi.util.SystemEnvironment;
  */
 public class Config {
 
-    private boolean temporary;
+    private String propPath;
     private Properties prop;
     private int current;
     private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "monsiaj.properties"};
@@ -57,10 +57,10 @@ public class Config {
     public int getNext() {
         int max = 0;
         List<Integer> list = new <Integer>ArrayList();
-        Pattern p = Pattern.compile(this.CONFIG_KEY + "\\.(\\d+)\\.");
+        Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
-            if (k.startsWith(this.CONFIG_KEY)) {
+            if (k.startsWith(Config.CONFIG_KEY)) {
                 Matcher m = p.matcher(k);
                 if (!m.find()) {
                     continue;
@@ -110,23 +110,25 @@ public class Config {
     }
 
     private void initProp() {
-        temporary = false;
+        propPath = null;
         current = 0;
         prop = new Properties();
         try {
             String jarPath = System.getProperty("java.class.path");
             String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator) + 1);
-            prop.load(new FileInputStream(dirPath + "config.properties"));
+            String path = dirPath + "config.properties";
+            prop.load(new FileInputStream(path));
             if (prop.size() > 0) {
-                temporary = true;
+                propPath = path;
             }
         } catch (IOException ex) {
             // do nothing
         }
 
-        if (!temporary) {
+        if (propPath == null) {
             try {
                 prop.load(new FileInputStream(PROP_PATH));
+                propPath = PROP_PATH;
             } catch (IOException ex) {
                 // initial
             }
@@ -134,7 +136,7 @@ public class Config {
     }
 
     private void readProp() {
-        current = Integer.valueOf(prop.getProperty(this.CURRENT_KEY, "0"));
+        current = Integer.valueOf(prop.getProperty(Config.CURRENT_KEY, "0"));
         List<Integer> list = this.getList();
         if (list.isEmpty()) {
             convertOldConfig();
@@ -147,35 +149,33 @@ public class Config {
     }
 
     public void save() {
-        if (!this.temporary) {
-            Properties tmp = new Properties() {
+        Properties tmp = new Properties() {
 
-                @Override
-                public Set<Object> keySet() {
-                    return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
-                }
-
-                @Override
-                public synchronized Enumeration<Object> keys() {
-                    return Collections.enumeration(new TreeSet<Object>(super.keySet()));
-                }
-            };
-            prop.setProperty(this.CURRENT_KEY, Integer.toString(current));
-            tmp.putAll(prop);
-            try {
-                tmp.store(new FileOutputStream(this.PROP_PATH), PROP_PATH);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            @Override
+            public Set<Object> keySet() {
+                return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
             }
+
+            @Override
+            public synchronized Enumeration<Object> keys() {
+                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+            }
+        };
+        prop.setProperty(Config.CURRENT_KEY, Integer.toString(current));
+        tmp.putAll(prop);
+        try {
+            tmp.store(new FileOutputStream(propPath), "monsiaj setting");
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
     public List<Integer> getList() {
         List<Integer> list = new <Integer>ArrayList();
-        Pattern p = Pattern.compile(this.CONFIG_KEY + "\\.(\\d+)\\.");
+        Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
-            if (k.startsWith(this.CONFIG_KEY)) {
+            if (k.startsWith(Config.CONFIG_KEY)) {
                 Matcher m = p.matcher(k);
                 if (!m.find()) {
                     continue;
@@ -191,11 +191,11 @@ public class Config {
     }
 
     private void setValue(int i, String key, String value) {
-        prop.setProperty(this.CONFIG_KEY + "." + i + "." + key, value);
+        prop.setProperty(Config.CONFIG_KEY + "." + i + "." + key, value);
     }
 
     private String getValue(int i, String key) {
-        return prop.getProperty(this.CONFIG_KEY + "." + i + "." + key, "");
+        return prop.getProperty(Config.CONFIG_KEY + "." + i + "." + key, "");
     }
 
     // desc
@@ -466,7 +466,7 @@ public class Config {
     }
 
     public void deleteConfig(int i) {
-        String keyPrefix = this.CONFIG_KEY + "." + i + ".";
+        String keyPrefix = Config.CONFIG_KEY + "." + i + ".";
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
             if (k.startsWith(keyPrefix)) {
