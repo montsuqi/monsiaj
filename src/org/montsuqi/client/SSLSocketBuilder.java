@@ -39,7 +39,6 @@ import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketBuilder {
