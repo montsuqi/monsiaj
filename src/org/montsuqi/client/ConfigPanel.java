@@ -36,13 +36,15 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.ExtensionFileFilter;
-import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
 public class ConfigPanel extends JPanel {
 
-    protected static final Logger logger = Logger.getLogger(ConfigPanel.class);
+    protected static final Logger logger = LogManager.getLogger(ConfigPanel.class);
     protected Config conf;
     protected JPanel basicPanel;
     protected JPanel sslPanel;
@@ -201,7 +203,7 @@ public class ConfigPanel extends JPanel {
                     updateFont(new Font("Osaka", Font.PLAIN, 12));
                 }
             } catch (Exception e) {
-                logger.warn(e);
+                logger.catching(Level.WARN, e);
             }
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -213,7 +215,7 @@ public class ConfigPanel extends JPanel {
                         }
 
                     } catch (Exception e) {
-                        logger.warn(e);
+                        logger.catching(Level.WARN, e);
                     }
                 }
             });
@@ -250,7 +252,7 @@ public class ConfigPanel extends JPanel {
         String styleFile = conf.getStyleFile(num);
         String lookAndFeel = conf.getLookAndFeel(num);
         String lookAndFeelThemeFile = conf.getLookAndFeelThemeFile(num);
-        boolean useTimer =  conf.getUseTimer(num);
+        boolean useTimer = conf.getUseTimer(num);
         long timerPeriod = conf.getTimerPeriod(num);
         String systemProperties = conf.getSystemProperties(num);
 
@@ -619,7 +621,7 @@ public class ConfigPanel extends JPanel {
                     } catch (Exception ex) {
                         System.out.println(ex);
                     }
-                }                
+                }
             }
         });
 

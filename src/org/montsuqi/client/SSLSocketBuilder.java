@@ -22,58 +22,30 @@
  */
 package org.montsuqi.client;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.crypto.BadPaddingException;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509KeyManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
-
-import org.montsuqi.util.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketBuilder {
 
     private static final int DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD = 30;
-    private Logger logger;
+    private static Logger logger = LogManager.getLogger(SSLSocketBuilder.class);
     private final SSLSocketFactory factory;
     private final KeyManager[] keyManagers;
     final TrustManager[] trustManagers;
@@ -97,7 +69,6 @@ public class SSLSocketBuilder {
     }
 
     public SSLSocketBuilder(String fileName, String password) throws IOException {
-        logger = Logger.getLogger(this.getClass());
         boolean keyManagerIsReady = false;
         try {
             keyManagers = createKeyManagers(fileName, password);
@@ -253,7 +224,7 @@ public class SSLSocketBuilder {
             if (trustManager instanceof X509TrustManager) {
                 X509TrustManager delegatee = (X509TrustManager) trustManager;
                 TrustManager tm = new MyTrustManager(delegatee);
-                return new TrustManager[]{tm};   
+                return new TrustManager[]{tm};
             }
         }
         return null;
@@ -302,10 +273,10 @@ public class SSLSocketBuilder {
             fis.close();
             return !"false".equals(deploymentProperties.getProperty("deployment.security.browser.keystore.use"));
         } catch (FileNotFoundException e) {
-            logger.info("{0} not fould", deploymentPropertiesFile);
+            logger.debug("{0} not fould", deploymentPropertiesFile);
             return false;
         } catch (IOException e) {
-            logger.info("{0} could not be read", deploymentPropertiesFile);
+            logger.debug("{0} could not be read", deploymentPropertiesFile);
             return false;
         }
     }

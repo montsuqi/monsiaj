@@ -33,11 +33,12 @@ import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
-import org.montsuqi.util.Logger;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
@@ -60,7 +61,7 @@ public class Protocol extends Connection {
     private Color sessionBGColor;
     private StringBuffer widgetName;
     private Interface xml;
-    static final Logger logger = Logger.getLogger(Protocol.class);
+    static final Logger logger = LogManager.getLogger(Protocol.class);
     private static final String VERSION = "version:blob:expand:pdf:negotiation:download:v47:v48:i18n:agent=monsiaj/" + Messages.getString("application.version");
     private TopWindow topWindow;
     private ArrayList<Component> dialogStack;
@@ -103,15 +104,15 @@ public class Protocol extends Connection {
     }
 
     private static boolean isNetworkByteOrder() {
-        logger.enter();
+        logger.entry();
         StringTokenizer tokens = new StringTokenizer(VERSION, String.valueOf(':'));
         while (tokens.hasMoreTokens()) {
             if ("no".equals(tokens.nextToken())) { //$NON-NLS-1$
-                logger.leave();
+                logger.exit();
                 return true;
             }
         }
-        logger.leave();
+        logger.exit();
         return false;
     }
 
@@ -120,14 +121,14 @@ public class Protocol extends Connection {
     }
 
     private synchronized boolean receiveFile(String name) throws IOException {
-        logger.enter(name);
+        logger.entry(name);
         sendPacketClass(PacketClass.GetScreen);
         sendString(name);
         byte pc = receivePacketClass();
         if (pc != PacketClass.ScreenDefine) {
             Object[] args = {new Byte(PacketClass.ScreenDefine), new Byte(pc)};
             logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args); //$NON-NLS-1$
-            logger.leave();
+            logger.exit();
             return false;
         }
         int size = receiveLength();
@@ -136,15 +137,15 @@ public class Protocol extends Connection {
         Node node = new Node(Interface.parseInput(new ByteArrayInputStream(bytes), this), name);
         nodeTable.put(name, node);
 
-        logger.leave();
+        logger.exit();
         return true;
     }
 
     private void showWindow(String name, String focusWindowName, String focusWidgetName) {
-        logger.enter(name);
+        logger.entry(name);
         Node node = getNode(name);
         if (node == null) {
-            logger.leave();
+            logger.exit();
             return;
         }
         xml = node.getInterface();
@@ -185,14 +186,14 @@ public class Protocol extends Connection {
             setFocus(focusWindowName, focusWidgetName);
             topWindow.validate();
         }
-        logger.leave();
+        logger.exit();
     }
 
     void closeWindow(String name) {
-        logger.enter(name);
+        logger.entry(name);
         Node node = getNode(name);
         if (node == null) {
-            logger.leave();
+            logger.exit();
             return;
         }
         Window window = node.getWindow();
@@ -208,35 +209,35 @@ public class Protocol extends Connection {
             stopTimer(window.getChild());
             window.getChild().setEnabled(false);
         }
-        logger.leave();
+        logger.exit();
     }
 
     void closeWindow(Component widget) {
-        logger.enter(widget);
+        logger.entry(widget);
         Node node = getNode(widget);
         if (node == null) {
-            logger.leave();
+            logger.exit();
             return;
         }
         node.getWindow().setVisible(false);
         clearWidget(node.getWindow());
         if (isReceiving()) {
-            logger.leave();
+            logger.exit();
             return;
         }
         Iterator i = nodeTable.values().iterator();
         while (i.hasNext()) {
             if (((Node) i.next()).getWindow() != null) {
-                logger.leave();
+                logger.exit();
                 return;
             }
         }
-        logger.leave();
+        logger.exit();
         client.exitSystem();
     }
 
     private void destroyNode(String name) {
-        logger.enter(name);
+        logger.entry(name);
         if (nodeTable.containsKey(name)) {
             Node node = (Node) nodeTable.get(name);
             Window window = node.getWindow();
@@ -246,20 +247,20 @@ public class Protocol extends Connection {
             node.clearChangedWidgets();
             nodeTable.remove(name);
         }
-        logger.leave();
+        logger.exit();
     }
 
     synchronized void checkScreens(boolean init) throws IOException {
-        logger.enter(Boolean.valueOf(init));
+        logger.entry(Boolean.valueOf(init));
         Window.busyAllWindows();
         while (receivePacketClass() == PacketClass.QueryScreen) {
             checkScreen1();
         }
-        logger.leave();
+        logger.exit();
     }
 
     private synchronized String checkScreen1() throws IOException {
-        logger.enter();
+        logger.entry();
         String name = receiveString();
         receiveLong(); // size
         receiveLong(); // mtime
@@ -270,38 +271,38 @@ public class Protocol extends Connection {
         } else {
             sendPacketClass(PacketClass.NOT);
         }
-        logger.leave();
+        logger.exit();
         return name;
     }
 
     synchronized boolean receiveWidgetData(Component widget) throws IOException {
-        logger.enter(widget);
+        logger.entry(widget);
         Class clazz = widget.getClass();
         WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
         if (marshaller != null) {
             marshaller.receive(valueManager, widget);
-            logger.leave();
+            logger.exit();
             return true;
         }
-        logger.leave();
+        logger.exit();
         return false;
     }
 
     private synchronized boolean sendWidgetData(String name, Component widget) throws IOException {
-        logger.enter(name, widget);
+        logger.entry(name, widget);
         Class clazz = widget.getClass();
         WidgetMarshaller marshaller = WidgetMarshaller.getMarshaller(clazz);
         if (marshaller != null) {
             marshaller.send(valueManager, name, widget);
-            logger.leave();
+            logger.exit();
             return true;
         }
-        logger.leave();
+        logger.exit();
         return false;
     }
 
     private synchronized void receiveValueSkip() throws IOException {
-        logger.enter();
+        logger.entry();
         int type = Type.NULL;
         receiveDataType();
         type = getLastDataType();
@@ -333,11 +334,11 @@ public class Protocol extends Connection {
             default:
                 break;
         }
-        logger.leave();
+        logger.exit();
     }
 
     public synchronized void receiveNodeValue(StringBuffer longName, int offset) throws IOException {
-        logger.enter(longName, new Integer(offset));
+        logger.entry(longName, new Integer(offset));
         switch (receiveDataType()) {
             case Type.RECORD:
                 receiveRecordValue(longName, offset);
@@ -349,11 +350,11 @@ public class Protocol extends Connection {
                 receiveValueSkip();
                 break;
         }
-        logger.leave();
+        logger.exit();
     }
 
     public synchronized void receiveValue(StringBuffer longName, int offset) throws IOException {
-        logger.enter(longName, new Integer(offset));
+        logger.entry(longName, new Integer(offset));
         Component widget = xml.getWidgetByLongName(longName.toString());
         if (widget != null) {
             if (receiveWidgetData(widget)) {
@@ -363,44 +364,44 @@ public class Protocol extends Connection {
         } else {
             receiveValueSkip();
         }
-        logger.leave();
+        logger.exit();
     }
 
     private synchronized void receiveRecordValue(StringBuffer longName, int offset) throws IOException {
-        logger.enter(longName, new Integer(offset));
+        logger.entry(longName, new Integer(offset));
         for (int i = 0, n = receiveInt(); i < n; i++) {
             String name = receiveString();
             longName.replace(offset, longName.length(), '.' + name);
             receiveValue(longName, offset + name.length() + 1);
         }
-        logger.leave();
+        logger.exit();
     }
 
     private synchronized void receiveArrayValue(StringBuffer longName, int offset) throws IOException {
-        logger.enter(longName, new Integer(offset));
+        logger.entry(longName, new Integer(offset));
         for (int i = 0, n = receiveInt(); i < n; i++) {
             String name = '[' + String.valueOf(i) + ']';
             longName.replace(offset, longName.length(), name);
             receiveValue(longName, offset + name.length());
         }
-        logger.leave();
+        logger.exit();
     }
 
     public synchronized String receiveName() throws IOException {
-        logger.enter();
+        logger.entry();
         final String s = receiveString();
-        logger.leave();
+        logger.exit();
         return s;
     }
 
     public synchronized void sendName(String name) throws IOException {
-        logger.enter(name);
+        logger.entry(name);
         sendString(name);
-        logger.leave();
+        logger.exit();
     }
 
     private synchronized void stopTimer(Component widget) {
-        // logger.enter(widget);
+        // logger.entry(widget);
         if (widget instanceof PandaTimer) {
             ((PandaTimer) widget).stopTimer();
         } else if (widget instanceof Container) {
@@ -409,11 +410,11 @@ public class Protocol extends Connection {
                 stopTimer(container.getComponent(i));
             }
         }
-        // logger.leave();
+        // logger.exit();
     }
 
     private synchronized void resetTimer(Component widget) {
-        // logger.enter(widget);
+        // logger.entry(widget);
         if (widget instanceof PandaTimer) {
             ((PandaTimer) widget).reset();
         } else if (widget instanceof Container) {
@@ -422,11 +423,11 @@ public class Protocol extends Connection {
                 resetTimer(container.getComponent(i));
             }
         }
-        // logger.leave();
+        // logger.exit();
     }
 
     private synchronized void clearWidget(Component widget) {
-        // logger.enter(widget);
+        // logger.entry(widget);
         if (widget instanceof JTextField) {
             JTextField text = (JTextField) widget;
             text.setText(null);
@@ -436,7 +437,7 @@ public class Protocol extends Connection {
                 clearWidget(container.getComponent(i));
             }
         }
-        // logger.leave();
+        // logger.exit();
     }
 
     private synchronized void resetScrollPane(Component widget) {
@@ -453,7 +454,7 @@ public class Protocol extends Connection {
     }
 
     synchronized void getScreenData() throws IOException {
-        logger.enter();
+        logger.entry();
 
         String focusWindowName = null;
         String focusWidgetName = null;
@@ -515,7 +516,7 @@ public class Protocol extends Connection {
             showWindow(this.windowName, focusWindowName, focusWidgetName);
         }
 
-        logger.leave();
+        logger.exit();
     }
 
     private synchronized void setFocus(String focusWindowName, String focusWidgetName) {
@@ -556,7 +557,7 @@ public class Protocol extends Connection {
     }
 
     synchronized void sendConnect(String user, String pass, String app) throws IOException, GeneralSecurityException {
-        logger.enter(user, pass, app);
+        logger.entry(user, pass, app);
         sendPacketClass(PacketClass.Connect);
         sendVersionString();
         sendString(user);
@@ -590,7 +591,7 @@ public class Protocol extends Connection {
         String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
         printAgent = new PrintAgent(port, user, pass, this.client.createSSLSocketFactory());
         printAgent.start();
-        logger.leave();
+        logger.exit();
     }
 
     public void startPing() {
@@ -666,7 +667,7 @@ public class Protocol extends Connection {
     }
 
     private synchronized void sendVersionString() throws IOException {
-        logger.enter();
+        logger.entry();
         byte[] bytes = VERSION.getBytes();
         sendChar((byte) (bytes.length & 0xff));
         sendChar((byte) 0);
@@ -674,31 +675,31 @@ public class Protocol extends Connection {
         sendChar((byte) 0);
         out.write(bytes);
         ((OutputStream) out).flush();
-        logger.leave();
+        logger.exit();
     }
 
     synchronized void sendEvent(String window, String widget, String event) throws IOException {
-        logger.enter(window, widget, event);
+        logger.entry(window, widget, event);
         sendPacketClass(PacketClass.Event);
         sendString(window);
         sendString(widget);
         sendString(event);
-        logger.leave();
+        logger.exit();
     }
 
     synchronized void sendWindowData() throws IOException {
-        logger.enter();
+        logger.entry();
         Iterator i = nodeTable.keySet().iterator();
         while (i.hasNext()) {
             _sendWndowData((String) i.next());
         }
         sendPacketClass(PacketClass.END);
         clearWindowTable();
-        logger.leave();
+        logger.exit();
     }
 
     private synchronized void _sendWndowData(String windowName) throws IOException {
-        logger.enter(windowName);
+        logger.entry(windowName);
         sendPacketClass(PacketClass.WindowName);
         sendString(windowName);
         Map<String, Component> changedMap = getNode(windowName).getChangedWidgets();
@@ -710,23 +711,23 @@ public class Protocol extends Connection {
             sendWidgetData(e.getKey(), e.getValue());
         }
         sendPacketClass(PacketClass.END);
-        logger.leave();
+        logger.exit();
     }
 
     void clearWindowTable() {
-        logger.enter();
+        logger.entry();
         Iterator i = nodeTable.values().iterator();
         while (i.hasNext()) {
             Node node = (Node) i.next();
             node.clearChangedWidgets();
         }
-        logger.leave();
+        logger.exit();
     }
 
     synchronized void addChangedWidget(Component widget) {
-        logger.enter(widget);
+        logger.entry(widget);
         if (isReceiving) {
-            logger.leave();
+            logger.exit();
             return;
         }
         Node node = getNode(widget);
@@ -737,11 +738,11 @@ public class Protocol extends Connection {
                 logger.warn(e);
             }
         }
-        logger.leave();
+        logger.exit();
     }
 
     public void _addChangedWidget(Component widget) {
-        logger.enter(widget);
+        logger.entry(widget);
         Node node = getNode(widget);
         if (node != null) {
             try {
@@ -750,11 +751,11 @@ public class Protocol extends Connection {
                 logger.warn(e);
             }
         }
-        logger.leave();
+        logger.exit();
     }
 
     public void addAlwaysSendWidget(Component widget) {
-        logger.enter(widget);
+        logger.entry(widget);
         Node node = getNode(widget);
         if (node != null) {
             try {
@@ -763,7 +764,7 @@ public class Protocol extends Connection {
                 logger.warn(e);
             }
         }
-        logger.leave();
+        logger.exit();
     }
 
     public boolean isReceiving() {
@@ -787,9 +788,9 @@ public class Protocol extends Connection {
     }
 
     synchronized void exit() {
-        logger.enter();
+        logger.entry();
         isReceiving = true;
-        logger.leave();
+        logger.exit();
         client.exitSystem();
     }
 
@@ -798,9 +799,9 @@ public class Protocol extends Connection {
     }
 
     public void exceptionOccured(IOException e) {
-        logger.enter(e);
+        logger.entry(e);
         ExceptionDialog.showExceptionDialog(e);
-        logger.leave();
+        logger.exit();
         client.exitSystem();
     }
 }

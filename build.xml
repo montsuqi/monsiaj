@@ -79,6 +79,7 @@
             </fileset>
             <fileset dir="${resources.dir}">
                 <include name="*.properties"/>
+                <include name="*.xml"/>
             </fileset>
         </copy>
         <copy todir="${build.dir}" >
@@ -105,12 +106,8 @@
             </fileset>
         </copy>
         <copy todir="${build.dir}/libs" >
-            <fileset dir="${libs.dir}">
-                <include name="commons-io-2.4.jar"/>                
-                <include name="ilf-gpl.jar"/>
-                <include name="nimrodlf.jar"/>
-                <include name="log4j.jar"/>
-                <include name="PDFRenderer.jar"/>
+            <fileset dir="${libs.dir}">         
+                <include name="*.jar"/>
             </fileset>
         </copy>
         <copy file="${build.dir}/README.txt" tofile="${build.dir}/README.windows.txt"/>
@@ -188,7 +185,7 @@
         </copy>
         <copy todir="${build.dir}/${loader.name}/libs">
             <fileset dir="${build.dir}/libs">
-                <include name="log4j.jar"/>   
+                <include name="log4j*.jar"/>   
             </fileset>         
         </copy>
 		<!-- ant 1.5.x should use destfile instead of zipfile-->
@@ -280,14 +277,14 @@
                 <include name="**/*.png"/>
                 <include name="com/sun/pdfview/font/res/cmap/*"/>
                 <include name="jp/or/med/orca/jmareceipt/**"/>  
+                <include name="*.xml"/>
                 <exclude name="org/montsuqi/tools/**"/>                
             </fileset>
         </jar>
         <jar jarfile="${build.dir}/monsiaj.jar" manifest="${resources.dir}/monsiaj.mf">
             <fileset dir="${build.dir}">
                 <include name="jp/or/med/orca/monsiaj/**"/>
-                <include name="org/montsuqi/util/**"/>
-                <include name="log4j.properties"/>
+                <include name="*.xml"/>
             </fileset>
         </jar>        
         <jar jarfile="${build.dir}/pandaglade.jar" manifest="${resources.dir}/pandaglade.mf">

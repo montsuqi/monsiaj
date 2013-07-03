@@ -28,7 +28,8 @@ import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.UIManager;
-import org.montsuqi.util.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <p>A class to manage configuration settings of the application.</p>
@@ -140,7 +141,7 @@ public class OldConfig {
      * <p>Default value of default config name.</p>
      */
     static final String DEFAULT_CONFIG_NAME = "default";
-    protected static final Logger logger = Logger.getLogger(OldConfig.class);
+    protected static final Logger logger = LogManager.getLogger(OldConfig.class);
 
     /**
      * <p>Constructs a configuration object.</p>

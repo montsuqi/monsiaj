@@ -26,7 +26,6 @@ package org.montsuqi.widgets;
 import java.awt.LayoutManager;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import org.montsuqi.util.Logger;
 
 /** <p>A class that simulates Gtk+'s VBox(Vertically stackable container).</p>
  */
@@ -37,7 +36,7 @@ public class VBox extends JComponent {
 		super.setLayout(new GtkBoxLayout(this, BoxLayout.Y_AXIS));
 	}
 
+    @Override
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(VBox.class).info("ignoring VBox#setLayout()"); //$NON-NLS-1$
 	}
 }

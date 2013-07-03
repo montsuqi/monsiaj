@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.montsuqi.util;
+package jp.or.med.orca.monsiaj;
 
 import java.io.*;
 import java.util.Enumeration;

@@ -56,7 +56,7 @@ public class Config {
 
     public int getNext() {
         int max = 0;
-        List<Integer> list = new <Integer>ArrayList();
+        ArrayList<Integer> list = new ArrayList<Integer>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -170,8 +170,8 @@ public class Config {
         }
     }
 
-    public List<Integer> getList() {
-        List<Integer> list = new <Integer>ArrayList();
+    public ArrayList<Integer> getList() {
+        ArrayList<Integer> list = new ArrayList<Integer>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();

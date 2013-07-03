@@ -33,8 +33,10 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Map;
 import javax.net.ssl.SSLSocketFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
-import org.montsuqi.util.Logger;
+
 
 /**
  * <p>The main application class for panda client.</p>
@@ -53,7 +55,7 @@ public class Client implements Runnable {
      */
     public Client(Config conf) {
         this.conf = conf;
-        logger = Logger.getLogger(Client.class);
+        logger = LogManager.getLogger(Client.class);
     }
 
 
@@ -74,18 +76,19 @@ public class Client implements Runnable {
         String user = conf.getUser(num);
         String password = conf.getPassword(num);
         String application = conf.getApplication(num);
+        logger.debug("user : {}",user);
         protocol.sendConnect(user, password, application);
     }
 
     private Map loadStyles() {
         URL url = conf.getStyleURL(conf.getCurrent());
         try {
-            logger.info("loading styles from URL: {0}", url); //$NON-NLS-1$
+            logger.debug("loading styles from URL: {0}", url); //$NON-NLS-1$
             InputStream in = url.openStream();
             return Style.load(in);
         } catch (IOException e) {
             logger.debug(e);
-            logger.info("using empty style set"); //$NON-NLS-1$
+            logger.debug("using empty style set"); //$NON-NLS-1$
             return Collections.EMPTY_MAP;
         }
     }
@@ -103,6 +106,7 @@ public class Client implements Runnable {
         int num = conf.getCurrent();
         String host = conf.getHost(num);
         int port = conf.getPort(num);
+        logger.debug("host : {}:{}",host,port);
         SocketAddress address = new InetSocketAddress(host, port);
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(address);

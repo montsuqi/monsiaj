@@ -22,6 +22,7 @@ public class HttpClient {
         URL url = new URL(strURL);
         String protocol = url.getProtocol();
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setInstanceFollowRedirects(false);
         if (protocol.equals("https")) {
             if (socketFactory != null) {
             ((HttpsURLConnection) con).setSSLSocketFactory(socketFactory);

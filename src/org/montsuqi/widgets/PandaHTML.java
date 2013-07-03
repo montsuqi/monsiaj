@@ -25,7 +25,6 @@ package org.montsuqi.widgets;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Executor;
@@ -35,7 +34,9 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.html.HTML;
-import org.montsuqi.util.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <p>A HTML viewer for platforms other than MacOS X.</p> <p>This component uses
@@ -43,7 +44,7 @@ import org.montsuqi.util.Logger;
  */
 public class PandaHTML extends JPanel {
 
-    protected static final Logger logger = Logger.getLogger(PandaHTML.class);
+    protected static final Logger logger = LogManager.getLogger(PandaHTML.class);
     protected Component html;
 
     public PandaHTML() {
@@ -91,7 +92,7 @@ public class PandaHTML extends JPanel {
      */
     public void setURI(URL uri) {
         Runnable loader = createLoader(uri);
-        logger.info("loading: {0}", uri); //$NON-NLS-1$
+        logger.debug("loading: {0}", uri); //$NON-NLS-1$
         Executor executor = new ThreadPerTaskExecutor();
         executor.execute(loader);
     }
@@ -111,7 +112,7 @@ public class PandaHTML extends JPanel {
                     JEditorPane editorPane = (JEditorPane) html;
                     editorPane.setPage(uri);
                 } catch (IOException e) {
-                    logger.warn(e);
+                    logger.catching(Level.WARN, e);
                 }
             }
         };

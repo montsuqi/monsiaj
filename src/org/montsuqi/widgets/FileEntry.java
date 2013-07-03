@@ -31,7 +31,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
-import org.montsuqi.util.Logger;
 
 /** <p>A class that simulates Gtk+'s FileEntry.</p>
  * 
@@ -42,7 +41,6 @@ public class FileEntry extends JComponent {
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private JTextField fileEntry;
     private JButton browseButton;
-    private Logger logger;
     byte[] data;
 
     public FileEntry() {

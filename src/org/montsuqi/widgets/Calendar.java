@@ -32,7 +32,6 @@ import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.montsuqi.util.Logger;
 
 /** <p>A class that simulates Gtk+'s Calendar widget.</p>
  * 
@@ -45,7 +44,6 @@ public class Calendar extends JComponent {
     private JButton[][] dateCells;
     private CalendarSpinner monthSpinner;
     private CalendarSpinner yearSpinner;
-    private Logger logger;
     Date[][] cellDates;
     java.util.Calendar cal;
 

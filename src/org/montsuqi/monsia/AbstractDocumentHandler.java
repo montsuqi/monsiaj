@@ -26,15 +26,10 @@ package org.montsuqi.monsia;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
-
+import java.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.client.Protocol;
-import org.montsuqi.util.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -46,7 +41,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 abstract class AbstractDocumentHandler extends DefaultHandler {
 
-	protected static final Logger logger = Logger.getLogger(AbstractDocumentHandler.class);
+	protected static final Logger logger = LogManager.getLogger(AbstractDocumentHandler.class);
 
 	protected final StringBuffer content;
 	protected final Map widgets;

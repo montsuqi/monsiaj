@@ -27,24 +27,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
-import org.montsuqi.util.Logger;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.PandaCList;
 
 public class ConfigViewer {
 
-    protected static final Logger logger = Logger.getLogger(Launcher.class);
     protected Config conf;
-
-    static {
-        if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
-            System.setProperty("monsia.logger.factory", "org.montsuqi.util.StdErrLogger"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        if (SystemEnvironment.isMacOSX()) {
-            System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-    }
 
     public ConfigViewer(Config conf) {
         this.conf = conf;
@@ -208,12 +196,6 @@ public class ConfigViewer {
 
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
-                if (entryName.equals("")) {
-                    String message = Messages.getString("ConfigurationViewer.edit_config_empty_config_name_error_message") + entryName;
-                    logger.warn(message);
-                    JOptionPane.showMessageDialog(f, message, "", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 configPanel.saveConfig(num);
                 f.dispose();
             }

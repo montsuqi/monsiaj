@@ -28,11 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.monsia.Style;
-import org.montsuqi.util.Logger;
 
 public final class WidgetValueManager {
 
-    protected static final Logger logger = Logger.getLogger(WidgetValueManager.class);
     private Protocol con;
     private Map styles;
     private Map attrTable;

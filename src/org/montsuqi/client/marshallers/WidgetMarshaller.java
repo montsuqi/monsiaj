@@ -28,15 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.client.Protocol;
-import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.*;
 
 /** <p>Superclass for all widget marshallers.</p>
  */
 public abstract class WidgetMarshaller {
 
-    protected static final Logger logger = Logger.getLogger(WidgetMarshaller.class);
+    protected static final Logger logger = LogManager.getLogger(WidgetMarshaller.class);
     private static Map classTable;
 
     static {

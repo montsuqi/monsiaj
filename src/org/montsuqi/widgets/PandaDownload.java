@@ -34,7 +34,6 @@ import java.nio.channels.FileChannel;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.montsuqi.util.GtkStockIcon;
-import org.montsuqi.util.Logger;
 
 /**
  * <p>A component that holds a timer to fire events periodically.</p>
@@ -44,7 +43,6 @@ import org.montsuqi.util.Logger;
  */
 public class PandaDownload extends JComponent {
 
-    protected static final Logger logger = Logger.getLogger(PandaDownload.class);
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     /**

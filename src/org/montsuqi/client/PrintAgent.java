@@ -77,7 +77,7 @@ public class PrintAgent extends Thread {
             return true;
         }
         try {
-            File file = download(request.path,request.filename);
+            File file = download(request.path, request.filename);
             if (file != null) {
                 request.action(file);
             } else {
@@ -88,7 +88,7 @@ public class PrintAgent extends Thread {
                         request.showRetryError();
                         return true;
                     default:
-                        request.setRetry(request.getRetry()-1);
+                        request.setRetry(request.getRetry() - 1);
                         return false;
                 }
             }
@@ -112,7 +112,7 @@ public class PrintAgent extends Thread {
     public void showDialog(String title, File file) {
         try {
             final JDialog dialog = new JDialog();
-            Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) { 
+            Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) {
 
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
@@ -154,11 +154,32 @@ public class PrintAgent extends Thread {
         return 0;
     }
 
-    public File download(String path,String filename) throws IOException {
-        File temp = File.createTempFile("monsiaj_printagent_", "__"+filename);
+    public File download(String path, String filename) throws IOException {
+        File temp = File.createTempFile("monsiaj_printagent_", "__" + filename);
         temp.deleteOnExit();
-        String url = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
-        BufferedInputStream in = new BufferedInputStream(HttpClient.get(url, sslSocketFactory));
+        String strURL = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
+
+        URL url = new URL(strURL);
+        String protocol = url.getProtocol();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setInstanceFollowRedirects(false);
+        if (protocol.equals("https")) {
+            if (sslSocketFactory != null) {
+                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
+            }
+        } else if (protocol.equals("http")) {
+            // do nothing
+        } else {
+            throw new IOException("bad protocol");
+        }
+        con.setRequestMethod("GET");
+        con.connect();
+        if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            con.disconnect();
+            throw new IOException("" + con.getResponseCode());
+        }
+        BufferedInputStream in = new BufferedInputStream(con.getInputStream());
         int length, size = 0;
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
         while ((length = in.read()) != -1) {
@@ -166,6 +187,7 @@ public class PrintAgent extends Thread {
             out.write(length);
         }
         out.close();
+        con.disconnect();
         if (size == 0) {
             return null;
         }

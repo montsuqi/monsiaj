@@ -29,8 +29,9 @@ import java.awt.GraphicsEnvironment;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.*;
-import org.montsuqi.util.Logger;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.*;
 
@@ -42,7 +43,7 @@ import org.montsuqi.widgets.*;
  */
 public class WidgetBuilder {
 
-    protected static final Logger logger = Logger.getLogger(WidgetBuilder.class);
+    protected static final Logger logger = LogManager.getLogger(WidgetBuilder.class);
     private static Map classMap;
     private static Map builderMap;
 

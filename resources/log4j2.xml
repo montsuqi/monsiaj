@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<configuration>
+    <appenders>
+        <RollingFile 
+            name="RollingFile" 
+            fileName="${sys:user.home}/.monsiaj/monsiaj.log"
+            filePattern="${sys:user.home}/.monsiaj/monsiaj.log.%i"
+            bufferredIO="false"
+        >
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="8 KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <Console name="Console">
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n"/>
+        </Console>
+    </appenders>
+    <loggers>
+        <root level="info">
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>
+</configuration>

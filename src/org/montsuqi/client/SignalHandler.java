@@ -33,7 +33,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import org.montsuqi.util.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.widgets.FileEntry;
 
 /**
@@ -41,7 +42,7 @@ import org.montsuqi.widgets.FileEntry;
  */
 public abstract class SignalHandler {
 
-    protected static final Logger logger = Logger.getLogger(SignalHandler.class);
+    protected static final Logger logger = LogManager.getLogger(SignalHandler.class);
     private String signalName = ""; //$NON-NLS-1$
 
     @Override
@@ -67,15 +68,15 @@ public abstract class SignalHandler {
      * @return a SignalHandler instance.
      */
     public static SignalHandler getSignalHandler(String handlerName) {
-        logger.enter(handlerName);
+        logger.entry(handlerName);
         if (handlers.containsKey(handlerName)) {
             final SignalHandler handler = (SignalHandler) handlers.get(handlerName);
-            logger.leave();
+            logger.exit();
             return handler;
         }
-        logger.info("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
+        logger.debug("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
         final SignalHandler handler = getSignalHandler(null);
-        logger.leave();
+        logger.exit();
         return handler;
     }
     static Map handlers;
@@ -90,15 +91,15 @@ public abstract class SignalHandler {
     }
 
     static void blockChangedHandlers() {
-        logger.enter();
+        logger.entry();
         timerBlocked = true;
-        logger.leave();
+        logger.exit();
     }
 
     static void unblockChangedHandlers() {
-        logger.enter();
+        logger.entry();
         timerBlocked = false;
-        logger.leave();
+        logger.exit();
     }
 
     static private String getWidgetName(String str) {

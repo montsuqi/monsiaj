@@ -25,7 +25,6 @@ package org.montsuqi.widgets;
 
 import java.awt.LayoutManager;
 import javax.swing.JComponent;
-import org.montsuqi.util.Logger;
 
 /** A Container that simulates Gtk+'s Table widget. */
 public class Table extends JComponent {
@@ -35,7 +34,7 @@ public class Table extends JComponent {
 		super.setLayout(new TableLayout());
 	}
 
+    @Override
 	public void setLayout(LayoutManager layout) {
-		Logger.getLogger(Table.class).info("ignoring Table#setLayout()"); //$NON-NLS-1$
 	}
 }

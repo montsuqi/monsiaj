@@ -26,39 +26,36 @@ import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URL;
 import java.util.prefs.Preferences;
 import javax.swing.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.GtkStockIcon;
-import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.Button;
-import org.montsuqi.widgets.ConsolePane;
 import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
 
-    protected static final Logger logger = Logger.getLogger(Launcher.class);
+    protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected String title;
     protected Config conf;
     protected ConfigPanel configPanel;
     protected JComboBox configCombo;
     private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
-    static {
-        if (System.getProperty("monsia.logger.factory") == null) { //$NON-NLS-1$
-            System.setProperty("monsia.logger.factory", "org.montsuqi.util.StdErrLogger");
-        }
-    }
-
     public static void main(String[] args) {
-        Launcher launcher = new Launcher(Messages.getString("application.title")); //$NON-NLS-1$
+        logger.info("---- start monsiaj");
+        logger.info("version : " + Messages.getString("application.version"));
+        logger.info("java : " + System.getProperty("java.version"));
+        logger.info("os : "
+                + System.getProperty("os.name") + "-"
+                + System.getProperty("os.version") + "-"
+                + System.getProperty("os.arch"));
+        Launcher launcher = new Launcher(Messages.getString("application.title"));
         launcher.launch(args);
     }
 
@@ -74,7 +71,7 @@ public class Launcher {
             UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
             UIManager.installLookAndFeel("InfoNode", "net.infonode.gui.laf.InfoNodeLookAndFeel");
         } catch (Exception e) {
-            logger.warn(e);
+            logger.catching(Level.WARN, e);
         }
     }
 
@@ -109,7 +106,7 @@ public class Launcher {
                     UIManager.setLookAndFeel(cname);
                 }
             } catch (Exception e) {
-                logger.warn(e);
+                logger.catching(Level.WARN, e);
                 return true;
             }
 
@@ -349,7 +346,7 @@ public class Launcher {
             //t.start();
             //t.join();
         } catch (Exception e) {
-            logger.fatal(e);
+            logger.catching(Level.FATAL, e);
             ExceptionDialog.showExceptionDialog(e);
             client.exitSystem();
         }

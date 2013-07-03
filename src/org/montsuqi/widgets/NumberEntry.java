@@ -23,30 +23,22 @@ copies.
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.im.InputContext;
-import java.awt.im.InputSubset;
-import java.util.Locale;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-
+import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-
-import org.montsuqi.util.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PrecisionScale;
 import org.montsuqi.util.SystemEnvironment;
 
@@ -174,7 +166,7 @@ class NumberDocument extends PlainDocument {
     protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
     static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
     static final BigDecimal ONE = new BigDecimal(BigInteger.ONE);
-    protected static final Logger logger = Logger.getLogger(NumberDocument.class);
+    protected static final Logger logger = LogManager.getLogger(NumberDocument.class);
 
     NumberDocument() {
         setFormat(DEFAULT_FORMAT);
@@ -194,7 +186,7 @@ class NumberDocument extends PlainDocument {
             scale = 0;
             insertString(0, t, null);
         } catch (BadLocationException e) {
-            logger.warn(e);
+            logger.catching(Level.WARN,e);
         }
         expo = 0;
         scale = 0;
@@ -262,6 +254,7 @@ class NumberDocument extends PlainDocument {
         return originalFormat;
     }
 
+    @Override
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
         if (str.length() <= 0) {
             return;

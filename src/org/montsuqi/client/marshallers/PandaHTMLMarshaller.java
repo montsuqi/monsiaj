@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.apache.logging.log4j.Level;
 
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
@@ -50,7 +51,7 @@ public class PandaHTMLMarshaller extends WidgetMarshaller {
                     final URL url = new URL(text);
                     html.setURI(url);
                 } catch (MalformedURLException e) {
-                    logger.info(e);
+                    logger.catching(Level.INFO,e);
                 }
             }
         }

@@ -23,14 +23,15 @@ copies.
 
 package org.montsuqi.monsia;
 
-import org.montsuqi.util.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.Attributes;
 
 /** <p>State ofject for interface definition parser(SAX Handler)s.</p>
  */
 abstract class ParserState {
 
-	protected static final Logger logger = Logger.getLogger(ParserState.class);
+	protected static final Logger logger = LogManager.getLogger(ParserState.class);
 
 	/** <p>Constructs a state with given <var>name</var>.</p>
 	 * 

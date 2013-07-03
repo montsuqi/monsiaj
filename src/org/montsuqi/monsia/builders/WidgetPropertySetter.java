@@ -37,8 +37,9 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Interface;
-import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.*;
 
@@ -58,7 +59,7 @@ abstract class WidgetPropertySetter {
      * @param value the value to set in String.
      */
     abstract void set(Interface xml, Container parent, Component widget, String value);
-    protected static final Logger logger = Logger.getLogger(WidgetPropertySetter.class);
+    protected static final Logger logger = LogManager.getLogger(WidgetPropertySetter.class);
 
     protected void warnUnsupportedProperty(String value) {
         logger.debug("not supported: {0}", value); //$NON-NLS-1$

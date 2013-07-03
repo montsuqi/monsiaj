@@ -7,15 +7,14 @@ package jp.or.med.orca.monsiaj;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarFile;
-import org.apache.log4j.Logger;
-import org.montsuqi.util.FileUtils;
-import org.montsuqi.util.HttpClient;
-import org.montsuqi.util.SystemEnvironment;
-import org.montsuqi.util.ZipUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -23,14 +22,26 @@ import org.montsuqi.util.ZipUtils;
  */
 public class Loader {
 
-    private static Logger log = Logger.getLogger(Loader.class);
+    private static Logger log = LogManager.getLogger(Loader.class);
     private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client/version.txt";
     private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client/";
     private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "cache"};
-    private final String CACHE_DIR = SystemEnvironment.createFilePath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
+    private final String CACHE_DIR = createFilePath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
     private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader.properties"};
-    private static final String PROP_PATH = SystemEnvironment.createFilePath(PROP_PATH_ELEM).getAbsolutePath();
+    private static final String PROP_PATH = createFilePath(PROP_PATH_ELEM).getAbsolutePath();
     private Properties prop;
+
+    private static File createFilePath(String[] elements) {
+        String path = "";
+        for (String elem : elements) {
+            if (path.isEmpty()) {
+                path = elem;
+            } else {
+                path = path + File.separator + elem;
+            }
+        }
+        return new File(path);
+    }
 
     private String loadCacheVersion() {
         prop = new Properties();
@@ -60,7 +71,7 @@ public class Loader {
         try {
             prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
         } catch (IOException ex) {
-            log.error(ex.getMessage(), ex);
+            log.catching(Level.ERROR, ex);
         }
     }
 
@@ -78,27 +89,44 @@ public class Loader {
         /*
          * zipファイルのダウンロード
          */
-        String url = DOWNLOAD_URL + "monsiaj-bin-" + version + ".zip";
-        InputStream is = HttpClient.get(url, null);
-        log.info("download " + url);
+        String strURL = DOWNLOAD_URL + "monsiaj-bin-" + version + ".zip";
+        log.info("download " + strURL);
+        HttpURLConnection con = httpGet(strURL);
+        URL url = new URL(strURL);
         File tmp = File.createTempFile("monsiaj-bin-" + version + "-", ".zip");
         tmp.deleteOnExit();
-        BufferedInputStream in = new BufferedInputStream(is);
+        BufferedInputStream in = new BufferedInputStream(con.getInputStream());
         int length;
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tmp));
         while ((length = in.read()) != -1) {
             out.write(length);
         }
         out.close();
+        con.disconnect();
         ZipUtils.unzip(tmp, cacheDir);
         tmp.delete();
         log.debug("-- updateCache end");
     }
 
+    private static HttpURLConnection httpGet(String strURL) throws IOException {
+        URL url = new URL(strURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setInstanceFollowRedirects(false);
+        con.setRequestMethod("GET");
+        con.connect();
+        if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            con.disconnect();
+            throw new IOException("" + con.getResponseCode());
+        }
+        return con;
+    }
+
     private String getVersion() throws IOException {
-        InputStream is = HttpClient.get(VERSION_URL, null);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        return reader.readLine();
+        HttpURLConnection con = httpGet(VERSION_URL);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String version = reader.readLine();
+        con.disconnect();
+        return version;
     }
 
     private void checkCache() {
@@ -171,8 +199,7 @@ public class Loader {
     }
 
     public static void main(String[] args) throws Exception {
-        log.debug("");
-        log.debug("---- Loader start");
+        log.info("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
         /*
@@ -181,6 +208,6 @@ public class Loader {
         System.clearProperty("proxyHost");
         System.clearProperty("proxyPort");
         loader.launch(args);
-        log.debug("---- Loader end");
+        log.info("---- Loader end");
     }
 }
