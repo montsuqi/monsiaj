@@ -49,12 +49,12 @@ public class Launcher {
 
     public static void main(String[] args) {
         logger.info("---- start monsiaj");
-        logger.info("version : " + Messages.getString("application.version"));
-        logger.info("java : " + System.getProperty("java.version"));
-        logger.info("os : "
-                + System.getProperty("os.name") + "-"
-                + System.getProperty("os.version") + "-"
-                + System.getProperty("os.arch"));
+        logger.info("version : {}",Messages.getString("application.version"));
+        logger.info("java : {}",System.getProperty("java.version"));
+        logger.info("os : {}-{}-{}",
+                System.getProperty("os.name"),
+                System.getProperty("os.version"),
+                System.getProperty("os.arch"));
         Launcher launcher = new Launcher(Messages.getString("application.title"));
         launcher.launch(args);
     }

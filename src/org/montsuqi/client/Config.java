@@ -10,6 +10,9 @@ import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
 /**
@@ -26,6 +29,7 @@ public class Config {
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
     private static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties";
+    protected static final Logger logger = LogManager.getLogger(Launcher.class);
 
     public int getCurrent() {
         return current;
@@ -116,7 +120,7 @@ public class Config {
         try {
             String jarPath = System.getProperty("java.class.path");
             String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator) + 1);
-            String path = dirPath + "config.properties";
+            String path = dirPath + "monsiaj.properties";
             prop.load(new FileInputStream(path));
             if (prop.size() > 0) {
                 propPath = path;
@@ -128,10 +132,10 @@ public class Config {
         if (propPath == null) {
             try {
                 prop.load(new FileInputStream(PROP_PATH));
-                propPath = PROP_PATH;
             } catch (IOException ex) {
                 // initial
             }
+            propPath = PROP_PATH;
         }
     }
 
@@ -150,7 +154,6 @@ public class Config {
 
     public void save() {
         Properties tmp = new Properties() {
-
             @Override
             public Set<Object> keySet() {
                 return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
@@ -166,7 +169,7 @@ public class Config {
         try {
             tmp.store(new FileOutputStream(propPath), "monsiaj setting");
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.catching(Level.WARN,ex);
         }
     }
 
