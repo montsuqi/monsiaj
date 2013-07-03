@@ -209,14 +209,6 @@ public class SSLSocketBuilder {
     }
 
     TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
-        boolean useBrowserSetting = getUseBrowserSetting();
-        logger.debug("use browser setting = {0}", Boolean.valueOf(useBrowserSetting));
-        logger.debug("ignored...");
-        // Force false for now.
-        useBrowserSetting = false;
-        if (useBrowserSetting) {
-            return null;
-        }
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init((KeyStore) null);
 
@@ -253,31 +245,6 @@ public class SSLSocketBuilder {
         } else {
             final String message = Messages.getString("Client.empty_pass"); //$NON-NLS-1$
             throw new SSLException(message);
-        }
-    }
-
-    private boolean getUseBrowserSetting() {
-        if (!SystemEnvironment.isWindows()) {
-            return false;
-        }
-        // Following code runs only on Windows.
-        Properties deploymentProperties = new Properties();
-        String home = System.getProperty("user.home");
-        File deploymentDirectory = SystemEnvironment.createFilePath(new String[]{
-                    home, "Application Data", "Sun", "Java", "Deployment"
-                });
-        File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
-        try {
-            FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
-            deploymentProperties.load(fis);
-            fis.close();
-            return !"false".equals(deploymentProperties.getProperty("deployment.security.browser.keystore.use"));
-        } catch (FileNotFoundException e) {
-            logger.debug("{0} not fould", deploymentPropertiesFile);
-            return false;
-        } catch (IOException e) {
-            logger.debug("{0} could not be read", deploymentPropertiesFile);
-            return false;
         }
     }
 
