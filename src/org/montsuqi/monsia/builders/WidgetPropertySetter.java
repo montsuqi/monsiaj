@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.monsia.builders;
 
@@ -43,16 +43,19 @@ import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.*;
 
-/** <p>WidgetPropertySetter is a class to help assigning properties to widgets.</p>
- * <p>These setters exist one for a class(and subclass) and property name.</p>
- * <p>When building a widget, a widget builder will look up a suitable setter
- * for each key in provided properties. When such a setter is found, its set method
- * is called to set a certain property of the widget.</p>
+/**
+ * <p>WidgetPropertySetter is a class to help assigning properties to
+ * widgets.</p> <p>These setters exist one for a class(and subclass) and
+ * property name.</p> <p>When building a widget, a widget builder will look up a
+ * suitable setter for each key in provided properties. When such a setter is
+ * found, its set method is called to set a certain property of the widget.</p>
  */
 abstract class WidgetPropertySetter {
 
-    /** <p>This method does the actual work of setting a property.
-     * Subclasses must implement this method.</p>
+    /**
+     * <p>This method does the actual work of setting a property. Subclasses
+     * must implement this method.</p>
+     *
      * @param xml glade screen definition
      * @param parent parent widget of the target widget.
      * @param widget target widget.
@@ -67,16 +70,19 @@ abstract class WidgetPropertySetter {
     private static Map propertyMap;
     private static final WidgetPropertySetter nullWidgetPropertySetter;
 
-    /** <p>Looks up a property setter for given class or its ancestors and
-     * property name.</p>
-     * <p>When no setter is found, nullWidgetPropertySetter, which does nothing,
-     * is returned.</p>
+    /**
+     * <p>Looks up a property setter for given class or its ancestors and
+     * property name.</p> <p>When no setter is found, nullWidgetPropertySetter,
+     * which does nothing, is returned.</p>
+     *
      * @param clazz class of the widget whose property is to be set.
      * @param name the proeprty name to be set.
      * @return a setter.
      */
     static WidgetPropertySetter getSetter(Class clazz, String name) {
-        for (/**/; clazz != null; clazz = clazz.getSuperclass()) {
+        for (/*
+                 * 
+                 */; clazz != null; clazz = clazz.getSuperclass()) {
             Map map = (Map) propertyMap.get(clazz);
             if (map == null || !map.containsKey(name)) {
                 continue;
@@ -388,6 +394,15 @@ abstract class WidgetPropertySetter {
             }
         });
 
+        registerProperty(Entry.class, "max_length", new WidgetPropertySetter() {
+
+            void set(Interface xml, Container parent, Component widget, String value) {
+                final Entry entry = (Entry) widget;
+                final int limit = ParameterConverter.toInteger(value);
+                entry.setLimit(limit);
+            }
+        });
+
         registerProperty(PandaEntry.class, "xim_enabled", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
@@ -448,18 +463,22 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        /* PandaTable */
+        /*
+         * PandaTable
+         */
         registerProperty(PandaTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
+
             public void set(Interface xml, Container parent, Component widget, String value) {
-                PandaTable table = (PandaTable)widget;
+                PandaTable table = (PandaTable) widget;
                 table.setColumns(ParameterConverter.toInteger(value));
                 table.setRows(table.getRows());
             }
-        });        
-        
+        });
+
         registerProperty(PandaTable.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
+
             public void set(Interface xml, Container parent, Component widget, String value) {
-                PandaTable table = (PandaTable)widget;
+                PandaTable table = (PandaTable) widget;
                 table.setRows(ParameterConverter.toInteger(value));
             }
         });
@@ -467,7 +486,7 @@ abstract class WidgetPropertySetter {
         registerProperty(PandaTable.class, "column_types", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
-                PandaTable table = (PandaTable)widget;                
+                PandaTable table = (PandaTable) widget;
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
                 String[] types = new String[tokens.countTokens()];
                 for (int i = 0; tokens.hasMoreTokens(); i++) {
@@ -475,11 +494,12 @@ abstract class WidgetPropertySetter {
                 }
                 table.setTypes(types);
             }
-        });        
+        });
 
         registerProperty(PandaTable.class, "column_titles", new WidgetPropertySetter() { //$NON-NLS-1$
+
             public void set(Interface xml, Container parent, Component widget, String value) {
-                PandaTable table = (PandaTable)widget;                
+                PandaTable table = (PandaTable) widget;
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
                 String[] titles = new String[tokens.countTokens()];
                 for (int i = 0; tokens.hasMoreTokens(); i++) {
@@ -488,8 +508,10 @@ abstract class WidgetPropertySetter {
                 table.setTitles(titles);
             }
         });
-        
-        /* PandaCList */
+
+        /*
+         * PandaCList
+         */
         registerProperty(PandaCList.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
@@ -502,7 +524,9 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        /* PandaCList,PandaTable */
+        /*
+         * PandaCList,PandaTable
+         */
         registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
@@ -515,7 +539,7 @@ abstract class WidgetPropertySetter {
                     setter.set(xml, parent, widget, String.valueOf(columns));
                 }
                 assert columns == model.getColumnCount();
-                
+
                 int totalWidth = 0;
                 for (int i = 0; i < model.getColumnCount() && tokens.hasMoreTokens(); i++) {
                     TableColumn column = model.getColumn(i);
@@ -546,7 +570,7 @@ abstract class WidgetPropertySetter {
                     lastColumn.setPreferredWidth(width);
                     lastColumn.setWidth(width);
                     // replace column_withs property
-                                        String new_column_widths;
+                    String new_column_widths;
                     if (value.contains(",")) {
                         new_column_widths = value.substring(0, value.lastIndexOf(",")) + "," + width;
                     } else {
@@ -800,10 +824,12 @@ abstract class WidgetPropertySetter {
 
     }
 
-    /** <p>Removes given prefix along with "GTK_" and "GTK_".
-     * </p>
+    /**
+     * <p>Removes given prefix along with "GTK_" and "GTK_". </p>
+     *
      * @param value target string to be normalized.
-     * @param prefixToRemove a prefix to remove. Ignored if it is null or its length is zero.
+     * @param prefixToRemove a prefix to remove. Ignored if it is null or its
+     * length is zero.
      * @return normalized string.
      */
     static String normalize(String value, String prefixToRemove) {

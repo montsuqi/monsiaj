@@ -20,7 +20,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 import org.montsuqi.util.GtkStockIcon;
-import org.montsuqi.util.HttpClient;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.widgets.Button;
