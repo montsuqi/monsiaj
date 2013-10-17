@@ -56,7 +56,6 @@ public class Client implements Runnable {
     public Client(Configuration conf) {
         this.conf = conf;
         logger = Logger.getLogger(Client.class);
-        JarSignersHardLinker.go();
     }
 
     /**
