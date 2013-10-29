@@ -302,6 +302,7 @@ public class Launcher {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
                 conf.setCurrent(num);
+		        conf.applySystemProperties(conf.getCurrent());
                 connect();
                 f.dispose();
             }
