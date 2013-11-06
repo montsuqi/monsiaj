@@ -128,7 +128,7 @@ class CListMarshaller extends WidgetMarshaller {
                     Color color = SafeColorDecoder.decode(con.receiveStringData());
                     bgcolors[j] = color != null ? color : Color.WHITE;
                 }
-                clist.setBGColors(bgcolors);
+                //clist.setBGColors(bgcolors);
             } else if ("fgcolor".equals(name)) {
                 Color[] fgcolors;
                 con.receiveDataTypeWithCheck(Type.ARRAY);
@@ -138,7 +138,7 @@ class CListMarshaller extends WidgetMarshaller {
                     Color color = SafeColorDecoder.decode(con.receiveStringData());
                     fgcolors[j] = color != null ? color : Color.BLACK;
                 }
-                clist.setFGColors(fgcolors);
+                //clist.setFGColors(fgcolors);
             } else {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 manager.registerValue(widget, name, null);

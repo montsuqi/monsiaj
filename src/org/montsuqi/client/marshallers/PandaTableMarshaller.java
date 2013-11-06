@@ -36,7 +36,8 @@ import org.montsuqi.client.Type;
 import org.montsuqi.widgets.PandaTable;
 
 /**
- * <p>A class to send/receive CList data.</p>
+ * <p>
+ * A class to send/receive CList data.</p>
  */
 class PandaTableMarshaller extends WidgetMarshaller {
 
@@ -67,14 +68,18 @@ class PandaTableMarshaller extends WidgetMarshaller {
             if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             } else if ("trow".equals(name)) { //$NON-NLS-1$
-                trow = con.receiveIntData() - 1;
-                if (trow < 0) {
-                    trow = 0;
+                trow = con.receiveIntData();
+                if (trow >= 1) {
+                    trow -= 1;
+                } else {
+                    // do nothing
                 }
             } else if ("tcolumn".equals(name)) { //$NON-NLS-1$
-                tcolumn = con.receiveIntData() - 1;
-                if (tcolumn < 0) {
-                    tcolumn = 0;
+                tcolumn = con.receiveIntData();
+                if (tcolumn >= 1) {
+                    tcolumn -= 1;
+                } else {
+                    // do nothing
                 }
             } else if ("trowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
@@ -95,11 +100,13 @@ class PandaTableMarshaller extends WidgetMarshaller {
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
-            } else if ("tvalue".equals(name)) { //$NON-NLS-1$
+            } else if ("tvalue".equals(name)) {
                 /*
                  * String dummy =
                  */ con.receiveStringData();
-            } else if ("rowdata".equals(name)) { //$NON-NLS-1$                
+            } else if ("ximenabled".equals(name)) {
+                table.setXimEnabled(con.receiveBooleanData());
+            } else if ("rowdata".equals(name)) {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 int nrows = con.receiveInt();
                 ArrayList cellNameList = new ArrayList<String>();
@@ -134,21 +141,20 @@ class PandaTableMarshaller extends WidgetMarshaller {
             }
         }
         widget.validate();
-        if (trow >= 0 && tcolumn >= 0) {
 
-            /*
-             * Windows7+Java 1.7で初回表示時にセル指定すると微妙にスクロールする問題のため 初回だけ0,0にセル指定する
-             */
-            if (widgetList.contains(widget.getName())) {
+        JScrollBar vScroll = getVerticalScrollBar(table);
+        BoundedRangeModel model = vScroll.getModel();
+
+        /*
+         * Windows7+Java 1.7で初回表示時にセル指定すると微妙にスクロールする問題のため 初回だけ0,0にセル指定する
+         */
+        if (!widgetList.contains(widget.getName())) {
+            widgetList.add(widget.getName());
+            table.changeSelection(0, 0, false, false);
+            model.setValue(0);
+        } else {
+            if (trow >= 0 && tcolumn >= 0) {
                 table.changeSelection(trow, tcolumn, false, false);
-            } else {
-                widgetList.add(widget.getName());
-                table.changeSelection(0, 0, false, false);
-            }
-
-            JScrollBar vScroll = getVerticalScrollBar(table);
-            if (vScroll != null) {
-                BoundedRangeModel model = vScroll.getModel();
                 int max = model.getMaximum();
                 int min = model.getMinimum();
                 int rows = table.getModel().getRowCount();

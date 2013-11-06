@@ -11,6 +11,7 @@ package org.montsuqi.widgets;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.im.InputContext;
+import java.awt.im.InputSubset;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -117,6 +118,15 @@ public class PandaTable extends JTable {
     private int changedRow;
     private int changedColumn;
     private String changedValue;
+    private boolean ximEnabled;
+
+    public boolean isXimEnabled() {
+        return ximEnabled;
+    }
+
+    public void setXimEnabled(boolean ximEnabled) {
+        this.ximEnabled = ximEnabled;
+    }
 
     public int getChangedColumn() {
         return changedColumn;
@@ -169,6 +179,7 @@ public class PandaTable extends JTable {
         this.setRowHeight(rowheight);
 
         enterPressed = false;
+        ximEnabled = false;
 
         final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
 
@@ -202,7 +213,22 @@ public class PandaTable extends JTable {
         ce.getComponent().addFocusListener(new FocusListener() {
 
             public void focusGained(FocusEvent e) {
-                // do nothing
+                if (SystemEnvironment.isWindows()) {
+                    if (ximEnabled) {
+                        InputContext ic = getInputContext();
+                        if (ic != null) {
+                            ic.setCharacterSubsets(new Character.Subset[]{InputSubset.KANJI});
+                            ic.selectInputMethod(Locale.JAPANESE);
+                        }
+                    } else {
+                        InputContext ic = getInputContext();
+                        if (ic != null) {
+                            ic.setCharacterSubsets(null);
+                            ic.endComposition();
+                            ic.selectInputMethod(Locale.ENGLISH);
+                        }
+                    }
+                }
             }
 
             public void focusLost(FocusEvent e) {
@@ -229,8 +255,6 @@ public class PandaTable extends JTable {
                 // do nothing
             }
         });
-
-
 
         changedRow = 0;
         changedColumn = 0;
@@ -396,7 +420,6 @@ public class PandaTable extends JTable {
 
         //final URL iconURL = table.getClass().getResource("orca.png");
         //final ImageIcon icon = new ImageIcon(iconURL);
-
         JScrollPane scroll = new JScrollPane(table);
         scroll.setPreferredSize(new Dimension(400, 300));
         container.add(scroll, BorderLayout.CENTER);
