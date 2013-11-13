@@ -49,8 +49,8 @@ public class Launcher {
 
     public static void main(String[] args) {
         logger.info("---- start monsiaj");
-        logger.info("version : {}",Messages.getString("application.version"));
-        logger.info("java : {}",System.getProperty("java.version"));
+        logger.info("version : {}", Messages.getString("application.version"));
+        logger.info("java : {}", System.getProperty("java.version"));
         logger.info("os : {}-{}-{}",
                 System.getProperty("os.name"),
                 System.getProperty("os.version"),
@@ -302,7 +302,7 @@ public class Launcher {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
                 conf.setCurrent(num);
-		        conf.applySystemProperties(conf.getCurrent());
+                conf.applySystemProperties(conf.getCurrent());
                 connect();
                 f.dispose();
             }

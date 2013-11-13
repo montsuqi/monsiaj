@@ -22,14 +22,32 @@ copies.
  */
 package org.montsuqi.monsia;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
-import javax.swing.*;
+import java.util.Map;
+import java.util.StringTokenizer;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.MenuElement;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.xml.parsers.SAXParser;
@@ -118,11 +136,6 @@ public class Interface {
             Class handlerClass = Class.forName(handlerClassName);
             AbstractDocumentHandler handler = (AbstractDocumentHandler) handlerClass.newInstance();
 
-            if (handlerClassName.equals(OLD_HANDLER)) {
-                if (protocol.getEncoding().equals("EUC-JP")) {
-                    input = new FakeEncodingInputStream(input);
-                }
-            }
             saxParser.parse(input, handler);
             return handler.getInterface(protocol);
         } catch (Exception e) {

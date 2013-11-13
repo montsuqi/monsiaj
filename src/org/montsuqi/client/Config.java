@@ -214,6 +214,19 @@ public class Config {
         setValue(i, "description", v);
     }
 
+    // authuri
+    public String getAuthURI(int i) {
+        String value = getValue(i, "authuri");
+        if (value.isEmpty()) {
+            return "http://localhost:8000";
+        }
+        return value;
+    }
+
+    public void setAuthURI(int i, String v) {
+        setValue(i, "authuri", v);
+    }    
+    
     // application
     public String getApplication(int i) {
         String value = getValue(i, "application");

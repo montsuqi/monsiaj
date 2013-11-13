@@ -81,14 +81,12 @@ public class WidgetBuilder {
         registerWidgetClass("Entry", Entry.class, entryBuilder); 
         registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder);        
         registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder);                
-        registerWidgetClass("FileEntry", FileEntry.class, new FileEntryBuilder()); 
         registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); 
         registerWidgetClass("Frame", Frame.class, new FrameBuilder()); 
         registerWidgetClass("HBox", HBox.class, defaultContainerBuilder); 
         registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder); 
         registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder); 
         registerWidgetClass("Label", JLabel.class, new LabelBuilder()); 
-        registerWidgetClass("List", JList.class, new ListBuilder()); 
         registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder); 
         registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder()); 
         registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder()); 

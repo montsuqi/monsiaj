@@ -21,29 +21,25 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package org.montsuqi.monsia.builders;
+package org.montsuqi.client.widgethandlers;
 
-import java.awt.Component;
-import java.awt.Container;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-import org.montsuqi.monsia.ChildInfo;
-import org.montsuqi.monsia.Interface;
-import org.montsuqi.monsia.WidgetInfo;
-import org.montsuqi.widgets.FileEntry;
+public class Messages {
+	private static final String BUNDLE_NAME = "org.montsuqi.client.marshallers.messages"; //$NON-NLS-1$
 
-public class FileEntryBuilder extends WidgetBuilder {
-	
-	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
-		FileEntry fileEntry = (FileEntry)parent;
-		if (info.getChildren().size() != 1) {
-			throw new WidgetBuildingException("only one child for a FileEntry"); //$NON-NLS-1$
-		}
-		ChildInfo cInfo = info.getChild(0);
-		WidgetInfo wInfo = cInfo.getWidgetInfo();
-		Component entry = fileEntry.getEntry();
-		setCommonParameters(xml, entry, wInfo);
-		setSignals(xml, entry, wInfo);
-		setProperties(xml, parent, entry, wInfo.getProperties());
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private Messages() {
+		// do nothing
 	}
 
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }

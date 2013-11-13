@@ -37,19 +37,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
 
-
 /**
- * <p>The main application class for panda client.</p>
+ * <p>
+ * The main application class for panda client.</p>
  */
 public class Client implements Runnable {
 
     private Config conf;
     Logger logger;
     private Protocol protocol;
-    private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 
     /**
-     * <p>Constructs a client initialized by the given configuration object.</p>
+     * <p>
+     * Constructs a client initialized by the given configuration object.</p>
      *
      * @param conf configuration.
      */
@@ -58,9 +58,9 @@ public class Client implements Runnable {
         logger = LogManager.getLogger(Client.class);
     }
 
-
     /**
-     * <p>Connects to the server using protocol, user, password and application
+     * <p>
+     * Connects to the server using protocol, user, password and application
      * name specified in the configuration of this client.</p>
      *
      * @throws IOException on IO errors.
@@ -71,13 +71,12 @@ public class Client implements Runnable {
         int num = conf.getCurrent();
         Map styles = loadStyles();
         long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
-        protocol = new Protocol(this, styles, timerPeriod);
+        protocol = new Protocol(conf, styles, timerPeriod);
 
         String user = conf.getUser(num);
         String password = conf.getPassword(num);
-        String application = conf.getApplication(num);
-        logger.debug("user : {}",user);
-        protocol.sendConnect(user, password, application);
+        logger.debug("user : {}", user);
+        protocol.startSession();
     }
 
     private Map loadStyles() {
@@ -94,8 +93,11 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Creates a socket for the connection.</p> <p>When the configuration
-     * says useSSL, an SSL Socket is returned instead.</p>
+     * <p>
+     * Creates a socket for the connection.</p>
+     * <p>
+     * When the configuration says useSSL, an SSL Socket is returned
+     * instead.</p>
      *
      * @return a socket connected at the TCP layer.
      * @throws IOException on IO error.
@@ -106,7 +108,7 @@ public class Client implements Runnable {
         int num = conf.getCurrent();
         String host = conf.getHost(num);
         int port = conf.getPort(num);
-        logger.debug("host : {}:{}",host,port);
+        logger.debug("host : {}:{}", host, port);
         SocketAddress address = new InetSocketAddress(host, port);
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(address);
@@ -122,10 +124,12 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>PrintAgent need SSLSocketFactory for SSL API connection</p>
+     * <p>
+     * PrintAgent need SSLSocketFactory for SSL API connection</p>
+     *
      * @return
      * @throws IOException
-     * @throws GeneralSecurityException 
+     * @throws GeneralSecurityException
      */
     SSLSocketFactory createSSLSocketFactory() throws IOException, GeneralSecurityException {
         int num = conf.getCurrent();
@@ -140,30 +144,26 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Kick the application.</p>
+     * <p>
+     * Kick the application.</p>
      */
     public void run() {
-        try {
-            protocol.checkScreens(true);
-            protocol.startReceiving();
-            protocol.getScreenData();
-            protocol.stopReceiving();
-            protocol.startPing();
-        } catch (IOException e) {
-            protocol.exceptionOccured(e);
-        }
+        protocol.startReceiving();
+        protocol.getWindow();
+        protocol.stopReceiving();
+        protocol.startPing();
     }
 
     /**
-     * <p>Terminates the application.</p> <p>Sends end packet to the server and
-     * exists.</p>
+     * <p>
+     * Terminates the application.</p>
+     * <p>
+     * Sends end packet to the server and exists.</p>
      */
     void exitSystem() {
         try {
             synchronized (this) {
-                if (protocol != null) {
-                    protocol.sendPacketClass(PacketClass.END);
-                }
+                protocol.endSession();
             }
         } catch (Exception e) {
             logger.warn(e);
@@ -173,7 +173,8 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Dispose connection if it exists.</p>
+     * <p>
+     * Dispose connection if it exists.</p>
      */
     protected void finalize() {
         if (protocol != null) {

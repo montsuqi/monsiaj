@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.widgets;
 
@@ -42,7 +42,10 @@ import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PrecisionScale;
 import org.montsuqi.util.SystemEnvironment;
 
-/** <p>A class that simulates Gtk+'s NumberEntry.</p>
+/**
+ * <
+ * p>
+ * A class that simulates Gtk+'s NumberEntry.</p>
  */
 public class NumberEntry extends Entry {
 
@@ -103,6 +106,11 @@ public class NumberEntry extends Entry {
         return doc.getValue();
     }
 
+    public double getValueDouble() {
+        NumberDocument doc = (NumberDocument) getDocument();
+        return doc.getValue().doubleValue();
+    }
+
     public void setFormat(String format) {
         NumberDocument doc = (NumberDocument) getDocument();
         doc.setFormat(format);
@@ -144,8 +152,8 @@ public class NumberEntry extends Entry {
             case KeyEvent.VK_HOME: // fall through
             case KeyEvent.VK_END:
                 if (e.getID() == KeyEvent.KEY_PRESSED || e.getID() == KeyEvent.KEY_RELEASED) {
-                    setValue(NumberDocument.ZERO);
-                }
+                setValue(NumberDocument.ZERO);
+            }
                 e.consume();
                 break;
             default:
@@ -186,7 +194,7 @@ class NumberDocument extends PlainDocument {
             scale = 0;
             insertString(0, t, null);
         } catch (BadLocationException e) {
-            logger.catching(Level.WARN,e);
+            logger.catching(Level.WARN, e);
         }
         expo = 0;
         scale = 0;
@@ -307,7 +315,10 @@ class NumberDocument extends PlainDocument {
         }
     }
 
-    /** <p>Test if zero value should be printed or left blank.</p>
+    /**
+     * <
+     * p>
+     * Test if zero value should be printed or left blank.</p>
      *
      * @return true if zero should be blank. false if zero should be printed.
      */
