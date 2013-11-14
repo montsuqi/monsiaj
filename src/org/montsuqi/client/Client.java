@@ -94,37 +94,6 @@ public class Client implements Runnable {
 
     /**
      * <p>
-     * Creates a socket for the connection.</p>
-     * <p>
-     * When the configuration says useSSL, an SSL Socket is returned
-     * instead.</p>
-     *
-     * @return a socket connected at the TCP layer.
-     * @throws IOException on IO error.
-     * @throws GeneralSecurityException on SSL verification/authentication
-     * failure.
-     */
-    Socket createSocket() throws IOException, GeneralSecurityException {
-        int num = conf.getCurrent();
-        String host = conf.getHost(num);
-        int port = conf.getPort(num);
-        logger.debug("host : {}:{}", host, port);
-        SocketAddress address = new InetSocketAddress(host, port);
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.connect(address);
-        Socket socket = socketChannel.socket();
-        if (!conf.getUseSSL(num)) {
-            return socket;
-        } else {
-            String fileName = conf.getClientCertificateFile(num);
-            String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
-            return builder.createSSLSocket(socket, host, port);
-        }
-    }
-
-    /**
-     * <p>
      * PrintAgent need SSLSocketFactory for SSL API connection</p>
      *
      * @return

@@ -54,9 +54,7 @@ public class ConfigPanel extends JPanel {
     protected JTextField userEntry;
     protected JPasswordField passwordEntry;
     protected JCheckBox savePasswordCheckbox;
-    protected JTextField hostEntry;
-    protected JTextField portEntry;
-    protected JTextField appEntry;
+    protected JTextField authURIEntry;
     // SSL Tab
     protected JCheckBox useSSLCheckbox;
     protected JButton clientCertificateButton;
@@ -238,9 +236,7 @@ public class ConfigPanel extends JPanel {
         String user = conf.getUser(num);
         String password = conf.getPassword(num);
         boolean savePassword = conf.getSavePassword(num);
-        String host = conf.getHost(num);
-        int port = conf.getPort(num);
-        String application = conf.getApplication(num);
+        String authURI = conf.getAuthURI(num);
 
         // SSL tab
         boolean useSSL = conf.getUseSSL(num);
@@ -262,9 +258,7 @@ public class ConfigPanel extends JPanel {
         // since setPass fetches its value from the preferences internally.
         savePasswordCheckbox.setSelected(savePassword);
         passwordEntry.setText(password);
-        hostEntry.setText(host);
-        portEntry.setText(String.valueOf(port));
-        appEntry.setText(application);
+        authURIEntry.setText(authURI);
 
         // SSL Tab
         useSSLCheckbox.setSelected(useSSL);
@@ -293,9 +287,7 @@ public class ConfigPanel extends JPanel {
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
         conf.setPassword(num, new String(passwordEntry.getPassword()));
-        conf.setHost(num, hostEntry.getText());
-        conf.setPort(num, Integer.parseInt(portEntry.getText()));
-        conf.setApplication(num, appEntry.getText());
+        conf.setAuthURI(num, authURIEntry.getText());
 
         // SSL Tab
         conf.setUseSSL(num, useSSLCheckbox.isSelected());
@@ -354,27 +346,16 @@ public class ConfigPanel extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        hostEntry = createTextField();
-        portEntry = createTextField();
-        portEntry.setColumns(5);
-        appEntry = createTextField();
+        authURIEntry = createTextField();
         userEntry = createTextField();
         passwordEntry = createPasswordField();
         savePasswordCheckbox = new JCheckBox();
         savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
 
         y = 0;
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.host")),
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.authURI")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(hostEntry,
-                createConstraints(1, y, 2, 1, 1.0, 0.0));
-        panel.add(portEntry,
-                createConstraints(3, y, 1, 1, 0.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.application")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(appEntry,
+        panel.add(authURIEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 

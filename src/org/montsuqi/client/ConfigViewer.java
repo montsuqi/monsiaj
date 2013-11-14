@@ -115,9 +115,7 @@ public class ConfigViewer {
     private void updateConfigList(PandaCList clist) {
         final String[] ColumnNames = {
             Messages.getString("ConfigurationViewer.config_name"),
-            Messages.getString("ConfigurationViewer.host"),
-            Messages.getString("ConfigurationViewer.port"),
-            Messages.getString("ConfigurationViewer.application"),
+            Messages.getString("ConfigurationViewer.authuri"),
             Messages.getString("ConfigurationViewer.user")
         };
 
@@ -126,10 +124,8 @@ public class ConfigViewer {
         int j = 0;
         for (int i : list) {            
             tableData[j][0] = conf.getDescription(i);
-            tableData[j][1] = conf.getHost(i);
-            tableData[j][2] = Integer.toString(conf.getPort(i));
-            tableData[j][3] = conf.getApplication(i);
-            tableData[j][4] = conf.getUser(i);
+            tableData[j][1] = conf.getAuthURI(i);
+            tableData[j][2] = conf.getUser(i);
             j++;
         }
         DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {

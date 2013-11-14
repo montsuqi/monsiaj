@@ -93,9 +93,6 @@ public class Config {
                 current = i;
             }
             setValue(i, "description", names[i]);
-            setValue(i, "application", conf.getApplication(names[i]));
-            setValue(i, "port", Integer.toString(conf.getPort(names[i])));
-            setValue(i, "host", conf.getHost(names[i]));
             setValue(i, "user", conf.getUser(names[i]));
             setValue(i, "password", conf.getPassword(names[i]));
             setValue(i, "savePassword", Boolean.toString(conf.getSavePassword(names[i])));
@@ -226,45 +223,6 @@ public class Config {
     public void setAuthURI(int i, String v) {
         setValue(i, "authuri", v);
     }    
-    
-    // application
-    public String getApplication(int i) {
-        String value = getValue(i, "application");
-        if (value.isEmpty()) {
-            return "panda:orca00";
-        }
-        return value;
-    }
-
-    public void setApplication(int i, String v) {
-        setValue(i, "application", v);
-    }
-
-    // port
-    public int getPort(int i) {
-        String value = getValue(i, "port");
-        if (value.isEmpty()) {
-            return 8000;
-        }
-        return Integer.valueOf(value);
-    }
-
-    public void setPort(int i, int p) {
-        setValue(i, "port", Integer.toString(p));
-    }
-
-    // host
-    public String getHost(int i) {
-        String value = getValue(i, "host");
-        if (value.isEmpty()) {
-            return "trial.orca.med.or.jp";
-        }
-        return value;
-    }
-
-    public void setHost(int i, String v) {
-        setValue(i, "host", v);
-    }
 
     // user
     public String getUser(int i) {
@@ -446,9 +404,7 @@ public class Config {
         System.out.println("------------------");
         for (int i : this.getList()) {
             System.out.println(this.getDescription(i));
-            System.out.println(Messages.getString("Configuration.list_host") + getHost(i));
-            System.out.println(Messages.getString("Configuration.list_port") + getPort(i));
-            System.out.println(Messages.getString("Configuration.list_application") + getApplication(i));
+            System.out.println(Messages.getString("Configuration.list_authURI") + getAuthURI(i));
             System.out.println(Messages.getString("Configuration.list_user") + getUser(i));
         }
     }
