@@ -57,7 +57,7 @@ public class WindowHandler extends WidgetHandler {
 
         String body = "";
         if (obj.has("popup_body")) {
-            body = obj.getString("body");
+            body = obj.getString("popup_body");
         }
 
         String icon = "";

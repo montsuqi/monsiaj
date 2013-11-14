@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
@@ -128,6 +129,7 @@ public class Protocol {
         int num = conf.getCurrent();
         final String user = this.conf.getUser(num);
         final String password = this.conf.getPassword(num);
+
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -169,12 +171,12 @@ public class Protocol {
 
     private JSONObject jsonRPC(URL url, String method, JSONObject params) throws JSONException, IOException {
         String reqStr = makeJSONRPCRequest(method, params);
-        URLConnection con = url.openConnection();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-        ((HttpsURLConnection) con).setInstanceFollowRedirects(false);
-        ((HttpsURLConnection) con).setRequestMethod("POST");
         con.setDoOutput(true);
-        ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
+        con.setInstanceFollowRedirects(false);
+        con.setRequestMethod("POST");
+        //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
         OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream());
 
@@ -190,7 +192,7 @@ public class Protocol {
             bos.write(length);
         }
         bos.close();
-        ((HttpsURLConnection) con).disconnect();
+        con.disconnect();
 
         JSONObject result = checkJSONRPCResponse(bytes.toString());
         bytes.close();
@@ -218,6 +220,7 @@ public class Protocol {
             logger.debug("restURIRoot:" + this.restURIRoot);
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -310,10 +313,10 @@ public class Protocol {
     public void getBLOB(String oid, OutputStream out) {
         try {
             URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
-            URLConnection con = url.openConnection();
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            ((HttpsURLConnection) con).setInstanceFollowRedirects(false);
-            ((HttpsURLConnection) con).setRequestMethod("GET");
+            con.setInstanceFollowRedirects(false);
+            con.setRequestMethod("GET");
 
             BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
             int length;
@@ -321,7 +324,7 @@ public class Protocol {
                 out.write(length);
             }
             out.close();
-            ((HttpsURLConnection) con).disconnect();
+            con.disconnect();
         } catch (IOException ex) {
             logger.warn(ex);
         } catch (Exception ex) {
@@ -333,18 +336,18 @@ public class Protocol {
     public String postBLOB(byte[] in) {
         try {
             URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/");
-            URLConnection con = url.openConnection();
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            ((HttpsURLConnection) con).setInstanceFollowRedirects(false);
-            ((HttpsURLConnection) con).setRequestMethod("POST");
+            con.setInstanceFollowRedirects(false);
+            con.setRequestMethod("POST");
             con.setDoOutput(true);
-            ((HttpsURLConnection) con).setFixedLengthStreamingMode(in.length);
+            //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
             con.setRequestProperty("Content-Type", "application/octet-stream");
             OutputStream os = con.getOutputStream();
             os.write(in);
             os.flush();
             os.close();
-            ((HttpsURLConnection) con).disconnect();
+            con.disconnect();
             return con.getHeaderField("x-blob-id");
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -451,6 +454,7 @@ public class Protocol {
             Object screenData = w.get("screen_data");
             updateWidget(node.getInterface(), _windowName, screenData);
             showWindow(_windowName);
+            this.windowName = _windowName;
         } else {
             closeWindow(_windowName);
         }

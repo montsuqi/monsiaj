@@ -72,10 +72,7 @@ public class Client implements Runnable {
         Map styles = loadStyles();
         long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
         protocol = new Protocol(conf, styles, timerPeriod);
-
-        String user = conf.getUser(num);
-        String password = conf.getPassword(num);
-        logger.debug("user : {}", user);
+        logger.debug("user : {}", conf.getUser(num));
         protocol.startSession();
     }
 
@@ -119,6 +116,7 @@ public class Client implements Runnable {
     public void run() {
         protocol.startReceiving();
         protocol.getWindow();
+        protocol.updateScreen();
         protocol.stopReceiving();
         protocol.startPing();
     }
@@ -146,8 +144,5 @@ public class Client implements Runnable {
      * Dispose connection if it exists.</p>
      */
     protected void finalize() {
-        if (protocol != null) {
-            exitSystem();
-        }
     }
 }

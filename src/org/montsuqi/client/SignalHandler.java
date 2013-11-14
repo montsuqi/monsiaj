@@ -23,7 +23,6 @@
 package org.montsuqi.client;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
@@ -31,7 +30,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -203,7 +208,7 @@ public abstract class SignalHandler {
                     if (con.isReceiving()) {
                         return;
                     }
-                    try {
+                    try {                   
                         con.startReceiving();
                         if (widget instanceof JComponent) {
                             if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
@@ -220,7 +225,7 @@ public abstract class SignalHandler {
                         if (window == null || widget == null) {
                             return;
                         }
-                        if (!window.getName().equals(con.getWindowName())) {
+                        if (!window.getName().equals(con.getWindowName())) {                             
                             return;
                         }
 
@@ -238,7 +243,7 @@ public abstract class SignalHandler {
                                 event = widgetName;
                             }
                         }
-                        org.montsuqi.widgets.Window.busyAllWindows();
+                        org.montsuqi.widgets.Window.busyAllWindows();                        
                         con.sendEvent(windowName, widgetName, event);
                         synchronized (con) {
                             blockChangedHandlers();

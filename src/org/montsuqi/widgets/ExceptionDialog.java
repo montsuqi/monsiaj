@@ -55,6 +55,7 @@ public class ExceptionDialog extends JOptionPane {
 		if (message == null || message.length() == 0) {
 			message = name;
 		}
+                e.printStackTrace();
 		JOptionPane.showMessageDialog(null, message, shortName, JOptionPane.ERROR_MESSAGE);
 	}
 }

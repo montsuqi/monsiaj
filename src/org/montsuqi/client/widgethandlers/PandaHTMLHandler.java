@@ -43,17 +43,19 @@ public class PandaHTMLHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaHTML html = (PandaHTML) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        this.setEditable(widget, obj);
         for (Iterator i = obj.keys(); i.hasNext();) {
             String key = (String) i.next();
             if (this.isCommonAttribute(key)) {
                 // do nothing
             } else {
                 try {
-                    URL url = new URL(obj.getString(key));
-                    html.setURI(url);
+                    String urlStr = obj.getString(key);
+                    if (urlStr != null && !urlStr.isEmpty()) {
+                        URL url = new URL(obj.getString(key));
+                        html.setURI(url);
+                    }
                 } catch (MalformedURLException e) {
-                    logger.catching(Level.INFO, e);
+                    //                  logger.catching(Level.INFO, e);
                 }
             }
         }

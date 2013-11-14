@@ -150,7 +150,7 @@ class CListHandler extends WidgetHandler {
             } else if (key.matches("fgcolor")) {
                 // do nothing
             } else {
-                JSONArray array = obj.getJSONArray("key");
+                JSONArray array = obj.getJSONArray(key);
                 int n = array.length();
                 n = n > count ? count : n;
                 for (int j = 0; j < n; j++) {
@@ -215,7 +215,7 @@ class CListHandler extends WidgetHandler {
             } else if (key.matches("fgcolor")) {
                 // do nothing
             } else {
-                JSONArray array = obj.getJSONArray("key");
+                JSONArray array = obj.getJSONArray(key);
                 for (int j = 0; j < table.getRowCount(); j++) {
                     array.put(j,selections.isSelectedIndex(j));
                 }
