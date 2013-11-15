@@ -84,7 +84,6 @@ public class Protocol {
     static final Logger logger = LogManager.getLogger(Protocol.class);
     private final TopWindow topWindow;
     private final ArrayList<Component> dialogStack;
-    private boolean enablePing;
     private static final int PingTimerPeriod = 3 * 1000;
     private javax.swing.Timer pingTimer;
     private PrintAgent printAgent;
@@ -123,7 +122,6 @@ public class Protocol {
         sessionBGColor = null;
         topWindow = new TopWindow();
         dialogStack = new ArrayList<Component>();
-        enablePing = false;
         rpcId = 1;
 
         int num = conf.getCurrent();
@@ -289,6 +287,14 @@ public class Protocol {
                 }
             }
 
+            if (result.has("popup")) {
+                String popup = result.getString("popup");
+                if (!popup.isEmpty()) {
+                    PopupNotify.popup(Messages.getString("Protocol.message_notify_summary"), popup, GtkStockIcon.get("gtk-dialog-info"), 0);
+                    return;
+                }
+            }
+
             if (result.has("dialog")) {
                 String dialog = result.getString("dialog");
                 if (!dialog.isEmpty()) {
@@ -297,13 +303,6 @@ public class Protocol {
                 }
             }
 
-            if (result.has("popup")) {
-                String popup = result.getString("popup");
-                if (!popup.isEmpty()) {
-                    PopupNotify.popup(Messages.getString("Protocol.message_notify_summary"), popup, GtkStockIcon.get("gtk-dialog-info"), 0);
-                    return;
-                }
-            }
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -631,19 +630,17 @@ public class Protocol {
     }
 
     public void startPing() {
-        if (enablePing) {
-            pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
+        pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        Protocol.this.sendPing();
-                    } catch (IOException ioe) {
-                        exceptionOccured(ioe);
-                    }
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Protocol.this.sendPing();
+                } catch (IOException ioe) {
+                    exceptionOccured(ioe);
                 }
-            });
-            pingTimer.start();
-        }
+            }
+        });
+        pingTimer.start();
     }
 
     public void addPrintRequest(String path, String title, int retry, boolean showDialog) {
