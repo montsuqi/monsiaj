@@ -23,6 +23,7 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
@@ -48,7 +49,7 @@ class NumberEntryHandler extends WidgetHandler {
             } else if (this.isEditable(key)) {
                 // do nothing
             } else {
-                entry.setValue(obj.getDouble(key));
+                entry.setValue(new BigDecimal(obj.getDouble(key)));
             }
         }
     }

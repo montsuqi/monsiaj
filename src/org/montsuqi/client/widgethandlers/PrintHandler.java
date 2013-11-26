@@ -51,7 +51,12 @@ public class PrintHandler extends WidgetHandler {
 
                 boolean showDialog = true;
                 if (itemObj.has("showdialog")) {
-                    showDialog = itemObj.getBoolean("showdialog");
+                    int v = itemObj.getInt("showdialog");
+                    if (v == 1) {
+                        showDialog = true;
+                    } else {
+                        showDialog = false;
+                    }
                 }
 
                 int retry = 0;

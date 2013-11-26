@@ -27,7 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
-import org.apache.logging.log4j.Level;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.Protocol;
@@ -55,7 +54,7 @@ public class PandaHTMLHandler extends WidgetHandler {
                         html.setURI(url);
                     }
                 } catch (MalformedURLException e) {
-                    //                  logger.catching(Level.INFO, e);
+                   html.setText("");
                 }
             }
         }

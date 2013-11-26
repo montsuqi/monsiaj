@@ -27,8 +27,8 @@ public class PandaTable extends JTable {
     private class PandaTableModel extends DefaultTableModel {
 
         private final int MAX_COLS = 100;
-        private String[] types;
-        private String[] titles;
+        private final String[] types;
+        private final String[] titles;
 
         public PandaTableModel() {
             super();

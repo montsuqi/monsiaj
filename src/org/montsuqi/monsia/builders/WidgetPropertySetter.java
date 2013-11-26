@@ -534,11 +534,9 @@ abstract class WidgetPropertySetter {
                 TableColumnModel model = table.getColumnModel();
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
                 int columns = tokens.countTokens();
-                if (model.getColumnCount() < columns) {
-                    WidgetPropertySetter setter = getSetter(JTable.class, "columns"); //$NON-NLS-1$
-                    setter.set(xml, parent, widget, String.valueOf(columns));
+                if (columns > model.getColumnCount()) {
+                    columns = model.getColumnCount();
                 }
-                assert columns == model.getColumnCount();
 
                 int totalWidth = 0;
                 for (int i = 0; i < model.getColumnCount() && tokens.hasMoreTokens(); i++) {

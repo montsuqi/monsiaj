@@ -23,7 +23,13 @@
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.im.InputContext;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -36,7 +42,6 @@ import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PrecisionScale;
@@ -194,7 +199,7 @@ class NumberDocument extends PlainDocument {
             scale = 0;
             insertString(0, t, null);
         } catch (BadLocationException e) {
-            logger.catching(Level.WARN, e);
+            logger.warn(e);
         }
         expo = 0;
         scale = 0;

@@ -12,14 +12,14 @@ and open the template in the editor.
             filePattern="${sys:user.home}/.monsiaj/monsiaj.log.%i"
             bufferredIO="false"
         >
-            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n"/>
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="8 KB"/>
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
         <Console name="Console">
-            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n"/>
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
         </Console>
     </appenders>
     <loggers>

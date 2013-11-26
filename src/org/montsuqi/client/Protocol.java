@@ -309,27 +309,22 @@ public class Protocol {
         }
     }
 
-    public void getBLOB(String oid, OutputStream out) {
-        try {
-            URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    public int getBLOB(String oid, OutputStream out) throws IOException {
+        URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            con.setInstanceFollowRedirects(false);
-            con.setRequestMethod("GET");
+        con.setInstanceFollowRedirects(false);
+        con.setRequestMethod("GET");
 
-            BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-            int length;
-            while ((length = bis.read()) != -1) {
-                out.write(length);
-            }
-            out.close();
-            con.disconnect();
-        } catch (IOException ex) {
-            logger.warn(ex);
-        } catch (Exception ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
+        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
+        int length;
+        while ((length = bis.read()) != -1) {
+            out.write(length);
         }
+        out.close();
+        con.disconnect();
+        
+        return con.getResponseCode();
     }
 
     public String postBLOB(byte[] in) {
@@ -410,7 +405,7 @@ public class Protocol {
         }
     }
 
-    private void updateWidget(Interface xml, String name, Object obj) throws JSONException {
+    private synchronized void updateWidget(Interface xml, String name, Object obj) throws JSONException {
         Component widget = xml.getWidgetByLongName(name);
         if (widget != null) {
             Class clazz = widget.getClass();

@@ -38,33 +38,35 @@ import org.montsuqi.widgets.PandaDownload;
  * A class to send/receive Timer data.</p>
  */
 public class DownloadHandler extends WidgetHandler {
-    
+
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaDownload download = (PandaDownload) widget;
         String fileName = "";
         String description = "";
-        
+
         if (obj.has("filename")) {
             fileName = obj.getString("filename");
         }
-        
+
         if (obj.has("description")) {
             description = obj.getString("description");
         }
-        
+
         if (obj.has("objectdata")) {
             try {
                 File temp = File.createTempFile("pandadonwload", fileName);
                 temp.deleteOnExit();
                 String blobid = obj.getString("objectdata");
-                con.getBLOB(blobid, new BufferedOutputStream(new FileOutputStream(temp)));
-                download.showDialog(fileName, description, temp);
+                int status = con.getBLOB(blobid, new BufferedOutputStream(new FileOutputStream(temp)));
+                if (status == 200) {
+                    download.showDialog(fileName, description, temp);
+                }
             } catch (IOException ex) {
                 logger.warn(ex);
             }
         }
     }
-    
+
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
     }
 }

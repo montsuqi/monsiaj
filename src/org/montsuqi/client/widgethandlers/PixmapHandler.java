@@ -24,6 +24,7 @@ package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.Icon;
@@ -49,15 +50,19 @@ public class PixmapHandler extends WidgetHandler {
                 // do nothing
             } else {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                con.getBLOB(obj.getString(key), bytes);
-                if (bytes.size() > 0) {
-                    Icon icon = new ImageIcon(bytes.toByteArray());
-                    pixmap.setText("");
-                    pixmap.setIcon(icon);
-                } else {
-                    pixmap.setText(Messages.getString("PixmapMarshaller.NO_IMAGE"));
-                    pixmap.setIcon(null);
-
+                try {
+                    int status = con.getBLOB(obj.getString(key), bytes);
+                    if (status == 200 && bytes.size() > 0) {
+                        Icon icon = new ImageIcon(bytes.toByteArray());
+                        pixmap.setText("");
+                        pixmap.setIcon(icon);
+                        pixmap.validate();
+                    } else {
+                        pixmap.setText(Messages.getString("PixmapMarshaller.NO_IMAGE"));
+                        pixmap.setIcon(null);
+                    }
+                } catch (IOException ex) {
+                    logger.warn(ex);
                 }
             }
         }
