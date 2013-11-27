@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
@@ -176,7 +177,7 @@ public class Protocol {
         con.setRequestMethod("POST");
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
-        OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream());
+        OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(),"UTF-8");
 
         osw.write(reqStr);
         osw.flush();
@@ -191,8 +192,7 @@ public class Protocol {
         }
         bos.close();
         con.disconnect();
-
-        JSONObject result = checkJSONRPCResponse(bytes.toString());
+        JSONObject result = checkJSONRPCResponse(bytes.toString("UTF-8"));
         bytes.close();
         return result;
     }
@@ -441,7 +441,11 @@ public class Protocol {
         Node node = getNode(_windowName);
         if (node == null) {
             String gladeData = w.getString("screen_define");
-            node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes()), this), _windowName);
+            try {
+            node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
+            } catch(UnsupportedEncodingException ex) {
+                logger.info("",ex);
+            }
             nodeTable.put(_windowName, node);
         }
         if (putType.matches("new") || putType.matches("current")) {

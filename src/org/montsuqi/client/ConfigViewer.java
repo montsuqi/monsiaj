@@ -22,9 +22,25 @@
  */
 package org.montsuqi.client;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import org.montsuqi.widgets.Button;
@@ -161,16 +177,12 @@ public class ConfigViewer {
                 ConfigPanel.createConstraints(1, 0, 1, 4, 1.0, 0.0));
 
         JPanel basicPanel = configPanel.getBasicPanel();
-        JPanel sslPanel = configPanel.getSSLPanel();
         JPanel othersPanel = configPanel.getOthersPanel();
 
         Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, (Color) SystemColor.controlDkShadow);
         basicPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
                 Messages.getString("ConfigurationPanel.basic_tab_label")));
-        sslPanel.setBorder(
-                BorderFactory.createTitledBorder(border,
-                Messages.getString("ConfigurationPanel.ssl_tab_label")));
         othersPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
                 Messages.getString("ConfigurationPanel.others_tab_label")));
@@ -179,7 +191,6 @@ public class ConfigViewer {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(configNamePanel);
         mainPanel.add(basicPanel);
-        mainPanel.add(sslPanel);
         mainPanel.add(othersPanel);
         container.add(mainPanel, BorderLayout.CENTER);
 
@@ -192,7 +203,7 @@ public class ConfigViewer {
 
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
-                configPanel.saveConfig(num);
+                configPanel.saveConfig(num,entryName);
                 f.dispose();
             }
         });

@@ -4,10 +4,21 @@
  */
 package org.montsuqi.client;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.logging.log4j.Level;
@@ -96,10 +107,6 @@ public class Config {
             setValue(i, "user", conf.getUser(names[i]));
             setValue(i, "password", conf.getPassword(names[i]));
             setValue(i, "savePassword", Boolean.toString(conf.getSavePassword(names[i])));
-            setValue(i, "useSSL", Boolean.toString(conf.getUseSSL(names[i])));
-            setValue(i, "clientCertificateFile", conf.getClientCertificateFileName(names[i]));
-            setValue(i, "clientCertificatePassword", conf.getClientCertificatePassword(names[i]));
-            setValue(i, "saveClientCertificatePassword", Boolean.toString(conf.getSaveClientCertificatePassword(names[i])));
             setValue(i, "styleFile", conf.getStyleFileName(names[i]));
             setValue(i, "lookAndFeel", conf.getLookAndFeelClassName(names[i]));
             setValue(i, "lookAndFeelThemeFile", conf.getLAFThemeFileName(names[i]));
@@ -215,7 +222,7 @@ public class Config {
     public String getAuthURI(int i) {
         String value = getValue(i, "authuri");
         if (value.isEmpty()) {
-            return "http://localhost:8000";
+            return "http://localhost:9292/auth";
         }
         return value;
     }
@@ -260,55 +267,6 @@ public class Config {
         setValue(i, "savePassword", Boolean.toString(v));
         if (!v) {
             setPassword(i, "");
-        }
-    }
-
-    // useSSL
-    public boolean getUseSSL(int i) {
-        String value = getValue(i, "useSSL");
-        if (value.isEmpty()) {
-            return false;
-        }
-        return Boolean.valueOf(value);
-    }
-
-    public void setUseSSL(int i, boolean v) {
-        setValue(i, "useSSL", Boolean.toString(v));
-    }
-
-    // clientCertificateFile
-    public String getClientCertificateFile(int i) {
-        String value = getValue(i, "clientCertificateFile");
-        return value;
-    }
-
-    public void setClientCertificateFile(int i, String v) {
-        setValue(i, "clientCertificateFile", v);
-    }
-
-    // clientCertificatePassword
-    public String getClientCertificatePassword(int i) {
-        String value = getValue(i, "clientCertificatePassword");
-        return value;
-    }
-
-    public void setClientCertificatePassword(int i, String v) {
-        setValue(i, "clientCertificatePassword", v);
-    }
-
-    // saveClientCertificatePassword
-    public boolean getSaveClientCertificatePassword(int i) {
-        String value = getValue(i, "saveClientCertificatePassword");
-        if (value.isEmpty()) {
-            return false;
-        }
-        return Boolean.valueOf(value);
-    }
-
-    public void setSaveClientCertificatePassword(int i, boolean v) {
-        setValue(i, "saveClientCertificatePassword", Boolean.toString(v));
-        if (!v) {
-            this.setClientCertificatePassword(i, "");
         }
     }
 

@@ -87,26 +87,6 @@ public class Client implements Runnable {
 
     /**
      * <p>
-     * PrintAgent need SSLSocketFactory for SSL API connection</p>
-     *
-     * @return
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    SSLSocketFactory createSSLSocketFactory() throws IOException, GeneralSecurityException {
-        int num = conf.getCurrent();
-        if (!conf.getUseSSL(num)) {
-            return null;
-        } else {
-            String fileName = conf.getClientCertificateFile(num);
-            String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
-            return builder.getFactory();
-        }
-    }
-
-    /**
-     * <p>
      * Kick the application.</p>
      */
     public void run() {

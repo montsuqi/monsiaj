@@ -23,7 +23,15 @@
 package org.montsuqi.client;
 
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -31,8 +39,26 @@ import java.awt.event.FocusEvent;
 import java.io.File;
 import java.net.URI;
 import java.util.Enumeration;
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.text.JTextComponent;
@@ -47,7 +73,6 @@ public class ConfigPanel extends JPanel {
     protected static final Logger logger = LogManager.getLogger(ConfigPanel.class);
     protected Config conf;
     protected JPanel basicPanel;
-    protected JPanel sslPanel;
     protected JPanel othersPanel;
     protected JPanel infoPanel;
     // Basic Tab
@@ -55,12 +80,6 @@ public class ConfigPanel extends JPanel {
     protected JPasswordField passwordEntry;
     protected JCheckBox savePasswordCheckbox;
     protected JTextField authURIEntry;
-    // SSL Tab
-    protected JCheckBox useSSLCheckbox;
-    protected JButton clientCertificateButton;
-    protected JTextField clientCertificateEntry;
-    protected JPasswordField exportPasswordEntry;
-    protected JCheckBox saveClientCertificatePasswordCheckbox;
     // Others Tab
     protected JTextField styleEntry;
     protected JComboBox lookAndFeelCombo;
@@ -200,7 +219,13 @@ public class ConfigPanel extends JPanel {
                 if (SystemEnvironment.isMacOSX() && (!className.startsWith("apple.laf.AquaLookAndFeel"))) {
                     updateFont(new Font("Osaka", Font.PLAIN, 12));
                 }
-            } catch (Exception e) {
+            } catch (ClassNotFoundException e) {
+                logger.catching(Level.WARN, e);
+            } catch (IllegalAccessException e) {
+                logger.catching(Level.WARN, e);
+            } catch (InstantiationException e) {
+                logger.catching(Level.WARN, e);
+            } catch (UnsupportedLookAndFeelException e) {
                 logger.catching(Level.WARN, e);
             }
             SwingUtilities.invokeLater(new Runnable() {
@@ -226,7 +251,6 @@ public class ConfigPanel extends JPanel {
         this.doChangeLookAndFeel = doChangeLookAndFeel;
         this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
         basicPanel = createBasicPanel();
-        sslPanel = createSSLPanel();
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
     }
@@ -237,12 +261,6 @@ public class ConfigPanel extends JPanel {
         String password = conf.getPassword(num);
         boolean savePassword = conf.getSavePassword(num);
         String authURI = conf.getAuthURI(num);
-
-        // SSL tab
-        boolean useSSL = conf.getUseSSL(num);
-        String clientCertificateFile = conf.getClientCertificateFile(num);
-        boolean saveClientCertificatePassword = conf.getSaveClientCertificatePassword(num);
-        String clientCertificatePassword = conf.getClientCertificatePassword(num);
 
         // Others tab
         String styleFile = conf.getStyleFile(num);
@@ -260,12 +278,6 @@ public class ConfigPanel extends JPanel {
         passwordEntry.setText(password);
         authURIEntry.setText(authURI);
 
-        // SSL Tab
-        useSSLCheckbox.setSelected(useSSL);
-        clientCertificateEntry.setText(clientCertificateFile);
-        exportPasswordEntry.setText(clientCertificatePassword);
-        saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
-
         // Others Tab
         styleEntry.setText(styleFile);
         lafThemeEntry.setText(lookAndFeelThemeFile);
@@ -277,9 +289,13 @@ public class ConfigPanel extends JPanel {
         useTimerCheck.setSelected(useTimer);
         timerPeriodEntry.setText(String.valueOf(timerPeriod));
         propertiesText.setText(systemProperties);
-        updateSSLPanelComponentsEnabled();
     }
 
+    protected void saveConfig(int num,String desc) {
+        conf.setDescription(num, desc);
+        this.saveConfig(num);
+    }
+    
     protected void saveConfig(int num) {
         // Basic Tab
         conf.setUser(num, userEntry.getText());
@@ -289,12 +305,6 @@ public class ConfigPanel extends JPanel {
         conf.setPassword(num, new String(passwordEntry.getPassword()));
         conf.setAuthURI(num, authURIEntry.getText());
 
-        // SSL Tab
-        conf.setUseSSL(num, useSSLCheckbox.isSelected());
-        conf.setClientCertificateFile(num, clientCertificateEntry.getText());
-        conf.setClientCertificatePassword(num, new String(exportPasswordEntry.getPassword()));
-        conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
-
         // Others Tab
         conf.setStyleFile(num, styleEntry.getText());
         conf.setLookAndFeel(num, lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
@@ -303,7 +313,7 @@ public class ConfigPanel extends JPanel {
         conf.setTimerPeriod(num, Integer.valueOf(timerPeriodEntry.getText()));
         conf.setSystemProperties(num, propertiesText.getText());
         conf.save();
-    }
+    }    
 
     public static GridBagConstraints createConstraints(int x, int y, int width, int height, double weightx, double weighty) {
         GridBagConstraints gbc = new GridBagConstraints();
@@ -385,73 +395,7 @@ public class ConfigPanel extends JPanel {
         }
         return panel;
     }
-
-    private void updateSSLPanelComponentsEnabled() {
-        final boolean useSsl = useSSLCheckbox.isSelected();
-        clientCertificateEntry.setEnabled(useSsl);
-        exportPasswordEntry.setEnabled(useSsl);
-        clientCertificateButton.setEnabled(useSsl);
-        saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
-    }
-
-    private JPanel createSSLPanel() {
-        int y;
-        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        useSSLCheckbox = new JCheckBox();
-        useSSLCheckbox.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                updateSSLPanelComponentsEnabled();
-            }
-        });
-        clientCertificateEntry = createTextField();
-        clientCertificateButton = new JButton();
-        clientCertificateButton.setAction(new FileSelectionAction(clientCertificateEntry, ".p12", clientCertificateDescription));
-        exportPasswordEntry = createPasswordField();
-        saveClientCertificatePasswordCheckbox = new JCheckBox();
-        saveClientCertificatePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(saveClientCertificatePasswordCheckbox));
-
-        y = 0;
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(useSSLCheckbox,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.client_certificate")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(clientCertificateEntry,
-                createConstraints(1, y, 2, 1, 1.0, 0.0));
-        panel.add(clientCertificateButton,
-                createConstraints(3, y, 1, 1, 0.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.cert_password")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(exportPasswordEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.save_cert_password")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(saveClientCertificatePasswordCheckbox,
-                createConstraints(1, y, 3, 1, 0.0, 0.0));
-        y++;
-
-        if (doPadding) {
-            for (int i = y; i < MAX_PANEL_ROWS; i++) {
-                panel.add(new JLabel(" "),
-                        createConstraints(0, i, MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
-            }
-        }
-
-        return panel;
-    }
-
+    
     private void updateLAFThemeEnabled() {
         String laf = (String) lookAndFeelCombo.getSelectedItem();
         boolean isNimrod = laf.equals("Nimrod");
@@ -658,10 +602,6 @@ public class ConfigPanel extends JPanel {
 
     public JPanel getBasicPanel() {
         return basicPanel;
-    }
-
-    public JPanel getSSLPanel() {
-        return sslPanel;
     }
 
     public JPanel getOthersPanel() {
