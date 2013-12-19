@@ -17,10 +17,10 @@
         <j2se version="1.6+"/>
         <jar href="jmareceipt.jar"/>
         <jar href="pandaclient.jar"/>
-        <jar href="libs/log4j.jar"/>
-        <jar href="libs/ilf-gpl.jar"/>        
-        <jar href="libs/nimrodlf.jar"/>
-        <jar href="libs/PDFRenderer.jar"/>
+        <jar href="log4j.jar"/>
+        <jar href="ilf-gpl.jar"/>        
+        <jar href="nimrodlf.jar"/>
+        <jar href="PDFRenderer.jar"/>
     </resources>
     <application-desc main-class="jp.or.med.orca.jmareceipt.JMAReceiptLauncher"/>
 </jnlp>
