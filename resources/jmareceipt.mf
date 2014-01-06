@@ -1,5 +1,5 @@
 Main-Class: org.montsuqi.client.Launcher
-Class-Path: libs/log4j-api-2.0-beta7.jar libs/log4j-core-2.0-beta7.jar libs/nimrodlf.jar libs/ilf-gpl.jar libs/PDFRenderer.jar
+Class-Path: log4j-api-2.0-beta7.jar log4j-core-2.0-beta7.jar nimrodlf.jar ilf-gpl.jar PDFRenderer.jar
 Permissions: all-permissions
 Codebase: *.orca.med.or.jp
-Trusted-Library: true
+Application-Name: monsiaj

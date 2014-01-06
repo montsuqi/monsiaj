@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <project name="panda-client" default="dist" basedir=".">
 
-	<!-- properties -->
+    <!-- properties -->
 
     <property name="src.dir"             value="src"/>
     <property name="build.dir"           value="bin"/>
@@ -26,7 +26,7 @@
         </fileset>
     </path>
 
-	<!-- targets -->
+    <!-- targets -->
 
     <target name="prepare">
         <delete includeEmptyDirs="true">
@@ -105,7 +105,7 @@
                 <include name="*"/>
             </fileset>
         </copy>
-        <copy todir="${build.dir}/libs" >
+        <copy todir="${build.dir}" >
             <fileset dir="${libs.dir}">         
                 <include name="*.jar"/>
             </fileset>
@@ -117,6 +117,7 @@
         <fixcrlf srcDir="${build.dir}" includes="*.windows.txt" eol="crlf" encoding="UTF-8" outputencoding="UTF-8"/>
         <fixcrlf srcDir="${build.dir}" includes="*.mac.txt" eol="mac" encoding="UTF-8" outputencoding="MS932"/>
         <native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8"/>
+        <native2ascii src="${resources.dir}" dest="${build.dir}" includes="*.mf" encoding="UTF-8"/>
         <filter token="webstarturl" value="${webstart.url}"/>
         <filter token="webstartvendor" value="${webstart.vendor}"/>
         <copy todir="${tmp.dir}" filtering="true">
@@ -129,7 +130,18 @@
                 <include name="*.jnlp"/>
             </fileset>
         </delete>
-        <native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8" reverse="true"/>
+        <native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.jnlp" encoding="UTF-8" reverse="true"/>        
+        <copy todir="${tmp.dir}" filtering="true">
+            <fileset dir="${build.dir}">
+                <include name="*.mf"/>
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir="${build.dir}">
+                <include name="*.mf"/>
+            </fileset>
+        </delete>
+        <native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.mf" encoding="UTF-8" reverse="true"/>
     </target>
 
     <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-loader,dist-src"/>
@@ -153,17 +165,12 @@
                 <include name="*.txt"/>
             </fileset>
         </copy>        
-        <copy todir="${build.dir}/${bin.name}/libs">
-            <fileset dir="${build.dir}/libs">
-                <include name="*.jar"/>
-            </fileset>
-        </copy>
         <copy todir="${build.dir}/${bin.name}/theme">
             <fileset dir="${build.dir}">
                 <include name="*.theme"/>
             </fileset>
         </copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
+        <!-- ant 1.5.x should use destfile instead of zipfile-->
         <zip zipfile="${dist.dir}/${bin.name}.zip">
             <fileset dir="${build.dir}">
                 <include name="${bin.name}/**"/>
@@ -175,7 +182,8 @@
         <property name="loader.name" value="monsiaj-${version}"/>
         <copy todir="${build.dir}/${loader.name}">
             <fileset dir="${build.dir}">           
-                <include name="monsiaj.jar"/>
+                <include name="monsiaj.jar"/>             
+                <include name="log4j*.jar"/>  
             </fileset>
             <fileset dir="${resources.dir}"> 
                 <include name="*.png"/>
@@ -183,12 +191,7 @@
                 <include name="*.ico"/>
             </fileset>
         </copy>
-        <copy todir="${build.dir}/${loader.name}/libs">
-            <fileset dir="${build.dir}/libs">
-                <include name="log4j*.jar"/>   
-            </fileset>         
-        </copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
+        <!-- ant 1.5.x should use destfile instead of zipfile-->
         <zip zipfile="${dist.dir}/${loader.name}.zip">
             <fileset dir="${build.dir}">
                 <include name="${loader.name}/**"/>
@@ -216,11 +219,6 @@
                 <exclude name="monsiaj.jar"/>
             </fileset>
         </copy>
-        <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java/libs">
-            <fileset dir="${build.dir}/libs">
-                <include name="*.jar"/>
-            </fileset>
-        </copy>
         <copy todir="${build.dir}/${macosx.app.dir}/Contents/MacOS">
             <fileset dir="${resources.dir}">
                 <include name="${macosx.app.stub}"/>
@@ -237,7 +235,7 @@
                 <include name="*.theme"/>
             </fileset>
         </copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
+        <!-- ant 1.5.x should use destfile instead of zipfile-->
         <zip zipfile="${dist.dir}/${bin.macosx.name}.zip">
             <fileset dir="${build.dir}">
                 <include name="${bin.macosx.name}/**"/>
@@ -260,7 +258,7 @@
                 <exclude name="**/CVS"/>
             </fileset>
         </copy>
-		<!-- ant 1.5.x should use destfile instead of zipfile-->
+        <!-- ant 1.5.x should use destfile instead of zipfile-->
         <zip zipfile="${dist.dir}/${src.name}.zip">
             <fileset dir="${build.dir}">
                 <include name="${src.name}/**"/>
@@ -299,7 +297,6 @@
         <signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
-                <include name="libs/*.jar"/>
             </fileset>
         </signjar>
         <apply executable="jarsigner">
@@ -308,7 +305,6 @@
             <arg value="${keystore}"/>
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
-                <include name="libs/*.jar"/>
             </fileset>
         </apply>
     </target>
