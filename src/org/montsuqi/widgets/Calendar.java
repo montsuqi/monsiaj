@@ -1,51 +1,68 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.widgets;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.montsuqi.util.Logger;
 
-/** <p>A class that simulates Gtk+'s Calendar widget.</p>
+/**
  * 
- * <p>When the date selection is changed, ChangeEvent will be fired.</p>
+ * 
+ * <p>A class that simulates Gtk+'s Calendar widget.</p>
+ *
+ * <p>
+ * When the date selection is changed, ChangeEvent will be fired.</p>
  */
 public class Calendar extends JComponent {
 
     Date date;
-    private JComponent caption;
-    private JButton[][] dateCells;
-    private CalendarSpinner monthSpinner;
-    private CalendarSpinner yearSpinner;
-    private Logger logger;
+    private final JComponent caption;
+    private final JButton[][] dateCells;
+    private final CalendarSpinner monthSpinner;
+    private final CalendarSpinner yearSpinner;
     Date[][] cellDates;
     java.util.Calendar cal;
 
@@ -56,10 +73,10 @@ public class Calendar extends JComponent {
         add(caption, BorderLayout.NORTH);
         caption.setLayout(new GridLayout(1, 2));
 
+        yearSpinner = new CalendarSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format")); 
+        caption.add(yearSpinner);
         monthSpinner = new CalendarSpinner(java.util.Calendar.MONTH, Messages.getString("Calendar.month_format"));
-        yearSpinner = new CalendarSpinner(java.util.Calendar.YEAR, Messages.getString("Calendar.year_format")); //$NON-NLS-1$
-        caption.add(monthSpinner); //$NON-NLS-1$
-        caption.add(yearSpinner); //$NON-NLS-1$
+        caption.add(monthSpinner);
 
         dateCells = new JButton[7][7];
         cellDates = new Date[7][7];
@@ -88,7 +105,6 @@ public class Calendar extends JComponent {
                 final JButton cell = new JButton();
                 cell.setHorizontalAlignment(SwingConstants.RIGHT);
 
-
                 final int finalRow = row;
                 final int finalCol = col;
                 cell.addActionListener(new ActionListener() {
@@ -101,7 +117,7 @@ public class Calendar extends JComponent {
                 dateCells[row][col] = cell;
                 dateCellPanel.add(cell);
                 cell.setMargin(margin);
-            //cell.setBorder(BorderFactory.createEmptyBorder());
+                //cell.setBorder(BorderFactory.createEmptyBorder());
             }
         }
         setCells(true);
@@ -117,17 +133,17 @@ public class Calendar extends JComponent {
     }
 
     public Date getDate() {
-        return (Date)date.clone();
+        return (Date) date.clone();
     }
 
     public void setDate(Date date, boolean real) {
-        this.date = (Date)date.clone();
+        this.date = (Date) date.clone();
         setCells(real);
         setSpinners();
     }
 
     public void setDateFromCalendarSpinner(Date date) {
-        this.date = (Date)date.clone();
+        this.date = (Date) date.clone();
         setCells(false);
     }
 
@@ -154,7 +170,7 @@ public class Calendar extends JComponent {
                 }
             }
         }
-    //monthLabel.setText(df.format(date));
+        //monthLabel.setText(df.format(date));
     }
 
     void setSpinners() {
@@ -191,7 +207,7 @@ public class Calendar extends JComponent {
 
     class CalendarSpinner extends JSpinner {
 
-        private ChangeListener[] listeners;
+        private final ChangeListener[] listeners;
 
         public CalendarSpinner(final int field, String format) {
             super();
@@ -205,21 +221,46 @@ public class Calendar extends JComponent {
             addChangeListener(new ChangeListener() {
 
                 public void stateChanged(ChangeEvent e) {
-                    int value;
-                    int oldvalue;
+
                     Date newDate = (Date) getValue();
-                    cal.setTime(newDate);
-                    value = cal.get(field);
-                    cal.setTime(date);
-                    oldvalue = cal.get(field);
-                    cal.add(field, value - oldvalue);
-                    if (value == oldvalue) {
-                        return;
+
+                    if (field == java.util.Calendar.MONTH) {
+                        int value;
+                        int oldvalue;
+
+                        cal.setTime(newDate);
+                        value = cal.get(field);
+                        cal.setTime(date);
+                        oldvalue = cal.get(field);
+                        if (value == oldvalue) {
+                            return;
+                        }
+                        if (oldvalue == 0 && value == 11) {
+                            cal.add(field, -1);
+                        } else if (oldvalue == 11 && value == 0) {
+                            cal.add(field, 1);
+                        } else {
+                            cal.add(field, value - oldvalue);
+                        }
+                        Calendar.this.setDateFromCalendarSpinner(cal.getTime());
+                        Calendar.this.setSpinners();
+                    } else if (field == java.util.Calendar.YEAR) {
+                        int value;
+                        int oldvalue;
+
+                        cal.setTime(newDate);
+                        value = cal.get(field);
+                        cal.setTime(date);
+                        oldvalue = cal.get(field);
+                        cal.add(field, value - oldvalue);
+                        if (value == oldvalue) {
+                            return;
+                        }
+                        Calendar.this.setDateFromCalendarSpinner(cal.getTime());
                     }
-                    Calendar.this.setDateFromCalendarSpinner(cal.getTime());
-            }
+                }
             });
-            listeners  = getChangeListeners();
+            listeners = getChangeListeners();
         }
     }
 
