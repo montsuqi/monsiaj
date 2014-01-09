@@ -39,7 +39,8 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.util.OptionParser;
 
 /**
- * <p>The main application class for panda client.</p>
+ * <p>
+ * The main application class for panda client.</p>
  */
 public class Client implements Runnable {
 
@@ -49,7 +50,8 @@ public class Client implements Runnable {
     private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 
     /**
-     * <p>Constructs a client initialized by the given configuration object.</p>
+     * <p>
+     * Constructs a client initialized by the given configuration object.</p>
      *
      * @param conf configuration.
      */
@@ -59,7 +61,8 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>A factory method to construct a Client instance initialized by the
+     * <p>
+     * A factory method to construct a Client instance initialized by the
      * command line.</p>
      *
      * @param args command line arguments.
@@ -94,7 +97,8 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Connects to the server using protocol, user, password and application
+     * <p>
+     * Connects to the server using protocol, user, password and application
      * name specified in the configuration of this client.</p>
      *
      * @throws IOException on IO errors.
@@ -110,6 +114,10 @@ public class Client implements Runnable {
         String user = conf.getUser(configName);
         String password = conf.getPassword(configName);
         String application = conf.getApplication(configName);
+        if (System.getProperty("monsia.config.reset_user") != null) {
+            conf.setUser(configName, "");
+            conf.save();
+        }
         protocol.sendConnect(user, password, application);
     }
 
@@ -127,8 +135,11 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Creates a socket for the connection.</p> <p>When the configuration
-     * says useSSL, an SSL Socket is returned instead.</p>
+     * <p>
+     * Creates a socket for the connection.</p>
+     * <p>
+     * When the configuration says useSSL, an SSL Socket is returned
+     * instead.</p>
      *
      * @return a socket connected at the TCP layer.
      * @throws IOException on IO error.
@@ -154,10 +165,12 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>PrintAgent need SSLSocketFactory for SSL API connection</p>
+     * <p>
+     * PrintAgent need SSLSocketFactory for SSL API connection</p>
+     *
      * @return
      * @throws IOException
-     * @throws GeneralSecurityException 
+     * @throws GeneralSecurityException
      */
     SSLSocketFactory createSSLSocketFactory() throws IOException, GeneralSecurityException {
         String configName = conf.getConfigurationName();
@@ -172,7 +185,8 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Kick the application.</p>
+     * <p>
+     * Kick the application.</p>
      */
     public void run() {
         try {
@@ -187,8 +201,10 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Terminates the application.</p> <p>Sends end packet to the server and
-     * exists.</p>
+     * <p>
+     * Terminates the application.</p>
+     * <p>
+     * Sends end packet to the server and exists.</p>
      */
     void exitSystem() {
         try {
@@ -205,7 +221,8 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>Dispose connection if it exists.</p>
+     * <p>
+     * Dispose connection if it exists.</p>
      */
     protected void finalize() {
         if (protocol != null) {

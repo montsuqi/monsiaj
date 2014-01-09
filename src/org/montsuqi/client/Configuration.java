@@ -75,7 +75,7 @@ public class Configuration {
     /**
      * <p>Default user: value of System property user.name.</p>
      */
-    static final String DEFAULT_USER = "trial"; //$NON-NLS-1$
+    static final String DEFAULT_USER = ""; //$NON-NLS-1$
     /**
      * <p>Default password: empty string.</p>
      */
