@@ -4,10 +4,21 @@
  */
 package org.montsuqi.client;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.logging.log4j.Level;
@@ -169,7 +180,7 @@ public class Config {
         try {
             tmp.store(new FileOutputStream(propPath), "monsiaj setting");
         } catch (IOException ex) {
-            logger.catching(Level.WARN,ex);
+            logger.catching(Level.WARN, ex);
         }
     }
 
@@ -256,9 +267,6 @@ public class Config {
     // user
     public String getUser(int i) {
         String value = getValue(i, "user");
-        if (value.isEmpty()) {
-            return "trial";
-        }
         return value;
     }
 
