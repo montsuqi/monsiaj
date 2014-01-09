@@ -347,7 +347,7 @@ public class Launcher {
             //t.start();
             //t.join();
         } catch (Exception e) {
-            logger.catching(Level.FATAL, e);
+            logger.catching(e);
             ExceptionDialog.showExceptionDialog(e);
             client.exitSystem();
         }

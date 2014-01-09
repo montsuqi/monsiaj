@@ -86,7 +86,7 @@ public class Protocol extends Connection {
     }
 
     Protocol(Client client, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
-        super(client.createSocket(), isNetworkByteOrder()); //$NON-NLS-1$
+        super(client.createSocket(), isNetworkByteOrder()); 
         this.client = client;
         isReceiving = false;
         nodeTable = new HashMap();
@@ -107,7 +107,7 @@ public class Protocol extends Connection {
         logger.entry();
         StringTokenizer tokens = new StringTokenizer(VERSION, String.valueOf(':'));
         while (tokens.hasMoreTokens()) {
-            if ("no".equals(tokens.nextToken())) { //$NON-NLS-1$
+            if ("no".equals(tokens.nextToken())) { 
                 logger.exit();
                 return true;
             }
@@ -127,7 +127,7 @@ public class Protocol extends Connection {
         byte pc = receivePacketClass();
         if (pc != PacketClass.ScreenDefine) {
             Object[] args = {new Byte(PacketClass.ScreenDefine), new Byte(pc)};
-            logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args); //$NON-NLS-1$
+            logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args); 
             logger.exit();
             return false;
         }
@@ -576,16 +576,16 @@ public class Protocol extends Connection {
                 }
                 break;
             case PacketClass.NOT:
-                throw new ConnectException(Messages.getString("Client.cannot_connect_to_server")); //$NON-NLS-1$
+                throw new ConnectException(Messages.getString("Client.cannot_connect_to_server")); 
             case PacketClass.E_VERSION:
-                throw new ConnectException(Messages.getString("Client.version_mismatch")); //$NON-NLS-1$
+                throw new ConnectException(Messages.getString("Client.version_mismatch")); 
             case PacketClass.E_AUTH:
-                throw new ConnectException(Messages.getString("Client.authentication_error")); //$NON-NLS-1$
+                throw new ConnectException(Messages.getString("Client.authentication_error")); 
             case PacketClass.E_APPL:
-                throw new ConnectException(Messages.getString("Client.application_name_invalid")); //$NON-NLS-1$
+                throw new ConnectException(Messages.getString("Client.application_name_invalid")); 
             default:
                 Object[] args = {Integer.toHexString(pc)};
-                throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); //$NON-NLS-1$
+                throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); 
         }
 
         String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();

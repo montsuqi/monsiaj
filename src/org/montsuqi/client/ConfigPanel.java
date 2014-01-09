@@ -203,7 +203,7 @@ public class ConfigPanel extends JPanel {
                     updateFont(new Font("Osaka", Font.PLAIN, 12));
                 }
             } catch (Exception e) {
-                logger.catching(Level.WARN, e);
+                logger.catching(e);
             }
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -215,7 +215,7 @@ public class ConfigPanel extends JPanel {
                         }
 
                     } catch (Exception e) {
-                        logger.catching(Level.WARN, e);
+                        logger.catching(e);
                     }
                 }
             });

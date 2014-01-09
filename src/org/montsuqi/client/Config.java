@@ -180,7 +180,7 @@ public class Config {
         try {
             tmp.store(new FileOutputStream(propPath), "monsiaj setting");
         } catch (IOException ex) {
-            logger.catching(Level.WARN, ex);
+            logger.catching(ex);
         }
     }
 

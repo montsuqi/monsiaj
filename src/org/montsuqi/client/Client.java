@@ -46,7 +46,7 @@ public class Client implements Runnable {
     private Config conf;
     Logger logger;
     private Protocol protocol;
-    private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
+    private static final String CLIENT_VERSION = "0.0"; 
 
     /**
      * <p>
@@ -88,12 +88,12 @@ public class Client implements Runnable {
     private Map loadStyles() {
         URL url = conf.getStyleURL(conf.getCurrent());
         try {
-            logger.debug("loading styles from URL: {0}", url); //$NON-NLS-1$
+            logger.debug("loading styles from URL: {0}", url); 
             InputStream in = url.openStream();
             return Style.load(in);
         } catch (IOException e) {
             logger.debug(e);
-            logger.debug("using empty style set"); //$NON-NLS-1$
+            logger.debug("using empty style set"); 
             return Collections.EMPTY_MAP;
         }
     }
