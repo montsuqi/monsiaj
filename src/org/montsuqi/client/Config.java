@@ -234,9 +234,6 @@ public class Config {
     // user
     public String getUser(int i) {
         String value = getValue(i, "user");
-        if (value.isEmpty()) {
-            return "trial";
-        }
         return value;
     }
 

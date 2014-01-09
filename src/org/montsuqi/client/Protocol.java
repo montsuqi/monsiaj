@@ -129,6 +129,11 @@ public class Protocol {
         final String user = this.conf.getUser(num);
         final String password = this.conf.getPassword(num);
 
+        if (System.getProperty("monsia.config.reset_user") != null) {
+            conf.setUser(num, "");
+            conf.save();
+        }
+
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -177,7 +182,7 @@ public class Protocol {
         con.setRequestMethod("POST");
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
-        OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(),"UTF-8");
+        OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
 
         osw.write(reqStr);
         osw.flush();
@@ -323,7 +328,7 @@ public class Protocol {
         }
         out.close();
         con.disconnect();
-        
+
         return con.getResponseCode();
     }
 
@@ -442,9 +447,9 @@ public class Protocol {
         if (node == null) {
             String gladeData = w.getString("screen_define");
             try {
-            node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
-            } catch(UnsupportedEncodingException ex) {
-                logger.info("",ex);
+                node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
+            } catch (UnsupportedEncodingException ex) {
+                logger.info("", ex);
             }
             nodeTable.put(_windowName, node);
         }
