@@ -42,16 +42,23 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.*;
 
-/** <p>WidgetPropertySetter is a class to help assigning properties to widgets.</p>
- * <p>These setters exist one for a class(and subclass) and property name.</p>
- * <p>When building a widget, a widget builder will look up a suitable setter
- * for each key in provided properties. When such a setter is found, its set method
+/**
+ * <p>
+ * WidgetPropertySetter is a class to help assigning properties to widgets.</p>
+ * <p>
+ * These setters exist one for a class(and subclass) and property name.</p>
+ * <p>
+ * When building a widget, a widget builder will look up a suitable setter for
+ * each key in provided properties. When such a setter is found, its set method
  * is called to set a certain property of the widget.</p>
  */
 abstract class WidgetPropertySetter {
 
-    /** <p>This method does the actual work of setting a property.
-     * Subclasses must implement this method.</p>
+    /**
+     * <p>
+     * This method does the actual work of setting a property. Subclasses must
+     * implement this method.</p>
+     *
      * @param xml glade screen definition
      * @param parent parent widget of the target widget.
      * @param widget target widget.
@@ -66,10 +73,14 @@ abstract class WidgetPropertySetter {
     private static Map propertyMap;
     private static final WidgetPropertySetter nullWidgetPropertySetter;
 
-    /** <p>Looks up a property setter for given class or its ancestors and
-     * property name.</p>
-     * <p>When no setter is found, nullWidgetPropertySetter, which does nothing,
-     * is returned.</p>
+    /**
+     * <p>
+     * Looks up a property setter for given class or its ancestors and property
+     * name.</p>
+     * <p>
+     * When no setter is found, nullWidgetPropertySetter, which does nothing, is
+     * returned.</p>
+     *
      * @param clazz class of the widget whose property is to be set.
      * @param name the proeprty name to be set.
      * @return a setter.
@@ -476,6 +487,19 @@ abstract class WidgetPropertySetter {
             }
         });        
 
+        registerProperty(PandaTable.class, "im_controls", new WidgetPropertySetter() { //$NON-NLS-1$
+
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaTable table = (PandaTable) widget;
+                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
+                String[] ics = new String[tokens.countTokens()];
+                for (int i = 0; tokens.hasMoreTokens(); i++) {
+                    ics[i] = tokens.nextToken();
+                }
+                table.setImControls(ics);
+            }
+        });
+
         registerProperty(PandaTable.class, "column_titles", new WidgetPropertySetter() { //$NON-NLS-1$
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTable table = (PandaTable)widget;                
@@ -716,7 +740,6 @@ abstract class WidgetPropertySetter {
 //				tl.setRowSpacing(ParameterConverter.toInteger(value));
 //			}
 //		});
-
         registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1
 
             void set(Interface xml, Container parent, Component widget, String value) {
@@ -799,8 +822,10 @@ abstract class WidgetPropertySetter {
 
     }
 
-    /** <p>Removes given prefix along with "GTK_" and "GTK_".
-     * </p>
+    /**
+     * <p>
+     * Removes given prefix along with "GTK_" and "GTK_". </p>
+     *
      * @param value target string to be normalized.
      * @param prefixToRemove a prefix to remove. Ignored if it is null or its length is zero.
      * @return normalized string.

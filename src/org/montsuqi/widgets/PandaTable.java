@@ -27,9 +27,9 @@ public class PandaTable extends JTable {
 
     private class PandaTableModel extends DefaultTableModel {
 
-        private final int MAX_COLS = 100;
         private String[] types;
         private String[] titles;
+        private String[] imControls;
 
         public PandaTableModel() {
             super();
@@ -111,6 +111,9 @@ public class PandaTable extends JTable {
             }
         }
     }
+
+    private final int MAX_COLS = 100;
+
     private Color[][] fgColors;
     private Color[][] bgColors;
     private PandaTableModel model;
@@ -118,15 +121,7 @@ public class PandaTable extends JTable {
     private int changedRow;
     private int changedColumn;
     private String changedValue;
-    private boolean ximEnabled;
-
-    public boolean isXimEnabled() {
-        return ximEnabled;
-    }
-
-    public void setXimEnabled(boolean ximEnabled) {
-        this.ximEnabled = ximEnabled;
-    }
+    private boolean[] imControls;
 
     public int getChangedColumn() {
         return changedColumn;
@@ -160,6 +155,12 @@ public class PandaTable extends JTable {
         this.enterPressed = enterPressed;
     }
 
+    public void setImControls(String[] cs) {
+        for (int i = 0; i < cs.length && i < imControls.length; i++) {
+            imControls[i] = cs[i].startsWith("t") || cs[i].startsWith("T");
+        }
+    }
+
     public PandaTable() {
         this.setRowSelectionAllowed(false);
         JTableHeader header = this.getTableHeader();
@@ -179,7 +180,10 @@ public class PandaTable extends JTable {
         this.setRowHeight(rowheight);
 
         enterPressed = false;
-        ximEnabled = false;
+        imControls = new boolean[MAX_COLS];
+        for (int i = 0; i < MAX_COLS; i++) {
+            imControls[i] = false;
+        }
 
         final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
 
@@ -213,19 +217,14 @@ public class PandaTable extends JTable {
         ce.getComponent().addFocusListener(new FocusListener() {
 
             public void focusGained(FocusEvent e) {
+                // do nothing                
                 if (SystemEnvironment.isWindows()) {
-                    if (ximEnabled) {
+                    if (imControls[getSelectedColumn()]) {
                         InputContext ic = getInputContext();
                         if (ic != null) {
                             ic.setCharacterSubsets(new Character.Subset[]{InputSubset.KANJI});
-                            ic.selectInputMethod(Locale.JAPANESE);
-                        }
-                    } else {
-                        InputContext ic = getInputContext();
-                        if (ic != null) {
-                            ic.setCharacterSubsets(null);
                             ic.endComposition();
-                            ic.selectInputMethod(Locale.ENGLISH);
+                            ic.selectInputMethod(Locale.JAPANESE);
                         }
                     }
                 }

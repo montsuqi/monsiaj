@@ -104,8 +104,6 @@ class PandaTableMarshaller extends WidgetMarshaller {
                 /*
                  * String dummy =
                  */ con.receiveStringData();
-            } else if ("ximenabled".equals(name)) {
-                table.setXimEnabled(con.receiveBooleanData());
             } else if ("rowdata".equals(name)) {
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 int nrows = con.receiveInt();
