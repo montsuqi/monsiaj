@@ -286,6 +286,11 @@ public class ConfigPanel extends JPanel {
         updateSSLPanelComponentsEnabled();
     }
 
+    protected void saveConfig(int num,String desc) {
+        conf.setDescription(num, desc);
+        this.saveConfig(num);
+    }
+    
     protected void saveConfig(int num) {
         // Basic Tab
         conf.setUser(num, userEntry.getText());

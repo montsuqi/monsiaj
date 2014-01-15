@@ -196,7 +196,7 @@ public class ConfigViewer {
 
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
-                configPanel.saveConfig(num);
+                configPanel.saveConfig(num,entryName);
                 f.dispose();
             }
         });
