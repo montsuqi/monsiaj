@@ -27,9 +27,8 @@ public class PandaTable extends JTable {
 
     private class PandaTableModel extends DefaultTableModel {
 
-        private String[] types;
-        private String[] titles;
-        private String[] imControls;
+        private final String[] types;
+        private final String[] titles;
 
         public PandaTableModel() {
             super();
@@ -96,10 +95,7 @@ public class PandaTable extends JTable {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            if (this.types[col].equals("label")) {
-                return false;
-            }
-            return true;
+            return !this.types[col].equals("label");
         }
 
         @Override
@@ -116,7 +112,7 @@ public class PandaTable extends JTable {
 
     private Color[][] fgColors;
     private Color[][] bgColors;
-    private PandaTableModel model;
+    private final PandaTableModel model;
     private boolean enterPressed;
     private int changedRow;
     private int changedColumn;
@@ -371,8 +367,7 @@ public class PandaTable extends JTable {
 
     @Override
     public Component prepareEditor(TableCellEditor editor, int row, int column) {
-        Component c = super.prepareEditor(editor, row,
-                column);
+        Component c = super.prepareEditor(editor,row,column);
         if (fgColors != null) {
             c.setForeground(fgColors[row][column]);
         }

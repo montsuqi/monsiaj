@@ -67,7 +67,7 @@ public class Launcher {
     protected Config conf;
     protected ConfigPanel configPanel;
     protected JComboBox configCombo;
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     public static void main(String[] args) {
         logger.info("---- start monsiaj");
@@ -206,15 +206,15 @@ public class Launcher {
 
     private void updateConfigCombo() {
         ActionListener[] listeners = configCombo.getActionListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            configCombo.removeActionListener(listeners[i]);
+        for (ActionListener listener : listeners) {
+            configCombo.removeActionListener(listener);
         }
         configCombo.removeAllItems();
         for (int i : conf.getList()) {
             configCombo.addItem(conf.getDescription(i));
         }
-        for (int i = 0; i < listeners.length; i++) {
-            configCombo.addActionListener(listeners[i]);
+        for (ActionListener listener : listeners) {
+            configCombo.addActionListener(listener);
         }
         configCombo.setSelectedItem(conf.getDescription(conf.getCurrent()));
     }
@@ -223,11 +223,11 @@ public class Launcher {
         String ver = System.getProperty("java.version");
         boolean isOld = false;
         if (ver.startsWith("1.7")) {
-            if (ver.compareToIgnoreCase("1.7.0_21") < 0) {
+            if (ver.compareToIgnoreCase("1.7.0_51") < 0) {
                 isOld = true;
             }
         } else if (ver.startsWith("1.6")) {
-            if (ver.compareToIgnoreCase("1.6.0_45") < 0) {
+            if (ver.compareToIgnoreCase("1.6.0_71") < 0) {
                 isOld = true;
             }
         }
@@ -303,7 +303,7 @@ public class Launcher {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
+        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { 
 
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
@@ -316,7 +316,7 @@ public class Launcher {
         });
         bar.add(run);
 
-        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { //$NON-NLS-1$
+        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { 
 
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -324,7 +324,7 @@ public class Launcher {
         });
         bar.add(cancel);
 
-        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
+        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { 
 
             public void actionPerformed(ActionEvent e) {
                 viewer.run(f);
@@ -369,7 +369,7 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); //$NON-NLS-1$
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); 
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }
