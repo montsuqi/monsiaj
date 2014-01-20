@@ -22,9 +22,9 @@ import org.apache.logging.log4j.Logger;
  */
 public class Loader {
 
-    private static Logger log = LogManager.getLogger(Loader.class);
-    private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client/version.txt";
-    private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client/";
+    private static final Logger log = LogManager.getLogger(Loader.class);
+    private final String VERSION_URL = "https://ftp.orca.med.or.jp/pub/java-client/version.txt";
+    private final String DOWNLOAD_URL = "https://ftp.orca.med.or.jp/pub/java-client/";
     private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "cache"};
     private final String CACHE_DIR = createFilePath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
     private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader.properties"};
