@@ -23,7 +23,7 @@ and open the template in the editor.
         </Console>
     </appenders>
     <loggers>
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
         </root>
