@@ -10,7 +10,6 @@ and open the template in the editor.
             name="RollingFile" 
             fileName="${sys:user.home}/.monsiaj/monsiaj.log"
             filePattern="${sys:user.home}/.monsiaj/monsiaj.log.%i"
-            bufferredIO="false"
         >
             <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
             <Policies>
