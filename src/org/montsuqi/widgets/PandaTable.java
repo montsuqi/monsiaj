@@ -18,6 +18,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import org.montsuqi.util.SafeColorDecoder;
@@ -362,13 +363,19 @@ public class PandaTable extends JTable {
         model.setValueAt(data, row, col);
     }
 
-    /*
-     * @Override public Component prepareEditor( TableCellEditor editor, int
-     * row, int column) { Component c = super.prepareEditor(editor, row,
-     * column); if (fgColors != null) { c.setForeground(fgColors[row][column]);
-     * } if (bgColors != null) { c.setBackground(bgColors[row][column]); }
-     * return c; }
-     */
+    @Override
+    public Component prepareEditor(TableCellEditor editor, int row, int column) {
+        Component c = super.prepareEditor(editor, row,
+                column);
+        if (fgColors != null) {
+            c.setForeground(fgColors[row][column]);
+        }
+        if (bgColors != null) {
+            c.setBackground(bgColors[row][column]);
+        }
+        return c;
+    }
+
     @Override
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
