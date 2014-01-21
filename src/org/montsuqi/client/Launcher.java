@@ -48,14 +48,15 @@ public class Launcher {
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     public static void main(String[] args) {
+        Launcher launcher = new Launcher(Messages.getString("application.title"));
+
         logger.info("---- start monsiaj");
-        logger.info("version : {}",Messages.getString("application.version"));
-        logger.info("java : {}",System.getProperty("java.version"));
+        logger.info("version : {}", Messages.getString("application.version"));
+        logger.info("java : {}", System.getProperty("java.version"));
         logger.info("os : {}-{}-{}",
                 System.getProperty("os.name"),
                 System.getProperty("os.version"),
                 System.getProperty("os.arch"));
-        Launcher launcher = new Launcher(Messages.getString("application.title"));
         launcher.launch(args);
     }
 
@@ -162,10 +163,10 @@ public class Launcher {
         configPanel.loadConfig(conf.getCurrent());
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); 
-        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel()); 
-        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); 
-        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); 
+        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel());
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -296,20 +297,20 @@ public class Launcher {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { 
+        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) {
 
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
                 conf.setCurrent(num);
-		        conf.applySystemProperties(conf.getCurrent());
+                conf.applySystemProperties(conf.getCurrent());
                 connect();
                 f.dispose();
             }
         });
         bar.add(run);
 
-        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { 
+        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -317,7 +318,7 @@ public class Launcher {
         });
         bar.add(cancel);
 
-        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { 
+        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
 
             public void actionPerformed(ActionEvent e) {
                 viewer.run(f);
@@ -362,7 +363,7 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); 
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png");
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }

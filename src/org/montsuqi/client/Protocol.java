@@ -788,9 +788,7 @@ public class Protocol extends Connection {
     }
 
     synchronized void exit() {
-        logger.entry();
         isReceiving = true;
-        logger.exit();
         client.exitSystem();
     }
 

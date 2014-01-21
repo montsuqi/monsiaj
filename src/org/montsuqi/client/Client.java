@@ -43,10 +43,12 @@ import org.montsuqi.monsia.Style;
  */
 public class Client implements Runnable {
 
-    private Config conf;
-    Logger logger;
+    private final Config conf;
     private Protocol protocol;
-    private static final String CLIENT_VERSION = "0.0"; 
+    protected static final Logger logger = LogManager.getLogger(Launcher.class);
+    private String user;
+    private String host;
+    private int port;
 
     /**
      * <p>
@@ -56,7 +58,6 @@ public class Client implements Runnable {
      */
     public Client(Config conf) {
         this.conf = conf;
-        logger = LogManager.getLogger(Client.class);
     }
 
     /**
@@ -74,14 +75,17 @@ public class Client implements Runnable {
         long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
         protocol = new Protocol(this, styles, timerPeriod);
 
-        String user = conf.getUser(num);
+        user = conf.getUser(num);
+        host = conf.getHost(num);
+        port = conf.getPort(num);
+        
         if (System.getProperty("monsia.config.reset_user") != null) {
             conf.setUser(num,"");
             conf.save();
         }
         String password = conf.getPassword(num);
         String application = conf.getApplication(num);
-        logger.debug("user : {}", user);
+        logger.info("connect {}@{}:{} {}",user,host,port,this);
         protocol.sendConnect(user, password, application);
     }
 
@@ -181,6 +185,7 @@ public class Client implements Runnable {
         } catch (Exception e) {
             logger.warn(e);
         } finally {
+            logger.info("disconnect {}@{}:{} {}",user,host,port,this);
             System.exit(0);
         }
     }
