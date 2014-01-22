@@ -41,7 +41,7 @@ import org.montsuqi.util.Logger;
 import org.montsuqi.util.SystemEnvironment;
 
 public class ConfigurationPanel extends JPanel {
-
+    
     protected static final Logger logger = Logger.getLogger(ConfigurationPanel.class);
     protected Configuration conf;
     protected JPanel basicPanel;
@@ -78,16 +78,17 @@ public class ConfigurationPanel extends JPanel {
     private MetalTheme systemMetalTheme;
 
     /**
-     * <p>An action to warn vulnerability of saving password.</p>
+     * <p>
+     * An action to warn vulnerability of saving password.</p>
      */
     private final class ConfirmSavePasswordAction implements ActionListener {
-
+        
         final JCheckBox checkbox;
-
+        
         public ConfirmSavePasswordAction(JCheckBox checkbox) {
             this.checkbox = checkbox;
         }
-
+        
         public void actionPerformed(ActionEvent e) {
             if (checkbox.isSelected()) {
                 int result = JOptionPane.showConfirmDialog(ConfigurationPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
@@ -99,18 +100,21 @@ public class ConfigurationPanel extends JPanel {
     }
 
     /**
-     * <p>An action to pop a fiel selection dialog.</p> <p>When a file is
-     * selected, the path of the selected file is set to specified text
-     * field.</p>
+     * <p>
+     * An action to pop a fiel selection dialog.</p>
+     * <p>
+     * When a file is selected, the path of the selected file is set to
+     * specified text field.</p>
      */
     private final class FileSelectionAction extends AbstractAction {
-
+        
         private JTextComponent entry;
         private String extension;
         private String description;
 
         /**
-         * <p>Constructs a FileSelectionAction.</p>
+         * <p>
+         * Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -124,7 +128,7 @@ public class ConfigurationPanel extends JPanel {
             this.extension = extension;
             this.description = description;
         }
-
+        
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser(entry.getText());
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
@@ -135,15 +139,16 @@ public class ConfigurationPanel extends JPanel {
             }
         }
     }
-
+    
     private final class ThemeSelectionAction extends AbstractAction {
-
+        
         private JTextComponent entry;
         private String extension;
         private String description;
 
         /**
-         * <p>Constructs a FileSelectionAction.</p>
+         * <p>
+         * Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -157,7 +162,7 @@ public class ConfigurationPanel extends JPanel {
             this.extension = extension;
             this.description = description;
         }
-
+        
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser(entry.getText()); //$NON-NLS-1$
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
@@ -169,9 +174,9 @@ public class ConfigurationPanel extends JPanel {
             }
         }
     }
-
+    
     final class TextAreaSelected extends FocusAdapter {
-
+        
         @Override
         public void focusGained(FocusEvent e) {
             Object o = e.getSource();
@@ -183,11 +188,11 @@ public class ConfigurationPanel extends JPanel {
             tc.selectAll();
         }
     }
-
+    
     protected void changeLookAndFeel() {
         changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
     }
-
+    
     protected void changeLookAndFeel(String className) {
         if (doChangeLookAndFeel) {
             try {
@@ -205,14 +210,14 @@ public class ConfigurationPanel extends JPanel {
                 logger.warn(e);
             }
             SwingUtilities.invokeLater(new Runnable() {
-
+                
                 public void run() {
                     Component root = SwingUtilities.getRoot(basicPanel);
                     try {
                         if (root != null) {
                             SwingUtilities.updateComponentTreeUI(root);
                         }
-
+                        
                     } catch (Exception e) {
                         logger.warn(e);
                     }
@@ -220,7 +225,7 @@ public class ConfigurationPanel extends JPanel {
             });
         }
     }
-
+    
     protected ConfigurationPanel(Configuration conf, boolean doPadding, boolean doChangeLookAndFeel) {
         this.conf = conf;
         this.doPadding = doPadding;
@@ -231,7 +236,7 @@ public class ConfigurationPanel extends JPanel {
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
     }
-
+    
     public void loadConfiguration(String configName, boolean newFlag) {
         // Basic tab
         String user = newFlag ? Configuration.DEFAULT_USER : conf.getUser(configName);
@@ -286,14 +291,18 @@ public class ConfigurationPanel extends JPanel {
         propertiesText.setText(properties);
         updateSSLPanelComponentsEnabled();
     }
-
+    
     protected void saveConfiguration(String configName) {
         // Basic Tab
         conf.setUser(configName, userEntry.getText());
         // Save save_pass check field before the password itself,
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(configName, savePasswordCheckbox.isSelected());
-        conf.setPassword(configName, new String(passwordEntry.getPassword()));
+        if (savePasswordCheckbox.isSelected()) {
+            conf.setPassword(configName, new String(passwordEntry.getPassword()));
+        } else {
+            conf.setPassword(configName, new String(""));        
+        }
         conf.setHost(configName, hostEntry.getText());
         conf.setPort(configName, Integer.parseInt(portEntry.getText()));
         conf.setApplication(configName, appEntry.getText());
@@ -319,7 +328,7 @@ public class ConfigurationPanel extends JPanel {
         conf.setTimerPeriod(configName, Long.parseLong(timerPeriodEntry.getText()));
         conf.setProperties(configName, propertiesText.getText());
     }
-
+    
     public static GridBagConstraints createConstraints(int x, int y, int width, int height, double weightx, double weighty) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
@@ -332,7 +341,7 @@ public class ConfigurationPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         return gbc;
     }
-
+    
     public static JLabel createLabel(String str) {
         JLabel label = new JLabel(str);
         label.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -341,26 +350,26 @@ public class ConfigurationPanel extends JPanel {
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         return label;
     }
-
+    
     public static JTextField createTextField() {
         JTextField tf = new JTextField();
         tf.setHorizontalAlignment(SwingConstants.LEFT);
         tf.setText("");
         return tf;
     }
-
+    
     public static JPasswordField createPasswordField() {
         JPasswordField pf = new JPasswordField();
         pf.setHorizontalAlignment(SwingConstants.LEFT);
         pf.setText("");
         return pf;
     }
-
+    
     private JPanel createBasicPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+        
         hostEntry = createTextField();
         portEntry = createTextField();
         portEntry.setColumns(5);
@@ -369,7 +378,7 @@ public class ConfigurationPanel extends JPanel {
         passwordEntry = createPasswordField();
         savePasswordCheckbox = new JCheckBox();
         savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
-
+        
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.host")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
@@ -378,31 +387,31 @@ public class ConfigurationPanel extends JPanel {
         panel.add(portEntry,
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.application")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(appEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.user")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(userEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(passwordEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.save_password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(savePasswordCheckbox,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
                 panel.add(new JLabel(" "),
@@ -411,7 +420,7 @@ public class ConfigurationPanel extends JPanel {
         }
         return panel;
     }
-
+    
     private void updateSSLPanelComponentsEnabled() {
         final boolean useSsl = useSSLCheckbox.isSelected();
         clientCertificateEntry.setEnabled(useSsl);
@@ -419,17 +428,17 @@ public class ConfigurationPanel extends JPanel {
         clientCertificateButton.setEnabled(useSsl);
         saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
     }
-
+    
     private JPanel createSSLPanel() {
         int y;
         final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+        
         useSSLCheckbox = new JCheckBox();
         useSSLCheckbox.addActionListener(new ActionListener() {
-
+            
             public void actionPerformed(ActionEvent e) {
                 updateSSLPanelComponentsEnabled();
             }
@@ -440,14 +449,14 @@ public class ConfigurationPanel extends JPanel {
         exportPasswordEntry = createPasswordField();
         saveClientCertificatePasswordCheckbox = new JCheckBox();
         saveClientCertificatePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(saveClientCertificatePasswordCheckbox));
-
+        
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(useSSLCheckbox,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.client_certificate")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(clientCertificateEntry,
@@ -455,36 +464,36 @@ public class ConfigurationPanel extends JPanel {
         panel.add(clientCertificateButton,
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.cert_password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(exportPasswordEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.save_cert_password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(saveClientCertificatePasswordCheckbox,
                 createConstraints(1, y, 3, 1, 0.0, 0.0));
         y++;
-
+        
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
                 panel.add(new JLabel(" "),
                         createConstraints(0, i, MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
             }
         }
-
+        
         return panel;
     }
-
+    
     private void updateLAFThemeEnabled() {
         String laf = (String) lookAndFeelCombo.getSelectedItem();
         boolean isNimrod = laf.equals("Nimrod");
         lafThemeEntry.setEnabled(isNimrod);
         lafThemeButton.setEnabled(isNimrod);
     }
-
+    
     private void updateFont(final Font font) {
         Enumeration e = UIManager.getDefaults().keys();
         while (e.hasMoreElements()) {
@@ -495,17 +504,17 @@ public class ConfigurationPanel extends JPanel {
             }
         }
     }
-
+    
     private JPanel createOthersPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+        
         styleEntry = createTextField();
         JButton styleButton = new JButton();
         styleButton.setAction(
                 new FileSelectionAction(styleEntry, ".properties",
-                Messages.getString("ConfigurationPanel.style_filter_pattern")));
+                        Messages.getString("ConfigurationPanel.style_filter_pattern")));
         lafs = UIManager.getInstalledLookAndFeels();
         String[] lafNames = new String[lafs.length];
         for (int i = 0; i < lafNames.length; i++) {
@@ -517,7 +526,7 @@ public class ConfigurationPanel extends JPanel {
             lookAndFeelCombo.addItem(lafNames[i]);
         }
         lookAndFeelCombo.addActionListener(new ActionListener() {
-
+            
             public void actionPerformed(ActionEvent e) {
                 updateLAFThemeEnabled();
                 changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
@@ -527,15 +536,15 @@ public class ConfigurationPanel extends JPanel {
         lafThemeButton = new JButton();
         lafThemeButton.setAction(
                 new ThemeSelectionAction(lafThemeEntry, ".theme",
-                Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
-
+                        Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
+        
         useLogViewerCheck = new JCheckBox();
-
+        
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
         useTimerCheck = new JCheckBox();
         useTimerCheck.addActionListener(new ActionListener() {
-
+            
             public void actionPerformed(ActionEvent e) {
                 timerPeriodEntry.setEnabled(useTimerCheck.isSelected());
             }
@@ -546,12 +555,12 @@ public class ConfigurationPanel extends JPanel {
         timerPeriodEntry = new JTextField(5);
         timerPeriodEntryPanel.add(timerPeriodEntry);
         timerPanel.add(timerPeriodEntryPanel);
-
+        
         propertiesText = new JTextArea(10, 30);
         propertiesText.addFocusListener(new TextAreaSelected());
         JScrollPane propertiesScroll = new JScrollPane(propertiesText, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         propertiesScroll.setMinimumSize(new Dimension(0, 100));
-
+        
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.style")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
@@ -560,13 +569,13 @@ public class ConfigurationPanel extends JPanel {
         panel.add(styleButton,
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.look_and_feel")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(lookAndFeelCombo,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.laf_theme")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(lafThemeEntry,
@@ -574,19 +583,19 @@ public class ConfigurationPanel extends JPanel {
         panel.add(lafThemeButton,
                 createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_log_viewer")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(useLogViewerCheck,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_timer")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(timerPanel,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
-
+        
         panel.add(createLabel(Messages.getString("ConfigurationPanel.additional_system_properties")),
                 createConstraints(0, y, 1, 6, 0.0, 1.0));
         panel.add(propertiesScroll,
@@ -600,12 +609,12 @@ public class ConfigurationPanel extends JPanel {
         }
         return panel;
     }
-
+    
     private JPanel createInfoPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+        
         JLabel version = new JLabel("monsiaj ver." + Messages.getString("application.version"));
         version.setHorizontalAlignment(SwingConstants.CENTER);
         version.setFont(new Font(null, Font.BOLD, 20));
@@ -613,7 +622,7 @@ public class ConfigurationPanel extends JPanel {
         copy.setHorizontalAlignment(SwingConstants.CENTER);
         JButton orcaButton = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
         orcaButton.addActionListener(new ActionListener() {
-
+            
             public void actionPerformed(ActionEvent e) {
                 Desktop d = Desktop.getDesktop();
                 if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
@@ -627,7 +636,7 @@ public class ConfigurationPanel extends JPanel {
         });
         JButton montsuqiButton = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
         montsuqiButton.addActionListener(new ActionListener() {
-
+            
             public void actionPerformed(ActionEvent e) {
                 Desktop d = Desktop.getDesktop();
                 if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
@@ -639,7 +648,7 @@ public class ConfigurationPanel extends JPanel {
                 }                
             }
         });
-
+        
         JPanel innerPanel = new JPanel();
         innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
         innerPanel.setBorder(BorderFactory.createLineBorder((Color) SystemColor.controlDkShadow));
@@ -658,29 +667,28 @@ public class ConfigurationPanel extends JPanel {
         innerPanel.add(new JLabel(" "));
         innerPanel.add(new JLabel(" "));
         innerPanel.add(new JLabel(" "));
-
+        
         y = 0;
         panel.add(version,
                 createConstraints(0, y, 4, 3, 1.0, 1.0));
         y += 3;
-
+        
         panel.add(copy,
                 createConstraints(0, y, 4, 1, 1.0, 1.0));
         y++;
-
+        
         panel.add(orcaButton,
                 createConstraints(0, y, 4, 1, 0.0, 1.0));
         y++;
-
+        
         panel.add(montsuqiButton,
                 createConstraints(0, y, 4, 1, 0.0, 1.0));
         y++;
-
+        
         panel.add(innerPanel,
                 createConstraints(0, y, 4, 1, 1.0, 1.0));
         y += 1;
-
-
+        
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
                 panel.add(new JLabel(" "),
@@ -689,19 +697,19 @@ public class ConfigurationPanel extends JPanel {
         }
         return panel;
     }
-
+    
     public JPanel getBasicPanel() {
         return basicPanel;
     }
-
+    
     public JPanel getSSLPanel() {
         return sslPanel;
     }
-
+    
     public JPanel getOthersPanel() {
         return othersPanel;
     }
-
+    
     public JPanel getInfoPanel() {
         return infoPanel;
     }
