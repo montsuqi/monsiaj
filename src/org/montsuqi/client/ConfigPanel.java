@@ -79,7 +79,8 @@ public class ConfigPanel extends JPanel {
     private MetalTheme systemMetalTheme;
 
     /**
-     * <p>An action to warn vulnerability of saving password.</p>
+     * <p>
+     * An action to warn vulnerability of saving password.</p>
      */
     private final class ConfirmSavePasswordAction implements ActionListener {
 
@@ -100,9 +101,11 @@ public class ConfigPanel extends JPanel {
     }
 
     /**
-     * <p>An action to pop a fiel selection dialog.</p> <p>When a file is
-     * selected, the path of the selected file is set to specified text
-     * field.</p>
+     * <p>
+     * An action to pop a fiel selection dialog.</p>
+     * <p>
+     * When a file is selected, the path of the selected file is set to
+     * specified text field.</p>
      */
     private final class FileSelectionAction extends AbstractAction {
 
@@ -111,7 +114,8 @@ public class ConfigPanel extends JPanel {
         private String description;
 
         /**
-         * <p>Constructs a FileSelectionAction.</p>
+         * <p>
+         * Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -144,7 +148,8 @@ public class ConfigPanel extends JPanel {
         private String description;
 
         /**
-         * <p>Constructs a FileSelectionAction.</p>
+         * <p>
+         * Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -286,18 +291,22 @@ public class ConfigPanel extends JPanel {
         updateSSLPanelComponentsEnabled();
     }
 
-    protected void saveConfig(int num,String desc) {
+    protected void saveConfig(int num, String desc) {
         conf.setDescription(num, desc);
         this.saveConfig(num);
     }
-    
+
     protected void saveConfig(int num) {
         // Basic Tab
         conf.setUser(num, userEntry.getText());
         // Save save_pass check field before the password itself,
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
-        conf.setPassword(num, new String(passwordEntry.getPassword()));
+        if (savePasswordCheckbox.isSelected()) {
+            conf.setPassword(num, new String(passwordEntry.getPassword()));
+        } else {
+            conf.setPassword(num, "");
+        }
         conf.setHost(num, hostEntry.getText());
         conf.setPort(num, Integer.parseInt(portEntry.getText()));
         conf.setApplication(num, appEntry.getText());
@@ -503,7 +512,7 @@ public class ConfigPanel extends JPanel {
         JButton styleButton = new JButton();
         styleButton.setAction(
                 new FileSelectionAction(styleEntry, ".properties",
-                Messages.getString("ConfigurationPanel.style_filter_pattern")));
+                        Messages.getString("ConfigurationPanel.style_filter_pattern")));
         lafs = UIManager.getInstalledLookAndFeels();
         String[] lafNames = new String[lafs.length];
         for (int i = 0; i < lafNames.length; i++) {
@@ -525,7 +534,7 @@ public class ConfigPanel extends JPanel {
         lafThemeButton = new JButton();
         lafThemeButton.setAction(
                 new ThemeSelectionAction(lafThemeEntry, ".theme",
-                Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
+                        Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
@@ -669,7 +678,6 @@ public class ConfigPanel extends JPanel {
         panel.add(innerPanel,
                 createConstraints(0, y, 4, 1, 1.0, 1.0));
         y += 1;
-
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
