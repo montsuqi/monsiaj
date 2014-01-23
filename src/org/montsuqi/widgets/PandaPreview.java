@@ -1,24 +1,24 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.widgets;
 
@@ -31,14 +31,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.PDFPrint;
 
-/** <p>Preview pane with control buttons and display of current scale.</p>
+/**
+ * <
+ * p>
+ * Preview pane with control buttons and display of current scale.</p>
  */
 public class PandaPreview extends JPanel {
+
+    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     class HandScrollListener extends MouseInputAdapter {
 
@@ -71,6 +77,7 @@ public class PandaPreview extends JPanel {
     private static final double SCALE_FACTOR = 1.2;
     private static final double SCALE_FIT_PAGE = -1.0;
     private static final double SCALE_FIT_PAGE_WIDTH = -2.0;
+    private static final String SCALE_FIT_PAGE_WIDTH_STR = Double.toString(SCALE_FIT_PAGE_WIDTH);
     private static final String[] SCALE_STRING = {
         Messages.getString("PandaPreview.fitPage"),
         Messages.getString("PandaPreview.fitPageWidth"),
@@ -95,22 +102,22 @@ public class PandaPreview extends JPanel {
         2.0,
         2.8284271247
     };
-    private JToolBar toolbar;
+    private final JToolBar toolbar;
     private NumberEntry pageEntry;
-    private JLabel pageLabel;
+    private final JLabel pageLabel;
     private JComboBox combo;
-    private JScrollPane scroll;
+    private final JScrollPane scroll;
     private double zoom;
     private String fileName;
     private PDFPanel panel;
-    private Action nextAction;
-    private Action prevAction;
-    private Action saveAction;
-    private Action printAction;
-    private Action zoomInAction;
-    private Action zoomOutAction;
-    private Action fitPageAction;
-    private Action fitPageWidthAction;
+    private final Action nextAction;
+    private final Action prevAction;
+    private final Action saveAction;
+    private final Action printAction;
+    private final Action zoomInAction;
+    private final Action zoomOutAction;
+    private final Action fitPageAction;
+    private final Action fitPageWidthAction;
 
     private final class NextAction extends AbstractAction {
 
@@ -207,7 +214,7 @@ public class PandaPreview extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            PDFPrint printer = new PDFPrint(new File(fileName),true);
+            PDFPrint printer = new PDFPrint(new File(fileName), true);
             printer.start();
         }
     }
@@ -292,7 +299,6 @@ public class PandaPreview extends JPanel {
         fitPageWidthAction = new FitPageWidthAction();
 
         combo = new JComboBox(SCALE_STRING);
-        combo.setSelectedIndex(1);
         combo.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent anEvent) {
@@ -301,22 +307,22 @@ public class PandaPreview extends JPanel {
             }
         });
         final Dimension preferredSize = combo.getPreferredSize();
-        combo.setMaximumSize(preferredSize);                
-        
+        combo.setMaximumSize(preferredSize);
+
         toolbar = new JToolBar();
         toolbar.setFloatable(false);
-        
+
         toolbar.add(prevAction);
         toolbar.add(nextAction);
-        toolbar.addSeparator();        
-        
+        toolbar.addSeparator();
+
         toolbar.add(pageEntry);
         toolbar.add(pageLabel);
-        toolbar.addSeparator();        
+        toolbar.addSeparator();
 
         toolbar.add(combo);
-        toolbar.addSeparator();        
-        
+        toolbar.addSeparator();
+
         toolbar.add(saveAction);
         toolbar.add(printAction);
 
@@ -332,7 +338,9 @@ public class PandaPreview extends JPanel {
         scroll.getViewport().addMouseMotionListener(hsl);
         scroll.getViewport().addMouseListener(hsl);
         add(scroll, BorderLayout.CENTER);
-        zoom = SCALE_FIT_PAGE_WIDTH;
+
+        zoom = Double.parseDouble(prefs.get("zoom",SCALE_FIT_PAGE_WIDTH_STR));
+        this.updateCombo();
 
         ActionMap actionMap = getActionMap();
         actionMap.put("prev", prevAction);
@@ -381,22 +389,24 @@ public class PandaPreview extends JPanel {
     }
 
     private void updateCombo() {
+        int index = 1;
         ActionListener[] listeners = combo.getActionListeners();
         for (int i = 0; i < listeners.length; i++) {
             combo.removeActionListener(listeners[i]);
         }
         if (zoom == SCALE_FIT_PAGE) {
-            combo.setSelectedIndex(0);
+            index = 0;
         } else if (zoom == SCALE_FIT_PAGE_WIDTH) {
-            combo.setSelectedIndex(1);
+            index = 1;
         } else {
             for (int i = 2; i < SCALE_VALUE.length; i++) {
-                combo.setSelectedIndex(i);
-                if (zoom < SCALE_VALUE[i]) {
+                index = i;
+                if (zoom <= SCALE_VALUE[i]) {
                     break;
                 }
             }
         }
+        combo.setSelectedIndex(index);
         for (int i = 0; i < listeners.length; i++) {
             combo.addActionListener(listeners[i]);
         }
@@ -439,6 +449,7 @@ public class PandaPreview extends JPanel {
     }
 
     private void setScale() {
+        prefs.put("zoom",Double.toString(zoom));
         panel.setScale(getRealZoom());
     }
 
