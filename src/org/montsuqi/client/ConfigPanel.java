@@ -307,11 +307,7 @@ public class ConfigPanel extends JPanel {
         // Save save_pass check field before the password itself,
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
-        if (savePasswordCheckbox.isSelected()) {
-            conf.setPassword(num, new String(passwordEntry.getPassword()));
-        } else {
-            conf.setPassword(num, new String(""));
-        }
+        conf.setPassword(num, new String(passwordEntry.getPassword()));
         conf.setAuthURI(num, authURIEntry.getText());
 
         // Others Tab

@@ -128,6 +128,11 @@ public class Protocol {
         int num = conf.getCurrent();
         final String user = this.conf.getUser(num);
         final String password = this.conf.getPassword(num);
+        
+        if (!this.conf.getSavePassword(num)) {
+            this.conf.setPassword(num, "");
+            this.conf.save();
+        }
 
         if (System.getProperty("monsia.config.reset_user") != null) {
             conf.setUser(num, "");
