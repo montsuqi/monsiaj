@@ -85,6 +85,12 @@ public class Client implements Runnable {
         }
         String password = conf.getPassword(num);
         String application = conf.getApplication(num);
+        
+        if (!conf.getSavePassword(num)) {
+            conf.setPassword(num, "");
+            conf.save();
+        }
+        
         logger.info("connect {}@{}:{} {}",user,host,port,this);
         protocol.sendConnect(user, password, application);
     }
