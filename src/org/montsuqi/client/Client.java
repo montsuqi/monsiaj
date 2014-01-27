@@ -118,6 +118,10 @@ public class Client implements Runnable {
             conf.setUser(configName, "");
             conf.save();
         }
+        if (!conf.getSavePassword(configName)) {
+            conf.setPassword(configName, "");
+            conf.save();
+        }
         protocol.sendConnect(user, password, application);
     }
 
