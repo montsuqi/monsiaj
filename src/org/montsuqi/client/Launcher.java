@@ -61,7 +61,7 @@ import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
-
+    
     protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected String title;
     protected Config conf;
@@ -82,6 +82,10 @@ public class Launcher {
     }
 
     public Launcher(String title) {
+        if (System.getProperty("monsia.log.level")!=null) {
+        } else {
+            System.setProperty("monsia.log.level", "info");
+        }        
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
