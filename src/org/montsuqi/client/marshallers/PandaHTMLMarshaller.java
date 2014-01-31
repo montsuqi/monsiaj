@@ -51,7 +51,7 @@ public class PandaHTMLMarshaller extends WidgetMarshaller {
                     final URL url = new URL(text);
                     html.setURI(url);
                 } catch (MalformedURLException e) {
-                    logger.catching(Level.INFO,e);
+                    logger.catching(Level.DEBUG,e);
                 }
             }
         }
