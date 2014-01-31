@@ -279,6 +279,8 @@ public class PandaTable extends JTable {
     //pns セル編集時に CellEditor にフォーカスさせる editCell
     private void editCell() {
         editCellAt(getSelectedRow(), getSelectedColumn());
+        this.setChangedRow(this.getSelectedRow());
+        this.setChangedColumn(this.getSelectedColumn());
 
         final DefaultCellEditor ce = (DefaultCellEditor) getDefaultEditor(Object.class);
         SwingUtilities.invokeLater(new Runnable() {
