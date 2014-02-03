@@ -92,9 +92,12 @@ public class Protocol {
     private Map styleMap;
 
     // jsonrpc
+    private String protocolVersion;
+    private String applicationVersion;
+    private String serverType;
     private int rpcId;
     private String sessionId;
-    private URL rpcURI;
+    private URL rpcUri;
     private String restURIRoot;
     private JSONObject resultJSON;
 
@@ -128,7 +131,7 @@ public class Protocol {
         int num = conf.getCurrent();
         final String user = this.conf.getUser(num);
         final String password = this.conf.getPassword(num);
-        
+
         if (!this.conf.getSavePassword(num)) {
             this.conf.setPassword(num, "");
             this.conf.save();
@@ -207,6 +210,27 @@ public class Protocol {
         return result;
     }
 
+    public void getServerInfo() {
+        try {
+            int num = conf.getCurrent();
+            URL url = new URL(conf.getAuthURI(num));
+
+            JSONObject params = new JSONObject();
+            JSONObject result = jsonRPC(url, "get_server_info", params);
+            this.protocolVersion = result.getString("protocol_version");
+            this.applicationVersion = result.getString("application_version");
+            this.serverType = result.getString("server_type");
+
+            logger.debug("protocol_version:" + this.protocolVersion);
+            logger.debug("application_version:" + this.applicationVersion);
+            logger.debug("server_type:" + this.serverType);
+
+        } catch (Exception ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
+        }
+    }
+
     public void startSession() {
         try {
             int num = conf.getCurrent();
@@ -219,16 +243,15 @@ public class Protocol {
 
             JSONObject result = jsonRPC(url, "start_session", params);
             meta = result.getJSONObject("meta");
-            this.rpcURI = new URL(result.getString("app_rpc_endpoint_uri"));
+            this.rpcUri = new URL(result.getString("app_rpc_endpoint_uri"));
             this.restURIRoot = result.getString("app_rest_api_uri_root");
             this.sessionId = meta.getString("session_id");
 
             logger.debug("session_id:" + this.sessionId);
-            logger.debug("rpcURI:" + this.rpcURI);
+            logger.debug("rpcURI:" + this.rpcUri);
             logger.debug("restURIRoot:" + this.restURIRoot);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -242,7 +265,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = jsonRPC(this.rpcURI, "end_session", params);
+            JSONObject result = jsonRPC(this.rpcUri, "end_session", params);
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -257,12 +280,30 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            this.resultJSON = jsonRPC(this.rpcURI, "get_window", params);
+            this.resultJSON = jsonRPC(this.rpcUri, "get_window", params);
 
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
+    }
+
+    public String getScreenDefine(String wname) {
+        try {
+            JSONObject params = new JSONObject();
+            JSONObject meta = new JSONObject();
+            meta.put("client_version", PANDA_CLIENT_VERSION);
+            meta.put("session_id", this.sessionId);
+            params.put("meta", meta);
+            params.put("window", wname);
+
+            JSONObject result = jsonRPC(this.rpcUri, "get_screen_define", params);
+            return result.getString("screen_define");
+        } catch (Exception ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
+        }
+        return null;
     }
 
     public void sendEvent(JSONObject params) {
@@ -272,7 +313,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            this.resultJSON = jsonRPC(this.rpcURI, "send_event", params);
+            this.resultJSON = jsonRPC(this.rpcUri, "send_event", params);
 
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -288,7 +329,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = jsonRPC(this.rpcURI, "get_message", params);
+            JSONObject result = jsonRPC(this.rpcUri, "get_message", params);
             if (result.has("abort")) {
                 String abort = result.getString("abort");
                 if (!abort.isEmpty()) {
@@ -450,7 +491,7 @@ public class Protocol {
         }
         Node node = getNode(_windowName);
         if (node == null) {
-            String gladeData = w.getString("screen_define");
+            String gladeData = this.getScreenDefine(_windowName);
             try {
                 node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
             } catch (UnsupportedEncodingException ex) {
