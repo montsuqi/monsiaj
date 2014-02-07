@@ -24,22 +24,16 @@ package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
-import org.montsuqi.client.Type;
 import org.montsuqi.widgets.PandaTable;
 
 /**
@@ -48,7 +42,7 @@ import org.montsuqi.widgets.PandaTable;
  */
 class PandaTableHandler extends WidgetHandler {
 
-    private static List widgetList;
+    private static final List widgetList;
 
     static {
         widgetList = new ArrayList();
@@ -154,11 +148,11 @@ class PandaTableHandler extends WidgetHandler {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         
         if (obj.has("trow")) {
-            obj.put("trow",table.getChangedRow());
+            obj.put("trow",table.getChangedRow()+1);
         }
         
         if (obj.has("tcolumn")) {
-            obj.put("tcolumn", table.getChangedRow());
+            obj.put("tcolumn", table.getChangedRow()+1);
         }
         
         if (obj.has("tvalue")) {

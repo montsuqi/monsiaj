@@ -28,7 +28,6 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Map;
-import javax.net.ssl.SSLSocketFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
@@ -39,7 +38,7 @@ import org.montsuqi.monsia.Style;
  */
 public class Client implements Runnable {
 
-    private Config conf;
+    private final Config conf;
     Logger logger;
     private Protocol protocol;
 
@@ -69,6 +68,7 @@ public class Client implements Runnable {
         long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
         protocol = new Protocol(conf, styles, timerPeriod);
         logger.debug("user : {}", conf.getUser(num));
+        protocol.getServerInfo();
         protocol.startSession();
     }
 
