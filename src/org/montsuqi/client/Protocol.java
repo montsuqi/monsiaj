@@ -490,6 +490,12 @@ public class Protocol extends Connection {
                         Component widget = xml.getWidget(wName);
                         if (widget != null) {
                             resetScrollPane(widget);
+                            if (widget instanceof Window) {
+                                Window window = (Window)widget;
+                                if (!window.isDialog()) {
+                                    resetScrollPane(window.getChild());
+                                }
+                            }
                         }
                     }
                     break;
