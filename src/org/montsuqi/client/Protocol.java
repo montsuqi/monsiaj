@@ -502,6 +502,14 @@ public class Protocol {
         if (putType.matches("new") || putType.matches("current")) {
             Object screenData = w.get("screen_data");
             updateWidget(node.getInterface(), _windowName, screenData);
+            if (!putType.matches("current")) {
+                Window window = node.getWindow();
+                if (window.isDialog()) {
+                    resetScrollPane(window);                    
+                } else {
+                    resetScrollPane(window.getChild());
+                }
+            }
             showWindow(_windowName);
             this.windowName = _windowName;
         } else {
