@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -199,7 +200,13 @@ public class Config {
                 }
             }
         }
-        Collections.sort(list);
+        Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                String n1 = Config.this.getDescription((Integer)o1);
+                String n2 = Config.this.getDescription((Integer)o2);
+                return n1.compareTo(n2);
+            }
+        });
         return list;
     }
 
