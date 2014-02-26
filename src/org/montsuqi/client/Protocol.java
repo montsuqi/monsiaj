@@ -361,6 +361,12 @@ public class Protocol {
     }
 
     public int getBLOB(String oid, OutputStream out) throws IOException {
+        if (oid.equals("0")) {
+            // empty object id
+            return 404;
+        }
+        
+        
         URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
