@@ -155,8 +155,9 @@ class CListHandler extends WidgetHandler {
                 int n = array.length();
                 n = n > count ? count : n;
                 for (int j = 0; j < n; j++) {
-                    clist.setSelection(j, array.getBoolean(j));
-                    if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI) {
+                    boolean selected = array.getBoolean(j);
+                    clist.setSelection(j, selected);
+                    if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
                         clist.changeSelection(j, 0, false, false);
                     }
                 }
