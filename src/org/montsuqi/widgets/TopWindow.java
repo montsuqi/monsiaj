@@ -40,7 +40,7 @@ import org.montsuqi.monsia.Interface;
  */
 public class TopWindow extends Window implements ComponentListener {
 
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private final int DEFAULT_WIDTH = 1024;
     private final int DEFAULT_HEIGHT = 768;
     private final int FOOTER = 24;
@@ -116,6 +116,7 @@ public class TopWindow extends Window implements ComponentListener {
         this.setLocation(x, y);
         this.setSize(width, height);
         this.addComponentListener(this);
+        this.setFocusCycleRoot(true);
         this.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
     }
 
