@@ -36,7 +36,7 @@ public class FileEntryBuilder extends WidgetBuilder {
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		FileEntry fileEntry = (FileEntry)parent;
 		if (info.getChildren().size() != 1) {
-			throw new WidgetBuildingException("only one child for a FileEntry"); //$NON-NLS-1$
+			throw new WidgetBuildingException("only one child for a FileEntry"); 
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();

@@ -92,7 +92,7 @@ public class PandaHTML extends JPanel {
      */
     public void setURI(URL uri) {
         Runnable loader = createLoader(uri);
-        logger.debug("loading: {0}", uri); //$NON-NLS-1$
+        logger.debug("loading: {0}", uri); 
         Executor executor = new ThreadPerTaskExecutor();
         executor.execute(loader);
     }

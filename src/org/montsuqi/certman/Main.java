@@ -39,17 +39,17 @@ public class Main {
 
 	class P12Filter extends FileFilter {
 		public boolean accept(File f) {
-			return f.getName().endsWith(".p12"); //$NON-NLS-1$
+			return f.getName().endsWith(".p12"); 
 		}
 
 		public String getDescription() {
-			return "PKCS#12"; //$NON-NLS-1$
+			return "PKCS#12"; 
 		}
 	}
 
 	class BrowseAction extends AbstractAction {
 		BrowseAction() {
-			super(Messages.getString("Browse")); //$NON-NLS-1$
+			super(Messages.getString("Browse")); 
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -59,7 +59,7 @@ public class Main {
 			if (keyStoreFile == null) {
 				return;
 			}
-			ks = loadKeyStore(keyStoreFile, "JKS", Messages.getString("InputPassphrase")); //$NON-NLS-1$ //$NON-NLS-2$
+			ks = loadKeyStore(keyStoreFile, "JKS", Messages.getString("InputPassphrase"));  //$NON-NLS-2$
 			importAction.setEnabled(ks != null);
 			storeField.setText(keyStoreFile.getPath());
 			storeField.setCaretPosition(storeField.getText().length());
@@ -69,7 +69,7 @@ public class Main {
 
 	public class ImportAction extends AbstractAction {
 		ImportAction() {
-			super(Messages.getString("Import")); //$NON-NLS-1$
+			super(Messages.getString("Import")); 
 		}
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser chooser = new JFileChooser();
@@ -79,7 +79,7 @@ public class Main {
 			if (p12File == null) {
 				return;
 			}
-			KeyStore p12Store = loadKeyStore(p12File, "PKCS12", Messages.getString("InputExportPass")); //$NON-NLS-1$ //$NON-NLS-2$
+			KeyStore p12Store = loadKeyStore(p12File, "PKCS12", Messages.getString("InputExportPass"));  //$NON-NLS-2$
 			try {
 				Enumeration aliases = p12Store.aliases();
 				while (aliases.hasMoreElements()) {
@@ -96,16 +96,16 @@ public class Main {
 				File ksFile = (File)files.get(ks);
 				ks.store(new FileOutputStream(ksFile), ksPass);
 				disposePass(ks);
-				JOptionPane.showMessageDialog(frame, Messages.getString("KeyStoreSaved")); //$NON-NLS-1$
+				JOptionPane.showMessageDialog(frame, Messages.getString("KeyStoreSaved")); 
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+				JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); 
 			}
 		}
 	}
 
 	public class QuitAction extends AbstractAction {
 		QuitAction() {
-			super(Messages.getString("Quit")); //$NON-NLS-1$
+			super(Messages.getString("Quit")); 
 		}
 		public void actionPerformed(ActionEvent e) {
 			System.exit(0);
@@ -141,10 +141,10 @@ public class Main {
 	}
 
 	private void initComponents() {
-		frame = new JFrame(Messages.getString("Application.title")); //$NON-NLS-1$
+		frame = new JFrame(Messages.getString("Application.title")); 
 		Container root = frame.getContentPane();
 
-		storeLabel = new JLabel(Messages.getString("KeyStore")); //$NON-NLS-1$
+		storeLabel = new JLabel(Messages.getString("KeyStore")); 
 		root.add(storeLabel);
 
 		storeField = new JTextField(20);
@@ -213,7 +213,7 @@ public class Main {
 			passPhrases.put(keyStore, pass);
 			return keyStore;
 		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); 
 			return null;
 		}
 	}

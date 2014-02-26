@@ -104,7 +104,7 @@ public class FileEntry extends JComponent {
     private class BrowseActionForSave extends AbstractAction {
 
         BrowseActionForSave() {
-            super(Messages.getString("FileEntry.browse")); //$NON-NLS-1$
+            super(Messages.getString("FileEntry.browse")); 
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -122,7 +122,7 @@ public class FileEntry extends JComponent {
                 return;
             }
             if (selected.exists() && selected.canWrite()) {
-                if (JOptionPane.showConfirmDialog(FileEntry.this, Messages.getString("FileEntry.ask_overwrite"), Messages.getString("FileEntry.question"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) { //$NON-NLS-1$ //$NON-NLS-2$
+                if (JOptionPane.showConfirmDialog(FileEntry.this, Messages.getString("FileEntry.ask_overwrite"), Messages.getString("FileEntry.question"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {  //$NON-NLS-2$
                     return;
                 }
             }
@@ -134,7 +134,7 @@ public class FileEntry extends JComponent {
     private class BrowseActionForLoad extends AbstractAction {
 
         BrowseActionForLoad() {
-            super(Messages.getString("FileEntry.browse")); //$NON-NLS-1$
+            super(Messages.getString("FileEntry.browse")); 
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -168,11 +168,11 @@ public class FileEntry extends JComponent {
         try {
             out = new FileOutputStream(getFile());
             out.write(data);
-            JOptionPane.showMessageDialog(FileEntry.this, Messages.getString("FileEntry.saved")); //$NON-NLS-1$
+            JOptionPane.showMessageDialog(FileEntry.this, Messages.getString("FileEntry.saved")); 
             out.flush();
             out.close();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); 
         }
     }
 
@@ -186,7 +186,7 @@ public class FileEntry extends JComponent {
             in.read(bytes, 0, length);
             in.close();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            JOptionPane.showMessageDialog(FileEntry.this, e.getMessage(), Messages.getString("FileEntry.error"), JOptionPane.ERROR_MESSAGE); 
         }
         return bytes;
     }

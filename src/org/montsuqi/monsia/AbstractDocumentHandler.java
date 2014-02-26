@@ -100,7 +100,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 */
 	protected void warnNotZero(String name, int actual) {
 		Object[] args = { name, new Integer(actual) };
-		logger.warn("{0} is not  0, but was {1}", args); //$NON-NLS-1$
+		logger.warn("{0} is not  0, but was {1}", args); 
 	}
 
 	/** <p>Warning helper method that warns about an unknown attribute.</p>
@@ -110,7 +110,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 */
 	protected void warnUnknownAttribute(String element, String attr) {
 		Object[] args = { attr, element };
-		logger.warn("unknown attribute {0} for <{1}>", args); //$NON-NLS-1$
+		logger.warn("unknown attribute {0} for <{1}>", args); 
 	}
 
 	/** <p>Warning helper method that warns that some attributes are missing.</p>
@@ -118,7 +118,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 * @param element the element interested.
 	 */
 	protected void warnMissingAttribute(String element) {
-		logger.warn("<{0}> element missing required attributes", element); //$NON-NLS-1$
+		logger.warn("<{0}> element missing required attributes", element); 
 	}
 
 	/** <p>Warning helper method that warns unexpected element nesting is found.</p>
@@ -128,7 +128,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 */
 	protected void warnUnexpectedElement(String outer, String inner) {
 		Object[] args = { outer, inner };
-		logger.warn("unexpected element <{0}> inside <{1}>", args); //$NON-NLS-1$
+		logger.warn("unexpected element <{0}> inside <{1}>", args); 
 	}
 
 	/** <p>Warning helper method that warns about an attribute alue which is not supported in Java.</p>
@@ -136,7 +136,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 * @param value the unsupported value name.
 	 */
 	protected void warnNotSupported(String value) {
-		logger.warn("{0} is not supported in Java", value); //$NON-NLS-1$
+		logger.warn("{0} is not supported in Java", value); 
 	}
 
 	/** <p>Builds the interface as the result of parsing.</p>
@@ -148,7 +148,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		if (isFinished()) {
 			return new Interface(topLevels, protocol);
 		}
-		throw new IllegalStateException("parsing is not finished yet"); //$NON-NLS-1$
+		throw new IllegalStateException("parsing is not finished yet"); 
 	}
 	
 	/** <p>Builds the interface as the result of parsing.</p>
@@ -159,7 +159,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		if (isFinished()) {
 			return new Interface(topLevels);
 		}
-		throw new IllegalStateException("parsing is not finished yet"); //$NON-NLS-1$
+		throw new IllegalStateException("parsing is not finished yet"); 
 	}	
 
 	/** <p>SAX handler called at the start of a document.</p>
@@ -182,10 +182,10 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
     @Override
 	public void endDocument() throws SAXException {
 		if (unknownDepth != 0) {
-			warnNotZero("unknownDepth", unknownDepth); //$NON-NLS-1$
+			warnNotZero("unknownDepth", unknownDepth); 
 		}
 		if (widgetDepth != 0) {
-			warnNotZero("widgetDepth", widgetDepth); //$NON-NLS-1$
+			warnNotZero("widgetDepth", widgetDepth); 
 		}
 	}
 
@@ -210,7 +210,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 * <p>Parser starts parsing at this state.</p>
 	 * <p>Parser transits to this state when it detects an unknown element.</p>
 	 */
-	protected final ParserState UNKNOWN = new ParserState("UNKNOWN") { //$NON-NLS-1$
+	protected final ParserState UNKNOWN = new ParserState("UNKNOWN") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			unknownDepth++;
 		}
@@ -225,16 +225,16 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 
 	/** <p>A ParserState instance that represents that parsing is end.</p>
 	 */
-	final ParserState FINISH = new ParserState("FINISH") { //$NON-NLS-1$
+	final ParserState FINISH = new ParserState("FINISH") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			logger.warn("there should be no elements here, but found <{0}>", localName); //$NON-NLS-1$
+			logger.warn("there should be no elements here, but found <{0}>", localName); 
 			prevState = state;
 			state = UNKNOWN;
 			unknownDepth++;
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			logger.warn("should not be closing any elements in this state"); //$NON-NLS-1$
+			logger.warn("should not be closing any elements in this state"); 
 		}
 	};
 
@@ -261,7 +261,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			// do nothing
 		} else if (propertyType == PropertyType.WIDGET) {
 			if (!widget.getProperties().isEmpty()) {
-				logger.warn("we already read all the props for this key, leaking"); //$NON-NLS-1$
+				logger.warn("we already read all the props for this key, leaking"); 
 			}
 			widget.setProperties(properties);
 			properties.clear();
@@ -269,14 +269,14 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			properties.clear();
 		} else if (propertyType == PropertyType.CHILD) {
 			if (widget.getChildren().isEmpty()) {
-				logger.warn("no children, but have child properties"); //$NON-NLS-1$
+				logger.warn("no children, but have child properties"); 
 			} else {
 				ChildInfo info = widget.getLastChild();
 				info.setProperties(properties);
 			}
 			properties.clear();
 		} else {
-			throw new IllegalStateException("unknown property type"); //$NON-NLS-1$
+			throw new IllegalStateException("unknown property type"); 
 		}
 
 		propertyType = PropertyType.NONE;
@@ -292,10 +292,10 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected void dialogHack(WidgetInfo info) {
 		String genericClassName = info.getClassName();
 		// handle Window/Dialog specially
-		if ("Window".equals(genericClassName)) { //$NON-NLS-1$
-			String type = info.getProperty("type"); //$NON-NLS-1$
-			if ("WINDOW_DIALOG".equals(removePrefix(type))) { //$NON-NLS-1$
-				info.setClassName("Dialog"); //$NON-NLS-1$
+		if ("Window".equals(genericClassName)) { 
+			String type = info.getProperty("type"); 
+			if ("WINDOW_DIALOG".equals(removePrefix(type))) { 
+				info.setClassName("Dialog"); 
 			}
 		}
 	}
@@ -320,11 +320,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 * @return normalized name
 	 */
 	private String removePrefix(String name) {
-		if (name.startsWith("GDK_")) { //$NON-NLS-1$
-			name = name.substring("GDK_".length()); //$NON-NLS-1$
+		if (name.startsWith("GDK_")) { 
+			name = name.substring("GDK_".length()); 
 		}
-		if (name.startsWith("GTK_")) { //$NON-NLS-1$
-			name = name.substring("GTK_".length()); //$NON-NLS-1$
+		if (name.startsWith("GTK_")) { 
+			name = name.substring("GTK_".length()); 
 		}
 		return name;
 	}
@@ -338,8 +338,8 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 		final Field[] fields = KeyEvent.class.getDeclaredFields();
 		keyName = removePrefix(keyName);
 		keyName = keyName.toUpperCase(Locale.ENGLISH);
-		if ( ! keyName.startsWith("VK_")) { //$NON-NLS-1$
-			keyName = "VK_" + keyName; //$NON-NLS-1$
+		if ( ! keyName.startsWith("VK_")) { 
+			keyName = "VK_" + keyName; 
 		}
 		if (keyName.length() > 0) {
 			for (int i = 0; i < fields.length; i++) {
@@ -353,7 +353,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 				}
 			}
 		}
-		logger.warn("key not found: {0}", keyName); //$NON-NLS-1$
+		logger.warn("key not found: {0}", keyName); 
 		return 0;
 	}
 
@@ -363,23 +363,23 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 * @return algebraically or-ed modifier masks.
 	 */
 	protected int parseModifiers(String modifierValue) {
-		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|"); //$NON-NLS-1$
+		StringTokenizer tokens = new StringTokenizer(modifierValue, " \t\n\r\f|"); 
 		int modifiers = 0;
 		while (tokens.hasMoreTokens()) {
 			String modifier = tokens.nextToken();
 			modifier = removePrefix(modifier);
-			if (modifier.equals("SHIFT_MASK")) { //$NON-NLS-1$
+			if (modifier.equals("SHIFT_MASK")) { 
 				modifiers |= InputEvent.SHIFT_MASK;
-			} else if (modifier.equals("LOCK_MASK")) { //$NON-NLS-1$
-				warnNotSupported("LOCK_MASK"); //$NON-NLS-1$
-			} else if (modifier.equals("CONTROL_MASK")) { //$NON-NLS-1$
+			} else if (modifier.equals("LOCK_MASK")) { 
+				warnNotSupported("LOCK_MASK"); 
+			} else if (modifier.equals("CONTROL_MASK")) { 
 				modifiers |= InputEvent.CTRL_MASK;
-			} else if (modifier.startsWith("MOD_")) { //$NON-NLS-1$
-				warnNotSupported("MOD_MASK"); //$NON-NLS-1$
-			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { //$NON-NLS-1$
+			} else if (modifier.startsWith("MOD_")) { 
+				warnNotSupported("MOD_MASK"); 
+			} else if (modifier.startsWith("BUTTON") && modifier.length() == 7) { 
 				modifiers |= parseButtonMask(modifier.substring(6));
-			} else if (modifier.equals("RELEASE_MASK")) { //$NON-NLS-1$
-				warnNotSupported("RELEASE_MASK"); //$NON-NLS-1$
+			} else if (modifier.equals("RELEASE_MASK")) { 
+				warnNotSupported("RELEASE_MASK"); 
 			}
 		}
 		return modifiers;
@@ -400,11 +400,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			case 3:
 				return InputEvent.BUTTON3_MASK;
 			default:
-				logger.warn("only BUTTON[1-3] are supported in Java"); //$NON-NLS-1$
+				logger.warn("only BUTTON[1-3] are supported in Java"); 
 				return 0;
 			}
 		} catch (NumberFormatException e) {
-			logger.warn("unknown BUTTON #: {0}", mask); //$NON-NLS-1$
+			logger.warn("unknown BUTTON #: {0}", mask); 
 			return 0;
 		}
 	}

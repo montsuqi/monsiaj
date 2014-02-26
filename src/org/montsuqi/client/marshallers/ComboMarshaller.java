@@ -61,11 +61,11 @@ class ComboMarshaller extends WidgetMarshaller {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
                 continue;
-            } else if ("count".equals(name)) { //$NON-NLS-1$
+            } else if ("count".equals(name)) { 
                 count = con.receiveIntData();
-            } else if ("item".equals(name)) { //$NON-NLS-1$
+            } else if ("item".equals(name)) { 
                 List list = new ArrayList();
-                list.add(""); //$NON-NLS-1$
+                list.add(""); 
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 for (int j = 0, num = con.receiveInt(); j < num; j++) {
                     try {
@@ -94,7 +94,7 @@ class ComboMarshaller extends WidgetMarshaller {
                     entryMarshaller.receive(manager, dummy);
                     selectedItem = dummy.getText();
                 } else {
-                    throw new WidgetMarshallingException("subwidget not found"); //$NON-NLS-1$
+                    throw new WidgetMarshallingException("subwidget not found"); 
                 }
             }
         }
@@ -105,6 +105,6 @@ class ComboMarshaller extends WidgetMarshaller {
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
-        assert false : "should never be called."; //$NON-NLS-1$
+        assert false : "should never be called."; 
     }
 }

@@ -45,7 +45,7 @@ class FrameBuilder extends ContainerBuilder {
     @Override
     void buildChildren(Interface xml, Container parent, WidgetInfo info) {
         if (info.getChildren().size() != 1) {
-            throw new WidgetBuildingException("only one child for a Frame"); //$NON-NLS-1$
+            throw new WidgetBuildingException("only one child for a Frame"); 
         }
         ChildInfo cInfo = info.getChild(0);
         WidgetInfo wInfo = cInfo.getWidgetInfo();

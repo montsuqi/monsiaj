@@ -36,7 +36,7 @@ class MenuItemBuilder extends WidgetBuilder {
 	
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Map properties = info.getProperties();
-		if (properties.containsKey("label") || properties.containsKey("stock_item")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (properties.containsKey("label") || properties.containsKey("stock_item")) {  //$NON-NLS-2$
 			return super.buildSelf(xml, parent, info);
 		}
 		return new JSeparator();

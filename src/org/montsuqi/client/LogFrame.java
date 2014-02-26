@@ -23,7 +23,7 @@ public class LogFrame extends Thread {
 
     @Override
     public void run() {
-        final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); //$NON-NLS-1$
+        final JFrame f = new JFrame(Messages.getString("Launcher.log_title")); 
         URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/orca.png");
         f.setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
         Container container = f.getContentPane();
@@ -41,15 +41,15 @@ public class LogFrame extends Thread {
         JPanel bar = new JPanel();
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
-        Button clear = new Button(new AbstractAction(Messages.getString("Launcher.log_clear")) { //$NON-NLS-1$
+        Button clear = new Button(new AbstractAction(Messages.getString("Launcher.log_clear")) { 
 
             public void actionPerformed(ActionEvent e) {
-                console.setText(""); //$NON-NLS-1$
+                console.setText(""); 
             }
         });
         bar.add(clear);
 
-        Button save = new Button(new AbstractAction(Messages.getString("Launcher.log_save_log_as")) { //$NON-NLS-1$
+        Button save = new Button(new AbstractAction(Messages.getString("Launcher.log_save_log_as")) { 
 
             public void actionPerformed(ActionEvent ev) {
                 JFileChooser chooser = new JFileChooser();
@@ -67,7 +67,7 @@ public class LogFrame extends Thread {
         });
         bar.add(save);
 
-        Button quit = new Button(new AbstractAction(Messages.getString("Launcher.log_quit")) { //$NON-NLS-1$
+        Button quit = new Button(new AbstractAction(Messages.getString("Launcher.log_quit")) { 
 
             public void actionPerformed(ActionEvent e) {
                 // do nothing

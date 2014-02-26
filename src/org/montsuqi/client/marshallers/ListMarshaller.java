@@ -53,11 +53,11 @@ class ListMarshaller extends WidgetMarshaller {
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
 			}
-			if ("count".equals(name)) { //$NON-NLS-1$
+			if ("count".equals(name)) { 
 				count = con.receiveIntData();
-			} else if ("from".equals(name)) { //$NON-NLS-1$
+			} else if ("from".equals(name)) { 
 				from = con.receiveIntData();
-			} else if ("item".equals(name)) { //$NON-NLS-1$
+			} else if ("item".equals(name)) { 
 				if (listModel.getSize() > 0) {
 					listModel.clear();
 				}

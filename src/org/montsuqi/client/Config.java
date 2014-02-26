@@ -464,7 +464,7 @@ public class Config {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                String[] pair = line.split("\\s*=\\s*"); //$NON-NLS-1$
+                String[] pair = line.split("\\s*=\\s*"); 
                 if (pair.length == 2) {
                     String key = pair[0].trim();
                     String value = pair[1].trim();

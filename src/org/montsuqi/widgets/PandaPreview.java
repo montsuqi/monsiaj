@@ -122,12 +122,12 @@ public class PandaPreview extends JPanel {
     private final class NextAction extends AbstractAction {
 
         NextAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png"); //$NON-NLS-1$
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png"); 
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.next")); //$NON-NLS-1$
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description")); //$NON-NLS-1$
+            putValue(Action.NAME, Messages.getString("PandaPreview.next")); 
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description")); 
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -143,12 +143,12 @@ public class PandaPreview extends JPanel {
     private final class PrevAction extends AbstractAction {
 
         PrevAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png"); //$NON-NLS-1$
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png"); 
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.prev")); //$NON-NLS-1$
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description")); //$NON-NLS-1$
+            putValue(Action.NAME, Messages.getString("PandaPreview.prev")); 
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description")); 
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -164,12 +164,12 @@ public class PandaPreview extends JPanel {
     private final class SaveAction extends AbstractAction {
 
         SaveAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png"); //$NON-NLS-1$
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png"); 
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.save")); //$NON-NLS-1$
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description")); //$NON-NLS-1$
+            putValue(Action.NAME, Messages.getString("PandaPreview.save")); 
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description")); 
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -205,12 +205,12 @@ public class PandaPreview extends JPanel {
     private final class PrintAction extends AbstractAction {
 
         PrintAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png"); //$NON-NLS-1$
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png"); 
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.print")); //$NON-NLS-1$
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description")); //$NON-NLS-1$
+            putValue(Action.NAME, Messages.getString("PandaPreview.print")); 
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description")); 
         }
 
         public void actionPerformed(ActionEvent e) {

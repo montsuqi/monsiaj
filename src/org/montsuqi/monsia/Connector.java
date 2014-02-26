@@ -56,7 +56,7 @@ abstract class Connector {
             logger.exit();
             return connector;
         }
-        logger.debug("connector not found for signal {0}", signalName); //$NON-NLS-1$
+        logger.debug("connector not found for signal {0}", signalName); 
         final Connector connector = getConnector(null);
         logger.exit();
         return connector;
@@ -96,7 +96,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("clicked", new Connector() { //$NON-NLS-1$
+        registerConnector("clicked", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof AbstractButton)) {
@@ -118,9 +118,9 @@ abstract class Connector {
             }
         });
 
-        registerConnector("button_press_event", getConnector("clicked")); //$NON-NLS-1$ //$NON-NLS-2$
+        registerConnector("button_press_event", getConnector("clicked"));  //$NON-NLS-2$
 
-        registerConnector("key_press_event", new Connector() { //$NON-NLS-1$
+        registerConnector("key_press_event", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addKeyListener(new KeyAdapter() {
@@ -137,7 +137,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("changed", new Connector() { //$NON-NLS-1$
+        registerConnector("changed", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaCombo) {
@@ -194,7 +194,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("activate", new Connector() { //$NON-NLS-1$
+        registerConnector("activate", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaCombo) {
@@ -225,9 +225,9 @@ abstract class Connector {
             }
         });
 
-        registerConnector("enter", getConnector("activate")); //$NON-NLS-1$ //$NON-NLS-2$
+        registerConnector("enter", getConnector("activate"));  //$NON-NLS-2$
 
-        registerConnector("focus_in_event", new Connector() { //$NON-NLS-1$
+        registerConnector("focus_in_event", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
@@ -242,7 +242,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("focus_out_event", new Connector() { //$NON-NLS-1$
+        registerConnector("focus_out_event", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
@@ -257,7 +257,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("map_event", new Connector() { //$NON-NLS-1$
+        registerConnector("map_event", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
@@ -285,7 +285,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("delete_event", new Connector() { //$NON-NLS-1$
+        registerConnector("delete_event", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
@@ -313,7 +313,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("destroy", new Connector() { //$NON-NLS-1$
+        registerConnector("destroy", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
@@ -341,7 +341,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("set_focus", new Connector() { //$NON-NLS-1$
+        registerConnector("set_focus", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
@@ -356,7 +356,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("select_row", new Connector() { //$NON-NLS-1$
+        registerConnector("select_row", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaCList) {
@@ -372,7 +372,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("unselect_row", new Connector() { //$NON-NLS-1$
+        registerConnector("unselect_row", new Connector() { 
 
             public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
                 // XxxSelectionModels don't care selection/unselection so use connectSelectRow
@@ -382,17 +382,17 @@ abstract class Connector {
             }
         });
 
-        registerConnector("selection_changed", getConnector("select_row")); //$NON-NLS-1$ //$NON-NLS-2$
+        registerConnector("selection_changed", getConnector("select_row"));  //$NON-NLS-2$
 
-        registerConnector("click_column", new Connector() { //$NON-NLS-1$
+        registerConnector("click_column", new Connector() { 
 
             public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
                 Object[] args = {target, handler, other};
-                logger.debug("click_column: target={0}, handler={1}, other={2}", args); //$NON-NLS-1$
+                logger.debug("click_column: target={0}, handler={1}, other={2}", args); 
             }
         });
 
-        registerConnector("switch_page", new Connector() { //$NON-NLS-1$
+        registerConnector("switch_page", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof JTabbedPane)) {
@@ -417,7 +417,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("toggled", new Connector() { //$NON-NLS-1$
+        registerConnector("toggled", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof JToggleButton)) {
@@ -431,7 +431,7 @@ abstract class Connector {
                         @Override
                         public void mousePressed(MouseEvent e) {
                             logger.entry();
-                            ButtonGroup g = (ButtonGroup) toggle.getClientProperty("group"); //$NON-NLS-1$
+                            ButtonGroup g = (ButtonGroup) toggle.getClientProperty("group"); 
                             JRadioButton deselected = null;
                             if (g == null) {
                                 logger.exit();
@@ -449,11 +449,11 @@ abstract class Connector {
                                 logger.exit();
                                 return;
                             }
-                            JRadioButton none = (JRadioButton) deselected.getClientProperty("none"); //$NON-NLS-1$
+                            JRadioButton none = (JRadioButton) deselected.getClientProperty("none"); 
                             none.setSelected(true);
-                            final Object o = "CLICKED"; //$NON-NLS-1$
+                            final Object o = "CLICKED"; 
                             invoke(con, handler, deselected, o);
-                            SignalHandler sendEvent = SignalHandler.getSignalHandler("send_event"); //$NON-NLS-1$
+                            SignalHandler sendEvent = SignalHandler.getSignalHandler("send_event"); 
                             assert sendEvent != null;
                             invoke(con, sendEvent, deselected, o);
 
@@ -478,7 +478,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("timeout", new Connector() { //$NON-NLS-1$
+        registerConnector("timeout", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof PandaTimer)) {
@@ -496,7 +496,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("day_selected", new Connector() { //$NON-NLS-1$
+        registerConnector("day_selected", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof Calendar)) {
@@ -514,7 +514,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("selection_get", new Connector() { //$NON-NLS-1$
+        registerConnector("selection_get", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof JMenuItem) {
@@ -531,7 +531,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("file_set", new Connector() { //$NON-NLS-1$
+        registerConnector("file_set", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof FileChooserButton) {
@@ -548,7 +548,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("color_set", new Connector() { //$NON-NLS-1$
+        registerConnector("color_set", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof ColorButton) {
@@ -565,7 +565,7 @@ abstract class Connector {
             }
         });
 
-        registerConnector("cell_edited", new Connector() { //$NON-NLS-1$
+        registerConnector("cell_edited", new Connector() { 
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaTable) {

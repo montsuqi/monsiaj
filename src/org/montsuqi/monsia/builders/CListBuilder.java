@@ -57,7 +57,7 @@ class CListBuilder extends ContainerBuilder {
             if (header instanceof JComponent) {
                 clist.registerHeaderComponent(i, (JComponent) header);
             } else {
-                throw new WidgetBuildingException("not-JComponent component for CList header"); //$NON-NLS-1$
+                throw new WidgetBuildingException("not-JComponent component for CList header"); 
             }
         }
     }

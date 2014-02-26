@@ -170,7 +170,7 @@ public class TablePanel extends JPanel {
 	
 	public JPasswordField addPasswordFieldRow(int y, String text) {
 		JPasswordField entry = new JPasswordField();
-		entry.setText(""); //$NON-NLS-1$
+		entry.setText(""); 
 		entry.addFocusListener(new FieldSelected());
 		addRow(y, text, entry);
 		return entry;

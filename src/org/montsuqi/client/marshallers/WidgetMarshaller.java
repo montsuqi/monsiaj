@@ -82,7 +82,7 @@ public abstract class WidgetMarshaller {
      */
     protected boolean handleCommonAttribute(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
-        if ("state".equals(name)) { //$NON-NLS-1$
+        if ("state".equals(name)) { 
             int state = con.receiveIntData();
             /* Widget states from gtkenums.h
             typedef enum
@@ -102,11 +102,11 @@ public abstract class WidgetMarshaller {
                 text.setEditable(flag);
             }
             return true;
-        } else if ("style".equals(name)) { //$NON-NLS-1$
+        } else if ("style".equals(name)) { 
             String buff = con.receiveStringData();
             manager.setStyle(widget, buff);
             return true;
-        } else if ("visible".equals(name)) { //$NON-NLS-1$
+        } else if ("visible".equals(name)) { 
             boolean visible = con.receiveBooleanData();
             widget.setEnabled(visible);
             widget.setVisible(visible);
@@ -119,7 +119,7 @@ public abstract class WidgetMarshaller {
     protected boolean handleEditable(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
         JTextField entry = (JTextField)widget;
-        if ("editable".equals(name)) { //$NON-NLS-1$
+        if ("editable".equals(name)) { 
             
             boolean editable = con.receiveBooleanData();
             entry.setEditable(editable);

@@ -43,7 +43,7 @@ public class DownloadMarshaller extends WidgetMarshaller {
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if ("objectdata".equals(name)) { //$NON-NLS-1$
+            if ("objectdata".equals(name)) { 
                 binary = con.receiveBinaryData();
             } else if ("filename".equals(name)) {
                 fileName = con.receiveStringData();

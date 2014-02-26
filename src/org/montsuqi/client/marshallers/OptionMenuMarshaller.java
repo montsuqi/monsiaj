@@ -51,12 +51,12 @@ public class OptionMenuMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
-			} else if ("count".equals(name)) { //$NON-NLS-1$
+			} else if ("count".equals(name)) { 
 				count = con.receiveIntData();
-			} else if ("select".equals(name)) { //$NON-NLS-1$
+			} else if ("select".equals(name)) { 
 				manager.registerAttribute(widget, name, null);
 				choice = con.receiveIntData();
-			} else if ("item".equals(name)) { //$NON-NLS-1$
+			} else if ("item".equals(name)) { 
 				con.receiveDataTypeWithCheck(Type.ARRAY);
 				int num = con.receiveInt();
 				if (count < 0) {

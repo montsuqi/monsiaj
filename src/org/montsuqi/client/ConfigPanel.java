@@ -92,7 +92,7 @@ public class ConfigPanel extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             if (checkbox.isSelected()) {
-                int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+                int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
                 if (result != JOptionPane.YES_OPTION) {
                     checkbox.setSelected(false);
                 }
@@ -124,7 +124,7 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         FileSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
+            super(Messages.getString("ConfigurationPanel.browse")); 
             this.entry = entry;
             this.extension = extension;
             this.description = description;
@@ -158,14 +158,14 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         ThemeSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
+            super(Messages.getString("ConfigurationPanel.browse")); 
             this.entry = entry;
             this.extension = extension;
             this.description = description;
         }
 
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser(entry.getText()); //$NON-NLS-1$
+            JFileChooser fileChooser = new JFileChooser(entry.getText()); 
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
             int ret = fileChooser.showOpenDialog(null);
             if (ret == JFileChooser.APPROVE_OPTION) {
@@ -426,7 +426,7 @@ public class ConfigPanel extends JPanel {
 
     private JPanel createSSLPanel() {
         int y;
-        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
+        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); 
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

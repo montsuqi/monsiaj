@@ -44,7 +44,7 @@ class NotebookBuilder extends ContainerBuilder {
         Notebook notebook = (Notebook) parent;
         int cCount = info.getChildren().size();
         if (cCount % 2 != 0) {
-            throw new WidgetBuildingException("odd number of notebook children"); //$NON-NLS-1$
+            throw new WidgetBuildingException("odd number of notebook children"); 
         }
         int tabCount = cCount / 2;
         String[] labels = new String[tabCount];
@@ -56,19 +56,19 @@ class NotebookBuilder extends ContainerBuilder {
             ChildInfo cInfo = info.getChild(i);
             WidgetInfo wInfo = cInfo.getWidgetInfo();
             Map properties = wInfo.getProperties();
-            if (properties.containsKey("child_name")) { //$NON-NLS-1$
-                if (properties.containsKey("label")) { //$NON-NLS-1$
-                    labels[currentLabel] = (String) properties.get("label"); //$NON-NLS-1$
+            if (properties.containsKey("child_name")) { 
+                if (properties.containsKey("label")) { 
+                    labels[currentLabel] = (String) properties.get("label"); 
                     Component dummy = new NotebookDummyButton(labels[currentLabel], currentLabel, notebook);
                     setCommonParameters(xml, dummy, wInfo);
                     setSignals(xml, dummy, wInfo);
                     enabled[currentLabel] = true;
-                    if (properties.containsKey("sensitive")) { //$NON-NLS-1$
-                        enabled[currentLabel] = ParameterConverter.toBoolean((String) properties.get("sensitive")); //$NON-NLS-1$
+                    if (properties.containsKey("sensitive")) { 
+                        enabled[currentLabel] = ParameterConverter.toBoolean((String) properties.get("sensitive")); 
                     }
                     currentLabel++;
                 } else {
-                    throw new WidgetBuildingException("no label for a tab"); //$NON-NLS-1$
+                    throw new WidgetBuildingException("no label for a tab"); 
                 }
             } else {
                 Component body = buildWidget(xml, wInfo, parent);
@@ -77,7 +77,7 @@ class NotebookBuilder extends ContainerBuilder {
             }
         }
         if (currentBody != bodies.length || currentLabel != labels.length) {
-            throw new WidgetBuildingException("tab/label count mismatch"); //$NON-NLS-1$
+            throw new WidgetBuildingException("tab/label count mismatch"); 
         }
         for (int i = 0; i < tabCount; i++) {
             notebook.add(labels[i], bodies[i]);

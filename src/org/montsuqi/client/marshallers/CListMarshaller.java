@@ -63,13 +63,13 @@ class CListMarshaller extends WidgetMarshaller {
                 con.receiveValue(label, offset + 1 + name.length());
             } else if (handleCommonAttribute(manager, widget, name)) {
                 //
-            } else if ("count".equals(name)) { //$NON-NLS-1$
+            } else if ("count".equals(name)) { 
                 count = con.receiveIntData();
-            } else if ("row".equals(name)) { //$NON-NLS-1$
+            } else if ("row".equals(name)) { 
                 row = con.receiveIntData();
                 int row2 = row > 1 ? row - 1 : 0;
                 clist.changeSelection(row2, 0, false, false);
-            } else if ("rowattr".equals(name)) { //$NON-NLS-1$
+            } else if ("rowattr".equals(name)) { 
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
                     case 1: // DOWN
@@ -88,11 +88,11 @@ class CListMarshaller extends WidgetMarshaller {
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
-            } else if ("column".equals(name)) { //$NON-NLS-1$
+            } else if ("column".equals(name)) { 
 				/*
                  * int dummy =
                  */ con.receiveIntData();
-            } else if ("item".equals(name)) { //$NON-NLS-1$
+            } else if ("item".equals(name)) { 
                 while (tableModel.getRowCount() > 0) {
                     tableModel.removeRow(0);
                 }
@@ -192,7 +192,7 @@ class CListMarshaller extends WidgetMarshaller {
             con.sendBooleanData(Type.BOOL,clist.getSelection(i));
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);
-                con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
+                con.sendName(va.getValueName() + ".row"); 
                 con.sendIntegerData(Type.INT, i + 1);
                 visibleRow = true;
             }

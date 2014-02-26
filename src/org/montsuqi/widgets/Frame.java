@@ -35,7 +35,7 @@ public class Frame extends JComponent {
     public Frame() {
         super();
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createTitledBorder("")); //$NON-NLS-1$
+        setBorder(BorderFactory.createTitledBorder("")); 
     }
 
     public void setTitle(String newTitle) {

@@ -61,8 +61,8 @@ class MenuBarBuilder extends ContainerBuilder {
 			JMenu menu = (JMenu)WidgetBuilder.buildWidget(xml, menuInfo, menuBar);
 			// set properties from the redundant GtkMenuItem part above.
 			String[] keys = {
-				"stock_item", //$NON-NLS-1$
-				"label" //$NON-NLS-1$
+				"stock_item", 
+				"label" 
 			};
 			for (int k = 0; k < keys.length; k++) {
 				if (properties.containsKey(keys[k])) {

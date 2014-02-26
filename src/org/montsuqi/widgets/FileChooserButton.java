@@ -110,7 +110,7 @@ public class FileChooserButton extends JComponent {
                 in.read(bytes, 0, length);
                 in.close();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(FileChooserButton.this, e.getMessage(), Messages.getString("FileChooserButton.error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                JOptionPane.showMessageDialog(FileChooserButton.this, e.getMessage(), Messages.getString("FileChooserButton.error"), JOptionPane.ERROR_MESSAGE); 
             }
         }
         return bytes;

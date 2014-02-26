@@ -66,17 +66,17 @@ class PandaTableMarshaller extends WidgetMarshaller {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
                 continue;
-            } else if ("trow".equals(name)) { //$NON-NLS-1$
+            } else if ("trow".equals(name)) { 
                 trow = con.receiveIntData() - 1;
                 if (trow < 0) {
                     trow = 0;
                 }
-            } else if ("tcolumn".equals(name)) { //$NON-NLS-1$
+            } else if ("tcolumn".equals(name)) { 
                 tcolumn = con.receiveIntData() - 1;
                 if (tcolumn < 0) {
                     tcolumn = 0;
                 }
-            } else if ("trowattr".equals(name)) { //$NON-NLS-1$
+            } else if ("trowattr".equals(name)) { 
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
                     case 1: // DOWN
@@ -95,11 +95,11 @@ class PandaTableMarshaller extends WidgetMarshaller {
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
-            } else if ("tvalue".equals(name)) { //$NON-NLS-1$
+            } else if ("tvalue".equals(name)) { 
                 /*
                  * String dummy =
                  */ con.receiveStringData();
-            } else if ("rowdata".equals(name)) { //$NON-NLS-1$                
+            } else if ("rowdata".equals(name)) {                 
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 int nrows = con.receiveInt();
                 ArrayList cellNameList = new ArrayList<String>();
@@ -174,15 +174,15 @@ class PandaTableMarshaller extends WidgetMarshaller {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 
         con.sendPacketClass(PacketClass.ScreenData);
-        con.sendName(name + ".trow"); //$NON-NLS-1$
+        con.sendName(name + ".trow"); 
         con.sendIntegerData(Type.INT, table.getChangedRow() + 1);
 
         con.sendPacketClass(PacketClass.ScreenData);
-        con.sendName(name + ".tcolumn"); //$NON-NLS-1$
+        con.sendName(name + ".tcolumn"); 
         con.sendIntegerData(Type.INT, table.getChangedColumn() + 1);
 
         con.sendPacketClass(PacketClass.ScreenData);
-        con.sendName(name + ".tvalue"); //$NON-NLS-1$
+        con.sendName(name + ".tvalue"); 
         con.sendStringData(Type.VARCHAR, table.getChangedValue());
 
         int k = 0;

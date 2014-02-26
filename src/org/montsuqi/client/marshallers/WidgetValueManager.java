@@ -79,7 +79,7 @@ public final class WidgetValueManager {
             return va.getOpt();
         }
         Object[] args = {name};
-        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$        
+        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args));         
     }
 
     ValueAttribute getAttribute(String name) {
@@ -87,7 +87,7 @@ public final class WidgetValueManager {
             return (ValueAttribute) attrTable.get(name);
         }
         Object[] args = {name};
-        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$
+        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); 
     }
 
     void setStyle(Component widget, String styleName) {

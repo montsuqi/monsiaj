@@ -264,12 +264,12 @@ public class Calendar extends JComponent {
     }
 
     public static void main(String[] args) {
-        final JFrame f = new JFrame("CalendarTest"); //$NON-NLS-1$
+        final JFrame f = new JFrame("CalendarTest"); 
         final Calendar cal = new Calendar();
         f.getContentPane().add(cal);
         f.setSize(400, 300);
         f.setVisible(true);
-        final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); //$NON-NLS-1$
+        final DateFormat dayFormat = new SimpleDateFormat("yyyy/MM/dd"); 
         cal.addChangeListener(new ChangeListener() {
 
             public void stateChanged(ChangeEvent e) {

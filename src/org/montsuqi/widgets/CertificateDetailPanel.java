@@ -125,7 +125,7 @@ public class CertificateDetailPanel extends JPanel {
 		final Font font = text.getFont();
 		final int style = font.getSize();
 		final int size = font.getSize();
-		final Font monospaceFont = new Font("Monospaced", style, size); //$NON-NLS-1$
+		final Font monospaceFont = new Font("Monospaced", style, size); 
 		text.setFont(monospaceFont);
 		text.setEditable(false);
 
@@ -155,14 +155,14 @@ public class CertificateDetailPanel extends JPanel {
 			final X500Principal subjectPrincipal = certificate.getSubjectX500Principal();
 			final String subjectName = getCommonName(subjectPrincipal);
 			final Object[] args = { subjectName, issuerName };
-			final MessageFormat format = new MessageFormat("{0} ({1})"); //$NON-NLS-1$
+			final MessageFormat format = new MessageFormat("{0} ({1})"); 
 			final String value = format.format(args);
 			return value;
 		}
 
 		private String getCommonName(X500Principal principal) {
 			final String distingishName = principal.getName();
-			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+			final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE); 
 			final Matcher matcher = pattern.matcher(distingishName);
 			if (matcher.find()) {
 				return matcher.group(1);
@@ -175,14 +175,14 @@ public class CertificateDetailPanel extends JPanel {
 	class CertificateTableModel extends AbstractTableModel {
 
 		String[] fieldNames = {
-			Messages.getString("CertificateDetailPanel.Version"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Serial"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Algorithm"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Issuer"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Validity"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Subject"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.Signature"), //$NON-NLS-1$
-			Messages.getString("CertificateDetailPanel.SHA1Fingerprint") //$NON-NLS-1$
+			Messages.getString("CertificateDetailPanel.Version"), 
+			Messages.getString("CertificateDetailPanel.Serial"), 
+			Messages.getString("CertificateDetailPanel.Algorithm"), 
+			Messages.getString("CertificateDetailPanel.Issuer"), 
+			Messages.getString("CertificateDetailPanel.Validity"), 
+			Messages.getString("CertificateDetailPanel.Subject"), 
+			Messages.getString("CertificateDetailPanel.Signature"), 
+			Messages.getString("CertificateDetailPanel.SHA1Fingerprint") 
 		};
 
 		private static final int VERSION_FIELD = 0;
@@ -195,8 +195,8 @@ public class CertificateDetailPanel extends JPanel {
 		private static final int FINGERPRINT_FIELD = 7;
 
 		private String[] columnNames = {
-				Messages.getString("CertificateDetailPanel.Field"), //$NON-NLS-1$
-				Messages.getString("CertificateDetailPanel.Value") //$NON-NLS-1$
+				Messages.getString("CertificateDetailPanel.Field"), 
+				Messages.getString("CertificateDetailPanel.Value") 
 		};
 
 		private static final int FIELD_COLUMN = 0;
@@ -235,7 +235,7 @@ public class CertificateDetailPanel extends JPanel {
 			case VALUE_COLUMN:
 				return getFieldValueFor(rowIndex);
 			}
-			throw new IllegalArgumentException("column is out of range."); //$NON-NLS-1$
+			throw new IllegalArgumentException("column is out of range."); 
 		}
 
 		private Object getFieldValueFor(int rowIndex) {
@@ -251,7 +251,7 @@ public class CertificateDetailPanel extends JPanel {
 			case VALIDITY_FIELD:
 				final Date notBefore = certificate.getNotBefore();
 				final Date notAfter = certificate.getNotAfter();
-				final Format format = new MessageFormat("[{0}, {1}]"); //$NON-NLS-1$
+				final Format format = new MessageFormat("[{0}, {1}]"); 
 				final Object[] args = { notBefore, notAfter };
 				return format.format(args);
 			case SUBJECT_FIELD:
@@ -261,13 +261,13 @@ public class CertificateDetailPanel extends JPanel {
 			case FINGERPRINT_FIELD:
 				return formatFingerprint(certificate);
 			default:
-				throw new IllegalArgumentException("row out of range."); //$NON-NLS-1$
+				throw new IllegalArgumentException("row out of range."); 
 			}
 		}
 
 		private String formatFingerprint(X509Certificate cert) {
 			try {
-				final MessageDigest digester = MessageDigest.getInstance("SHA"); //$NON-NLS-1$
+				final MessageDigest digester = MessageDigest.getInstance("SHA"); 
 				final byte[] digest = digester.digest(cert.getEncoded());
 				final StringBuffer buf = new StringBuffer();
 				for (int i = 0; i < digest.length; i++) {

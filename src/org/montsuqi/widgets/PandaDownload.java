@@ -130,7 +130,7 @@ public class PandaDownload extends JComponent {
                 }
                 File selected = chooser.getSelectedFile();
                 if (selected.exists() && selected.canWrite()) {
-                    if (JOptionPane.showConfirmDialog(dialog, Messages.getString("FileEntry.ask_overwrite"), Messages.getString("FileEntry.question"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) { //$NON-NLS-1$ //$NON-NLS-2$
+                    if (JOptionPane.showConfirmDialog(dialog, Messages.getString("FileEntry.ask_overwrite"), Messages.getString("FileEntry.question"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {  //$NON-NLS-2$
                         return;
                     }
                 }

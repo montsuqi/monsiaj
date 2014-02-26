@@ -72,13 +72,13 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			ChildInfo childInfo = parent.getLastChild();
 			// x, y property should go to childinfo
 			Map widgetProperties = w.getProperties();
-			if (widgetProperties.containsKey("x")) { //$NON-NLS-1$
-				childInfo.addProperty("x", (String)widgetProperties.get("x")); //$NON-NLS-1$ //$NON-NLS-2$
-				//widgetProperties.remove("x"); //$NON-NLS-1$
+			if (widgetProperties.containsKey("x")) { 
+				childInfo.addProperty("x", (String)widgetProperties.get("x"));  //$NON-NLS-2$
+				//widgetProperties.remove("x"); 
 			}
-			if (widgetProperties.containsKey("y")) { //$NON-NLS-1$
-				childInfo.addProperty("y", (String)widgetProperties.get("y")); //$NON-NLS-1$ //$NON-NLS-2$
-				//widgetProperties.remove("y"); //$NON-NLS-1$
+			if (widgetProperties.containsKey("y")) { 
+				childInfo.addProperty("y", (String)widgetProperties.get("y"));  //$NON-NLS-2$
+				//widgetProperties.remove("y"); 
 			}
 		}
 
@@ -110,25 +110,25 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		unknownDepth++;
 	}
 
-	final ParserState START = new ParserState("START") { //$NON-NLS-1$
+	final ParserState START = new ParserState("START") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			if ( ! localName.equals("GTK-Interface")) { //$NON-NLS-1$
-				warnUnexpectedElement("<null>", localName); //$NON-NLS-1$
+			if ( ! localName.equals("GTK-Interface")) { 
+				warnUnexpectedElement("<null>", localName); 
 			}
 			state = GTK_INTERFACE;
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			logger.warn("should not be closing any elements in this state"); //$NON-NLS-1$
+			logger.warn("should not be closing any elements in this state"); 
 		}
 	};
 
-	final ParserState GTK_INTERFACE = new ParserState("GTK_INTERFACE") { //$NON-NLS-1$
+	final ParserState GTK_INTERFACE = new ParserState("GTK_INTERFACE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			if (localName.equals("widget")) { //$NON-NLS-1$
+			if (localName.equals("widget")) { 
 				state = WIDGET;
 				initializeWidgetInfo();
-			} else if (localName.equals("style")) { //$NON-NLS-1$
+			} else if (localName.equals("style")) { 
 				state = STYLE;
 				// ignore style stuff in Java
 			} else {
@@ -143,19 +143,19 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 	};
 
-	final ParserState WIDGET = new ParserState("WIDGET") { //$NON-NLS-1$
+	final ParserState WIDGET = new ParserState("WIDGET") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
-			if (localName.equals("style")) { //$NON-NLS-1$
+			if (localName.equals("style")) { 
 				state = STYLE;
 				// ignore all style stuff in Java
-			} else if (localName.equals("accelerator") || localName.equals("Accelerator")) { //$NON-NLS-1$ //$NON-NLS-2$
+			} else if (localName.equals("accelerator") || localName.equals("Accelerator")) {  //$NON-NLS-2$
 				state = ACCELERATOR;
-			} else if (localName.equals("signal") || localName.equals("Signal")) { //$NON-NLS-1$ //$NON-NLS-2$
+			} else if (localName.equals("signal") || localName.equals("Signal")) {  //$NON-NLS-2$
 				state = SIGNAL;
-			} else if (localName.equals("child")) { //$NON-NLS-1$
+			} else if (localName.equals("child")) { 
 				// the child section
 				state = WIDGET_CHILD;
-			} else if (localName.equals("widget")) { //$NON-NLS-1$
+			} else if (localName.equals("widget")) { 
 				initializeWidgetInfo();
 			} else if (localName.equals("preview") || localName.equals("Preview")) {
 				state = PREVIEW;
@@ -168,13 +168,13 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 
 		void endElement(String uri, String localName, String qName) {
-			if (localName.equals("widget")) { //$NON-NLS-1$
+			if (localName.equals("widget")) { 
 				flushWidgetInfo();
 			}
 		}
 	};
 
-	final ParserState WIDGET_ATTRIBUTE = new ParserState("WIDGET_ATTRIBUTE") { //$NON-NLS-1$
+	final ParserState WIDGET_ATTRIBUTE = new ParserState("WIDGET_ATTRIBUTE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
@@ -183,28 +183,28 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			state = WIDGET;
 			String value = content.toString();
 			WidgetInfo w = getLastPendingWidget();
-			if (localName.equals("class")) { //$NON-NLS-1$
-				if (value.startsWith("Gtk")) { //$NON-NLS-1$
-					value = value.substring("Gtk".length()); //$NON-NLS-1$
+			if (localName.equals("class")) { 
+				if (value.startsWith("Gtk")) { 
+					value = value.substring("Gtk".length()); 
 				} else if (value.startsWith("Gnome")) {
-					value = value.substring("Gnome".length()); //$NON-NLS-1$
+					value = value.substring("Gnome".length()); 
 				}
 				w.setClassName(value);
-			} else if (localName.equals("name")) { //$NON-NLS-1$
+			} else if (localName.equals("name")) { 
 				w.setName(value);
-			} else if (localName.equals("visible")) { //$NON-NLS-1$
-				w.addProperty("visible", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (localName.equals("sensitive")) { //$NON-NLS-1$
-				w.addProperty("sensitive", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (localName.equals("can_default")) { //$NON-NLS-1$
-				w.addProperty("can_default", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (localName.equals("can_focus")) { //$NON-NLS-1$
-				w.addProperty("can_focus", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (localName.equals("has_default")) { //$NON-NLS-1$
-				w.addProperty("has_default", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (localName.equals("has_focus")) { //$NON-NLS-1$
-				w.addProperty("has_focus", content.charAt(0) == 'T' ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else if (localName.equals("style_name")) { //$NON-NLS-1$
+			} else if (localName.equals("visible")) { 
+				w.addProperty("visible", content.charAt(0) == 'T' ? "true" : "false");  //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (localName.equals("sensitive")) { 
+				w.addProperty("sensitive", content.charAt(0) == 'T' ? "true" : "false");  //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (localName.equals("can_default")) { 
+				w.addProperty("can_default", content.charAt(0) == 'T' ? "true" : "false");  //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (localName.equals("can_focus")) { 
+				w.addProperty("can_focus", content.charAt(0) == 'T' ? "true" : "false");  //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (localName.equals("has_default")) { 
+				w.addProperty("has_default", content.charAt(0) == 'T' ? "true" : "false");  //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (localName.equals("has_focus")) { 
+				w.addProperty("has_focus", content.charAt(0) == 'T' ? "true" : "false");  //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (localName.equals("style_name")) { 
 				// ignore
 			} else {
 				// some other attribute
@@ -213,7 +213,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 	};
 
-	final ParserState WIDGET_CHILD = new ParserState("WIDGET_CHILD") { //$NON-NLS-1$
+	final ParserState WIDGET_CHILD = new ParserState("WIDGET_CHILD") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			propertyType = PropertyType.CHILD;
 			propertyName = localName;
@@ -231,7 +231,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 	};
 
-	final ParserState WIDGET_CHILD_ATTRIBUTE = new ParserState("WIDGET_CHILD_ATTRIBUTE") { //$NON-NLS-1$
+	final ParserState WIDGET_CHILD_ATTRIBUTE = new ParserState("WIDGET_CHILD_ATTRIBUTE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
@@ -242,7 +242,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 	};
 
-	final ParserState SIGNAL = new ParserState("SIGNAL") { //$NON-NLS-1$
+	final ParserState SIGNAL = new ParserState("SIGNAL") { 
 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			state = SIGNAL_ATTRIBUTE;
@@ -252,16 +252,16 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			SignalInfo signal = new SignalInfo(signalName, signalHandler, signalObject, signalAfter);
-			signalName = ""; //$NON-NLS-1$
-			signalHandler = ""; //$NON-NLS-1$
-			signalObject = ""; //$NON-NLS-1$
+			signalName = ""; 
+			signalHandler = ""; 
+			signalObject = ""; 
 			signalAfter = false;
 			WidgetInfo w = getLastPendingWidget();
 			w.addSignalInfo(signal);
 		}
 	};
 
-	final ParserState SIGNAL_ATTRIBUTE = new ParserState("SIGNAL_ATTRIBUTE") { //$NON-NLS-1$
+	final ParserState SIGNAL_ATTRIBUTE = new ParserState("SIGNAL_ATTRIBUTE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
@@ -269,19 +269,19 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = SIGNAL;
 			String value = content.toString();
-			if (localName.equals("name")) { //$NON-NLS-1$
+			if (localName.equals("name")) { 
 				signalName = value;
-			} else if (localName.equals("handler")) { //$NON-NLS-1$
+			} else if (localName.equals("handler")) { 
 				signalHandler = value;
-			} else if (localName.equals("data")) { //$NON-NLS-1$
+			} else if (localName.equals("data")) { 
 				signalObject = value;
-			} else if (localName.equals("after")) { //$NON-NLS-1$
+			} else if (localName.equals("after")) { 
 				signalAfter = value.charAt(0) == 'T';
 			}
 		}
 	};
 
-	final ParserState ACCELERATOR = new ParserState("ACCELERATOR") { //$NON-NLS-1$
+	final ParserState ACCELERATOR = new ParserState("ACCELERATOR") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			state = ACCELERATOR_ATTRIBUTE;
 			clearContent();
@@ -294,12 +294,12 @@ public class Glade1Handler extends AbstractDocumentHandler {
 				WidgetInfo w = getLastPendingWidget();
 				w.addAccelInfo(accel);
 			} else {
-				logger.warn("accelerator ignored"); //$NON-NLS-1$
+				logger.warn("accelerator ignored"); 
 			}
 		}
 	};
 
-	final ParserState ACCELERATOR_ATTRIBUTE = new ParserState("ACCELERATOR_ATTRIBUTE") { //$NON-NLS-1$
+	final ParserState ACCELERATOR_ATTRIBUTE = new ParserState("ACCELERATOR_ATTRIBUTE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
@@ -307,17 +307,17 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		void endElement(String uri, String localName, String qName) {
 			state = ACCELERATOR;
 			String value = content.toString();
-			if (localName.equals("key") && value.startsWith("GDK_")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (localName.equals("key") && value.startsWith("GDK_")) {  //$NON-NLS-2$
 				accelKey = keyCode(value);
-			} else if (localName.equals("modifiers")) { //$NON-NLS-1$
+			} else if (localName.equals("modifiers")) { 
 				accelModifiers = parseModifiers(value);
-			} else if (localName.equals("signal")) { //$NON-NLS-1$
+			} else if (localName.equals("signal")) { 
 				accelSignal = value;
 			}
 		}
 	};
 
-	final ParserState STYLE = new ParserState("STYLE") { //$NON-NLS-1$
+	final ParserState STYLE = new ParserState("STYLE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			state = STYLE_ATTRIBUTE;
 			clearContent();
@@ -328,7 +328,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 		}
 	};
 
-	final ParserState STYLE_ATTRIBUTE = new ParserState("STYLE_ATTRIBUTE") { //$NON-NLS-1$
+	final ParserState STYLE_ATTRIBUTE = new ParserState("STYLE_ATTRIBUTE") { 
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}

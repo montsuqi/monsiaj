@@ -46,7 +46,7 @@ class FrameMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
-			} else if ("label".equals(name)) { //$NON-NLS-1$
+			} else if ("label".equals(name)) { 
 				manager.registerAttribute(widget, name, null);
 				frame.setTitle(con.receiveStringData());
 			} else {

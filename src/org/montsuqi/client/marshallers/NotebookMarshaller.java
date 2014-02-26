@@ -47,7 +47,7 @@ class NotebookMarshaller extends WidgetMarshaller {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
                 continue;
-            } else if ("pageno".equals(name)) { //$NON-NLS-1$
+            } else if ("pageno".equals(name)) { 
                 page = con.receiveIntData();
                 manager.registerAttribute(widget, name, null);
             } else {
@@ -56,7 +56,7 @@ class NotebookMarshaller extends WidgetMarshaller {
             }
         }
         if (page == -1) {
-            throw new WidgetMarshallingException("notebook page not found"); //$NON-NLS-1$
+            throw new WidgetMarshallingException("notebook page not found"); 
         }
         note.setSelectedIndex(page);
         if (con.getServerVersion() >= 14700) {

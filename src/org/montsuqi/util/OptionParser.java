@@ -37,10 +37,10 @@ public class OptionParser {
     static final String CONFIG_TRAILER;
 
     static {
-        if (System.getProperty("os.name").startsWith("Windows")) { //$NON-NLS-1$ //$NON-NLS-2$
-            CONFIG_TRAILER = ".CFG"; //$NON-NLS-1$
+        if (System.getProperty("os.name").startsWith("Windows")) {  //$NON-NLS-2$
+            CONFIG_TRAILER = ".CFG"; 
         } else {
-            CONFIG_TRAILER = ".conf"; //$NON-NLS-1$
+            CONFIG_TRAILER = ".conf"; 
         }
     }
     private static final char COMMAND_SWITCH = '-';
@@ -73,7 +73,7 @@ public class OptionParser {
             return ((Option) options.get(name)).getValue();
         }
         Object[] args = {name};
-        throw new IllegalArgumentException(MessageFormat.format("no such option: {0}", args)); //$NON-NLS-1$
+        throw new IllegalArgumentException(MessageFormat.format("no such option: {0}", args)); 
     }
 
     public String getString(String key) {
@@ -137,8 +137,8 @@ public class OptionParser {
                     break;
                 case COMMAND_SWITCH:
                     isParam = true;
-                    if (arg.equals("-?") || arg.equals("-h") || arg.equals("-H")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        System.out.println(usage("USAGE:" + program + " <option(s)> files...")); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (arg.equals("-?") || arg.equals("-h") || arg.equals("-H")) {  //$NON-NLS-2$ //$NON-NLS-3$
+                        System.out.println(usage("USAGE:" + program + " <option(s)> files..."));  //$NON-NLS-2$
                         System.exit(0);
                     } else {
                         isParam = analyzeLine(arg.substring(1));
@@ -156,8 +156,8 @@ public class OptionParser {
     }
 
     private boolean analyzeLine(String line) {
-        if (line.startsWith(";")) { //$NON-NLS-1$
-            logger.debug("skipping comment: " + line); //$NON-NLS-1$
+        if (line.startsWith(";")) { 
+            logger.debug("skipping comment: " + line); 
             return false;
         }
         String key = line;
@@ -185,22 +185,22 @@ public class OptionParser {
 
     public String usage(String comment) {
         Iterator i = options.values().iterator();
-        Format format = new MessageFormat("-{0} : {1}\n"); //$NON-NLS-1$
+        Format format = new MessageFormat("-{0} : {1}\n"); 
         // "  -%-12s : %-40s"
         StringBuffer usage = new StringBuffer();
         usage.append(comment);
-        usage.append("\n"); //$NON-NLS-1$
+        usage.append("\n"); 
         while (i.hasNext()) {
             Option o = (Option) i.next();
             Object[] args = {o.getName(), o.getMessage()};
             usage.append(format.format(args));
             Object value = o.getValue();
             if (value != null) {
-                usage.append("\t[" + value + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                usage.append("\n"); //$NON-NLS-1$
+                usage.append("\t[" + value + "]");  //$NON-NLS-2$
+                usage.append("\n"); 
             }
         }
-        usage.append("\n"); //$NON-NLS-1$
+        usage.append("\n"); 
         return usage.toString();
     }
 
@@ -214,14 +214,14 @@ public class OptionParser {
     public static void main(String[] args) {
         OptionParser parser = new OptionParser();
 
-        parser.add("a", "aaa", "abc"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        parser.add("b", "bbb", 10); //$NON-NLS-1$ //$NON-NLS-2$
-        parser.add("c", "ccc", false); //$NON-NLS-1$ //$NON-NLS-2$
+        parser.add("a", "aaa", "abc");  //$NON-NLS-2$ //$NON-NLS-3$
+        parser.add("b", "bbb", 10);  //$NON-NLS-2$
+        parser.add("c", "ccc", false);  //$NON-NLS-2$
 
-        args = parser.parse("OptionParser", args); //$NON-NLS-1$
+        args = parser.parse("OptionParser", args); 
 
-        System.out.println("*****\n"); //$NON-NLS-1$
-        System.out.println(parser.usage("Usage")); //$NON-NLS-1$
+        System.out.println("*****\n"); 
+        System.out.println(parser.usage("Usage")); 
         for (int i = 0; i < args.length; i++) {
             System.out.println(args[i]);
         }

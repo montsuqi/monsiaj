@@ -52,7 +52,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if ("objectdata".equals(name)) { //$NON-NLS-1$
+            if ("objectdata".equals(name)) { 
                 binary = con.receiveBinaryData();
                 manager.registerAttribute(widget, "objectdata", null);
             } else if (handleCommonAttribute(manager, widget, name)) {
@@ -67,7 +67,7 @@ class FileEntryMarshaller extends WidgetMarshaller {
                     entryMarshaller.receive(manager, dummy);
                     entryReceived = true;
                 } else {
-                    throw new WidgetMarshallingException("subwidget not found"); //$NON-NLS-1$
+                    throw new WidgetMarshallingException("subwidget not found"); 
                 }
             }
         }
