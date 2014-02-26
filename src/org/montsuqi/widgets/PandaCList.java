@@ -39,6 +39,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import org.montsuqi.util.SafeColorDecoder;
 
 public class PandaCList extends JTable {
 
@@ -51,6 +52,8 @@ public class PandaCList extends JTable {
     private Color[] fgColors;
     private final boolean[] selection;
     private int mode;
+    private Color selectionBGColor;
+    private Color ltSelectionBGColor;
 
     public void addChangeListener(ChangeListener l) {
         listenerList.add(ChangeListener.class, l);
@@ -83,6 +86,20 @@ public class PandaCList extends JTable {
         setAutoscrolls(true);
         setRowSelectionAllowed(false);
         initActions();
+
+        String strColor = System.getProperty("monsia.pandaclist.selection_bg_color");
+        if (strColor != null) {
+            selectionBGColor = SafeColorDecoder.decode(strColor);
+        } else {
+            selectionBGColor = new Color(0xCC, 0xCC, 0xEE);
+        }
+
+        strColor = System.getProperty("monsia.pandaclist.lt_selection_bg_color");
+        if (strColor != null) {
+            ltSelectionBGColor = SafeColorDecoder.decode(strColor);
+        } else {
+            ltSelectionBGColor = new Color(0xCC, 0xCC, 0xFF);
+        }
 
         if (System.getProperty("monsia.widget.pandaclist.showgrid") == null) {
             this.setShowGrid(false);
@@ -183,9 +200,9 @@ public class PandaCList extends JTable {
         }
         if (selection[row]) {
             if (this.isRowSelected(row)) {
-                c.setBackground(new Color(0xCC, 0xCC, 0xFF));
+                c.setBackground(this.ltSelectionBGColor);
             } else {
-                c.setBackground(new Color(0xCC, 0xCC, 0xEE));
+                c.setBackground(this.selectionBGColor);
             }
         } else {
             if (bgColors != null && row < bgColors.length && bgColors[row] != null) {
