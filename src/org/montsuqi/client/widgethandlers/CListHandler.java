@@ -32,7 +32,6 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -190,7 +189,7 @@ class CListHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTable table = (JTable) widget;
-        ListSelectionModel selections = table.getSelectionModel();
+        PandaCList clist = (PandaCList)widget;
 
         for (Iterator i = obj.keys(); i.hasNext();) {
             String key = (String) i.next();
@@ -218,7 +217,7 @@ class CListHandler extends WidgetHandler {
             } else {
                 JSONArray array = obj.getJSONArray(key);
                 for (int j = 0; j < table.getRowCount(); j++) {
-                    array.put(j, selections.isSelectedIndex(j));
+                    array.put(j, clist.getSelection(j));
                 }
             }
         }
