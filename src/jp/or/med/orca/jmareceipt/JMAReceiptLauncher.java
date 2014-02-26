@@ -45,7 +45,7 @@ public class JMAReceiptLauncher extends Launcher {
      * <p>Application entry point.</p>
      */
     public static void main(String[] args) {
-        Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); //$NON-NLS-1$
+        Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); 
         launcher.launch(args);
     }
 
@@ -54,7 +54,7 @@ public class JMAReceiptLauncher extends Launcher {
      */
     @Override
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); //$NON-NLS-1$
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); 
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }

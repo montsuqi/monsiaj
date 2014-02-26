@@ -86,13 +86,13 @@ public class Style {
 			} else {
 				style = (Style)styles.get(styleName);
 			}
-			if ("font".equals(attribute)) { //$NON-NLS-1$
+			if ("font".equals(attribute)) { 
 				Font font = Font.decode(value);
 				style.setFont(font);
-			} else if ("foreground".equals(attribute) || "fg".equals(attribute)) { //$NON-NLS-1$ //$NON-NLS-2$
+			} else if ("foreground".equals(attribute) || "fg".equals(attribute)) {  //$NON-NLS-2$
 				Color fg = SafeColorDecoder.decode(value);
 				style.setForeground(fg);
-			} else if ("background".equals(attribute) || "bg".equals(attribute)) { //$NON-NLS-1$ //$NON-NLS-2$
+			} else if ("background".equals(attribute) || "bg".equals(attribute)) {  //$NON-NLS-2$
 				Color bg = SafeColorDecoder.decode(value);
 				style.setBackground(bg);
 			}

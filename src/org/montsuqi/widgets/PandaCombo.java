@@ -84,11 +84,11 @@ public class PandaCombo extends JComboBox {
 			parent.remove(downKey);
 			parent.remove(enterKey);
 		}
-		actionMap.put("moveSelectionUp", new MoveSelectionAction(-1)); //$NON-NLS-1$
-		actionMap.put("moveSelectionDown", new MoveSelectionAction(1)); //$NON-NLS-1$
+		actionMap.put("moveSelectionUp", new MoveSelectionAction(-1)); 
+		actionMap.put("moveSelectionDown", new MoveSelectionAction(1)); 
 
-		inputMap.put(upKey, "moveSelectionUp"); //$NON-NLS-1$
-		inputMap.put(downKey, "moveSelectionDown"); //$NON-NLS-1$
+		inputMap.put(upKey, "moveSelectionUp"); 
+		inputMap.put(downKey, "moveSelectionDown"); 
 		
 		addPopupMenuListener(new PopupMenuListener() {
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
@@ -112,9 +112,9 @@ class PandaComboBoxEditor extends BasicComboBoxEditor {
 	JComboBox combo;
 
 	public PandaComboBoxEditor(final JComboBox combo) {
-		editor  = new BorderlessPandaEntry("", 9); //$NON-NLS-1$
+		editor  = new BorderlessPandaEntry("", 9); 
 		this.combo = combo;
-		editor.putClientProperty("panda combo editor", Boolean.TRUE); //$NON-NLS-1$
+		editor.putClientProperty("panda combo editor", Boolean.TRUE); 
 	}
 
 	class BorderlessPandaEntry extends PandaEntry {

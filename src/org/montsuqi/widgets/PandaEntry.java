@@ -47,10 +47,10 @@ public class PandaEntry extends Entry {
             if (source instanceof Entry) {
                 Entry entry = (Entry) source;
                 String text = entry.getText();
-                if (text.endsWith("n")) { //$NON-NLS-1$
+                if (text.endsWith("n")) { 
                     Document doc = entry.getDocument();
                     try {
-                        doc.insertString(doc.getLength(), "\n", null); //$NON-NLS-1$
+                        doc.insertString(doc.getLength(), "\n", null); 
                     } catch (BadLocationException e) {
                         throw new RuntimeException(e);
                     }
@@ -182,11 +182,11 @@ public class PandaEntry extends Entry {
     }
 
     public static void main(String[] args) {
-        final JFrame f = new JFrame("TestPandaEntry"); //$NON-NLS-1$
+        final JFrame f = new JFrame("TestPandaEntry"); 
         java.awt.event.ActionListener al = new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent ev) {
-                System.out.println("evt"); //$NON-NLS-1$
+                System.out.println("evt"); 
             }
         };
         PandaEntry pe = new PandaEntry();
@@ -234,57 +234,57 @@ class PandaDocument extends LengthLimitableDocument {
         0, 0, 0, 0, 0, '\u30a6', 0, 0,
         0, 0, 0, '\uff5b', '\uff5c', '\uff5d', '\uffe3', 0,};
     private static final RuleEntry[] KANA_TABLE = {
-        new RuleEntry("l", "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("x", "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("k", "\u30ab", "\u30ad", "\u30af", "\u30b1", "\u30b3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("ky", "\u30ad\u30e3", "\u30ad\u30a3", "\u30ad\u30e5", "\u30ad\u30a7", "\u30ad\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("g", "\u30ac", "\u30ae", "\u30b0", "\u30b2", "\u30b4"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("gy", "\u30ae\u30e3", "\u30ae\u30a3", "\u30ae\u30e5", "\u30ae\u30a7", "\u30ae\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("s", "\u30b5", "\u30b7", "\u30b9", "\u30bb", "\u30bd"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("sh", "\u30b7\u30e3", "\u30b7", "\u30b7\u30e5", "\u30b7\u30a7", "\u30b7\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("sy", "\u30b7\u30e3", "\u30b7\u30a3", "\u30b7\u30e5", "\u30b7\u30a7", "\u30b7\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("z", "\u30b6", "\u30b8", "\u30ba", "\u30bc", "\u30be"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("j", "\u30b8\u30e3", "\u30b8", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("jy", "\u30b8\u30e3", "\u30b8\u30a3", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("zy", "\u30b8\u30e3", "\u30b8\u30a3", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("t", "\u30bf", "\u30c1", "\u30c4", "\u30c6", "\u30c8"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("ts", null, null, "\u30c4", null, null), //$NON-NLS-1$ //$NON-NLS-2$
-        new RuleEntry("lt", null, null, "\u30c3", null, null), //$NON-NLS-1$ //$NON-NLS-2$
-        new RuleEntry("xt", null, null, "\u30c3", null, null), //$NON-NLS-1$ //$NON-NLS-2$
-        new RuleEntry("ty", "\u30c1\u30e3", "\u30c1\u30a3", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("cy", "\u30c1\u30e3", "\u30c1\u30a3", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("ch", "\u30c1\u30e3", "\u30c1", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("th", "\u30c6\u30e3", "\u30c6\u30a3", "\u30c6\u30e5", "\u30c6\u30a7", "\u30c6\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("d", "\u30c0", "\u30c2", "\u30c5", "\u30c7", "\u30c9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("dy", "\u30c2\u30e3", "\u30c2\u30a3", "\u30c2\u30e5", "\u30c2\u30a7", "\u30c2\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("dh", "\u30c7\u30e3", "\u30c7\u30a3", "\u30c7\u30e5", "\u30c7\u30a7", "\u30c7\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("dw", "\u30c9\u30a1", "\u30c9\u30a3", "\u30c9\u30a5", "\u30c9\u30a7", "\u30c9\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("n", "\u30ca", "\u30cb", "\u30cc", "\u30cd", "\u30ce"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("ny", "\u30cb\u30e3", "\u30cb\u30a3", "\u30cb\u30e5", "\u30cb\u30a7", "\u30cb\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("h", "\u30cf", "\u30d2", "\u30d5", "\u30d8", "\u30db"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("f", "\u30d5\u30a1", "\u30d5\u30a3", "\u30d5", "\u30d5\u30a7", "\u30d5\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("hy", "\u30d2\u30e3", "\u30d2\u30a3", "\u30d2\u30e5", "\u30d2\u30a7", "\u30d2\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("fy", "\u30d5\u30e3", "\u30d5\u30a3", "\u30d5\u30e5", "\u30d5\u30a7", "\u30d5\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("b", "\u30d0", "\u30d3", "\u30d6", "\u30d9", "\u30dc"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("by", "\u30d3\u30e3", "\u30d3\u30a3", "\u30d3\u30e5", "\u30d3\u30a7", "\u30d3\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("p", "\u30d1", "\u30d4", "\u30d7", "\u30da", "\u30dd"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("py", "\u30d4\u30e3", "\u30d4\u30a3", "\u30d4\u30e5", "\u30d4\u30a7", "\u30d4\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("m", "\u30de", "\u30df", "\u30e0", "\u30e1", "\u30e2"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("my", "\u30df\u30e3", "\u30df\u30a3", "\u30df\u30e5", "\u30df\u30a7", "\u30df\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("y", "\u30e4", "\u30a4", "\u30e6", "\u30a4\u30a7", "\u30e8"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("ly", "\u30e3", null, "\u30e5", null, "\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        new RuleEntry("xy", "\u30e3", null, "\u30e5", null, "\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        new RuleEntry("r", "\u30e9", "\u30ea", "\u30eb", "\u30ec", "\u30ed"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("ry", "\u30ea\u30e3", "\u30ea\u30a3", "\u30ea\u30e5", "\u30ea\u30a7", "\u30ea\u30e7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("w", "\u30ef", "\u30f0", "\u30a6", "\u30f1", "\u30f2"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("wh", "\u30ef", "\u30a6\u30a3", "\u30a6", "\u30a6\u30a7", "\u30a6\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("lw", "\u30ee", null, null, null, null), //$NON-NLS-1$ //$NON-NLS-2$
-        new RuleEntry("xw", "\u30ee", null, null, null, null), //$NON-NLS-1$ //$NON-NLS-2$
-        new RuleEntry("v", "\u30f4\u30a1", "\u30f4\u30a3", "\u30f4", "\u30f4\u30a7", "\u30f4\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        new RuleEntry("q", "\u30af\u30a1", "\u30af\u30a3", "\u30af", "\u30af\u30a7", "\u30af\u30a9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("l", "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("x", "\u30a1", "\u30a3", "\u30a5", "\u30a7", "\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("k", "\u30ab", "\u30ad", "\u30af", "\u30b1", "\u30b3"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("ky", "\u30ad\u30e3", "\u30ad\u30a3", "\u30ad\u30e5", "\u30ad\u30a7", "\u30ad\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("g", "\u30ac", "\u30ae", "\u30b0", "\u30b2", "\u30b4"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("gy", "\u30ae\u30e3", "\u30ae\u30a3", "\u30ae\u30e5", "\u30ae\u30a7", "\u30ae\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("s", "\u30b5", "\u30b7", "\u30b9", "\u30bb", "\u30bd"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("sh", "\u30b7\u30e3", "\u30b7", "\u30b7\u30e5", "\u30b7\u30a7", "\u30b7\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("sy", "\u30b7\u30e3", "\u30b7\u30a3", "\u30b7\u30e5", "\u30b7\u30a7", "\u30b7\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("z", "\u30b6", "\u30b8", "\u30ba", "\u30bc", "\u30be"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("j", "\u30b8\u30e3", "\u30b8", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("jy", "\u30b8\u30e3", "\u30b8\u30a3", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("zy", "\u30b8\u30e3", "\u30b8\u30a3", "\u30b8\u30e5", "\u30b8\u30a7", "\u30b8\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("t", "\u30bf", "\u30c1", "\u30c4", "\u30c6", "\u30c8"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("ts", null, null, "\u30c4", null, null),  //$NON-NLS-2$
+        new RuleEntry("lt", null, null, "\u30c3", null, null),  //$NON-NLS-2$
+        new RuleEntry("xt", null, null, "\u30c3", null, null),  //$NON-NLS-2$
+        new RuleEntry("ty", "\u30c1\u30e3", "\u30c1\u30a3", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("cy", "\u30c1\u30e3", "\u30c1\u30a3", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("ch", "\u30c1\u30e3", "\u30c1", "\u30c1\u30e5", "\u30c1\u30a7", "\u30c1\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("th", "\u30c6\u30e3", "\u30c6\u30a3", "\u30c6\u30e5", "\u30c6\u30a7", "\u30c6\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("d", "\u30c0", "\u30c2", "\u30c5", "\u30c7", "\u30c9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("dy", "\u30c2\u30e3", "\u30c2\u30a3", "\u30c2\u30e5", "\u30c2\u30a7", "\u30c2\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("dh", "\u30c7\u30e3", "\u30c7\u30a3", "\u30c7\u30e5", "\u30c7\u30a7", "\u30c7\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("dw", "\u30c9\u30a1", "\u30c9\u30a3", "\u30c9\u30a5", "\u30c9\u30a7", "\u30c9\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("n", "\u30ca", "\u30cb", "\u30cc", "\u30cd", "\u30ce"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("ny", "\u30cb\u30e3", "\u30cb\u30a3", "\u30cb\u30e5", "\u30cb\u30a7", "\u30cb\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("h", "\u30cf", "\u30d2", "\u30d5", "\u30d8", "\u30db"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("f", "\u30d5\u30a1", "\u30d5\u30a3", "\u30d5", "\u30d5\u30a7", "\u30d5\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("hy", "\u30d2\u30e3", "\u30d2\u30a3", "\u30d2\u30e5", "\u30d2\u30a7", "\u30d2\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("fy", "\u30d5\u30e3", "\u30d5\u30a3", "\u30d5\u30e5", "\u30d5\u30a7", "\u30d5\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("b", "\u30d0", "\u30d3", "\u30d6", "\u30d9", "\u30dc"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("by", "\u30d3\u30e3", "\u30d3\u30a3", "\u30d3\u30e5", "\u30d3\u30a7", "\u30d3\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("p", "\u30d1", "\u30d4", "\u30d7", "\u30da", "\u30dd"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("py", "\u30d4\u30e3", "\u30d4\u30a3", "\u30d4\u30e5", "\u30d4\u30a7", "\u30d4\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("m", "\u30de", "\u30df", "\u30e0", "\u30e1", "\u30e2"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("my", "\u30df\u30e3", "\u30df\u30a3", "\u30df\u30e5", "\u30df\u30a7", "\u30df\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("y", "\u30e4", "\u30a4", "\u30e6", "\u30a4\u30a7", "\u30e8"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("ly", "\u30e3", null, "\u30e5", null, "\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        new RuleEntry("xy", "\u30e3", null, "\u30e5", null, "\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        new RuleEntry("r", "\u30e9", "\u30ea", "\u30eb", "\u30ec", "\u30ed"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("ry", "\u30ea\u30e3", "\u30ea\u30a3", "\u30ea\u30e5", "\u30ea\u30a7", "\u30ea\u30e7"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("w", "\u30ef", "\u30f0", "\u30a6", "\u30f1", "\u30f2"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("wh", "\u30ef", "\u30a6\u30a3", "\u30a6", "\u30a6\u30a7", "\u30a6\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("lw", "\u30ee", null, null, null, null),  //$NON-NLS-2$
+        new RuleEntry("xw", "\u30ee", null, null, null, null),  //$NON-NLS-2$
+        new RuleEntry("v", "\u30f4\u30a1", "\u30f4\u30a3", "\u30f4", "\u30f4\u30a7", "\u30f4\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        new RuleEntry("q", "\u30af\u30a1", "\u30af\u30a3", "\u30af", "\u30af\u30a7", "\u30af\u30a9"),  //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
     };
-    private static final String LOW_ALPHABETS = "abcdefghijklmnopqrstuvwxyz"; //$NON-NLS-1$
-    private static final String AEIOU = "aeiou"; //$NON-NLS-1$
+    private static final String LOW_ALPHABETS = "abcdefghijklmnopqrstuvwxyz"; 
+    private static final String AEIOU = "aeiou"; 
 
     PandaDocument() {
         mode = ASCII;
@@ -358,13 +358,13 @@ class PandaDocument extends LengthLimitableDocument {
                 }
             } else if (prefix.charAt(0) == 'n' && thisChar != 'y') {
                 // n -> \u30f3
-                str = "\u30f3"; //$NON-NLS-1$
+                str = "\u30f3"; 
                 if (thisChar != 'n' && thisChar != '\n' && thisChar != '\'') {
                     str += thisChar;
                 }
             } else if (thisChar == prefix.charAt(0)) {
                 // xx -> \u30c3
-                str = "\u30c3" + thisChar; //$NON-NLS-1$
+                str = "\u30c3" + thisChar; 
             } else if (thisChar == '\n') {
                 // ignore ENTER after prefix
                 return;

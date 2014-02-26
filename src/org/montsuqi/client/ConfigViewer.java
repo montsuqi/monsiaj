@@ -55,7 +55,7 @@ public class ConfigViewer {
     }
 
     public void run(Frame parent) {
-        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); //$NON-NLS-1$
+        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); 
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout(5, 5));
         final PandaCList clist = new PandaCList();
@@ -75,7 +75,7 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { //$NON-NLS-1$
+        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { 
 
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
@@ -85,7 +85,7 @@ public class ConfigViewer {
         });
         bar.add(newButton);
 
-        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { //$NON-NLS-1$
+        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { 
 
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = clist.getSelectedRow();
@@ -98,12 +98,12 @@ public class ConfigViewer {
         });
         bar.add(editButton);
 
-        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { //$NON-NLS-1$
+        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { 
 
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = clist.getSelectedRow();
                 if (selectedRow >= 0) {
-                    int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+                    int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
                         String configName = (String) (clist.getValueAt(selectedRow, 0));
                         conf.deleteConfig(conf.getConfigByDescription(configName));
@@ -114,7 +114,7 @@ public class ConfigViewer {
         });
         bar.add(deleteButton);
 
-        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { //$NON-NLS-1$
+        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { 
 
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
@@ -159,7 +159,7 @@ public class ConfigViewer {
 
     protected void editConfig(Dialog parent, final int num, final boolean newFlag) {
         String title = newFlag ? Messages.getString("ConfigurationViewer.new") : Messages.getString("ConfigurationViewer.edit");
-        final JDialog f = new JDialog(parent, title, true); //$NON-NLS-1$
+        final JDialog f = new JDialog(parent, title, true); 
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout());
 
@@ -199,7 +199,7 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { //$NON-NLS-1$
+        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { 
 
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
@@ -209,7 +209,7 @@ public class ConfigViewer {
         });
         bar.add(editOKButton);
 
-        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { //$NON-NLS-1$
+        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { 
 
             public void actionPerformed(ActionEvent e) {
                 f.dispose();

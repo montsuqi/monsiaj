@@ -174,9 +174,9 @@ public class Launcher {
         configPanel.loadConfig(conf.getCurrent());
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$
-        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); //$NON-NLS-1$
-        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); //$NON-NLS-1$
+        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); 
+        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); 
+        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); 
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;

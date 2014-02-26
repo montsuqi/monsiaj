@@ -41,8 +41,8 @@ import org.montsuqi.widgets.PandaPreview;
  */
 class PreviewHandler extends WidgetHandler {
 
-    private static final String TEMP_PREFIX = "pandapreview"; //$NON-NLS-1$
-    private static final String TEMP_SUFFIX = ".pdf"; //$NON-NLS-1$
+    private static final String TEMP_PREFIX = "pandapreview"; 
+    private static final String TEMP_SUFFIX = ".pdf"; 
 
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaPreview preview = (PandaPreview) widget;

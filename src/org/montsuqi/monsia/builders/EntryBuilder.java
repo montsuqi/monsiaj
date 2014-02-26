@@ -37,8 +37,8 @@ public class EntryBuilder extends WidgetBuilder {
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		// In Gtk+ entry widgets, can_focus property is set false by default.
 		// To simulate Gtk+ behavior, temporally set can_focus to false.
-		final String canFocus = info.getProperty("can_focus"); //$NON-NLS-1$
-		info.setProperty("can_focus", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+		final String canFocus = info.getProperty("can_focus"); 
+		info.setProperty("can_focus", "false");  //$NON-NLS-2$
 		final Component c = super.buildSelf(xml, parent, info);
 		final JTextComponent text = (JTextComponent)c;
 		if (canFocus != null) {

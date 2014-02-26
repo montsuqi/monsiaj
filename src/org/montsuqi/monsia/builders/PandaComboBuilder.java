@@ -27,8 +27,8 @@ package org.montsuqi.monsia.builders;
  */
 class PandaComboBuilder extends ComboBuilder {
 	protected void ensureValidEntryType(String actualType) {
-		if ( ! "PandaEntry".equals(actualType)) { //$NON-NLS-1$
-			throw new WidgetBuildingException("not a PandaEntry widget"); //$NON-NLS-1$
+		if ( ! "PandaEntry".equals(actualType)) { 
+			throw new WidgetBuildingException("not a PandaEntry widget"); 
 		}
 	}
 }

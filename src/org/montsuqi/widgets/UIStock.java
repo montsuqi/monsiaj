@@ -42,7 +42,7 @@ public class UIStock {
 		stocks = new HashMap();
 	}
 
-	private static final String BUNDLE_NAME = "org.montsuqi.widgets.uistocks"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.montsuqi.widgets.uistocks"; 
 	private static final ResourceBundle RESOURCE_BUNDLE =
 		ResourceBundle.getBundle(BUNDLE_NAME);
 
@@ -59,7 +59,7 @@ public class UIStock {
 		this.accelerator = accelerator;
 
 		if (iconFile != null) {
-			String iconPath = "/org/montsuqi/widgets/images/" + iconFile; //$NON-NLS-1$
+			String iconPath = "/org/montsuqi/widgets/images/" + iconFile; 
 			URL url = getClass().getResource(iconPath);
 			if (url != null) {
 				icon = new ImageIcon(url);
@@ -113,27 +113,27 @@ public class UIStock {
 
 	private static UIStock createStock(String key) {
 		String label;
-		key = "UIStock." + key; //$NON-NLS-1$
+		key = "UIStock." + key; 
 		try {
-			label = RESOURCE_BUNDLE.getString(key + ".label"); //$NON-NLS-1$
+			label = RESOURCE_BUNDLE.getString(key + ".label"); 
 		} catch (MissingResourceException e) {
-			throw new IllegalArgumentException("stock not found"); //$NON-NLS-1$
+			throw new IllegalArgumentException("stock not found"); 
 		}
 		String tooltip;
 		try {
-			tooltip = RESOURCE_BUNDLE.getString(key + ".tooltip"); //$NON-NLS-1$
+			tooltip = RESOURCE_BUNDLE.getString(key + ".tooltip"); 
 		} catch (MissingResourceException e) {
-			tooltip = ""; //$NON-NLS-1$
+			tooltip = ""; 
 		}
 		String icon;
 		try {
-			icon = RESOURCE_BUNDLE.getString(key + ".icon"); //$NON-NLS-1$
+			icon = RESOURCE_BUNDLE.getString(key + ".icon"); 
 		} catch (MissingResourceException e) {
 			icon = null;
 		}
 		KeyStroke accelerator;
 		try {
-			accelerator = KeyStroke.getKeyStroke(RESOURCE_BUNDLE.getString(key + ".accelerator")); //$NON-NLS-1$
+			accelerator = KeyStroke.getKeyStroke(RESOURCE_BUNDLE.getString(key + ".accelerator")); 
 		} catch (MissingResourceException e) {
 			accelerator = null;
 		}
