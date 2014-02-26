@@ -147,7 +147,7 @@ class CListMarshaller extends WidgetMarshaller {
                     if (j < count) {
                         clist.setSelection(j,selected);
                         if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
-                            clist.changeSelection(row, 0, false, false);
+                            clist.changeSelection(j, 0, false, false);
                         }
                     }
                 }

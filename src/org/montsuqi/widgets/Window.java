@@ -36,6 +36,7 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.LayoutFocusTraversalPolicy;
 
 /** <p>A JFrame wrapper.</p>
  */
@@ -112,6 +113,8 @@ public class Window extends JFrame {
         dialog.setSize(this.getSize());
         dialog.validate();
         dialog.requestFocus();
+        dialog.setFocusCycleRoot(true);
+        dialog.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
         return dialog;
     }
     

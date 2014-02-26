@@ -117,7 +117,5 @@ class FixedBuilder extends ContainerBuilder {
 
         Insets insets = parent.getInsets();
         parent.setSize(rightMost + insets.right, bottomMost + insets.bottom);
-
-        parent.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
     }
 }
