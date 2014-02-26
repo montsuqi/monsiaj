@@ -601,21 +601,15 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JTable.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
+        registerProperty(PandaCList.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
 
             public void set(Interface xml, Container parent, Component widget, String value) {
-                JTable table = (JTable) widget;
+                PandaCList clist = (PandaCList) widget;
                 value = normalize(value, "SELECTION_"); //$NON-NLS-1$
                 if ("SINGLE".equals(value)) { //$NON-NLS-1$
-                    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                } else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
-                    table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                } else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
-                    warnUnsupportedProperty(value);
-                } else if ("BROWSE".equals(value)) { //$NON-NLS-1$
-                    warnUnsupportedProperty(value);
+                    clist.setMode(PandaCList.SELECTION_MODE_SINGLE);
                 } else {
-                    throw new IllegalArgumentException(value);
+                    clist.setMode(PandaCList.SELECTION_MODE_MULTI);
                 }
             }
         });

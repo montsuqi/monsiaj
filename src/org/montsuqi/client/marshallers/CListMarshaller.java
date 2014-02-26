@@ -28,7 +28,6 @@ import java.awt.Container;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
@@ -47,12 +46,7 @@ class CListMarshaller extends WidgetMarshaller {
         PandaCList clist = (PandaCList) widget;
 
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        TableColumnModel columnModel = table.getColumnModel();
-        ListSelectionModel selections = table.getSelectionModel();
-        String[] labels = new String[columnModel.getColumnCount()];
-        for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
-            labels[i] = (String) columnModel.getColumn(i).getHeaderValue();
-        }
+
         con.receiveDataTypeWithCheck(Type.RECORD);
         StringBuffer widgetName = con.getWidgetNameBuffer();
         StringBuffer label = new StringBuffer(widgetName.toString());
@@ -68,11 +62,13 @@ class CListMarshaller extends WidgetMarshaller {
             if (sub != null) {
                 con.receiveValue(label, offset + 1 + name.length());
             } else if (handleCommonAttribute(manager, widget, name)) {
-                continue;
+                //
             } else if ("count".equals(name)) { //$NON-NLS-1$
                 count = con.receiveIntData();
             } else if ("row".equals(name)) { //$NON-NLS-1$
                 row = con.receiveIntData();
+                int row2 = row > 1 ? row - 1 : 0;
+                clist.changeSelection(row2, 0, false, false);
             } else if ("rowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
@@ -149,10 +145,9 @@ class CListMarshaller extends WidgetMarshaller {
                 for (int j = 0; j < num; j++) {
                     boolean selected = con.receiveBooleanData();
                     if (j < count) {
-                        if (selected) {
-                            selections.addSelectionInterval(j, j);
-                        } else {
-                            selections.removeSelectionInterval(j, j);
+                        clist.setSelection(j,selected);
+                        if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
+                            clist.changeSelection(row, 0, false, false);
                         }
                     }
                 }
@@ -181,39 +176,20 @@ class CListMarshaller extends WidgetMarshaller {
                 model.setValue(0);
             }
         }
-
-        // save selection values
-        ListSelectionModel savedSelections = new DefaultListSelectionModel();
-        int rows = table.getRowCount();
-        copySelections(rows, savedSelections, selections);
-        // setColumnIdentifiers resets selection values
-        //tableModel.setColumnIdentifiers(labels);
-        // restore selection values
-        copySelections(rows, selections, savedSelections);
         widget.setVisible(true);
-    }
-
-    private void copySelections(int rows, ListSelectionModel to, ListSelectionModel from) {
-        for (int i = 0; i < rows; i++) {
-            if (from.isSelectedIndex(i)) {
-                to.addSelectionInterval(i, i);
-            } else {
-                to.removeSelectionInterval(i, i);
-            }
-        }
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
+        PandaCList clist = (PandaCList)widget;
         ValueAttribute va = manager.getAttribute(name);
-        ListSelectionModel selections = table.getSelectionModel();
         boolean visibleRow = false;
         int rows = table.getRowCount();
         for (int i = 0; i < rows; i++) {
             con.sendPacketClass(PacketClass.ScreenData);
             con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i) + ']');
-            con.sendBooleanData(Type.BOOL, selections.isSelectedIndex(i));
+            con.sendBooleanData(Type.BOOL,clist.getSelection(i));
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);
                 con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
