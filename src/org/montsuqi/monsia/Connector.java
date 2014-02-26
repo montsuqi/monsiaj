@@ -32,7 +32,6 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
-import javax.swing.tree.TreeSelectionModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.client.Protocol;
@@ -380,45 +379,16 @@ abstract class Connector {
         registerConnector("select_row", new Connector() { //$NON-NLS-1$
 
             public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
-                if (target instanceof JTree) {
-                    JTree tree = (JTree) target;
-                    TreeSelectionModel model = tree.getSelectionModel();
-                    model.addTreeSelectionListener(new TreeSelectionListener() {
 
-                        public void valueChanged(TreeSelectionEvent e) {
+                if (target instanceof PandaCList) {
+                    PandaCList table = (PandaCList) target;
+                    table.addChangeListener(new ChangeListener() {
+                        public void stateChanged(ChangeEvent e) {
                             logger.entry();
                             invoke(con, handler, target, other);
                             logger.exit();
                         }
                     });
-                } else {
-                    ListSelectionListener listener = new ListSelectionListener() {
-
-                        public void valueChanged(ListSelectionEvent e) {
-                            logger.entry();
-                            if (!e.getValueIsAdjusting()) {
-                                invoke(con, handler, target, other);
-                            }
-                            logger.exit();
-                        }
-                    };
-                    if (target instanceof JList) {
-                        JList list = (JList) target;
-                        ListSelectionModel model = list.getSelectionModel();
-                        model.addListSelectionListener(listener);
-                    } else if (target instanceof PandaCList) {
-                        PandaCList table = (PandaCList) target;
-                        ListSelectionModel model = table.getSelectionModel();
-                        model.addListSelectionListener(listener);
-                        table.addActionListener(new ActionListener() {
-
-                            public void actionPerformed(ActionEvent arg0) {
-                                logger.entry();
-                                invoke(con, handler, target, other);
-                                logger.exit();
-                            }
-                        });
-                    }
                 }
             }
         });

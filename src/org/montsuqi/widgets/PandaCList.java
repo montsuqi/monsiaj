@@ -22,124 +22,165 @@
  */
 package org.montsuqi.widgets;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
-public class PandaCList extends JTable implements PropertyChangeListener {
-
-    class MoveAction extends AbstractAction {
-
-        int rowMove;
-        int columnMove;
-
-        MoveAction(int rowMove, int columnMove) {
-            this.rowMove = rowMove;
-            this.columnMove = columnMove;
-        }
-
-        public void actionPerformed(final ActionEvent e) {
-            int newRow = moveIndex((PandaCListSelectionModel) getSelectionModel(), rowMove, getRowCount() - 1);
-            int newColumn = moveIndex((PandaCListSelectionModel) getColumnModel().getSelectionModel(), columnMove, getColumnCount() - 1);
-            changeSelection(newRow, newColumn, false, true);
-            repaint();
-        }
-
-        private int moveIndex(PandaCListSelectionModel selections, int move, int max) {
-            boolean notify = selections.isNotifySelectionChange();
-            selections.setNotifySelectionChange(false);
-            int selected = selections.getMinSelectionIndex();
-            selections.removeSelectionInterval(selected, selected);
-            selected += move;
-            selected = selected < 0 ? 0 : max < selected ? max : selected;
-            selections.setSelectionInterval(selected, selected);
-            selections.setNotifySelectionChange(notify);
-            return selected;
-        }
-    }
+public class PandaCList extends JTable {
+    
+    public static final int SELECTION_MODE_SINGLE = 1;
+    public static final int SELECTION_MODE_MULTI = 2;
+    
+    public static final int MAX_ROWS = 256;
+    
     private Color[] bgColors;
     private Color[] fgColors;
-
+    private final boolean[] selection;
+    private int mode;
+    
+    public void addChangeListener(ChangeListener l) {
+        listenerList.add(ChangeListener.class, l);
+    }
+    
+    public void removeChangeListener(ChangeListener l) {
+        listenerList.remove(ChangeListener.class, l);
+    }
+    
+    public int getMode() {
+        return mode;
+    }
+    
+    public void setMode(int mode) {
+        this.mode = mode;
+    }
+    
     public void setBGColors(Color[] bgColors) {
         this.bgColors = bgColors;
     }
-
+    
     public void setFGColors(Color[] fgColors) {
         this.fgColors = fgColors;
     }
-
+    
     public PandaCList() {
         super();
-        setFocusable(false);
-        addPropertyChangeListener("model", this); //$NON-NLS-1$
+        setFocusable(true);
         setAutoResizeMode(AUTO_RESIZE_OFF);
         setAutoscrolls(true);
+        setRowSelectionAllowed(false);
         initActions();
+        
         if (System.getProperty("monsia.widget.pandaclist.showgrid") == null) {
             this.setShowGrid(false);
         }
+        mode = PandaCList.SELECTION_MODE_SINGLE;
+        selection = new boolean[MAX_ROWS];
+        for (boolean b : selection) {
+            b = false;
+        }
+        
+        addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent e) {
+                int row = PandaCList.this.rowAtPoint(e.getPoint());
+                if (row == -1) {
+                    return;
+                }
+                if (mode == PandaCList.SELECTION_MODE_MULTI) {
+                    PandaCList.this.toggleSelection(row);
+                } else {
+                    PandaCList.this.singleSelection(row);
+                }
+                PandaCList.this.resizeAndRepaint();
+                PandaCList.this.fireChangeEvent(null);
+            }
+            
+            public void mousePressed(MouseEvent e) {
+            }
+            
+            public void mouseReleased(MouseEvent e) {
+            }
+            
+            public void mouseEntered(MouseEvent e) {
+            }
+            
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
-
+    
+    public void setSelection(int row, boolean val) {
+        if (row < MAX_ROWS) {
+            selection[row] = val;
+        }
+    }
+    
+    public boolean getSelection(int row) {
+        if (row < MAX_ROWS) {
+            return selection[row];
+        }
+        return false;
+    }
+    
+    public void toggleSelection(int row) {
+        setSelection(row, !getSelection(row));
+    }
+    
+    public void singleSelection(int row) {
+        for (int i = 0; i < selection.length; i++) {
+            selection[i] = i == row;
+        }
+    }
+    
     private void initActions() {
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        KeyStroke enterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        for (InputMap parent = inputs; parent != null; parent = parent.getParent()) {
-            if (parent.get(enterKey) != null) {
-                parent.remove(enterKey);
-            }
-        }
 
+        /*
         actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "focusOutNext"); //$NON-NLS-1$
 
         actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "focusOutPrevious"); //$NON-NLS-1$
-
-        actions.put("moveUp", new MoveAction(-1, 0)); //$NON-NLS-1$
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "moveUp"); //$NON-NLS-1$
-
-        actions.put("moveDown", new MoveAction(1, 0)); //$NON-NLS-1$
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "moveDown"); //$NON-NLS-1$
-
-        actions.put("moveLeft", new MoveAction(0, -1)); //$NON-NLS-1$
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "moveLeft"); //$NON-NLS-1$
-
-        actions.put("moveRight", new MoveAction(0, 1)); //$NON-NLS-1$
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "moveRight"); //$NON-NLS-1$
+        */
 
         actions.put("doAction", new AbstractAction() { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
-                fireActionEvent(e);
+                int row = PandaCList.this.getSelectedRow();
+                if (mode == PandaCList.SELECTION_MODE_MULTI) {
+                    PandaCList.this.toggleSelection(row);
+                } else {
+                    PandaCList.this.singleSelection(row);
+                }
+                PandaCList.this.resizeAndRepaint();
+                fireChangeEvent(new ChangeEvent(PandaCList.this));
             }
         });
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "doAction"); //$NON-NLS-1$
     }
-
-    protected void fireActionEvent(ActionEvent e) {
-        ActionListener[] listeners = (ActionListener[]) listenerList.getListeners(ActionListener.class);
-        for (int i = 0; i < listeners.length; i++) {
-            listeners[i].actionPerformed(e);
+    
+    protected void fireChangeEvent(ChangeEvent e) {
+        ChangeListener[] listeners = (ChangeListener[]) listenerList.getListeners(ChangeListener.class);
+        for (int i = 0, n = listeners.length; i < n; i++) {
+            ChangeListener l = listeners[i];
+            l.stateChanged(e);
         }
     }
-
+    
     @Override
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
@@ -147,22 +188,32 @@ public class PandaCList extends JTable implements PropertyChangeListener {
         if (fgColors != null && row < fgColors.length && fgColors[row] != null) {
             c.setForeground(fgColors[row]);
         }
-        if (bgColors != null && row < bgColors.length && bgColors[row] != null) {
+        if (selection[row]) {
             if (this.isRowSelected(row)) {
-                int r = bgColors[row].getRed();
-                int g = bgColors[row].getGreen();
-                int b = bgColors[row].getBlue();
-                r = r - 0x30 < 0 ? 0 : r - 0x30;
-                g = g - 0x30 < 0 ? 0 : g - 0x30;
-                b = b - 0x30 < 0 ? 0 : b - 0x30;
-                c.setBackground(new Color(r, g, b));
+                c.setBackground(new Color(0xCC, 0xCC, 0xFF));
             } else {
-                c.setBackground(bgColors[row]);
-            }            
+                c.setBackground(new Color(0xCC, 0xCC, 0xEE));
+            }
+        } else {
+            if (bgColors != null && row < bgColors.length && bgColors[row] != null) {
+                if (this.isRowSelected(row)) {
+                    int r = bgColors[row].getRed();
+                    int g = bgColors[row].getGreen();
+                    int b = bgColors[row].getBlue();
+                    r = r - 0x30 < 0 ? 0 : r - 0x30;
+                    g = g - 0x30 < 0 ? 0 : g - 0x30;
+                    b = b - 0x30 < 0 ? 0 : b - 0x30;
+                    c.setBackground(new Color(r, g, b));
+                } else {
+                    c.setBackground(bgColors[row]);
+                }
+            } else {
+                c.setBackground(Color.white);
+            }
         }
         return c;
     }
-
+    
     @Override
     public void createDefaultColumnsFromModel() {
         TableColumnModel model = getColumnModel();
@@ -182,50 +233,80 @@ public class PandaCList extends JTable implements PropertyChangeListener {
             column.setWidth(width[i]);
         }
     }
-
+    
     @Override
-    protected TableColumnModel createDefaultColumnModel() {
-        TableColumnModel model = super.createDefaultColumnModel();
-        model.setSelectionModel(createDefaultSelectionModel());
-        return model;
+    public boolean isCellEditable(int row, int column) {
+        return false;
     }
 
-    @Override
-    protected ListSelectionModel createDefaultSelectionModel() {
-        return new PandaCListSelectionModel();
-    }
+    /*
+     @Override
+     protected TableColumnModel createDefaultColumnModel() {
+     TableColumnModel model = super.createDefaultColumnModel();
+     model.setSelectionModel(createDefaultSelectionModel());
+     return model;
+     }
 
-    @Override
-    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-        super.changeSelection(rowIndex, columnIndex, true, extend);
-    }
+     @Override
+     protected ListSelectionModel createDefaultSelectionModel() {
+     return new PandaCListSelectionModel();
+     }
 
+     @Override
+     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+     super.changeSelection(rowIndex, columnIndex, true, extend);
+     }
+     */
     public void registerHeaderComponent(int i, JComponent header) {
         TableCellRenderer renderer = new CListHeaderRenderer(header);
         TableColumn column = columnModel.getColumn(i);
         column.setHeaderRenderer(renderer);
     }
-
-    public void addActionListener(ActionListener listener) {
-        listenerList.add(ActionListener.class, listener);
-    }
-
-    public void removeActionListener(ActionListener listener) {
-        listenerList.remove(ActionListener.class, listener);
-    }
-
-    public void propertyChange(PropertyChangeEvent e) {
-        String name = e.getPropertyName();
-        if (!name.equals("model")) { //$NON-NLS-1$
-            return;
+    
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("PandaCList");
+        Container container = frame.getContentPane();
+        container.setLayout(new BorderLayout(10, 5));
+        
+        final PandaCList clist = new PandaCList();
+        TableColumnModel columnModel = clist.getColumnModel();
+        columnModel.addColumn(new TableColumn());
+        columnModel.addColumn(new TableColumn());
+        columnModel.addColumn(new TableColumn());
+        
+        DefaultTableModel tableModel = (DefaultTableModel) clist.getModel();
+        tableModel.setColumnCount(3);
+        
+        for (int i = 0; i < 50; i++) {
+            Object[] rowData = new String[3];
+            rowData[0] = Integer.toString(i);
+            rowData[1] = Integer.toString(i + 1);
+            rowData[2] = Integer.toString(i + 2);
+            tableModel.addRow(rowData);
         }
-        TableModel oldModel = (TableModel) e.getOldValue();
-        if (oldModel != null) {
-            oldModel.removeTableModelListener(this);
-        }
-        TableModel newModel = (TableModel) e.getNewValue();
-        if (newModel != null) {
-            newModel.addTableModelListener(this);
-        }
+        
+        clist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JScrollPane scroll = new JScrollPane(clist);
+        scroll.setPreferredSize(new Dimension(400, 300));
+        container.add(scroll, BorderLayout.CENTER);
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+        container.add(buttonPanel, BorderLayout.SOUTH);
+        
+        JButton button3 = new JButton(new AbstractAction("output") {
+            
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+            }
+        });
+        
+        buttonPanel.add(button3);
+        
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setSize(500, 500);
+        frame.setVisible(true);
     }
 }
