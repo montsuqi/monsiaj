@@ -47,12 +47,11 @@ import org.montsuqi.widgets.PandaCList;
  */
 class CListHandler extends WidgetHandler {
 
-    public void set(Protocol con,Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JTable table = (JTable) widget;
         PandaCList clist = (PandaCList) widget;
 
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        ListSelectionModel selections = table.getSelectionModel();
 
         this.setCommonAttribute(widget, obj, styleMap);
 
@@ -64,6 +63,8 @@ class CListHandler extends WidgetHandler {
         int row = 0;
         if (obj.has("row")) {
             row = obj.getInt("row");
+            int row2 = row > 1 ? row - 1 : 0;
+            clist.changeSelection(row2, 0, false, false);
         }
 
         double rowattr = 0.0;
@@ -98,9 +99,9 @@ class CListHandler extends WidgetHandler {
             for (int i = 0; i < n; i++) {
                 JSONObject rowObj = array.getJSONObject(i);
                 Object rowData[] = new String[rowObj.length()];
-                
+
                 JSONArray keys = rowObj.getJSONArray("__keys__");
-                for(int j=0;j<keys.length();j++) {
+                for (int j = 0; j < keys.length(); j++) {
                     rowData[j] = rowObj.getString(keys.getString(j));
                 }
                 tableModel.addRow(rowData);
@@ -154,10 +155,9 @@ class CListHandler extends WidgetHandler {
                 int n = array.length();
                 n = n > count ? count : n;
                 for (int j = 0; j < n; j++) {
-                    if (array.getBoolean(j)) {
-                        selections.addSelectionInterval(j, j);
-                    } else {
-                        selections.removeSelectionInterval(j, j);
+                    clist.setSelection(j, array.getBoolean(j));
+                    if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI) {
+                        clist.changeSelection(j, 0, false, false);
                     }
                 }
             }
@@ -187,10 +187,10 @@ class CListHandler extends WidgetHandler {
         widget.setVisible(true);
     }
 
-    public void get(Protocol con,Component widget, JSONObject obj) throws JSONException {
+    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTable table = (JTable) widget;
-        ListSelectionModel selections = table.getSelectionModel();        
-        
+        ListSelectionModel selections = table.getSelectionModel();
+
         for (Iterator i = obj.keys(); i.hasNext();) {
             String key = (String) i.next();
             if (this.isCommonAttribute(key)) {
@@ -198,9 +198,9 @@ class CListHandler extends WidgetHandler {
             } else if (key.matches("count")) {
                 // do nothing
             } else if (key.matches("row")) {
-                for(int j =0;j<table.getRowCount();j++) {
-                    if (isVisibleRow(table,j)) {
-                        obj.put(key,j+1);
+                for (int j = 0; j < table.getRowCount(); j++) {
+                    if (isVisibleRow(table, j)) {
+                        obj.put(key, j + 1);
                         break;
                     }
                 }
@@ -217,7 +217,7 @@ class CListHandler extends WidgetHandler {
             } else {
                 JSONArray array = obj.getJSONArray(key);
                 for (int j = 0; j < table.getRowCount(); j++) {
-                    array.put(j,selections.isSelectedIndex(j));
+                    array.put(j, selections.isSelectedIndex(j));
                 }
             }
         }

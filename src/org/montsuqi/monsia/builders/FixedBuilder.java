@@ -27,7 +27,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.FocusListener;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.Rectangle;
 
 import java.util.Map;
@@ -55,7 +54,7 @@ class FixedBuilder extends ContainerBuilder {
         for (int i = 0, n = info.getChildren().size(); i < n; i++) {
             ChildInfo cInfo = info.getChild(i);
             WidgetInfo wInfo = cInfo.getWidgetInfo();
-            Component child = null;
+            Component child;
             int x = 0;
             int y = 0;
             child = buildWidget(xml, wInfo, parent);
