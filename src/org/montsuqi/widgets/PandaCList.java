@@ -29,7 +29,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -42,41 +41,41 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class PandaCList extends JTable {
-    
+
     public static final int SELECTION_MODE_SINGLE = 1;
     public static final int SELECTION_MODE_MULTI = 2;
-    
+
     public static final int MAX_ROWS = 256;
-    
+
     private Color[] bgColors;
     private Color[] fgColors;
     private final boolean[] selection;
     private int mode;
-    
+
     public void addChangeListener(ChangeListener l) {
         listenerList.add(ChangeListener.class, l);
     }
-    
+
     public void removeChangeListener(ChangeListener l) {
         listenerList.remove(ChangeListener.class, l);
     }
-    
+
     public int getMode() {
         return mode;
     }
-    
+
     public void setMode(int mode) {
         this.mode = mode;
     }
-    
+
     public void setBGColors(Color[] bgColors) {
         this.bgColors = bgColors;
     }
-    
+
     public void setFGColors(Color[] fgColors) {
         this.fgColors = fgColors;
     }
-    
+
     public PandaCList() {
         super();
         setFocusable(true);
@@ -84,7 +83,7 @@ public class PandaCList extends JTable {
         setAutoscrolls(true);
         setRowSelectionAllowed(false);
         initActions();
-        
+
         if (System.getProperty("monsia.widget.pandaclist.showgrid") == null) {
             this.setShowGrid(false);
         }
@@ -93,7 +92,7 @@ public class PandaCList extends JTable {
         for (boolean b : selection) {
             b = false;
         }
-        
+
         addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
                 int row = PandaCList.this.rowAtPoint(e.getPoint());
@@ -108,55 +107,47 @@ public class PandaCList extends JTable {
                 PandaCList.this.resizeAndRepaint();
                 PandaCList.this.fireChangeEvent(null);
             }
-            
+
             public void mousePressed(MouseEvent e) {
             }
-            
+
             public void mouseReleased(MouseEvent e) {
             }
-            
+
             public void mouseEntered(MouseEvent e) {
             }
-            
+
             public void mouseExited(MouseEvent e) {
             }
         });
     }
-    
+
     public void setSelection(int row, boolean val) {
         if (row < MAX_ROWS) {
             selection[row] = val;
         }
     }
-    
+
     public boolean getSelection(int row) {
         if (row < MAX_ROWS) {
             return selection[row];
         }
         return false;
     }
-    
+
     public void toggleSelection(int row) {
         setSelection(row, !getSelection(row));
     }
-    
+
     public void singleSelection(int row) {
         for (int i = 0; i < selection.length; i++) {
             selection[i] = i == row;
         }
     }
-    
+
     private void initActions() {
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        /*
-        actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "focusOutNext"); //$NON-NLS-1$
-
-        actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "focusOutPrevious"); //$NON-NLS-1$
-        */
 
         actions.put("doAction", new AbstractAction() { //$NON-NLS-1$
 
@@ -172,8 +163,9 @@ public class PandaCList extends JTable {
             }
         });
         inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "doAction"); //$NON-NLS-1$
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "doAction"); //$NON-NLS-1$
     }
-    
+
     protected void fireChangeEvent(ChangeEvent e) {
         ChangeListener[] listeners = (ChangeListener[]) listenerList.getListeners(ChangeListener.class);
         for (int i = 0, n = listeners.length; i < n; i++) {
@@ -181,7 +173,7 @@ public class PandaCList extends JTable {
             l.stateChanged(e);
         }
     }
-    
+
     @Override
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
@@ -214,7 +206,7 @@ public class PandaCList extends JTable {
         }
         return c;
     }
-    
+
     @Override
     public void createDefaultColumnsFromModel() {
         TableColumnModel model = getColumnModel();
@@ -234,50 +226,32 @@ public class PandaCList extends JTable {
             column.setWidth(width[i]);
         }
     }
-    
+
     @Override
     public boolean isCellEditable(int row, int column) {
         return false;
     }
 
-    /*
-     @Override
-     protected TableColumnModel createDefaultColumnModel() {
-     TableColumnModel model = super.createDefaultColumnModel();
-     model.setSelectionModel(createDefaultSelectionModel());
-     return model;
-     }
-
-     @Override
-     protected ListSelectionModel createDefaultSelectionModel() {
-     return new PandaCListSelectionModel();
-     }
-
-     @Override
-     public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-     super.changeSelection(rowIndex, columnIndex, true, extend);
-     }
-     */
     public void registerHeaderComponent(int i, JComponent header) {
         TableCellRenderer renderer = new CListHeaderRenderer(header);
         TableColumn column = columnModel.getColumn(i);
         column.setHeaderRenderer(renderer);
     }
-    
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("PandaCList");
         Container container = frame.getContentPane();
         container.setLayout(new BorderLayout(10, 5));
-        
+
         final PandaCList clist = new PandaCList();
         TableColumnModel columnModel = clist.getColumnModel();
         columnModel.addColumn(new TableColumn());
         columnModel.addColumn(new TableColumn());
         columnModel.addColumn(new TableColumn());
-        
+
         DefaultTableModel tableModel = (DefaultTableModel) clist.getModel();
         tableModel.setColumnCount(3);
-        
+
         for (int i = 0; i < 50; i++) {
             Object[] rowData = new String[3];
             rowData[0] = Integer.toString(i);
@@ -285,26 +259,26 @@ public class PandaCList extends JTable {
             rowData[2] = Integer.toString(i + 2);
             tableModel.addRow(rowData);
         }
-        
+
         clist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+
         JScrollPane scroll = new JScrollPane(clist);
         scroll.setPreferredSize(new Dimension(400, 300));
         container.add(scroll, BorderLayout.CENTER);
-        
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         container.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         JButton button3 = new JButton(new AbstractAction("output") {
-            
+
             @Override
             public void actionPerformed(ActionEvent ev) {
             }
         });
-        
+
         buttonPanel.add(button3);
-        
+
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setSize(500, 500);
