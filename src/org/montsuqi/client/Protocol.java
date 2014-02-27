@@ -508,14 +508,6 @@ public class Protocol {
         if (putType.matches("new") || putType.matches("current")) {
             Object screenData = w.get("screen_data");
             updateWidget(node.getInterface(), _windowName, screenData);
-            if (!putType.matches("current")) {
-                Window window = node.getWindow();
-                if (window.isDialog()) {
-                    resetScrollPane(window);                    
-                } else {
-                    resetScrollPane(window.getChild());
-                }
-            }
             showWindow(_windowName);
             this.windowName = _windowName;
         } else {
@@ -618,7 +610,6 @@ public class Protocol {
     }
 
     private synchronized void stopTimer(Component widget) {
-        // logger.entry(widget);
         if (widget instanceof PandaTimer) {
             ((PandaTimer) widget).stopTimer();
         } else if (widget instanceof Container) {
@@ -627,31 +618,15 @@ public class Protocol {
                 stopTimer(container.getComponent(i));
             }
         }
-        // logger.exit();
     }
 
     private synchronized void resetTimer(Component widget) {
-        // logger.entry(widget);
         if (widget instanceof PandaTimer) {
             ((PandaTimer) widget).reset();
         } else if (widget instanceof Container) {
             Container container = (Container) widget;
             for (int i = 0, n = container.getComponentCount(); i < n; i++) {
                 resetTimer(container.getComponent(i));
-            }
-        }
-        // logger.exit();
-    }
-
-    private synchronized void resetScrollPane(Component widget) {
-        if (widget instanceof JScrollPane) {
-            JViewport view = ((JScrollPane) widget).getViewport();
-            view.setViewPosition(new Point(0, 0));
-        }
-        if (widget instanceof Container) {
-            Component[] children = ((Container) widget).getComponents();
-            for (int i = 0, n = children.length; i < n; i++) {
-                resetScrollPane(children[i]);
             }
         }
     }
