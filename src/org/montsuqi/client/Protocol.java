@@ -26,7 +26,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -41,17 +40,13 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -251,6 +246,7 @@ public class Protocol {
             logger.debug("rpcURI:" + this.rpcUri);
             logger.debug("restURIRoot:" + this.restURIRoot);
 
+            // printAgent = new PrintAgent(...);
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -365,8 +361,7 @@ public class Protocol {
             // empty object id
             return 404;
         }
-        
-        
+
         URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -491,10 +486,7 @@ public class Protocol {
         String putType = w.getString("put_type");
         String _windowName = w.getString("window");
         logger.debug("window[" + _windowName + "] put_type[" + putType + "]");
-        if (_windowName.startsWith("_")) {
-            // do nothing for dummy window
-            return;
-        }
+
         Node node = getNode(_windowName);
         if (node == null) {
             String gladeData = this.getScreenDefine(_windowName);
@@ -506,10 +498,14 @@ public class Protocol {
             nodeTable.put(_windowName, node);
         }
         if (putType.matches("new") || putType.matches("current")) {
+            this.windowName = _windowName;
             Object screenData = w.get("screen_data");
             updateWidget(node.getInterface(), _windowName, screenData);
+            if (_windowName.startsWith("_")) {
+                // do nothing for dummy window
+                return;
+            }
             showWindow(_windowName);
-            this.windowName = _windowName;
         } else {
             closeWindow(_windowName);
         }
@@ -586,7 +582,7 @@ public class Protocol {
         logger.exit();
     }
 
-    void closeWindow(String name) {
+    private void closeWindow(String name) {
         logger.entry(name);
         Node node = getNode(name);
         if (node == null) {
@@ -633,6 +629,9 @@ public class Protocol {
 
     private synchronized void setFocus(String focusWindowName, String focusWidgetName) {
         if (focusWindowName == null || focusWidgetName == null) {
+            return;
+        }
+        if (focusWindowName.startsWith("_")) {
             return;
         }
         Node node = getNode(focusWindowName);
@@ -683,11 +682,11 @@ public class Protocol {
     }
 
     public void addPrintRequest(String path, String title, int retry, boolean showDialog) {
-        printAgent.addPrintRequest(path, title, retry, showDialog);
+        //printAgent.addPrintRequest(path, title, retry, showDialog);
     }
 
     public void addDLRequest(String path, String filename, String description, int retry) {
-        printAgent.addDLRequest(path, filename, description, retry);
+        //printAgent.addDLRequest(path, filename, description, retry);
     }
 
     private synchronized void sendPing() throws IOException {

@@ -248,9 +248,9 @@ public abstract class SignalHandler {
                         synchronized (con) {
                             blockChangedHandlers();
                             con.updateScreen();
-                            while (con.getWindowName().startsWith("_")) {
-                                con.sendEvent(con.getWindowName(), con.getWindowName(), "DummyEvent");
-                                con.updateScreen();
+                            while (con.getWindowName().startsWith("_")) {                            
+                                con.sendEvent(con.getWindowName(), con.getWindowName(), "DummyEvent");                             
+                                con.updateScreen();                           
                             }
                             unblockChangedHandlers();
                         }

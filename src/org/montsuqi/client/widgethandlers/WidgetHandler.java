@@ -23,7 +23,6 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.AbstractButton;
@@ -64,7 +63,7 @@ import org.montsuqi.widgets.Window;
 public abstract class WidgetHandler {
 
     protected static final Logger logger = LogManager.getLogger(WidgetHandler.class);
-    private static Map classTable;
+    private static final Map classTable;
 
     static {
         classTable = new HashMap();
