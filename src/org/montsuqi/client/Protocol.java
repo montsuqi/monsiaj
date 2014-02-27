@@ -52,19 +52,19 @@ import org.montsuqi.widgets.Window;
  */
 public class Protocol extends Connection {
 
-    private Client client;
+    private final Client client;
     private boolean isReceiving;
-    private long timerPeriod;
-    private HashMap nodeTable;
-    private WidgetValueManager valueManager;
+    private final long timerPeriod;
+    private final HashMap nodeTable;
+    private final WidgetValueManager valueManager;
     private String sessionTitle;
     private Color sessionBGColor;
     private StringBuffer widgetName;
     private Interface xml;
     static final Logger logger = LogManager.getLogger(Protocol.class);
     private static final String VERSION = "version:blob:expand:pdf:negotiation:download:v47:v48:i18n:agent=monsiaj/" + Messages.getString("application.version");
-    private TopWindow topWindow;
-    private ArrayList<Component> dialogStack;
+    private final TopWindow topWindow;
+    private final ArrayList<Component> dialogStack;
     private boolean enablePing;
     private static final int PingTimerPeriod = 3 * 1000;
     private javax.swing.Timer pingTimer;
@@ -427,7 +427,6 @@ public class Protocol extends Connection {
     }
 
     private synchronized void clearWidget(Component widget) {
-        // logger.entry(widget);
         if (widget instanceof JTextField) {
             JTextField text = (JTextField) widget;
             text.setText(null);
@@ -435,20 +434,6 @@ public class Protocol extends Connection {
             Container container = (Container) widget;
             for (int i = 0, n = container.getComponentCount(); i < n; i++) {
                 clearWidget(container.getComponent(i));
-            }
-        }
-        // logger.exit();
-    }
-
-    private synchronized void resetScrollPane(Component widget) {
-        if (widget instanceof JScrollPane) {
-            JViewport view = ((JScrollPane) widget).getViewport();
-            view.setViewPosition(new Point(0, 0));
-        }
-        if (widget instanceof Container) {
-            Component[] children = ((Container) widget).getComponents();
-            for (int i = 0, n = children.length; i < n; i++) {
-                resetScrollPane(children[i]);
             }
         }
     }
@@ -485,18 +470,6 @@ public class Protocol extends Connection {
                     c = receivePacketClass();
                     if (c == PacketClass.ScreenData) {
                         receiveValue(widgetName, widgetName.length());
-                    }
-                    if (type != ScreenType.CURRENT_WINDOW && xml != null) {
-                        Component widget = xml.getWidget(wName);
-                        if (widget != null) {
-                            resetScrollPane(widget);
-                            if (widget instanceof Window) {
-                                Window window = (Window)widget;
-                                if (!window.isDialog()) {
-                                    resetScrollPane(window.getChild());
-                                }
-                            }
-                        }
                     }
                     break;
                 case ScreenType.JOIN_WINDOW:
