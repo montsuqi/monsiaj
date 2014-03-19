@@ -238,9 +238,16 @@ public class Protocol {
 
             JSONObject result = jsonRPC(url, "start_session", params);
             meta = result.getJSONObject("meta");
-            this.rpcUri = new URL(result.getString("app_rpc_endpoint_uri"));
-            this.restURIRoot = result.getString("app_rest_api_uri_root");
+
             this.sessionId = meta.getString("session_id");
+
+            if (this.serverType.startsWith("glserver")) {
+                this.rpcUri = url;
+                this.restURIRoot = url.toString().replaceFirst("/rpc/", "/rest/");
+            } else {
+                this.rpcUri = new URL(result.getString("app_rpc_endpoint_uri"));
+                this.restURIRoot = result.getString("app_rest_api_uri_root");
+            }
 
             logger.debug("session_id:" + this.sessionId);
             logger.debug("rpcURI:" + this.rpcUri);
