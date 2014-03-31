@@ -150,14 +150,17 @@ class CListHandler extends WidgetHandler {
             } else if (key.matches("fgcolor")) {
                 // do nothing
             } else {
-                JSONArray array = obj.getJSONArray(key);
-                int n = array.length();
-                n = n > count ? count : n;
-                for (int j = 0; j < n; j++) {
-                    boolean selected = array.getBoolean(j);
-                    clist.setSelection(j, selected);
-                    if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
-                        clist.changeSelection(j, 0, false, false);
+                Object child = obj.get(key);
+                if (child instanceof JSONArray) {
+                    JSONArray array = obj.getJSONArray(key);
+                    int n = array.length();
+                    n = n > count ? count : n;
+                    for (int j = 0; j < n; j++) {
+                        boolean selected = array.getBoolean(j);
+                        clist.setSelection(j, selected);
+                        if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
+                            clist.changeSelection(j, 0, false, false);
+                        }
                     }
                 }
             }
@@ -189,7 +192,7 @@ class CListHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTable table = (JTable) widget;
-        PandaCList clist = (PandaCList)widget;
+        PandaCList clist = (PandaCList) widget;
 
         for (Iterator i = obj.keys(); i.hasNext();) {
             String key = (String) i.next();
@@ -215,9 +218,12 @@ class CListHandler extends WidgetHandler {
             } else if (key.matches("fgcolor")) {
                 // do nothing
             } else {
-                JSONArray array = obj.getJSONArray(key);
-                for (int j = 0; j < table.getRowCount(); j++) {
-                    array.put(j, clist.getSelection(j));
+                Object child = obj.get(key);
+                if (child instanceof JSONArray) {
+                    JSONArray array = obj.getJSONArray(key);
+                    for (int j = 0; j < table.getRowCount(); j++) {
+                        array.put(j, clist.getSelection(j));
+                    }
                 }
             }
         }
