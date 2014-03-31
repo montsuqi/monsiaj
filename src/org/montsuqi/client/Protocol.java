@@ -186,19 +186,19 @@ public class Protocol {
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
 
-        int responseCode = con.getResponseCode();
-        if (responseCode == 401 || responseCode == 403) {
-            JOptionPane.showMessageDialog(null,Messages.getString("Protocol.auth_error_message"),Messages.getString("Protocol.auth_error"),  JOptionPane.ERROR_MESSAGE);
-            logger.info("auth error:"+responseCode);
-            System.exit(1);
-        }
-        
         OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
 
         osw.write(reqStr);
         osw.flush();
         osw.close();
-        
+
+        int responseCode = con.getResponseCode();
+        if (responseCode == 401 || responseCode == 403) {
+            JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
+            logger.info("auth error:" + responseCode);
+            System.exit(1);
+        }
+
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         BufferedOutputStream bos = new BufferedOutputStream(bytes);
         BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
