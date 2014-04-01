@@ -323,6 +323,7 @@ public class Launcher {
         Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { 
 
             public void actionPerformed(ActionEvent e) {
+                logger.info("launcher canceled");
                 System.exit(0);
             }
         });
@@ -331,6 +332,7 @@ public class Launcher {
         Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { 
 
             public void actionPerformed(ActionEvent e) {
+                logger.info("view server configs");
                 viewer.run(f);
                 updateConfigCombo();
             }
