@@ -27,11 +27,14 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.PandaCList;
 
 public class ConfigViewer {
 
+    protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected Config conf;
 
     public ConfigViewer(Config conf) {
@@ -92,6 +95,7 @@ public class ConfigViewer {
                         String configName = (String) (clist.getValueAt(selectedRow, 0));
                         conf.deleteConfig(conf.getConfigByDescription(configName));
                         updateConfigList(clist);
+                        logger.info("server config:"+configName + " deleted");
                     }
                 }
             }
@@ -197,6 +201,7 @@ public class ConfigViewer {
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
                 configPanel.saveConfig(num,entryName);
+                logger.info("server config:"+entryName + " edited");
                 f.dispose();
             }
         });
