@@ -228,7 +228,11 @@ public class Config {
     public String getAuthURI(int i) {
         String value = getValue(i, "authuri");
         if (value.isEmpty()) {
-            return "http://localhost:9292/auth";
+            return "http://localhost:8000/rpc/";
+        } else {
+            if (!value.endsWith("/")) {
+                value += "/";
+            }
         }
         return value;
     }

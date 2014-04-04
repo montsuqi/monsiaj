@@ -61,7 +61,9 @@ public class PrintHandler extends WidgetHandler {
                 }
 
                 if (!path.isEmpty() && !title.isEmpty()) {
-                    con.addPrintRequest(path, title, retry, showDialog);
+                    if (con.getServerType().startsWith("glserver")) {
+                        con.addPrintRequest(path, title, retry, showDialog);
+                    }
                 }
             }
         }

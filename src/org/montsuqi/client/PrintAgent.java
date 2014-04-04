@@ -6,16 +6,10 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.prefs.Preferences;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
@@ -36,23 +30,13 @@ import org.montsuqi.widgets.PandaPreview;
 public class PrintAgent extends Thread {
 
     private final int DELAY = 3000;
-    private ConcurrentLinkedQueue<PrintRequest> printQ;
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-    private String port;
-    private SSLSocketFactory sslSocketFactory;
+    private final ConcurrentLinkedQueue<PrintRequest> printQ;
+    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    private final Protocol con;
 
-    public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
+    public PrintAgent(Protocol con) {
         printQ = new ConcurrentLinkedQueue<PrintRequest>();
-        this.port = port;
-        this.sslSocketFactory = sslSocketFactory;
-        Authenticator.setDefault(new Authenticator() {
-
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password.toCharArray());
-            }
-        });
-
+        this.con = con;
     }
 
     @Override
@@ -76,7 +60,7 @@ public class PrintAgent extends Thread {
             return true;
         }
         try {
-            File file = download(request.path, request.filename);
+            File file = con.apiDownload(request.path, request.filename);
             if (file != null) {
                 request.action(file);
             } else {
@@ -152,60 +136,10 @@ public class PrintAgent extends Thread {
         }
         return 0;
     }
-
-    public File download(String path, String filename) throws IOException {
-        File temp = File.createTempFile("monsiaj_printagent_", "__" + filename);
-        temp.deleteOnExit();
-        String strURL = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
-
-        URL url = new URL(strURL);
-        String protocol = url.getProtocol();
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setInstanceFollowRedirects(false);
-        if (protocol.equals("https")) {
-            if (sslSocketFactory != null) {
-                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
-            }
-        } else if (protocol.equals("http")) {
-            // do nothing
-        } else {
-            throw new IOException("bad protocol");
-        }
-        con.setRequestMethod("GET");
-        con.connect();
-        if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            con.disconnect();
-            throw new IOException("" + con.getResponseCode());
-        }
-        BufferedInputStream in = new BufferedInputStream(con.getInputStream());
-        int length, size = 0;
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
-        while ((length = in.read()) != -1) {
-            size += length;
-            out.write(length);
-        }
-        out.close();
-        con.disconnect();
-        if (size == 0) {
-            return null;
-        }
-        return temp;
-    }
-
-    static public void main(String[] argv) {
-
-        PrintAgent agent = new PrintAgent(argv[0], "ormaster", "ormaster", null);
-        agent.start();
-
-        for (int i = 1; i < argv.length; i++) {
-            agent.addPrintRequest(argv[i], argv[i], 100, true);
-        }
-    }
-
+    
     public class DLRequest extends PrintRequest {
 
-        private String description;
+        private final String description;
 
         public DLRequest(String url, String filename, String desc, int retry) {
             super(url, "", retry, false);
@@ -250,7 +184,7 @@ public class PrintAgent extends Thread {
         private String title;
         protected String filename;
         private int retry;
-        private boolean showDialog;
+        private final boolean showDialog;
 
         public PrintRequest(String url, String title, int retry, boolean showdialog) {
             this.path = url;

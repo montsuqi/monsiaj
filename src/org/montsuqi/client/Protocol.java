@@ -32,6 +32,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -145,6 +147,38 @@ public class Protocol {
         });
     }
 
+    public File apiDownload(String path, String filename) throws IOException {
+        File temp = File.createTempFile("monsiaj_apidownload_", "__" + filename);
+        URL url = new URL(this.restURIRoot + path);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setDoOutput(true);
+        con.setInstanceFollowRedirects(false);
+        con.setRequestMethod("GET");
+        //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
+        con.setRequestProperty("Content-Type", "application/json");
+
+        int responseCode = con.getResponseCode();
+
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            con.disconnect();
+            throw new IOException("" + responseCode);
+        }
+        BufferedInputStream in = new BufferedInputStream(con.getInputStream());
+        int length, size = 0;
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+        while ((length = in.read()) != -1) {
+            size += length;
+            out.write(length);
+        }
+        out.close();
+        con.disconnect();
+        if (size == 0) {
+            return null;
+        }
+        return temp;
+    }
+
     private String makeJSONRPCRequest(String method, JSONObject params) throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("jsonrpc", "2.0");
@@ -168,7 +202,7 @@ public class Protocol {
             JSONObject objError = obj.getJSONObject("error");
             int code = objError.getInt("code");
             String message = objError.getString("message");
-            throw new JSONException("jsonrpc error code:" + obj + " message:" + message);
+            throw new JSONException("jsonrpc error code:" + code + " message:" + message);
         }
         if (!obj.has("result")) {
             throw new JSONException("no result object");
@@ -261,11 +295,16 @@ public class Protocol {
             logger.debug("rpcURI:" + this.rpcUri);
             logger.debug("restURIRoot:" + this.restURIRoot);
 
-            // printAgent = new PrintAgent(...);
+            printAgent = new PrintAgent(this);
+            printAgent.start();
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
+    }
+
+    public String getServerType() {
+        return serverType;
     }
 
     public void endSession() {
@@ -697,11 +736,11 @@ public class Protocol {
     }
 
     public void addPrintRequest(String path, String title, int retry, boolean showDialog) {
-        //printAgent.addPrintRequest(path, title, retry, showDialog);
+        printAgent.addPrintRequest(path, title, retry, showDialog);
     }
 
     public void addDLRequest(String path, String filename, String description, int retry) {
-        //printAgent.addDLRequest(path, filename, description, retry);
+        printAgent.addDLRequest(path, filename, description, retry);
     }
 
     private synchronized void sendPing() throws IOException {
