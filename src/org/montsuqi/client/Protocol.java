@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
@@ -98,6 +100,8 @@ public class Protocol {
     private String restURIRoot;
     private JSONObject resultJSON;
 
+    private final SSLSocketFactory sslSocketFactory;
+
     static final String PANDA_CLIENT_VERSION = "1.4.8";
 
     public String getWindowName() {
@@ -145,12 +149,33 @@ public class Protocol {
                 return new PasswordAuthentication(user, password.toCharArray());
             }
         });
+
+        String fileName = conf.getClientCertificateFile(num);
+        String certpass = conf.getClientCertificatePassword(num);
+        if (!conf.getUseSSL(num) || fileName.isEmpty()) {
+            sslSocketFactory = null;
+        } else {
+            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, certpass);
+            sslSocketFactory = builder.getFactory();
+        }
     }
 
     public File apiDownload(String path, String filename) throws IOException {
         File temp = File.createTempFile("monsiaj_apidownload_", "__" + filename);
         URL url = new URL(this.restURIRoot + path);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        String protocol = url.getProtocol();
+        if (protocol.equals("https")) {
+            if (sslSocketFactory != null) {
+                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
+            }
+        } else if (protocol.equals("http")) {
+            // do nothing
+        } else {
+            throw new IOException("bad protocol");
+        }
 
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -213,6 +238,18 @@ public class Protocol {
     private JSONObject jsonRPC(URL url, String method, JSONObject params) throws JSONException, IOException {
         String reqStr = makeJSONRPCRequest(method, params);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        String protocol = url.getProtocol();
+        if (protocol.equals("https")) {
+            if (sslSocketFactory != null) {
+                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
+            }
+        } else if (protocol.equals("http")) {
+            // do nothing
+        } else {
+            throw new IOException("bad protocol");
+        }
 
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -419,6 +456,18 @@ public class Protocol {
         URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
+        String protocol = url.getProtocol();
+        if (protocol.equals("https")) {
+            if (sslSocketFactory != null) {
+                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
+            }
+        } else if (protocol.equals("http")) {
+            // do nothing
+        } else {
+            throw new IOException("bad protocol");
+        }
+
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("GET");
 
@@ -437,6 +486,18 @@ public class Protocol {
         try {
             URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            String protocol = url.getProtocol();
+            if (protocol.equals("https")) {
+                if (sslSocketFactory != null) {
+                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                    ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
+                }
+            } else if (protocol.equals("http")) {
+                // do nothing
+            } else {
+                throw new IOException("bad protocol");
+            }
 
             con.setInstanceFollowRedirects(false);
             con.setRequestMethod("POST");

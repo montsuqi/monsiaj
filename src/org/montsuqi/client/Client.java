@@ -114,11 +114,4 @@ public class Client implements Runnable {
             System.exit(0);
         }
     }
-
-    /**
-     * <p>
-     * Dispose connection if it exists.</p>
-     */
-    protected void finalize() {
-    }
 }

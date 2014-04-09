@@ -61,7 +61,7 @@ import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
-    
+
     protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected String title;
     protected Config conf;
@@ -82,10 +82,10 @@ public class Launcher {
     }
 
     public Launcher(String title) {
-        if (System.getProperty("monsia.log.level")!=null) {
+        if (System.getProperty("monsia.log.level") != null) {
         } else {
             System.setProperty("monsia.log.level", "info");
-        }        
+        }
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
@@ -147,6 +147,22 @@ public class Launcher {
                     return true;
                 }
             }
+            
+            /*
+             * confirm certificate password when the certificate password not
+             * preserved
+             */
+            if (conf.getUseSSL(conf.getCurrent())
+                    && !conf.getClientCertificateFile(conf.getCurrent()).equals("")
+                    && !conf.getSaveClientCertificatePassword(conf.getCurrent())) {
+                JPasswordField pwd = new JPasswordField();
+                Object[] message = {Messages.getString("Launcher.input_certificate_password_message"), pwd};
+                int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_certificate_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (resp != JOptionPane.OK_OPTION) {
+                    return true;
+                }
+            }
+
             connect();
             return true;
         }
@@ -174,9 +190,10 @@ public class Launcher {
         configPanel.loadConfig(conf.getCurrent());
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); 
-        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); 
-        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); 
+        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel());
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -307,7 +324,7 @@ public class Launcher {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { 
+        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) {
 
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
@@ -320,7 +337,7 @@ public class Launcher {
         });
         bar.add(run);
 
-        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { 
+        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
             public void actionPerformed(ActionEvent e) {
                 logger.info("launcher canceled");
@@ -329,7 +346,7 @@ public class Launcher {
         });
         bar.add(cancel);
 
-        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { 
+        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
 
             public void actionPerformed(ActionEvent e) {
                 logger.info("view server configs");
@@ -375,7 +392,7 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); 
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png");
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }

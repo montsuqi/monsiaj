@@ -95,28 +95,6 @@ public class Config {
         readProp();
     }
 
-    private void convertOldConfig() {
-        OldConfig conf = new OldConfig();
-        String currentName = conf.getConfigurationName();
-        String[] names = conf.getConfigurationNames();
-        for (int i = 0; i < names.length; i++) {
-            if (names[i].equals(currentName)) {
-                current = i;
-            }
-            setValue(i, "description", names[i]);
-            setValue(i, "user", conf.getUser(names[i]));
-            setValue(i, "password", conf.getPassword(names[i]));
-            setValue(i, "savePassword", Boolean.toString(conf.getSavePassword(names[i])));
-            setValue(i, "styleFile", conf.getStyleFileName(names[i]));
-            setValue(i, "lookAndFeel", conf.getLookAndFeelClassName(names[i]));
-            setValue(i, "lookAndFeelThemeFile", conf.getLAFThemeFileName(names[i]));
-            setValue(i, "useTimer", Boolean.toString(conf.getUseTimer(names[i])));
-            setValue(i, "timerPeriod", Long.toString(conf.getTimerPeriod(names[i])));
-            setValue(i, "systemProperties", conf.getProperties(names[i]));
-        }
-        //conf.delete();
-    }
-
     private void initProp() {
         propPath = null;
         current = 0;
@@ -146,9 +124,6 @@ public class Config {
     private void readProp() {
         current = Integer.valueOf(prop.getProperty(Config.CURRENT_KEY, "0"));
         List<Integer> list = this.getList();
-        if (list.isEmpty()) {
-            convertOldConfig();
-        }
         list = this.getList();
         if (list.isEmpty()) {
             setValue(0, "description", "default");
@@ -195,8 +170,8 @@ public class Config {
         }
         Collections.sort(list, new Comparator() {
             public int compare(Object o1, Object o2) {
-                String n1 = Config.this.getDescription((Integer)o1);
-                String n2 = Config.this.getDescription((Integer)o2);
+                String n1 = Config.this.getDescription((Integer) o1);
+                String n2 = Config.this.getDescription((Integer) o2);
                 return n1.compareTo(n2);
             }
         });
@@ -239,7 +214,7 @@ public class Config {
 
     public void setAuthURI(int i, String v) {
         setValue(i, "authuri", v);
-    }    
+    }
 
     // user
     public String getUser(int i) {
@@ -274,6 +249,55 @@ public class Config {
         setValue(i, "savePassword", Boolean.toString(v));
         if (!v) {
             setPassword(i, "");
+        }
+    }
+
+    // useSSL
+    public boolean getUseSSL(int i) {
+        String value = getValue(i, "useSSL");
+        if (value.isEmpty()) {
+            return false;
+        }
+        return Boolean.valueOf(value);
+    }
+
+    public void setUseSSL(int i, boolean v) {
+        setValue(i, "useSSL", Boolean.toString(v));
+    }
+
+    // clientCertificateFile
+    public String getClientCertificateFile(int i) {
+        String value = getValue(i, "clientCertificateFile");
+        return value;
+    }
+
+    public void setClientCertificateFile(int i, String v) {
+        setValue(i, "clientCertificateFile", v);
+    }
+
+    // clientCertificatePassword
+    public String getClientCertificatePassword(int i) {
+        String value = getValue(i, "clientCertificatePassword");
+        return value;
+    }
+
+    public void setClientCertificatePassword(int i, String v) {
+        setValue(i, "clientCertificatePassword", v);
+    }
+
+    // saveClientCertificatePassword
+    public boolean getSaveClientCertificatePassword(int i) {
+        String value = getValue(i, "saveClientCertificatePassword");
+        if (value.isEmpty()) {
+            return false;
+        }
+        return Boolean.valueOf(value);
+    }
+
+    public void setSaveClientCertificatePassword(int i, boolean v) {
+        setValue(i, "saveClientCertificatePassword", Boolean.toString(v));
+        if (!v) {
+            this.setClientCertificatePassword(i, "");
         }
     }
 
@@ -384,7 +408,7 @@ public class Config {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                String[] pair = line.split("\\s*=\\s*"); 
+                String[] pair = line.split("\\s*=\\s*");
                 if (pair.length == 2) {
                     String key = pair[0].trim();
                     String value = pair[1].trim();

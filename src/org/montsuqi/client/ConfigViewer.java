@@ -58,7 +58,7 @@ public class ConfigViewer {
     }
 
     public void run(Frame parent) {
-        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); 
+        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true);
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout(5, 5));
         final PandaCList clist = new PandaCList();
@@ -78,7 +78,7 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { 
+        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) {
 
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
@@ -88,7 +88,7 @@ public class ConfigViewer {
         });
         bar.add(newButton);
 
-        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { 
+        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) {
 
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = clist.getSelectedRow();
@@ -101,7 +101,7 @@ public class ConfigViewer {
         });
         bar.add(editButton);
 
-        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { 
+        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) {
 
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = clist.getSelectedRow();
@@ -111,14 +111,14 @@ public class ConfigViewer {
                         String configName = (String) (clist.getValueAt(selectedRow, 0));
                         conf.deleteConfig(conf.getConfigByDescription(configName));
                         updateConfigList(clist);
-                        logger.info("server config:"+configName + " deleted");
+                        logger.info("server config:" + configName + " deleted");
                     }
                 }
             }
         });
         bar.add(deleteButton);
 
-        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { 
+        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) {
 
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
@@ -142,7 +142,7 @@ public class ConfigViewer {
         java.util.List<Integer> list = conf.getList();
         Object[][] tableData = new Object[list.size()][ColumnNames.length];
         int j = 0;
-        for (int i : list) {            
+        for (int i : list) {
             tableData[j][0] = conf.getDescription(i);
             tableData[j][1] = conf.getAuthURI(i);
             tableData[j][2] = conf.getUser(i);
@@ -163,7 +163,7 @@ public class ConfigViewer {
 
     protected void editConfig(Dialog parent, final int num, final boolean newFlag) {
         String title = newFlag ? Messages.getString("ConfigurationViewer.new") : Messages.getString("ConfigurationViewer.edit");
-        final JDialog f = new JDialog(parent, title, true); 
+        final JDialog f = new JDialog(parent, title, true);
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout());
 
@@ -181,20 +181,26 @@ public class ConfigViewer {
                 ConfigPanel.createConstraints(1, 0, 1, 4, 1.0, 0.0));
 
         JPanel basicPanel = configPanel.getBasicPanel();
+        JPanel sslPanel = configPanel.getSSLPanel();
         JPanel othersPanel = configPanel.getOthersPanel();
 
         Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, (Color) SystemColor.controlDkShadow);
         basicPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
-                Messages.getString("ConfigurationPanel.basic_tab_label")));
+                        Messages.getString("ConfigurationPanel.basic_tab_label")));
+        sslPanel.setBorder(
+                BorderFactory.createTitledBorder(border,
+                        Messages.getString("ConfigurationPanel.ssl_tab_label")));
+
         othersPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
-                Messages.getString("ConfigurationPanel.others_tab_label")));
+                        Messages.getString("ConfigurationPanel.others_tab_label")));
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(configNamePanel);
         mainPanel.add(basicPanel);
+        mainPanel.add(sslPanel);        
         mainPanel.add(othersPanel);
         container.add(mainPanel, BorderLayout.CENTER);
 
@@ -203,18 +209,18 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { 
+        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) {
 
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
-                configPanel.saveConfig(num,entryName);
-                logger.info("server config:"+entryName + " edited");
+                configPanel.saveConfig(num, entryName);
+                logger.info("server config:" + entryName + " edited");
                 f.dispose();
             }
         });
         bar.add(editOKButton);
 
-        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { 
+        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) {
 
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
