@@ -47,7 +47,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -73,7 +72,7 @@ public class ConfigPanel extends JPanel {
     protected static final Logger logger = LogManager.getLogger(ConfigPanel.class);
     protected Config conf;
     protected JPanel basicPanel;
-    protected JPanel sslPanel;    
+    protected JPanel sslPanel;
     protected JPanel othersPanel;
     protected JPanel infoPanel;
     // Basic Tab
@@ -83,11 +82,12 @@ public class ConfigPanel extends JPanel {
     protected JTextField authURIEntry;
     // SSL Tab
     protected JCheckBox useSSLCheckbox;
+    protected JButton caCertificateButton;
+    protected JTextField caCertificateEntry;
     protected JButton clientCertificateButton;
     protected JTextField clientCertificateEntry;
     protected JPasswordField exportPasswordEntry;
     protected JCheckBox saveClientCertificatePasswordCheckbox;
-
     // Others Tab
     protected JTextField styleEntry;
     protected JComboBox lookAndFeelCombo;
@@ -263,11 +263,13 @@ public class ConfigPanel extends JPanel {
 
         // SSL tab
         boolean useSSL = conf.getUseSSL(num);
+        String caCertificateFile = conf.getCACertificateFile(num);
         String clientCertificateFile = conf.getClientCertificateFile(num);
         boolean saveClientCertificatePassword = conf.getSaveClientCertificatePassword(num);
         String clientCertificatePassword = conf.getClientCertificatePassword(num);
 
         useSSLCheckbox.setSelected(useSSL);
+        caCertificateEntry.setText(caCertificateFile);
         clientCertificateEntry.setText(clientCertificateFile);
         exportPasswordEntry.setText(clientCertificatePassword);
         saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
@@ -308,6 +310,7 @@ public class ConfigPanel extends JPanel {
 
         // SSL Tab
         conf.setUseSSL(num, useSSLCheckbox.isSelected());
+        conf.setCACertificateFile(num, caCertificateEntry.getText());
         conf.setClientCertificateFile(num, clientCertificateEntry.getText());
         conf.setClientCertificatePassword(num, new String(exportPasswordEntry.getPassword()));
         conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
@@ -405,14 +408,17 @@ public class ConfigPanel extends JPanel {
     private void updateSSLPanelComponentsEnabled() {
         final boolean useSsl = useSSLCheckbox.isSelected();
         clientCertificateEntry.setEnabled(useSsl);
-        exportPasswordEntry.setEnabled(useSsl);
         clientCertificateButton.setEnabled(useSsl);
+        caCertificateEntry.setEnabled(useSsl);
+        caCertificateButton.setEnabled(useSsl);
+        exportPasswordEntry.setEnabled(useSsl);
         saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
     }
 
     private JPanel createSSLPanel() {
         int y;
         final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description");
+        final String caCertificateDescription = Messages.getString("ConfigurationPanel.ca_certificate_description");
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -424,6 +430,9 @@ public class ConfigPanel extends JPanel {
                 updateSSLPanelComponentsEnabled();
             }
         });
+        caCertificateEntry = createTextField();
+        caCertificateButton = new JButton();
+        caCertificateButton.setAction(new FileSelectionAction(caCertificateEntry, ".pem", caCertificateDescription));
         clientCertificateEntry = createTextField();
         clientCertificateButton = new JButton();
         clientCertificateButton.setAction(new FileSelectionAction(clientCertificateEntry, ".p12", clientCertificateDescription));
@@ -435,6 +444,14 @@ public class ConfigPanel extends JPanel {
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(useSSLCheckbox,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
+        y++;
+
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.ca_certificate")),
+                createConstraints(0, y, 1, 1, 0.0, 1.0));
+        panel.add(caCertificateEntry,
+                createConstraints(1, y, 2, 1, 1.0, 0.0));
+        panel.add(caCertificateButton,
+                createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.client_certificate")),

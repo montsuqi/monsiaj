@@ -150,12 +150,13 @@ public class Protocol {
             }
         });
 
-        String fileName = conf.getClientCertificateFile(num);
-        String certpass = conf.getClientCertificatePassword(num);
-        if (!conf.getUseSSL(num) || fileName.isEmpty()) {
+        String caCert = conf.getCACertificateFile(num);
+        String p12 = conf.getClientCertificateFile(num);
+        String p12Password = conf.getClientCertificatePassword(num);
+        if (!conf.getUseSSL(num) || p12.isEmpty()) {
             sslSocketFactory = null;
         } else {
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, certpass);
+            SSLSocketBuilder builder = new SSLSocketBuilder(caCert,p12, p12Password);
             sslSocketFactory = builder.getFactory();
         }
     }

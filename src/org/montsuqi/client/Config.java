@@ -35,7 +35,13 @@ public class Config {
     private String propPath;
     private Properties prop;
     private int current;
-    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "monsiaj.properties"};
+
+    private static final String PROP_FILENAME = "monsiaj.jsonrpc.properties";
+    private static final String JARPATH = System.getProperty("java.class.path");
+    private static final String DIRPATH = JARPATH.substring(0, JARPATH.lastIndexOf(File.separator) + 1);
+    private static final String DIRECT_PROP_PATH = DIRPATH + PROP_FILENAME;
+
+    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", PROP_FILENAME};
     private static final String PROP_PATH = SystemEnvironment.createFilePath(PROP_PATH_ELEM).getAbsolutePath();
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
@@ -100,12 +106,9 @@ public class Config {
         current = 0;
         prop = new Properties();
         try {
-            String jarPath = System.getProperty("java.class.path");
-            String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator) + 1);
-            String path = dirPath + "monsiaj.properties";
-            prop.load(new FileInputStream(path));
+            prop.load(new FileInputStream(DIRECT_PROP_PATH));
             if (prop.size() > 0) {
-                propPath = path;
+                propPath = DIRECT_PROP_PATH;
             }
         } catch (IOException ex) {
             // do nothing
@@ -124,7 +127,6 @@ public class Config {
     private void readProp() {
         current = Integer.valueOf(prop.getProperty(Config.CURRENT_KEY, "0"));
         List<Integer> list = this.getList();
-        list = this.getList();
         if (list.isEmpty()) {
             setValue(0, "description", "default");
             list.add(0);
@@ -263,6 +265,16 @@ public class Config {
 
     public void setUseSSL(int i, boolean v) {
         setValue(i, "useSSL", Boolean.toString(v));
+    }
+
+    // clientCertificateFile
+    public String getCACertificateFile(int i) {
+        String value = getValue(i, "caCertificateFile");
+        return value;
+    }
+
+    public void setCACertificateFile(int i, String v) {
+        setValue(i, "caCertificateFile", v);
     }
 
     // clientCertificateFile
