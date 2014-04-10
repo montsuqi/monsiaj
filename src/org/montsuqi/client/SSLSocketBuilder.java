@@ -67,52 +67,23 @@ public class SSLSocketBuilder {
         return factory;
     }
 
-    public SSLSocketBuilder(String caCert, String p12, String p12Password) throws IOException {
-        boolean keyManagerIsReady = false;
-        try {
+    public SSLSocketBuilder(String caCert, String p12, String p12Password) throws IOException,GeneralSecurityException {
+        if (!p12.isEmpty()) {
             keyManagers = createKeyManagers(p12, p12Password);
-            keyManagerIsReady = true;
-            if (caCert == null || caCert.isEmpty()) {
-                trustManagers = createSystemDefaultTrustManagers();
-            } else {
-                trustManagers = createCAFileTrustManagers(caCert);
-            }
-            final SSLContext ctx = SSLContext.getInstance("TLS");
-            ctx.init(keyManagers, trustManagers, null);
-            factory = ctx.getSocketFactory();
-        } catch (SSLException e) {
-            throw e;
-        } catch (FileNotFoundException e) {
-            String missingFileName;
-            // we cannot check keyManagers != null here, since it may not be initialized.
-            if (keyManagerIsReady) {
-                missingFileName = null;
-            } else {
-                missingFileName = new File(p12).getAbsolutePath();
-            }
-            final String format = Messages.getString("Client.file_not_found_format");
-            Object[] args = {missingFileName};
-            final String message = MessageFormat.format(format, args);
-            throw new IOException(message);
-        } catch (IOException e) {
-            System.out.println(e);
-            final Throwable t = e.getCause();
-            if (isMissingPassphraseMessage(e.getMessage())) {
-                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid");
-                final SSLException ssle = new SSLException(message);
-                throw ssle;
-            }
-            if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) {
-                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid");
-                final SSLException ssle = new SSLException(message);
-                throw ssle;
-            }
-            throw e;
-        } catch (GeneralSecurityException e) {
-            final String message = e.getMessage();
-            final SSLException ssle = new SSLException(message);
-            throw ssle;
+        } else {
+            keyManagers = new KeyManager[]{};
         }
+        
+        if (caCert == null || caCert.isEmpty()) {
+            trustManagers = createSystemDefaultTrustManagers();
+        } else {
+            trustManagers = createCAFileTrustManagers(caCert);
+        }
+        
+        final SSLContext ctx;
+        ctx = SSLContext.getInstance("TLS");
+        ctx.init(keyManagers, trustManagers, null);
+        factory = ctx.getSocketFactory();
     }
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {

@@ -153,11 +153,12 @@ public class Protocol {
         String caCert = conf.getCACertificateFile(num);
         String p12 = conf.getClientCertificateFile(num);
         String p12Password = conf.getClientCertificatePassword(num);
-        if (!conf.getUseSSL(num) || p12.isEmpty()) {
-            sslSocketFactory = null;
-        } else {
-            SSLSocketBuilder builder = new SSLSocketBuilder(caCert,p12, p12Password);
+        if (conf.getUseSSL(num)) {
+            SSLSocketBuilder builder = new SSLSocketBuilder(caCert, p12, p12Password);
             sslSocketFactory = builder.getFactory();
+        } else {
+            sslSocketFactory = null;
+
         }
     }
 
