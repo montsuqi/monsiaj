@@ -26,8 +26,8 @@ import java.awt.Component;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,26 +41,23 @@ import org.montsuqi.widgets.PandaPreview;
  */
 class PreviewHandler extends WidgetHandler {
 
-    private static final String TEMP_PREFIX = "pandapreview"; 
-    private static final String TEMP_SUFFIX = ".pdf"; 
+    private static final String TEMP_PREFIX = "pandapreview";
+    private static final String TEMP_SUFFIX = ".pdf";
 
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaPreview preview = (PandaPreview) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                try {
+        if (obj.has("objectdata")) {
+            try {
                 File temp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
                 temp.deleteOnExit();
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
-                con.getBLOB(obj.getString(key), out);
+                con.getBLOB(obj.getString("objectdata"), out);
                 preview.load(temp.getAbsolutePath());
-                } catch (Exception ex) {
-                    logger.warn(ex);
-                }
+            } catch (IOException ex) {
+                logger.warn(ex);
+            } catch (JSONException ex) {
+                logger.warn(ex);
             }
         }
     }

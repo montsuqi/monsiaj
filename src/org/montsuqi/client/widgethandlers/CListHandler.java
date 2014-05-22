@@ -25,7 +25,6 @@ package org.montsuqi.client.widgethandlers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.util.Iterator;
 import java.util.Map;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JScrollBar;
@@ -98,10 +97,9 @@ class CListHandler extends WidgetHandler {
             for (int i = 0; i < n; i++) {
                 JSONObject rowObj = array.getJSONObject(i);
                 Object rowData[] = new String[rowObj.length()];
-
-                JSONArray keys = rowObj.getJSONArray("__keys__");
-                for (int j = 0; j < keys.length(); j++) {
-                    rowData[j] = rowObj.getString(keys.getString(j));
+                for (int j = 0; j < clist.getColumnCount(); j++) {
+                    String key = "column" + (j + 1);
+                    rowData[j] = rowObj.getString(key);
                 }
                 tableModel.addRow(rowData);
             }
@@ -131,37 +129,15 @@ class CListHandler extends WidgetHandler {
             clist.setFGColors(fgcolors);
         }
 
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (key.matches("count")) {
-                // do nothing
-            } else if (key.matches("row")) {
-                // do nothing
-            } else if (key.matches("rowattr")) {
-                // do nothing
-            } else if (key.matches("column")) {
-                // do nothing
-            } else if (key.matches("item")) {
-                // do nothing
-            } else if (key.matches("bgcolor")) {
-                // do nothing
-            } else if (key.matches("fgcolor")) {
-                // do nothing
-            } else {
-                Object child = obj.get(key);
-                if (child instanceof JSONArray) {
-                    JSONArray array = obj.getJSONArray(key);
-                    int n = array.length();
-                    n = n > count ? count : n;
-                    for (int j = 0; j < n; j++) {
-                        boolean selected = array.getBoolean(j);
-                        clist.setSelection(j, selected);
-                        if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
-                            clist.changeSelection(j, 0, false, false);
-                        }
-                    }
+        if (obj.has("selectdata")) {
+            JSONArray array = obj.getJSONArray("selectdata");
+            int n = array.length();
+            n = n > count ? count : n;
+            for (int j = 0; j < n; j++) {
+                boolean selected = array.getBoolean(j);
+                clist.setSelection(j, selected);
+                if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
+                    clist.changeSelection(j, 0, false, false);
                 }
             }
         }
@@ -194,41 +170,23 @@ class CListHandler extends WidgetHandler {
         JTable table = (JTable) widget;
         PandaCList clist = (PandaCList) widget;
 
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (key.matches("count")) {
-                // do nothing
-            } else if (key.matches("row")) {
-                for (int j = 0; j < table.getRowCount(); j++) {
-                    if (isVisibleRow(table, j)) {
-                        obj.put(key, j + 1);
-                        break;
-                    }
-                }
-            } else if (key.matches("rowattr")) {
-                // do nothing
-            } else if (key.matches("column")) {
-                // do nothing
-            } else if (key.matches("item")) {
-                // do nothing
-            } else if (key.matches("bgcolor")) {
-                // do nothing
-            } else if (key.matches("fgcolor")) {
-                // do nothing
-            } else {
-                Object child = obj.get(key);
-                if (child instanceof JSONArray) {
-                    JSONArray array = obj.getJSONArray(key);
-                    for (int j = 0; j < table.getRowCount(); j++) {
-                        array.put(j, clist.getSelection(j));
-                    }
+        if (obj.has("row")) {
+            for (int j = 0; j < table.getRowCount(); j++) {
+                if (isVisibleRow(table, j)) {
+                    obj.put("row", j + 1);
+                    break;
                 }
             }
         }
-    }
 
+        if (obj.has("selectdata")) {
+            JSONArray array = obj.getJSONArray("selectdata");
+            for (int j = 0; j < table.getRowCount(); j++) {
+                array.put(j, clist.getSelection(j));
+            }
+        }
+    }
+    
     private boolean isVisibleRow(JTable table, int row) {
         JScrollBar vScroll = getVerticalScrollBar(table);
         if (vScroll == null) {

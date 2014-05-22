@@ -39,6 +39,7 @@ import org.montsuqi.monsia.WidgetInfo;
  *  to JComboBox's editor component.</p>
  */
 class ComboBuilder extends ContainerBuilder {
+        @Override
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
 		JComboBox combo = (JComboBox)widget;
@@ -47,6 +48,7 @@ class ComboBuilder extends ContainerBuilder {
 		return widget;
 	}
 
+        @Override
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		JComboBox combo = (JComboBox)parent;
 		if (info.getChildren().size() != 1) {

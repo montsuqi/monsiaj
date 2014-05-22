@@ -95,17 +95,18 @@ class PandaTableHandler extends WidgetHandler {
             JSONArray array = obj.getJSONArray("rowdata");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject rowObj = array.getJSONObject(i);
-                JSONArray keys = rowObj.getJSONArray("__keys__");
-                for (int j = 0; j < keys.length(); j++) {
-                    JSONObject colObj = rowObj.getJSONObject(keys.getString(j));
-                    for (Iterator ite = colObj.keys(); ite.hasNext();) {
-                        String key = (String) ite.next();
-                        if (key.matches("celldata")) {
-                            table.setCell(i, j, colObj.getString(key));
-                        } else if (key.matches("fgcolor")) {
-                            table.setFGColor(i, j, colObj.getString(key));
-                        } else if (key.matches("bgcolor")) {
-                            table.setBGColor(i, j, colObj.getString(key));
+                for (int j = 0; j < table.getColumns(); j++) {
+                    String key = "column" + (j + 1);
+                    if (rowObj.has(key)) {
+                        JSONObject colObj = rowObj.getJSONObject(key);
+                        if (colObj.has("celldata")) {
+                            table.setCell(i, j, colObj.getString("celldata"));
+                        }
+                        if (colObj.has("fgcolor")) {
+                            table.setFGColor(i, j, colObj.getString("fgcolor"));
+                        }
+                        if (colObj.has("bgcolor")) {
+                            table.setBGColor(i, j, colObj.getString("bgcolor"));
                         }
                     }
                 }
@@ -146,28 +147,30 @@ class PandaTableHandler extends WidgetHandler {
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         PandaTable table = (PandaTable) widget;
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        
+
         if (obj.has("trow")) {
-            obj.put("trow",table.getChangedRow()+1);
+            obj.put("trow", table.getChangedRow() + 1);
         }
-        
+
         if (obj.has("tcolumn")) {
-            obj.put("tcolumn", table.getChangedRow()+1);
+            obj.put("tcolumn", table.getChangedRow() + 1);
         }
-        
+
         if (obj.has("tvalue")) {
             obj.put("tvalue", table.getChangedValue());
         }
-        
+
         if (obj.has("rowdata")) {
             JSONArray array = obj.getJSONArray("rowdata");
-            for(int i=0;i<array.length();i++) {
+            for (int i = 0; i < array.length(); i++) {
                 JSONObject rowObj = array.getJSONObject(i);
-                JSONArray keys = rowObj.getJSONArray("__keys__");
-                for(int j=0;j<keys.length();j++) {
-                    JSONObject colObj = rowObj.getJSONObject(keys.getString(j));
-                    if (colObj.has("celldata")) {
-                        colObj.put("celldata", (String)tableModel.getValueAt(i, j));
+                for (int j = 0; j < table.getColumns(); j++) {
+                    String key = "column" + (j + 1);
+                    if (rowObj.has(key)) {
+                        JSONObject colObj = rowObj.getJSONObject(key);
+                        if (colObj.has("celldata")) {
+                            colObj.put("celldata", (String) tableModel.getValueAt(i, j));
+                        }
                     }
                 }
             }

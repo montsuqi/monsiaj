@@ -23,7 +23,6 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.util.Iterator;
 import java.util.Map;
 import javax.swing.text.JTextComponent;
 import org.json.JSONException;
@@ -40,28 +39,18 @@ class TextHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JTextComponent text = (JTextComponent) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                text.setText(obj.getString(key));
-                if (!text.isEditable()) {
-                    text.setCaretPosition(0);
-                }
+        if (obj.has("textdata")) {
+            text.setText(obj.getString("textdata"));
+            if (!text.isEditable()) {
+                text.setCaretPosition(0);
             }
         }
     }
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTextComponent text = (JTextComponent) widget;
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                obj.put(key, text.getText());
-            }
+        if (obj.has("textdata")) {
+            obj.put("textdata", text.getText());
         }
     }
 }

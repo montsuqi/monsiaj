@@ -23,16 +23,11 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
-import org.montsuqi.client.Type;
 import org.montsuqi.widgets.PandaTimer;
 
 /**
@@ -42,7 +37,7 @@ import org.montsuqi.widgets.PandaTimer;
  */
 public class TimerHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {   
+    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaTimer timer = (PandaTimer) widget;
         this.setCommonAttribute(widget, obj, styleMap);
 

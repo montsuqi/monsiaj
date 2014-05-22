@@ -23,7 +23,6 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.util.Iterator;
 import java.util.Map;
 import javax.swing.JTextField;
 import org.json.JSONException;
@@ -40,30 +39,16 @@ class EntryHandler extends WidgetHandler {
         JTextField entry = (JTextField) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         this.setEditable(widget, obj);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (this.isEditable(key)) {
-                // do nothing
-            } else {
-                entry.setText(obj.getString(key));
-                entry.setCaretPosition(0);
-            }
+        if (obj.has("textdata")) {
+            entry.setText(obj.getString("textdata"));
+            entry.setCaretPosition(0);
         }
     }
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTextField entry = (JTextField) widget;
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (this.isEditable(key)) {
-                // do nothing
-            } else {
-                obj.put(key,entry.getText());
-            }
+        if (obj.has("textdata")) {
+            obj.put("textdata",entry.getText());
         }
     }
 }

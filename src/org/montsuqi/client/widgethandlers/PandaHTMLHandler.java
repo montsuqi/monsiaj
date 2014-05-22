@@ -25,7 +25,6 @@ package org.montsuqi.client.widgethandlers;
 import java.awt.Component;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,20 +41,15 @@ public class PandaHTMLHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaHTML html = (PandaHTML) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                try {
-                    String urlStr = obj.getString(key);
-                    if (urlStr != null && !urlStr.isEmpty()) {
-                        URL url = new URL(obj.getString(key));
-                        html.setURI(url);
-                    }
-                } catch (MalformedURLException e) {
-                   html.setText("");
+        if (obj.has("uri")) {
+            try {
+                String urlStr = obj.getString("uri");
+                if (urlStr != null && !urlStr.isEmpty()) {
+                    URL url = new URL(urlStr);
+                    html.setURI(url);
                 }
+            } catch (MalformedURLException e) {
+                html.setText("");
             }
         }
     }

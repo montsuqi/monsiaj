@@ -24,7 +24,6 @@ package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,29 +41,15 @@ class NumberEntryHandler extends WidgetHandler {
         NumberEntry entry = (NumberEntry) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         this.setEditable(widget, obj);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (this.isEditable(key)) {
-                // do nothing
-            } else {
-                entry.setValue(new BigDecimal(obj.getDouble(key)));
-            }
+        if (obj.has("numdata")) {
+            entry.setValue(new BigDecimal(obj.getDouble("numdata")));
         }
     }
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         NumberEntry entry = (NumberEntry) widget;
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (this.isEditable(key)) {
-                // do nothing
-            } else {
-                obj.put(key, entry.getValueDouble());
-            }
+        if (obj.has("numdata")) {
+            obj.put("numdata", entry.getValueDouble());
         }
     }
 }

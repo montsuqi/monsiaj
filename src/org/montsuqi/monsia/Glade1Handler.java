@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
  */
 public class Glade1Handler extends AbstractDocumentHandler {
 
-	private LinkedList pendingWidgets;
+	private final LinkedList pendingWidgets;
 	String signalName;
 	String signalHandler;
 	String signalObject;

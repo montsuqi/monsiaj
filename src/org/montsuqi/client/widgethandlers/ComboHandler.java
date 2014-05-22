@@ -80,10 +80,13 @@ class ComboHandler extends WidgetHandler {
             } else if (key.matches("item")) {
                 // do nothing
             } else {
+/*                
                 JSONObject entryObj = obj.getJSONObject(key);
                 EntryHandler entryHandler = new EntryHandler();
                 entryHandler.set(con,editor,entryObj,styleMap);
                 entryString = ((JTextField)editor).getText();
+*/
+                entryString = obj.getJSONObject(key).getString("textdata");
             }
         }
         if (entryString != null) {

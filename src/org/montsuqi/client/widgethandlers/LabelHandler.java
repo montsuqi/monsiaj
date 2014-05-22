@@ -23,7 +23,6 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.util.Iterator;
 import java.util.Map;
 import javax.swing.JLabel;
 import org.json.JSONException;
@@ -40,14 +39,9 @@ class LabelHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JLabel label = (JLabel) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                String text = "<html>" +obj.getString(key)+ "</html>";
-                label.setText(text);
-            }
+        if (obj.has("textdata")) {
+            String text = "<html>" + obj.getString("textdata") + "</html>";
+            label.setText(text);
         }
     }
 

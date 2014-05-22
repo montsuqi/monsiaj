@@ -23,7 +23,6 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,30 +35,20 @@ import org.montsuqi.widgets.ColorButton;
  */
 class ColorButtonHandler extends WidgetHandler {
 
-    public void set(Protocol con,Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         ColorButton button = (ColorButton) widget;
         this.setCommonAttribute(widget, obj, styleMap);
 
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                button.setColorStr(obj.getString(key));
-            }
+        if (obj.has("color")) {
+            button.setColorStr(obj.getString("color"));
         }
     }
 
-    public void get(Protocol con,Component widget, JSONObject obj) throws JSONException {
+    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         ColorButton button = (ColorButton) widget;
 
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                obj.put(key, button.getColorStr());
-            }
+        if (obj.has("color")) {
+            obj.put("color", button.getColorStr());
         }
     }
 }

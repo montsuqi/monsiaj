@@ -23,7 +23,6 @@
 package org.montsuqi.client.widgethandlers;
 
 import java.awt.Component;
-import java.util.Iterator;
 import java.util.Map;
 import javax.swing.AbstractButton;
 import org.json.JSONException;
@@ -39,30 +38,18 @@ class ButtonHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         AbstractButton button = (AbstractButton) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (key.matches("label")) {
-                button.setText(obj.getString(key));
-            } else {
-                button.setSelected(obj.getBoolean(key));
-            }
+        if (obj.has("label")) {
+            button.setText(obj.getString("label"));
+        }
+        if (obj.has("isactive")) {
+            button.setSelected(obj.getBoolean("isactive"));
         }
     }
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         AbstractButton button = (AbstractButton) widget;
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else if (key.matches("label")) {
-                // do nothing
-            } else {
-                obj.put(key, button.isSelected());
-                button.setSelected(obj.getBoolean(key));
-            }
+        if (obj.has("isactive")) {
+            obj.put("isactive", button.isSelected());
         }
     }
 }

@@ -25,7 +25,6 @@ package org.montsuqi.client.widgethandlers;
 import java.awt.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -44,26 +43,20 @@ public class PixmapHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         Pixmap pixmap = (Pixmap) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        for (Iterator i = obj.keys(); i.hasNext();) {
-            String key = (String) i.next();
-            if (this.isCommonAttribute(key)) {
-                // do nothing
-            } else {
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                try {
-                    int status = con.getBLOB(obj.getString(key), bytes);
-                    if (status == 200 && bytes.size() > 0) {
-                        Icon icon = new ImageIcon(bytes.toByteArray());
-                        pixmap.setText("");
-                        pixmap.setIcon(icon);
-                        pixmap.validate();
-                    } else {
-                        pixmap.setText(Messages.getString("PixmapMarshaller.NO_IMAGE"));
-                        pixmap.setIcon(null);
-                    }
-                } catch (IOException ex) {
-                    logger.warn(ex);
+        if (obj.has("objectdata")) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            try {
+                int status = con.getBLOB(obj.getString("objectdata"), bytes);
+                if (status == 200 && bytes.size() > 0) {
+                    Icon icon = new ImageIcon(bytes.toByteArray());
+                    pixmap.setText("");
+                    pixmap.setIcon(icon);
+                    pixmap.validate();
+                } else {
+                    pixmap.setIcon(null);
                 }
+            } catch (IOException ex) {
+                logger.warn(ex);
             }
         }
     }
