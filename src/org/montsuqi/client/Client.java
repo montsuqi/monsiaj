@@ -122,10 +122,10 @@ public class Client implements Runnable {
      */
     Socket createSocket() throws IOException, GeneralSecurityException {
         int num = conf.getCurrent();
-        String host = conf.getHost(num);
-        int port = conf.getPort(num);
-        logger.debug("host : {}:{}", host, port);
-        SocketAddress address = new InetSocketAddress(host, port);
+        String hostName = conf.getHost(num);
+        int portNum = conf.getPort(num);
+        logger.debug("host : {}:{}", hostName, portNum);
+        SocketAddress address = new InetSocketAddress(hostName, portNum);
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(address);
         Socket socket = socketChannel.socket();
@@ -135,7 +135,7 @@ public class Client implements Runnable {
             String fileName = conf.getClientCertificateFile(num);
             String password = conf.getClientCertificatePassword(num);
             SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
-            return builder.createSSLSocket(socket, host, port);
+            return builder.createSSLSocket(socket, hostName, portNum);
         }
     }
 
