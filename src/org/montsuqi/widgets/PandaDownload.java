@@ -33,24 +33,34 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.prefs.Preferences;
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.montsuqi.client.Launcher;
 import org.montsuqi.util.GtkStockIcon;
+import org.montsuqi.util.PopupNotify;
 
 /**
- * <p>A component that holds a timer to fire events periodically.</p>
+ * <p>
+ * A component that holds a timer to fire events periodically.</p>
  *
- * <p>This class repeatedly fires a TimerEvent once on every repetition of
- * period to its TimerListeners.</p>
+ * <p>
+ * This class repeatedly fires a TimerEvent once on every repetition of period
+ * to its TimerListeners.</p>
  */
 public class PandaDownload extends JComponent {
 
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    protected static final Logger logger = LogManager.getLogger(PandaDownload.class);
 
     /**
-     * <p>Constructs a timer component.</p>
+     * <p>
+     * Constructs a timer component.</p>
      *
-     * <p>Initially this component's timer has a duration of 60 seconds. This
-     * helps it wait firing events until the component is on view.</p>
-     * <p>Correct duration should be set later.</p>
+     * <p>
+     * Initially this component's timer has a duration of 60 seconds. This helps
+     * it wait firing events until the component is on view.</p>
+     * <p>
+     * Correct duration should be set later.</p>
      */
     public PandaDownload() {
         super();
@@ -74,14 +84,14 @@ public class PandaDownload extends JComponent {
     }
 
     public void showDialog(final String fileName, final String description, final File file) throws IOException {
-        final JDialog dialog = new JDialog((JFrame)null, Messages.getString("PandaDownload.title"), true);
+        final JDialog dialog = new JDialog((JFrame) null, Messages.getString("PandaDownload.title"), true);
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         String descLine = "";
 
         if (description.length() > 0) {
             descLine = Messages.getString("PandaDownload.description") + description + "\n";
         }
-        
+
         JPanel textPanel = new JPanel(new BorderLayout(5, 5));
         textPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -144,8 +154,11 @@ public class PandaDownload extends JComponent {
                         srcChannel.close();
                         destChannel.close();
                     }
+                    PopupNotify.popup(Messages.getString("PandaDownload.save_comp"),
+                            selected.getAbsolutePath() + Messages.getString("PandaDownload.save_comp_msg"),
+                            GtkStockIcon.get("gtk-dialog-info"), 0);
                 } catch (IOException ex) {
-                    System.out.println(ex);
+                    logger.warn(ex);
                 }
             }
         });
@@ -162,7 +175,7 @@ public class PandaDownload extends JComponent {
         dialog.add(panel);
         dialog.pack();
         dialog.setResizable(false);
-        dialog.setLocationRelativeTo((JFrame)null);
+        dialog.setLocationRelativeTo((JFrame) null);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
@@ -174,6 +187,6 @@ public class PandaDownload extends JComponent {
         }
         File file = new File(args[0]);
         PandaDownload pd = new PandaDownload();
-        pd.showDialog(file.getName(), args[1],file);
+        pd.showDialog(file.getName(), args[1], file);
     }
 }
