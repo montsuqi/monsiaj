@@ -61,8 +61,8 @@
 
 
     <target name="compile" depends="prepare,set-javac-options,set-version">
-        <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.6"
-               target="1.6"
+        <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.7"
+               target="1.7"
                debug="${javac.debug}" debuglevel="${javac.debuglevel}">
             <compilerarg value="-Xlint:deprecation"/>                   
             <compilerarg value="-Xlint:unchecked"/>
@@ -144,7 +144,7 @@
         <native2ascii src="${tmp.dir}" dest="${build.dir}" includes="*.mf" encoding="UTF-8" reverse="true"/>
     </target>
 
-    <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-bin-mac,dist-loader,dist-src"/>
+    <target name="dist" description="Build files to be distributed." depends="dist-bin,dist-loader,dist-src"/>
 
     <target name="dist-bin" depends="create-jars,copy-files,set-version">
         <property name="bin.name" value="monsiaj-bin-${version}"/>
@@ -198,52 +198,6 @@
             </fileset>
         </zip>
     </target>    
-
-    <target name="dist-bin-mac" depends="create-jars,copy-files,set-version">
-        <property name="bin.macosx.name" value="monsiaj-bin-macosx-${version}"/>
-        <copy todir="${build.dir}/${macosx.app.dir}/Contents">
-            <fileset dir="${resources.dir}">
-                <include name="Info.plist"/>
-                <include name="PkgInfo"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources">
-            <fileset dir="${resources.dir}">
-                <include name="*.lproj/**"/>
-                <include name="*.icns"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.dir}/${macosx.app.dir}/Contents/Resources/Java">
-            <fileset dir="${build.dir}">
-                <include name="*.jar"/>
-                <exclude name="monsiaj.jar"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.dir}/${macosx.app.dir}/Contents/MacOS">
-            <fileset dir="${resources.dir}">
-                <include name="${macosx.app.stub}"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.dir}/${bin.macosx.name}">
-            <fileset dir="${build.dir}">
-                <include name="${macosx.app.dir}/**"/>
-                <include name="*.txt"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.dir}/${bin.macosx.name}/theme">
-            <fileset dir="${build.dir}">
-                <include name="*.theme"/>
-            </fileset>
-        </copy>
-        <!-- ant 1.5.x should use destfile instead of zipfile-->
-        <zip zipfile="${dist.dir}/${bin.macosx.name}.zip">
-            <fileset dir="${build.dir}">
-                <include name="${bin.macosx.name}/**"/>
-                <exclude name="${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/"/>
-            </fileset>
-            <zipfileset dir="${build.dir}" prefix="${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/" filemode="755" file="${build.dir}/${bin.macosx.name}/${macosx.app.dir}/Contents/MacOS/${macosx.app.stub}"/>
-        </zip>
-    </target>
 
     <target name="dist-src" depends="set-version">
         <property name="src.name" value="monsiaj-src-${version}"/>

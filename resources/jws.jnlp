@@ -14,7 +14,7 @@
         <all-permissions/>
     </security>
     <resources>
-        <j2se version="1.6+"/>
+        <j2se version="1.7+"/>
         <jar href="jmareceipt.jar"/>
         <jar href="log4j-api-2.0-beta9.jar"/>
         <jar href="log4j-core-2.0-beta9.jar"/>        
