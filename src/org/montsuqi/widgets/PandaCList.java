@@ -87,6 +87,11 @@ public class PandaCList extends JTable {
         setRowSelectionAllowed(false);
         initActions();
 
+        if (System.getProperty("monsia.pandaclist.rowheight") != null) {
+            int rowheight = Integer.parseInt(System.getProperty("monsia.pandaclist.rowheight"));
+            this.setRowHeight(rowheight);
+        }
+
         String strColor = System.getProperty("monsia.pandaclist.selection_bg_color");
         if (strColor != null) {
             selectionBGColor = SafeColorDecoder.decode(strColor);
@@ -166,7 +171,7 @@ public class PandaCList extends JTable {
         ActionMap actions = getActionMap();
         InputMap inputs = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        actions.put("doAction", new AbstractAction() { 
+        actions.put("doAction", new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {
                 int row = PandaCList.this.getSelectedRow();
@@ -179,8 +184,8 @@ public class PandaCList extends JTable {
                 fireChangeEvent(new ChangeEvent(PandaCList.this));
             }
         });
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "doAction"); 
-        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "doAction"); 
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "doAction");
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "doAction");
     }
 
     protected void fireChangeEvent(ChangeEvent e) {
