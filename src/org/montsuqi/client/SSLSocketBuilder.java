@@ -211,17 +211,71 @@ public class SSLSocketBuilder {
     }
 
     TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
-        getUseBrowserSetting();
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init((KeyStore) null);
-        for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
-            if (trustManager instanceof X509TrustManager) {
-                X509TrustManager delegatee = (X509TrustManager) trustManager;
-                TrustManager tm = new MyTrustManager(delegatee);
-                return new TrustManager[]{tm};
+
+        if (SystemEnvironment.isMacOSX()) {
+            System.setProperty("javax.net.ssl.trustStoreType", "KeychainStore");
+            System.setProperty("javax.net.ssl.trustStoreProvider", "Apple");
+            final File trustStorePath = getTrustStorePath();
+            final InputStream is = new FileInputStream(trustStorePath);
+            final KeyStore ks = KeyStore.getInstance("KeychainStore", "Apple");
+            ks.load(is, null);
+            is.close();
+            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+            tmf.init(ks);
+            final TrustManager[] tms = tmf.getTrustManagers();
+            for (TrustManager tm1 : tms) {
+                if (tm1 instanceof X509TrustManager) {
+                    final X509TrustManager delegatee = (X509TrustManager) tm1;
+                    final TrustManager tm = new MyTrustManager(delegatee);
+                    return new TrustManager[]{tm};
+                }
             }
+            return tms;
+
+        } else {
+            final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+            final File trustStorePath = getTrustStorePath();
+            final InputStream is = new FileInputStream(trustStorePath);
+            ks.load(is, null);
+            is.close();
+            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
+            tmf.init(ks);
+            final TrustManager[] tms = tmf.getTrustManagers();
+            for (TrustManager tm1 : tms) {
+                if (tm1 instanceof X509TrustManager) {
+                    final X509TrustManager delegatee = (X509TrustManager) tm1;
+                    final TrustManager tm = new MyTrustManager(delegatee);
+                    return new TrustManager[]{tm};
+                }
+            }
+            return tms;
+
         }
-        return null;
+    }
+
+    private File getTrustStorePath() {
+        String home = System.getProperty("user.home");
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.startsWith("windows vista")
+                || osName.startsWith("windows 7")
+                || osName.startsWith("windows 8")
+                || osName.startsWith("windows 9")
+                || osName.startsWith("windows 10")) {
+            return new File(
+                    SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
+        } else if (SystemEnvironment.isWindows()) {
+            return new File(
+                    SystemEnvironment.createFilePath(new String[]{home, "Application Data", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
+
+        } else if (SystemEnvironment.isMacOSX()) {
+            return new File(
+                    SystemEnvironment.createFilePath(new String[]{home, "Library", "Keychains"}),
+                    "login.keychain");
+        } else {
+            return new File(
+                    SystemEnvironment.createFilePath(new String[]{home, ".java", "deployment", "security"}),
+                    "trusted.jssecacerts");
+        }
     }
 
     private KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
@@ -247,28 +301,6 @@ public class SSLSocketBuilder {
         } else {
             final String message = Messages.getString("Client.empty_pass");
             throw new SSLException(message);
-        }
-    }
-
-    private void getUseBrowserSetting() {
-        if (!SystemEnvironment.isWindows()) {
-            return;
-        }
-        // Following code runs only on Windows.
-        Properties deploymentProperties = new Properties();
-        String home = System.getProperty("user.home");
-        File deploymentDirectory = SystemEnvironment.createFilePath(new String[]{
-            home, "Application Data", "Sun", "Java", "Deployment"
-        });
-        File deploymentPropertiesFile = new File(deploymentDirectory, "deployment.properties");
-        try {
-            FileInputStream fis = new FileInputStream(deploymentPropertiesFile);
-            deploymentProperties.load(fis);
-            fis.close();
-        } catch (FileNotFoundException e) {
-            logger.debug("{0} not fould", deploymentPropertiesFile);
-        } catch (IOException e) {
-            logger.debug("{0} could not be read", deploymentPropertiesFile);
         }
     }
 
