@@ -59,9 +59,6 @@ class NotebookHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         Notebook note = (Notebook) widget;
-     
-        if (obj.has("pageno")) {
-            obj.put("pageno",note.getSelectedIndex());
-        }
+        obj.put("pageno", note.getSelectedIndex());
     }
 }

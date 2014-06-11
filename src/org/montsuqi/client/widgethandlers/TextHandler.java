@@ -49,8 +49,6 @@ class TextHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTextComponent text = (JTextComponent) widget;
-        if (obj.has("textdata")) {
-            obj.put("textdata", text.getText());
-        }
+        obj.put("textdata", text.getText());
     }
 }

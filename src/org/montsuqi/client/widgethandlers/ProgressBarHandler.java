@@ -39,16 +39,14 @@ class ProgressBarHandler extends WidgetHandler {
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JProgressBar progress = (JProgressBar) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-        if(obj.has("value")) {
+        if (obj.has("value")) {
             progress.setValue(obj.getInt("value"));
         }
     }
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JProgressBar progress = (JProgressBar) widget;
-        if(obj.has("value")) {
-            obj.put("value", progress.getValue());
-        }
+        obj.put("value", progress.getValue());
     }
 
 }

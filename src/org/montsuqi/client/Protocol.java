@@ -90,6 +90,7 @@ public class Protocol {
     private PrintAgent printAgent;
     private String windowName;
     private Map styleMap;
+    private Map<String, Component> changedWidgetMap;
 
     // jsonrpc
     private String protocolVersion;
@@ -129,6 +130,7 @@ public class Protocol {
         topWindow = new TopWindow();
         dialogStack = new ArrayList<Component>();
         rpcId = 1;
+        changedWidgetMap = new HashMap<String, Component>();
 
         int num = conf.getCurrent();
         final String user = this.conf.getUser(num);
@@ -398,7 +400,6 @@ public class Protocol {
 
     public void sendEvent(JSONObject params) {
         try {
-            System.out.println("----- send event -----");
             JSONObject meta = new JSONObject();
             meta.put("client_version", PANDA_CLIENT_VERSION);
             meta.put("session_id", this.sessionId);
@@ -562,26 +563,32 @@ public class Protocol {
     }
 
     private void updateScreenData(Interface xml, String name, Object obj) throws JSONException {
-        Component widget = xml.getWidgetByLongName(name);
-        if (widget != null) {
-            Class clazz = widget.getClass();
-            WidgetHandler handler = WidgetHandler.getHandler(clazz);
-            if (handler != null) {
-                handler.get(this, widget, (JSONObject) obj);
-            }
-        }
         if (obj instanceof JSONObject) {
-            JSONObject j = (JSONObject) obj;
-            for (Iterator i = j.keys(); i.hasNext();) {
+            JSONObject object = (JSONObject) obj;
+            for (Iterator i = object.keys(); i.hasNext();) {
                 String key = (String) i.next();
                 String childName = name + "." + key;
-                updateScreenData(xml, childName, j.get(key));
+                Object child = object.get(key);
+                if (child instanceof JSONObject || child instanceof JSONArray) {
+                    updateScreenData(xml, childName, object.get(key));
+                }
+            }
+            Component widget = xml.getWidgetByLongName(name);
+            if (widget != null && changedWidgetMap.containsKey(widget.getName())) {
+                Class clazz = widget.getClass();
+                WidgetHandler handler = WidgetHandler.getHandler(clazz);
+                if (handler != null) {
+                    handler.get(this, widget, (JSONObject) obj);
+                }
             }
         } else if (obj instanceof JSONArray) {
-            JSONArray a = (JSONArray) obj;
-            for (int i = 0; i < a.length(); i++) {
+            JSONArray array = (JSONArray) obj;
+            for (int i = 0; i < array.length(); i++) {
                 String childName = name + "[" + i + "]";
-                updateScreenData(xml, childName, a.get(i));
+                Object child = array.get(i);
+                if (child instanceof JSONObject || child instanceof JSONArray) {
+                    updateScreenData(xml, childName, child);
+                }
             }
         }
     }
@@ -600,7 +607,12 @@ public class Protocol {
             }
             if (screenData != null) {
                 Node node = getNode(windowName);
-                updateScreenData(node.getInterface(), windowName, screenData);
+                if (windowName.startsWith("_")) {
+                    screenData = new JSONObject();
+                } else {
+                    updateScreenData(node.getInterface(), windowName, screenData);
+                }
+                changedWidgetMap.clear();
 
                 JSONObject eventData = new JSONObject();
                 eventData.put("window", windowName);
@@ -616,7 +628,7 @@ public class Protocol {
         }
     }
 
-    private synchronized void updateWidget(Interface xml, String name, Object obj) throws JSONException {
+    private synchronized void setWidgetData(Interface xml, String name, Object obj) throws JSONException {
         Component widget = xml.getWidgetByLongName(name);
         if (widget != null) {
             Class clazz = widget.getClass();
@@ -630,22 +642,21 @@ public class Protocol {
             for (Iterator i = j.keys(); i.hasNext();) {
                 String key = (String) i.next();
                 String childName = name + "." + key;
-                updateWidget(xml, childName, j.get(key));
+                setWidgetData(xml, childName, j.get(key));
             }
         } else if (obj instanceof JSONArray) {
             JSONArray a = (JSONArray) obj;
             for (int i = 0; i < a.length(); i++) {
                 String childName = name + "[" + i + "]";
-                updateWidget(xml, childName, a.get(i));
+                setWidgetData(xml, childName, a.get(i));
             }
         }
     }
 
-    private void updateWindow(JSONObject w) throws JSONException {
+    private void setWindowData(JSONObject w) throws JSONException {
         String putType = w.getString("put_type");
         String _windowName = w.getString("window");
         logger.debug("window[" + _windowName + "] put_type[" + putType + "]");
-System.out.println("window[" + _windowName + "] put_type[" + putType + "]"); 
 
         Node node = getNode(_windowName);
         if (node == null) {
@@ -661,7 +672,7 @@ System.out.println("window[" + _windowName + "] put_type[" + putType + "]");
         if (putType.matches("new") || putType.matches("current")) {
             this.windowName = _windowName;
             Object screenData = w.get("screen_data");
-            updateWidget(node.getInterface(), _windowName, screenData);
+            setWidgetData(node.getInterface(), _windowName, screenData);
             if (_windowName.startsWith("_")) {
                 // do nothing for dummy window
                 return;
@@ -680,7 +691,7 @@ System.out.println("window[" + _windowName + "] put_type[" + putType + "]");
             String focusedWidget = windowData.getString("focused_widget");
             JSONArray windows = windowData.getJSONArray("windows");
             for (int i = 0; i < windows.length(); i++) {
-                updateWindow(windows.getJSONObject(i));
+                setWindowData(windows.getJSONObject(i));
             }
             if (!focusedWindow.startsWith("_")) {
                 setFocus(focusedWindow, focusedWidget);
@@ -864,57 +875,15 @@ System.out.println("window[" + _windowName + "] put_type[" + putType + "]");
         }
     }
 
-    void clearWindowTable() {
-        logger.entry();
-        Iterator i = nodeTable.values().iterator();
-        while (i.hasNext()) {
-            Node node = (Node) i.next();
-            node.clearChangedWidgets();
-        }
-        logger.exit();
-    }
-
     synchronized void addChangedWidget(Component widget) {
-        logger.entry(widget);
         if (isReceiving) {
-            logger.exit();
             return;
         }
-        Node node = getNode(widget);
-        if (node != null) {
-            try {
-                node.addChangedWidget(widget.getName(), widget);
-            } catch (IllegalArgumentException e) {
-                logger.warn(e);
-            }
-        }
-        logger.exit();
+        _addChangedWidget(widget);
     }
 
-    public void _addChangedWidget(Component widget) {
-        logger.entry(widget);
-        Node node = getNode(widget);
-        if (node != null) {
-            try {
-                node.addChangedWidget(widget.getName(), widget);
-            } catch (IllegalArgumentException e) {
-                logger.warn(e);
-            }
-        }
-        logger.exit();
-    }
-
-    public void addAlwaysSendWidget(Component widget) {
-        logger.entry(widget);
-        Node node = getNode(widget);
-        if (node != null) {
-            try {
-                node.addAlwaysSendWidget(widget.getName(), widget);
-            } catch (IllegalArgumentException e) {
-                logger.warn(e);
-            }
-        }
-        logger.exit();
+    synchronized public void _addChangedWidget(Component widget) {
+        changedWidgetMap.put(widget.getName(), widget);
     }
 
     public boolean isReceiving() {

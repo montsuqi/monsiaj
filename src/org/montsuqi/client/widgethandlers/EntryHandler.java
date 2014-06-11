@@ -47,8 +47,6 @@ class EntryHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         JTextField entry = (JTextField) widget;
-        if (obj.has("textdata")) {
-            obj.put("textdata",entry.getText());
-        }
+        obj.put("textdata", entry.getText());
     }
 }

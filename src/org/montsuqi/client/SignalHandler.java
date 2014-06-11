@@ -256,7 +256,6 @@ public abstract class SignalHandler {
                         }
                         
                         while (con.getWindowName().startsWith("_")) {
-System.out.println("---- dummy event ----");                            
                             con.sendEvent(con.getWindowName(), con.getWindowName(), "DummyEvent");                         
                             con.updateScreen();
                         }
@@ -430,7 +429,6 @@ System.out.println("---- dummy event ----");
         registerHandler("map_event", new SignalHandler() {
 
             public void handle(Protocol con, Component widget, Object userData) {
-                con.clearWindowTable();
             }
         });
 

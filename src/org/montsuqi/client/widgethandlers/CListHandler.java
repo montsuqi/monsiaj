@@ -170,23 +170,20 @@ class CListHandler extends WidgetHandler {
         JTable table = (JTable) widget;
         PandaCList clist = (PandaCList) widget;
 
-        if (obj.has("row")) {
-            for (int j = 0; j < table.getRowCount(); j++) {
-                if (isVisibleRow(table, j)) {
-                    obj.put("row", j + 1);
-                    break;
-                }
+        for (int j = 0; j < table.getRowCount(); j++) {
+            if (isVisibleRow(table, j)) {
+                obj.put("row", j + 1);
+                break;
             }
         }
 
-        if (obj.has("selectdata")) {
-            JSONArray array = obj.getJSONArray("selectdata");
-            for (int j = 0; j < table.getRowCount(); j++) {
-                array.put(j, clist.getSelection(j));
-            }
+        JSONArray array = new JSONArray();
+        obj.put("selectdata",array);
+        for (int j = 0; j < table.getRowCount(); j++) {
+            array.put(j, clist.getSelection(j));
         }
     }
-    
+
     private boolean isVisibleRow(JTable table, int row) {
         JScrollBar vScroll = getVerticalScrollBar(table);
         if (vScroll == null) {

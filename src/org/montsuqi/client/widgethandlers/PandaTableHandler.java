@@ -146,32 +146,21 @@ class PandaTableHandler extends WidgetHandler {
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         PandaTable table = (PandaTable) widget;
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        obj.put("trow", table.getChangedRow() + 1);
+        obj.put("tcolumn", table.getChangedRow() + 1);
+        obj.put("tvalue", table.getChangedValue());
 
-        if (obj.has("trow")) {
-            obj.put("trow", table.getChangedRow() + 1);
-        }
+        JSONArray array = new JSONArray();
+        obj.put("rowdata", array);
 
-        if (obj.has("tcolumn")) {
-            obj.put("tcolumn", table.getChangedRow() + 1);
-        }
-
-        if (obj.has("tvalue")) {
-            obj.put("tvalue", table.getChangedValue());
-        }
-
-        if (obj.has("rowdata")) {
-            JSONArray array = obj.getJSONArray("rowdata");
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject rowObj = array.getJSONObject(i);
-                for (int j = 0; j < table.getColumns(); j++) {
-                    String key = "column" + (j + 1);
-                    if (rowObj.has(key)) {
-                        JSONObject colObj = rowObj.getJSONObject(key);
-                        if (colObj.has("celldata")) {
-                            colObj.put("celldata", (String) tableModel.getValueAt(i, j));
-                        }
-                    }
-                }
+        for (int i = 0; i < table.getRows(); i++) {
+            JSONObject rowObj = new JSONObject();
+            array.put(i,rowObj);
+            for (int j = 0; j < table.getColumns(); j++) {
+                String key = "column" + (j + 1);
+                JSONObject colObj = new JSONObject();
+                rowObj.put(key, colObj);
+                colObj.put("celldata", (String) tableModel.getValueAt(i, j));
             }
         }
     }

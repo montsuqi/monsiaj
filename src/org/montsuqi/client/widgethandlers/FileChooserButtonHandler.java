@@ -40,7 +40,7 @@ class FileChooserButtonHandler extends WidgetHandler {
 
         this.setCommonAttribute(widget, obj, styleMap);
         fcb.setFile(null);
-        con.addAlwaysSendWidget(widget);
+        con._addChangedWidget(widget);
     }
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
@@ -50,11 +50,7 @@ class FileChooserButtonHandler extends WidgetHandler {
             return;
         }
         String oid = con.postBLOB(binary);
-        if (obj.has("objectdata")) {
-            obj.put("objectdata",oid);
-        }
-        if (obj.has("filename")) {
-            obj.put("filename", fcb.getFileName());
-        }
+        obj.put("objectdata", oid);
+        obj.put("filename", fcb.getFileName());
     }
 }

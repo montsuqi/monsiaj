@@ -48,8 +48,6 @@ class ButtonHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         AbstractButton button = (AbstractButton) widget;
-        if (obj.has("isactive")) {
-            obj.put("isactive", button.isSelected());
-        }
+        obj.put("isactive", button.isSelected());
     }
 }

@@ -48,8 +48,6 @@ class NumberEntryHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         NumberEntry entry = (NumberEntry) widget;
-        if (obj.has("numdata")) {
-            obj.put("numdata", entry.getValueDouble());
-        }
+        obj.put("numdata", entry.getValueDouble());
     }
 }

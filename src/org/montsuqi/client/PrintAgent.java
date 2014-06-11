@@ -49,7 +49,6 @@ public class PrintAgent extends Thread {
         while (true) {
             try {
                 Thread.sleep(DELAY);
-System.out.println(printQ.size());                
                 for (PrintRequest request : printQ) {
                     if (processRequest(request)) {
                         synchronized (this) {

@@ -25,24 +25,17 @@ package org.montsuqi.client;
 /**
  * <p>A class which manages a top-level window and its changed widgets.</p>
  */
-import java.awt.Component;
-import java.util.HashMap;
-import java.util.Map;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.widgets.Window;
 
 public class Node {
 
-    private Interface xml;
-    private String name;
-    private Map<String,Component> changedWidgets;
-    private Map<String,Component> alwaysSendWidgets;
+    private final Interface xml;
+    private final String name;
 
     Node(Interface xml, String name) {
         this.xml = xml;
         this.name = name;
-        this.changedWidgets = new HashMap<String,Component>();
-        this.alwaysSendWidgets = new HashMap<String,Component>();
     }
 
     String getName() {
@@ -55,29 +48,5 @@ public class Node {
 
     Window getWindow() {
         return (Window) xml.getWidget(name);
-    }
-
-    void clearChangedWidgets() {
-        changedWidgets.clear();
-    }
-
-    Map getChangedWidgets() {
-        return changedWidgets;
-    }
-
-    Map getAlwaysSendWidgets() {
-        return alwaysSendWidgets;
-    }    
-
-    void addChangedWidget(String widgetName, Component widget) {
-        if (!changedWidgets.containsKey(widgetName)) {
-            changedWidgets.put(widgetName, widget);
-        }
-    }
-
-    void addAlwaysSendWidget(String widgetName, Component widget) {
-        if (!alwaysSendWidgets.containsKey(widgetName)) {
-            alwaysSendWidgets.put(widgetName, widget);
-        }
     }
 }

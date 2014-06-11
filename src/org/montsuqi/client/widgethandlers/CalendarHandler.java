@@ -37,7 +37,7 @@ import org.montsuqi.client.Protocol;
  */
 class CalendarHandler extends WidgetHandler {
 
-    public void set(Protocol con,Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar) widget;
         Calendar calendar = Calendar.getInstance();
         this.setCommonAttribute(widget, obj, styleMap);
@@ -59,19 +59,13 @@ class CalendarHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con,Component widget, JSONObject obj) throws JSONException {
+    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar) widget;
         Calendar cal = Calendar.getInstance();
         Date date = calendarWidget.getDate();
         cal.setTime(date);
-        if (obj.has("year")) {
-            obj.put("year", cal.get(Calendar.YEAR));
-        }
-        if (obj.has("month")) {
-            obj.put("month", cal.get(Calendar.MONTH));
-        }
-        if (obj.has("day")) {
-            obj.put("day", cal.get(Calendar.DATE));            
-        }
+        obj.put("year", cal.get(Calendar.YEAR));
+        obj.put("month", cal.get(Calendar.MONTH));
+        obj.put("day", cal.get(Calendar.DATE));
     }
 }

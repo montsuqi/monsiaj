@@ -46,9 +46,6 @@ class ColorButtonHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         ColorButton button = (ColorButton) widget;
-
-        if (obj.has("color")) {
-            obj.put("color", button.getColorStr());
-        }
+        obj.put("color", button.getColorStr());
     }
 }

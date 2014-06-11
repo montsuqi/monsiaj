@@ -48,9 +48,6 @@ public class TimerHandler extends WidgetHandler {
 
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
         PandaTimer timer = (PandaTimer) widget;
-
-        if (obj.has("duration")) {
-            obj.put("duration", timer.getDuration());
-        }
+        obj.put("duration", timer.getDuration());
     }
 }

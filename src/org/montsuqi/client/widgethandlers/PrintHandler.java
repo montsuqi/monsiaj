@@ -42,13 +42,11 @@ public class PrintHandler extends WidgetHandler {
                 String path = "";
                 if (itemObj.has("path")) {
                     path = itemObj.getString("path");
-                    itemObj.put("path","");
                 }
 
                 String title = "";
                 if (itemObj.has("title")) {
                     title = itemObj.getString("title");
-                    itemObj.put("title", "");
                 }
 
                 boolean showDialog = true;
