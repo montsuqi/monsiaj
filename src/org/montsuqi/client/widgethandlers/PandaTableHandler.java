@@ -25,7 +25,6 @@ package org.montsuqi.client.widgethandlers;
 import java.awt.Component;
 import java.awt.Container;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
@@ -56,7 +55,7 @@ class PandaTableHandler extends WidgetHandler {
         int trow = 0;
         if (obj.has("trow")) {
             trow = obj.getInt("trow");
-            if (trow > 1) {
+            if (trow >= 1) {
                 trow -= 1;
             }
         }
@@ -86,7 +85,7 @@ class PandaTableHandler extends WidgetHandler {
         int tcolumn = 0;
         if (obj.has("tcolumn")) {
             tcolumn = obj.getInt("tcolumn");
-            if (tcolumn > 1) {
+            if (tcolumn >= 1) {
                 tcolumn -= 1;
             }
         }

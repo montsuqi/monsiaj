@@ -13,6 +13,8 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
@@ -29,13 +31,16 @@ import org.montsuqi.widgets.PandaPreview;
  */
 public class PrintAgent extends Thread {
 
+    private static final Logger logger = LogManager.getLogger(PrintAgent.class);
     private final int DELAY = 3000;
     private final ConcurrentLinkedQueue<PrintRequest> printQ;
+    private final ConcurrentLinkedQueue<ServerPrintRequest> serverPrintQ;
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private final Protocol con;
 
     public PrintAgent(Protocol con) {
         printQ = new ConcurrentLinkedQueue<PrintRequest>();
+        serverPrintQ = new ConcurrentLinkedQueue<ServerPrintRequest>();
         this.con = con;
     }
 
@@ -44,52 +49,66 @@ public class PrintAgent extends Thread {
         while (true) {
             try {
                 Thread.sleep(DELAY);
+System.out.println(printQ.size());                
                 for (PrintRequest request : printQ) {
                     if (processRequest(request)) {
-                        printQ.remove(request);
+                        synchronized (this) {
+                            printQ.remove(request);
+                        }
+                    }
+                }
+                for (ServerPrintRequest request : serverPrintQ) {
+                    request.action();
+                    synchronized (this) {
+                        serverPrintQ.remove(request);
                     }
                 }
             } catch (InterruptedException e) {
-                System.out.println(e);
+                logger.warn(e);
             }
         }
     }
 
-    synchronized boolean processRequest(PrintRequest request) {
+    boolean processRequest(PrintRequest request) {
         if (request == null) {
             return true;
         }
-        try {
-            File file = con.apiDownload(request.path, request.filename);
-            if (file != null) {
-                request.action(file);
-            } else {
-                switch (request.getRetry()) {
-                    case 0:
-                        return false;
-                    case 1:
-                        request.showRetryError();
-                        return true;
-                    default:
-                        request.setRetry(request.getRetry() - 1);
-                        return false;
-                }
-            }
-        } catch (IOException ex) {
-            if (!ex.getMessage().equals("204")) {
-                ex.printStackTrace();
-                request.showOtherError();
+        if (request.action()) {
+        } else {
+            switch (request.getRetry()) {
+                case 0:
+                    return false;
+                case 1:
+                    request.showRetryError();
+                    return true;
+                default:
+                    request.setRetry(request.getRetry() - 1);
+                    return false;
             }
         }
         return true;
     }
 
     synchronized public void addPrintRequest(String url, String title, int retry, boolean showDialog) {
+        for (PrintRequest req : printQ) {
+            if (req.path.equals(url)) {
+                return;
+            }
+        }
         printQ.add(new PrintRequest(url, title, retry, showDialog));
     }
 
     synchronized public void addDLRequest(String url, String filename, String desc, int retry) {
+        for (PrintRequest req : printQ) {
+            if (req.path.equals(url)) {
+                return;
+            }
+        }
         printQ.add(new DLRequest(url, filename, desc, retry));
+    }
+
+    synchronized public void addServerPrintRequest(String printer, String oid) {
+        serverPrintQ.add(new ServerPrintRequest(printer, oid));
     }
 
     public void showDialog(String title, File file) {
@@ -110,14 +129,17 @@ public class PrintAgent extends Thread {
             container.add(preview, BorderLayout.CENTER);
             container.add(closeButton, BorderLayout.SOUTH);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
             preview.setSize(800, 600);
             preview.load(file.getAbsolutePath());
             preview.setVisible(true);
+
             dialog.setModal(true);
+            dialog.setResizable(false);
             dialog.setVisible(true);
             closeButton.requestFocus();
-        } catch (Exception ex) {
-            System.out.println(ex);
+        } catch (IOException ex) {
+            logger.warn(ex);
         }
     }
 
@@ -128,15 +150,13 @@ public class PrintAgent extends Thread {
             ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
                     0, channel.size());
             PDFFile pdf = new PDFFile(buf);
-            if (pdf != null) {
-                return pdf.getNumPages();
-            }
-        } catch (Exception ex) {
-            System.out.println(ex);
+            return pdf.getNumPages();
+        } catch (IOException ex) {
+            logger.warn(ex);
         }
         return 0;
     }
-    
+
     public class DLRequest extends PrintRequest {
 
         private final String description;
@@ -148,14 +168,22 @@ public class PrintAgent extends Thread {
         }
 
         @Override
-        public void action(File file) {
+        public boolean action() {
             try {
+                File file = con.apiDownload(path, filename);
+                if (file == null) {
+                    return false;
+                }
                 PandaDownload pd = new PandaDownload();
                 pd.setName("PrintAgent.PandaDownload");
                 pd.showDialog(this.filename, this.description, file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                this.showOtherError();
+                return true;
+            } catch (IOException ex) {
+                if (!ex.getMessage().equals("204")) {
+                    logger.warn(ex);
+                    this.showOtherError();
+                }
+                return true;
             }
         }
 
@@ -180,11 +208,11 @@ public class PrintAgent extends Thread {
 
     public class PrintRequest {
 
-        private String path;
-        private String title;
+        protected String path;
+        protected String title;
         protected String filename;
-        private int retry;
-        private final boolean showDialog;
+        protected int retry;
+        protected final boolean showDialog;
 
         public PrintRequest(String url, String title, int retry, boolean showdialog) {
             this.path = url;
@@ -194,16 +222,29 @@ public class PrintAgent extends Thread {
             this.filename = "print.pdf";
         }
 
-        public void action(File file) {
-            if (this.isShowdialog()) {
-                showDialog(this.getTitle(), file);
-            } else {
-                PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                        Messages.getString("PrintAgent.notify_print_start") + "\n\n"
-                        + Messages.getString("PrintAgent.title") + this.getTitle(),
-                        GtkStockIcon.get("gtk-print"), 0);
-                PDFPrint printer = new PDFPrint(file, false);
-                printer.start();
+        public boolean action() {
+            try {
+                File file = con.apiDownload(path, filename);
+                if (file == null) {
+                    return false;
+                }
+                if (this.isShowdialog()) {
+                    showDialog(this.getTitle(), file);
+                } else {
+                    PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                            Messages.getString("PrintAgent.notify_print_start") + "\n\n"
+                            + Messages.getString("PrintAgent.title") + this.getTitle(),
+                            GtkStockIcon.get("gtk-print"), 0);
+                    PDFPrint printer = new PDFPrint(file, false);
+                    printer.start();
+                }
+                return true;
+            } catch (IOException ex) {
+                if (!ex.getMessage().equals("204")) {
+                    logger.warn(ex);
+                    this.showOtherError();
+                }
+                return true;
             }
         }
 
@@ -249,4 +290,33 @@ public class PrintAgent extends Thread {
             this.path = url;
         }
     }
+
+    public class ServerPrintRequest {
+
+        private final String printer;
+        private final String oid;
+
+        public ServerPrintRequest(String printer, String oid) {
+            this.printer = printer;
+            this.oid = oid;
+        }
+
+        public void action() {
+            try {
+                File temp = File.createTempFile("printagent", "pdf");
+                temp.deleteOnExit();
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+                con.getBLOB(oid, out);
+                PDFPrint pdfPrint = new PDFPrint(temp, this.printer);
+                pdfPrint.start();
+            } catch (IOException ex) {
+                logger.warn(ex);
+                PopupNotify.popup(Messages.getString("PrintAgent.notify_summary_server"),
+                        Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                        + Messages.getString("PrintAgent.printer" + this.printer),
+                        GtkStockIcon.get("gtk-dialog-error"), 0);
+            }
+        }
+    }
+
 }

@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -84,7 +85,7 @@ public class Protocol {
     static final Logger logger = LogManager.getLogger(Protocol.class);
     private final TopWindow topWindow;
     private final ArrayList<Component> dialogStack;
-    private static final int PingTimerPeriod = 3 * 1000;
+    private static final int PingTimerPeriod = 10 * 1000;
     private javax.swing.Timer pingTimer;
     private PrintAgent printAgent;
     private String windowName;
@@ -397,13 +398,13 @@ public class Protocol {
 
     public void sendEvent(JSONObject params) {
         try {
+            System.out.println("----- send event -----");
             JSONObject meta = new JSONObject();
             meta.put("client_version", PANDA_CLIENT_VERSION);
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
             this.resultJSON = jsonRPC(this.rpcUri, "send_event", params);
-
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -439,11 +440,52 @@ public class Protocol {
                 String dialog = result.getString("dialog");
                 if (!dialog.isEmpty()) {
                     JOptionPane.showMessageDialog(topWindow, dialog);
-                    return;
                 }
             }
 
-        } catch (Exception ex) {
+        } catch (JSONException ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
+        } catch (IOException ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
+        } catch (HeadlessException ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
+        }
+    }
+
+    public void listReports() {
+        try {
+            JSONObject params = new JSONObject();
+            JSONObject meta = new JSONObject();
+            meta.put("client_version", PANDA_CLIENT_VERSION);
+            meta.put("session_id", this.sessionId);
+            params.put("meta", meta);
+
+            JSONObject result = jsonRPC(this.rpcUri, "list_reports", params);
+
+            if (result.has("result")) {
+                JSONArray array = result.getJSONArray("result");
+                for (int j = 0; j < array.length(); j++) {
+                    JSONObject item = array.getJSONObject(j);
+                    String printer = null;
+                    String oid = null;
+                    if (item.has("printer")) {
+                        printer = item.getString("printer");
+                    }
+                    if (item.has("object_id")) {
+                        oid = item.getString("object_id");
+                    }
+                    if (printer != null && oid != null) {
+                        printAgent.addServerPrintRequest(printer, oid);
+                    }
+                }
+            }
+        } catch (JSONException ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
+        } catch (IOException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -512,7 +554,7 @@ public class Protocol {
             os.close();
             con.disconnect();
             return con.getHeaderField("x-blob-id");
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -569,7 +611,7 @@ public class Protocol {
                 params.put("event_data", eventData);
                 this.sendEvent(params);
             }
-        } catch (Exception ex) {
+        } catch (JSONException ex) {
             logger.warn(ex);
         }
     }
@@ -603,6 +645,7 @@ public class Protocol {
         String putType = w.getString("put_type");
         String _windowName = w.getString("window");
         logger.debug("window[" + _windowName + "] put_type[" + putType + "]");
+System.out.println("window[" + _windowName + "] put_type[" + putType + "]"); 
 
         Node node = getNode(_windowName);
         if (node == null) {
@@ -610,7 +653,8 @@ public class Protocol {
             try {
                 node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
             } catch (UnsupportedEncodingException ex) {
-                logger.info("", ex);
+                logger.info(ex);
+                return;
             }
             nodeTable.put(_windowName, node);
         }
@@ -638,7 +682,9 @@ public class Protocol {
             for (int i = 0; i < windows.length(); i++) {
                 updateWindow(windows.getJSONObject(i));
             }
-            setFocus(focusedWindow, focusedWidget);
+            if (!focusedWindow.startsWith("_")) {
+                setFocus(focusedWindow, focusedWidget);
+            }
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -809,7 +855,11 @@ public class Protocol {
     private synchronized void sendPing() throws IOException {
         if (!isReceiving) {
             this.startReceiving();
-            getMessage();
+            if (this.getServerType().startsWith("ginbee")) {
+                listReports();
+            } else {
+                getMessage();
+            }
             this.stopReceiving();
         }
     }
