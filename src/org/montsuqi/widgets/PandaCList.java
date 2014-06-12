@@ -116,7 +116,17 @@ public class PandaCList extends JTable {
         }
 
         addMouseListener(new MouseListener() {
+            @Override
             public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
                 int row = PandaCList.this.rowAtPoint(e.getPoint());
                 if (row == -1) {
                     return;
@@ -130,15 +140,11 @@ public class PandaCList extends JTable {
                 PandaCList.this.fireChangeEvent(null);
             }
 
-            public void mousePressed(MouseEvent e) {
-            }
-
-            public void mouseReleased(MouseEvent e) {
-            }
-
+            @Override
             public void mouseEntered(MouseEvent e) {
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
             }
         });
