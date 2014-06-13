@@ -55,7 +55,7 @@ public class PDFPrint extends Thread {
             PrinterJob pjob = PrinterJob.getPrinterJob();
             pjob.setJobName(file.getName());
 
-            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") != null) {
+            if (System.getProperty("monsia.util.PDFPrint.force_use_default_printer") != null) {
                 showDialog = false;
             }
             String printer_ = System.getProperty("monsia.util.PDFPrint.printer");
