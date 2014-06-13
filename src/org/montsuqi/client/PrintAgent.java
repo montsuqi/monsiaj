@@ -42,7 +42,7 @@ public class PrintAgent extends Thread {
     private SSLSocketFactory sslSocketFactory;
 
     public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
-        printQ = new ConcurrentLinkedQueue<PrintRequest>();
+        printQ = new ConcurrentLinkedQueue<>();
         this.port = port;
         this.sslSocketFactory = sslSocketFactory;
         Authenticator.setDefault(new Authenticator() {
@@ -113,6 +113,7 @@ public class PrintAgent extends Thread {
             final JDialog dialog = new JDialog();
             Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
                 }
