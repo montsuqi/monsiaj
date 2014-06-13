@@ -25,7 +25,7 @@ import org.montsuqi.util.PDFPrint.PDFPrintPage;
 public class PDFPrint extends Thread {
 
     private final File file;
-    private final String printer;
+    private String printer;
     private boolean showDialog;
 
     protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
@@ -55,10 +55,14 @@ public class PDFPrint extends Thread {
             PrinterJob pjob = PrinterJob.getPrinterJob();
             pjob.setJobName(file.getName());
 
-            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") == null) {
+            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") != null) {
                 showDialog = false;
             }
-
+            String printer_ = System.getProperty("monsia.util.PDFPrint.printer");
+            if (printer_ != null) {
+                printer = printer_;
+                showDialog = false;
+            }            
             if (showDialog) {
                 if (!pjob.printDialog(reqset)) {
                     return;
@@ -127,6 +131,7 @@ public class PDFPrint extends Thread {
 
         // from Printable interface:  prints a single page, given a Graphics
         // to draw into, the page format, and the page number.
+        @Override
         public int print(Graphics g, PageFormat format, int index) throws PrinterException {
             Graphics2D g2 = (Graphics2D) g;
             Rectangle2D.Double pageable;
