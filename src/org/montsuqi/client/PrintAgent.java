@@ -38,10 +38,18 @@ public class PrintAgent extends Thread {
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private final Protocol con;
 
-    public PrintAgent(Protocol con) {
-        printQ = new ConcurrentLinkedQueue<PrintRequest>();
-        serverPrintQ = new ConcurrentLinkedQueue<ServerPrintRequest>();
-        this.con = con;
+    public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
+        printQ = new ConcurrentLinkedQueue<>();
+        this.port = port;
+        this.sslSocketFactory = sslSocketFactory;
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, password.toCharArray());
+            }
+        });
+
     }
 
     @Override
@@ -115,6 +123,7 @@ public class PrintAgent extends Thread {
             final JDialog dialog = new JDialog();
             Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
                 }

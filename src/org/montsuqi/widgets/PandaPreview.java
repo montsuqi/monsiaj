@@ -213,6 +213,7 @@ public class PandaPreview extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description")); 
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             PDFPrint printer = new PDFPrint(new File(fileName), true);
             printer.start();
@@ -221,6 +222,7 @@ public class PandaPreview extends JPanel {
 
     private final class ZoomInAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             zoom = getRealZoom() * SCALE_FACTOR;
             if (zoom > SCALE_VALUE[SCALE_VALUE.length - 1]) {
@@ -233,6 +235,7 @@ public class PandaPreview extends JPanel {
 
     private final class ZoomOutAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             zoom = getRealZoom() / SCALE_FACTOR;
             if (zoom < 0.02) {
@@ -245,6 +248,7 @@ public class PandaPreview extends JPanel {
 
     private final class FitPageAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             zoom = SCALE_FIT_PAGE;
             updateCombo();
@@ -254,6 +258,7 @@ public class PandaPreview extends JPanel {
 
     private final class FitPageWidthAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             zoom = SCALE_FIT_PAGE_WIDTH;
             updateCombo();
@@ -274,11 +279,12 @@ public class PandaPreview extends JPanel {
         pageEntry.setMaximumSize(new Dimension(55, 40));
         pageEntry.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int pagenum;
                 try {
                     pagenum = Integer.parseInt(pageEntry.getText());
-                } catch (Exception ex) {
+                } catch (NumberFormatException ex) {
                     pagenum = panel.getPageNum();
                 }
                 if (1 <= pagenum && pagenum <= panel.getNumPages()) {
@@ -301,6 +307,7 @@ public class PandaPreview extends JPanel {
         combo = new JComboBox(SCALE_STRING);
         combo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent anEvent) {
                 zoom = SCALE_VALUE[combo.getSelectedIndex()];
                 setScale();
@@ -391,8 +398,8 @@ public class PandaPreview extends JPanel {
     private void updateCombo() {
         int index = 1;
         ActionListener[] listeners = combo.getActionListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            combo.removeActionListener(listeners[i]);
+        for (ActionListener listener : listeners) {
+            combo.removeActionListener(listener);
         }
         if (zoom == SCALE_FIT_PAGE) {
             index = 0;
@@ -407,8 +414,8 @@ public class PandaPreview extends JPanel {
             }
         }
         combo.setSelectedIndex(index);
-        for (int i = 0; i < listeners.length; i++) {
-            combo.addActionListener(listeners[i]);
+        for (ActionListener listener : listeners) {
+            combo.addActionListener(listener);
         }
     }
 

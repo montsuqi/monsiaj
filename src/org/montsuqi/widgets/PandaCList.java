@@ -179,6 +179,7 @@ public class PandaCList extends JTable {
 
         actions.put("doAction", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = PandaCList.this.getSelectedRow();
                 if (mode == PandaCList.SELECTION_MODE_MULTI) {
