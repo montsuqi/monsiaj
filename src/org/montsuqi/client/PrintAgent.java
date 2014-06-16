@@ -9,7 +9,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
@@ -35,21 +34,12 @@ public class PrintAgent extends Thread {
     private final int DELAY = 3000;
     private final ConcurrentLinkedQueue<PrintRequest> printQ;
     private final ConcurrentLinkedQueue<ServerPrintRequest> serverPrintQ;
-    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private final Protocol con;
 
-    public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
-        printQ = new ConcurrentLinkedQueue<>();
-        this.port = port;
-        this.sslSocketFactory = sslSocketFactory;
-        Authenticator.setDefault(new Authenticator() {
-
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password.toCharArray());
-            }
-        });
-
+    public PrintAgent(Protocol con) {
+        printQ = new ConcurrentLinkedQueue<PrintRequest>();
+        serverPrintQ = new ConcurrentLinkedQueue<ServerPrintRequest>();
+        this.con = con;
     }
 
     @Override
@@ -317,6 +307,10 @@ public class PrintAgent extends Thread {
                 con.getBLOB(oid, out);
                 PDFPrint pdfPrint = new PDFPrint(temp, this.printer);
                 pdfPrint.start();
+                PopupNotify.popup(Messages.getString("PrintAgent.notify_summary_server"),
+                        Messages.getString("PrintAgent.notify_print_start") + "\n\n"
+                        + Messages.getString("PrintAgent.printer" + this.printer),
+                        GtkStockIcon.get("gtk-print"), 0);
             } catch (IOException ex) {
                 logger.warn(ex);
                 PopupNotify.popup(Messages.getString("PrintAgent.notify_summary_server"),
