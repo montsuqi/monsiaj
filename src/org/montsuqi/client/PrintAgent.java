@@ -309,13 +309,13 @@ public class PrintAgent extends Thread {
                 pdfPrint.start();
                 PopupNotify.popup(Messages.getString("PrintAgent.notify_summary_server"),
                         Messages.getString("PrintAgent.notify_print_start") + "\n\n"
-                        + Messages.getString("PrintAgent.printer" + this.printer),
+                        + Messages.getString("PrintAgent.printer") + this.printer,
                         GtkStockIcon.get("gtk-print"), 0);
             } catch (IOException ex) {
                 logger.warn(ex);
                 PopupNotify.popup(Messages.getString("PrintAgent.notify_summary_server"),
                         Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
-                        + Messages.getString("PrintAgent.printer" + this.printer),
+                        + Messages.getString("PrintAgent.printer") + this.printer,
                         GtkStockIcon.get("gtk-dialog-error"), 0);
             }
         }

@@ -465,7 +465,6 @@ public class Protocol {
             params.put("meta", meta);
 
             JSONArray array = (JSONArray)jsonRPC(this.rpcUri, "list_reports", params);
-
             for (int j = 0; j < array.length(); j++) {
                 JSONObject item = array.getJSONObject(j);
                 String printer = null;
