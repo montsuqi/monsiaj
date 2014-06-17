@@ -39,21 +39,23 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SafeColorDecoder;
 
 public class PandaCList extends JTable {
 
+    protected static final Logger logger = LogManager.getLogger(PandaCList.class);
+
     public static final int SELECTION_MODE_SINGLE = 1;
     public static final int SELECTION_MODE_MULTI = 2;
 
-    public static final int MAX_ROWS = 256;
-
     private Color[] bgColors;
     private Color[] fgColors;
-    private final boolean[] selection;
+    private boolean[] selection;
     private int mode;
     private Color selectionBGColor;
-    private Color ltSelectionBGColor;
+    private Color selectionFGColor;
 
     public void addChangeListener(ChangeListener l) {
         listenerList.add(ChangeListener.class, l);
@@ -79,6 +81,14 @@ public class PandaCList extends JTable {
         this.fgColors = fgColors;
     }
 
+    public void setSelection(boolean[] s) {
+        this.selection = s;
+    }
+
+    public boolean[] getSelection() {
+        return this.selection;
+    }
+
     public PandaCList() {
         super();
         setFocusable(true);
@@ -96,24 +106,20 @@ public class PandaCList extends JTable {
         if (strColor != null) {
             selectionBGColor = SafeColorDecoder.decode(strColor);
         } else {
-            selectionBGColor = new Color(0xCC, 0xCC, 0xEE);
+            selectionBGColor = new Color(0x33, 0x66, 0xFF);
         }
 
-        strColor = System.getProperty("monsia.pandaclist.lt_selection_bg_color");
+        strColor = System.getProperty("monsia.pandaclist.selection_fg_color");
         if (strColor != null) {
-            ltSelectionBGColor = SafeColorDecoder.decode(strColor);
+            selectionFGColor = SafeColorDecoder.decode(strColor);
         } else {
-            ltSelectionBGColor = new Color(0xCC, 0xCC, 0xFF);
+            selectionFGColor = new Color(0xFF, 0xFF, 0xFF);
         }
 
         if (System.getProperty("monsia.widget.pandaclist.showgrid") == null) {
             this.setShowGrid(false);
         }
         mode = PandaCList.SELECTION_MODE_SINGLE;
-        selection = new boolean[MAX_ROWS];
-        for (boolean b : selection) {
-            b = false;
-        }
 
         addMouseListener(new MouseListener() {
             @Override
@@ -150,21 +156,8 @@ public class PandaCList extends JTable {
         });
     }
 
-    public void setSelection(int row, boolean val) {
-        if (row < MAX_ROWS) {
-            selection[row] = val;
-        }
-    }
-
-    public boolean getSelection(int row) {
-        if (row < MAX_ROWS) {
-            return selection[row];
-        }
-        return false;
-    }
-
     public void toggleSelection(int row) {
-        setSelection(row, !getSelection(row));
+        selection[row] = !selection[row];
     }
 
     public void singleSelection(int row) {
@@ -206,16 +199,14 @@ public class PandaCList extends JTable {
     @Override
     public Component prepareRenderer(
             TableCellRenderer renderer, int row, int column) {
+
         Component c = super.prepareRenderer(renderer, row, column);
         if (fgColors != null && row < fgColors.length && fgColors[row] != null) {
             c.setForeground(fgColors[row]);
         }
         if (selection[row]) {
-            if (this.isRowSelected(row)) {
-                c.setBackground(this.ltSelectionBGColor);
-            } else {
-                c.setBackground(this.selectionBGColor);
-            }
+            c.setBackground(this.selectionBGColor);
+            c.setForeground(this.selectionFGColor);
         } else {
             if (bgColors != null && row < bgColors.length && bgColors[row] != null) {
                 if (this.isRowSelected(row)) {
@@ -232,6 +223,7 @@ public class PandaCList extends JTable {
             } else {
                 c.setBackground(Color.white);
             }
+            c.setForeground(Color.BLACK);
         }
         return c;
     }
