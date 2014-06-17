@@ -219,7 +219,7 @@ public class Protocol {
         return obj.toString();
     }
 
-    private JSONObject checkJSONRPCResponse(String jsonStr) throws JSONException {
+    private Object checkJSONRPCResponse(String jsonStr) throws JSONException {
         JSONObject obj = new JSONObject(jsonStr);
         if (!obj.getString("jsonrpc").matches("2.0")) {
             throw new JSONException("invalid jsonrpc version");
@@ -237,10 +237,10 @@ public class Protocol {
         if (!obj.has("result")) {
             throw new JSONException("no result object");
         }
-        return obj.getJSONObject("result");
+        return obj.get("result");
     }
 
-    private JSONObject jsonRPC(URL url, String method, JSONObject params) throws JSONException, IOException {
+    private Object jsonRPC(URL url, String method, JSONObject params) throws JSONException, IOException {
         String reqStr = makeJSONRPCRequest(method, params);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -284,7 +284,7 @@ public class Protocol {
         }
         bos.close();
         con.disconnect();
-        JSONObject result = checkJSONRPCResponse(bytes.toString("UTF-8"));
+        Object result = checkJSONRPCResponse(bytes.toString("UTF-8"));
         bytes.close();
         return result;
     }
@@ -295,7 +295,7 @@ public class Protocol {
             URL url = new URL(conf.getAuthURI(num));
 
             JSONObject params = new JSONObject();
-            JSONObject result = jsonRPC(url, "get_server_info", params);
+            JSONObject result = (JSONObject)jsonRPC(url, "get_server_info", params);
             this.protocolVersion = result.getString("protocol_version");
             this.applicationVersion = result.getString("application_version");
             this.serverType = result.getString("server_type");
@@ -320,7 +320,7 @@ public class Protocol {
             meta.put("client_version", PANDA_CLIENT_VERSION);
             params.put("meta", meta);
 
-            JSONObject result = jsonRPC(url, "start_session", params);
+            JSONObject result = (JSONObject)jsonRPC(url, "start_session", params);
             meta = result.getJSONObject("meta");
 
             this.sessionId = meta.getString("session_id");
@@ -357,7 +357,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = jsonRPC(this.rpcUri, "end_session", params);
+            JSONObject result = (JSONObject)jsonRPC(this.rpcUri, "end_session", params);
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -372,7 +372,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            this.resultJSON = jsonRPC(this.rpcUri, "get_window", params);
+            this.resultJSON = (JSONObject)jsonRPC(this.rpcUri, "get_window", params);
 
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -389,7 +389,7 @@ public class Protocol {
             params.put("meta", meta);
             params.put("window", wname);
 
-            JSONObject result = jsonRPC(this.rpcUri, "get_screen_define", params);
+            JSONObject result = (JSONObject)jsonRPC(this.rpcUri, "get_screen_define", params);
             return result.getString("screen_define");
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -405,7 +405,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            this.resultJSON = jsonRPC(this.rpcUri, "send_event", params);
+            this.resultJSON = (JSONObject)jsonRPC(this.rpcUri, "send_event", params);
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -420,7 +420,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = jsonRPC(this.rpcUri, "get_message", params);
+            JSONObject result = (JSONObject)jsonRPC(this.rpcUri, "get_message", params);
             if (result.has("abort")) {
                 String abort = result.getString("abort");
                 if (!abort.isEmpty()) {
@@ -464,23 +464,20 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = jsonRPC(this.rpcUri, "list_reports", params);
+            JSONArray array = (JSONArray)jsonRPC(this.rpcUri, "list_reports", params);
 
-            if (result.has("result")) {
-                JSONArray array = result.getJSONArray("result");
-                for (int j = 0; j < array.length(); j++) {
-                    JSONObject item = array.getJSONObject(j);
-                    String printer = null;
-                    String oid = null;
-                    if (item.has("printer")) {
-                        printer = item.getString("printer");
-                    }
-                    if (item.has("object_id")) {
-                        oid = item.getString("object_id");
-                    }
-                    if (printer != null && oid != null) {
-                        printAgent.addServerPrintRequest(printer, oid);
-                    }
+            for (int j = 0; j < array.length(); j++) {
+                JSONObject item = array.getJSONObject(j);
+                String printer = null;
+                String oid = null;
+                if (item.has("printer")) {
+                    printer = item.getString("printer");
+                }
+                if (item.has("object_id")) {
+                    oid = item.getString("object_id");
+                }
+                if (printer != null && oid != null) {
+                    printAgent.addServerPrintRequest(printer, oid);
                 }
             }
         } catch (JSONException ex) {
