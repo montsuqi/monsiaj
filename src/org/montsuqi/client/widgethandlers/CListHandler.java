@@ -133,13 +133,15 @@ class CListHandler extends WidgetHandler {
             JSONArray array = obj.getJSONArray("selectdata");
             int n = array.length();
             n = n > count ? count : n;
+            boolean[] selection = new boolean[n];
             for (int j = 0; j < n; j++) {
                 boolean selected = array.getBoolean(j);
-                clist.setSelection(j, selected);
+                selection[j] = selected;
                 if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
                     clist.changeSelection(j, 0, false, false);
                 }
             }
+            clist.setSelection(selection);
         }
         JScrollBar vScroll = getVerticalScrollBar(table);
         if (vScroll != null) {
@@ -179,8 +181,9 @@ class CListHandler extends WidgetHandler {
 
         JSONArray array = new JSONArray();
         obj.put("selectdata",array);
-        for (int j = 0; j < table.getRowCount(); j++) {
-            array.put(j, clist.getSelection(j));
+        boolean[] selection = clist.getSelection();
+        for (int j = 0; j < selection.length; j++) {
+            array.put(j, selection[j]);
         }
     }
 
