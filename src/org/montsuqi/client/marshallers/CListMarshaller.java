@@ -40,6 +40,7 @@ import org.montsuqi.widgets.PandaCList;
  */
 class CListMarshaller extends WidgetMarshaller {
 
+    @Override
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
@@ -142,14 +143,16 @@ class CListMarshaller extends WidgetMarshaller {
                 if (count < 0) {
                     count = num;
                 }
+                boolean[] selection = new boolean[num];
                 for (int j = 0; j < num; j++) {
                     boolean selected = con.receiveBooleanData();
                     if (j < count) {
-                        clist.setSelection(j,selected);
+                        selection[j] = selected;
                         if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
                             clist.changeSelection(j, 0, false, false);
                         }
                     }
+                    clist.setSelection(selection);
                 }
             }
         }
@@ -179,6 +182,7 @@ class CListMarshaller extends WidgetMarshaller {
         widget.setVisible(true);
     }
 
+    @Override
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
@@ -186,10 +190,11 @@ class CListMarshaller extends WidgetMarshaller {
         ValueAttribute va = manager.getAttribute(name);
         boolean visibleRow = false;
         int rows = table.getRowCount();
+        boolean[] selection = clist.getSelection();
         for (int i = 0; i < rows; i++) {
             con.sendPacketClass(PacketClass.ScreenData);
             con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i) + ']');
-            con.sendBooleanData(Type.BOOL,clist.getSelection(i));
+            con.sendBooleanData(Type.BOOL,selection[i]);
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);
                 con.sendName(va.getValueName() + ".row"); 
