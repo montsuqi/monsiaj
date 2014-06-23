@@ -30,7 +30,6 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.widgets.Button;
-import org.montsuqi.widgets.PandaCList;
 
 public class ConfigViewer {
 
@@ -45,14 +44,11 @@ public class ConfigViewer {
         final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); 
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout(5, 5));
-        final PandaCList clist = new PandaCList();
-        clist.setFocusable(true);
-        clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        clist.setShowGrid(true);
-        updateConfigList(clist);
-        clist.setAutoResizeMode(PandaCList.AUTO_RESIZE_LAST_COLUMN);
+        final JTable table = new JTable();
+        table.setRowSelectionAllowed(true);
+        updateConfigList(table);
 
-        JScrollPane scroll = new JScrollPane(clist,
+        JScrollPane scroll = new JScrollPane(table,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         container.add(scroll, BorderLayout.CENTER);
@@ -64,22 +60,24 @@ public class ConfigViewer {
 
         Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
                 editConfig(f, num, true);
-                updateConfigList(clist);
+                updateConfigList(table);
             }
         });
         bar.add(newButton);
 
         Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = clist.getSelectedRow();
+                int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     int num = conf.getList().get(selectedRow);
                     editConfig(f, num, false);
-                    updateConfigList(clist);
+                    updateConfigList(table);
                 }
             }
         });
@@ -87,14 +85,15 @@ public class ConfigViewer {
 
         Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = clist.getSelectedRow();
+                int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
-                        String configName = (String) (clist.getValueAt(selectedRow, 0));
+                        String configName = (String) (table.getValueAt(selectedRow, 0));
                         conf.deleteConfig(conf.getConfigByDescription(configName));
-                        updateConfigList(clist);
+                        updateConfigList(table);
                         logger.info("server config:"+configName + " deleted");
                     }
                 }
@@ -104,6 +103,7 @@ public class ConfigViewer {
 
         Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
             }
@@ -116,7 +116,7 @@ public class ConfigViewer {
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    private void updateConfigList(PandaCList clist) {
+    private void updateConfigList(JTable clist) {
         final String[] ColumnNames = {
             Messages.getString("ConfigurationViewer.config_name"),
             Messages.getString("ConfigurationViewer.host"),
@@ -198,6 +198,7 @@ public class ConfigViewer {
 
         Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
                 configPanel.saveConfig(num,entryName);
@@ -209,6 +210,7 @@ public class ConfigViewer {
 
         Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
             }
