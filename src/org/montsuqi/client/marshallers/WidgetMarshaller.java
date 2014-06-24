@@ -38,7 +38,7 @@ import org.montsuqi.widgets.*;
 public abstract class WidgetMarshaller {
 
     protected static final Logger logger = LogManager.getLogger(WidgetMarshaller.class);
-    private static Map<Class,WidgetMarshaller> classTable;
+    private static final Map<Class,WidgetMarshaller> classTable;
 
     static {
         classTable = new HashMap<>();
@@ -48,14 +48,11 @@ public abstract class WidgetMarshaller {
         registerMarshaller(JLabel.class, new LabelMarshaller());
         registerMarshaller(JComboBox.class, new ComboMarshaller());
         registerMarshaller(AbstractButton.class, new ButtonMarshaller());
-        registerMarshaller(JList.class, new ListMarshaller());
         registerMarshaller(JTabbedPane.class, new NotebookMarshaller());
         registerMarshaller(Calendar.class, new CalendarMarshaller());
         registerMarshaller(JProgressBar.class, new ProgressBarMarshaller());
         registerMarshaller(PandaPreview.class, new PreviewMarshaller());
-        registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
         registerMarshaller(Frame.class, new FrameMarshaller());
-        registerMarshaller(FileEntry.class, new FileEntryMarshaller());
         registerMarshaller(FileChooserButton.class, new FileChooserButtonMarshaller());
         registerMarshaller(ColorButton.class, new ColorButtonMarshaller());        
         registerMarshaller(PandaTimer.class, new TimerMarshaller());
