@@ -174,8 +174,8 @@ public class Loader {
     private void invokeLauncher(String[] args) throws Exception {
         String cacheVersion = loadCacheVersion();
         File file = new File(CACHE_DIR + "monsiaj-bin-" + cacheVersion + "/jmareceipt.jar");
-        URLClassLoader loader = new URLClassLoader(new URL[]{file.toURL()});
-        Class cobj = loader.loadClass("jp.or.med.orca.jmareceipt.JMAReceiptLauncher");
+        URLClassLoader loader = new URLClassLoader(new URL[]{new URL(file.getAbsolutePath())});
+        Class<?> cobj = loader.loadClass("jp.or.med.orca.jmareceipt.JMAReceiptLauncher");
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
         m.setAccessible(true);
         int mods = m.getModifiers();

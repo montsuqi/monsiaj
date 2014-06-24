@@ -31,16 +31,16 @@ import org.montsuqi.monsia.Style;
 
 public final class WidgetValueManager {
 
-    private Protocol con;
-    private Map styles;
-    private Map attrTable;
-    private Map valueTable;
+    private final Protocol con;
+    private final Map styles;
+    private final Map<String,ValueAttribute> attrTable;
+    private final Map<String,Object> valueTable;
 
     public WidgetValueManager(Protocol con, Map styles) {
         this.con = con;
         this.styles = styles;
-        attrTable = new HashMap();
-        valueTable = new HashMap();
+        attrTable = new HashMap<>();
+        valueTable = new HashMap<>();
     }
 
     Protocol getProtocol() {

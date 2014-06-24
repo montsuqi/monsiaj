@@ -86,7 +86,7 @@ public class Main {
 					String alias = (String)aliases.nextElement();
 					Certificate[] chain = p12Store.getCertificateChain(alias);
 					if (p12Store.isKeyEntry(alias)) {
-						char[] pass = (char[])passPhrases.get(p12Store);
+						char[] pass = passPhrases.get(p12Store);
 						Key key = p12Store.getKey(alias, pass);
 						ks.setKeyEntry(alias, key, pass, chain);
 						disposePass(p12Store);
@@ -120,8 +120,8 @@ public class Main {
 	private JButton quitButton;
 	private JPanel buttons;
 
-	Map files;
-	Map passPhrases;
+	Map<KeyStore,File> files;
+	Map<KeyStore,char[]> passPhrases;
 	KeyStore ks;
 	ImportAction importAction;
 
@@ -130,8 +130,8 @@ public class Main {
 	}
 
 	Main() {
-		files = new HashMap();
-		passPhrases = new HashMap();
+		files = new HashMap<>();
+		passPhrases = new HashMap<>();
 		ks = null;
 		initComponents();
 		layoutComponents();

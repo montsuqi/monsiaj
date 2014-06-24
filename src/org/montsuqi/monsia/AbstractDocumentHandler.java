@@ -44,11 +44,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	protected static final Logger logger = LogManager.getLogger(AbstractDocumentHandler.class);
 
 	protected final StringBuffer content;
-	protected final Map widgets;
-	protected final List topLevels;
-	protected final HashMap properties;
-	protected final List signals;
-	protected final List accels;
+	protected final Map<String,WidgetInfo> widgets;
+	protected final List<WidgetInfo> topLevels;
+	protected final Map<String,String> properties;
+	protected final List<SignalInfo> signals;
+	protected final List<AccelInfo> accels;
 
 	protected ParserState state;
 	protected ParserState prevState;
@@ -65,11 +65,11 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	public AbstractDocumentHandler() {
 		super();
 		content = new StringBuffer();
-		widgets = new HashMap();
-		topLevels = new ArrayList();
-		properties = new HashMap();
-		signals = new ArrayList();
-		accels = new ArrayList();
+		widgets = new HashMap<>();
+		topLevels = new ArrayList<>();
+		properties = new HashMap<>();
+		signals = new ArrayList<>();
+		accels = new ArrayList<>();
 
 	}
 
@@ -211,10 +211,12 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	 * <p>Parser transits to this state when it detects an unknown element.</p>
 	 */
 	protected final ParserState UNKNOWN = new ParserState("UNKNOWN") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			unknownDepth++;
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			unknownDepth--;
 			if (unknownDepth == 0) {
@@ -226,6 +228,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 	/** <p>A ParserState instance that represents that parsing is end.</p>
 	 */
 	final ParserState FINISH = new ParserState("FINISH") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			logger.warn("there should be no elements here, but found <{0}>", localName); 
 			prevState = state;
@@ -233,6 +236,7 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
 			unknownDepth++;
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			logger.warn("should not be closing any elements in this state"); 
 		}

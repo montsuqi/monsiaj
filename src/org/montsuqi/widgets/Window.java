@@ -215,9 +215,8 @@ public class Window extends JFrame {
      */
     public static Window[] getMontsuqiWindows() {
         Frame[] frames = Frame.getFrames();
-        List list = new ArrayList();
-        for (int i = 0; i < frames.length; i++) {
-            Frame f = frames[i];
+        List<Frame> list = new ArrayList<>();
+        for (Frame f : frames) {
             if (f instanceof Window) {
                 list.add(f);
             }

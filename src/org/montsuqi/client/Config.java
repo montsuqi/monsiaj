@@ -71,7 +71,7 @@ public class Config {
 
     public int getNext() {
         int max = 0;
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -200,7 +200,8 @@ public class Config {
                 }
             }
         }
-        Collections.sort(list, new Comparator() {
+        Collections.sort(list, new Comparator<Object>() {
+            @Override
             public int compare(Object o1, Object o2) {
                 String n1 = Config.this.getDescription((Integer)o1);
                 String n2 = Config.this.getDescription((Integer)o2);

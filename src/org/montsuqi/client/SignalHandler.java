@@ -79,7 +79,8 @@ public abstract class SignalHandler {
         logger.exit();
         return handler;
     }
-    static Map handlers;
+    
+    static Map<String,SignalHandler> handlers;
     static Timer timer;
     static TimerTask timerTask;
     static boolean timerBlocked;
@@ -114,7 +115,7 @@ public abstract class SignalHandler {
     }
 
     static {
-        handlers = new HashMap();
+        handlers = new HashMap<>();
 
         timer = new Timer();
         timerTask = null;

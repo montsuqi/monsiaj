@@ -44,7 +44,7 @@ public class Launcher {
     protected String title;
     protected Config conf;
     protected ConfigPanel configPanel;
-    protected JComboBox configCombo;
+    protected JComboBox<String> configCombo;
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     public static void main(String[] args) {
@@ -152,10 +152,11 @@ public class Launcher {
         GridBagConstraints gbc;
 
         JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
-        configCombo = new JComboBox();
+        configCombo = new JComboBox<>();
         updateConfigCombo();
         configCombo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 java.util.List<Integer> list = conf.getList();
                 int current = list.get(configCombo.getSelectedIndex());

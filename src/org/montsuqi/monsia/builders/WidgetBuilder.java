@@ -44,8 +44,8 @@ import org.montsuqi.widgets.*;
 public class WidgetBuilder {
 
     protected static final Logger logger = LogManager.getLogger(WidgetBuilder.class);
-    private static Map classMap;
-    private static Map builderMap;
+    private static Map<String,Class> classMap;
+    private static Map<String,WidgetBuilder> builderMap;
 
     /**
      * <p>Maps a generic(toolkit independent) widget class name, to actual Java
@@ -65,8 +65,8 @@ public class WidgetBuilder {
 
     // set up the widget builder map
     static {
-        builderMap = new HashMap();
-        classMap = new HashMap();
+        builderMap = new HashMap<>();
+        classMap = new HashMap<>();
 
         WidgetBuilder defaultWidgetBuilder = new WidgetBuilder();
         WidgetBuilder defaultContainerBuilder = new ContainerBuilder();

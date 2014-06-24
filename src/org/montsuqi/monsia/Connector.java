@@ -44,7 +44,7 @@ import org.montsuqi.widgets.*;
  */
 abstract class Connector {
 
-    private static Map connectors;
+    private static Map<String,Connector> connectors;
     protected static final Logger logger = LogManager.getLogger(Connector.class);
 
     abstract void connect(Protocol con, Component target, SignalHandler handler, Object other);
@@ -52,7 +52,7 @@ abstract class Connector {
     public static Connector getConnector(String signalName) {
         logger.entry(signalName);
         if (connectors.containsKey(signalName)) {
-            final Connector connector = (Connector) connectors.get(signalName);
+            final Connector connector = connectors.get(signalName);
             logger.exit();
             return connector;
         }
@@ -87,7 +87,7 @@ abstract class Connector {
     }
 
     static {
-        connectors = new HashMap();
+        connectors = new HashMap<>();
 
         registerConnector(null, new Connector() {
 

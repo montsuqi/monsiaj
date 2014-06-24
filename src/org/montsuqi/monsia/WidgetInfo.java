@@ -37,17 +37,17 @@ public class WidgetInfo {
 	private String className;
 	private String name;
 	private WidgetInfo parent;
-	private final LinkedHashMap properties; // <Property>
-	private final List signals; // <SignalInfo>
-	private final List accels; // <Accel>
-	private final LinkedList children; // <ChildInfo> public Object getChildren;
+	private final LinkedHashMap<String,String> properties; // <Property>
+	private final List<SignalInfo> signals; // <SignalInfo>
+	private final List<AccelInfo> accels; // <Accel>
+	private final LinkedList<ChildInfo> children; // <ChildInfo> public Object getChildren;
 
 	WidgetInfo() {
 		parent = null;
-		properties = new LinkedHashMap();
-		signals = new ArrayList();
-		accels = new ArrayList();
-		children = new LinkedList();
+		properties = new LinkedHashMap<>();
+		signals = new ArrayList<>();
+		accels = new ArrayList<>();
+		children = new LinkedList<>();
 	}
 
 	WidgetInfo(String className, String name) {
@@ -91,7 +91,7 @@ public class WidgetInfo {
 		this.name = name;
 	}
 
-	public Map getProperties() {
+	public Map<String,String> getProperties() {
 		return properties;
 	}
 
@@ -99,7 +99,7 @@ public class WidgetInfo {
 		return (String)properties.get(key);
 	}
 
-	public synchronized void setProperties(Map properties) {
+	public synchronized void setProperties(Map<String,String> properties) {
 		this.properties.clear();
 		this.properties.putAll(properties);
 	}
@@ -116,7 +116,7 @@ public class WidgetInfo {
 		return Collections.unmodifiableList(signals);
 	}
 
-	synchronized void setSignals(List signals) {
+	synchronized void setSignals(List<SignalInfo> signals) {
 		this.signals.clear();
 		this.signals.addAll(signals);
 	}
@@ -125,7 +125,7 @@ public class WidgetInfo {
 		return accels;
 	}
 
-	synchronized void setAccels(List accels) {
+	synchronized void setAccels(List<AccelInfo> accels) {
 		this.accels.clear();
 		this.accels.addAll(accels);
 	}

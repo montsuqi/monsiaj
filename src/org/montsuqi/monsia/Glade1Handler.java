@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
  */
 public class Glade1Handler extends AbstractDocumentHandler {
 
-	private LinkedList pendingWidgets;
+	private final LinkedList<WidgetInfo> pendingWidgets;
 	String signalName;
 	String signalHandler;
 	String signalObject;
@@ -43,7 +43,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	String accelSignal;
 
 	WidgetInfo getLastPendingWidget() {
-		return (WidgetInfo)pendingWidgets.getLast();
+		return pendingWidgets.getLast();
 	}
 
 	void initializeWidgetInfo() {
@@ -91,9 +91,10 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	public Glade1Handler() {
 		super();
 		startState = START;
-		pendingWidgets = new LinkedList();
+		pendingWidgets = new LinkedList<>();
 	}
 
+        @Override
 	protected boolean shouldAppendCharactersToContent() {
 		return state == WIDGET_ATTRIBUTE ||
 			state == WIDGET_CHILD_ATTRIBUTE ||
@@ -111,6 +112,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	}
 
 	final ParserState START = new ParserState("START") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if ( ! localName.equals("GTK-Interface")) { 
 				warnUnexpectedElement("<null>", localName); 
@@ -118,12 +120,14 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			state = GTK_INTERFACE;
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			logger.warn("should not be closing any elements in this state"); 
 		}
 	};
 
 	final ParserState GTK_INTERFACE = new ParserState("GTK_INTERFACE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("widget")) { 
 				state = WIDGET;
@@ -138,12 +142,14 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			}
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = FINISH;
 		}
 	};
 
 	final ParserState WIDGET = new ParserState("WIDGET") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			if (localName.equals("style")) { 
 				state = STYLE;
@@ -167,6 +173,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			}
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			if (localName.equals("widget")) { 
 				flushWidgetInfo();
@@ -175,10 +182,12 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState WIDGET_ATTRIBUTE = new ParserState("WIDGET_ATTRIBUTE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			String value = content.toString();
@@ -214,6 +223,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState WIDGET_CHILD = new ParserState("WIDGET_CHILD") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			propertyType = PropertyType.CHILD;
 			propertyName = localName;
@@ -221,6 +231,7 @@ public class Glade1Handler extends AbstractDocumentHandler {
 			clearContent();
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			WidgetInfo w = getLastPendingWidget();
 			WidgetInfo parent = w.getParent();
@@ -232,10 +243,12 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState WIDGET_CHILD_ATTRIBUTE = new ParserState("WIDGET_CHILD_ATTRIBUTE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			properties.put(propertyName, content.toString());
 			state = WIDGET_CHILD;
@@ -244,11 +257,13 @@ public class Glade1Handler extends AbstractDocumentHandler {
 
 	final ParserState SIGNAL = new ParserState("SIGNAL") { 
 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			state = SIGNAL_ATTRIBUTE;
 			clearContent();
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			SignalInfo signal = new SignalInfo(signalName, signalHandler, signalObject, signalAfter);
@@ -262,10 +277,12 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState SIGNAL_ATTRIBUTE = new ParserState("SIGNAL_ATTRIBUTE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = SIGNAL;
 			String value = content.toString();
@@ -282,11 +299,13 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState ACCELERATOR = new ParserState("ACCELERATOR") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			state = ACCELERATOR_ATTRIBUTE;
 			clearContent();
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = WIDGET;
 			if (accelKey != 0) {
@@ -300,10 +319,12 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState ACCELERATOR_ATTRIBUTE = new ParserState("ACCELERATOR_ATTRIBUTE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = ACCELERATOR;
 			String value = content.toString();
@@ -318,21 +339,25 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 
 	final ParserState STYLE = new ParserState("STYLE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			state = STYLE_ATTRIBUTE;
 			clearContent();
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			// ignore all style stuff in Java
 		}
 	};
 
 	final ParserState STYLE_ATTRIBUTE = new ParserState("STYLE_ATTRIBUTE") { 
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
 
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			state = STYLE;
 			// ignore all style stuff in Java
@@ -340,9 +365,11 @@ public class Glade1Handler extends AbstractDocumentHandler {
 	};
 	
 	final ParserState PREVIEW = new ParserState("PREVIEW") {
+                @Override
 		void startElement(String uri, String localName, String qName, Attributes attrs) {
 			noElementHere(localName);
 		}
+                @Override
 		void endElement(String uri, String localName, String qName) {
 			WidgetInfo w = getLastPendingWidget();
 			String value = content.toString();

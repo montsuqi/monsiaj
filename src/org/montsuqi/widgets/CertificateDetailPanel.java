@@ -61,7 +61,7 @@ public class CertificateDetailPanel extends JPanel {
 	static final int BYTES_IN_ROW = 16;
 	JTable table;
 	JTextArea text;
-	JList list;
+	JList<String> list;
 	X509Certificate[] chain;
 
 	public CertificateDetailPanel() {
@@ -114,7 +114,7 @@ public class CertificateDetailPanel extends JPanel {
 	private void initComponents() {
 		setLayout(new BorderLayout());
 
-		list = new JList();
+		list = new JList<>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -144,10 +144,12 @@ public class CertificateDetailPanel extends JPanel {
 
 	class CertificateListModel extends AbstractListModel {
 
+                @Override
 		public int getSize() {
 			return chain.length;
 		}
 
+                @Override
 		public Object getElementAt(int index) {
 			final X509Certificate certificate = chain[index];
 			final X500Principal issuerPrincipal = certificate.getIssuerX500Principal();
@@ -194,7 +196,7 @@ public class CertificateDetailPanel extends JPanel {
 		private static final int SIGNATURE_FIELD = 6;
 		private static final int FINGERPRINT_FIELD = 7;
 
-		private String[] columnNames = {
+		private final String[] columnNames = {
 				Messages.getString("CertificateDetailPanel.Field"), 
 				Messages.getString("CertificateDetailPanel.Value") 
 		};
@@ -202,32 +204,38 @@ public class CertificateDetailPanel extends JPanel {
 		private static final int FIELD_COLUMN = 0;
 		static final int VALUE_COLUMN = 1;
 
-		private X509Certificate certificate;
+		private final X509Certificate certificate;
 
 		public CertificateTableModel(X509Certificate certificate) {
 			this.certificate = certificate;
 		}
 
+                @Override
 		public int getRowCount() {
 			return fieldNames.length;
 		}
 
+                @Override
 		public int getColumnCount() {
 			return columnNames.length;
 		}
 
+                @Override
 		public String getColumnName(int columnIndex) {
 			return columnNames[columnIndex];
 		}
 
+                @Override
 		public Class getColumnClass(int columnIndex) {
 			return String.class;
 		}
 
+                @Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return false;
 		}
 
+                @Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case FIELD_COLUMN:
@@ -320,7 +328,7 @@ public class CertificateDetailPanel extends JPanel {
 		}
 
 		private String zeroPad(final String value, int width) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			for (int i = width - value.length(); i > 0; i--) {
 				buf.append('0');
 			}

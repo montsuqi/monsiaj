@@ -55,7 +55,7 @@ public class Protocol extends Connection {
     private final Client client;
     private boolean isReceiving;
     private final long timerPeriod;
-    private final HashMap nodeTable;
+    private final HashMap<String,Node> nodeTable;
     private final WidgetValueManager valueManager;
     private String sessionTitle;
     private Color sessionBGColor;
@@ -89,7 +89,7 @@ public class Protocol extends Connection {
         super(client.createSocket(), isNetworkByteOrder()); 
         this.client = client;
         isReceiving = false;
-        nodeTable = new HashMap();
+        nodeTable = new HashMap<>();
         valueManager = new WidgetValueManager(this, styleMap);
         this.timerPeriod = timerPeriod;
         sessionTitle = "";

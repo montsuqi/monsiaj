@@ -40,18 +40,19 @@ import org.montsuqi.monsia.Interface;
  */
 class ComboMarshaller extends WidgetMarshaller {
 
-    private WidgetMarshaller entryMarshaller;
+    private final WidgetMarshaller entryMarshaller;
 
     ComboMarshaller() {
         entryMarshaller = new EntryMarshaller();
     }
 
+    @Override
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
-        JComboBox combo = (JComboBox) widget;
+        JComboBox combo = (JComboBox)widget;
         Component sub = null;
 
-        DefaultComboBoxModel model = (DefaultComboBoxModel) combo.getModel();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel)combo.getModel();
         Interface xml = con.getInterface();
         con.receiveDataTypeWithCheck(Type.RECORD);
         String selectedItem = null;
@@ -60,11 +61,10 @@ class ComboMarshaller extends WidgetMarshaller {
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
-                continue;
             } else if ("count".equals(name)) { 
                 count = con.receiveIntData();
             } else if ("item".equals(name)) { 
-                List list = new ArrayList();
+                List<String> list = new ArrayList<>();
                 list.add(""); 
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 for (int j = 0, num = con.receiveInt(); j < num; j++) {
@@ -82,7 +82,7 @@ class ComboMarshaller extends WidgetMarshaller {
                 model.removeAllElements();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    model.addElement(iter.next());
+                    model.addElement((String)iter.next());
                 }
             } else {
                 StringBuffer widgetName = con.getWidgetNameBuffer();

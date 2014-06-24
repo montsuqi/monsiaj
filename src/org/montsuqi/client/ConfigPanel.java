@@ -65,7 +65,7 @@ public class ConfigPanel extends JPanel {
     protected JCheckBox saveClientCertificatePasswordCheckbox;
     // Others Tab
     protected JTextField styleEntry;
-    protected JComboBox lookAndFeelCombo;
+    protected JComboBox<String> lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
     protected JCheckBox useTimerCheck;
@@ -74,9 +74,9 @@ public class ConfigPanel extends JPanel {
     protected LookAndFeelInfo[] lafs;
     private static final int MAX_PANEL_ROWS = 12;
     private static final int MAX_PANEL_COLUMNS = 4;
-    private boolean doPadding;
-    private boolean doChangeLookAndFeel;
-    private MetalTheme systemMetalTheme;
+    private final boolean doPadding;
+    private final boolean doChangeLookAndFeel;
+    private final MetalTheme systemMetalTheme;
 
     /**
      * <p>
@@ -515,7 +515,7 @@ public class ConfigPanel extends JPanel {
         for (int i = 0; i < lafNames.length; i++) {
             lafNames[i] = lafs[i].getName();
         }
-        lookAndFeelCombo = new JComboBox();
+        lookAndFeelCombo = new JComboBox<>();
         lookAndFeelCombo.setEditable(false);
         for (int i = 0; i < lafNames.length; i++) {
             lookAndFeelCombo.addItem(lafNames[i]);

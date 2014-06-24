@@ -105,7 +105,7 @@ public class PandaPreview extends JPanel {
     private final JToolBar toolbar;
     private NumberEntry pageEntry;
     private final JLabel pageLabel;
-    private JComboBox combo;
+    private JComboBox<String> combo;
     private final JScrollPane scroll;
     private double zoom;
     private String fileName;
@@ -304,7 +304,7 @@ public class PandaPreview extends JPanel {
         fitPageAction = new FitPageAction();
         fitPageWidthAction = new FitPageWidthAction();
 
-        combo = new JComboBox(SCALE_STRING);
+        combo = new JComboBox<>(SCALE_STRING);
         combo.addActionListener(new ActionListener() {
 
             @Override

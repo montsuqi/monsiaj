@@ -38,10 +38,10 @@ import org.montsuqi.widgets.*;
 public abstract class WidgetMarshaller {
 
     protected static final Logger logger = LogManager.getLogger(WidgetMarshaller.class);
-    private static Map classTable;
+    private static Map<Class,WidgetMarshaller> classTable;
 
     static {
-        classTable = new HashMap();
+        classTable = new HashMap<>();
         registerMarshaller(JTextField.class, new EntryMarshaller());
         registerMarshaller(NumberEntry.class, new NumberEntryMarshaller());
         registerMarshaller(JTextArea.class, new TextMarshaller());

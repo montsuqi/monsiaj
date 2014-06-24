@@ -63,7 +63,8 @@
     <target name="compile" depends="prepare,set-javac-options,set-version">
         <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.7"
                target="1.7" encoding="utf-8"
-               debug="${javac.debug}" debuglevel="${javac.debuglevel}">
+               debug="${javac.debug}" debuglevel="${javac.debuglevel}"
+               includeantruntime="false">
             <compilerarg value="-Xlint:deprecation"/>                   
             <compilerarg value="-Xlint:unchecked"/>
             <include name="**/*.java"/>

@@ -45,11 +45,11 @@ public class OptionParser {
     }
     private static final char COMMAND_SWITCH = '-';
     private static final char RESPONSE_FILE_SWITCH = '@';
-    private Map options;
+    private final Map<String,Option> options;
     private static final Logger logger = LogManager.getLogger(OptionParser.class);
 
     public OptionParser() {
-        options = new TreeMap();
+        options = new TreeMap<>();
     }
 
     public void add(String name, String message, boolean defaultValue) {
@@ -90,7 +90,7 @@ public class OptionParser {
 
     public String[] parse(String program, String[] args) {
         try {
-            List result = new LinkedList();
+            List<String> result = new LinkedList<>();
             File paramFile = new File(changeSuffix(program, CONFIG_TRAILER));
             if (paramFile.canRead()) {
                 result.addAll(parseFile(program, paramFile));
@@ -103,8 +103,8 @@ public class OptionParser {
         }
     }
 
-    private List parseFile(String program, File file) {
-        List lines = new LinkedList();
+    private List<String> parseFile(String program, File file) {
+        List<String> lines = new LinkedList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
@@ -121,11 +121,11 @@ public class OptionParser {
         return parseArray(program, lines.toArray(new String[lines.size()]));
     }
 
-    private List parseArray(String program, Object[] args) {
-        List files = new LinkedList();
-        for (int i = 0; i < args.length; i++) {
+    private List<String> parseArray(String program, Object[] args) {
+        List<String> files = new LinkedList<>();
+        for (Object arg1 : args) {
             boolean isParam = false;
-            String arg = (String) args[i];
+            String arg = (String) arg1;
             char c = arg.charAt(0);
             switch (c) {
                 case RESPONSE_FILE_SWITCH:
@@ -167,10 +167,7 @@ public class OptionParser {
             key = line.substring(0, index);
             value = line.substring(index + 1, line.length());
         }
-
-        Iterator i = options.values().iterator();
-        while (i.hasNext()) {
-            Option option = (Option) i.next();
+        for (Option option : options.values()) {
             String name = option.getName();
 
             if (key.equals(name)) {
@@ -186,8 +183,7 @@ public class OptionParser {
     public String usage(String comment) {
         Iterator i = options.values().iterator();
         Format format = new MessageFormat("-{0} : {1}\n"); 
-        // "  -%-12s : %-40s"
-        StringBuffer usage = new StringBuffer();
+        StringBuilder usage = new StringBuilder();
         usage.append(comment);
         usage.append("\n"); 
         while (i.hasNext()) {
@@ -196,7 +192,7 @@ public class OptionParser {
             usage.append(format.format(args));
             Object value = o.getValue();
             if (value != null) {
-                usage.append("\t[" + value + "]");  //$NON-NLS-2$
+                usage.append("\t[").append(value).append("]");  //$NON-NLS-2$
                 usage.append("\n"); 
             }
         }
