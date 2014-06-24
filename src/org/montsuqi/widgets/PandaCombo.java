@@ -52,6 +52,7 @@ public class PandaCombo extends JComboBox {
             this.move = move;
         }
 
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             int items = getItemCount();
             if (items <= 1) {
@@ -93,10 +94,12 @@ public class PandaCombo extends JComboBox {
         inputMap.put(downKey, "moveSelectionDown");
 
         addPopupMenuListener(new PopupMenuListener() {
+            @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
                 // do nothing
             }
 
+            @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
                 if (getItemCount() > 1) {
                     JTextField text = (JTextField) getEditor().getEditorComponent();
@@ -104,6 +107,7 @@ public class PandaCombo extends JComboBox {
                 }
             }
 
+            @Override
             public void popupMenuCanceled(PopupMenuEvent arg0) {
                 // do nothing
             }

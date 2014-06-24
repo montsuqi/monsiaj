@@ -128,8 +128,6 @@ public class WidgetBuilder {
         registerWidgetClass("Button", Button.class, defaultWidgetBuilder);
         registerWidgetClass("Calendar", Calendar.class, defaultWidgetBuilder);
         registerWidgetClass("CheckButton", CheckBox.class, new CheckButtonBuilder());
-        registerWidgetClass("Combo", JComboBox.class, new ComboBuilder());
-        registerWidgetClass("CList", PandaCList.class, new CListBuilder());
         registerWidgetClass("Dialog", Window.class, new WindowBuilder());
         registerWidgetClass("Entry", Entry.class, entryBuilder);
         registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder);
@@ -140,13 +138,8 @@ public class WidgetBuilder {
         registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder);
         registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder);
         registerWidgetClass("Label", JLabel.class, new LabelBuilder());
-        registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder);
-        registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder());
-        registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder());
-        registerWidgetClass("PixmapMenuItem", JMenuItem.class, new MenuItemBuilder());
         registerWidgetClass("Notebook", Notebook.class, new NotebookBuilder());
         registerWidgetClass("NumberEntry", NumberEntry.class, entryBuilder);
-        registerWidgetClass("OptionMenu", OptionMenu.class, defaultWidgetBuilder);
         registerWidgetClass("PandaCombo", PandaCombo.class, new PandaComboBuilder());
         registerWidgetClass("PandaCList", PandaCList.class, new CListBuilder());
         registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder);
