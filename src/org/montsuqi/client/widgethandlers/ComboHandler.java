@@ -41,10 +41,12 @@ import org.montsuqi.client.Protocol;
  */
 class ComboHandler extends WidgetHandler {
 
+    
+    @Override
     public void set(Protocol con,Component widget, JSONObject obj, Map styleMap) throws JSONException {
-        JComboBox combo = (JComboBox) widget;
-        DefaultComboBoxModel model = (DefaultComboBoxModel) combo.getModel();
-        Component sub = null;
+        //@SuppressWarnings("unchecked")
+        JComboBox<String> combo = (JComboBox<String>) widget;
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) combo.getModel();
         
         this.setCommonAttribute(widget, obj, styleMap);
 
@@ -55,7 +57,7 @@ class ComboHandler extends WidgetHandler {
 
         if (obj.has("item")) {
             JSONArray array = obj.getJSONArray("item");
-            List list = new ArrayList();
+            List<String> list = new ArrayList<>();
             list.add("");
             for (int j = 0; j < array.length(); j++) {
                 if (j < count) {
@@ -63,8 +65,8 @@ class ComboHandler extends WidgetHandler {
                 }
             }
             model.removeAllElements();
-            for (Iterator iter = list.iterator(); iter.hasNext();) {
-                model.addElement(iter.next());
+            for (String s : list) {
+                model.addElement(s);
             }
         }
 
@@ -94,6 +96,7 @@ class ComboHandler extends WidgetHandler {
         }        
     }
 
+    @Override
     public void get(Protocol con,Component widget, JSONObject obj) throws JSONException {
     }
 }

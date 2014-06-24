@@ -66,7 +66,7 @@ public class Launcher {
     protected String title;
     protected Config conf;
     protected ConfigPanel configPanel;
-    protected JComboBox configCombo;
+    protected JComboBox<String> configCombo;
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     public static void main(String[] args) {
@@ -175,10 +175,11 @@ public class Launcher {
         GridBagConstraints gbc;
 
         JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
-        configCombo = new JComboBox();
+        configCombo = new JComboBox<>();
         updateConfigCombo();
         configCombo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 java.util.List<Integer> list = conf.getList();
                 int current = list.get(configCombo.getSelectedIndex());
@@ -286,6 +287,7 @@ public class Launcher {
             checkBox.setSelected(checked);
             checkBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     prefs.put(Launcher.class.getName() + ".security_risk_agreement", checkBox.isSelected() ? "yes" : "no");
                 }
@@ -326,6 +328,7 @@ public class Launcher {
 
         Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
@@ -339,6 +342,7 @@ public class Launcher {
 
         Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 logger.info("launcher canceled");
                 System.exit(0);
@@ -348,6 +352,7 @@ public class Launcher {
 
         Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 logger.info("view server configs");
                 viewer.run(f);

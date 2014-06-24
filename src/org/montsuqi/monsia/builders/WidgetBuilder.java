@@ -86,19 +86,22 @@ import org.montsuqi.widgets.VSeparator;
 import org.montsuqi.widgets.Window;
 
 /**
- * <p>Super class for all widget builders.</p>
+ * <p>
+ * Super class for all widget builders.</p>
  *
- * <p>A widget builder is a class which provides methods to create instances of
- * a specific class.</p>
+ * <p>
+ * A widget builder is a class which provides methods to create instances of a
+ * specific class.</p>
  */
 public class WidgetBuilder {
 
     protected static final Logger logger = LogManager.getLogger(WidgetBuilder.class);
-    private static Map classMap;
-    private static Map builderMap;
+    private static Map<String, Class> classMap;
+    private static Map<String, WidgetBuilder> builderMap;
 
     /**
-     * <p>Maps a generic(toolkit independent) widget class name, to actual Java
+     * <p>
+     * Maps a generic(toolkit independent) widget class name, to actual Java
      * class and widget builder.</p>
      *
      * @param genericClassName a toolkit independent widget type like 'Button'
@@ -115,59 +118,59 @@ public class WidgetBuilder {
 
     // set up the widget builder map
     static {
-        builderMap = new HashMap();
-        classMap = new HashMap();
+        builderMap = new HashMap<>();
+        classMap = new HashMap<>();
 
         WidgetBuilder defaultWidgetBuilder = new WidgetBuilder();
         WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
         WidgetBuilder entryBuilder = new EntryBuilder();
 
-        registerWidgetClass("Button", Button.class, defaultWidgetBuilder); 
-        registerWidgetClass("Calendar", Calendar.class, defaultWidgetBuilder); 
-        registerWidgetClass("CheckButton", CheckBox.class, new CheckButtonBuilder()); 
-        registerWidgetClass("Combo", JComboBox.class, new ComboBuilder()); 
-        registerWidgetClass("CList", PandaCList.class, new CListBuilder()); 
-        registerWidgetClass("Dialog", Window.class, new WindowBuilder()); 
-        registerWidgetClass("Entry", Entry.class, entryBuilder); 
-        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder);        
-        registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder);                
-        registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); 
-        registerWidgetClass("Frame", Frame.class, new FrameBuilder()); 
-        registerWidgetClass("HBox", HBox.class, defaultContainerBuilder); 
-        registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder); 
-        registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder); 
-        registerWidgetClass("Label", JLabel.class, new LabelBuilder()); 
-        registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder); 
-        registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder()); 
-        registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder()); 
-        registerWidgetClass("PixmapMenuItem", JMenuItem.class, new MenuItemBuilder()); 
-        registerWidgetClass("Notebook", Notebook.class, new NotebookBuilder()); 
-        registerWidgetClass("NumberEntry", NumberEntry.class, entryBuilder); 
-        registerWidgetClass("OptionMenu", OptionMenu.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaCombo", PandaCombo.class, new PandaComboBuilder()); 
-        registerWidgetClass("PandaCList", PandaCList.class, new CListBuilder()); 
-        registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder); 
-        registerWidgetClass("PandaHTML", PandaHTML.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaPS", PandaPreview.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaText", JTextArea.class, new TextAreaBuilder()); 
-        registerWidgetClass("PandaTimer", PandaTimer.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaDownload", PandaDownload.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaDownload2", PandaDownload2.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaPrint", PandaPrint.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaTable", PandaTable.class, defaultWidgetBuilder); 
-        registerWidgetClass("Pixmap", Pixmap.class, defaultWidgetBuilder); 
-        registerWidgetClass("Placeholder", JPanel.class, defaultWidgetBuilder); 
-        registerWidgetClass("ProgressBar", JProgressBar.class, defaultWidgetBuilder); 
-        registerWidgetClass("RadioButton", RadioButton.class, new RadioButtonBuilder()); 
-        registerWidgetClass("ScrolledWindow", JScrollPane.class, new ScrolledWindowBuilder()); 
-        registerWidgetClass("Table", Table.class, new TableBuilder()); 
-        registerWidgetClass("Text", JTextArea.class, new TextAreaBuilder()); 
-        registerWidgetClass("ToggleButton", ToggleButton.class, defaultContainerBuilder); 
-        registerWidgetClass("VBox", VBox.class, defaultContainerBuilder); 
-        registerWidgetClass("VPaned", VPaned.class, defaultContainerBuilder); 
-        registerWidgetClass("VSeparator", VSeparator.class, defaultWidgetBuilder); 
-        registerWidgetClass("Viewport", JViewport.class, new ViewportBuilder()); 
-        registerWidgetClass("Window", Window.class, new WindowBuilder()); 
+        registerWidgetClass("Button", Button.class, defaultWidgetBuilder);
+        registerWidgetClass("Calendar", Calendar.class, defaultWidgetBuilder);
+        registerWidgetClass("CheckButton", CheckBox.class, new CheckButtonBuilder());
+        registerWidgetClass("Combo", JComboBox.class, new ComboBuilder());
+        registerWidgetClass("CList", PandaCList.class, new CListBuilder());
+        registerWidgetClass("Dialog", Window.class, new WindowBuilder());
+        registerWidgetClass("Entry", Entry.class, entryBuilder);
+        registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder);
+        registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder);
+        registerWidgetClass("Fixed", Fixed.class, new FixedBuilder());
+        registerWidgetClass("Frame", Frame.class, new FrameBuilder());
+        registerWidgetClass("HBox", HBox.class, defaultContainerBuilder);
+        registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder);
+        registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder);
+        registerWidgetClass("Label", JLabel.class, new LabelBuilder());
+        registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder);
+        registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder());
+        registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder());
+        registerWidgetClass("PixmapMenuItem", JMenuItem.class, new MenuItemBuilder());
+        registerWidgetClass("Notebook", Notebook.class, new NotebookBuilder());
+        registerWidgetClass("NumberEntry", NumberEntry.class, entryBuilder);
+        registerWidgetClass("OptionMenu", OptionMenu.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaCombo", PandaCombo.class, new PandaComboBuilder());
+        registerWidgetClass("PandaCList", PandaCList.class, new CListBuilder());
+        registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder);
+        registerWidgetClass("PandaHTML", PandaHTML.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaPS", PandaPreview.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaText", JTextArea.class, new TextAreaBuilder());
+        registerWidgetClass("PandaTimer", PandaTimer.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaDownload", PandaDownload.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaDownload2", PandaDownload2.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaPrint", PandaPrint.class, defaultWidgetBuilder);
+        registerWidgetClass("PandaTable", PandaTable.class, defaultWidgetBuilder);
+        registerWidgetClass("Pixmap", Pixmap.class, defaultWidgetBuilder);
+        registerWidgetClass("Placeholder", JPanel.class, defaultWidgetBuilder);
+        registerWidgetClass("ProgressBar", JProgressBar.class, defaultWidgetBuilder);
+        registerWidgetClass("RadioButton", RadioButton.class, new RadioButtonBuilder());
+        registerWidgetClass("ScrolledWindow", JScrollPane.class, new ScrolledWindowBuilder());
+        registerWidgetClass("Table", Table.class, new TableBuilder());
+        registerWidgetClass("Text", JTextArea.class, new TextAreaBuilder());
+        registerWidgetClass("ToggleButton", ToggleButton.class, defaultContainerBuilder);
+        registerWidgetClass("VBox", VBox.class, defaultContainerBuilder);
+        registerWidgetClass("VPaned", VPaned.class, defaultContainerBuilder);
+        registerWidgetClass("VSeparator", VSeparator.class, defaultWidgetBuilder);
+        registerWidgetClass("Viewport", JViewport.class, new ViewportBuilder());
+        registerWidgetClass("Window", Window.class, new WindowBuilder());
     }
 
     // an interface to make a modified font.
@@ -180,27 +183,25 @@ public class WidgetBuilder {
     static {
         String[] fontlist = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         String[] classes = {
-            "Button", 
-            "ToggleButton", 
-            "RadioButton", 
-            "ComboBox", 
-            "CheckBox", 
-            "RadioButton", 
-            "TabbedPane", 
-            "Label", 
-            "TextField", 
-            "FormattedTextField", 
-            "TextArea", 
-            "Table", 
-            "ToolBar", 
-            "TitledBorder", 
-            "ToolTip", 
-            "ProgressBar", 
-            "List", 
-        };
-
-        for (int i = 0; i < classes.length; i++) {
-            String userFontSpec = System.getProperty("monsia.user.font." + classes[i].toLowerCase(Locale.ENGLISH)); 
+            "Button",
+            "ToggleButton",
+            "RadioButton",
+            "ComboBox",
+            "CheckBox",
+            "RadioButton",
+            "TabbedPane",
+            "Label",
+            "TextField",
+            "FormattedTextField",
+            "TextArea",
+            "Table",
+            "ToolBar",
+            "TitledBorder",
+            "ToolTip",
+            "ProgressBar",
+            "List",};
+        for (String classe : classes) {
+            String userFontSpec = System.getProperty("monsia.user.font." + classe.toLowerCase(Locale.ENGLISH));
             if (userFontSpec == null) {
                 userFontSpec = System.getProperty("monsia.user.font"); //$NON-NLS-1
             }
@@ -214,19 +215,20 @@ public class WidgetBuilder {
                     userFontSpec = "Monospaced-PLAIN-12";
                 }
             }
-
             if (userFontSpec == null) {
                 // remove boldness
-                modifyFont(classes[i], new FontModifier() {
+                modifyFont(classe, new FontModifier() {
 
+                    @Override
                     public Font modifyFont(Font font) {
                         return font.deriveFont(font.getStyle() & ~Font.BOLD);
                     }
                 });
             } else {
                 final Font userFont = Font.decode(userFontSpec);
-                modifyFont(classes[i], new FontModifier() {
+                modifyFont(classe, new FontModifier() {
 
+                    @Override
                     public Font modifyFont(Font font) {
                         return userFont;
                     }
@@ -236,7 +238,7 @@ public class WidgetBuilder {
     }
 
     private static void modifyFont(String className, FontModifier creator) {
-        String key = className + ".font"; 
+        String key = className + ".font";
         Font font = (Font) UIManager.get(key);
         if (font != null) {
             font = creator.modifyFont(font);
@@ -245,15 +247,17 @@ public class WidgetBuilder {
     }
 
     /**
-     * <p>Builds a widget.</p>
+     * <p>
+     * Builds a widget.</p>
      *
      *
-     * <p>A widget is build in following steps:</p> <ol> <li>Build Self. Build
-     * the widget itself using the widget info and other stuff. This is
-     * performed by buildSelf method. Properties in widget info are set.
-     * Accelerators are set too.</li> <li>Build Children. Build children widgets
-     * in it. This is performed by buildChildren method. Basic procedure of
-     * building children is defined in ContainerBuilder widget builder.</li>
+     * <p>
+     * A widget is build in following steps:</p> <ol> <li>Build Self. Build the
+     * widget itself using the widget info and other stuff. This is performed by
+     * buildSelf method. Properties in widget info are set. Accelerators are set
+     * too.</li> <li>Build Children. Build children widgets in it. This is
+     * performed by buildChildren method. Basic procedure of building children
+     * is defined in ContainerBuilder widget builder.</li>
      * <li>Names are assigned.</li> <li>Signals are set.</li> </ol>
      *
      * @param xml glade interface definition.
@@ -265,9 +269,9 @@ public class WidgetBuilder {
         String genericClassName = info.getClassName();
         WidgetBuilder builder = (WidgetBuilder) builderMap.get(genericClassName);
         if (builder == null) {
-            logger.warn("unknown widget class: {0}", genericClassName); 
+            logger.warn("unknown widget class: {0}", genericClassName);
             Object[] args = {genericClassName};
-            return new JLabel(MessageFormat.format("[a {0}]", args)); 
+            return new JLabel(MessageFormat.format("[a {0}]", args));
         }
         try {
             Component widget = builder.buildSelf(xml, parent, info);
@@ -296,8 +300,11 @@ public class WidgetBuilder {
     }
 
     /**
-     * <p>Instantiate a specific component.</p> <p>When one is created
-     * successfuly, properties are set and accelerators are assigned.</p>
+     * <p>
+     * Instantiate a specific component.</p>
+     * <p>
+     * When one is created successfuly, properties are set and accelerators are
+     * assigned.</p>
      *
      * @param xml glade screen definition.
      * @param parent parent widget.
@@ -359,7 +366,7 @@ public class WidgetBuilder {
             Map.Entry ent = (Map.Entry) i.next();
             String name = (String) ent.getKey();
             String value = (String) ent.getValue();
-            if ("position".equals(name)) { 
+            if ("position".equals(name)) {
                 positionValue = value;
                 continue; // set position after size of this window is determined.
             }
@@ -367,7 +374,7 @@ public class WidgetBuilder {
             setter.set(xml, parent, widget, value);
         }
         if (positionValue != null) {
-            WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, "position"); 
+            WidgetPropertySetter setter = WidgetPropertySetter.getSetter(clazz, "position");
             setter.set(xml, parent, widget, positionValue);
         }
     }

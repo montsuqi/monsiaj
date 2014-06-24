@@ -30,15 +30,17 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * <p>A class that simulates Gtk+'s Notebook widget.</p>
+ * <p>
+ * A class that simulates Gtk+'s Notebook widget.</p>
  *
- * <p>Since Gtk+'s Notebook uses button for tabs, this component maps a dummy
+ * <p>
+ * Since Gtk+'s Notebook uses button for tabs, this component maps a dummy
  * button(NotebookDummyButton) for each tab to simulate its behavior. Dummy
  * buttons are not displayed but can react on action events.</p>
  */
 public class Notebook extends JTabbedPane {
 
-    Map buttons;
+    Map<Integer, NotebookDummyButton> buttons;
     private int index;
     private int pindex;
     private boolean switchPage;
@@ -54,13 +56,14 @@ public class Notebook extends JTabbedPane {
     public Notebook() {
         super();
 
-        buttons = new HashMap();
+        buttons = new HashMap<>();
         index = 0;
         pindex = 0;
         switchPage = true;
 
         addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 Integer selected = new Integer(getSelectedIndex());
                 pindex = index;
@@ -76,7 +79,8 @@ public class Notebook extends JTabbedPane {
     }
 
     /**
-     * <p>Registers a dummy button to a tab.</p>
+     * <p>
+     * Registers a dummy button to a tab.</p>
      *
      * @param button a NotebookDummyButton with an index.
      */

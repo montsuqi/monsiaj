@@ -63,10 +63,10 @@ import org.montsuqi.widgets.Window;
 public abstract class WidgetHandler {
 
     protected static final Logger logger = LogManager.getLogger(WidgetHandler.class);
-    private static final Map classTable;
+    private static final Map<Class,WidgetHandler> classTable;
 
     static {
-        classTable = new HashMap();
+        classTable = new HashMap<>();
         registerHandler(JTextField.class, new EntryHandler());
         registerHandler(NumberEntry.class, new NumberEntryHandler());
         registerHandler(JTextArea.class, new TextHandler());

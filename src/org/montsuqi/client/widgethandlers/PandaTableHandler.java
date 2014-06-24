@@ -41,10 +41,10 @@ import org.montsuqi.widgets.PandaTable;
  */
 class PandaTableHandler extends WidgetHandler {
 
-    private static final List widgetList;
+    private static final List<String> widgetList;
 
     static {
-        widgetList = new ArrayList();
+        widgetList = new ArrayList<>();
     }
 
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {

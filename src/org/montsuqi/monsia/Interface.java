@@ -68,22 +68,22 @@ public class Interface {
 
     private Map<String, Component> widgetNameTable;
     private Map<String, Component> widgetLongNameTable;
-    private Map<String, Map> propertyTable;
-    private Map buttonGroups;
+    private Map<String, Map<String,String>> propertyTable;
+    private Map<String, ButtonGroup> buttonGroups;
     private Protocol protocol;
     private Component topLevel;
-    private List signals;
+    private List<SignalData> signals;
     private Component focusWidget;
     private Component defaultWidget;
     private JMenuBar menuBar;
     private static final Logger logger = LogManager.getLogger(Interface.class);
-    private static Map accelHandlers;
+    private static Map<String,AccelHandler> accelHandlers;
     private double phScale = 1.0;
     private double pvScale = 1.0;
 
     static {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
-        accelHandlers = new HashMap();
+        accelHandlers = new HashMap<>();
     }
     private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; 
     private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; 
@@ -177,11 +177,11 @@ public class Interface {
     }
 
     private void initMember() {
-        widgetNameTable = new HashMap<String, Component>();
-        widgetLongNameTable = new HashMap<String, Component>();
-        propertyTable = new HashMap<String, Map>();
-        signals = new ArrayList();
-        buttonGroups = new HashMap();
+        widgetNameTable = new HashMap<>();
+        widgetLongNameTable = new HashMap<>();
+        propertyTable = new HashMap<>();
+        signals = new ArrayList<>();
+        buttonGroups = new HashMap<>();
         topLevel = null;
         defaultWidget = null;
         focusWidget = null;
@@ -200,9 +200,7 @@ public class Interface {
     }
 
     private void signalAutoConnect() {
-        Iterator entries = signals.iterator();
-        while (entries.hasNext()) {
-            SignalData data = (SignalData) entries.next();
+        for (SignalData data : signals) {
             String handlerName = data.getHandler().toLowerCase();
             SignalHandler handler = SignalHandler.getSignalHandler(handlerName);
             if (data.isAfter()) {
@@ -339,7 +337,7 @@ public class Interface {
         widgetLongNameTable.put(longName, widget);
     }
 
-    public void setProperties(String longName, Map properties) {
+    public void setProperties(String longName, Map<String,String> properties) {
         this.propertyTable.put(longName, properties);
     }
 

@@ -105,7 +105,7 @@ public class PandaPreview extends JPanel {
     private final JToolBar toolbar;
     private NumberEntry pageEntry;
     private final JLabel pageLabel;
-    private JComboBox combo;
+    private JComboBox<String> combo;
     private final JScrollPane scroll;
     private double zoom;
     private String fileName;
@@ -122,14 +122,15 @@ public class PandaPreview extends JPanel {
     private final class NextAction extends AbstractAction {
 
         NextAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.next")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.next"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int numPages = panel.getNumPages();
             int pageNum = panel.getPageNum();
@@ -143,14 +144,15 @@ public class PandaPreview extends JPanel {
     private final class PrevAction extends AbstractAction {
 
         PrevAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.prev")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.prev"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int numPages = panel.getNumPages();
             int pageNum = panel.getPageNum();
@@ -164,14 +166,15 @@ public class PandaPreview extends JPanel {
     private final class SaveAction extends AbstractAction {
 
         SaveAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.save")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.save"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser fc = new JFileChooser();
             fc.setFileFilter(new ExtensionFileFilter(".pdf", "PDF (*.pdf)"));
@@ -187,13 +190,14 @@ public class PandaPreview extends JPanel {
                     } else {
                         file = fc.getSelectedFile();
                     }
-                    FileInputStream in = new FileInputStream(fileName);
-                    FileOutputStream out = new FileOutputStream(file);
-                    b = new byte[in.available()];
-                    while (in.read(b) > 0) {
-                        out.write(b);
+                    FileOutputStream out;
+                    try (FileInputStream in = new FileInputStream(fileName)) {
+                        out = new FileOutputStream(file);
+                        b = new byte[in.available()];
+                        while (in.read(b) > 0) {
+                            out.write(b);
+                        }
                     }
-                    in.close();
                     out.close();
                 } catch (Exception ex) {
                     System.out.println(ex);
@@ -205,12 +209,12 @@ public class PandaPreview extends JPanel {
     private final class PrintAction extends AbstractAction {
 
         PrintAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.print")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.print"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description"));
         }
 
         @Override
@@ -304,7 +308,7 @@ public class PandaPreview extends JPanel {
         fitPageAction = new FitPageAction();
         fitPageWidthAction = new FitPageWidthAction();
 
-        combo = new JComboBox(SCALE_STRING);
+        combo = new JComboBox<>(SCALE_STRING);
         combo.addActionListener(new ActionListener() {
 
             @Override
@@ -346,7 +350,7 @@ public class PandaPreview extends JPanel {
         scroll.getViewport().addMouseListener(hsl);
         add(scroll, BorderLayout.CENTER);
 
-        zoom = Double.parseDouble(prefs.get("zoom",SCALE_FIT_PAGE_WIDTH_STR));
+        zoom = Double.parseDouble(prefs.get("zoom", SCALE_FIT_PAGE_WIDTH_STR));
         this.updateCombo();
 
         ActionMap actionMap = getActionMap();
@@ -456,7 +460,7 @@ public class PandaPreview extends JPanel {
     }
 
     private void setScale() {
-        prefs.put("zoom",Double.toString(zoom));
+        prefs.put("zoom", Double.toString(zoom));
         panel.setScale(getRealZoom());
     }
 

@@ -77,7 +77,7 @@ public class Protocol {
     private final Config conf;
     private boolean isReceiving;
     private final long timerPeriod;
-    private final HashMap nodeTable;
+    private final HashMap<String,Node> nodeTable;
     private String sessionTitle;
     private Color sessionBGColor;
     private StringBuffer widgetName;
@@ -122,15 +122,15 @@ public class Protocol {
     Protocol(Config conf, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
         this.conf = conf;
         isReceiving = false;
-        nodeTable = new HashMap();
+        nodeTable = new HashMap<>();
         this.styleMap = styleMap;
         this.timerPeriod = timerPeriod;
         sessionTitle = "";
         sessionBGColor = null;
         topWindow = new TopWindow();
-        dialogStack = new ArrayList<Component>();
+        dialogStack = new ArrayList<>();
         rpcId = 1;
-        changedWidgetMap = new HashMap<String, Component>();
+        changedWidgetMap = new HashMap<>();
 
         int num = conf.getCurrent();
         final String user = this.conf.getUser(num);

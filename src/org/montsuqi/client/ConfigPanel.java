@@ -90,7 +90,7 @@ public class ConfigPanel extends JPanel {
     protected JCheckBox saveClientCertificatePasswordCheckbox;
     // Others Tab
     protected JTextField styleEntry;
-    protected JComboBox lookAndFeelCombo;
+    protected JComboBox<String> lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
     protected JCheckBox useTimerCheck;
@@ -517,7 +517,7 @@ public class ConfigPanel extends JPanel {
         for (int i = 0; i < lafNames.length; i++) {
             lafNames[i] = lafs[i].getName();
         }
-        lookAndFeelCombo = new JComboBox();
+        lookAndFeelCombo = new JComboBox<>();
         lookAndFeelCombo.setEditable(false);
         for (int i = 0; i < lafNames.length; i++) {
             lookAndFeelCombo.addItem(lafNames[i]);

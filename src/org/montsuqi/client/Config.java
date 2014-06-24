@@ -77,7 +77,7 @@ public class Config {
 
     public int getNext() {
         int max = 0;
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -137,12 +137,12 @@ public class Config {
         Properties tmp = new Properties() {
             @Override
             public Set<Object> keySet() {
-                return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
+                return Collections.unmodifiableSet(new TreeSet<>(super.keySet()));
             }
 
             @Override
             public synchronized Enumeration<Object> keys() {
-                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+                return Collections.enumeration(new TreeSet<>(super.keySet()));
             }
         };
         prop.setProperty(Config.CURRENT_KEY, Integer.toString(current));
@@ -155,7 +155,7 @@ public class Config {
     }
 
     public ArrayList<Integer> getList() {
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -170,7 +170,8 @@ public class Config {
                 }
             }
         }
-        Collections.sort(list, new Comparator() {
+        Collections.sort(list, new Comparator<Object>() {
+            @Override
             public int compare(Object o1, Object o2) {
                 String n1 = Config.this.getDescription((Integer) o1);
                 String n2 = Config.this.getDescription((Integer) o2);
