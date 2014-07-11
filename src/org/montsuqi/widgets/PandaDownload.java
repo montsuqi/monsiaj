@@ -35,7 +35,6 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.client.Launcher;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PopupNotify;
 
@@ -66,7 +65,7 @@ public class PandaDownload extends JComponent {
         super();
     }
 
-    private String displaySize(long size) {
+    private static String displaySize(long size) {
         String displaySize;
         final long ONE_KB = 1024;
         final long ONE_MB = ONE_KB * ONE_KB;
@@ -114,6 +113,7 @@ public class PandaDownload extends JComponent {
 
         Button openButton = new Button(new AbstractAction(Messages.getString("PandaDownload.open")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Desktop d = Desktop.getDesktop();
                 if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.OPEN)) {
@@ -130,6 +130,7 @@ public class PandaDownload extends JComponent {
 
         Button saveButton = new Button(new AbstractAction(Messages.getString("PandaDownload.save")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String dir = prefs.get(PandaDownload.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);

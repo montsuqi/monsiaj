@@ -93,7 +93,6 @@ public class PrintAgent extends Thread {
             }
         } catch (IOException ex) {
             if (!ex.getMessage().equals("204")) {
-                ex.printStackTrace();
                 request.showOtherError();
             }
         }
@@ -108,7 +107,7 @@ public class PrintAgent extends Thread {
         printQ.add(new DLRequest(url, filename, desc, retry));
     }
 
-    public void showDialog(String title, File file) {
+    public static void showDialog(String title, File file) {
         try {
             final JDialog dialog = new JDialog();
             Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) {
@@ -206,7 +205,7 @@ public class PrintAgent extends Thread {
 
     public class DLRequest extends PrintRequest {
 
-        private String description;
+        private final String description;
 
         public DLRequest(String url, String filename, String desc, int retry) {
             super(url, "", retry, false);
@@ -221,7 +220,6 @@ public class PrintAgent extends Thread {
                 pd.setName("PrintAgent.PandaDownload");
                 pd.showDialog(this.filename, this.description, file);
             } catch (Exception ex) {
-                ex.printStackTrace();
                 this.showOtherError();
             }
         }
@@ -251,7 +249,7 @@ public class PrintAgent extends Thread {
         private String title;
         protected String filename;
         private int retry;
-        private boolean showDialog;
+        private final boolean showDialog;
 
         public PrintRequest(String url, String title, int retry, boolean showdialog) {
             this.path = url;

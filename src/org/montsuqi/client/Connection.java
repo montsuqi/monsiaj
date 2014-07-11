@@ -549,7 +549,7 @@ public class Connection {
         }
     }
 
-    private synchronized byte[] receiveBinary() throws IOException {
+    public synchronized byte[] receiveBinary() throws IOException {
         int size = receiveLength();
         byte[] bin = new byte[size];
         if (size > 0) {

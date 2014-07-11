@@ -106,15 +106,15 @@ public class OptionParser {
     private List<String> parseFile(String program, File file) {
         List<String> lines = new LinkedList<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.length() > 0) {
-                    lines.add(line);
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if (line.length() > 0) {
+                        lines.add(line);
+                    }
                 }
             }
-            br.close();
         } catch (IOException e) {
             throw new OptionParserException(e);
         }
@@ -218,8 +218,8 @@ public class OptionParser {
 
         System.out.println("*****\n"); 
         System.out.println(parser.usage("Usage")); 
-        for (int i = 0; i < args.length; i++) {
-            System.out.println(args[i]);
+        for (String arg : args) {
+            System.out.println(arg);
         }
     }
 }

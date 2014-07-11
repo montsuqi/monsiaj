@@ -1,4 +1,5 @@
-/*      PANDA -- a simple transaction monitor
+/*      
+PANDA -- a simple transaction monitor
 
  Copyright (C) 1998-1999 Ogochan.
  2000-2003 Ogochan & JMA (Japan Medical Association).
@@ -25,7 +26,10 @@ package org.montsuqi.client;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
@@ -35,19 +39,25 @@ import java.util.*;
 import javax.swing.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.montsuqi.client.marshallers.WidgetMarshaller;
 import org.montsuqi.client.marshallers.WidgetValueManager;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
+import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.ExceptionDialog;
+import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TopWindow;
 import org.montsuqi.widgets.Window;
 
 /**
- * <p>A class that implements high level operations over client/server
+ * <p>
+ * A class that implements high level operations over client/server
  * connection.</p>
  */
 public class Protocol extends Connection {
@@ -55,7 +65,7 @@ public class Protocol extends Connection {
     private final Client client;
     private boolean isReceiving;
     private final long timerPeriod;
-    private final HashMap<String,Node> nodeTable;
+    private final HashMap<String, Node> nodeTable;
     private final WidgetValueManager valueManager;
     private String sessionTitle;
     private Color sessionBGColor;
@@ -86,7 +96,7 @@ public class Protocol extends Connection {
     }
 
     Protocol(Client client, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
-        super(client.createSocket(), isNetworkByteOrder()); 
+        super(client.createSocket(), isNetworkByteOrder());
         this.client = client;
         isReceiving = false;
         nodeTable = new HashMap<>();
@@ -95,7 +105,7 @@ public class Protocol extends Connection {
         sessionTitle = "";
         sessionBGColor = null;
         topWindow = new TopWindow();
-        dialogStack = new ArrayList<Component>();
+        dialogStack = new ArrayList<>();
         enablePing = false;
     }
 
@@ -107,7 +117,7 @@ public class Protocol extends Connection {
         logger.entry();
         StringTokenizer tokens = new StringTokenizer(VERSION, String.valueOf(':'));
         while (tokens.hasMoreTokens()) {
-            if ("no".equals(tokens.nextToken())) { 
+            if ("no".equals(tokens.nextToken())) {
                 logger.exit();
                 return true;
             }
@@ -127,7 +137,7 @@ public class Protocol extends Connection {
         byte pc = receivePacketClass();
         if (pc != PacketClass.ScreenDefine) {
             Object[] args = {new Byte(PacketClass.ScreenDefine), new Byte(pc)};
-            logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args); 
+            logger.warn("invalid protocol sequence: expected({0}), but was ({1})", args);
             logger.exit();
             return false;
         }
@@ -303,9 +313,8 @@ public class Protocol extends Connection {
 
     private synchronized void receiveValueSkip() throws IOException {
         logger.entry();
-        int type = Type.NULL;
         receiveDataType();
-        type = getLastDataType();
+        int type = getLastDataType();
         switch (type) {
             case Type.INT:
                 receiveInt();
@@ -515,6 +524,7 @@ public class Protocol extends Connection {
                 if (SystemEnvironment.isMacOSX()) {
                     EventQueue.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             focusWidget.requestFocus();
 
@@ -555,16 +565,16 @@ public class Protocol extends Connection {
                 }
                 break;
             case PacketClass.NOT:
-                throw new ConnectException(Messages.getString("Client.cannot_connect_to_server")); 
+                throw new ConnectException(Messages.getString("Client.cannot_connect_to_server"));
             case PacketClass.E_VERSION:
-                throw new ConnectException(Messages.getString("Client.version_mismatch")); 
+                throw new ConnectException(Messages.getString("Client.version_mismatch"));
             case PacketClass.E_AUTH:
-                throw new ConnectException(Messages.getString("Client.authentication_error")); 
+                throw new ConnectException(Messages.getString("Client.authentication_error"));
             case PacketClass.E_APPL:
-                throw new ConnectException(Messages.getString("Client.application_name_invalid")); 
+                throw new ConnectException(Messages.getString("Client.application_name_invalid"));
             default:
                 Object[] args = {Integer.toHexString(pc)};
-                throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args)); 
+                throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args));
         }
 
         String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
@@ -577,11 +587,14 @@ public class Protocol extends Connection {
         if (enablePing) {
             pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         Protocol.this.sendPing();
                     } catch (IOException ioe) {
                         exceptionOccured(ioe);
+                    } catch (JSONException ex) {
+                        exceptionOccured(ex);
                     }
                 }
             });
@@ -598,11 +611,120 @@ public class Protocol extends Connection {
     }
 
     public void addDLRequest(String path, String filename, String description, int retry) {
-        printAgent.addDLRequest(path, filename,description, retry);
+        printAgent.addDLRequest(path, filename, description, retry);
     }
 
-    private synchronized void sendPing() throws IOException {
+    private synchronized byte[] receiveBLOB(String oid) throws IOException {
+        this.sendPacketClass(PacketClass.GetBLOB);
+        this.sendString(oid);
+        return this.receiveBinary();
+    }
+
+    private synchronized void printReport(JSONObject obj) throws JSONException, IOException {
+        String printer = null;
+        String title = "";
+        boolean showDialog = false;
+
+        if (!obj.has("object_id")) {
+            return;
+        }
+        String oid = obj.getString("object_id");
+        if (obj.has("printer")) {
+            printer = obj.getString("printer");
+        }
+        if (obj.has("title")) {
+            title = obj.getString("title");
+        }
+        if (obj.has("showdialog")) {
+            showDialog = true;
+        }
+        try {
+            byte[] bin = receiveBLOB(oid);
+            if (bin != null && bin.length > 0) {
+                File temp = File.createTempFile("clientPrint", "report.pdf");
+                temp.deleteOnExit();
+                try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
+                    os.write(bin);
+                    os.flush();
+                }
+                if (showDialog) {
+                    PrintAgent.showDialog(title, temp);
+                } else {
+                    if (printer != null) {
+                        PDFPrint pdfPrint = new PDFPrint(temp, false);
+                        pdfPrint.start();
+                    } else {
+                        PDFPrint pdfPrint = new PDFPrint(temp, printer);
+                        pdfPrint.start();                        
+                    }
+                    PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                            Messages.getString("PrintAgent.notify_print_start") + "\n\n"
+                            + Messages.getString("PrintAgent.title") + title + "\n"
+                            + Messages.getString("PrintAgent.printer") + printer,
+                            GtkStockIcon.get("gtk-print"), 0);
+                }
+            }
+        } catch (IOException ex) {
+            logger.warn(ex);
+            PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                    Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
+                    + Messages.getString("PrintAgent.title") + title,
+                    GtkStockIcon.get("gtk-dialog-error"), 0);
+        }
+    }
+
+    private synchronized void downloadFile(JSONObject obj) throws JSONException {
+        String filename = "misc.dat";
+        String desc = "";
+
+        if (!obj.has("object_id")) {
+            return;
+        }
+        String oid = obj.getString("object_id");
+        if (obj.has("filename")) {
+            filename = obj.getString("filename");
+        }
+        if (obj.has("description")) {
+            desc = obj.getString("description");
+        }
+        try {
+            byte[] bin = receiveBLOB(oid);
+            if (bin != null && bin.length > 0) {
+                File temp = File.createTempFile("clientPrint", filename);
+                temp.deleteOnExit();
+                try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
+                    os.write(bin);
+                    os.flush();
+                }
+                PandaDownload pd = new PandaDownload();
+                pd.showDialog(filename, desc, temp);
+            }
+        } catch (IOException ex) {
+            logger.warn(ex);
+        }
+    }
+
+    private synchronized void sendPing() throws IOException, JSONException {
         if (!isReceiving) {
+            // for orca 4.8
+            if (serverVersion >= 14900) {
+                this.startReceiving();
+                this.sendPacketClass(PacketClass.ListDownloads);
+                JSONObject obj = new JSONObject(this.receiveString());
+                if (obj.has("result")) {
+                    JSONArray array = obj.getJSONArray("result");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject child = array.getJSONObject(i);
+                        String type = child.getString("type");
+                        if (type.startsWith("report")) {
+                            printReport(child);
+                        } else {
+                            downloadFile(child);
+                        }
+                    }
+                }
+                this.stopReceiving();
+            }
             // for orca 4.7
             if (serverVersion >= 14700) {
                 this.startReceiving();
@@ -695,9 +817,7 @@ public class Protocol extends Connection {
 
     void clearWindowTable() {
         logger.entry();
-        Iterator i = nodeTable.values().iterator();
-        while (i.hasNext()) {
-            Node node = (Node) i.next();
+        for (Node node : nodeTable.values()) {
             node.clearChangedWidgets();
         }
         logger.exit();
@@ -775,7 +895,7 @@ public class Protocol extends Connection {
         return widgetName;
     }
 
-    public void exceptionOccured(IOException e) {
+    public void exceptionOccured(Exception e) {
         logger.entry(e);
         ExceptionDialog.showExceptionDialog(e);
         logger.exit();
