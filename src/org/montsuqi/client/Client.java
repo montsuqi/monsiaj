@@ -24,32 +24,27 @@ package org.montsuqi.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.URL;
-import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Map;
-import javax.net.ssl.SSLSocketFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
 
-
 /**
- * <p>The main application class for panda client.</p>
+ * <p>
+ * The main application class for panda client.</p>
  */
 public class Client implements Runnable {
 
-    private Config conf;
+    private final Config conf;
     Logger logger;
     private Protocol protocol;
-    private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 
     /**
-     * <p>Constructs a client initialized by the given configuration object.</p>
+     * <p>
+     * Constructs a client initialized by the given configuration object.</p>
      *
      * @param conf configuration.
      */
@@ -58,9 +53,9 @@ public class Client implements Runnable {
         logger = LogManager.getLogger(Client.class);
     }
 
-
     /**
-     * <p>Connects to the server using protocol, user, password and application
+     * <p>
+     * Connects to the server using protocol, user, password and application
      * name specified in the configuration of this client.</p>
      *
      * @throws IOException on IO errors.
@@ -71,113 +66,52 @@ public class Client implements Runnable {
         int num = conf.getCurrent();
         Map styles = loadStyles();
         long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
-        protocol = new Protocol(this, styles, timerPeriod);
-
-        String user = conf.getUser(num);
-        String password = conf.getPassword(num);
-        String application = conf.getApplication(num);
-        logger.debug("user : {}",user);
-        protocol.sendConnect(user, password, application);
+        protocol = new Protocol(conf, styles, timerPeriod);
+        logger.debug("user : {}", conf.getUser(num));
+        protocol.getServerInfo();
+        protocol.startSession();
     }
 
     private Map loadStyles() {
         URL url = conf.getStyleURL(conf.getCurrent());
         try {
-            logger.debug("loading styles from URL: {0}", url); //$NON-NLS-1$
+            logger.debug("loading styles from URL: {0}", url); 
             InputStream in = url.openStream();
             return Style.load(in);
         } catch (IOException e) {
             logger.debug(e);
-            logger.debug("using empty style set"); //$NON-NLS-1$
+            logger.debug("using empty style set"); 
             return Collections.EMPTY_MAP;
         }
     }
 
     /**
-     * <p>Creates a socket for the connection.</p> <p>When the configuration
-     * says useSSL, an SSL Socket is returned instead.</p>
-     *
-     * @return a socket connected at the TCP layer.
-     * @throws IOException on IO error.
-     * @throws GeneralSecurityException on SSL verification/authentication
-     * failure.
-     */
-    Socket createSocket() throws IOException, GeneralSecurityException {
-        int num = conf.getCurrent();
-        String host = conf.getHost(num);
-        int port = conf.getPort(num);
-        logger.debug("host : {}:{}",host,port);
-        SocketAddress address = new InetSocketAddress(host, port);
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.connect(address);
-        Socket socket = socketChannel.socket();
-        if (!conf.getUseSSL(num)) {
-            return socket;
-        } else {
-            String fileName = conf.getClientCertificateFile(num);
-            String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
-            return builder.createSSLSocket(socket, host, port);
-        }
-    }
-
-    /**
-     * <p>PrintAgent need SSLSocketFactory for SSL API connection</p>
-     * @return
-     * @throws IOException
-     * @throws GeneralSecurityException 
-     */
-    SSLSocketFactory createSSLSocketFactory() throws IOException, GeneralSecurityException {
-        int num = conf.getCurrent();
-        if (!conf.getUseSSL(num)) {
-            return null;
-        } else {
-            String fileName = conf.getClientCertificateFile(num);
-            String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
-            return builder.getFactory();
-        }
-    }
-
-    /**
-     * <p>Kick the application.</p>
+     * <p>
+     * Kick the application.</p>
      */
     public void run() {
-        try {
-            protocol.checkScreens(true);
-            protocol.startReceiving();
-            protocol.getScreenData();
-            protocol.stopReceiving();
-            protocol.startPing();
-        } catch (IOException e) {
-            protocol.exceptionOccured(e);
-        }
+        protocol.startReceiving();
+        protocol.getWindow();
+        protocol.updateScreen();
+        protocol.stopReceiving();
+        protocol.startPing();
     }
 
     /**
-     * <p>Terminates the application.</p> <p>Sends end packet to the server and
-     * exists.</p>
+     * <p>
+     * Terminates the application.</p>
+     * <p>
+     * Sends end packet to the server and exists.</p>
      */
     void exitSystem() {
         try {
             synchronized (this) {
-                if (protocol != null) {
-                    protocol.sendPacketClass(PacketClass.END);
-                }
+                protocol.endSession();
             }
         } catch (Exception e) {
             logger.warn(e);
         } finally {
             System.exit(0);
-        }
-    }
-
-    /**
-     * <p>Dispose connection if it exists.</p>
-     */
-    protected void finalize() {
-        if (protocol != null) {
-            exitSystem();
         }
     }
 }

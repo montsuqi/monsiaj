@@ -1,6 +1,6 @@
-= antを用いたビルド方法
+# antを用いたビルド方法
 
-== もっとも単純なビルド
+## もっとも単純なビルド
 
 コマンドラインから、
 
@@ -9,16 +9,19 @@
 を実行します。
 
 ターゲット dist が実行され、dist/ディレクトリの下に
+
 * dist/monsiaj-bin-YYYYMMDD.zip
 * dist/monsiaj-bin-macosx-YYYYMMDD.zip
 * dist/monsiaj-src-YYYYMMDD.zip
+
 が生成されます。(YYYYNNDD=ビルド時の日付)
 
 このビルドの場合、
+
 * 署名は行われません。
 * クラスファイルにはデバッグ情報が含まれます。
 
-== ビルドのカスタマイズ
+## ビルドのカスタマイズ
 
 ビルドの動作をカスタマイズするには、プロパティファイルを用います。
 
@@ -29,15 +32,15 @@
 
 のように実行してください。
 
-=== 署名を行う場合
+### 署名を行う場合
 
 プロパティファイルに、
 
- do.sign=true
- alias=署名する鍵のエイリアス
- keystore=キーストアファイル名
- webstart.url=http://... jwsを設置するURL
- webstart.vendor=ベンダー名
+    do.sign=true
+    alias=署名する鍵のエイリアス
+    keystore=キーストアファイル名
+    webstart.url=http://... jwsを設置するURL
+    webstart.vendor=ベンダー名
 
 を設定して実行します。途中でキーストアのパスワードと鍵パスワードを
 聞かれるので答えますが、
@@ -52,17 +55,17 @@ XXXXXXX[Return]
 do.signプロパティを設定してある場合、dist/ に置かれたファイル内の
 jarファイルは署名済みのものとなります。
 
-=== デバッグオプションを外す場合
+### デバッグオプションを外す場合
 
 デフォルトでは、コンパイルはデバッグオプション付きとなります。
 これを外すためには、プロパティファイルに
 
- javac.debug=no
+    javac.debug=no
 
 を設定してください。
 
 含めるデバッグ情報の種別は、
 
- javac.debuglevel=lines,vars,source
+     javac.debuglevel=lines,vars,source
 
 のように、含めたいものをコンマで区切って指定します。

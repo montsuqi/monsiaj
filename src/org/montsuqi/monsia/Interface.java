@@ -22,14 +22,32 @@ copies.
  */
 package org.montsuqi.monsia;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
-import javax.swing.*;
+import java.util.Map;
+import java.util.StringTokenizer;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.MenuElement;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.xml.parsers.SAXParser;
@@ -50,25 +68,25 @@ public class Interface {
 
     private Map<String, Component> widgetNameTable;
     private Map<String, Component> widgetLongNameTable;
-    private Map<String, Map> propertyTable;
-    private Map buttonGroups;
+    private Map<String, Map<String,String>> propertyTable;
+    private Map<String, ButtonGroup> buttonGroups;
     private Protocol protocol;
     private Component topLevel;
-    private List signals;
+    private List<SignalData> signals;
     private Component focusWidget;
     private Component defaultWidget;
     private JMenuBar menuBar;
     private static final Logger logger = LogManager.getLogger(Interface.class);
-    private static Map accelHandlers;
+    private static Map<String,AccelHandler> accelHandlers;
     private double phScale = 1.0;
     private double pvScale = 1.0;
 
     static {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
-        accelHandlers = new HashMap();
+        accelHandlers = new HashMap<>();
     }
-    private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; //$NON-NLS-1$
-    private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; //$NON-NLS-1$
+    private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; 
+    private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; 
 
     public void setDefaultWidget(Component widget) {
         defaultWidget = widget;
@@ -110,7 +128,7 @@ public class Interface {
                 input = new BufferedInputStream(input);
             }
 
-            String handlerClassName = System.getProperty("monsia.document.handler"); //$NON-NLS-1$
+            String handlerClassName = System.getProperty("monsia.document.handler"); 
             if (handlerClassName == null) {
                 handlerClassName = isNewScreenDefinition(input) ? NEW_HANDLER : OLD_HANDLER;
             }
@@ -118,11 +136,6 @@ public class Interface {
             Class handlerClass = Class.forName(handlerClassName);
             AbstractDocumentHandler handler = (AbstractDocumentHandler) handlerClass.newInstance();
 
-            if (handlerClassName.equals(OLD_HANDLER)) {
-                if (protocol.getEncoding().equals("EUC-JP")) {
-                    input = new FakeEncodingInputStream(input);
-                }
-            }
             saxParser.parse(input, handler);
             return handler.getInterface(protocol);
         } catch (Exception e) {
@@ -136,7 +149,7 @@ public class Interface {
                 input = new BufferedInputStream(input);
             }
 
-            String handlerClassName = System.getProperty("monsia.document.handler"); //$NON-NLS-1$
+            String handlerClassName = System.getProperty("monsia.document.handler"); 
             if (handlerClassName == null) {
                 handlerClassName = isNewScreenDefinition(input) ? NEW_HANDLER : OLD_HANDLER;
             }
@@ -160,15 +173,15 @@ public class Interface {
         input.read(bytes);
         String head = new String(bytes);
         input.reset();
-        return head.indexOf("GTK-Interface") < 0; //$NON-NLS-1$
+        return head.indexOf("GTK-Interface") < 0; 
     }
 
     private void initMember() {
-        widgetNameTable = new HashMap<String, Component>();
-        widgetLongNameTable = new HashMap<String, Component>();
-        propertyTable = new HashMap<String, Map>();
-        signals = new ArrayList();
-        buttonGroups = new HashMap();
+        widgetNameTable = new HashMap<>();
+        widgetLongNameTable = new HashMap<>();
+        propertyTable = new HashMap<>();
+        signals = new ArrayList<>();
+        buttonGroups = new HashMap<>();
         topLevel = null;
         defaultWidget = null;
         focusWidget = null;
@@ -187,9 +200,7 @@ public class Interface {
     }
 
     private void signalAutoConnect() {
-        Iterator entries = signals.iterator();
-        while (entries.hasNext()) {
-            SignalData data = (SignalData) entries.next();
+        for (SignalData data : signals) {
             String handlerName = data.getHandler().toLowerCase();
             SignalHandler handler = SignalHandler.getSignalHandler(handlerName);
             if (data.isAfter()) {
@@ -218,7 +229,7 @@ public class Interface {
 
     public Component getWidget(String name) {
         if (name == null) {
-            throw new NullPointerException("name is null."); //$NON-NLS-1$
+            throw new NullPointerException("name is null."); 
         }
         return (Component) widgetNameTable.get(name);
     }
@@ -234,7 +245,7 @@ public class Interface {
     
     public Component getWidgetByLongName(String longName) {
         if (longName == null) {
-            throw new NullPointerException("long name is null."); //$NON-NLS-1$
+            throw new NullPointerException("long name is null."); 
         }
         return (Component) widgetLongNameTable.get(longName);
     }
@@ -246,17 +257,17 @@ public class Interface {
             group = new ButtonGroup();
             buttonGroups.put(groupName, group);
             none = new JRadioButton();
-            none.putClientProperty("none", none); //$NON-NLS-1$
+            none.putClientProperty("none", none); 
             group.add(none);
         } else {
             group = (ButtonGroup) buttonGroups.get(groupName);
             assert group.getButtonCount() > 0;
             JRadioButton first = (JRadioButton) group.getElements().nextElement();
-            none = (JRadioButton) first.getClientProperty("none"); //$NON-NLS-1$
+            none = (JRadioButton) first.getClientProperty("none"); 
         }
         group.add(button);
-        button.putClientProperty("group", group); //$NON-NLS-1$
-        button.putClientProperty("none", none); //$NON-NLS-1$
+        button.putClientProperty("group", group); 
+        button.putClientProperty("none", none); 
     }
 
     public void setTopLevel(Component widget) {
@@ -306,7 +317,7 @@ public class Interface {
         for (int i = 0; i < subs.length; i++) {
             MenuElement sub = subs[i];
             JComponent c = (JComponent) sub.getComponent();
-            c.putClientProperty("window", f); //$NON-NLS-1$
+            c.putClientProperty("window", f); 
             setWindowForMenuElements(f, sub);
         }
     }
@@ -321,12 +332,12 @@ public class Interface {
 
     public void setWidgetLongNameTable(String longName, Component widget) {
         if (widgetLongNameTable.containsKey(longName)) {
-            logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName); //$NON-NLS-1$
+            logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName); 
         }
         widgetLongNameTable.put(longName, widget);
     }
 
-    public void setProperties(String longName, Map properties) {
+    public void setProperties(String longName, Map<String,String> properties) {
         this.propertyTable.put(longName, properties);
     }
 
@@ -435,7 +446,7 @@ public class Interface {
 
     public void setMenuBar(JMenuBar menuBar) {
         if (this.menuBar != null && this.menuBar != menuBar) {
-            logger.warn("menubar is already set, replacing with new one."); //$NON-NLS-1$
+            logger.warn("menubar is already set, replacing with new one."); 
         }
         this.menuBar = menuBar;
     }

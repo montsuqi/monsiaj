@@ -23,7 +23,15 @@
 package org.montsuqi.client;
 
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -31,8 +39,25 @@ import java.awt.event.FocusEvent;
 import java.io.File;
 import java.net.URI;
 import java.util.Enumeration;
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.text.JTextComponent;
@@ -54,18 +79,18 @@ public class ConfigPanel extends JPanel {
     protected JTextField userEntry;
     protected JPasswordField passwordEntry;
     protected JCheckBox savePasswordCheckbox;
-    protected JTextField hostEntry;
-    protected JTextField portEntry;
-    protected JTextField appEntry;
+    protected JTextField authURIEntry;
     // SSL Tab
     protected JCheckBox useSSLCheckbox;
+    protected JButton caCertificateButton;
+    protected JTextField caCertificateEntry;
     protected JButton clientCertificateButton;
     protected JTextField clientCertificateEntry;
     protected JPasswordField exportPasswordEntry;
     protected JCheckBox saveClientCertificatePasswordCheckbox;
     // Others Tab
     protected JTextField styleEntry;
-    protected JComboBox lookAndFeelCombo;
+    protected JComboBox<String> lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
     protected JCheckBox useTimerCheck;
@@ -74,44 +99,26 @@ public class ConfigPanel extends JPanel {
     protected LookAndFeelInfo[] lafs;
     private static final int MAX_PANEL_ROWS = 12;
     private static final int MAX_PANEL_COLUMNS = 4;
-    private boolean doPadding;
-    private boolean doChangeLookAndFeel;
-    private MetalTheme systemMetalTheme;
+    private final boolean doPadding;
+    private final boolean doChangeLookAndFeel;
+    private final MetalTheme systemMetalTheme;
 
     /**
-     * <p>An action to warn vulnerability of saving password.</p>
-     */
-    private final class ConfirmSavePasswordAction implements ActionListener {
-
-        final JCheckBox checkbox;
-
-        public ConfirmSavePasswordAction(JCheckBox checkbox) {
-            this.checkbox = checkbox;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            if (checkbox.isSelected()) {
-                int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
-                if (result != JOptionPane.YES_OPTION) {
-                    checkbox.setSelected(false);
-                }
-            }
-        }
-    }
-
-    /**
-     * <p>An action to pop a fiel selection dialog.</p> <p>When a file is
-     * selected, the path of the selected file is set to specified text
-     * field.</p>
+     * <p>
+     * An action to pop a fiel selection dialog.</p>
+     * <p>
+     * When a file is selected, the path of the selected file is set to
+     * specified text field.</p>
      */
     private final class FileSelectionAction extends AbstractAction {
 
-        private JTextComponent entry;
-        private String extension;
-        private String description;
+        private final JTextComponent entry;
+        private final String extension;
+        private final String description;
 
         /**
-         * <p>Constructs a FileSelectionAction.</p>
+         * <p>
+         * Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -120,7 +127,7 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         FileSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
+            super(Messages.getString("ConfigurationPanel.browse"));
             this.entry = entry;
             this.extension = extension;
             this.description = description;
@@ -139,12 +146,13 @@ public class ConfigPanel extends JPanel {
 
     private final class ThemeSelectionAction extends AbstractAction {
 
-        private JTextComponent entry;
-        private String extension;
-        private String description;
+        private final JTextComponent entry;
+        private final String extension;
+        private final String description;
 
         /**
-         * <p>Constructs a FileSelectionAction.</p>
+         * <p>
+         * Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -153,14 +161,14 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         ThemeSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
+            super(Messages.getString("ConfigurationPanel.browse"));
             this.entry = entry;
             this.extension = extension;
             this.description = description;
         }
 
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser(entry.getText()); //$NON-NLS-1$
+            JFileChooser fileChooser = new JFileChooser(entry.getText());
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
             int ret = fileChooser.showOpenDialog(null);
             if (ret == JFileChooser.APPROVE_OPTION) {
@@ -202,7 +210,13 @@ public class ConfigPanel extends JPanel {
                 if (SystemEnvironment.isMacOSX() && (!className.startsWith("apple.laf.AquaLookAndFeel"))) {
                     updateFont(new Font("Osaka", Font.PLAIN, 12));
                 }
-            } catch (Exception e) {
+            } catch (ClassNotFoundException e) {
+                logger.catching(Level.WARN, e);
+            } catch (IllegalAccessException e) {
+                logger.catching(Level.WARN, e);
+            } catch (InstantiationException e) {
+                logger.catching(Level.WARN, e);
+            } catch (UnsupportedLookAndFeelException e) {
                 logger.catching(Level.WARN, e);
             }
             SwingUtilities.invokeLater(new Runnable() {
@@ -238,15 +252,27 @@ public class ConfigPanel extends JPanel {
         String user = conf.getUser(num);
         String password = conf.getPassword(num);
         boolean savePassword = conf.getSavePassword(num);
-        String host = conf.getHost(num);
-        int port = conf.getPort(num);
-        String application = conf.getApplication(num);
+        String authURI = conf.getAuthURI(num);
+
+        userEntry.setText(user);
+        // Save save_pass check field before the password itself,
+        // since setPass fetches its value from the preferences internally.
+        savePasswordCheckbox.setSelected(savePassword);
+        passwordEntry.setText(password);
+        authURIEntry.setText(authURI);
 
         // SSL tab
         boolean useSSL = conf.getUseSSL(num);
+        String caCertificateFile = conf.getCACertificateFile(num);
         String clientCertificateFile = conf.getClientCertificateFile(num);
         boolean saveClientCertificatePassword = conf.getSaveClientCertificatePassword(num);
         String clientCertificatePassword = conf.getClientCertificatePassword(num);
+
+        useSSLCheckbox.setSelected(useSSL);
+        caCertificateEntry.setText(caCertificateFile);
+        clientCertificateEntry.setText(clientCertificateFile);
+        exportPasswordEntry.setText(clientCertificatePassword);
+        saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
 
         // Others tab
         String styleFile = conf.getStyleFile(num);
@@ -256,34 +282,21 @@ public class ConfigPanel extends JPanel {
         long timerPeriod = conf.getTimerPeriod(num);
         String systemProperties = conf.getSystemProperties(num);
 
-        // Basic Tab
-        userEntry.setText(user);
-        // Save save_pass check field before the password itself,
-        // since setPass fetches its value from the preferences internally.
-        savePasswordCheckbox.setSelected(savePassword);
-        passwordEntry.setText(password);
-        hostEntry.setText(host);
-        portEntry.setText(String.valueOf(port));
-        appEntry.setText(application);
-
-        // SSL Tab
-        useSSLCheckbox.setSelected(useSSL);
-        clientCertificateEntry.setText(clientCertificateFile);
-        exportPasswordEntry.setText(clientCertificatePassword);
-        saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
-
-        // Others Tab
         styleEntry.setText(styleFile);
         lafThemeEntry.setText(lookAndFeelThemeFile);
-        for (int i = 0; i < lafs.length; i++) {
-            if (lookAndFeel.equals(lafs[i].getClassName())) {
-                lookAndFeelCombo.setSelectedItem(lafs[i].getName());
+        for (LookAndFeelInfo laf : lafs) {
+            if (lookAndFeel.equals(laf.getClassName())) {
+                lookAndFeelCombo.setSelectedItem(laf.getName());
             }
         }
         useTimerCheck.setSelected(useTimer);
         timerPeriodEntry.setText(String.valueOf(timerPeriod));
         propertiesText.setText(systemProperties);
-        updateSSLPanelComponentsEnabled();
+    }
+
+    protected void saveConfig(int num, String desc) {
+        conf.setDescription(num, desc);
+        this.saveConfig(num);
     }
 
     protected void saveConfig(int num) {
@@ -293,12 +306,11 @@ public class ConfigPanel extends JPanel {
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
         conf.setPassword(num, new String(passwordEntry.getPassword()));
-        conf.setHost(num, hostEntry.getText());
-        conf.setPort(num, Integer.parseInt(portEntry.getText()));
-        conf.setApplication(num, appEntry.getText());
+        conf.setAuthURI(num, authURIEntry.getText());
 
         // SSL Tab
         conf.setUseSSL(num, useSSLCheckbox.isSelected());
+        conf.setCACertificateFile(num, caCertificateEntry.getText());
         conf.setClientCertificateFile(num, clientCertificateEntry.getText());
         conf.setClientCertificatePassword(num, new String(exportPasswordEntry.getPassword()));
         conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
@@ -354,27 +366,15 @@ public class ConfigPanel extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        hostEntry = createTextField();
-        portEntry = createTextField();
-        portEntry.setColumns(5);
-        appEntry = createTextField();
+        authURIEntry = createTextField();
         userEntry = createTextField();
         passwordEntry = createPasswordField();
         savePasswordCheckbox = new JCheckBox();
-        savePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(savePasswordCheckbox));
 
         y = 0;
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.host")),
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.authURI")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(hostEntry,
-                createConstraints(1, y, 2, 1, 1.0, 0.0));
-        panel.add(portEntry,
-                createConstraints(3, y, 1, 1, 0.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.application")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(appEntry,
+        panel.add(authURIEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
@@ -408,14 +408,17 @@ public class ConfigPanel extends JPanel {
     private void updateSSLPanelComponentsEnabled() {
         final boolean useSsl = useSSLCheckbox.isSelected();
         clientCertificateEntry.setEnabled(useSsl);
-        exportPasswordEntry.setEnabled(useSsl);
         clientCertificateButton.setEnabled(useSsl);
+        caCertificateEntry.setEnabled(useSsl);
+        caCertificateButton.setEnabled(useSsl);
+        exportPasswordEntry.setEnabled(useSsl);
         saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
     }
 
     private JPanel createSSLPanel() {
         int y;
-        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
+        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description");
+        final String caCertificateDescription = Messages.getString("ConfigurationPanel.ca_certificate_description");
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -427,18 +430,28 @@ public class ConfigPanel extends JPanel {
                 updateSSLPanelComponentsEnabled();
             }
         });
+        caCertificateEntry = createTextField();
+        caCertificateButton = new JButton();
+        caCertificateButton.setAction(new FileSelectionAction(caCertificateEntry, ".pem", caCertificateDescription));
         clientCertificateEntry = createTextField();
         clientCertificateButton = new JButton();
         clientCertificateButton.setAction(new FileSelectionAction(clientCertificateEntry, ".p12", clientCertificateDescription));
         exportPasswordEntry = createPasswordField();
         saveClientCertificatePasswordCheckbox = new JCheckBox();
-        saveClientCertificatePasswordCheckbox.addActionListener(new ConfirmSavePasswordAction(saveClientCertificatePasswordCheckbox));
 
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(useSSLCheckbox,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
+        y++;
+
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.ca_certificate")),
+                createConstraints(0, y, 1, 1, 0.0, 1.0));
+        panel.add(caCertificateEntry,
+                createConstraints(1, y, 2, 1, 1.0, 0.0));
+        panel.add(caCertificateButton,
+                createConstraints(3, y, 1, 1, 0.0, 0.0));
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.client_certificate")),
@@ -498,13 +511,13 @@ public class ConfigPanel extends JPanel {
         JButton styleButton = new JButton();
         styleButton.setAction(
                 new FileSelectionAction(styleEntry, ".properties",
-                Messages.getString("ConfigurationPanel.style_filter_pattern")));
+                        Messages.getString("ConfigurationPanel.style_filter_pattern")));
         lafs = UIManager.getInstalledLookAndFeels();
         String[] lafNames = new String[lafs.length];
         for (int i = 0; i < lafNames.length; i++) {
             lafNames[i] = lafs[i].getName();
         }
-        lookAndFeelCombo = new JComboBox();
+        lookAndFeelCombo = new JComboBox<>();
         lookAndFeelCombo.setEditable(false);
         for (int i = 0; i < lafNames.length; i++) {
             lookAndFeelCombo.addItem(lafNames[i]);
@@ -520,7 +533,7 @@ public class ConfigPanel extends JPanel {
         lafThemeButton = new JButton();
         lafThemeButton.setAction(
                 new ThemeSelectionAction(lafThemeEntry, ".theme",
-                Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
+                        Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
@@ -664,7 +677,6 @@ public class ConfigPanel extends JPanel {
         panel.add(innerPanel,
                 createConstraints(0, y, 4, 1, 1.0, 1.0));
         y += 1;
-
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {

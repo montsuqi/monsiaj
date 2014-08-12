@@ -39,6 +39,7 @@ import org.montsuqi.monsia.WidgetInfo;
  *  to JComboBox's editor component.</p>
  */
 class ComboBuilder extends ContainerBuilder {
+        @Override
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component widget = super.buildSelf(xml, parent, info);
 		JComboBox combo = (JComboBox)widget;
@@ -47,10 +48,11 @@ class ComboBuilder extends ContainerBuilder {
 		return widget;
 	}
 
+        @Override
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		JComboBox combo = (JComboBox)parent;
 		if (info.getChildren().size() != 1) {
-			throw new WidgetBuildingException("only one child for a Combo"); //$NON-NLS-1$
+			throw new WidgetBuildingException("only one child for a Combo"); 
 		}
 		ChildInfo cInfo = info.getChild(0);
 		WidgetInfo wInfo = cInfo.getWidgetInfo();
@@ -65,8 +67,8 @@ class ComboBuilder extends ContainerBuilder {
 	 * @param actualType the type given in screen definition.
 	 */
 	protected void ensureValidEntryType(String actualType) {
-		if ( ! "Entry".equals(actualType)) { //$NON-NLS-1$
-			throw new WidgetBuildingException("not a Entry widget"); //$NON-NLS-1$
+		if ( ! "Entry".equals(actualType)) { 
+			throw new WidgetBuildingException("not a Entry widget"); 
 		}
 	}
 }

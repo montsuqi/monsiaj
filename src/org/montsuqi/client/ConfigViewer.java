@@ -22,16 +22,35 @@
  */
 package org.montsuqi.client;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.widgets.Button;
-import org.montsuqi.widgets.PandaCList;
 
 public class ConfigViewer {
 
+    protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected Config conf;
 
     public ConfigViewer(Config conf) {
@@ -39,17 +58,14 @@ public class ConfigViewer {
     }
 
     public void run(Frame parent) {
-        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); //$NON-NLS-1$
+        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true);
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout(5, 5));
-        final PandaCList clist = new PandaCList();
-        clist.setFocusable(true);
-        clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        clist.setShowGrid(true);
-        updateConfigList(clist);
-        clist.setAutoResizeMode(PandaCList.AUTO_RESIZE_LAST_COLUMN);
+        final JTable table = new JTable();
+        table.setRowSelectionAllowed(true);
+        updateConfigList(table);
 
-        JScrollPane scroll = new JScrollPane(clist,
+        JScrollPane scroll = new JScrollPane(table,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         container.add(scroll, BorderLayout.CENTER);
@@ -59,46 +75,47 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { //$NON-NLS-1$
+        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) {
 
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
                 editConfig(f, num, true);
-                updateConfigList(clist);
+                updateConfigList(table);
             }
         });
         bar.add(newButton);
 
-        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { //$NON-NLS-1$
+        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) {
 
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = clist.getSelectedRow();
+                int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     int num = conf.getList().get(selectedRow);
                     editConfig(f, num, false);
-                    updateConfigList(clist);
+                    updateConfigList(table);
                 }
             }
         });
         bar.add(editButton);
 
-        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { //$NON-NLS-1$
+        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) {
 
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = clist.getSelectedRow();
+                int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
-                    int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+                    int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
-                        String configName = (String) (clist.getValueAt(selectedRow, 0));
+                        String configName = (String) (table.getValueAt(selectedRow, 0));
                         conf.deleteConfig(conf.getConfigByDescription(configName));
-                        updateConfigList(clist);
+                        updateConfigList(table);
+                        logger.info("server config:" + configName + " deleted");
                     }
                 }
             }
         });
         bar.add(deleteButton);
 
-        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { //$NON-NLS-1$
+        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) {
 
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
@@ -112,24 +129,20 @@ public class ConfigViewer {
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    private void updateConfigList(PandaCList clist) {
+    private void updateConfigList(JTable table) {
         final String[] ColumnNames = {
             Messages.getString("ConfigurationViewer.config_name"),
-            Messages.getString("ConfigurationViewer.host"),
-            Messages.getString("ConfigurationViewer.port"),
-            Messages.getString("ConfigurationViewer.application"),
+            Messages.getString("ConfigurationViewer.authuri"),
             Messages.getString("ConfigurationViewer.user")
         };
 
         java.util.List<Integer> list = conf.getList();
         Object[][] tableData = new Object[list.size()][ColumnNames.length];
         int j = 0;
-        for (int i : list) {            
+        for (int i : list) {
             tableData[j][0] = conf.getDescription(i);
-            tableData[j][1] = conf.getHost(i);
-            tableData[j][2] = Integer.toString(conf.getPort(i));
-            tableData[j][3] = conf.getApplication(i);
-            tableData[j][4] = conf.getUser(i);
+            tableData[j][1] = conf.getAuthURI(i);
+            tableData[j][2] = conf.getUser(i);
             j++;
         }
         DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {
@@ -138,7 +151,7 @@ public class ConfigViewer {
                 return false;
             }
         };
-        clist.setModel(model);
+        table.setModel(model);
     }
 
     protected ConfigPanel createConfigPanel(Config conf) {
@@ -147,7 +160,7 @@ public class ConfigViewer {
 
     protected void editConfig(Dialog parent, final int num, final boolean newFlag) {
         String title = newFlag ? Messages.getString("ConfigurationViewer.new") : Messages.getString("ConfigurationViewer.edit");
-        final JDialog f = new JDialog(parent, title, true); //$NON-NLS-1$
+        final JDialog f = new JDialog(parent, title, true);
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout());
 
@@ -171,19 +184,20 @@ public class ConfigViewer {
         Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, (Color) SystemColor.controlDkShadow);
         basicPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
-                Messages.getString("ConfigurationPanel.basic_tab_label")));
+                        Messages.getString("ConfigurationPanel.basic_tab_label")));
         sslPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
-                Messages.getString("ConfigurationPanel.ssl_tab_label")));
+                        Messages.getString("ConfigurationPanel.ssl_tab_label")));
+
         othersPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
-                Messages.getString("ConfigurationPanel.others_tab_label")));
+                        Messages.getString("ConfigurationPanel.others_tab_label")));
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(configNamePanel);
         mainPanel.add(basicPanel);
-        mainPanel.add(sslPanel);
+        mainPanel.add(sslPanel);        
         mainPanel.add(othersPanel);
         container.add(mainPanel, BorderLayout.CENTER);
 
@@ -192,17 +206,18 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { //$NON-NLS-1$
+        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) {
 
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
-                configPanel.saveConfig(num);
+                configPanel.saveConfig(num, entryName);
+                logger.info("server config:" + entryName + " edited");
                 f.dispose();
             }
         });
         bar.add(editOKButton);
 
-        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { //$NON-NLS-1$
+        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) {
 
             public void actionPerformed(ActionEvent e) {
                 f.dispose();

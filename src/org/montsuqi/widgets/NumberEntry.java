@@ -1,29 +1,35 @@
 /*      PANDA -- a simple transaction monitor
 
-Copyright (C) 1998-1999 Ogochan.
-2000-2003 Ogochan & JMA (Japan Medical Association).
-2002-2006 OZAWA Sakuro.
+ Copyright (C) 1998-1999 Ogochan.
+ 2000-2003 Ogochan & JMA (Japan Medical Association).
+ 2002-2006 OZAWA Sakuro.
 
-This module is part of PANDA.
+ This module is part of PANDA.
 
-PANDA is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
-to anyone for the consequences of using it or for whether it serves
-any particular purpose or works at all, unless he says so in writing.
-Refer to the GNU General Public License for full details.
+ PANDA is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+ to anyone for the consequences of using it or for whether it serves
+ any particular purpose or works at all, unless he says so in writing.
+ Refer to the GNU General Public License for full details.
 
-Everyone is granted permission to copy, modify and redistribute
-PANDA, but only under the conditions described in the GNU General
-Public License.  A copy of this license is supposed to have been given
-to you along with PANDA so you can know your rights and
-responsibilities.  It should be in a file named COPYING.  Among other
-things, the copyright notice and this notice must be preserved on all
-copies.
+ Everyone is granted permission to copy, modify and redistribute
+ PANDA, but only under the conditions described in the GNU General
+ Public License.  A copy of this license is supposed to have been given
+ to you along with PANDA so you can know your rights and
+ responsibilities.  It should be in a file named COPYING.  Among other
+ things, the copyright notice and this notice must be preserved on all
+ copies.
  */
 package org.montsuqi.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.im.InputContext;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -36,13 +42,15 @@ import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PrecisionScale;
 import org.montsuqi.util.SystemEnvironment;
 
-/** <p>A class that simulates Gtk+'s NumberEntry.</p>
+/**
+ * <
+ * p>
+ * A class that simulates Gtk+'s NumberEntry.</p>
  */
 public class NumberEntry extends Entry {
 
@@ -103,6 +111,11 @@ public class NumberEntry extends Entry {
         return doc.getValue();
     }
 
+    public double getValueDouble() {
+        NumberDocument doc = (NumberDocument) getDocument();
+        return doc.getValue().doubleValue();
+    }
+
     public void setFormat(String format) {
         NumberDocument doc = (NumberDocument) getDocument();
         doc.setFormat(format);
@@ -110,9 +123,9 @@ public class NumberEntry extends Entry {
     }
 
     public static void main(String[] args) {
-        final JFrame f = new JFrame("TestNumberEntry"); //$NON-NLS-1$
+        final JFrame f = new JFrame("TestNumberEntry"); 
         final NumberEntry ne = new NumberEntry();
-        ne.setFormat("-----"); //$NON-NLS-1$
+        ne.setFormat("-----"); 
         ne.setValue(new BigDecimal(0));
         f.getContentPane().setLayout(new BorderLayout());
         f.getContentPane().add(ne, BorderLayout.CENTER);
@@ -144,8 +157,8 @@ public class NumberEntry extends Entry {
             case KeyEvent.VK_HOME: // fall through
             case KeyEvent.VK_END:
                 if (e.getID() == KeyEvent.KEY_PRESSED || e.getID() == KeyEvent.KEY_RELEASED) {
-                    setValue(NumberDocument.ZERO);
-                }
+                setValue(NumberDocument.ZERO);
+            }
                 e.consume();
                 break;
             default:
@@ -163,7 +176,7 @@ class NumberDocument extends PlainDocument {
     private int scale;
     private int expo;
     private boolean minus = false;
-    protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; //$NON-NLS-1$
+    protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; 
     static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
     static final BigDecimal ONE = new BigDecimal(BigInteger.ONE);
     protected static final Logger logger = LogManager.getLogger(NumberDocument.class);
@@ -186,7 +199,7 @@ class NumberDocument extends PlainDocument {
             scale = 0;
             insertString(0, t, null);
         } catch (BadLocationException e) {
-            logger.catching(Level.WARN,e);
+            logger.warn(e);
         }
         expo = 0;
         scale = 0;
@@ -300,14 +313,17 @@ class NumberDocument extends PlainDocument {
         String formatted = formatValue(value);
         remove(0, getLength());
         // treat zero value representation specially
-        if ((formatted.trim().equals("0") || formatted.trim().equals("+0")) && leaveZeroAsBlank()) { //$NON-NLS-1$
+        if ((formatted.trim().equals("0") || formatted.trim().equals("+0")) && leaveZeroAsBlank()) { 
             // do nothing
         } else {
             super.insertString(0, formatted, a);
         }
     }
 
-    /** <p>Test if zero value should be printed or left blank.</p>
+    /**
+     * <
+     * p>
+     * Test if zero value should be printed or left blank.</p>
      *
      * @return true if zero should be blank. false if zero should be printed.
      */

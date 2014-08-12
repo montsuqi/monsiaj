@@ -37,14 +37,14 @@ import javax.crypto.BadPaddingException;
 import javax.net.ssl.*;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
+import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketBuilder {
 
     private static final int DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD = 30;
-    private static Logger logger = LogManager.getLogger(SSLSocketBuilder.class);
+    private static final Logger logger = LogManager.getLogger(SSLSocketBuilder.class);
     private final SSLSocketFactory factory;
     private final KeyManager[] keyManagers;
     final TrustManager[] trustManagers;
@@ -67,74 +67,23 @@ public class SSLSocketBuilder {
         return factory;
     }
 
-    public SSLSocketBuilder(String fileName, String password) throws IOException {
-        boolean keyManagerIsReady = false;
-        try {
-            keyManagers = createKeyManagers(fileName, password);
-            keyManagerIsReady = true;
-            trustManagers = createTrustManagers();
-            final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
-            ctx.init(keyManagers, trustManagers, null);
-            factory = ctx.getSocketFactory();
-        } catch (SSLException e) {
-            throw e;
-        } catch (FileNotFoundException e) {
-            String missingFileName;
-            // we cannot check keyManagers != null here, since it may not be initialized.
-            if (keyManagerIsReady) {
-                missingFileName = null;
-            } else {
-                missingFileName = new File(fileName).getAbsolutePath();
-            }
-            final String format = Messages.getString("Client.file_not_found_format");
-            Object[] args = {missingFileName};
-            final String message = MessageFormat.format(format, args);
-            throw new IOException(message);
-        } catch (IOException e) {
-            System.out.println(e);
-            final Throwable t = e.getCause();
-            if (isMissingPassphraseMessage(e.getMessage())) {
-                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
-                final SSLException ssle = new SSLException(message);
-                throw ssle;
-            }
-            if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
-                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
-                final SSLException ssle = new SSLException(message);
-                throw ssle;
-            }
-            throw e;
-        } catch (GeneralSecurityException e) {
-            final String message = e.getMessage();
-            final SSLException ssle = new SSLException(message);
-            throw ssle;
+    public SSLSocketBuilder(String caCert, String p12, String p12Password) throws IOException,GeneralSecurityException {
+        if (!p12.isEmpty()) {
+            keyManagers = createKeyManagers(p12, p12Password);
+        } else {
+            keyManagers = new KeyManager[]{};
         }
-    }
-
-    public SSLSocket createSSLSocket(final Socket socket, final String host, final int port) throws IOException, GeneralSecurityException {
-        try {
-            final SSLSocket sslSocket = (SSLSocket) factory.createSocket(socket, host, port, true);
-            sslSocket.startHandshake();
-            final SSLSession session = sslSocket.getSession();
-            validatePeerCertificates(session.getPeerCertificates(), host);
-            return sslSocket;
-        } catch (SSLException e) {
-            if (e.getCause() instanceof RuntimeException) {
-                Throwable t = e.getCause();
-                t = t.getCause();
-                logger.fatal(t);
-                if (t instanceof GeneralSecurityException) {
-                    throw (GeneralSecurityException) t;
-                }
-            }
-            throw e;
-        } catch (IOException e) {
-            if (isBrokenPipeMessage(e.getMessage())) {
-                final String message = Messages.getString("Client.broken_pipe");
-                throw new IOException(message); //$NON-NLS-1$
-            }
-            throw e;
+        
+        if (caCert == null || caCert.isEmpty()) {
+            trustManagers = createSystemDefaultTrustManagers();
+        } else {
+            trustManagers = createCAFileTrustManagers(caCert);
         }
+        
+        final SSLContext ctx;
+        ctx = SSLContext.getInstance("TLS");
+        ctx.init(keyManagers, trustManagers, null);
+        factory = ctx.getSocketFactory();
     }
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
@@ -193,82 +142,90 @@ public class SSLSocketBuilder {
     }
 
     /**
-     * <p>Test if the given message means that passphrase is missing.</p>
+     * <p>
+     * Test if the given message means that passphrase is missing.</p>
      */
     private boolean isMissingPassphraseMessage(String message) {
-        return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
-                message.indexOf("/ by zero") >= 0; //$NON-NLS-1$
+        return message != null && message.indexOf("Default SSL context init failed") >= 0
+                && message.indexOf("/ by zero") >= 0;
     }
 
-    /**
-     * <p>Test if the given message means broken pipe.</p>
-     */
-    private boolean isBrokenPipeMessage(String message) {
-        return message != null && message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
+    protected static byte[] parseDERFromPEM(byte[] pem, String beginDelimiter, String endDelimiter) {
+        String data = new String(pem);
+        if (data.contains(beginDelimiter) && data.contains(endDelimiter)) {
+            String[] tokens = data.split(beginDelimiter);
+            tokens = tokens[1].split(endDelimiter);
+            return DatatypeConverter.parseBase64Binary(tokens[0]);
+        } else {
+            return pem;
+        }
     }
 
-    TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+    protected static X509Certificate generateCertificateFromDER(byte[] certBytes) throws CertificateException {
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+
+        return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(certBytes));
+    }
+
+    private byte[] fileToBytes(File file) throws IOException {
+        byte[] bytes = new byte[(int) file.length()];
+        FileInputStream inputStream = new FileInputStream(file);
+        inputStream.read(bytes);
+        inputStream.close();
+        return bytes;
+    }
+
+    private TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
+        byte[] certPem = fileToBytes(new File(caCertPath));
+        byte[] certBytes = parseDERFromPEM(certPem, "-----BEGIN CERTIFICATE-----", "-----END CERTIFICATE-----");
+        X509Certificate cert = generateCertificateFromDER(certBytes);
+
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(null);
+        keystore.setCertificateEntry("cert-alias", cert);
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keystore);
+        return trustManagerFactory.getTrustManagers();
+    }
+
+    private TrustManager[] createSystemDefaultTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init((KeyStore) null);
 
-        for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
-            if (trustManager instanceof X509TrustManager) {
-                X509TrustManager delegatee = (X509TrustManager) trustManager;
-                TrustManager tm = new MyTrustManager(delegatee);
-                return new TrustManager[]{tm};
-            }
-        }
-        return null;
+        return trustManagerFactory.getTrustManagers();
     }
 
     private KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
         if (fileName == null || fileName.length() <= 0) {
             return null;
         }
-        if (pass != null && pass.length() > 0) {
-            final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-            final InputStream is = new FileInputStream(fileName);
-            ks.load(is, pass.toCharArray());
-            checkPkcs12FileFormat(ks);
-            final KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            kmf.init(ks, pass.toCharArray());
-            final KeyManager[] kms = kmf.getKeyManagers();
-            for (int i = 0; i < kms.length; i++) {
-                if (kms[i] instanceof X509KeyManager) {
-                    final X509KeyManager delegatee = (X509KeyManager) kms[i];
-                    final KeyManager km = new MyKeyManager(delegatee);
-                    return new KeyManager[]{km};
-                }
-            }
-            return kms;
-        } else {
-            final String message = Messages.getString("Client.empty_pass"); //$NON-NLS-1$
-            throw new SSLException(message);
-        }
+        final KeyStore ks = KeyStore.getInstance("PKCS12");
+        final InputStream is = new FileInputStream(fileName);
+        ks.load(is, pass.toCharArray());
+        checkPkcs12FileFormat(ks);
+        final KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        kmf.init(ks, pass.toCharArray());
+        return kmf.getKeyManagers();
     }
 
     private void checkPkcs12FileFormat(final KeyStore ks) throws IOException {
         try {
             final Enumeration e = ks.aliases();
-            final String alias = (String) e.nextElement();
-            if (e.hasMoreElements()) {
-                final String message = Messages.getString("Client.more_than_one_client_certificate_in_pkcs12"); //$NON-NLS-1$
-                throw new SSLException(message);
-            }
-            final Certificate certificate = ks.getCertificate(alias);
-            if (certificate instanceof X509Certificate) {
-                final X509Certificate x509certificate = (X509Certificate) certificate;
-                checkCertificateExpiration(x509certificate);
-                final int before = getWarnCertificateExpirationThreashold();
-                warnCertificateExpirationWithin(x509certificate, before);
+            while (e.hasMoreElements()) {
+                final String alias = (String) e.nextElement();
+                final Certificate certificate = ks.getCertificate(alias);
+                if (certificate instanceof X509Certificate) {
+                    final X509Certificate x509certificate = (X509Certificate) certificate;
+                    checkCertificateExpiration(x509certificate);
+                    final int before = getWarnCertificateExpirationThreashold();
+                    warnCertificateExpirationWithin(x509certificate, before);
+                }
             }
         } catch (SSLException e) {
             throw e;
         } catch (Exception e) {
             final String message = e.getMessage();
-            final IOException ioe = new IOException(message);
-            ioe.initCause(e);
-            throw ioe;
+            throw new IOException(message, e);
         }
     }
 
@@ -277,12 +234,12 @@ public class SSLSocketBuilder {
             certificate.checkValidity();
         } catch (CertificateExpiredException e) {
             final Object[] args = {certificate.getSubjectDN(), certificate.getNotAfter()};
-            final String format = Messages.getString("Client.client_certificate_expired_format"); //$NON-NLS-1$
+            final String format = Messages.getString("Client.client_certificate_expired_format");
             final String message = MessageFormat.format(format, args);
             throw new SSLException(message);
         } catch (CertificateNotYetValidException e) {
             final Object[] args = {certificate.getSubjectDN(), certificate.getNotBefore()};
-            final String format = Messages.getString("Client.client_certificate_not_yet_valid_format"); //$NON-NLS-1$
+            final String format = Messages.getString("Client.client_certificate_not_yet_valid_format");
             final String message = MessageFormat.format(format, args);
             throw new SSLException(message);
         }
@@ -306,135 +263,19 @@ public class SSLSocketBuilder {
 
     private int getWarnCertificateExpirationThreashold() {
         int before = DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD;
-        final String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before"); //$NON-NLS-1$
+        final String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before");
         if (warnExpirationThreshold != null) {
             try {
                 final int newBefore = Integer.parseInt(warnExpirationThreshold);
                 if (newBefore > 0) {
                     before = newBefore;
                 } else {
-                    logger.warn("monsia.warn.certificate.expiration.before must be a positive value, ignored."); //$NON-NLS-1$
+                    logger.warn("monsia.warn.certificate.expiration.before must be a positive value, ignored.");
                 }
             } catch (NumberFormatException e) {
-                logger.warn("monsia.warn.certificate.expiration.before is not a number, falling back to default."); //$NON-NLS-1$
+                logger.warn("monsia.warn.certificate.expiration.before is not a number, falling back to default.");
             }
         }
         return before;
-    }
-
-    final class MyKeyManager implements X509KeyManager {
-
-        private final X509KeyManager delegatee;
-
-        MyKeyManager(X509KeyManager delegatee) {
-            this.delegatee = delegatee;
-        }
-
-        public String[] getClientAliases(String keyType, Principal[] issuers) {
-            return delegatee.getClientAliases(keyType, issuers);
-        }
-
-        public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
-            return delegatee.chooseClientAlias(keyType, issuers, socket);
-        }
-
-        public String[] getServerAliases(String keyType, Principal[] issuers) {
-            return delegatee.getServerAliases(keyType, issuers);
-        }
-
-        public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-            return delegatee.chooseServerAlias(keyType, issuers, socket);
-        }
-
-        public X509Certificate[] getCertificateChain(String alias) {
-            final X509Certificate[] chain = delegatee.getCertificateChain(alias);
-            X509TrustManager tm;
-            try {
-                tm = (X509TrustManager) trustManagers[0];
-                tm.checkClientTrusted(chain, "RSA"); //$NON-NLS-1$
-            } catch (CertificateException e) {
-                throw new RuntimeException(e);
-            }
-            return chain;
-        }
-
-        public PrivateKey getPrivateKey(String alias) {
-            return delegatee.getPrivateKey(alias);
-        }
-    }
-
-    final class MyTrustManager implements X509TrustManager {
-
-        private final X509TrustManager delegatee;
-
-        MyTrustManager(X509TrustManager delegatee) {
-            this.delegatee = delegatee;
-        }
-
-        private boolean isSelfCertificate(X509Certificate[] chain) {
-            final Principal subjectDN = chain[0].getSubjectDN();
-            final Principal issuerDN = chain[0].getIssuerDN();
-            return chain.length == 1 && subjectDN.equals(issuerDN);
-        }
-
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            if (isSelfCertificate(chain)) {
-                return;
-            }
-            try {
-                delegatee.checkClientTrusted(chain, authType);
-            } catch (CertificateException e) {
-                final String messageForDialog = Messages.getString("Client.client_certificate_verify_failed_proceed_connection_p");
-                final String messageForException = Messages.getString("Client.untrusted_client_certificate");
-                showAuthenticationFailure(chain, messageForDialog, messageForException);
-            }
-        }
-
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            try {
-                delegatee.checkServerTrusted(chain, authType);
-            } catch (CertificateException e) {
-                final String messageForDialog = Messages.getString("Client.server_certificate_verify_failed_proceed_connection_p");
-                final String messageForException = Messages.getString("Client.server_certificate_could_not_be_trusted");
-                showAuthenticationFailure(chain, messageForDialog, messageForException);
-            }
-        }
-        private static final int PROCEED_OPTION = 0;
-        private static final int CHECK_OPTION = 1;
-
-        private void showAuthenticationFailure(X509Certificate[] chain, String messageForDialog, String messageForException) throws CertificateException {
-            Object[] options = {
-                Messages.getString("Client.proceed"),
-                Messages.getString("Client.check_certificates"),
-                Messages.getString("Client.cancel")
-            };
-            CONFIRMATION_LOOP:
-            while (true) {
-                int n = JOptionPane.showOptionDialog(null,
-                        messageForDialog,
-                        Messages.getString("Client.warning_title"),
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        options,
-                        options[2]);
-                switch (n) {
-                    case PROCEED_OPTION:
-                        break CONFIRMATION_LOOP;
-                    case CHECK_OPTION:
-                        final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
-                        certificatePanel.setCertificateChain(chain);
-                        final String title = Messages.getString("Client.checking_certificate_chain");
-                        JOptionPane.showMessageDialog(null, certificatePanel, title, JOptionPane.PLAIN_MESSAGE);
-                        continue CONFIRMATION_LOOP;
-                    default:
-                        throw new CertificateException(messageForException);
-                }
-            }
-        }
-
-        public X509Certificate[] getAcceptedIssuers() {
-            return delegatee.getAcceptedIssuers();
-        }
     }
 }

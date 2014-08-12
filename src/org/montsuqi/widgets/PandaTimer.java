@@ -65,14 +65,14 @@ public class PandaTimer extends JComponent {
 
     public void startTimer() {
         if (!timer.isRunning() && timer.getDelay() != 0) {
-            logger.debug("starting timer: {0}", getName()); //$NON-NLS-1$
+            logger.debug("starting timer: {0}", getName()); 
             timer.start();
         }
     }
 
     public void stopTimer() {
         if (timer.isRunning()) {
-            logger.debug("stopping timer: {0}", getName()); //$NON-NLS-1$
+            logger.debug("stopping timer: {0}", getName()); 
             timer.stop();
         }
     }
@@ -123,7 +123,7 @@ public class PandaTimer extends JComponent {
      */
     public void setDuration(int duration) {
         Object[] args = {getName(), new Integer(duration)};
-        logger.debug("duration of {0}: {1}", args); //$NON-NLS-1$
+        logger.debug("duration of {0}: {1}", args); 
         timer.setInitialDelay(duration * 1000); //throws IllegalArgumentException on negative argument.
         timer.setDelay(duration * 1000);
         assert duration >= 0;

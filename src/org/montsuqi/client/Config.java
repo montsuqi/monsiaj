@@ -4,13 +4,24 @@
  */
 package org.montsuqi.client;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -24,7 +35,13 @@ public class Config {
     private String propPath;
     private Properties prop;
     private int current;
-    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "monsiaj.properties"};
+
+    private static final String PROP_FILENAME = "monsiaj.jsonrpc.properties";
+    private static final String JARPATH = System.getProperty("java.class.path");
+    private static final String DIRPATH = JARPATH.substring(0, JARPATH.lastIndexOf(File.separator) + 1);
+    private static final String DIRECT_PROP_PATH = DIRPATH + PROP_FILENAME;
+
+    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", PROP_FILENAME};
     private static final String PROP_PATH = SystemEnvironment.createFilePath(PROP_PATH_ELEM).getAbsolutePath();
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
@@ -60,7 +77,7 @@ public class Config {
 
     public int getNext() {
         int max = 0;
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -84,46 +101,14 @@ public class Config {
         readProp();
     }
 
-    private void convertOldConfig() {
-        OldConfig conf = new OldConfig();
-        String currentName = conf.getConfigurationName();
-        String[] names = conf.getConfigurationNames();
-        for (int i = 0; i < names.length; i++) {
-            if (names[i].equals(currentName)) {
-                current = i;
-            }
-            setValue(i, "description", names[i]);
-            setValue(i, "application", conf.getApplication(names[i]));
-            setValue(i, "port", Integer.toString(conf.getPort(names[i])));
-            setValue(i, "host", conf.getHost(names[i]));
-            setValue(i, "user", conf.getUser(names[i]));
-            setValue(i, "password", conf.getPassword(names[i]));
-            setValue(i, "savePassword", Boolean.toString(conf.getSavePassword(names[i])));
-            setValue(i, "useSSL", Boolean.toString(conf.getUseSSL(names[i])));
-            setValue(i, "clientCertificateFile", conf.getClientCertificateFileName(names[i]));
-            setValue(i, "clientCertificatePassword", conf.getClientCertificatePassword(names[i]));
-            setValue(i, "saveClientCertificatePassword", Boolean.toString(conf.getSaveClientCertificatePassword(names[i])));
-            setValue(i, "styleFile", conf.getStyleFileName(names[i]));
-            setValue(i, "lookAndFeel", conf.getLookAndFeelClassName(names[i]));
-            setValue(i, "lookAndFeelThemeFile", conf.getLAFThemeFileName(names[i]));
-            setValue(i, "useTimer", Boolean.toString(conf.getUseTimer(names[i])));
-            setValue(i, "timerPeriod", Long.toString(conf.getTimerPeriod(names[i])));
-            setValue(i, "systemProperties", conf.getProperties(names[i]));
-        }
-        //conf.delete();
-    }
-
     private void initProp() {
         propPath = null;
         current = 0;
         prop = new Properties();
         try {
-            String jarPath = System.getProperty("java.class.path");
-            String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator) + 1);
-            String path = dirPath + "monsiaj.properties";
-            prop.load(new FileInputStream(path));
+            prop.load(new FileInputStream(DIRECT_PROP_PATH));
             if (prop.size() > 0) {
-                propPath = path;
+                propPath = DIRECT_PROP_PATH;
             }
         } catch (IOException ex) {
             // do nothing
@@ -143,10 +128,6 @@ public class Config {
         current = Integer.valueOf(prop.getProperty(Config.CURRENT_KEY, "0"));
         List<Integer> list = this.getList();
         if (list.isEmpty()) {
-            convertOldConfig();
-        }
-        list = this.getList();
-        if (list.isEmpty()) {
             setValue(0, "description", "default");
             list.add(0);
         }
@@ -156,12 +137,12 @@ public class Config {
         Properties tmp = new Properties() {
             @Override
             public Set<Object> keySet() {
-                return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
+                return Collections.unmodifiableSet(new TreeSet<>(super.keySet()));
             }
 
             @Override
             public synchronized Enumeration<Object> keys() {
-                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+                return Collections.enumeration(new TreeSet<>(super.keySet()));
             }
         };
         prop.setProperty(Config.CURRENT_KEY, Integer.toString(current));
@@ -169,12 +150,12 @@ public class Config {
         try {
             tmp.store(new FileOutputStream(propPath), "monsiaj setting");
         } catch (IOException ex) {
-            logger.catching(Level.WARN,ex);
+            logger.catching(ex);
         }
     }
 
     public ArrayList<Integer> getList() {
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -189,7 +170,14 @@ public class Config {
                 }
             }
         }
-        Collections.sort(list);
+        Collections.sort(list, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                String n1 = Config.this.getDescription((Integer) o1);
+                String n2 = Config.this.getDescription((Integer) o2);
+                return n1.compareTo(n2);
+            }
+        });
         return list;
     }
 
@@ -214,51 +202,26 @@ public class Config {
         setValue(i, "description", v);
     }
 
-    // application
-    public String getApplication(int i) {
-        String value = getValue(i, "application");
+    // authuri
+    public String getAuthURI(int i) {
+        String value = getValue(i, "authuri");
         if (value.isEmpty()) {
-            return "panda:orca00";
+            return "http://localhost:8000/rpc/";
+        } else {
+            if (!value.endsWith("/")) {
+                value += "/";
+            }
         }
         return value;
     }
 
-    public void setApplication(int i, String v) {
-        setValue(i, "application", v);
-    }
-
-    // port
-    public int getPort(int i) {
-        String value = getValue(i, "port");
-        if (value.isEmpty()) {
-            return 8000;
-        }
-        return Integer.valueOf(value);
-    }
-
-    public void setPort(int i, int p) {
-        setValue(i, "port", Integer.toString(p));
-    }
-
-    // host
-    public String getHost(int i) {
-        String value = getValue(i, "host");
-        if (value.isEmpty()) {
-            return "trial.orca.med.or.jp";
-        }
-        return value;
-    }
-
-    public void setHost(int i, String v) {
-        setValue(i, "host", v);
+    public void setAuthURI(int i, String v) {
+        setValue(i, "authuri", v);
     }
 
     // user
     public String getUser(int i) {
         String value = getValue(i, "user");
-        if (value.isEmpty()) {
-            return "trial";
-        }
         return value;
     }
 
@@ -303,6 +266,16 @@ public class Config {
 
     public void setUseSSL(int i, boolean v) {
         setValue(i, "useSSL", Boolean.toString(v));
+    }
+
+    // clientCertificateFile
+    public String getCACertificateFile(int i) {
+        String value = getValue(i, "caCertificateFile");
+        return value;
+    }
+
+    public void setCACertificateFile(int i, String v) {
+        setValue(i, "caCertificateFile", v);
     }
 
     // clientCertificateFile
@@ -433,9 +406,7 @@ public class Config {
         System.out.println("------------------");
         for (int i : this.getList()) {
             System.out.println(this.getDescription(i));
-            System.out.println(Messages.getString("Configuration.list_host") + getHost(i));
-            System.out.println(Messages.getString("Configuration.list_port") + getPort(i));
-            System.out.println(Messages.getString("Configuration.list_application") + getApplication(i));
+            System.out.println(Messages.getString("Configuration.list_authURI") + getAuthURI(i));
             System.out.println(Messages.getString("Configuration.list_user") + getUser(i));
         }
     }
@@ -450,7 +421,7 @@ public class Config {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                String[] pair = line.split("\\s*=\\s*"); //$NON-NLS-1$
+                String[] pair = line.split("\\s*=\\s*");
                 if (pair.length == 2) {
                     String key = pair[0].trim();
                     String value = pair[1].trim();

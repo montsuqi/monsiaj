@@ -97,11 +97,11 @@ public class Loader {
         tmp.deleteOnExit();
         BufferedInputStream in = new BufferedInputStream(con.getInputStream());
         int length;
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tmp));
-        while ((length = in.read()) != -1) {
-            out.write(length);
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tmp))) {
+            while ((length = in.read()) != -1) {
+                out.write(length);
+            }
         }
-        out.close();
         con.disconnect();
         ZipUtils.unzip(tmp, cacheDir);
         tmp.delete();
@@ -174,8 +174,8 @@ public class Loader {
     private void invokeLauncher(String[] args) throws Exception {
         String cacheVersion = loadCacheVersion();
         File file = new File(CACHE_DIR + "monsiaj-bin-" + cacheVersion + "/jmareceipt.jar");
-        URLClassLoader loader = new URLClassLoader(new URL[]{file.toURL()});
-        Class cobj = loader.loadClass("jp.or.med.orca.jmareceipt.JMAReceiptLauncher");
+        URLClassLoader loader = new URLClassLoader(new URL[]{new URL(file.getAbsolutePath())});
+        Class<?> cobj = loader.loadClass("jp.or.med.orca.jmareceipt.JMAReceiptLauncher");
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
         m.setAccessible(true);
         int mods = m.getModifiers();

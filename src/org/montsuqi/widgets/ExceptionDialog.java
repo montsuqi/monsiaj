@@ -24,10 +24,13 @@ copies.
 package org.montsuqi.widgets;
 
 import javax.swing.JOptionPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /** <p>A Dialog to display information about an exception briefly.</p>
  */
 public class ExceptionDialog extends JOptionPane {
+        static final Logger logger = LogManager.getLogger(ExceptionDialog.class);
 
 	// inhibit instantiation
 	private ExceptionDialog() {
@@ -55,6 +58,7 @@ public class ExceptionDialog extends JOptionPane {
 		if (message == null || message.length() == 0) {
 			message = name;
 		}
+                logger.info("error",e);
 		JOptionPane.showMessageDialog(null, message, shortName, JOptionPane.ERROR_MESSAGE);
 	}
 }

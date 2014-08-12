@@ -27,7 +27,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.FocusListener;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.Rectangle;
 
 import java.util.Map;
@@ -55,16 +54,16 @@ class FixedBuilder extends ContainerBuilder {
         for (int i = 0, n = info.getChildren().size(); i < n; i++) {
             ChildInfo cInfo = info.getChild(i);
             WidgetInfo wInfo = cInfo.getWidgetInfo();
-            Component child = null;
+            Component child;
             int x = 0;
             int y = 0;
             child = buildWidget(xml, wInfo, parent);
             Map properties = cInfo.getProperties();
-            if (properties.containsKey("x")) { //$NON-NLS-1$
-                x = ParameterConverter.toInteger((String) properties.get("x")); //$NON-NLS-1$
+            if (properties.containsKey("x")) { 
+                x = ParameterConverter.toInteger((String) properties.get("x")); 
             }
-            if (properties.containsKey("y")) { //$NON-NLS-1$
-                y = ParameterConverter.toInteger((String) properties.get("y")); //$NON-NLS-1$
+            if (properties.containsKey("y")) { 
+                y = ParameterConverter.toInteger((String) properties.get("y")); 
             }
 
             // Since JTable itself does not have capability to scroll,

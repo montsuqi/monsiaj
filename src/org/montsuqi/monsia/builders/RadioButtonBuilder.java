@@ -40,10 +40,10 @@ class RadioButtonBuilder extends ContainerBuilder {
 		JRadioButton radio = (JRadioButton)widget;
 		Map properties = info.getProperties();
 		// button group is managed in Interface.
-		if (properties.containsKey("group")) { //$NON-NLS-1$
-			xml.setButtonGroup(radio, (String)properties.get("group")); //$NON-NLS-1$
+		if (properties.containsKey("group")) { 
+			xml.setButtonGroup(radio, (String)properties.get("group")); 
 		} else {
-			logger.warn("RadioButton {0} has no group", properties.get("name")); //$NON-NLS-1$ //$NON-NLS-2$
+			logger.warn("RadioButton {0} has no group", properties.get("name"));  //$NON-NLS-2$
 		}
 		return widget;
 	}

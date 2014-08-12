@@ -28,7 +28,11 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Executor;
-import javax.swing.*;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AbstractDocument;
@@ -92,9 +96,13 @@ public class PandaHTML extends JPanel {
      */
     public void setURI(URL uri) {
         Runnable loader = createLoader(uri);
-        logger.debug("loading: {0}", uri); //$NON-NLS-1$
+        logger.debug("loading: {0}", uri); 
         Executor executor = new ThreadPerTaskExecutor();
         executor.execute(loader);
+    }
+    
+    public void setText(String text) {
+        ((JEditorPane)html).setText(text);
     }
 
     protected class ThreadPerTaskExecutor implements Executor {

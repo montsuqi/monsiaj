@@ -42,28 +42,28 @@ public class OldConfig {
     private String pass;
     private String clientCertificatePass;
     private Preferences prefs;
-    private static final String PORT_KEY = "port"; //$NON-NLS-1$
-    private static final String HOST_KEY = "host"; //$NON-NLS-1$
-    private static final String USER_KEY = "user"; //$NON-NLS-1$
-    private static final String SAVE_PASSWORD_KEY = "save_pass"; //$NON-NLS-1$
-    private static final String PASSWORD_KEY = "password"; //$NON-NLS-1$
-    private static final String STYLES_KEY = "styles"; //$NON-NLS-1$
-    private static final String APPLICATION_KEY = "application"; //$NON-NLS-1$
-    private static final String USE_SSL_KEY = "use_ssl"; //$NON-NLS-1$
-    private static final String SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY = "save_client_certificate_pass"; //$NON-NLS-1$
-    private static final String CLIENT_CERTIFICATE_KEY = "client_certificate"; //$NON-NLS-1$
-    private static final String CLIENT_CERTIFICATE_PASSWORD_KEY = "client_certificate_password"; //$NON-NLS-1$
-    private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; //$NON-NLS-1$
-    private static final String LAF_THEME_KEY = "laf_theme"; //$NON-NLS-1$
-    private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; //$NON-NLS-1$
-    private static final String PROPERTIES_KEY = "properties"; //$NON-NLS-1$
-    private static final String USE_TIMER_KEY = "use_timer"; //$NON-NLS-1$
-    private static final String TIMER_PERIOD_KEY = "timer_period"; //$NON-NLS-1$
-    private static final String CURRENT_CONFIG_KEY = "current_config"; //$NON-NLS-1$
+    private static final String PORT_KEY = "port"; 
+    private static final String HOST_KEY = "host"; 
+    private static final String USER_KEY = "user"; 
+    private static final String SAVE_PASSWORD_KEY = "save_pass"; 
+    private static final String PASSWORD_KEY = "password"; 
+    private static final String STYLES_KEY = "styles"; 
+    private static final String APPLICATION_KEY = "application"; 
+    private static final String USE_SSL_KEY = "use_ssl"; 
+    private static final String SAVE_CLIENT_CERTIFICATE_PASSWORD_KEY = "save_client_certificate_pass"; 
+    private static final String CLIENT_CERTIFICATE_KEY = "client_certificate"; 
+    private static final String CLIENT_CERTIFICATE_PASSWORD_KEY = "client_certificate_password"; 
+    private static final String LOOK_AND_FEEL_KEY = "look_and_feel"; 
+    private static final String LAF_THEME_KEY = "laf_theme"; 
+    private static final String USE_LOG_VIEWER_KEY = "use_log_viewer"; 
+    private static final String PROPERTIES_KEY = "properties"; 
+    private static final String USE_TIMER_KEY = "use_timer"; 
+    private static final String TIMER_PERIOD_KEY = "timer_period"; 
+    private static final String CURRENT_CONFIG_KEY = "current_config"; 
     
-    private static final String PANDA_SCHEME = "panda:"; //$NON-NLS-1$
-    private static final String CONFIG_NODE_BASE = "config"; //$NON-NLS-1$
-    private static final String CONFIG_NODE = CONFIG_NODE_BASE + "/"; //$NON-NLS-1$
+    private static final String PANDA_SCHEME = "panda:"; 
+    private static final String CONFIG_NODE_BASE = "config"; 
+    private static final String CONFIG_NODE = CONFIG_NODE_BASE + "/"; 
     /**
      * <p>Default port: 8000</p>
      */
@@ -71,23 +71,23 @@ public class OldConfig {
     /**
      * <p>Default host: localhost</p>
      */
-    static final String DEFAULT_HOST = "trial.orca.med.or.jp"; //$NON-NLS-1$
+    static final String DEFAULT_HOST = "trial.orca.med.or.jp"; 
     /**
      * <p>Default user: value of System property user.name.</p>
      */
-    static final String DEFAULT_USER = "trial"; //$NON-NLS-1$
+    static final String DEFAULT_USER = "trial"; 
     /**
      * <p>Default password: empty string.</p>
      */
-    static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
+    static final String DEFAULT_PASSWORD = ""; 
     /**
      * <p>Default client certificate password: empty string.</p>
      */
-    static final String DEFAULT_CLIENT_CERTIFICATE_PASSWORD = ""; //$NON-NLS-1$
+    static final String DEFAULT_CLIENT_CERTIFICATE_PASSWORD = ""; 
     /**
      * <p>Default client certificate path: empty string.</p>
      */
-    static final String DEFAULT_CLIENT_CERTIFICATE = ""; //$NON-NLS-1$
+    static final String DEFAULT_CLIENT_CERTIFICATE = ""; 
     /**
      * <p>Default value of save password checkbox: false.</p>
      */
@@ -95,16 +95,16 @@ public class OldConfig {
     /**
      * <p>Default application name: "demo".</p>
      */
-    static final String DEFAULT_APPLICATION = "panda:orca00"; //$NON-NLS-1$
+    static final String DEFAULT_APPLICATION = "panda:orca00"; 
     /**
      * <p>Default style definitions: empty string.</p>
      */
-    static final String DEFAULT_STYLES = ""; //$NON-NLS-1$
+    static final String DEFAULT_STYLES = ""; 
     /**
      * <p>Default style resource name:
      * /org/montsuqi/client/style.properteis.</p>
      */
-    static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties"; //$NON-NLS-1$
+    static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties"; 
     /**
      * <p>Default value of use SSL checkbox: false.</p>
      */
@@ -635,7 +635,7 @@ public class OldConfig {
      * @return properties.
      */
     public String getProperties(String configName) {
-        final String properties = getString(configName, PROPERTIES_KEY, ""); //$NON-NLS-1$
+        final String properties = getString(configName, PROPERTIES_KEY, ""); 
         return properties;
     }
 
@@ -660,7 +660,7 @@ public class OldConfig {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                String[] pair = line.split("\\s*=\\s*"); //$NON-NLS-1$
+                String[] pair = line.split("\\s*=\\s*"); 
                 if (pair.length == 2) {
                     String key = pair[0].trim();
                     String value = pair[1].trim();

@@ -48,9 +48,9 @@ public class ParameterConverter {
 	 * if it is not zero, false if it is zero.
 	 */
 	public static boolean toBoolean(String s) {
-		if ("tyTY".indexOf(s.charAt(0)) >= 0) { //$NON-NLS-1$
+		if ("tyTY".indexOf(s.charAt(0)) >= 0) { 
 			return true;
-		} else if ("fnFN".indexOf(s.charAt(0)) >= 0) { //$NON-NLS-1$
+		} else if ("fnFN".indexOf(s.charAt(0)) >= 0) { 
 			return false;
 		} else {
 			return toInteger(s) != 0;

@@ -73,7 +73,7 @@ public final class Type {
 				throw new InternalError();
 			}
 		}
-		throw new IllegalArgumentException("type not found: " + type); //$NON-NLS-1$
+		throw new IllegalArgumentException("type not found: " + type); 
 	}
 
 }

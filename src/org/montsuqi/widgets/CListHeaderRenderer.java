@@ -36,7 +36,7 @@ class CListHeaderRenderer implements TableCellRenderer {
 	private Component component;
 
 	public CListHeaderRenderer(JComponent c) {
-		c.setBorder(UIManager.getBorder("TableHeader.cellBorder")); //$NON-NLS-1$
+		c.setBorder(UIManager.getBorder("TableHeader.cellBorder")); 
 		c.setOpaque(true);
 		this.component = c;
 	}

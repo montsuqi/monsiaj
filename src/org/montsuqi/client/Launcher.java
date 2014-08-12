@@ -23,12 +23,34 @@
 package org.montsuqi.client;
 
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.prefs.Preferences;
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,13 +66,13 @@ public class Launcher {
     protected String title;
     protected Config conf;
     protected ConfigPanel configPanel;
-    protected JComboBox configCombo;
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    protected JComboBox<String> configCombo;
+    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     public static void main(String[] args) {
         logger.info("---- start monsiaj");
-        logger.info("version : {}",Messages.getString("application.version"));
-        logger.info("java : {}",System.getProperty("java.version"));
+        logger.info("version : {}", Messages.getString("application.version"));
+        logger.info("java : {}", System.getProperty("java.version"));
         logger.info("os : {}-{}-{}",
                 System.getProperty("os.name"),
                 System.getProperty("os.version"),
@@ -60,6 +82,10 @@ public class Launcher {
     }
 
     public Launcher(String title) {
+        if (System.getProperty("monsia.log.level") != null) {
+        } else {
+            System.setProperty("monsia.log.level", "info");
+        }
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
@@ -121,6 +147,7 @@ public class Launcher {
                     return true;
                 }
             }
+            
             /*
              * confirm certificate password when the certificate password not
              * preserved
@@ -135,6 +162,7 @@ public class Launcher {
                     return true;
                 }
             }
+
             connect();
             return true;
         }
@@ -147,10 +175,11 @@ public class Launcher {
         GridBagConstraints gbc;
 
         JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
-        configCombo = new JComboBox();
+        configCombo = new JComboBox<>();
         updateConfigCombo();
         configCombo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 java.util.List<Integer> list = conf.getList();
                 int current = list.get(configCombo.getSelectedIndex());
@@ -162,10 +191,10 @@ public class Launcher {
         configPanel.loadConfig(conf.getCurrent());
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$
-        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel()); //$NON-NLS-1$
-        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); //$NON-NLS-1$
-        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); //$NON-NLS-1$
+        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel());
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -199,15 +228,15 @@ public class Launcher {
 
     private void updateConfigCombo() {
         ActionListener[] listeners = configCombo.getActionListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            configCombo.removeActionListener(listeners[i]);
+        for (ActionListener listener : listeners) {
+            configCombo.removeActionListener(listener);
         }
         configCombo.removeAllItems();
         for (int i : conf.getList()) {
             configCombo.addItem(conf.getDescription(i));
         }
-        for (int i = 0; i < listeners.length; i++) {
-            configCombo.addActionListener(listeners[i]);
+        for (ActionListener listener : listeners) {
+            configCombo.addActionListener(listener);
         }
         configCombo.setSelectedItem(conf.getDescription(conf.getCurrent()));
     }
@@ -216,11 +245,11 @@ public class Launcher {
         String ver = System.getProperty("java.version");
         boolean isOld = false;
         if (ver.startsWith("1.7")) {
-            if (ver.compareToIgnoreCase("1.7.0_21") < 0) {
+            if (ver.compareToIgnoreCase("1.7.0_51") < 0) {
                 isOld = true;
             }
         } else if (ver.startsWith("1.6")) {
-            if (ver.compareToIgnoreCase("1.6.0_45") < 0) {
+            if (ver.compareToIgnoreCase("1.6.0_71") < 0) {
                 isOld = true;
             }
         }
@@ -258,6 +287,7 @@ public class Launcher {
             checkBox.setSelected(checked);
             checkBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     prefs.put(Launcher.class.getName() + ".security_risk_agreement", checkBox.isSelected() ? "yes" : "no");
                 }
@@ -296,30 +326,35 @@ public class Launcher {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
+        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
                 conf.setCurrent(num);
-		        conf.applySystemProperties(conf.getCurrent());
+                conf.applySystemProperties(conf.getCurrent());
                 connect();
                 f.dispose();
             }
         });
         bar.add(run);
 
-        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { //$NON-NLS-1$
+        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
+                logger.info("launcher canceled");
                 System.exit(0);
             }
         });
         bar.add(cancel);
 
-        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
+        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
+                logger.info("view server configs");
                 viewer.run(f);
                 updateConfigCombo();
             }
@@ -362,7 +397,7 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); //$NON-NLS-1$
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png");
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }

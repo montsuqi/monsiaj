@@ -2,4 +2,4 @@ Main-Class: org.montsuqi.tools.TestGlade
 Class-Path: jmareceipt.jar
 Permissions: all-permissions
 Codebase: *.orca.med.or.jp
-Trusted-Library: true
+Application-Name: monsiaj
