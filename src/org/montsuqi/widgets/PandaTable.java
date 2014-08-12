@@ -11,7 +11,6 @@ package org.montsuqi.widgets;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.im.InputContext;
-import java.awt.im.InputSubset;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -27,8 +26,9 @@ public class PandaTable extends JTable {
 
     private class PandaTableModel extends DefaultTableModel {
 
-        private final String[] types;
-        private final String[] titles;
+        private final int MAX_COLS = 100;
+        private String[] types;
+        private String[] titles;
 
         public PandaTableModel() {
             super();
@@ -95,7 +95,10 @@ public class PandaTable extends JTable {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            return !this.types[col].equals("label");
+            if (this.types[col].equals("label")) {
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -107,17 +110,13 @@ public class PandaTable extends JTable {
             }
         }
     }
-
-    private final int MAX_COLS = 100;
-
     private Color[][] fgColors;
     private Color[][] bgColors;
-    private final PandaTableModel model;
+    private PandaTableModel model;
     private boolean enterPressed;
     private int changedRow;
     private int changedColumn;
     private String changedValue;
-    private boolean[] imControls;
 
     public int getChangedColumn() {
         return changedColumn;
@@ -151,12 +150,6 @@ public class PandaTable extends JTable {
         this.enterPressed = enterPressed;
     }
 
-    public void setImControls(String[] cs) {
-        for (int i = 0; i < cs.length && i < imControls.length; i++) {
-            imControls[i] = cs[i].startsWith("t") || cs[i].startsWith("T");
-        }
-    }
-
     public PandaTable() {
         this.setRowSelectionAllowed(false);
         JTableHeader header = this.getTableHeader();
@@ -176,10 +169,6 @@ public class PandaTable extends JTable {
         this.setRowHeight(rowheight);
 
         enterPressed = false;
-        imControls = new boolean[MAX_COLS];
-        for (int i = 0; i < MAX_COLS; i++) {
-            imControls[i] = false;
-        }
 
         final DefaultCellEditor ce = (DefaultCellEditor) this.getDefaultEditor(Object.class);
 
@@ -217,17 +206,7 @@ public class PandaTable extends JTable {
 
             @Override
             public void focusGained(FocusEvent e) {
-                // do nothing                
-                if (SystemEnvironment.isWindows()) {
-                    if (imControls[getSelectedColumn()]) {
-                        InputContext ic = getInputContext();
-                        if (ic != null) {
-                            ic.setCharacterSubsets(new Character.Subset[]{InputSubset.KANJI});
-                            ic.endComposition();
-                            ic.selectInputMethod(Locale.JAPANESE);
-                        }
-                    }
-                }
+                // do nothing
             }
 
             @Override
@@ -279,8 +258,6 @@ public class PandaTable extends JTable {
     //pns セル編集時に CellEditor にフォーカスさせる editCell
     private void editCell() {
         editCellAt(getSelectedRow(), getSelectedColumn());
-        this.setChangedRow(this.getSelectedRow());
-        this.setChangedColumn(this.getSelectedColumn());
 
         final DefaultCellEditor ce = (DefaultCellEditor) getDefaultEditor(Object.class);
         SwingUtilities.invokeLater(new Runnable() {
@@ -369,7 +346,8 @@ public class PandaTable extends JTable {
 
     @Override
     public Component prepareEditor(TableCellEditor editor, int row, int column) {
-        Component c = super.prepareEditor(editor,row,column);
+        Component c = super.prepareEditor(editor, row,
+                column);
         if (fgColors != null) {
             c.setForeground(fgColors[row][column]);
         }

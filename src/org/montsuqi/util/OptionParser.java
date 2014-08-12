@@ -37,19 +37,19 @@ public class OptionParser {
     static final String CONFIG_TRAILER;
 
     static {
-        if (System.getProperty("os.name").startsWith("Windows")) {  //$NON-NLS-2$
-            CONFIG_TRAILER = ".CFG"; 
+        if (System.getProperty("os.name").startsWith("Windows")) { //$NON-NLS-1$ //$NON-NLS-2$
+            CONFIG_TRAILER = ".CFG"; //$NON-NLS-1$
         } else {
-            CONFIG_TRAILER = ".conf"; 
+            CONFIG_TRAILER = ".conf"; //$NON-NLS-1$
         }
     }
     private static final char COMMAND_SWITCH = '-';
     private static final char RESPONSE_FILE_SWITCH = '@';
-    private final Map<String,Option> options;
+    private Map options;
     private static final Logger logger = LogManager.getLogger(OptionParser.class);
 
     public OptionParser() {
-        options = new TreeMap<>();
+        options = new TreeMap();
     }
 
     public void add(String name, String message, boolean defaultValue) {
@@ -73,7 +73,7 @@ public class OptionParser {
             return ((Option) options.get(name)).getValue();
         }
         Object[] args = {name};
-        throw new IllegalArgumentException(MessageFormat.format("no such option: {0}", args)); 
+        throw new IllegalArgumentException(MessageFormat.format("no such option: {0}", args)); //$NON-NLS-1$
     }
 
     public String getString(String key) {
@@ -90,7 +90,7 @@ public class OptionParser {
 
     public String[] parse(String program, String[] args) {
         try {
-            List<String> result = new LinkedList<>();
+            List result = new LinkedList();
             File paramFile = new File(changeSuffix(program, CONFIG_TRAILER));
             if (paramFile.canRead()) {
                 result.addAll(parseFile(program, paramFile));
@@ -103,29 +103,29 @@ public class OptionParser {
         }
     }
 
-    private List<String> parseFile(String program, File file) {
-        List<String> lines = new LinkedList<>();
+    private List parseFile(String program, File file) {
+        List lines = new LinkedList();
         try {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    line = line.trim();
-                    if (line.length() > 0) {
-                        lines.add(line);
-                    }
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.length() > 0) {
+                    lines.add(line);
                 }
             }
+            br.close();
         } catch (IOException e) {
             throw new OptionParserException(e);
         }
         return parseArray(program, lines.toArray(new String[lines.size()]));
     }
 
-    private List<String> parseArray(String program, Object[] args) {
-        List<String> files = new LinkedList<>();
-        for (Object arg1 : args) {
+    private List parseArray(String program, Object[] args) {
+        List files = new LinkedList();
+        for (int i = 0; i < args.length; i++) {
             boolean isParam = false;
-            String arg = (String) arg1;
+            String arg = (String) args[i];
             char c = arg.charAt(0);
             switch (c) {
                 case RESPONSE_FILE_SWITCH:
@@ -137,8 +137,8 @@ public class OptionParser {
                     break;
                 case COMMAND_SWITCH:
                     isParam = true;
-                    if (arg.equals("-?") || arg.equals("-h") || arg.equals("-H")) {  //$NON-NLS-2$ //$NON-NLS-3$
-                        System.out.println(usage("USAGE:" + program + " <option(s)> files..."));  //$NON-NLS-2$
+                    if (arg.equals("-?") || arg.equals("-h") || arg.equals("-H")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        System.out.println(usage("USAGE:" + program + " <option(s)> files...")); //$NON-NLS-1$ //$NON-NLS-2$
                         System.exit(0);
                     } else {
                         isParam = analyzeLine(arg.substring(1));
@@ -156,8 +156,8 @@ public class OptionParser {
     }
 
     private boolean analyzeLine(String line) {
-        if (line.startsWith(";")) { 
-            logger.debug("skipping comment: " + line); 
+        if (line.startsWith(";")) { //$NON-NLS-1$
+            logger.debug("skipping comment: " + line); //$NON-NLS-1$
             return false;
         }
         String key = line;
@@ -167,7 +167,10 @@ public class OptionParser {
             key = line.substring(0, index);
             value = line.substring(index + 1, line.length());
         }
-        for (Option option : options.values()) {
+
+        Iterator i = options.values().iterator();
+        while (i.hasNext()) {
+            Option option = (Option) i.next();
             String name = option.getName();
 
             if (key.equals(name)) {
@@ -182,21 +185,22 @@ public class OptionParser {
 
     public String usage(String comment) {
         Iterator i = options.values().iterator();
-        Format format = new MessageFormat("-{0} : {1}\n"); 
-        StringBuilder usage = new StringBuilder();
+        Format format = new MessageFormat("-{0} : {1}\n"); //$NON-NLS-1$
+        // "  -%-12s : %-40s"
+        StringBuffer usage = new StringBuffer();
         usage.append(comment);
-        usage.append("\n"); 
+        usage.append("\n"); //$NON-NLS-1$
         while (i.hasNext()) {
             Option o = (Option) i.next();
             Object[] args = {o.getName(), o.getMessage()};
             usage.append(format.format(args));
             Object value = o.getValue();
             if (value != null) {
-                usage.append("\t[").append(value).append("]");  //$NON-NLS-2$
-                usage.append("\n"); 
+                usage.append("\t[" + value + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                usage.append("\n"); //$NON-NLS-1$
             }
         }
-        usage.append("\n"); 
+        usage.append("\n"); //$NON-NLS-1$
         return usage.toString();
     }
 
@@ -210,16 +214,16 @@ public class OptionParser {
     public static void main(String[] args) {
         OptionParser parser = new OptionParser();
 
-        parser.add("a", "aaa", "abc");  //$NON-NLS-2$ //$NON-NLS-3$
-        parser.add("b", "bbb", 10);  //$NON-NLS-2$
-        parser.add("c", "ccc", false);  //$NON-NLS-2$
+        parser.add("a", "aaa", "abc"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        parser.add("b", "bbb", 10); //$NON-NLS-1$ //$NON-NLS-2$
+        parser.add("c", "ccc", false); //$NON-NLS-1$ //$NON-NLS-2$
 
-        args = parser.parse("OptionParser", args); 
+        args = parser.parse("OptionParser", args); //$NON-NLS-1$
 
-        System.out.println("*****\n"); 
-        System.out.println(parser.usage("Usage")); 
-        for (String arg : args) {
-            System.out.println(arg);
+        System.out.println("*****\n"); //$NON-NLS-1$
+        System.out.println(parser.usage("Usage")); //$NON-NLS-1$
+        for (int i = 0; i < args.length; i++) {
+            System.out.println(args[i]);
         }
     }
 }

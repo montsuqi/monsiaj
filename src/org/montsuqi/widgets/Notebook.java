@@ -38,7 +38,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Notebook extends JTabbedPane {
 
-    Map<Integer,NotebookDummyButton> buttons;
+    Map buttons;
     private int index;
     private int pindex;
     private boolean switchPage;
@@ -54,14 +54,13 @@ public class Notebook extends JTabbedPane {
     public Notebook() {
         super();
 
-        buttons = new HashMap<>();
+        buttons = new HashMap();
         index = 0;
         pindex = 0;
         switchPage = true;
 
         addChangeListener(new ChangeListener() {
 
-            @Override
             public void stateChanged(ChangeEvent e) {
                 Integer selected = new Integer(getSelectedIndex());
                 pindex = index;

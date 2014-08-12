@@ -39,7 +39,7 @@ class ScrolledWindowBuilder extends ContainerBuilder {
     @Override
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		if (info.getChildren().size() != 1) {
-			throw new WidgetBuildingException("only one child for a ScrolledWindow"); 
+			throw new WidgetBuildingException("only one child for a ScrolledWindow"); //$NON-NLS-1$
 		}
 		JScrollPane scroll = (JScrollPane)parent;
 		ChildInfo cInfo = info.getChild(0);

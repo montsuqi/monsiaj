@@ -14,32 +14,19 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PDFPrint.PDFPrintPage;
 
 public class PDFPrint extends Thread {
 
-    private final File file;
-    private String printer;
+    private File file;
     private boolean showDialog;
-
-    protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
 
     public PDFPrint(File file, boolean showDialog) {
         this.file = file;
         this.showDialog = showDialog;
-        this.printer = null;
-    }
-
-    public PDFPrint(File file, String printer) {
-        this.file = file;
-        this.showDialog = false;
-        this.printer = printer;
     }
 
     @Override
@@ -52,32 +39,16 @@ public class PDFPrint extends Thread {
             PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
 
             PDFPrintPage pages = new PDFPrintPage(pdfFile);
+
             PrinterJob pjob = PrinterJob.getPrinterJob();
+
             pjob.setJobName(file.getName());
 
-            if (System.getProperty("monsia.util.PDFPrint.force_use_default_printer") != null) {
-                showDialog = false;
-            }
-            String printer_ = System.getProperty("monsia.util.PDFPrint.printer");
-            if (printer_ != null) {
-                printer = printer_;
-                showDialog = false;
-            }            
-            if (showDialog) {
+            if (System.getProperty("monsia.util.PDFPrint.force_default_printer") == null && showDialog) {
                 if (!pjob.printDialog(reqset)) {
                     return;
                 }
-            } else {
-                if (printer != null) {
-                    PrintService[] pss = PrintServiceLookup.lookupPrintServices(null, null);
-                    for (PrintService ps : pss) {
-                        if (printer.equals(ps.getName())) {
-                            pjob.setPrintService(ps);
-                        }
-                    }
-                }
             }
-
             // validate the page against the chosen printer to correct
             // paper settings and margins
             PageFormat pf = pjob.getPageFormat(reqset);
@@ -96,20 +67,23 @@ public class PDFPrint extends Thread {
                 PrintServiceAttributeSet myAset = service.getAttributes();
                 Attribute[] attr = myAset.toArray();
                 System.out.println("Attributes set:");
-                for (Attribute attr1 : attr) {
-                    System.out.println("   " + attr1);
+                for (int i = 0; i < attr.length; i++) {
+                    System.out.println("   " + attr[i]);
                 }
             }
-            pjob.print();
-        } catch (PrinterException ex) {
-            logger.warn(ex);
+
+            try {
+                pjob.print();
+            } catch (PrinterException ex) {
+                ex.printStackTrace();
+            }
         } catch (java.io.IOException ex) {
-            logger.warn(ex);
+            ex.printStackTrace();
         }
     }
 
     public static void main(String args[]) throws Exception {
-        PDFPrint printer = new PDFPrint(new File(args[0]), args[1]);
+        PDFPrint printer = new PDFPrint(new File(args[0]), true);
         printer.start();
     }
 
@@ -131,8 +105,8 @@ public class PDFPrint extends Thread {
 
         // from Printable interface:  prints a single page, given a Graphics
         // to draw into, the page format, and the page number.
-        @Override
-        public int print(Graphics g, PageFormat format, int index) throws PrinterException {
+        public int print(Graphics g, PageFormat format, int index)
+                throws PrinterException {
             Graphics2D g2 = (Graphics2D) g;
             Rectangle2D.Double pageable;
             double hmargin = GetPrintOption("monsia.util.PDFPrint.hmargin");

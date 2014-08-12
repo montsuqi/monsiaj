@@ -44,21 +44,17 @@ import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.*;
 
 /**
- * <p>
- * WidgetPropertySetter is a class to help assigning properties to widgets.</p>
- * <p>
- * These setters exist one for a class(and subclass) and property name.</p>
- * <p>
- * When building a widget, a widget builder will look up a suitable setter for
- * each key in provided properties. When such a setter is found, its set method
- * is called to set a certain property of the widget.</p>
+ * <p>WidgetPropertySetter is a class to help assigning properties to
+ * widgets.</p> <p>These setters exist one for a class(and subclass) and
+ * property name.</p> <p>When building a widget, a widget builder will look up a
+ * suitable setter for each key in provided properties. When such a setter is
+ * found, its set method is called to set a certain property of the widget.</p>
  */
 abstract class WidgetPropertySetter {
 
     /**
-     * <p>
-     * This method does the actual work of setting a property. Subclasses must
-     * implement this method.</p>
+     * <p>This method does the actual work of setting a property. Subclasses
+     * must implement this method.</p>
      *
      * @param xml glade screen definition
      * @param parent parent widget of the target widget.
@@ -69,18 +65,15 @@ abstract class WidgetPropertySetter {
     protected static final Logger logger = LogManager.getLogger(WidgetPropertySetter.class);
 
     protected void warnUnsupportedProperty(String value) {
-        logger.debug("not supported: {0}", value);
+        logger.debug("not supported: {0}", value); //$NON-NLS-1$
     }
-    private static Map<Class, Map<String, WidgetPropertySetter>> propertyMap;
+    private static Map propertyMap;
     private static final WidgetPropertySetter nullWidgetPropertySetter;
 
     /**
-     * <p>
-     * Looks up a property setter for given class or its ancestors and property
-     * name.</p>
-     * <p>
-     * When no setter is found, nullWidgetPropertySetter, which does nothing, is
-     * returned.</p>
+     * <p>Looks up a property setter for given class or its ancestors and
+     * property name.</p> <p>When no setter is found, nullWidgetPropertySetter,
+     * which does nothing, is returned.</p>
      *
      * @param clazz class of the widget whose property is to be set.
      * @param name the proeprty name to be set.
@@ -104,35 +97,32 @@ abstract class WidgetPropertySetter {
 
     private static void registerProperty(Class clazz, String propertyName, WidgetPropertySetter setter) {
         if (!propertyMap.containsKey(clazz)) {
-            propertyMap.put(clazz, new HashMap<String, WidgetPropertySetter>());
+            propertyMap.put(clazz, new HashMap());
         }
-        Map<String, WidgetPropertySetter> map = propertyMap.get(clazz);
+        Map map = (Map) propertyMap.get(clazz);
         map.put(propertyName, setter);
     }
 
     static {
-        propertyMap = new HashMap<>();
+        propertyMap = new HashMap();
 
         nullWidgetPropertySetter = new WidgetPropertySetter() {
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 // do nothing
             }
         };
 
-        registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() {
+        registerProperty(AbstractButton.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 AbstractButton button = (AbstractButton) widget;
                 button.setText(value.replaceAll("_", ""));
             }
         });
 
-        registerProperty(Component.class, "width_request", new WidgetPropertySetter() {
+        registerProperty(Component.class, "width_request", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 Dimension size = widget.getSize();
                 try {
@@ -141,15 +131,14 @@ abstract class WidgetPropertySetter {
                     size.height = height;
                     widget.setSize(size);
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("not a number");
+                    throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
                 }
             }
         });
-        registerProperty(Component.class, "width", getSetter(Component.class, "width_request"));  //$NON-NLS-2$
+        registerProperty(Component.class, "width", getSetter(Component.class, "width_request")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        registerProperty(Component.class, "height_request", new WidgetPropertySetter() {
+        registerProperty(Component.class, "height_request", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 Dimension size = widget.getSize();
                 try {
@@ -158,33 +147,30 @@ abstract class WidgetPropertySetter {
                     size.width = width;
                     widget.setSize(size);
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("not a number");
+                    throw new IllegalArgumentException("not a number"); //$NON-NLS-1$
                 }
             }
         });
-        registerProperty(Component.class, "height", getSetter(Component.class, "height_request"));  //$NON-NLS-2$
+        registerProperty(Component.class, "height", getSetter(Component.class, "height_request")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        registerProperty(Component.class, "visible", new WidgetPropertySetter() {
+        registerProperty(Component.class, "visible", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 boolean visible = ParameterConverter.toBoolean(value);
                 widget.setVisible(visible);
             }
         });
 
-        registerProperty(Component.class, "tooltip", new WidgetPropertySetter() {
+        registerProperty(Component.class, "tooltip", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JComponent c = (JComponent) widget;
                 c.setToolTipText(value);
             }
         });
 
-        registerProperty(Component.class, "has_default", new WidgetPropertySetter() {
+        registerProperty(Component.class, "has_default", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 if (ParameterConverter.toBoolean(value)) {
                     xml.setDefaultWidget(widget);
@@ -192,9 +178,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(Component.class, "has_focus", new WidgetPropertySetter() {
+        registerProperty(Component.class, "has_focus", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 if (ParameterConverter.toBoolean(value)) {
                     xml.setFocusWidget(widget);
@@ -202,62 +187,58 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(AbstractButton.class, "can_focus", new WidgetPropertySetter() {
+        registerProperty(AbstractButton.class, "can_focus", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 final boolean flag = ParameterConverter.toBoolean(value);
                 widget.setFocusable(flag);
             }
         });
 
-        registerProperty(java.awt.Frame.class, "title", new WidgetPropertySetter() {
+        registerProperty(java.awt.Frame.class, "title", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 java.awt.Frame frame = (java.awt.Frame) widget;
                 frame.setTitle(value);
             }
         });
 
-        registerProperty(JLabel.class, "label", new WidgetPropertySetter() {
+        registerProperty(JLabel.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JLabel label = (JLabel) widget;
-                value = value.replaceFirst("\\s+\\z", "");  //$NON-NLS-2$
-                label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value);
+                value = value.replaceFirst("\\s+\\z", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value); //$NON-NLS-1$
             }
 
             // convert multi-line label value into HTML
             private String makeHTML(String value) {
-                StringBuilder buf = new StringBuilder("<html>");
-                StringTokenizer tokens = new StringTokenizer(value, "\n\"<>&", true);
+                StringBuffer buf = new StringBuffer("<html>"); //$NON-NLS-1$
+                StringTokenizer tokens = new StringTokenizer(value, "\n\"<>&", true); //$NON-NLS-1$
                 while (tokens.hasMoreTokens()) {
                     String token = tokens.nextToken();
-                    if ("\n".equals(token)) {
-                        buf.append("<br>");
-                    } else if ("\"".equals(token)) {
-                        buf.append("&dquot;");
-                    } else if ("<".equals(token)) {
-                        buf.append("&lt;");
-                    } else if (">".equals(token)) {
-                        buf.append("&gt;");
-                    } else if ("&".equals(token)) {
-                        buf.append("&amp;");
+                    if ("\n".equals(token)) { //$NON-NLS-1$
+                        buf.append("<br>"); //$NON-NLS-1$
+                    } else if ("\"".equals(token)) { //$NON-NLS-1$
+                        buf.append("&dquot;"); //$NON-NLS-1$
+                    } else if ("<".equals(token)) { //$NON-NLS-1$
+                        buf.append("&lt;"); //$NON-NLS-1$
+                    } else if (">".equals(token)) { //$NON-NLS-1$
+                        buf.append("&gt;"); //$NON-NLS-1$
+                    } else if ("&".equals(token)) { //$NON-NLS-1$
+                        buf.append("&amp;"); //$NON-NLS-1$
                     } else {
                         buf.append(token);
                     }
                 }
-                buf.append("</html>");
+                buf.append("</html>"); //$NON-NLS-1$
                 value = buf.toString();
                 return value;
             }
         });
 
-        registerProperty(JLabel.class, "xalign", new WidgetPropertySetter() {
+        registerProperty(JLabel.class, "xalign", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JLabel label = (JLabel) widget;
                 double align = Double.parseDouble(value);
@@ -271,9 +252,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JLabel.class, "yalign", new WidgetPropertySetter() {
+        registerProperty(JLabel.class, "yalign", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JLabel label = (JLabel) widget;
                 double align = Double.parseDouble(value);
@@ -287,29 +267,27 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JList.class, "selection_mode", new WidgetPropertySetter() {
+        registerProperty(JList.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JList list = (JList) widget;
-                value = normalize(value, "SELECTION_");
-                if ("SINGLE".equals(value)) {
+                value = normalize(value, "SELECTION_"); //$NON-NLS-1$
+                if ("SINGLE".equals(value)) { //$NON-NLS-1$
                     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                } else if ("MULTIPLE".equals(value)) {
+                } else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
                     list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                } else if ("EXTENDED".equals(value)) {
+                } else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
                     warnUnsupportedProperty(value);
-                } else if ("BROWSE".equals(value)) {
+                } else if ("BROWSE".equals(value)) { //$NON-NLS-1$
                     warnUnsupportedProperty(value);
                 } else {
-                    throw new IllegalArgumentException("invalid selection mode");
+                    throw new IllegalArgumentException("invalid selection mode"); //$NON-NLS-1$
                 }
             }
         });
 
-        registerProperty(JTextComponent.class, "editable", new WidgetPropertySetter() {
+        registerProperty(JTextComponent.class, "editable", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTextComponent text = (JTextComponent) widget;
                 final boolean flag = ParameterConverter.toBoolean(value);
@@ -318,9 +296,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JTextComponent.class, "can_focus", new WidgetPropertySetter() {
+        registerProperty(JTextComponent.class, "can_focus", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTextComponent text = (JTextComponent) widget;
                 final boolean flag = ParameterConverter.toBoolean(value);
@@ -329,18 +306,16 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JTextComponent.class, "text", new WidgetPropertySetter() {
+        registerProperty(JTextComponent.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTextComponent text = (JTextComponent) widget;
                 text.setText(value);
             }
         });
 
-        registerProperty(JTextArea.class, "text", new WidgetPropertySetter() {
+        registerProperty(JTextArea.class, "text", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTextArea text = (JTextArea) widget;
                 text.setText(value);
@@ -350,17 +325,16 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JTextField.class, "justify", new WidgetPropertySetter() {
+        registerProperty(JTextField.class, "justify", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTextField text = (JTextField) widget;
-                value = normalize(value, "JUSTIFY_");
-                if ("CENTER".equals(value)) {
+                value = normalize(value, "JUSTIFY_"); //$NON-NLS-1$
+                if ("CENTER".equals(value)) { //$NON-NLS-1$
                     text.setHorizontalAlignment(SwingConstants.CENTER);
-                } else if ("LEFT".equals(value)) {
+                } else if ("LEFT".equals(value)) { //$NON-NLS-1$
                     text.setHorizontalAlignment(SwingConstants.LEFT);
-                } else if ("RIGHT".equals(value)) {
+                } else if ("RIGHT".equals(value)) { //$NON-NLS-1$
                     text.setHorizontalAlignment(SwingConstants.RIGHT);
                 } else {
                     warnUnsupportedProperty(value);
@@ -368,9 +342,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JLabel.class, "wrap", new WidgetPropertySetter() {
+        registerProperty(JLabel.class, "wrap", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JLabel label = (JLabel) widget;
                 // wrap=true is converted to left alighnemt
@@ -380,44 +353,40 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JPasswordField.class, "invisible_char", new WidgetPropertySetter() {
+        registerProperty(JPasswordField.class, "invisible_char", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JPasswordField password = (JPasswordField) widget;
                 password.setEchoChar(value.charAt(0));
             }
         });
 
-        registerProperty(NumberEntry.class, "format", new WidgetPropertySetter() {
+        registerProperty(NumberEntry.class, "format", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 NumberEntry entry = (NumberEntry) widget;
                 entry.setFormat(value);
             }
         });
 
-        registerProperty(PandaEntry.class, "input_mode", new WidgetPropertySetter() {
+        registerProperty(PandaEntry.class, "input_mode", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaEntry entry = (PandaEntry) widget;
-                if (value.equals("ASCII")) {
+                if (value.equals("ASCII")) { //$NON-NLS-1$
                     entry.setInputMode(PandaEntry.ASCII);
-                } else if (value.equals("KANA")) {
+                } else if (value.equals("KANA")) { //$NON-NLS-1$
                     entry.setInputMode(PandaEntry.KANA);
-                } else if (value.equals("XIM")) {
+                } else if (value.equals("XIM")) { //$NON-NLS-1$
                     entry.setInputMode(PandaEntry.XIM);
                 } else {
-                    throw new IllegalArgumentException("invalid input mode");
+                    throw new IllegalArgumentException("invalid input mode"); //$NON-NLS-1$
                 }
             }
         });
 
         registerProperty(Entry.class, "text_max_length", new WidgetPropertySetter() {
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 final Entry entry = (Entry) widget;
                 final int limit = ParameterConverter.toInteger(value);
@@ -427,7 +396,6 @@ abstract class WidgetPropertySetter {
 
         registerProperty(Entry.class, "max_length", new WidgetPropertySetter() {
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 final Entry entry = (Entry) widget;
                 final int limit = ParameterConverter.toInteger(value);
@@ -435,18 +403,16 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(PandaEntry.class, "xim_enabled", new WidgetPropertySetter() {
+        registerProperty(PandaEntry.class, "xim_enabled", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaEntry entry = (PandaEntry) widget;
                 entry.setXIMEnabled(ParameterConverter.toBoolean(value));
             }
         });
 
-        registerProperty(JProgressBar.class, "lower", new WidgetPropertySetter() {
+        registerProperty(JProgressBar.class, "lower", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JProgressBar progress = (JProgressBar) widget;
                 BoundedRangeModel model = progress.getModel();
@@ -454,9 +420,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JProgressBar.class, "upper", new WidgetPropertySetter() {
+        registerProperty(JProgressBar.class, "upper", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JProgressBar progress = (JProgressBar) widget;
                 BoundedRangeModel model = progress.getModel();
@@ -464,9 +429,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JProgressBar.class, "value", new WidgetPropertySetter() {
+        registerProperty(JProgressBar.class, "value", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JProgressBar progress = (JProgressBar) widget;
                 BoundedRangeModel model = progress.getModel();
@@ -474,27 +438,25 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JProgressBar.class, "orientation", new WidgetPropertySetter() {
+        registerProperty(JProgressBar.class, "orientation", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JProgressBar progress = (JProgressBar) widget;
-                value = normalize(value, "PROGRESS_");
-                if ("LEFT_TO_RIGHT".equals(value)) {
+                value = normalize(value, "PROGRESS_"); //$NON-NLS-1$
+                if ("LEFT_TO_RIGHT".equals(value)) { //$NON-NLS-1$
                     progress.setOrientation(SwingConstants.HORIZONTAL);
-                } else if ("RIGHT_TO_LEFT".equals(value)) {
+                } else if ("RIGHT_TO_LEFT".equals(value)) { //$NON-NLS-1$
                     progress.setOrientation(SwingConstants.HORIZONTAL);
-                } else if ("TOP_TO_BOTTOM".equals(value)) {
+                } else if ("TOP_TO_BOTTOM".equals(value)) { //$NON-NLS-1$
                     progress.setOrientation(SwingConstants.VERTICAL);
-                } else if ("BOTTOM_TO_TOP".equals(value)) {
+                } else if ("BOTTOM_TO_TOP".equals(value)) { //$NON-NLS-1$
                     progress.setOrientation(SwingConstants.VERTICAL);
                 }
             }
         });
 
-        registerProperty(JProgressBar.class, "show_text", new WidgetPropertySetter() {
+        registerProperty(JProgressBar.class, "show_text", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JProgressBar progress = (JProgressBar) widget;
                 progress.setStringPainted(ParameterConverter.toBoolean(value));
@@ -504,9 +466,8 @@ abstract class WidgetPropertySetter {
         /*
          * PandaTable
          */
-        registerProperty(PandaTable.class, "columns", new WidgetPropertySetter() {
+        registerProperty(PandaTable.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTable table = (PandaTable) widget;
                 table.setColumns(ParameterConverter.toInteger(value));
@@ -514,18 +475,16 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(PandaTable.class, "rows", new WidgetPropertySetter() {
+        registerProperty(PandaTable.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTable table = (PandaTable) widget;
                 table.setRows(ParameterConverter.toInteger(value));
             }
         });
 
-        registerProperty(PandaTable.class, "column_types", new WidgetPropertySetter() {
+        registerProperty(PandaTable.class, "column_types", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTable table = (PandaTable) widget;
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
@@ -537,23 +496,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(PandaTable.class, "im_controls", new WidgetPropertySetter() {
+        registerProperty(PandaTable.class, "column_titles", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
-            public void set(Interface xml, Container parent, Component widget, String value) {
-                PandaTable table = (PandaTable) widget;
-                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
-                String[] ics = new String[tokens.countTokens()];
-                for (int i = 0; tokens.hasMoreTokens(); i++) {
-                    ics[i] = tokens.nextToken();
-                }
-                table.setImControls(ics);
-            }
-        });
-
-        registerProperty(PandaTable.class, "column_titles", new WidgetPropertySetter() {
-
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTable table = (PandaTable) widget;
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
@@ -568,9 +512,8 @@ abstract class WidgetPropertySetter {
         /*
          * PandaCList
          */
-        registerProperty(PandaCList.class, "columns", new WidgetPropertySetter() {
+        registerProperty(PandaCList.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTable table = (JTable) widget;
                 TableColumnModel model = table.getColumnModel();
@@ -584,16 +527,15 @@ abstract class WidgetPropertySetter {
         /*
          * PandaCList,PandaTable
          */
-        registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() {
+        registerProperty(JTable.class, "column_widths", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTable table = (JTable) widget;
                 TableColumnModel model = table.getColumnModel();
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
                 int columns = tokens.countTokens();
                 if (model.getColumnCount() < columns) {
-                    WidgetPropertySetter setter = getSetter(JTable.class, "columns");
+                    WidgetPropertySetter setter = getSetter(JTable.class, "columns"); //$NON-NLS-1$
                     setter.set(xml, parent, widget, String.valueOf(columns));
                 }
                 assert columns == model.getColumnCount();
@@ -639,23 +581,27 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(PandaCList.class, "selection_mode", new WidgetPropertySetter() {
+        registerProperty(JTable.class, "selection_mode", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
-                PandaCList clist = (PandaCList) widget;
-                value = normalize(value, "SELECTION_");
-                if ("SINGLE".equals(value)) {
-                    clist.setMode(PandaCList.SELECTION_MODE_SINGLE);
+                JTable table = (JTable) widget;
+                value = normalize(value, "SELECTION_"); //$NON-NLS-1$
+                if ("SINGLE".equals(value)) { //$NON-NLS-1$
+                    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                } else if ("MULTIPLE".equals(value)) { //$NON-NLS-1$
+                    table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                } else if ("EXTENDED".equals(value)) { //$NON-NLS-1$
+                    warnUnsupportedProperty(value);
+                } else if ("BROWSE".equals(value)) { //$NON-NLS-1$
+                    warnUnsupportedProperty(value);
                 } else {
-                    clist.setMode(PandaCList.SELECTION_MODE_MULTI);
+                    throw new IllegalArgumentException(value);
                 }
             }
         });
 
-        registerProperty(JTable.class, "show_titles", new WidgetPropertySetter() {
+        registerProperty(JTable.class, "show_titles", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTable table = (JTable) widget;
                 JTableHeader header = table.getTableHeader();
@@ -663,9 +609,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(PandaHTML.class, "uri", new WidgetPropertySetter() {
+        registerProperty(PandaHTML.class, "uri", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaHTML pane = (PandaHTML) widget;
                 try {
@@ -680,35 +625,32 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(PandaTimer.class, "duration", new WidgetPropertySetter() {
+        registerProperty(PandaTimer.class, "duration", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 PandaTimer timer = (PandaTimer) widget;
                 timer.setDuration(ParameterConverter.toInteger(value));
             }
         });
 
-        registerProperty(org.montsuqi.widgets.Frame.class, "label", new WidgetPropertySetter() {
+        registerProperty(org.montsuqi.widgets.Frame.class, "label", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 org.montsuqi.widgets.Frame frame = (org.montsuqi.widgets.Frame) widget;
                 frame.setBorder(BorderFactory.createTitledBorder(value));
             }
         });
 
-        registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() {
+        registerProperty(JScrollPane.class, "hscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JScrollPane scroll = (JScrollPane) widget;
-                value = normalize(value, "POLICY_");
-                if ("ALWAYS".equals(value)) {
+                value = normalize(value, "POLICY_"); //$NON-NLS-1$
+                if ("ALWAYS".equals(value)) { //$NON-NLS-1$
                     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-                } else if (value.startsWith("AUTO")) {
+                } else if (value.startsWith("AUTO")) { //$NON-NLS-1$
                     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                } else if ("NEVER".equals(value)) {
+                } else if ("NEVER".equals(value)) { //$NON-NLS-1$
                     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
                 } else {
                     throw new IllegalArgumentException(value);
@@ -716,17 +658,16 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() {
+        registerProperty(JScrollPane.class, "vscrollbar_policy", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JScrollPane scroll = (JScrollPane) widget;
-                value = normalize(value, "POLICY_");
-                if ("ALWAYS".equals(value)) {
+                value = normalize(value, "POLICY_"); //$NON-NLS-1$
+                if ("ALWAYS".equals(value)) { //$NON-NLS-1$
                     scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                } else if (value.startsWith("AUTO")) {
+                } else if (value.startsWith("AUTO")) { //$NON-NLS-1$
                     scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-                } else if ("NEVER".equals(value)) {
+                } else if ("NEVER".equals(value)) { //$NON-NLS-1$
                     scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
                 } else {
                     throw new IllegalArgumentException(value);
@@ -734,12 +675,11 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JMenuItem.class, "stock_item", new WidgetPropertySetter() {
+        registerProperty(JMenuItem.class, "stock_item", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 JMenuItem item = (JMenuItem) widget;
-                value = normalize(value, "GNOMEUIINFO_MENU_");
+                value = normalize(value, "GNOMEUIINFO_MENU_"); //$NON-NLS-1$
                 UIStock stock = UIStock.get(value);
                 if (stock == null) {
                     return;
@@ -763,7 +703,7 @@ abstract class WidgetPropertySetter {
             }
         });
 
-//		registerProperty(Table.class, "rows", new WidgetPropertySetter() { 
+//		registerProperty(Table.class, "rows", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
 //				Table table = (Table)widget;
 //				TableLayout layout = (TableLayout)table.getLayout();
@@ -771,14 +711,14 @@ abstract class WidgetPropertySetter {
 //			}
 //		});
 //
-//		registerProperty(Table.class, "columns", new WidgetPropertySetter() { 
+//		registerProperty(Table.class, "columns", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
 //				Table table = (Table)widget;
 //				TableLayout layout = (TableLayout)table.getLayout();
 //				layout.setColumns(ParameterConverter.toInteger(value));
 //			}
 //		});
-//		registerProperty(Table.class, "homogeneous", new WidgetPropertySetter() { 
+//		registerProperty(Table.class, "homogeneous", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
 //				Table table = (Table)widget;
 //				TableLayout tl = (TableLayout)table.getLayout();
@@ -786,7 +726,7 @@ abstract class WidgetPropertySetter {
 //			}
 //		});
 //
-//		registerProperty(Table.class, "row_spacing", new WidgetPropertySetter() { 
+//		registerProperty(Table.class, "row_spacing", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
 //				Table table = (Table)widget;
 //				TableLayout tl = (TableLayout)table.getLayout();
@@ -794,46 +734,43 @@ abstract class WidgetPropertySetter {
 //			}
 //		});
 //
-//		registerProperty(Table.class, "column_spacing", new WidgetPropertySetter() { 
+//		registerProperty(Table.class, "column_spacing", new WidgetPropertySetter() { //$NON-NLS-1$
 //			void set(Interface xml, Container parent, Component widget, String value) {
 //				Table table = (Table)widget;
 //				TableLayout tl = (TableLayout)table.getLayout();
 //				tl.setRowSpacing(ParameterConverter.toInteger(value));
 //			}
 //		});
+
         registerProperty(Window.class, "allow_grow", new WidgetPropertySetter() { //$NON-NLS-1
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 Window window = (Window) widget;
                 window.setAllow_Grow(ParameterConverter.toBoolean(value));
             }
         });
 
-        registerProperty(Window.class, "allow_shrink", new WidgetPropertySetter() {
+        registerProperty(Window.class, "allow_shrink", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 Window window = (Window) widget;
                 window.setAllow_Shrink(ParameterConverter.toBoolean(value));
             }
         });
 
-        registerProperty(java.awt.Window.class, "position", new WidgetPropertySetter() {
+        registerProperty(java.awt.Window.class, "position", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 value = normalize(value, null);
-                if (value.equals("WIN_POS_CENTER")) {
+                if (value.equals("WIN_POS_CENTER")) { //$NON-NLS-1$
                     java.awt.Window window = (java.awt.Window) widget;
                     window.setLocationRelativeTo(null);
                 }
             }
         });
 
-        registerProperty(java.awt.Window.class, "x", new WidgetPropertySetter() {
+        registerProperty(java.awt.Window.class, "x", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 java.awt.Window window = (java.awt.Window) widget;
                 int x = ParameterConverter.toInteger(value);
@@ -842,9 +779,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(java.awt.Window.class, "y", new WidgetPropertySetter() {
+        registerProperty(java.awt.Window.class, "y", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 java.awt.Window window = (java.awt.Window) widget;
                 int x = window.getX();
@@ -853,9 +789,8 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JDialog.class, "modal", new WidgetPropertySetter() {
+        registerProperty(JDialog.class, "modal", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 JDialog dialog = (JDialog) widget;
                 dialog.setModal(ParameterConverter.toBoolean(value));
@@ -863,27 +798,24 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(Pixmap.class, "scaled", new WidgetPropertySetter() {
+        registerProperty(Pixmap.class, "scaled", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 Pixmap pixmap = (Pixmap) widget;
                 pixmap.setScaled(ParameterConverter.toBoolean(value));
             }
         });
 
-        registerProperty(Pixmap.class, "scaled_width", new WidgetPropertySetter() {
+        registerProperty(Pixmap.class, "scaled_width", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 Pixmap pixmap = (Pixmap) widget;
                 pixmap.setScaledWidth(ParameterConverter.toInteger(value));
             }
         });
 
-        registerProperty(Pixmap.class, "scaled_height", new WidgetPropertySetter() {
+        registerProperty(Pixmap.class, "scaled_height", new WidgetPropertySetter() { //$NON-NLS-1$
 
-            @Override
             void set(Interface xml, Container parent, Component widget, String value) {
                 Pixmap pixmap = (Pixmap) widget;
                 pixmap.setScaledHeight(ParameterConverter.toInteger(value));
@@ -893,8 +825,7 @@ abstract class WidgetPropertySetter {
     }
 
     /**
-     * <p>
-     * Removes given prefix along with "GTK_" and "GTK_". </p>
+     * <p>Removes given prefix along with "GTK_" and "GTK_". </p>
      *
      * @param value target string to be normalized.
      * @param prefixToRemove a prefix to remove. Ignored if it is null or its
@@ -902,11 +833,11 @@ abstract class WidgetPropertySetter {
      * @return normalized string.
      */
     static String normalize(String value, String prefixToRemove) {
-        if (value.startsWith("GDK_")) {
-            value = value.substring("GDK_".length());
+        if (value.startsWith("GDK_")) { //$NON-NLS-1$
+            value = value.substring("GDK_".length()); //$NON-NLS-1$
         }
-        if (value.startsWith("GTK_")) {
-            value = value.substring("GTK_".length());
+        if (value.startsWith("GTK_")) { //$NON-NLS-1$
+            value = value.substring("GTK_".length()); //$NON-NLS-1$
         }
         if (prefixToRemove != null) {
             int length = prefixToRemove.length();

@@ -41,14 +41,14 @@ class FileChooserButtonMarshaller extends WidgetMarshaller {
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if ("objectdata".equals(name)) { 
+            if ("objectdata".equals(name)) { //$NON-NLS-1$
                 con.receiveBinaryData();
             } else if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             } else if ("filename".equals(name)) {
                 con.receiveStringData();
             } else {
-                throw new WidgetMarshallingException("does not reach here"); 
+                throw new WidgetMarshallingException("does not reach here"); //$NON-NLS-1$
             }
         }
         fcb.setFile(null);

@@ -39,18 +39,18 @@ import org.montsuqi.widgets.TableLayout;
  */
 class TableBuilder extends ContainerBuilder {
 
-	private static final String LEFT_ATTACH_KEY = "left_attach"; 
-	private static final String RIGHT_ATTACH_KEY = "right_attach"; 
-	private static final String TOP_ATTACH_KEY = "top_attach"; 
-	private static final String BOTTOM_ATTACH_KEY = "bottom_attach"; 
-	private static final String XEXPAND_KEY = "xexpand"; 
-	private static final String YEXPAND_KEY = "yexpand"; 
-	private static final String XSHRINK_KEY = "xshrink"; 
-	private static final String YSHRINK_KEY = "yshrink"; 
-	private static final String XPAD_KEY = "xpad"; 
-	private static final String YPAD_KEY = "ypad"; 
-	private static final String X_KEY = "x"; 
-	private static final String Y_KEY = "y"; 
+	private static final String LEFT_ATTACH_KEY = "left_attach"; //$NON-NLS-1$
+	private static final String RIGHT_ATTACH_KEY = "right_attach"; //$NON-NLS-1$
+	private static final String TOP_ATTACH_KEY = "top_attach"; //$NON-NLS-1$
+	private static final String BOTTOM_ATTACH_KEY = "bottom_attach"; //$NON-NLS-1$
+	private static final String XEXPAND_KEY = "xexpand"; //$NON-NLS-1$
+	private static final String YEXPAND_KEY = "yexpand"; //$NON-NLS-1$
+	private static final String XSHRINK_KEY = "xshrink"; //$NON-NLS-1$
+	private static final String YSHRINK_KEY = "yshrink"; //$NON-NLS-1$
+	private static final String XPAD_KEY = "xpad"; //$NON-NLS-1$
+	private static final String YPAD_KEY = "ypad"; //$NON-NLS-1$
+	private static final String X_KEY = "x"; //$NON-NLS-1$
+	private static final String Y_KEY = "y"; //$NON-NLS-1$
 
 	void buildChildren(Interface xml, Container parent, WidgetInfo info) {
 		TableLayout layout = (TableLayout)parent.getLayout();

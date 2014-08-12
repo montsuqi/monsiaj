@@ -46,10 +46,10 @@ public class AccelHandler {
 		}
 	}
 
-	private final List<Pair> list;
+	private List list;
 
 	AccelHandler() {
-		list = new ArrayList<>();
+		list = new ArrayList();
 	}
 
 	void addAccels(Component widget, List accels) {

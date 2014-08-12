@@ -39,7 +39,7 @@ public class SystemEnvironment {
 	 * @return true if the running system is MacOS X. false otherwise.
 	 */
 	public static boolean isMacOSX() {
-		return System.getProperty("os.name").toLowerCase().startsWith("mac os x");  //$NON-NLS-2$
+		return System.getProperty("os.name").toLowerCase().startsWith("mac os x"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static boolean isJavaVersionMatch(String version) {
@@ -51,13 +51,13 @@ public class SystemEnvironment {
 	 * @return true if the running system is Windows. false otherwise.
 	 */
 	public static boolean isWindows() {
-		String osName = System.getProperty("os.name").toLowerCase(); 
-		return osName.startsWith("windows"); 
+		String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
+		return osName.startsWith("windows"); //$NON-NLS-1$
 	}
 
 	private final static boolean isMS932;
 	static {
-		if (Locale.getDefault().getLanguage().equals("ja")) { 
+		if (Locale.getDefault().getLanguage().equals("ja")) { //$NON-NLS-1$
 			isMS932 = isWindows();
 		} else {
 			isMS932 = false;
@@ -79,7 +79,7 @@ public class SystemEnvironment {
 	 */
 	public static void setMacMenuTitle(String title) {
 		if (title != null && isMacOSX()) {
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); 
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", title); //$NON-NLS-1$
 		}
 	}
 

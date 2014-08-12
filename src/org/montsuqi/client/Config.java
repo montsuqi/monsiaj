@@ -4,24 +4,13 @@
  */
 package org.montsuqi.client;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -71,7 +60,7 @@ public class Config {
 
     public int getNext() {
         int max = 0;
-        List<Integer> list = new ArrayList<>();
+        ArrayList<Integer> list = new ArrayList<Integer>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -167,12 +156,12 @@ public class Config {
         Properties tmp = new Properties() {
             @Override
             public Set<Object> keySet() {
-                return Collections.unmodifiableSet(new TreeSet<>(super.keySet()));
+                return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
             }
 
             @Override
             public synchronized Enumeration<Object> keys() {
-                return Collections.enumeration(new TreeSet<>(super.keySet()));
+                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
             }
         };
         prop.setProperty(Config.CURRENT_KEY, Integer.toString(current));
@@ -180,12 +169,12 @@ public class Config {
         try {
             tmp.store(new FileOutputStream(propPath), "monsiaj setting");
         } catch (IOException ex) {
-            logger.catching(ex);
+            logger.catching(Level.WARN,ex);
         }
     }
 
     public ArrayList<Integer> getList() {
-        ArrayList<Integer> list = new ArrayList<>();
+        ArrayList<Integer> list = new ArrayList<Integer>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
@@ -200,14 +189,7 @@ public class Config {
                 }
             }
         }
-        Collections.sort(list, new Comparator<Object>() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                String n1 = Config.this.getDescription((Integer)o1);
-                String n2 = Config.this.getDescription((Integer)o2);
-                return n1.compareTo(n2);
-            }
-        });
+        Collections.sort(list);
         return list;
     }
 
@@ -274,6 +256,9 @@ public class Config {
     // user
     public String getUser(int i) {
         String value = getValue(i, "user");
+        if (value.isEmpty()) {
+            return "trial";
+        }
         return value;
     }
 
@@ -465,7 +450,7 @@ public class Config {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                String[] pair = line.split("\\s*=\\s*"); 
+                String[] pair = line.split("\\s*=\\s*"); //$NON-NLS-1$
                 if (pair.length == 2) {
                     String key = pair[0].trim();
                     String value = pair[1].trim();

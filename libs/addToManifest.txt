@@ -1,3 +1,0 @@
-Permissions: all-permissions
-Codebase: *.orca.med.or.jp
-Application-Name: monsiaj

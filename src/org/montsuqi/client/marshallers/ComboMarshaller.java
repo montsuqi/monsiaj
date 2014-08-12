@@ -40,19 +40,18 @@ import org.montsuqi.monsia.Interface;
  */
 class ComboMarshaller extends WidgetMarshaller {
 
-    private final WidgetMarshaller entryMarshaller;
+    private WidgetMarshaller entryMarshaller;
 
     ComboMarshaller() {
         entryMarshaller = new EntryMarshaller();
     }
 
-    @Override
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
-        JComboBox combo = (JComboBox)widget;
+        JComboBox combo = (JComboBox) widget;
         Component sub = null;
 
-        DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
+        DefaultComboBoxModel model = (DefaultComboBoxModel) combo.getModel();
         Interface xml = con.getInterface();
         con.receiveDataTypeWithCheck(Type.RECORD);
         String selectedItem = null;
@@ -61,11 +60,12 @@ class ComboMarshaller extends WidgetMarshaller {
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
-            } else if ("count".equals(name)) { 
+                continue;
+            } else if ("count".equals(name)) { //$NON-NLS-1$
                 count = con.receiveIntData();
-            } else if ("item".equals(name)) { 
-                List<String> list = new ArrayList<>();
-                list.add(""); 
+            } else if ("item".equals(name)) { //$NON-NLS-1$
+                List list = new ArrayList();
+                list.add(""); //$NON-NLS-1$
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 for (int j = 0, num = con.receiveInt(); j < num; j++) {
                     try {
@@ -94,7 +94,7 @@ class ComboMarshaller extends WidgetMarshaller {
                     entryMarshaller.receive(manager, dummy);
                     selectedItem = dummy.getText();
                 } else {
-                    throw new WidgetMarshallingException("subwidget not found"); 
+                    throw new WidgetMarshallingException("subwidget not found"); //$NON-NLS-1$
                 }
             }
         }
@@ -105,6 +105,6 @@ class ComboMarshaller extends WidgetMarshaller {
     }
 
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
-        assert false : "should never be called."; 
+        assert false : "should never be called."; //$NON-NLS-1$
     }
 }

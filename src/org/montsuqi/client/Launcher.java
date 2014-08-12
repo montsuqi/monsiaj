@@ -39,32 +39,27 @@ import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
-    
+
     protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected String title;
     protected Config conf;
     protected ConfigPanel configPanel;
-    protected JComboBox<String> configCombo;
-    private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+    protected JComboBox configCombo;
+    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     public static void main(String[] args) {
-        Launcher launcher = new Launcher(Messages.getString("application.title"));
-
         logger.info("---- start monsiaj");
-        logger.info("version : {}", Messages.getString("application.version"));
-        logger.info("java : {}", System.getProperty("java.version"));
+        logger.info("version : {}",Messages.getString("application.version"));
+        logger.info("java : {}",System.getProperty("java.version"));
         logger.info("os : {}-{}-{}",
                 System.getProperty("os.name"),
                 System.getProperty("os.version"),
                 System.getProperty("os.arch"));
+        Launcher launcher = new Launcher(Messages.getString("application.title"));
         launcher.launch(args);
     }
 
     public Launcher(String title) {
-        if (System.getProperty("monsia.log.level")!=null) {
-        } else {
-            System.setProperty("monsia.log.level", "info");
-        }        
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
@@ -152,11 +147,10 @@ public class Launcher {
         GridBagConstraints gbc;
 
         JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
-        configCombo = new JComboBox<>();
+        configCombo = new JComboBox();
         updateConfigCombo();
         configCombo.addActionListener(new ActionListener() {
 
-            @Override
             public void actionPerformed(ActionEvent evt) {
                 java.util.List<Integer> list = conf.getList();
                 int current = list.get(configCombo.getSelectedIndex());
@@ -168,10 +162,10 @@ public class Launcher {
         configPanel.loadConfig(conf.getCurrent());
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel());
-        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel());
-        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel());
-        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel()); //$NON-NLS-1$
+        tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel()); //$NON-NLS-1$
+        tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel()); //$NON-NLS-1$
+        tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel()); //$NON-NLS-1$
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -205,15 +199,15 @@ public class Launcher {
 
     private void updateConfigCombo() {
         ActionListener[] listeners = configCombo.getActionListeners();
-        for (ActionListener listener : listeners) {
-            configCombo.removeActionListener(listener);
+        for (int i = 0; i < listeners.length; i++) {
+            configCombo.removeActionListener(listeners[i]);
         }
         configCombo.removeAllItems();
         for (int i : conf.getList()) {
             configCombo.addItem(conf.getDescription(i));
         }
-        for (ActionListener listener : listeners) {
-            configCombo.addActionListener(listener);
+        for (int i = 0; i < listeners.length; i++) {
+            configCombo.addActionListener(listeners[i]);
         }
         configCombo.setSelectedItem(conf.getDescription(conf.getCurrent()));
     }
@@ -222,11 +216,11 @@ public class Launcher {
         String ver = System.getProperty("java.version");
         boolean isOld = false;
         if (ver.startsWith("1.7")) {
-            if (ver.compareToIgnoreCase("1.7.0_51") < 0) {
+            if (ver.compareToIgnoreCase("1.7.0_21") < 0) {
                 isOld = true;
             }
         } else if (ver.startsWith("1.6")) {
-            if (ver.compareToIgnoreCase("1.6.0_71") < 0) {
+            if (ver.compareToIgnoreCase("1.6.0_45") < 0) {
                 isOld = true;
             }
         }
@@ -302,32 +296,30 @@ public class Launcher {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) {
+        Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
                 conf.setCurrent(num);
-                conf.applySystemProperties(conf.getCurrent());
+		        conf.applySystemProperties(conf.getCurrent());
                 connect();
                 f.dispose();
             }
         });
         bar.add(run);
 
-        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
+        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
-                logger.info("launcher canceled");
                 System.exit(0);
             }
         });
         bar.add(cancel);
 
-        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
+        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) { //$NON-NLS-1$
 
             public void actionPerformed(ActionEvent e) {
-                logger.info("view server configs");
                 viewer.run(f);
                 updateConfigCombo();
             }
@@ -355,7 +347,7 @@ public class Launcher {
             //t.start();
             //t.join();
         } catch (Exception e) {
-            logger.catching(e);
+            logger.catching(Level.FATAL, e);
             ExceptionDialog.showExceptionDialog(e);
             client.exitSystem();
         }
@@ -370,7 +362,7 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png");
+        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png"); //$NON-NLS-1$
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }

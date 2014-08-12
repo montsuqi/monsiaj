@@ -42,7 +42,7 @@ public class PrintAgent extends Thread {
     private SSLSocketFactory sslSocketFactory;
 
     public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
-        printQ = new ConcurrentLinkedQueue<>();
+        printQ = new ConcurrentLinkedQueue<PrintRequest>();
         this.port = port;
         this.sslSocketFactory = sslSocketFactory;
         Authenticator.setDefault(new Authenticator() {
@@ -93,6 +93,7 @@ public class PrintAgent extends Thread {
             }
         } catch (IOException ex) {
             if (!ex.getMessage().equals("204")) {
+                ex.printStackTrace();
                 request.showOtherError();
             }
         }
@@ -107,12 +108,11 @@ public class PrintAgent extends Thread {
         printQ.add(new DLRequest(url, filename, desc, retry));
     }
 
-    public static void showDialog(String title, File file) {
+    public void showDialog(String title, File file) {
         try {
             final JDialog dialog = new JDialog();
             Button closeButton = new Button(new AbstractAction(Messages.getString("PrintAgent.close")) {
 
-                @Override
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
                 }
@@ -205,7 +205,7 @@ public class PrintAgent extends Thread {
 
     public class DLRequest extends PrintRequest {
 
-        private final String description;
+        private String description;
 
         public DLRequest(String url, String filename, String desc, int retry) {
             super(url, "", retry, false);
@@ -220,6 +220,7 @@ public class PrintAgent extends Thread {
                 pd.setName("PrintAgent.PandaDownload");
                 pd.showDialog(this.filename, this.description, file);
             } catch (Exception ex) {
+                ex.printStackTrace();
                 this.showOtherError();
             }
         }
@@ -249,7 +250,7 @@ public class PrintAgent extends Thread {
         private String title;
         protected String filename;
         private int retry;
-        private final boolean showDialog;
+        private boolean showDialog;
 
         public PrintRequest(String url, String title, int retry, boolean showdialog) {
             this.path = url;

@@ -42,7 +42,7 @@ public class TableLayout extends GridBagLayout {
 		if (object instanceof TableConstraints) {
 			setConstraints(comp, (TableConstraints)object);
 		} else if (object != null) {
-			throw new IllegalArgumentException("unacceptable constraints type"); 
+			throw new IllegalArgumentException("unacceptable constraints type"); //$NON-NLS-1$
 		}
 	}
 
@@ -51,7 +51,7 @@ public class TableLayout extends GridBagLayout {
 	}
 
 	public static void main(String[] args) {
-		JFrame f = new JFrame("TableLayoutTest"); 
+		JFrame f = new JFrame("TableLayoutTest"); //$NON-NLS-1$
 		Container container = f.getContentPane();
 
 		TableLayout tl = new TableLayout();
@@ -59,7 +59,7 @@ public class TableLayout extends GridBagLayout {
 		TableConstraints tc = new TableConstraints();
 		JLabel label;
 
-		label = new JLabel("AAA"); 
+		label = new JLabel("AAA"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 0;
 		tc.rightAttach = 1;
@@ -71,28 +71,28 @@ public class TableLayout extends GridBagLayout {
 		container.add(label);
 
 
-		label = new JLabel("BBB"); 
+		label = new JLabel("BBB"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 1;
 		tc.rightAttach = 2;
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("CCC"); 
+		label = new JLabel("CCC"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 2;
 		tc.rightAttach = 3;
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("DDD"); 
+		label = new JLabel("DDD"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 3;
 		tc.rightAttach = 4;
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("EEE"); 
+		label = new JLabel("EEE"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 0;
 		tc.rightAttach = 4;
@@ -101,7 +101,7 @@ public class TableLayout extends GridBagLayout {
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("FFF"); 
+		label = new JLabel("FFF"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 0;
 		tc.rightAttach = 3;
@@ -110,14 +110,14 @@ public class TableLayout extends GridBagLayout {
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("GGG"); 
+		label = new JLabel("GGG"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 3;
 		tc.rightAttach = 4;
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("HHH"); 
+		label = new JLabel("HHH"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 0;
 		tc.rightAttach = 1;
@@ -126,7 +126,7 @@ public class TableLayout extends GridBagLayout {
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("III"); 
+		label = new JLabel("III"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 1;
 		tc.rightAttach = 4;
@@ -135,7 +135,7 @@ public class TableLayout extends GridBagLayout {
 		tl.setConstraints(label, tc);
 		container.add(label);
 
-		label = new JLabel("JJJ"); 
+		label = new JLabel("JJJ"); //$NON-NLS-1$
 		label.setBorder(BorderFactory.createLineBorder(Color.red));
 		tc.leftAttach = 1;
 		tc.rightAttach = 4;

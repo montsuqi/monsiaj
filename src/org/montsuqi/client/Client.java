@@ -37,32 +37,30 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
 
+
 /**
- * <p>
- * The main application class for panda client.</p>
+ * <p>The main application class for panda client.</p>
  */
 public class Client implements Runnable {
 
-    private final Config conf;
+    private Config conf;
+    Logger logger;
     private Protocol protocol;
-    protected static final Logger logger = LogManager.getLogger(Launcher.class);
-    private String user;
-    private String host;
-    private int port;
+    private static final String CLIENT_VERSION = "0.0"; //$NON-NLS-1$
 
     /**
-     * <p>
-     * Constructs a client initialized by the given configuration object.</p>
+     * <p>Constructs a client initialized by the given configuration object.</p>
      *
      * @param conf configuration.
      */
     public Client(Config conf) {
         this.conf = conf;
+        logger = LogManager.getLogger(Client.class);
     }
 
+
     /**
-     * <p>
-     * Connects to the server using protocol, user, password and application
+     * <p>Connects to the server using protocol, user, password and application
      * name specified in the configuration of this client.</p>
      *
      * @throws IOException on IO errors.
@@ -75,45 +73,29 @@ public class Client implements Runnable {
         long timerPeriod = conf.getUseTimer(num) ? conf.getTimerPeriod(num) : 0;
         protocol = new Protocol(this, styles, timerPeriod);
 
-        user = conf.getUser(num);
-        host = conf.getHost(num);
-        port = conf.getPort(num);
-        
-        if (System.getProperty("monsia.config.reset_user") != null) {
-            conf.setUser(num,"");
-            conf.save();
-        }
+        String user = conf.getUser(num);
         String password = conf.getPassword(num);
         String application = conf.getApplication(num);
-        
-        if (!conf.getSavePassword(num)) {
-            conf.setPassword(num, "");
-            conf.save();
-        }
-        
-        logger.info("connect {}@{}:{} {}",user,host,port,this);
+        logger.debug("user : {}",user);
         protocol.sendConnect(user, password, application);
     }
 
     private Map loadStyles() {
         URL url = conf.getStyleURL(conf.getCurrent());
         try {
-            logger.debug("loading styles from URL: {0}", url); 
+            logger.debug("loading styles from URL: {0}", url); //$NON-NLS-1$
             InputStream in = url.openStream();
             return Style.load(in);
         } catch (IOException e) {
             logger.debug(e);
-            logger.debug("using empty style set"); 
+            logger.debug("using empty style set"); //$NON-NLS-1$
             return Collections.EMPTY_MAP;
         }
     }
 
     /**
-     * <p>
-     * Creates a socket for the connection.</p>
-     * <p>
-     * When the configuration says useSSL, an SSL Socket is returned
-     * instead.</p>
+     * <p>Creates a socket for the connection.</p> <p>When the configuration
+     * says useSSL, an SSL Socket is returned instead.</p>
      *
      * @return a socket connected at the TCP layer.
      * @throws IOException on IO error.
@@ -122,10 +104,10 @@ public class Client implements Runnable {
      */
     Socket createSocket() throws IOException, GeneralSecurityException {
         int num = conf.getCurrent();
-        String hostName = conf.getHost(num);
-        int portNum = conf.getPort(num);
-        logger.debug("host : {}:{}", hostName, portNum);
-        SocketAddress address = new InetSocketAddress(hostName, portNum);
+        String host = conf.getHost(num);
+        int port = conf.getPort(num);
+        logger.debug("host : {}:{}",host,port);
+        SocketAddress address = new InetSocketAddress(host, port);
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(address);
         Socket socket = socketChannel.socket();
@@ -135,17 +117,15 @@ public class Client implements Runnable {
             String fileName = conf.getClientCertificateFile(num);
             String password = conf.getClientCertificatePassword(num);
             SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
-            return builder.createSSLSocket(socket, hostName, portNum);
+            return builder.createSSLSocket(socket, host, port);
         }
     }
 
     /**
-     * <p>
-     * PrintAgent need SSLSocketFactory for SSL API connection</p>
-     *
+     * <p>PrintAgent need SSLSocketFactory for SSL API connection</p>
      * @return
      * @throws IOException
-     * @throws GeneralSecurityException
+     * @throws GeneralSecurityException 
      */
     SSLSocketFactory createSSLSocketFactory() throws IOException, GeneralSecurityException {
         int num = conf.getCurrent();
@@ -160,8 +140,7 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>
-     * Kick the application.</p>
+     * <p>Kick the application.</p>
      */
     public void run() {
         try {
@@ -176,10 +155,8 @@ public class Client implements Runnable {
     }
 
     /**
-     * <p>
-     * Terminates the application.</p>
-     * <p>
-     * Sends end packet to the server and exists.</p>
+     * <p>Terminates the application.</p> <p>Sends end packet to the server and
+     * exists.</p>
      */
     void exitSystem() {
         try {
@@ -191,14 +168,12 @@ public class Client implements Runnable {
         } catch (Exception e) {
             logger.warn(e);
         } finally {
-            logger.info("disconnect {}@{}:{} {}",user,host,port,this);
             System.exit(0);
         }
     }
 
     /**
-     * <p>
-     * Dispose connection if it exists.</p>
+     * <p>Dispose connection if it exists.</p>
      */
     protected void finalize() {
         if (protocol != null) {

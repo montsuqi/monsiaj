@@ -37,7 +37,7 @@ public class GtkBoxLayout extends BoxLayout {
 	public GtkBoxLayout(Container target, int axis) {
 		super(target, axis);
 		if (axis != X_AXIS && axis != Y_AXIS) {
-			throw new IllegalArgumentException("unknown axis:" + axis); 
+			throw new IllegalArgumentException("unknown axis:" + axis); //$NON-NLS-1$
 		}
 		this.axis = axis;
 	}
@@ -58,7 +58,7 @@ public class GtkBoxLayout extends BoxLayout {
 				r.x = 0;
 				r.width = width;
 			} else {
-				throw new IllegalStateException("unexpected axis:" + axis); 
+				throw new IllegalStateException("unexpected axis:" + axis); //$NON-NLS-1$
 			}
 			c.setBounds(r);
 		}

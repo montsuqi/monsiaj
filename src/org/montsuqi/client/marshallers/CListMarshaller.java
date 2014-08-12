@@ -28,6 +28,7 @@ import java.awt.Container;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import org.montsuqi.client.PacketClass;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
@@ -40,14 +41,18 @@ import org.montsuqi.widgets.PandaCList;
  */
 class CListMarshaller extends WidgetMarshaller {
 
-    @Override
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
         PandaCList clist = (PandaCList) widget;
 
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-
+        TableColumnModel columnModel = table.getColumnModel();
+        ListSelectionModel selections = table.getSelectionModel();
+        String[] labels = new String[columnModel.getColumnCount()];
+        for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
+            labels[i] = (String) columnModel.getColumn(i).getHeaderValue();
+        }
         con.receiveDataTypeWithCheck(Type.RECORD);
         StringBuffer widgetName = con.getWidgetNameBuffer();
         StringBuffer label = new StringBuffer(widgetName.toString());
@@ -63,14 +68,12 @@ class CListMarshaller extends WidgetMarshaller {
             if (sub != null) {
                 con.receiveValue(label, offset + 1 + name.length());
             } else if (handleCommonAttribute(manager, widget, name)) {
-                //
-            } else if ("count".equals(name)) { 
+                continue;
+            } else if ("count".equals(name)) { //$NON-NLS-1$
                 count = con.receiveIntData();
-            } else if ("row".equals(name)) { 
+            } else if ("row".equals(name)) { //$NON-NLS-1$
                 row = con.receiveIntData();
-                int row2 = row > 1 ? row - 1 : 0;
-                clist.changeSelection(row2, 0, false, false);
-            } else if ("rowattr".equals(name)) { 
+            } else if ("rowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
                     case 1: // DOWN
@@ -89,11 +92,11 @@ class CListMarshaller extends WidgetMarshaller {
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
-            } else if ("column".equals(name)) { 
+            } else if ("column".equals(name)) { //$NON-NLS-1$
 				/*
                  * int dummy =
                  */ con.receiveIntData();
-            } else if ("item".equals(name)) { 
+            } else if ("item".equals(name)) { //$NON-NLS-1$
                 while (tableModel.getRowCount() > 0) {
                     tableModel.removeRow(0);
                 }
@@ -143,16 +146,15 @@ class CListMarshaller extends WidgetMarshaller {
                 if (count < 0) {
                     count = num;
                 }
-                boolean[] selection = new boolean[num];
                 for (int j = 0; j < num; j++) {
                     boolean selected = con.receiveBooleanData();
                     if (j < count) {
-                        selection[j] = selected;
-                        if (clist.getMode() == PandaCList.SELECTION_MODE_MULTI && selected) {
-                            clist.changeSelection(j, 0, false, false);
+                        if (selected) {
+                            selections.addSelectionInterval(j, j);
+                        } else {
+                            selections.removeSelectionInterval(j, j);
                         }
                     }
-                    clist.setSelection(selection);
                 }
             }
         }
@@ -179,25 +181,42 @@ class CListMarshaller extends WidgetMarshaller {
                 model.setValue(0);
             }
         }
+
+        // save selection values
+        ListSelectionModel savedSelections = new DefaultListSelectionModel();
+        int rows = table.getRowCount();
+        copySelections(rows, savedSelections, selections);
+        // setColumnIdentifiers resets selection values
+        //tableModel.setColumnIdentifiers(labels);
+        // restore selection values
+        copySelections(rows, selections, savedSelections);
         widget.setVisible(true);
     }
 
-    @Override
+    private void copySelections(int rows, ListSelectionModel to, ListSelectionModel from) {
+        for (int i = 0; i < rows; i++) {
+            if (from.isSelectedIndex(i)) {
+                to.addSelectionInterval(i, i);
+            } else {
+                to.removeSelectionInterval(i, i);
+            }
+        }
+    }
+
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
-        PandaCList clist = (PandaCList)widget;
         ValueAttribute va = manager.getAttribute(name);
+        ListSelectionModel selections = table.getSelectionModel();
         boolean visibleRow = false;
         int rows = table.getRowCount();
-        boolean[] selection = clist.getSelection();
         for (int i = 0; i < rows; i++) {
             con.sendPacketClass(PacketClass.ScreenData);
             con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i) + ']');
-            con.sendBooleanData(Type.BOOL,selection[i]);
+            con.sendBooleanData(Type.BOOL, selections.isSelectedIndex(i));
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);
-                con.sendName(va.getValueName() + ".row"); 
+                con.sendName(va.getValueName() + ".row"); //$NON-NLS-1$
                 con.sendIntegerData(Type.INT, i + 1);
                 visibleRow = true;
             }

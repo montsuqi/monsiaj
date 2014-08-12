@@ -31,16 +31,16 @@ import org.montsuqi.monsia.Style;
 
 public final class WidgetValueManager {
 
-    private final Protocol con;
-    private final Map styles;
-    private final Map<String,ValueAttribute> attrTable;
-    private final Map<String,Object> valueTable;
+    private Protocol con;
+    private Map styles;
+    private Map attrTable;
+    private Map valueTable;
 
     public WidgetValueManager(Protocol con, Map styles) {
         this.con = con;
         this.styles = styles;
-        attrTable = new HashMap<>();
-        valueTable = new HashMap<>();
+        attrTable = new HashMap();
+        valueTable = new HashMap();
     }
 
     Protocol getProtocol() {
@@ -79,7 +79,7 @@ public final class WidgetValueManager {
             return va.getOpt();
         }
         Object[] args = {name};
-        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args));         
+        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$        
     }
 
     ValueAttribute getAttribute(String name) {
@@ -87,7 +87,7 @@ public final class WidgetValueManager {
             return (ValueAttribute) attrTable.get(name);
         }
         Object[] args = {name};
-        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); 
+        throw new IllegalArgumentException(MessageFormat.format("no such value name: {0}", args)); //$NON-NLS-1$
     }
 
     void setStyle(Component widget, String styleName) {

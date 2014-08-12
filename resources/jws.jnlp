@@ -14,14 +14,13 @@
         <all-permissions/>
     </security>
     <resources>
-        <j2se version="1.7+"/>
+        <j2se version="1.6+"/>
         <jar href="jmareceipt.jar"/>
-        <jar href="log4j-api-2.0-beta9.jar"/>
-        <jar href="log4j-core-2.0-beta9.jar"/>        
-        <jar href="ilf-gpl.jar"/>        
-        <jar href="nimrodlf.jar"/>
-        <jar href="PDFRenderer.jar"/>
-        <jar href="org.json.20120521.jar"/>        
+        <jar href="libs/log4j-api-2.0-beta7.jar"/>
+        <jar href="libs/log4j-core-2.0-beta7.jar"/>        
+        <jar href="libs/ilf-gpl.jar"/>        
+        <jar href="libs/nimrodlf.jar"/>
+        <jar href="libs/PDFRenderer.jar"/>
     </resources>
     <application-desc main-class="jp.or.med.orca.jmareceipt.JMAReceiptLauncher"/>
 </jnlp>

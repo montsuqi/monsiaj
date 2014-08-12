@@ -33,7 +33,6 @@ import org.montsuqi.widgets.PandaDownload;
  */
 public class DownloadMarshaller extends WidgetMarshaller {
 
-    @Override
     public void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         PandaDownload download = (PandaDownload) widget;
@@ -44,27 +43,27 @@ public class DownloadMarshaller extends WidgetMarshaller {
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
-            if ("objectdata".equals(name)) { 
+            if ("objectdata".equals(name)) { //$NON-NLS-1$
                 binary = con.receiveBinaryData();
             } else if ("filename".equals(name)) {
                 fileName = con.receiveStringData();
             } else if ("description".equals(name)) {
                 description = con.receiveStringData();                
             } else if (handleCommonAttribute(manager, widget, name)) {
+                continue;
             }
         }
         if (binary != null && binary.length > 0) {
             File temp = File.createTempFile("PandaDownload", fileName);
             temp.deleteOnExit();
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
-                out.write(binary);
-                out.flush();
-            }
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+            out.write(binary);
+            out.flush();
+            out.close();
             download.showDialog(fileName, description, temp);
         }
     }
 
-    @Override
     public void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         // do nothing
     }

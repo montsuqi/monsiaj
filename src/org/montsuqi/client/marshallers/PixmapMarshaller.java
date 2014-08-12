@@ -49,10 +49,10 @@ public class PixmapMarshaller extends WidgetMarshaller {
                 byte[] data = con.receiveBinaryData();
                 if (data.length > 0) {
                     Icon icon = new ImageIcon(data);
-                    pixmap.setText(""); 
+                    pixmap.setText(""); //$NON-NLS-1$
                     pixmap.setIcon(icon);
                 } else {
-                    pixmap.setText(Messages.getString("PixmapMarshaller.NO_IMAGE")); 
+                    pixmap.setText(Messages.getString("PixmapMarshaller.NO_IMAGE")); //$NON-NLS-1$
                     pixmap.setIcon(null);
                 }
             }

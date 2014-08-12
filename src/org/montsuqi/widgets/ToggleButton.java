@@ -47,11 +47,11 @@ public class ToggleButton extends JToggleButton {
 
 	private void initActions() {
 		ActionMap actions = getActionMap();
-		actions.put("focusOutNext", new FocusOutNextAction()); 
-		actions.put("focusOutPrevious", new FocusOutPreviousAction()); 
+		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
+		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
 
 		InputMap inputs = getInputMap(JComponent.WHEN_FOCUSED);
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); 
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
 	}
 }

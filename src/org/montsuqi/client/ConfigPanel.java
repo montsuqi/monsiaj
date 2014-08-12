@@ -65,7 +65,7 @@ public class ConfigPanel extends JPanel {
     protected JCheckBox saveClientCertificatePasswordCheckbox;
     // Others Tab
     protected JTextField styleEntry;
-    protected JComboBox<String> lookAndFeelCombo;
+    protected JComboBox lookAndFeelCombo;
     protected JTextField lafThemeEntry;
     protected JButton lafThemeButton;
     protected JCheckBox useTimerCheck;
@@ -74,13 +74,12 @@ public class ConfigPanel extends JPanel {
     protected LookAndFeelInfo[] lafs;
     private static final int MAX_PANEL_ROWS = 12;
     private static final int MAX_PANEL_COLUMNS = 4;
-    private final boolean doPadding;
-    private final boolean doChangeLookAndFeel;
-    private final MetalTheme systemMetalTheme;
+    private boolean doPadding;
+    private boolean doChangeLookAndFeel;
+    private MetalTheme systemMetalTheme;
 
     /**
-     * <p>
-     * An action to warn vulnerability of saving password.</p>
+     * <p>An action to warn vulnerability of saving password.</p>
      */
     private final class ConfirmSavePasswordAction implements ActionListener {
 
@@ -92,7 +91,7 @@ public class ConfigPanel extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             if (checkbox.isSelected()) {
-                int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
+                int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                 if (result != JOptionPane.YES_OPTION) {
                     checkbox.setSelected(false);
                 }
@@ -101,11 +100,9 @@ public class ConfigPanel extends JPanel {
     }
 
     /**
-     * <p>
-     * An action to pop a fiel selection dialog.</p>
-     * <p>
-     * When a file is selected, the path of the selected file is set to
-     * specified text field.</p>
+     * <p>An action to pop a fiel selection dialog.</p> <p>When a file is
+     * selected, the path of the selected file is set to specified text
+     * field.</p>
      */
     private final class FileSelectionAction extends AbstractAction {
 
@@ -114,8 +111,7 @@ public class ConfigPanel extends JPanel {
         private String description;
 
         /**
-         * <p>
-         * Constructs a FileSelectionAction.</p>
+         * <p>Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -124,7 +120,7 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         FileSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); 
+            super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
             this.entry = entry;
             this.extension = extension;
             this.description = description;
@@ -148,8 +144,7 @@ public class ConfigPanel extends JPanel {
         private String description;
 
         /**
-         * <p>
-         * Constructs a FileSelectionAction.</p>
+         * <p>Constructs a FileSelectionAction.</p>
          *
          * @param entry a text field to which the path of the selected file is
          * set.
@@ -158,14 +153,14 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         ThemeSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); 
+            super(Messages.getString("ConfigurationPanel.browse")); //$NON-NLS-1$
             this.entry = entry;
             this.extension = extension;
             this.description = description;
         }
 
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser(entry.getText()); 
+            JFileChooser fileChooser = new JFileChooser(entry.getText()); //$NON-NLS-1$
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
             int ret = fileChooser.showOpenDialog(null);
             if (ret == JFileChooser.APPROVE_OPTION) {
@@ -208,7 +203,7 @@ public class ConfigPanel extends JPanel {
                     updateFont(new Font("Osaka", Font.PLAIN, 12));
                 }
             } catch (Exception e) {
-                logger.catching(e);
+                logger.catching(Level.WARN, e);
             }
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -220,7 +215,7 @@ public class ConfigPanel extends JPanel {
                         }
 
                     } catch (Exception e) {
-                        logger.catching(e);
+                        logger.catching(Level.WARN, e);
                     }
                 }
             });
@@ -291,11 +286,6 @@ public class ConfigPanel extends JPanel {
         updateSSLPanelComponentsEnabled();
     }
 
-    protected void saveConfig(int num, String desc) {
-        conf.setDescription(num, desc);
-        this.saveConfig(num);
-    }
-
     protected void saveConfig(int num) {
         // Basic Tab
         conf.setUser(num, userEntry.getText());
@@ -303,7 +293,6 @@ public class ConfigPanel extends JPanel {
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
         conf.setPassword(num, new String(passwordEntry.getPassword()));
-
         conf.setHost(num, hostEntry.getText());
         conf.setPort(num, Integer.parseInt(portEntry.getText()));
         conf.setApplication(num, appEntry.getText());
@@ -426,7 +415,7 @@ public class ConfigPanel extends JPanel {
 
     private JPanel createSSLPanel() {
         int y;
-        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); 
+        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); //$NON-NLS-1$
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -509,13 +498,13 @@ public class ConfigPanel extends JPanel {
         JButton styleButton = new JButton();
         styleButton.setAction(
                 new FileSelectionAction(styleEntry, ".properties",
-                        Messages.getString("ConfigurationPanel.style_filter_pattern")));
+                Messages.getString("ConfigurationPanel.style_filter_pattern")));
         lafs = UIManager.getInstalledLookAndFeels();
         String[] lafNames = new String[lafs.length];
         for (int i = 0; i < lafNames.length; i++) {
             lafNames[i] = lafs[i].getName();
         }
-        lookAndFeelCombo = new JComboBox<>();
+        lookAndFeelCombo = new JComboBox();
         lookAndFeelCombo.setEditable(false);
         for (int i = 0; i < lafNames.length; i++) {
             lookAndFeelCombo.addItem(lafNames[i]);
@@ -531,7 +520,7 @@ public class ConfigPanel extends JPanel {
         lafThemeButton = new JButton();
         lafThemeButton.setAction(
                 new ThemeSelectionAction(lafThemeEntry, ".theme",
-                        Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
+                Messages.getString("ConfigurationPanel.laf_theme_filter_pattern")));
 
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
@@ -675,6 +664,7 @@ public class ConfigPanel extends JPanel {
         panel.add(innerPanel,
                 createConstraints(0, y, 4, 1, 1.0, 1.0));
         y += 1;
+
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {

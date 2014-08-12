@@ -130,7 +130,7 @@ public class Connection {
     public synchronized int receiveDataTypeWithCheck(int expected) throws IOException {
         receiveDataType();
         if (dataType != expected) {
-            throw new IOException("data type mismatch: expected " + Type.getName(expected) + ", but was " + Type.getName(dataType));  //$NON-NLS-2$
+            throw new IOException("data type mismatch: expected " + Type.getName(expected) + ", but was " + Type.getName(dataType)); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return dataType;
     }
@@ -332,7 +332,7 @@ public class Connection {
     synchronized void sendFixed(BigDecimal xval) throws IOException {
         String s;
         if (xval.equals(ZERO)) {
-            sendString("0"); 
+            sendString("0"); //$NON-NLS-1$
             return;
         }
         if (xval.signum() >= 0) {
@@ -387,7 +387,7 @@ public class Connection {
         if (receiveDataType() == Type.NUMBER) {
             return receiveFixed();
         }
-        throw new IllegalArgumentException("invalid data conversion"); 
+        throw new IllegalArgumentException("invalid data conversion"); //$NON-NLS-1$
     }
 
     public synchronized void sendFixedData(int type, BigDecimal xval) throws IOException {
@@ -409,7 +409,7 @@ public class Connection {
             //	sendFixed(xval);
             //	break;
             default:
-                throw new IllegalArgumentException("invalid data conversion"); 
+                throw new IllegalArgumentException("invalid data conversion"); //$NON-NLS-1$
         }
     }
 
@@ -448,7 +448,7 @@ public class Connection {
                 return receiveString();
             default:
                 Object[] args = {Integer.toHexString(type)};
-                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); 
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); //$NON-NLS-1$
         }
     }
 
@@ -545,11 +545,11 @@ public class Connection {
                 return receiveBinary();
             default:
                 Object[] args = {Integer.toHexString(type)};
-                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); 
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); //$NON-NLS-1$
         }
     }
 
-    public synchronized byte[] receiveBinary() throws IOException {
+    private synchronized byte[] receiveBinary() throws IOException {
         int size = receiveLength();
         byte[] bin = new byte[size];
         if (size > 0) {
@@ -572,7 +572,7 @@ public class Connection {
                 break;
             default:
                 Object[] args = {Integer.toHexString(type)};
-                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); 
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); //$NON-NLS-1$
         }
     }
 

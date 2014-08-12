@@ -59,11 +59,11 @@ public class Entry extends JTextField {
 		ActionMap actions = getActionMap();
 		InputMap inputs = getInputMap();
 
-		actions.put("focusOutNext", new FocusOutNextAction()); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); 
+		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); //$NON-NLS-1$
 
-		actions.put("focusOutPrevious", new FocusOutPreviousAction()); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); 
+		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
 		addFocusListener(new EntryFocusListener());
 	}
 

@@ -5,29 +5,27 @@ and open the template in the editor.
 -->
 
 <configuration>
-    <Properties>
-        <Property name="monsiaj.log.level">info</Property>
-    </Properties>    
     <appenders>
         <RollingFile 
             name="RollingFile" 
-            fileName="${sys:user.home}/.monsiaj/monsiaj.log.txt"
-            filePattern="${sys:user.home}/.monsiaj/monsiaj.log.txt.%i"
+            fileName="${sys:user.home}/.monsiaj/monsiaj.log"
+            filePattern="${sys:user.home}/.monsiaj/monsiaj.log.%i"
+            bufferredIO="false"
         >
-            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n"/>
             <Policies>
-                <SizeBasedTriggeringPolicy size="512 KB"/>
+                <SizeBasedTriggeringPolicy size="8 KB"/>
             </Policies>
-            <DefaultRolloverStrategy max="5" fileindex="min"/>
+            <DefaultRolloverStrategy max="5"/>
         </RollingFile>
-        <Console name="Console">            
-            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
+        <Console name="Console">
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n"/>
         </Console>
     </appenders>
     <loggers>
-        <root level="${sys:monsiaj.log.level}">
+        <root level="info">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
         </root>
-    </loggers>  
+    </loggers>
 </configuration>

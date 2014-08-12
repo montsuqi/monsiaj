@@ -84,7 +84,7 @@ public class LittleEndianDataInputStream extends InputStream implements DataInpu
 	}
 
 	public String readLine() throws IOException {
-		throw new UnsupportedOperationException("deprecated DataInput#readLine() is not impremented"); 
+		throw new UnsupportedOperationException("deprecated DataInput#readLine() is not impremented"); //$NON-NLS-1$
 	}
 
 	public long readLong() throws IOException {

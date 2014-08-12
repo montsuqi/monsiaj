@@ -46,7 +46,7 @@ public class PrintMarshaller extends WidgetMarshaller {
                     con.receiveDataTypeWithCheck(Type.RECORD);
                     for (int k = 0, n3 = con.receiveInt(); k < n3; k++) {
                         String name2 = con.receiveName();
-                        if ("path".equals(name2)) {                             
+                        if ("path".equals(name2)) { //$NON-NLS-1$                            
                             path = con.receiveStringData();
                         } else if ("title".equals(name2)) {
                             title = con.receiveStringData();

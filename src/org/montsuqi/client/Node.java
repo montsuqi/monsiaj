@@ -33,16 +33,16 @@ import org.montsuqi.widgets.Window;
 
 public class Node {
 
-    private final Interface xml;
-    private final String name;
-    private final Map<String,Component> changedWidgets;
-    private final Map<String,Component> alwaysSendWidgets;
+    private Interface xml;
+    private String name;
+    private Map<String,Component> changedWidgets;
+    private Map<String,Component> alwaysSendWidgets;
 
     Node(Interface xml, String name) {
         this.xml = xml;
         this.name = name;
-        this.changedWidgets = new HashMap<>();
-        this.alwaysSendWidgets = new HashMap<>();
+        this.changedWidgets = new HashMap<String,Component>();
+        this.alwaysSendWidgets = new HashMap<String,Component>();
     }
 
     String getName() {
@@ -61,11 +61,11 @@ public class Node {
         changedWidgets.clear();
     }
 
-    Map<String,Component> getChangedWidgets() {
+    Map getChangedWidgets() {
         return changedWidgets;
     }
 
-    Map<String,Component> getAlwaysSendWidgets() {
+    Map getAlwaysSendWidgets() {
         return alwaysSendWidgets;
     }    
 

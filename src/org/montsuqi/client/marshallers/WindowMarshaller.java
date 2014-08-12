@@ -52,7 +52,7 @@ public class WindowMarshaller extends WidgetMarshaller {
                 continue;
             }
              */
-            if ("title".equals(name)) { 
+            if ("title".equals(name)) { //$NON-NLS-1$
                 String title = con.receiveStringData();
                 con.setSessionTitle(title);
             } else if ("bgcolor".equals(name)) {                

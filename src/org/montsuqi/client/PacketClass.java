@@ -43,9 +43,7 @@ public interface PacketClass {
     public static final byte Pong = 0x10;
     public static final byte PongDialog = 0x11;
     public static final byte PongPopup = 0x12;
-    public static final byte PongAbort = 0x13;
-    public static final byte ListDownloads = 0x14;
-    public static final byte GetBLOB = 0x15;
+    public static final byte PongAbort = 0x13;    
     public static final byte OK = (byte) 0x80;
     public static final byte END = (byte) 0x81;
     public static final byte NOT = (byte) 0x83;

@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 /** <p>A class that holds utility methods for string manipulation.</p>
  */
 public class StringUtils {
-	private static final Map<String,String> ENTITY_REPLACEMENTS = new HashMap<>();
+	private static final Map ENTITY_REPLACEMENTS = new HashMap();
 	static {
 		ENTITY_REPLACEMENTS.put("\"", "&dquot;");
 		ENTITY_REPLACEMENTS.put("<", "&lt;");

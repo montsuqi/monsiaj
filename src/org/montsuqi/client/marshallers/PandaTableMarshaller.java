@@ -40,16 +40,22 @@ import org.montsuqi.widgets.PandaTable;
  */
 class PandaTableMarshaller extends WidgetMarshaller {
 
-    private static final List<String> widgetList;
+    private static List widgetList;
 
     static {
-        widgetList = new ArrayList<>();
+        widgetList = new ArrayList();
     }
 
-    @Override
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         PandaTable table = (PandaTable) widget;
+
+        TableColumnModel columnModel = table.getColumnModel();
+        String[] labels = new String[columnModel.getColumnCount()];
+        for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
+            labels[i] = (String) columnModel.getColumn(i).getHeaderValue();
+        }
+
         con.receiveDataTypeWithCheck(Type.RECORD);
 
         int trow = 0;
@@ -60,17 +66,17 @@ class PandaTableMarshaller extends WidgetMarshaller {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
                 continue;
-            } else if ("trow".equals(name)) { 
+            } else if ("trow".equals(name)) { //$NON-NLS-1$
                 trow = con.receiveIntData() - 1;
                 if (trow < 0) {
                     trow = 0;
                 }
-            } else if ("tcolumn".equals(name)) { 
+            } else if ("tcolumn".equals(name)) { //$NON-NLS-1$
                 tcolumn = con.receiveIntData() - 1;
                 if (tcolumn < 0) {
                     tcolumn = 0;
                 }
-            } else if ("trowattr".equals(name)) { 
+            } else if ("trowattr".equals(name)) { //$NON-NLS-1$
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
                     case 1: // DOWN
@@ -89,15 +95,15 @@ class PandaTableMarshaller extends WidgetMarshaller {
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
-            } else if ("tvalue".equals(name)) { 
+            } else if ("tvalue".equals(name)) { //$NON-NLS-1$
                 /*
                  * String dummy =
                  */ con.receiveStringData();
-            } else if ("rowdata".equals(name)) {                 
+            } else if ("rowdata".equals(name)) { //$NON-NLS-1$                
                 con.receiveDataTypeWithCheck(Type.ARRAY);
                 int nrows = con.receiveInt();
-                ArrayList<String> cellNameList = new ArrayList<>();
-                ArrayList<String> cellDataList = new ArrayList<>();
+                ArrayList cellNameList = new ArrayList<String>();
+                ArrayList cellDataList = new ArrayList<String>();
                 for (int j = 0; j < nrows; j++) {
                     con.receiveDataTypeWithCheck(Type.RECORD);
                     int ncols = con.receiveInt();
@@ -162,22 +168,21 @@ class PandaTableMarshaller extends WidgetMarshaller {
         }
     }
 
-    @Override
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         PandaTable table = (PandaTable) widget;
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 
         con.sendPacketClass(PacketClass.ScreenData);
-        con.sendName(name + ".trow"); 
+        con.sendName(name + ".trow"); //$NON-NLS-1$
         con.sendIntegerData(Type.INT, table.getChangedRow() + 1);
 
         con.sendPacketClass(PacketClass.ScreenData);
-        con.sendName(name + ".tcolumn"); 
+        con.sendName(name + ".tcolumn"); //$NON-NLS-1$
         con.sendIntegerData(Type.INT, table.getChangedColumn() + 1);
 
         con.sendPacketClass(PacketClass.ScreenData);
-        con.sendName(name + ".tvalue"); 
+        con.sendName(name + ".tvalue"); //$NON-NLS-1$
         con.sendStringData(Type.VARCHAR, table.getChangedValue());
 
         int k = 0;

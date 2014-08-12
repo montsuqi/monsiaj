@@ -39,7 +39,6 @@ import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketBuilder {
@@ -74,7 +73,7 @@ public class SSLSocketBuilder {
             keyManagers = createKeyManagers(fileName, password);
             keyManagerIsReady = true;
             trustManagers = createTrustManagers();
-            final SSLContext ctx = SSLContext.getInstance("TLS");
+            final SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
             ctx.init(keyManagers, trustManagers, null);
             factory = ctx.getSocketFactory();
         } catch (SSLException e) {
@@ -95,12 +94,12 @@ public class SSLSocketBuilder {
             System.out.println(e);
             final Throwable t = e.getCause();
             if (isMissingPassphraseMessage(e.getMessage())) {
-                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid");
+                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
                 final SSLException ssle = new SSLException(message);
                 throw ssle;
             }
-            if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) {
-                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid");
+            if (t != null && (t instanceof BadPaddingException || t.getMessage().equals("Could not perform unpadding: invalid pad byte."))) { //$NON-NLS-1$
+                final String message = Messages.getString("Client.client_certificate_password_maybe_invalid"); //$NON-NLS-1$
                 final SSLException ssle = new SSLException(message);
                 throw ssle;
             }
@@ -132,7 +131,7 @@ public class SSLSocketBuilder {
         } catch (IOException e) {
             if (isBrokenPipeMessage(e.getMessage())) {
                 final String message = Messages.getString("Client.broken_pipe");
-                throw new IOException(message);
+                throw new IOException(message); //$NON-NLS-1$
             }
             throw e;
         }
@@ -194,88 +193,32 @@ public class SSLSocketBuilder {
     }
 
     /**
-     * <p>
-     * Test if the given message means that passphrase is missing.</p>
+     * <p>Test if the given message means that passphrase is missing.</p>
      */
     private boolean isMissingPassphraseMessage(String message) {
-        return message != null && message.indexOf("Default SSL context init failed") >= 0
-                && message.indexOf("/ by zero") >= 0;
+        return message != null && message.indexOf("Default SSL context init failed") >= 0 && //$NON-NLS-1$
+                message.indexOf("/ by zero") >= 0; //$NON-NLS-1$
     }
 
     /**
-     * <p>
-     * Test if the given message means broken pipe.</p>
+     * <p>Test if the given message means broken pipe.</p>
      */
     private boolean isBrokenPipeMessage(String message) {
-        return message != null && message.toLowerCase().startsWith("broken pipe");
+        return message != null && message.toLowerCase().startsWith("broken pipe"); //$NON-NLS-1$
     }
 
     TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init((KeyStore) null);
 
-        if (SystemEnvironment.isMacOSX()) {
-            System.setProperty("javax.net.ssl.trustStoreType", "KeychainStore");
-            System.setProperty("javax.net.ssl.trustStoreProvider", "Apple");
-            final File trustStorePath = getTrustStorePath();
-            final InputStream is = new FileInputStream(trustStorePath);
-            final KeyStore ks = KeyStore.getInstance("KeychainStore", "Apple");
-            ks.load(is, null);
-            is.close();
-            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            tmf.init(ks);
-            final TrustManager[] tms = tmf.getTrustManagers();
-            for (TrustManager tm1 : tms) {
-                if (tm1 instanceof X509TrustManager) {
-                    final X509TrustManager delegatee = (X509TrustManager) tm1;
-                    final TrustManager tm = new MyTrustManager(delegatee);
-                    return new TrustManager[]{tm};
-                }
+        for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+            if (trustManager instanceof X509TrustManager) {
+                X509TrustManager delegatee = (X509TrustManager) trustManager;
+                TrustManager tm = new MyTrustManager(delegatee);
+                return new TrustManager[]{tm};
             }
-            return tms;
-
-        } else {
-            final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-            final File trustStorePath = getTrustStorePath();
-            final InputStream is = new FileInputStream(trustStorePath);
-            ks.load(is, null);
-            is.close();
-            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            tmf.init(ks);
-            final TrustManager[] tms = tmf.getTrustManagers();
-            for (TrustManager tm1 : tms) {
-                if (tm1 instanceof X509TrustManager) {
-                    final X509TrustManager delegatee = (X509TrustManager) tm1;
-                    final TrustManager tm = new MyTrustManager(delegatee);
-                    return new TrustManager[]{tm};
-                }
-            }
-            return tms;
-
         }
-    }
-
-    private File getTrustStorePath() {
-        String home = System.getProperty("user.home");
-        String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("windows vista")
-                || osName.startsWith("windows 7")
-                || osName.startsWith("windows 8")
-                || osName.startsWith("windows 9")
-                || osName.startsWith("windows 10")) {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
-        } else if (SystemEnvironment.isWindows()) {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "Application Data", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
-
-        } else if (SystemEnvironment.isMacOSX()) {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, "Library", "Keychains"}),
-                    "login.keychain");
-        } else {
-            return new File(
-                    SystemEnvironment.createFilePath(new String[]{home, ".java", "deployment", "security"}),
-                    "trusted.jssecacerts");
-        }
+        return null;
     }
 
     private KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
@@ -283,23 +226,23 @@ public class SSLSocketBuilder {
             return null;
         }
         if (pass != null && pass.length() > 0) {
-            final KeyStore ks = KeyStore.getInstance("PKCS12");
+            final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
             final InputStream is = new FileInputStream(fileName);
             ks.load(is, pass.toCharArray());
             checkPkcs12FileFormat(ks);
-            final KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            final KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
             kmf.init(ks, pass.toCharArray());
             final KeyManager[] kms = kmf.getKeyManagers();
-            for (KeyManager km1 : kms) {
-                if (km1 instanceof X509KeyManager) {
-                    final X509KeyManager delegatee = (X509KeyManager) km1;
+            for (int i = 0; i < kms.length; i++) {
+                if (kms[i] instanceof X509KeyManager) {
+                    final X509KeyManager delegatee = (X509KeyManager) kms[i];
                     final KeyManager km = new MyKeyManager(delegatee);
                     return new KeyManager[]{km};
                 }
             }
             return kms;
         } else {
-            final String message = Messages.getString("Client.empty_pass");
+            final String message = Messages.getString("Client.empty_pass"); //$NON-NLS-1$
             throw new SSLException(message);
         }
     }
@@ -309,7 +252,7 @@ public class SSLSocketBuilder {
             final Enumeration e = ks.aliases();
             final String alias = (String) e.nextElement();
             if (e.hasMoreElements()) {
-                final String message = Messages.getString("Client.more_than_one_client_certificate_in_pkcs12");
+                final String message = Messages.getString("Client.more_than_one_client_certificate_in_pkcs12"); //$NON-NLS-1$
                 throw new SSLException(message);
             }
             final Certificate certificate = ks.getCertificate(alias);
@@ -334,12 +277,12 @@ public class SSLSocketBuilder {
             certificate.checkValidity();
         } catch (CertificateExpiredException e) {
             final Object[] args = {certificate.getSubjectDN(), certificate.getNotAfter()};
-            final String format = Messages.getString("Client.client_certificate_expired_format");
+            final String format = Messages.getString("Client.client_certificate_expired_format"); //$NON-NLS-1$
             final String message = MessageFormat.format(format, args);
             throw new SSLException(message);
         } catch (CertificateNotYetValidException e) {
             final Object[] args = {certificate.getSubjectDN(), certificate.getNotBefore()};
-            final String format = Messages.getString("Client.client_certificate_not_yet_valid_format");
+            final String format = Messages.getString("Client.client_certificate_not_yet_valid_format"); //$NON-NLS-1$
             final String message = MessageFormat.format(format, args);
             throw new SSLException(message);
         }
@@ -363,17 +306,17 @@ public class SSLSocketBuilder {
 
     private int getWarnCertificateExpirationThreashold() {
         int before = DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD;
-        final String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before");
+        final String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before"); //$NON-NLS-1$
         if (warnExpirationThreshold != null) {
             try {
                 final int newBefore = Integer.parseInt(warnExpirationThreshold);
                 if (newBefore > 0) {
                     before = newBefore;
                 } else {
-                    logger.warn("monsia.warn.certificate.expiration.before must be a positive value, ignored.");
+                    logger.warn("monsia.warn.certificate.expiration.before must be a positive value, ignored."); //$NON-NLS-1$
                 }
             } catch (NumberFormatException e) {
-                logger.warn("monsia.warn.certificate.expiration.before is not a number, falling back to default.");
+                logger.warn("monsia.warn.certificate.expiration.before is not a number, falling back to default."); //$NON-NLS-1$
             }
         }
         return before;
@@ -408,7 +351,7 @@ public class SSLSocketBuilder {
             X509TrustManager tm;
             try {
                 tm = (X509TrustManager) trustManagers[0];
-                tm.checkClientTrusted(chain, "RSA");
+                tm.checkClientTrusted(chain, "RSA"); //$NON-NLS-1$
             } catch (CertificateException e) {
                 throw new RuntimeException(e);
             }

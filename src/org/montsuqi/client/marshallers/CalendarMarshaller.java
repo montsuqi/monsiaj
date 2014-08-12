@@ -41,7 +41,7 @@ class CalendarMarshaller extends WidgetMarshaller {
 		org.montsuqi.widgets.Calendar calendarWidget = (org.montsuqi.widgets.Calendar)widget;
 
 		con.receiveDataTypeWithCheck(Type.RECORD);
-		manager.registerAttribute(widget, "", null); 
+		manager.registerAttribute(widget, "", null); //$NON-NLS-1$
 
 		Calendar calendar = Calendar.getInstance();
 		int year = 0;
@@ -49,13 +49,13 @@ class CalendarMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
-			} else if ("year".equals(name)) { 
+			} else if ("year".equals(name)) { //$NON-NLS-1$
 				year = con.receiveIntData();
 				calendar.set(Calendar.YEAR, year);
-			} else if ("month".equals(name)) { 
+			} else if ("month".equals(name)) { //$NON-NLS-1$
 				int month = con.receiveIntData();
 				calendar.set(Calendar.MONTH, month - 1);
-			} else if ("day".equals(name)) { 
+			} else if ("day".equals(name)) { //$NON-NLS-1$
 				int day = con.receiveIntData();
 				calendar.set(Calendar.DATE, day);
 			} else {
@@ -78,15 +78,15 @@ class CalendarMarshaller extends WidgetMarshaller {
 		ValueAttribute va = manager.getAttribute(name);
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendName(va.getValueName() + ".year"); 
+		con.sendName(va.getValueName() + ".year"); //$NON-NLS-1$
 		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.YEAR));
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendName(va.getValueName() + ".month"); 
+		con.sendName(va.getValueName() + ".month"); //$NON-NLS-1$
 		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.MONTH) + 1);
 
 		con.sendPacketClass(PacketClass.ScreenData);
-		con.sendName(va.getValueName() + ".day"); 
+		con.sendName(va.getValueName() + ".day"); //$NON-NLS-1$
 		con.sendIntegerData(Type.INT, cal.get(java.util.Calendar.DATE));
 	}
 }

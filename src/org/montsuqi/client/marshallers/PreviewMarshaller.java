@@ -36,8 +36,8 @@ import org.montsuqi.widgets.PandaPreview;
  */
 class PreviewMarshaller extends WidgetMarshaller {
 
-    private static final String TEMP_PREFIX = "pandapreview"; 
-    private static final String TEMP_SUFFIX = ".pdf"; 
+    private static final String TEMP_PREFIX = "pandapreview"; //$NON-NLS-1$
+    private static final String TEMP_SUFFIX = ".pdf"; //$NON-NLS-1$
 
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();

@@ -27,13 +27,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.montsuqi.widgets.Button;
+import org.montsuqi.widgets.PandaCList;
 
 public class ConfigViewer {
 
-    protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected Config conf;
 
     public ConfigViewer(Config conf) {
@@ -41,14 +39,17 @@ public class ConfigViewer {
     }
 
     public void run(Frame parent) {
-        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); 
+        final JDialog f = new JDialog(parent, Messages.getString("ConfigurationViewer.title"), true); //$NON-NLS-1$
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout(5, 5));
-        final JTable table = new JTable();
-        table.setRowSelectionAllowed(true);
-        updateConfigList(table);
+        final PandaCList clist = new PandaCList();
+        clist.setFocusable(true);
+        clist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        clist.setShowGrid(true);
+        updateConfigList(clist);
+        clist.setAutoResizeMode(PandaCList.AUTO_RESIZE_LAST_COLUMN);
 
-        JScrollPane scroll = new JScrollPane(table,
+        JScrollPane scroll = new JScrollPane(clist,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         container.add(scroll, BorderLayout.CENTER);
@@ -58,52 +59,47 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { 
+        Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) { //$NON-NLS-1$
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
                 editConfig(f, num, true);
-                updateConfigList(table);
+                updateConfigList(clist);
             }
         });
         bar.add(newButton);
 
-        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { 
+        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) { //$NON-NLS-1$
 
-            @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
+                int selectedRow = clist.getSelectedRow();
                 if (selectedRow >= 0) {
                     int num = conf.getList().get(selectedRow);
                     editConfig(f, num, false);
-                    updateConfigList(table);
+                    updateConfigList(clist);
                 }
             }
         });
         bar.add(editButton);
 
-        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { 
+        Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) { //$NON-NLS-1$
 
-            @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
+                int selectedRow = clist.getSelectedRow();
                 if (selectedRow >= 0) {
-                    int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
+                    int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
-                        String configName = (String) (table.getValueAt(selectedRow, 0));
+                        String configName = (String) (clist.getValueAt(selectedRow, 0));
                         conf.deleteConfig(conf.getConfigByDescription(configName));
-                        updateConfigList(table);
-                        logger.info("server config:"+configName + " deleted");
+                        updateConfigList(clist);
                     }
                 }
             }
         });
         bar.add(deleteButton);
 
-        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { 
+        Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) { //$NON-NLS-1$
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
             }
@@ -116,7 +112,7 @@ public class ConfigViewer {
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    private void updateConfigList(JTable clist) {
+    private void updateConfigList(PandaCList clist) {
         final String[] ColumnNames = {
             Messages.getString("ConfigurationViewer.config_name"),
             Messages.getString("ConfigurationViewer.host"),
@@ -151,7 +147,7 @@ public class ConfigViewer {
 
     protected void editConfig(Dialog parent, final int num, final boolean newFlag) {
         String title = newFlag ? Messages.getString("ConfigurationViewer.new") : Messages.getString("ConfigurationViewer.edit");
-        final JDialog f = new JDialog(parent, title, true); 
+        final JDialog f = new JDialog(parent, title, true); //$NON-NLS-1$
         Container container = f.getContentPane();
         container.setLayout(new BorderLayout());
 
@@ -196,21 +192,18 @@ public class ConfigViewer {
         bar.setLayout(new FlowLayout());
         container.add(bar, BorderLayout.SOUTH);
 
-        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { 
+        Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) { //$NON-NLS-1$
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
-                configPanel.saveConfig(num,entryName);
-                logger.info("server config:"+entryName + " edited");
+                configPanel.saveConfig(num);
                 f.dispose();
             }
         });
         bar.add(editOKButton);
 
-        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { 
+        Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) { //$NON-NLS-1$
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
             }

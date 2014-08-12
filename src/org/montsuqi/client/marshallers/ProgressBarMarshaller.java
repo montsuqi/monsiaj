@@ -46,7 +46,7 @@ class ProgressBarMarshaller extends WidgetMarshaller {
 			String name = con.receiveName();
 			if (handleCommonAttribute(manager, widget, name)) {
 				continue;
-			} else if ("value".equals(name)) { 
+			} else if ("value".equals(name)) { //$NON-NLS-1$
 				manager.registerAttribute(widget, name, null);
 				progress.setValue(con.receiveIntData());
 			}

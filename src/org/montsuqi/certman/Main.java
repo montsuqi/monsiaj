@@ -39,17 +39,17 @@ public class Main {
 
 	class P12Filter extends FileFilter {
 		public boolean accept(File f) {
-			return f.getName().endsWith(".p12"); 
+			return f.getName().endsWith(".p12"); //$NON-NLS-1$
 		}
 
 		public String getDescription() {
-			return "PKCS#12"; 
+			return "PKCS#12"; //$NON-NLS-1$
 		}
 	}
 
 	class BrowseAction extends AbstractAction {
 		BrowseAction() {
-			super(Messages.getString("Browse")); 
+			super(Messages.getString("Browse")); //$NON-NLS-1$
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -59,7 +59,7 @@ public class Main {
 			if (keyStoreFile == null) {
 				return;
 			}
-			ks = loadKeyStore(keyStoreFile, "JKS", Messages.getString("InputPassphrase"));  //$NON-NLS-2$
+			ks = loadKeyStore(keyStoreFile, "JKS", Messages.getString("InputPassphrase")); //$NON-NLS-1$ //$NON-NLS-2$
 			importAction.setEnabled(ks != null);
 			storeField.setText(keyStoreFile.getPath());
 			storeField.setCaretPosition(storeField.getText().length());
@@ -69,7 +69,7 @@ public class Main {
 
 	public class ImportAction extends AbstractAction {
 		ImportAction() {
-			super(Messages.getString("Import")); 
+			super(Messages.getString("Import")); //$NON-NLS-1$
 		}
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser chooser = new JFileChooser();
@@ -79,14 +79,14 @@ public class Main {
 			if (p12File == null) {
 				return;
 			}
-			KeyStore p12Store = loadKeyStore(p12File, "PKCS12", Messages.getString("InputExportPass"));  //$NON-NLS-2$
+			KeyStore p12Store = loadKeyStore(p12File, "PKCS12", Messages.getString("InputExportPass")); //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				Enumeration aliases = p12Store.aliases();
 				while (aliases.hasMoreElements()) {
 					String alias = (String)aliases.nextElement();
 					Certificate[] chain = p12Store.getCertificateChain(alias);
 					if (p12Store.isKeyEntry(alias)) {
-						char[] pass = passPhrases.get(p12Store);
+						char[] pass = (char[])passPhrases.get(p12Store);
 						Key key = p12Store.getKey(alias, pass);
 						ks.setKeyEntry(alias, key, pass, chain);
 						disposePass(p12Store);
@@ -96,16 +96,16 @@ public class Main {
 				File ksFile = (File)files.get(ks);
 				ks.store(new FileOutputStream(ksFile), ksPass);
 				disposePass(ks);
-				JOptionPane.showMessageDialog(frame, Messages.getString("KeyStoreSaved")); 
+				JOptionPane.showMessageDialog(frame, Messages.getString("KeyStoreSaved")); //$NON-NLS-1$
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); 
+				JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			}
 		}
 	}
 
 	public class QuitAction extends AbstractAction {
 		QuitAction() {
-			super(Messages.getString("Quit")); 
+			super(Messages.getString("Quit")); //$NON-NLS-1$
 		}
 		public void actionPerformed(ActionEvent e) {
 			System.exit(0);
@@ -120,8 +120,8 @@ public class Main {
 	private JButton quitButton;
 	private JPanel buttons;
 
-	Map<KeyStore,File> files;
-	Map<KeyStore,char[]> passPhrases;
+	Map files;
+	Map passPhrases;
 	KeyStore ks;
 	ImportAction importAction;
 
@@ -130,8 +130,8 @@ public class Main {
 	}
 
 	Main() {
-		files = new HashMap<>();
-		passPhrases = new HashMap<>();
+		files = new HashMap();
+		passPhrases = new HashMap();
 		ks = null;
 		initComponents();
 		layoutComponents();
@@ -141,10 +141,10 @@ public class Main {
 	}
 
 	private void initComponents() {
-		frame = new JFrame(Messages.getString("Application.title")); 
+		frame = new JFrame(Messages.getString("Application.title")); //$NON-NLS-1$
 		Container root = frame.getContentPane();
 
-		storeLabel = new JLabel(Messages.getString("KeyStore")); 
+		storeLabel = new JLabel(Messages.getString("KeyStore")); //$NON-NLS-1$
 		root.add(storeLabel);
 
 		storeField = new JTextField(20);
@@ -213,7 +213,7 @@ public class Main {
 			passPhrases.put(keyStore, pass);
 			return keyStore;
 		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); 
+			JOptionPane.showMessageDialog(frame, ex.getMessage(), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return null;
 		}
 	}

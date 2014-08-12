@@ -43,7 +43,7 @@ class ButtonMarshaller extends WidgetMarshaller {
             if (handleCommonAttribute(manager, widget, name)) {
                 continue;
             }
-            if ("label".equals(name)) { 
+            if ("label".equals(name)) { //$NON-NLS-1$
                 String label = con.receiveStringData();
                 button.setText(label);
             } else {

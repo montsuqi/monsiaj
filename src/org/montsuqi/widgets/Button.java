@@ -55,13 +55,13 @@ public class Button extends JButton {
 
 	private void initActions() {
 		ActionMap actions = getActionMap();
-		actions.put("focusOutNext", new FocusOutNextAction()); 
-		actions.put("focusOutPrevious", new FocusOutPreviousAction()); 
+		actions.put("focusOutNext", new FocusOutNextAction()); //$NON-NLS-1$
+		actions.put("focusOutPrevious", new FocusOutPreviousAction()); //$NON-NLS-1$
 
 		InputMap inputs = getInputMap(JComponent.WHEN_FOCUSED);
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "pressed"); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), "released"); 
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "pressed"); //$NON-NLS-1$
+		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), "released"); //$NON-NLS-1$
 	}
 }

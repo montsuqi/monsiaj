@@ -44,8 +44,8 @@ import org.montsuqi.widgets.*;
 public class WidgetBuilder {
 
     protected static final Logger logger = LogManager.getLogger(WidgetBuilder.class);
-    private static Map<String,Class> classMap;
-    private static Map<String,WidgetBuilder> builderMap;
+    private static Map classMap;
+    private static Map builderMap;
 
     /**
      * <p>Maps a generic(toolkit independent) widget class name, to actual Java
@@ -65,8 +65,8 @@ public class WidgetBuilder {
 
     // set up the widget builder map
     static {
-        builderMap = new HashMap<>();
-        classMap = new HashMap<>();
+        builderMap = new HashMap();
+        classMap = new HashMap();
 
         WidgetBuilder defaultWidgetBuilder = new WidgetBuilder();
         WidgetBuilder defaultContainerBuilder = new ContainerBuilder();
@@ -75,19 +75,27 @@ public class WidgetBuilder {
         registerWidgetClass("Button", Button.class, defaultWidgetBuilder); 
         registerWidgetClass("Calendar", Calendar.class, defaultWidgetBuilder); 
         registerWidgetClass("CheckButton", CheckBox.class, new CheckButtonBuilder()); 
+        registerWidgetClass("Combo", JComboBox.class, new ComboBuilder()); 
+        registerWidgetClass("CList", PandaCList.class, new CListBuilder()); 
         registerWidgetClass("Dialog", Window.class, new WindowBuilder()); 
         registerWidgetClass("Entry", Entry.class, entryBuilder); 
         registerWidgetClass("FileChooserButton", FileChooserButton.class, defaultWidgetBuilder);        
         registerWidgetClass("ColorButton", ColorButton.class, defaultWidgetBuilder);                
+        registerWidgetClass("FileEntry", FileEntry.class, new FileEntryBuilder()); 
         registerWidgetClass("Fixed", Fixed.class, new FixedBuilder()); 
         registerWidgetClass("Frame", Frame.class, new FrameBuilder()); 
         registerWidgetClass("HBox", HBox.class, defaultContainerBuilder); 
         registerWidgetClass("VPaned", HPaned.class, defaultContainerBuilder); 
         registerWidgetClass("HSeparator", HSeparator.class, defaultWidgetBuilder); 
         registerWidgetClass("Label", JLabel.class, new LabelBuilder()); 
+        registerWidgetClass("List", JList.class, new ListBuilder()); 
+        registerWidgetClass("Menu", JMenu.class, defaultContainerBuilder); 
+        registerWidgetClass("MenuBar", JMenuBar.class, new MenuBarBuilder()); 
+        registerWidgetClass("MenuItem", JMenuItem.class, new MenuItemBuilder()); 
         registerWidgetClass("PixmapMenuItem", JMenuItem.class, new MenuItemBuilder()); 
         registerWidgetClass("Notebook", Notebook.class, new NotebookBuilder()); 
         registerWidgetClass("NumberEntry", NumberEntry.class, entryBuilder); 
+        registerWidgetClass("OptionMenu", OptionMenu.class, defaultWidgetBuilder); 
         registerWidgetClass("PandaCombo", PandaCombo.class, new PandaComboBuilder()); 
         registerWidgetClass("PandaCList", PandaCList.class, new CListBuilder()); 
         registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder); 

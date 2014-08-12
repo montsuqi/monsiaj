@@ -38,21 +38,24 @@ import org.montsuqi.widgets.*;
 public abstract class WidgetMarshaller {
 
     protected static final Logger logger = LogManager.getLogger(WidgetMarshaller.class);
-    private static final Map<Class,WidgetMarshaller> classTable;
+    private static Map classTable;
 
     static {
-        classTable = new HashMap<>();
+        classTable = new HashMap();
         registerMarshaller(JTextField.class, new EntryMarshaller());
         registerMarshaller(NumberEntry.class, new NumberEntryMarshaller());
         registerMarshaller(JTextArea.class, new TextMarshaller());
         registerMarshaller(JLabel.class, new LabelMarshaller());
         registerMarshaller(JComboBox.class, new ComboMarshaller());
         registerMarshaller(AbstractButton.class, new ButtonMarshaller());
+        registerMarshaller(JList.class, new ListMarshaller());
         registerMarshaller(JTabbedPane.class, new NotebookMarshaller());
         registerMarshaller(Calendar.class, new CalendarMarshaller());
         registerMarshaller(JProgressBar.class, new ProgressBarMarshaller());
         registerMarshaller(PandaPreview.class, new PreviewMarshaller());
+        registerMarshaller(OptionMenu.class, new OptionMenuMarshaller());
         registerMarshaller(Frame.class, new FrameMarshaller());
+        registerMarshaller(FileEntry.class, new FileEntryMarshaller());
         registerMarshaller(FileChooserButton.class, new FileChooserButtonMarshaller());
         registerMarshaller(ColorButton.class, new ColorButtonMarshaller());        
         registerMarshaller(PandaTimer.class, new TimerMarshaller());
@@ -79,7 +82,7 @@ public abstract class WidgetMarshaller {
      */
     protected boolean handleCommonAttribute(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
-        if ("state".equals(name)) { 
+        if ("state".equals(name)) { //$NON-NLS-1$
             int state = con.receiveIntData();
             /* Widget states from gtkenums.h
             typedef enum
@@ -99,11 +102,11 @@ public abstract class WidgetMarshaller {
                 text.setEditable(flag);
             }
             return true;
-        } else if ("style".equals(name)) { 
+        } else if ("style".equals(name)) { //$NON-NLS-1$
             String buff = con.receiveStringData();
             manager.setStyle(widget, buff);
             return true;
-        } else if ("visible".equals(name)) { 
+        } else if ("visible".equals(name)) { //$NON-NLS-1$
             boolean visible = con.receiveBooleanData();
             widget.setEnabled(visible);
             widget.setVisible(visible);
@@ -116,7 +119,7 @@ public abstract class WidgetMarshaller {
     protected boolean handleEditable(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
         JTextField entry = (JTextField)widget;
-        if ("editable".equals(name)) { 
+        if ("editable".equals(name)) { //$NON-NLS-1$
             
             boolean editable = con.receiveBooleanData();
             entry.setEditable(editable);

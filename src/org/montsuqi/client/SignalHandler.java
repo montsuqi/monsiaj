@@ -43,7 +43,7 @@ import org.montsuqi.widgets.FileEntry;
 public abstract class SignalHandler {
 
     protected static final Logger logger = LogManager.getLogger(SignalHandler.class);
-    private String signalName = ""; 
+    private String signalName = ""; //$NON-NLS-1$
 
     @Override
     public String toString() {
@@ -74,13 +74,12 @@ public abstract class SignalHandler {
             logger.exit();
             return handler;
         }
-        logger.debug("signal handler for {0} is not found", handlerName); 
+        logger.debug("signal handler for {0} is not found", handlerName); //$NON-NLS-1$
         final SignalHandler handler = getSignalHandler(null);
         logger.exit();
         return handler;
     }
-    
-    static Map<String,SignalHandler> handlers;
+    static Map handlers;
     static Timer timer;
     static TimerTask timerTask;
     static boolean timerBlocked;
@@ -115,7 +114,7 @@ public abstract class SignalHandler {
     }
 
     static {
-        handlers = new HashMap<>();
+        handlers = new HashMap();
 
         timer = new Timer();
         timerTask = null;
@@ -123,16 +122,16 @@ public abstract class SignalHandler {
 
         // In addition to kana/kanji, some special symbols can trigger sendEventWhenIdle.
         StringBuilder buf = new StringBuilder();
-        buf.append("\u3000\uff01\u201d\uff03\uff04\uff05\uff06\u2019"); 
-        buf.append("\uff08\uff09\uff0a\uff0b\uff0c\u30fc\uff0e\uff0f"); 
-        buf.append("\uff10\uff11\uff12\uff13\uff14\uff15\uff16\uff17"); 
-        buf.append("\uff18\uff19\uff1a\uff1b\uff1c\uff1d\uff1e\uff1f"); 
-        buf.append("\uff20\uff21\uff22\uff23\uff24\uff25\uff26\uff27"); 
-        buf.append("\uff28\uff29\uff2a\uff2b\uff2c\uff2d\uff2e\uff2f"); 
-        buf.append("\uff30\uff31\uff32\uff33\uff34\uff35\uff36\uff37"); 
-        buf.append("\uff38\uff39\uff3a\uff3b\uffe5\uff3d\uff3e\uff3f"); 
-        buf.append("\u2018\u30a2\u30a8\u30a4\u30aa\u30a6\uff5b\uff5c"); 
-        buf.append("\uff5d\uffe3"); 
+        buf.append("\u3000\uff01\u201d\uff03\uff04\uff05\uff06\u2019"); //$NON-NLS-1$
+        buf.append("\uff08\uff09\uff0a\uff0b\uff0c\u30fc\uff0e\uff0f"); //$NON-NLS-1$
+        buf.append("\uff10\uff11\uff12\uff13\uff14\uff15\uff16\uff17"); //$NON-NLS-1$
+        buf.append("\uff18\uff19\uff1a\uff1b\uff1c\uff1d\uff1e\uff1f"); //$NON-NLS-1$
+        buf.append("\uff20\uff21\uff22\uff23\uff24\uff25\uff26\uff27"); //$NON-NLS-1$
+        buf.append("\uff28\uff29\uff2a\uff2b\uff2c\uff2d\uff2e\uff2f"); //$NON-NLS-1$
+        buf.append("\uff30\uff31\uff32\uff33\uff34\uff35\uff36\uff37"); //$NON-NLS-1$
+        buf.append("\uff38\uff39\uff3a\uff3b\uffe5\uff3d\uff3e\uff3f"); //$NON-NLS-1$
+        buf.append("\u2018\u30a2\u30a8\u30a4\u30aa\u30a6\uff5b\uff5c"); //$NON-NLS-1$
+        buf.append("\uff5d\uffe3"); //$NON-NLS-1$
         SYMBOLS = buf.toString();
 
         /**
@@ -148,7 +147,7 @@ public abstract class SignalHandler {
         /**
          * <p>A signal handler which selects all text on a text field.</p>
          */
-        registerHandler("select_all", new SignalHandler() { 
+        registerHandler("select_all", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 JTextField field = (JTextField) widget;
@@ -159,7 +158,7 @@ public abstract class SignalHandler {
         /**
          * <p>A signal handler which unselect all text on a text field.</p>
          */
-        registerHandler("unselect_all", new SignalHandler() { 
+        registerHandler("unselect_all", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 JTextField field = (JTextField) widget;
@@ -202,14 +201,14 @@ public abstract class SignalHandler {
                     try {
                         con.startReceiving();
                         if (widget instanceof JComponent) {
-                            if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { 
+                            if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) { //$NON-NLS-1$
                                 con._addChangedWidget(widget);
                             }
                         }
                         Window window;
                         if (widget instanceof JMenuItem) {
                             JComponent c = (JComponent) widget;
-                            window = (Window) c.getClientProperty("window"); 
+                            window = (Window) c.getClientProperty("window"); //$NON-NLS-1$
                         } else {
                             window = SwingUtilities.windowForComponent(widget);
                         }
@@ -332,31 +331,31 @@ public abstract class SignalHandler {
             }
         };
 
-        registerHandler("send_event", sendEvent); 
-        registerHandler("send_event_when_idle", sendEventWhenIdle); 
-        registerHandler("send_event_on_focus_out", sendEvent); 
+        registerHandler("send_event", sendEvent); //$NON-NLS-1$
+        registerHandler("send_event_when_idle", sendEventWhenIdle); //$NON-NLS-1$
+        registerHandler("send_event_on_focus_out", sendEvent); //$NON-NLS-1$
 
         /**
          * <p>A signal handler which registers the taret widget as "changed" and
          * sends "SELECT" event.</p>
          */
-        registerHandler("clist_send_event", new SignalHandler() { 
+        registerHandler("clist_send_event", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
-                sendEvent.handle(con, widget, "SELECT"); 
+                sendEvent.handle(con, widget, "SELECT"); //$NON-NLS-1$
             }
         });
         
-        registerHandler("notebook_send_event", new SignalHandler() { 
+        registerHandler("notebook_send_event", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
-                sendEvent.handle(con, widget, "SWITCH"); 
+                sendEvent.handle(con, widget, "SWITCH"); //$NON-NLS-1$
             }
         });
         
-        registerHandler("table_send_event", new SignalHandler() { 
+        registerHandler("table_send_event", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
@@ -367,10 +366,10 @@ public abstract class SignalHandler {
         /**
          * <p>A signal handler which sends an "ACTIVATE".</p>
          */
-        registerHandler("activate_widget", new SignalHandler() { 
+        registerHandler("activate_widget", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                sendEvent.handle(con, widget, "ACTIVATE"); 
+                sendEvent.handle(con, widget, "ACTIVATE"); //$NON-NLS-1$
             }
         });
 
@@ -378,7 +377,7 @@ public abstract class SignalHandler {
          * <p>A signal handler which moves the focus to the widget of given
          * name.</p>
          */
-        registerHandler("entry_next_focus", new SignalHandler() { 
+        registerHandler("entry_next_focus", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 Node node = con.getNode(widget);
@@ -391,15 +390,15 @@ public abstract class SignalHandler {
             }
         });
 
-        registerHandler("changed", changed); 
-        registerHandler("entry_changed", changed); 
-        registerHandler("text_changed", changed); 
-        registerHandler("button_toggled", changed); 
-        registerHandler("selection_changed", changed); 
-        registerHandler("click_column", changed); 
-        registerHandler("day_selected", changed); 
-        registerHandler("switch_page", changed); 
-        registerHandler("no_switch_page", changed);         
+        registerHandler("changed", changed); //$NON-NLS-1$
+        registerHandler("entry_changed", changed); //$NON-NLS-1$
+        registerHandler("text_changed", changed); //$NON-NLS-1$
+        registerHandler("button_toggled", changed); //$NON-NLS-1$
+        registerHandler("selection_changed", changed); //$NON-NLS-1$
+        registerHandler("click_column", changed); //$NON-NLS-1$
+        registerHandler("day_selected", changed); //$NON-NLS-1$
+        registerHandler("switch_page", changed); //$NON-NLS-1$
+        registerHandler("no_switch_page", changed); //$NON-NLS-1$        
         
         registerHandler("fileentry_changed", new SignalHandler() {
 
@@ -415,7 +414,7 @@ public abstract class SignalHandler {
             }
         });
 
-        registerHandler("entry_set_editable", new SignalHandler() { 
+        registerHandler("entry_set_editable", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 // do nothing?
@@ -426,7 +425,7 @@ public abstract class SignalHandler {
          * <p>A signal handler which removes all changed widgets from all
          * windows.</p>
          */
-        registerHandler("map_event", new SignalHandler() { 
+        registerHandler("map_event", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 con.clearWindowTable();
@@ -436,7 +435,7 @@ public abstract class SignalHandler {
         /**
          * do nothing for now
          */
-        registerHandler("set_focus", new SignalHandler() { 
+        registerHandler("set_focus", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 // Node node = con.getNode(widget);
@@ -448,14 +447,14 @@ public abstract class SignalHandler {
          * <p>A signal handler to close the window on which target widget
          * is.</p>
          */
-        registerHandler("window_close", new SignalHandler() { 
+        registerHandler("window_close", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 con.closeWindow(widget);
             }
         });
 
-        registerHandler("window_destroy", new SignalHandler() { 
+        registerHandler("window_destroy", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 con.exit();
@@ -466,7 +465,7 @@ public abstract class SignalHandler {
          * <p>A signal handler to open the given URL on target JTextPane
          * widget.</p>
          */
-        registerHandler("open_browser", new SignalHandler() { 
+        registerHandler("open_browser", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 if (!(widget instanceof JTextPane)) {
@@ -479,7 +478,7 @@ public abstract class SignalHandler {
             }
         });
 
-        registerHandler("keypress_filter", new SignalHandler() { 
+        registerHandler("keypress_filter", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 Component next = con.getInterface().getWidget((String) userData);
@@ -487,14 +486,14 @@ public abstract class SignalHandler {
             }
         });
 
-        registerHandler("press_filter", new SignalHandler() { 
+        registerHandler("press_filter", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
-                //logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); 
+                //logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); //$NON-NLS-1$
             }
         });
 
-        registerHandler("gtk_true", new SignalHandler() { 
+        registerHandler("gtk_true", new SignalHandler() { //$NON-NLS-1$
 
             public void handle(Protocol con, Component widget, Object userData) {
                 // callback placeholder wich has no effect
