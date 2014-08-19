@@ -21,7 +21,7 @@
         <jar href="ilf-gpl.jar"/>        
         <jar href="nimrodlf.jar"/>
         <jar href="PDFRenderer.jar"/>
-        <jar href="org.json.20120521.jar"/>        
+        <jar href="org.json-20120521.jar"/>        
     </resources>
     <application-desc main-class="jp.or.med.orca.jmareceipt.JMAReceiptLauncher"/>
 </jnlp>
