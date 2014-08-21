@@ -982,8 +982,8 @@ public class Protocol {
     private synchronized void sendPing() throws IOException {
         if (!isReceiving) {
             this.startReceiving();
+            listDownloads();
             if (this.getServerType().startsWith("ginbee")) {
-                listDownloads();
             } else {
                 getMessage();
             }
