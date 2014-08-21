@@ -1,5 +1,5 @@
 Main-Class: jp.or.med.orca.monsiaj.Loader
-Class-Path: log4j-core-2.0-beta9.jar log4j-api-2.0-beta9.jar
+Class-Path: log4j-core-2.0.1.jar log4j-api-2.0.1.jar
 Permissions: all-permissions
 Codebase: *.orca.med.or.jp
 Application-Name: monsiaj
