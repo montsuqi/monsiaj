@@ -58,7 +58,7 @@ public class ExceptionDialog extends JOptionPane {
 		if (message == null || message.length() == 0) {
 			message = name;
 		}
-                logger.info("error",e);
+                logger.error(e);
 		JOptionPane.showMessageDialog(null, message, shortName, JOptionPane.ERROR_MESSAGE);
 	}
 }

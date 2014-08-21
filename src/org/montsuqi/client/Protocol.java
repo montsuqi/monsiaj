@@ -22,9 +22,11 @@
  */
 package org.montsuqi.client;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -50,8 +52,10 @@ import java.util.Iterator;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -60,9 +64,13 @@ import org.json.JSONObject;
 import org.montsuqi.client.widgethandlers.WidgetHandler;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
+import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
+import org.montsuqi.widgets.PandaDownload;
+import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.TopWindow;
 import org.montsuqi.widgets.Window;
@@ -77,7 +85,7 @@ public class Protocol {
     private final Config conf;
     private boolean isReceiving;
     private final long timerPeriod;
-    private final HashMap<String,Node> nodeTable;
+    private final HashMap<String, Node> nodeTable;
     private String sessionTitle;
     private Color sessionBGColor;
     private StringBuffer widgetName;
@@ -87,7 +95,6 @@ public class Protocol {
     private final ArrayList<Component> dialogStack;
     private static final int PingTimerPeriod = 10 * 1000;
     private javax.swing.Timer pingTimer;
-    private PrintAgent printAgent;
     private String windowName;
     private Map styleMap;
     private Map<String, Component> changedWidgetMap;
@@ -295,7 +302,7 @@ public class Protocol {
             URL url = new URL(conf.getAuthURI(num));
 
             JSONObject params = new JSONObject();
-            JSONObject result = (JSONObject)jsonRPC(url, "get_server_info", params);
+            JSONObject result = (JSONObject) jsonRPC(url, "get_server_info", params);
             this.protocolVersion = result.getString("protocol_version");
             this.applicationVersion = result.getString("application_version");
             this.serverType = result.getString("server_type");
@@ -320,7 +327,7 @@ public class Protocol {
             meta.put("client_version", PANDA_CLIENT_VERSION);
             params.put("meta", meta);
 
-            JSONObject result = (JSONObject)jsonRPC(url, "start_session", params);
+            JSONObject result = (JSONObject) jsonRPC(url, "start_session", params);
             meta = result.getJSONObject("meta");
 
             this.sessionId = meta.getString("session_id");
@@ -336,9 +343,6 @@ public class Protocol {
             logger.debug("session_id:" + this.sessionId);
             logger.debug("rpcURI:" + this.rpcUri);
             logger.debug("restURIRoot:" + this.restURIRoot);
-
-            printAgent = new PrintAgent(this);
-            printAgent.start();
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -357,7 +361,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = (JSONObject)jsonRPC(this.rpcUri, "end_session", params);
+            JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "end_session", params);
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -372,7 +376,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            this.resultJSON = (JSONObject)jsonRPC(this.rpcUri, "get_window", params);
+            this.resultJSON = (JSONObject) jsonRPC(this.rpcUri, "get_window", params);
 
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -389,7 +393,7 @@ public class Protocol {
             params.put("meta", meta);
             params.put("window", wname);
 
-            JSONObject result = (JSONObject)jsonRPC(this.rpcUri, "get_screen_define", params);
+            JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "get_screen_define", params);
             return result.getString("screen_define");
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -405,7 +409,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            this.resultJSON = (JSONObject)jsonRPC(this.rpcUri, "send_event", params);
+            this.resultJSON = (JSONObject) jsonRPC(this.rpcUri, "send_event", params);
         } catch (Exception ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
@@ -420,7 +424,7 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONObject result = (JSONObject)jsonRPC(this.rpcUri, "get_message", params);
+            JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "get_message", params);
             if (result.has("abort")) {
                 String abort = result.getString("abort");
                 if (!abort.isEmpty()) {
@@ -456,7 +460,134 @@ public class Protocol {
         }
     }
 
-    public void listReports() {
+    private void showReportDialog(String title, File file) throws IOException {
+        final JDialog dialog = new JDialog();
+        Button closeButton = new Button(new AbstractAction(Messages.getString("PrintReport.close")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
+        Container container = dialog.getContentPane();
+        container.setLayout(new BorderLayout(5, 5));
+        PandaPreview preview = new PandaPreview();
+        dialog.setSize(new Dimension(800, 600));
+        dialog.setLocationRelativeTo(null);
+        dialog.setTitle(Messages.getString("PrintReport.title") + title);
+        container.add(preview, BorderLayout.CENTER);
+        container.add(closeButton, BorderLayout.SOUTH);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+        preview.setSize(800, 600);
+        preview.load(file.getAbsolutePath());
+        preview.setVisible(true);
+
+        dialog.setModal(true);
+        dialog.setResizable(false);
+        dialog.setVisible(true);
+        closeButton.requestFocus();
+    }
+
+    private void printReport(JSONObject item) {
+        try {
+            if (!item.has("object_id")) {
+                return;
+            }
+            String oid = item.getString("object_id");
+
+            String printer = null;
+            if (item.has("printer")) {
+                printer = item.getString("printer");
+            }
+
+            String title = "";
+            if (item.has("title")) {
+                printer = item.getString("title");
+            }
+
+            boolean showdialog = false;
+            if (item.has("showdialog")) {
+                showdialog = item.getBoolean("showdialog");
+            }
+            if (oid == null || oid.equals("0")) {
+                return;
+            }
+
+            try {
+                File temp = File.createTempFile("report", "pdf");
+                temp.deleteOnExit();
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+                this.getBLOB(oid, out);
+                if (showdialog) {
+                    showReportDialog(title, temp);
+                } else {
+                    PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
+                            Messages.getString("PrintReport.notify_print_start") + "\n\n"
+                            + Messages.getString("PrintReport.printer") + printer + "\n\n"
+                            + Messages.getString("PrintReport.title") + title,
+                            GtkStockIcon.get("gtk-print"), 0);
+                    if (printer != null) {
+                        PDFPrint print = new PDFPrint(temp, printer);
+                        print.start();
+                    } else {
+                        PDFPrint print = new PDFPrint(temp, false);
+                        print.start();
+                    }
+                }
+            } catch (IOException ex) {
+                logger.warn(ex);
+                PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
+                        Messages.getString("PrintReport.notify_print_fail") + "\n\n"
+                        + Messages.getString("PrintReport.printer") + printer + "\n"
+                        + Messages.getString("PrintReport.title") + title,
+                        GtkStockIcon.get("gtk-dialog-error"), 0);
+            }
+        } catch (JSONException ex) {
+            logger.warn(ex);
+        }
+
+    }
+
+    private void downloadFile(JSONObject item) {
+        try {
+            if (!item.has("object_id")) {
+                return;
+            }
+            String oid = item.getString("object_id");
+
+            String filename = "";
+            if (item.has("filename")) {
+                filename = item.getString("filename");
+            }
+            String desc = "";
+            if (item.has("description")) {
+                desc = item.getString("description");
+            }
+            if (oid == null || oid.equals("0")) {
+                return;
+            }
+            try {
+                File temp = File.createTempFile("downloadfile", "dat");
+                temp.deleteOnExit();
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+                this.getBLOB(oid, out);
+                PandaDownload pd = new PandaDownload();
+                pd.showDialog(filename, desc, temp);
+            } catch (IOException ex) {
+                logger.warn(ex);
+                PopupNotify.popup(Messages.getString("DownloadFile.notify_summary"),
+                        Messages.getString("DownloadFile.fail") + "\n\n"
+                        + Messages.getString("DownloadFile.filename") + filename + "\n"
+                        + Messages.getString("DownloadFile.description") + desc,
+                        GtkStockIcon.get("gtk-dialog-error"), 0);
+            }
+        } catch (JSONException ex) {
+            logger.warn(ex);
+        }
+    }
+
+    public void listDownloads() {
         try {
             JSONObject params = new JSONObject();
             JSONObject meta = new JSONObject();
@@ -464,27 +595,24 @@ public class Protocol {
             meta.put("session_id", this.sessionId);
             params.put("meta", meta);
 
-            JSONArray array = (JSONArray)jsonRPC(this.rpcUri, "list_reports", params);
+            JSONArray array = (JSONArray) jsonRPC(this.rpcUri, "list_downloads", params);
             for (int j = 0; j < array.length(); j++) {
                 JSONObject item = array.getJSONObject(j);
-                String printer = null;
-                String oid = null;
-                if (item.has("printer")) {
-                    printer = item.getString("printer");
+
+                String type = null;
+                if (item.has("type")) {
+                    type = item.getString("type");
                 }
-                if (item.has("object_id")) {
-                    oid = item.getString("object_id");
-                }
-                if (printer != null && oid != null) {
-                    printAgent.addServerPrintRequest(printer, oid);
+                if (type != null) {
+                    if (type.equals("report")) {
+                        printReport(item);
+                    } else {
+                        downloadFile(item);
+                    }
                 }
             }
-        } catch (JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        } catch (IOException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
+        } catch (JSONException | IOException ex) {
+            logger.warn(ex);
         }
     }
 
@@ -851,19 +979,11 @@ public class Protocol {
         pingTimer.start();
     }
 
-    public void addPrintRequest(String path, String title, int retry, boolean showDialog) {
-        printAgent.addPrintRequest(path, title, retry, showDialog);
-    }
-
-    public void addDLRequest(String path, String filename, String description, int retry) {
-        printAgent.addDLRequest(path, filename, description, retry);
-    }
-
     private synchronized void sendPing() throws IOException {
         if (!isReceiving) {
             this.startReceiving();
             if (this.getServerType().startsWith("ginbee")) {
-                listReports();
+                listDownloads();
             } else {
                 getMessage();
             }
