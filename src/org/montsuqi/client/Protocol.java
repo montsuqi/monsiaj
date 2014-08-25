@@ -105,13 +105,12 @@ public class Protocol {
     private String serverType;
     private int rpcId;
     private String sessionId;
-    private URL rpcUri;
+    private String rpcUri;
     private String restURIRoot;
     private JSONObject resultJSON;
 
     private final SSLSocketFactory sslSocketFactory;
-
-    static final String PANDA_CLIENT_VERSION = "1.4.8";
+    static final String PANDA_CLIENT_VERSION = "2.0.0";
 
     public String getWindowName() {
         return windowName;
@@ -159,35 +158,30 @@ public class Protocol {
                 return new PasswordAuthentication(user, password.toCharArray());
             }
         });
+        sslSocketFactory = SSLSocketFactoryHelper.getFactory(conf);
+    }
 
-        String caCert = conf.getCACertificateFile(num);
-        String p12 = conf.getClientCertificateFile(num);
-        String p12Password = conf.getClientCertificatePassword(num);
-        if (conf.getUseSSL(num)) {
-            SSLSocketBuilder builder = new SSLSocketBuilder(caCert, p12, p12Password);
-            sslSocketFactory = builder.getFactory();
-        } else {
-            sslSocketFactory = null;
-
+    private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
+        URL url = new URL(strURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String protocol = url.getProtocol();
+        switch (protocol) {
+            case "https":
+                if (sslSocketFactory != null) {
+                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                }
+                break;
+            case "http":
+                break;
+            default:
+                throw new IOException("bad protocol");
         }
+        return con;
     }
 
     public File apiDownload(String path, String filename) throws IOException {
         File temp = File.createTempFile("monsiaj_apidownload_", "__" + filename);
-        URL url = new URL(this.restURIRoot + path);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        String protocol = url.getProtocol();
-        if (protocol.equals("https")) {
-            if (sslSocketFactory != null) {
-                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
-            }
-        } else if (protocol.equals("http")) {
-            // do nothing
-        } else {
-            throw new IOException("bad protocol");
-        }
+        HttpURLConnection con = getHttpURLConnection(this.restURIRoot + path);
 
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -203,12 +197,12 @@ public class Protocol {
         }
         BufferedInputStream in = new BufferedInputStream(con.getInputStream());
         int length, size = 0;
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
-        while ((length = in.read()) != -1) {
-            size += length;
-            out.write(length);
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
+            while ((length = in.read()) != -1) {
+                size += length;
+                out.write(length);
+            }
         }
-        out.close();
         con.disconnect();
         if (size == 0) {
             return null;
@@ -247,33 +241,19 @@ public class Protocol {
         return obj.get("result");
     }
 
-    private Object jsonRPC(URL url, String method, JSONObject params) throws JSONException, IOException {
+    private Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         String reqStr = makeJSONRPCRequest(method, params);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        String protocol = url.getProtocol();
-        if (protocol.equals("https")) {
-            if (sslSocketFactory != null) {
-                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
-            }
-        } else if (protocol.equals("http")) {
-            // do nothing
-        } else {
-            throw new IOException("bad protocol");
-        }
+        HttpURLConnection con = getHttpURLConnection(url);
 
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("POST");
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
-
-        OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-
-        osw.write(reqStr);
-        osw.flush();
-        osw.close();
+        try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
+            osw.write(reqStr);
+            osw.flush();
+        }
 
         int responseCode = con.getResponseCode();
         if (responseCode == 401 || responseCode == 403) {
@@ -281,25 +261,25 @@ public class Protocol {
             logger.info("auth error:" + responseCode);
             System.exit(1);
         }
-
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        BufferedOutputStream bos = new BufferedOutputStream(bytes);
-        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-        int length;
-        while ((length = bis.read()) != -1) {
-            bos.write(length);
+        Object result;
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
+                BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
+                int length;
+                while ((length = bis.read()) != -1) {
+                    bos.write(length);
+                }
+            }
+            con.disconnect();
+            result = checkJSONRPCResponse(bytes.toString("UTF-8"));
         }
-        bos.close();
-        con.disconnect();
-        Object result = checkJSONRPCResponse(bytes.toString("UTF-8"));
-        bytes.close();
         return result;
     }
 
     public void getServerInfo() {
         try {
             int num = conf.getCurrent();
-            URL url = new URL(conf.getAuthURI(num));
+            String url = conf.getAuthURI(num);
 
             JSONObject params = new JSONObject();
             JSONObject result = (JSONObject) jsonRPC(url, "get_server_info", params);
@@ -311,7 +291,7 @@ public class Protocol {
             logger.debug("application_version:" + this.applicationVersion);
             logger.debug("server_type:" + this.serverType);
 
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -320,7 +300,7 @@ public class Protocol {
     public void startSession() {
         try {
             int num = conf.getCurrent();
-            URL url = new URL(conf.getAuthURI(num));
+            String url = conf.getAuthURI(num);
 
             JSONObject params = new JSONObject();
             JSONObject meta = new JSONObject();
@@ -334,16 +314,16 @@ public class Protocol {
 
             if (this.serverType.startsWith("glserver")) {
                 this.rpcUri = url;
-                this.restURIRoot = url.toString().replaceFirst("/rpc/", "/rest/");
+                this.restURIRoot = url.replaceFirst("/rpc/", "/rest/");
             } else {
-                this.rpcUri = new URL(result.getString("app_rpc_endpoint_uri"));
+                this.rpcUri = result.getString("app_rpc_endpoint_uri");
                 this.restURIRoot = result.getString("app_rest_api_uri_root");
             }
 
             logger.debug("session_id:" + this.sessionId);
             logger.debug("rpcURI:" + this.rpcUri);
             logger.debug("restURIRoot:" + this.restURIRoot);
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -362,7 +342,7 @@ public class Protocol {
             params.put("meta", meta);
 
             JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "end_session", params);
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -378,7 +358,7 @@ public class Protocol {
 
             this.resultJSON = (JSONObject) jsonRPC(this.rpcUri, "get_window", params);
 
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -395,7 +375,7 @@ public class Protocol {
 
             JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "get_screen_define", params);
             return result.getString("screen_define");
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -410,7 +390,7 @@ public class Protocol {
             params.put("meta", meta);
 
             this.resultJSON = (JSONObject) jsonRPC(this.rpcUri, "send_event", params);
-        } catch (Exception ex) {
+        } catch (IOException | JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -448,13 +428,7 @@ public class Protocol {
                 }
             }
 
-        } catch (JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        } catch (IOException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        } catch (HeadlessException ex) {
+        } catch (JSONException | IOException | HeadlessException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -536,7 +510,7 @@ public class Protocol {
                     }
                 }
             } catch (IOException ex) {
-                logger.warn(ex);
+                logger.warn(ex,ex);
                 PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
                         Messages.getString("PrintReport.notify_print_fail") + "\n\n"
                         + Messages.getString("PrintReport.printer") + printer + "\n"
@@ -544,9 +518,8 @@ public class Protocol {
                         GtkStockIcon.get("gtk-dialog-error"), 0);
             }
         } catch (JSONException ex) {
-            logger.warn(ex);
+            logger.warn(ex,ex);
         }
-
     }
 
     private void downloadFile(JSONObject item) {
@@ -575,7 +548,7 @@ public class Protocol {
                 PandaDownload pd = new PandaDownload();
                 pd.showDialog(filename, desc, temp);
             } catch (IOException ex) {
-                logger.warn(ex);
+                logger.warn(ex,ex);
                 PopupNotify.popup(Messages.getString("DownloadFile.notify_summary"),
                         Messages.getString("DownloadFile.fail") + "\n\n"
                         + Messages.getString("DownloadFile.filename") + filename + "\n"
@@ -583,7 +556,7 @@ public class Protocol {
                         GtkStockIcon.get("gtk-dialog-error"), 0);
             }
         } catch (JSONException ex) {
-            logger.warn(ex);
+            logger.warn(ex,ex);
         }
     }
 
@@ -612,7 +585,7 @@ public class Protocol {
                 }
             }
         } catch (JSONException | IOException ex) {
-            logger.warn(ex);
+            logger.warn(ex,ex);
         }
     }
 
@@ -626,15 +599,16 @@ public class Protocol {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
         String protocol = url.getProtocol();
-        if (protocol.equals("https")) {
-            if (sslSocketFactory != null) {
-                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
-            }
-        } else if (protocol.equals("http")) {
-            // do nothing
-        } else {
-            throw new IOException("bad protocol");
+        switch (protocol) {
+            case "https":
+                if (sslSocketFactory != null) {
+                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                }
+                break;
+            case "http":
+                break;
+            default:
+                throw new IOException("bad protocol");
         }
 
         con.setInstanceFollowRedirects(false);
@@ -657,15 +631,16 @@ public class Protocol {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
             String protocol = url.getProtocol();
-            if (protocol.equals("https")) {
-                if (sslSocketFactory != null) {
-                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                    ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
-                }
-            } else if (protocol.equals("http")) {
-                // do nothing
-            } else {
-                throw new IOException("bad protocol");
+            switch (protocol) {
+                case "https":
+                    if (sslSocketFactory != null) {
+                        ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                    }
+                    break;
+                case "http":
+                    break;
+                default:
+                    throw new IOException("bad protocol");
             }
 
             con.setInstanceFollowRedirects(false);
@@ -673,10 +648,10 @@ public class Protocol {
             con.setDoOutput(true);
             //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
             con.setRequestProperty("Content-Type", "application/octet-stream");
-            OutputStream os = con.getOutputStream();
-            os.write(in);
-            os.flush();
-            os.close();
+            try (OutputStream os = con.getOutputStream()) {
+                os.write(in);
+                os.flush();
+            }
             con.disconnect();
             return con.getHeaderField("x-blob-id");
         } catch (IOException ex) {
@@ -748,7 +723,7 @@ public class Protocol {
                 this.sendEvent(params);
             }
         } catch (JSONException ex) {
-            logger.warn(ex);
+            logger.warn(ex,ex);
         }
     }
 
@@ -788,7 +763,7 @@ public class Protocol {
             try {
                 node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
             } catch (UnsupportedEncodingException ex) {
-                logger.info(ex);
+                logger.info(ex,ex);
                 return;
             }
             nodeTable.put(_windowName, node);
@@ -820,7 +795,7 @@ public class Protocol {
             if (!focusedWindow.startsWith("_")) {
                 setFocus(focusedWindow, focusedWidget);
             }
-        } catch (Exception ex) {
+        } catch (JSONException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
@@ -835,10 +810,8 @@ public class Protocol {
     }
 
     private void showWindow(String name) {
-        logger.entry(name);
         Node node = getNode(name);
         if (node == null) {
-            logger.exit();
             return;
         }
         xml = node.getInterface();
@@ -877,14 +850,11 @@ public class Protocol {
             resetTimer(window.getChild());
             topWindow.validate();
         }
-        logger.exit();
     }
 
     private void closeWindow(String name) {
-        logger.entry(name);
         Node node = getNode(name);
         if (node == null) {
-            logger.exit();
             return;
         }
         Window window = node.getWindow();
@@ -900,7 +870,6 @@ public class Protocol {
             stopTimer(window.getChild());
             window.getChild().setEnabled(false);
         }
-        logger.exit();
     }
 
     private synchronized void stopTimer(Component widget) {
@@ -945,6 +914,7 @@ public class Protocol {
                 if (SystemEnvironment.isMacOSX()) {
                     EventQueue.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             focusWidget.requestFocus();
 
@@ -967,7 +937,7 @@ public class Protocol {
 
     public void startPing() {
         pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     Protocol.this.sendPing();
@@ -983,10 +953,7 @@ public class Protocol {
         if (!isReceiving) {
             this.startReceiving();
             listDownloads();
-            if (this.getServerType().startsWith("ginbee")) {
-            } else {
-                getMessage();
-            }
+            getMessage();
             this.stopReceiving();
         }
     }
@@ -1033,9 +1000,7 @@ public class Protocol {
     }
 
     public void exceptionOccured(IOException e) {
-        logger.entry(e);
         ExceptionDialog.showExceptionDialog(e);
-        logger.exit();
         System.exit(1);
     }
 }

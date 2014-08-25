@@ -33,7 +33,7 @@ import java.io.UnsupportedEncodingException;
  * <p>This class fakes xml encoding parameter to solve this problem.</p>
  */
 final class FakeEncodingInputStream extends InputStream {
-	private InputStream in;
+	private final InputStream in;
 	byte[] headerBytes;
 	private int index;
 
@@ -46,9 +46,7 @@ final class FakeEncodingInputStream extends InputStream {
 		try {
 			headerBytes = FAKE_HEADER.getBytes("euc-jp"); 
 		} catch (UnsupportedEncodingException e) {
-			IOException ioe = new IOException();
-			ioe.initCause(e);
-			throw ioe;
+			throw new IOException(e);
 		}
 		index = 0;
 	}
@@ -57,6 +55,7 @@ final class FakeEncodingInputStream extends InputStream {
 	 * while the index is less than FAKE_HEADER's length.  When it read all from
 	 * FAKE_HEADER, it returns bytes actually read.</p>
 	 */
+        @Override
 	public int read() throws IOException {
 		int b;
 		if (index < headerBytes.length) {

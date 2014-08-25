@@ -314,6 +314,36 @@ public class Config {
         }
     }
 
+    public boolean getUsePKCS11(int i) {
+        String value = getValue(i, "usePKCS11");
+        if (value.isEmpty()) {
+            return false;
+        }
+        return Boolean.valueOf(value);
+    }
+
+    public void setUsePKCS11(int i, boolean v) {
+        setValue(i, "usePKCS11", Boolean.toString(v));
+    }
+
+    public String getPKCS11Lib(int i) {
+        String value = getValue(i, "pkcs11Lib");
+        return value;
+    }
+
+    public void setPKCS11Lib(int i, String v) {
+        setValue(i, "pkcs11Lib", v);
+    }
+
+    public String getPKCS11Slot(int i) {
+        String value = getValue(i, "pkcs11Slot");
+        return value;
+    }
+
+    public void setPKCS11Slot(int i, String v) {
+        setValue(i, "pkcs11Slot", v);
+    }
+
     // styleFile
     public String getStyleFile(int i) {
         String value = getValue(i, "styleFile");

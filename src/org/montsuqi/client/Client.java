@@ -79,8 +79,7 @@ public class Client implements Runnable {
             InputStream in = url.openStream();
             return Style.load(in);
         } catch (IOException e) {
-            logger.debug(e);
-            logger.debug("using empty style set"); 
+            logger.debug(e,e);
             return Collections.EMPTY_MAP;
         }
     }
@@ -89,6 +88,7 @@ public class Client implements Runnable {
      * <p>
      * Kick the application.</p>
      */
+    @Override
     public void run() {
         protocol.startReceiving();
         protocol.getWindow();
@@ -109,7 +109,7 @@ public class Client implements Runnable {
                 protocol.endSession();
             }
         } catch (Exception e) {
-            logger.warn(e);
+            logger.warn(e,e);
         } finally {
             System.exit(0);
         }
