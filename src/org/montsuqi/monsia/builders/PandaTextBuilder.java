@@ -35,7 +35,7 @@ import org.montsuqi.monsia.WidgetInfo;
 /** <p>A builder to create TextArea widgets.</p>
  * <p>It sets wrapping mode to fit Gtk+'s behavior.</p>
  */
-public class TextAreaBuilder extends WidgetBuilder {
+public class PandaTextBuilder extends WidgetBuilder {
 
 	Component buildSelf(Interface xml, Container parent, WidgetInfo info) {
 		Component c = super.buildSelf(xml, parent, info);

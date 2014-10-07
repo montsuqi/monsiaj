@@ -93,7 +93,7 @@ public class WidgetBuilder {
         registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder); 
         registerWidgetClass("PandaHTML", PandaHTML.class, defaultWidgetBuilder); 
         registerWidgetClass("PandaPS", PandaPreview.class, defaultWidgetBuilder); 
-        registerWidgetClass("PandaText", JTextArea.class, new TextAreaBuilder()); 
+        registerWidgetClass("PandaText", PandaText.class, new PandaTextBuilder()); 
         registerWidgetClass("PandaTimer", PandaTimer.class, defaultWidgetBuilder); 
         registerWidgetClass("PandaDownload", PandaDownload.class, defaultWidgetBuilder); 
         registerWidgetClass("PandaDownload2", PandaDownload2.class, defaultWidgetBuilder); 
@@ -105,7 +105,7 @@ public class WidgetBuilder {
         registerWidgetClass("RadioButton", RadioButton.class, new RadioButtonBuilder()); 
         registerWidgetClass("ScrolledWindow", JScrollPane.class, new ScrolledWindowBuilder()); 
         registerWidgetClass("Table", Table.class, new TableBuilder()); 
-        registerWidgetClass("Text", JTextArea.class, new TextAreaBuilder()); 
+        registerWidgetClass("Text", PandaText.class, new PandaTextBuilder()); 
         registerWidgetClass("ToggleButton", ToggleButton.class, defaultContainerBuilder); 
         registerWidgetClass("VBox", VBox.class, defaultContainerBuilder); 
         registerWidgetClass("VPaned", VPaned.class, defaultContainerBuilder); 
