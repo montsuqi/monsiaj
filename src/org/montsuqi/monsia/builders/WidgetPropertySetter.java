@@ -338,11 +338,11 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(JTextArea.class, "text", new WidgetPropertySetter() {
+        registerProperty(PandaText.class, "text", new WidgetPropertySetter() {
 
             @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
-                JTextArea text = (JTextArea) widget;
+                PandaText text = (PandaText) widget;
                 text.setText(value);
                 if (!text.isEditable()) {
                     text.setCaretPosition(0);
@@ -444,6 +444,15 @@ abstract class WidgetPropertySetter {
             }
         });
 
+        registerProperty(PandaText.class, "xim_enabled", new WidgetPropertySetter() {
+
+            @Override
+            public void set(Interface xml, Container parent, Component widget, String value) {
+                PandaText text = (PandaText) widget;
+                text.setXIMEnabled(ParameterConverter.toBoolean(value));
+            }
+        });
+        
         registerProperty(JProgressBar.class, "lower", new WidgetPropertySetter() {
 
             @Override

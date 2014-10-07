@@ -38,7 +38,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import javax.swing.UIManager;
 import org.apache.logging.log4j.LogManager;
@@ -68,6 +67,7 @@ import org.montsuqi.widgets.PandaEntry;
 import org.montsuqi.widgets.PandaHTML;
 import org.montsuqi.widgets.PandaPreview;
 import org.montsuqi.widgets.PandaTable;
+import org.montsuqi.widgets.PandaText;
 import org.montsuqi.widgets.PandaTimer;
 import org.montsuqi.widgets.Pixmap;
 import org.montsuqi.widgets.RadioButton;
@@ -138,7 +138,7 @@ public class WidgetBuilder {
         registerWidgetClass("PandaEntry", PandaEntry.class, entryBuilder);
         registerWidgetClass("PandaHTML", PandaHTML.class, defaultWidgetBuilder);
         registerWidgetClass("PandaPS", PandaPreview.class, defaultWidgetBuilder);
-        registerWidgetClass("PandaText", JTextArea.class, new TextAreaBuilder());
+        registerWidgetClass("PandaText", PandaText.class, new PandaTextBuilder());
         registerWidgetClass("PandaTimer", PandaTimer.class, defaultWidgetBuilder);
         registerWidgetClass("PandaDownload", PandaDownload.class, defaultWidgetBuilder);
         registerWidgetClass("PandaTable", PandaTable.class, defaultWidgetBuilder);
@@ -148,7 +148,7 @@ public class WidgetBuilder {
         registerWidgetClass("RadioButton", RadioButton.class, new RadioButtonBuilder());
         registerWidgetClass("ScrolledWindow", JScrollPane.class, new ScrolledWindowBuilder());
         registerWidgetClass("Table", Table.class, new TableBuilder());
-        registerWidgetClass("Text", JTextArea.class, new TextAreaBuilder());
+        registerWidgetClass("Text", PandaText.class, new PandaTextBuilder());
         registerWidgetClass("ToggleButton", ToggleButton.class, defaultContainerBuilder);
         registerWidgetClass("VBox", VBox.class, defaultContainerBuilder);
         registerWidgetClass("VPaned", VPaned.class, defaultContainerBuilder);
@@ -199,25 +199,14 @@ public class WidgetBuilder {
                     userFontSpec = "Monospaced-PLAIN-12";
                 }
             }
-            if (userFontSpec == null) {
-                // remove boldness
-                modifyFont(classe, new FontModifier() {
+            final Font userFont = Font.decode(userFontSpec);
+            modifyFont(classe, new FontModifier() {
 
-                    @Override
-                    public Font modifyFont(Font font) {
-                        return font.deriveFont(font.getStyle() & ~Font.BOLD);
-                    }
-                });
-            } else {
-                final Font userFont = Font.decode(userFontSpec);
-                modifyFont(classe, new FontModifier() {
-
-                    @Override
-                    public Font modifyFont(Font font) {
-                        return userFont;
-                    }
-                });
-            }
+                @Override
+                public Font modifyFont(Font font) {
+                    return userFont;
+                }
+            });
         }
     }
 
@@ -307,10 +296,7 @@ public class WidgetBuilder {
             setProperties(xml, parent, widget, info.getProperties());
             xml.addAccels(widget, info);
             return widget;
-        } catch (InstantiationException e) {
-            logger.fatal(e);
-            throw new InterfaceBuildingException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             logger.fatal(e);
             throw new InterfaceBuildingException(e);
         }
