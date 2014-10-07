@@ -32,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -54,6 +55,13 @@ public class PandaCList extends JTable {
     private Color[] fgColors;
     private boolean[] selection;
     private int mode;
+
+    /* mouse selection */
+    private int msStartRow;
+    private int msPrevRow;
+    private boolean msDragged;
+    private boolean msValue;
+
     private Color selectionBGColor;
     private Color selectionFGColor;
 
@@ -124,21 +132,36 @@ public class PandaCList extends JTable {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
+                msDragged = false;
+                int row = PandaCList.this.rowAtPoint(e.getPoint());
+                if (row == -1) {
+                    return;
+                }
+                msStartRow = row;
+                msPrevRow = row;
+                msValue = !selection[row];
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 int row = PandaCList.this.rowAtPoint(e.getPoint());
                 if (row == -1) {
-                    return;
+                    if (msDragged) {
+                        PandaCList.this.resizeAndRepaint();
+                        PandaCList.this.fireChangeEvent(null);
+                        return;
+                    } else {
+                        return;
+                    }
                 }
                 if (mode == PandaCList.SELECTION_MODE_MULTI) {
-                    PandaCList.this.toggleSelection(row);
+                    if (!msDragged) {
+                        PandaCList.this.toggleSelection(row);
+                    }
                 } else {
                     PandaCList.this.singleSelection(row);
                 }
@@ -152,6 +175,51 @@ public class PandaCList extends JTable {
 
             @Override
             public void mouseExited(MouseEvent e) {
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionListener() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int prev;
+                if (mode != PandaCList.SELECTION_MODE_MULTI) {
+                    return;
+                }
+                msDragged = true;
+                int row = PandaCList.this.rowAtPoint(e.getPoint());
+                if (row == -1) {
+                    return;
+                }
+                if (row == msStartRow) {
+                    selection[row] = msValue;
+                    return;
+                }
+                if (row == msPrevRow) {
+                    return;
+                } else {
+                    prev = msPrevRow;
+                    msPrevRow = row;
+                }
+
+                if (row > msStartRow) {
+                    if (row > prev) {
+                        selection[row] = msValue;
+                    } else {
+                        selection[prev] = !msValue;
+                    }
+                } else {
+                    if (row < prev) {
+                        selection[row] = msValue;
+                    } else {
+                        selection[prev] = !msValue;
+                    }
+                }
+                PandaCList.this.resizeAndRepaint();
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
             }
         });
     }
