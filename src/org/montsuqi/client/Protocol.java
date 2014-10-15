@@ -1,5 +1,5 @@
 /*      
-PANDA -- a simple transaction monitor
+ PANDA -- a simple transaction monitor
 
  Copyright (C) 1998-1999 Ogochan.
  2000-2003 Ogochan & JMA (Japan Medical Association).
@@ -49,6 +49,7 @@ import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.PandaTimer;
@@ -95,6 +96,7 @@ public class Protocol extends Connection {
         return topWindow;
     }
 
+
     Protocol(Client client, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
         super(client.createSocket(), isNetworkByteOrder());
         this.client = client;
@@ -108,7 +110,7 @@ public class Protocol extends Connection {
         dialogStack = new ArrayList<>();
         enablePing = false;
     }
-
+    
     public long getTimerPeriod() {
         return timerPeriod;
     }
@@ -576,9 +578,7 @@ public class Protocol extends Connection {
                 Object[] args = {Integer.toHexString(pc)};
                 throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args));
         }
-
-        String port = this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
-        printAgent = new PrintAgent(port, user, pass, this.client.createSSLSocketFactory());
+        printAgent = new PrintAgent(this.socket.getInetAddress().getHostAddress(),user, pass,client.createSSLSocketFactory());        
         printAgent.start();
         logger.exit();
     }
@@ -641,8 +641,7 @@ public class Protocol extends Connection {
         try {
             byte[] bin = receiveBLOB(oid);
             if (bin != null && bin.length > 0) {
-                File temp = File.createTempFile("clientPrint", "report.pdf");
-                temp.deleteOnExit();
+                File temp = TempFile.createTempFile("clientPrint", "report.pdf");                
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
                     os.write(bin);
                     os.flush();
@@ -655,7 +654,7 @@ public class Protocol extends Connection {
                         pdfPrint.start();
                     } else {
                         PDFPrint pdfPrint = new PDFPrint(temp, printer);
-                        pdfPrint.start();                        
+                        pdfPrint.start();
                     }
                     PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
                             Messages.getString("PrintAgent.notify_print_start") + "\n\n"
@@ -690,8 +689,7 @@ public class Protocol extends Connection {
         try {
             byte[] bin = receiveBLOB(oid);
             if (bin != null && bin.length > 0) {
-                File temp = File.createTempFile("clientPrint", filename);
-                temp.deleteOnExit();
+                File temp = TempFile.createTempFile("clientPrint", filename);
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
                     os.write(bin);
                     os.flush();

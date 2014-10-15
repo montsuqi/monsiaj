@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.io.*;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.PandaDownload;
 
 /**
@@ -54,8 +55,7 @@ public class DownloadMarshaller extends WidgetMarshaller {
             }
         }
         if (binary != null && binary.length > 0) {
-            File temp = File.createTempFile("PandaDownload", fileName);
-            temp.deleteOnExit();
+            File temp = TempFile.createTempFile("PandaDownload","download.dat");
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
                 out.write(binary);
                 out.flush();

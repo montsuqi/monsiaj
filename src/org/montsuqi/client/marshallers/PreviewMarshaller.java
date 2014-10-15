@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.client.Type;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.PandaPreview;
 
 /** <p>A class to send/receive Preview data.</p>
@@ -47,11 +48,9 @@ class PreviewMarshaller extends WidgetMarshaller {
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
             if (handleCommonAttribute(manager, widget, name)) {
-                continue;
             } else {
                 byte[] bin = con.receiveBinaryData();
-                File temp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
-                temp.deleteOnExit();
+                File temp = TempFile.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 out.write(bin);
                 out.flush();

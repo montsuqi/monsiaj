@@ -32,10 +32,12 @@ import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.net.ssl.SSLSocketFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
+import org.montsuqi.util.TempFile;
 
 /**
  * <p>
@@ -78,32 +80,32 @@ public class Client implements Runnable {
         user = conf.getUser(num);
         host = conf.getHost(num);
         port = conf.getPort(num);
-        
+
         if (System.getProperty("monsia.config.reset_user") != null) {
-            conf.setUser(num,"");
+            conf.setUser(num, "");
             conf.save();
         }
         String password = conf.getPassword(num);
         String application = conf.getApplication(num);
-        
+
         if (!conf.getSavePassword(num)) {
             conf.setPassword(num, "");
             conf.save();
         }
-        
-        logger.info("connect {}@{}:{} {}",user,host,port,this);
+
+        logger.info("connect {}@{}:{} {}", user, host, port, this);
         protocol.sendConnect(user, password, application);
     }
 
     private Map loadStyles() {
         URL url = conf.getStyleURL(conf.getCurrent());
         try {
-            logger.debug("loading styles from URL: {0}", url); 
+            logger.debug("loading styles from URL: {0}", url);
             InputStream in = url.openStream();
             return Style.load(in);
         } catch (IOException e) {
             logger.debug(e);
-            logger.debug("using empty style set"); 
+            logger.debug("using empty style set");
             return Collections.EMPTY_MAP;
         }
     }
@@ -185,13 +187,13 @@ public class Client implements Runnable {
         try {
             synchronized (this) {
                 if (protocol != null) {
-                    protocol.sendPacketClass(PacketClass.END);
+                    TempFile.cleanTempDir();
                 }
             }
         } catch (Exception e) {
             logger.warn(e);
         } finally {
-            logger.info("disconnect {}@{}:{} {}",user,host,port,this);
+            logger.info("disconnect {}@{}:{} {}", user, host, port, this);
             System.exit(0);
         }
     }
@@ -201,8 +203,11 @@ public class Client implements Runnable {
      * Dispose connection if it exists.</p>
      */
     protected void finalize() {
-        if (protocol != null) {
+        try {
+            super.finalize();
             exitSystem();
+        } catch (Throwable ex) {
+            java.util.logging.Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

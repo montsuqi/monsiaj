@@ -12,6 +12,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.prefs.Preferences;
 import javax.net.ssl.HttpsURLConnection;
@@ -22,6 +23,7 @@ import javax.swing.WindowConstants;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.PandaDownload;
 import org.montsuqi.widgets.PandaPreview;
@@ -37,14 +39,13 @@ public class PrintAgent extends Thread {
 
     private final int DELAY = 3000;
     private ConcurrentLinkedQueue<PrintRequest> printQ;
-    private Preferences prefs = Preferences.userNodeForPackage(this.getClass());
     private String port;
     private SSLSocketFactory sslSocketFactory;
 
-    public PrintAgent(String port, final String user, final String password, SSLSocketFactory sslSocketFactory) {
+    public PrintAgent(String port, final String user, final String password,SSLSocketFactory factory) throws IOException, GeneralSecurityException {
         printQ = new ConcurrentLinkedQueue<>();
         this.port = port;
-        this.sslSocketFactory = sslSocketFactory;
+        this.sslSocketFactory = factory;
         Authenticator.setDefault(new Authenticator() {
 
             @Override
@@ -154,20 +155,19 @@ public class PrintAgent extends Thread {
     }
 
     public File download(String path, String filename) throws IOException {
-        File temp = File.createTempFile("monsiaj_printagent_", "__" + filename);
-        temp.deleteOnExit();
+        File temp = TempFile.createTempFile("monsiaj_printagent_", "__" + filename);
         String strURL = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
 
         URL url = new URL(strURL);
-        String protocol = url.getProtocol();
+        String scheme = url.getProtocol();
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setInstanceFollowRedirects(false);
-        if (protocol.equals("https")) {
+        if (scheme.equals("https")) {
             if (sslSocketFactory != null) {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
                 ((HttpsURLConnection) con).setHostnameVerifier(SSLSocketBuilder.CommonNameVerifier);
             }
-        } else if (protocol.equals("http")) {
+        } else if (scheme.equals("http")) {
             // do nothing
         } else {
             throw new IOException("bad protocol");
@@ -191,16 +191,6 @@ public class PrintAgent extends Thread {
             return null;
         }
         return temp;
-    }
-
-    static public void main(String[] argv) {
-
-        PrintAgent agent = new PrintAgent(argv[0], "ormaster", "ormaster", null);
-        agent.start();
-
-        for (int i = 1; i < argv.length; i++) {
-            agent.addPrintRequest(argv[i], argv[i], 100, true);
-        }
     }
 
     public class DLRequest extends PrintRequest {
