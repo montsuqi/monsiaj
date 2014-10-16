@@ -67,6 +67,7 @@ import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
 import org.montsuqi.widgets.PandaDownload;
@@ -180,7 +181,7 @@ public class Protocol {
     }
 
     public File apiDownload(String path, String filename) throws IOException {
-        File temp = File.createTempFile("monsiaj_apidownload_", "__" + filename);
+        File temp = TempFile.createTempFile("monsiaj_apidownload_", "__" + filename);
         HttpURLConnection con = getHttpURLConnection(this.restURIRoot + path);
 
         con.setDoOutput(true);
@@ -489,7 +490,7 @@ public class Protocol {
             }
 
             try {
-                File temp = File.createTempFile("report", "pdf");
+                File temp = TempFile.createTempFile("report", "pdf");
                 temp.deleteOnExit();
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 this.getBLOB(oid, out);
@@ -541,7 +542,7 @@ public class Protocol {
                 return;
             }
             try {
-                File temp = File.createTempFile("downloadfile", "dat");
+                File temp = TempFile.createTempFile("downloadfile", "dat");
                 temp.deleteOnExit();
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 this.getBLOB(oid, out);

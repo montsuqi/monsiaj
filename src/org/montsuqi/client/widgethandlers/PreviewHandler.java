@@ -32,6 +32,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.Protocol;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.PandaPreview;
 
 /**
@@ -44,24 +45,24 @@ class PreviewHandler extends WidgetHandler {
     private static final String TEMP_PREFIX = "pandapreview";
     private static final String TEMP_SUFFIX = ".pdf";
 
+    @Override
     public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaPreview preview = (PandaPreview) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         if (obj.has("objectdata")) {
             try {
-                File temp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
+                File temp = TempFile.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
                 temp.deleteOnExit();
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 con.getBLOB(obj.getString("objectdata"), out);
                 preview.load(temp.getAbsolutePath());
-            } catch (IOException ex) {
-                logger.warn(ex);
-            } catch (JSONException ex) {
+            } catch (    IOException | JSONException ex) {
                 logger.warn(ex);
             }
         }
     }
 
+    @Override
     public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
     }
 }

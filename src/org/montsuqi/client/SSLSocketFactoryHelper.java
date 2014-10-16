@@ -39,6 +39,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.util.TempFile;
 
 public class SSLSocketFactoryHelper {
 
@@ -68,7 +69,7 @@ public class SSLSocketFactoryHelper {
          *   see docs.oracle.com/javase/7/docs/technotes/guides/security/p11guide.html
          */
         String configStr = "name=monsiaj\nlibrary=" + lib + "\nslot=" + slot;
-        File temp = File.createTempFile("pkcs11", "cfg");
+        File temp = TempFile.createTempFile("pkcs11", "cfg");
         temp.deleteOnExit();
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
             out.write(configStr.getBytes());

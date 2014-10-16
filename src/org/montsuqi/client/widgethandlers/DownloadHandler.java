@@ -31,6 +31,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.Protocol;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.PandaDownload;
 
 /**
@@ -54,7 +55,7 @@ public class DownloadHandler extends WidgetHandler {
 
         if (obj.has("objectdata")) {
             try {
-                File temp = File.createTempFile("pandadonwload", fileName);
+                File temp = TempFile.createTempFile("pandadonwload", fileName);
                 temp.deleteOnExit();
                 String blobid = obj.getString("objectdata");
                 int status = con.getBLOB(blobid, new BufferedOutputStream(new FileOutputStream(temp)));
