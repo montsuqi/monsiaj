@@ -108,6 +108,7 @@ public class Client {
         windowStack = protocol.getWindow();
         updateScreen();
         stopReceiving();
+        startPing();
     }
 
     void disconnect() {
@@ -117,6 +118,92 @@ public class Client {
             logger.warn(e, e);
         } finally {
             System.exit(0);
+        }
+    }
+
+    public void startPing() {
+        pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendPing();
+            }
+        });
+        pingTimer.start();
+    }
+
+    public void updateScreen() throws JSONException, IOException {
+        JSONObject windowData = windowStack.getJSONObject("window_data");
+        focusedWindow = windowData.getString("focused_window");
+        focusedWidget = windowData.getString("focused_widget");
+        JSONArray windows = windowData.getJSONArray("windows");
+        for (int i = 0; i < windows.length(); i++) {
+            JSONObject w = windows.getJSONObject(i);
+            String putType = w.getString("put_type");
+            String windowName = w.getString("window");
+            Node node = uiControl.getNode(windowName);
+            if (node == null) {
+                String gladeData = protocol.getScreenDefine(windowName);
+                try {
+                    node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), uiControl), windowName);
+                } catch (UnsupportedEncodingException ex) {
+                    logger.info(ex, ex);
+                    return;
+                }
+                uiControl.putNode(windowName, node);
+            }
+            logger.debug("window[" + windowName + "] put_type[" + putType + "]");
+        }
+        for (int i = 0; i < windows.length(); i++) {
+            JSONObject w = windows.getJSONObject(i);
+            String putType = w.getString("put_type");
+            String windowName = w.getString("window");
+            if (putType.matches("new") || putType.matches("current")) {
+            } else {
+                uiControl.closeWindow(windowName);
+            }
+        }
+        for (int i = 0; i < windows.length(); i++) {
+            JSONObject w = windows.getJSONObject(i);
+            JSONObject screenData = w.getJSONObject("screen_data");
+            String putType = w.getString("put_type");
+            String windowName = w.getString("window");
+            if (putType.matches("new") || putType.matches("current")) {
+                Node node = uiControl.getNode(windowName);
+                uiControl.setWidget(node.getInterface(), windowName, screenData);
+                uiControl.showWindow(windowName);
+            }
+        }
+        uiControl.setFocus(focusedWindow, focusedWidget);
+    }
+
+    public void sendEvent(String windowName, String widgetName, String event) {
+        try {
+            JSONObject screenData = null;
+            JSONObject windowData = windowStack.getJSONObject("window_data");
+            JSONArray windows = windowData.getJSONArray("windows");
+            for (int i = 0; i < windows.length(); i++) {
+                JSONObject winObj = windows.getJSONObject(i);
+                if (winObj.has("window") && winObj.getString("window").matches(windowName)) {
+                    screenData = winObj.getJSONObject("screen_data");
+                    break;
+                }
+            }
+            if (screenData != null) {
+                uiControl.updateScreenData(null, windowName, screenData);
+                uiControl.clearChangedWidget();
+                JSONObject eventData = new JSONObject();
+                eventData.put("window", windowName);
+                eventData.put("widget", widgetName);
+                eventData.put("event", event);
+                eventData.put("screen_data", screenData);
+                JSONObject params = new JSONObject();
+                params.put("event_data", eventData);
+                windowStack = protocol.sendEvent(params);
+                updateScreen();
+            }
+        } catch (JSONException | IOException ex) {
+            ExceptionDialog.showExceptionDialog(ex);
+            System.exit(1);
         }
     }
 
@@ -246,16 +333,6 @@ public class Client {
         }
     }
 
-    public void startPing() {
-        pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendPing();
-            }
-        });
-        pingTimer.start();
-    }
-
     private void listDownloads() throws IOException, JSONException {
         JSONArray array = protocol.listDownloads();
         for (int j = 0; j < array.length(); j++) {
@@ -311,82 +388,6 @@ public class Client {
             }
         } catch (IOException | JSONException ex) {
             logger.catching(Level.FATAL, ex);
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
-    }
-
-    public void updateScreen() throws JSONException, IOException {
-        JSONObject windowData = windowStack.getJSONObject("window_data");
-        focusedWindow = windowData.getString("focused_window");
-        focusedWidget = windowData.getString("focused_widget");
-        JSONArray windows = windowData.getJSONArray("windows");
-        for (int i = 0; i < windows.length(); i++) {
-            JSONObject w = windows.getJSONObject(i);
-            String putType = w.getString("put_type");
-            String windowName = w.getString("window");
-            Node node = uiControl.getNode(windowName);
-            if (node == null) {
-                String gladeData = protocol.getScreenDefine(windowName);
-                try {
-                    node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), uiControl), windowName);
-                } catch (UnsupportedEncodingException ex) {
-                    logger.info(ex, ex);
-                    return;
-                }
-                uiControl.putNode(windowName, node);
-            }
-            logger.debug("window[" + windowName + "] put_type[" + putType + "]");
-        }
-        for (int i = 0; i < windows.length(); i++) {
-            JSONObject w = windows.getJSONObject(i);
-            String putType = w.getString("put_type");
-            String windowName = w.getString("window");
-            if (putType.matches("new") || putType.matches("current")) {
-            } else {
-                uiControl.closeWindow(windowName);
-            }
-        }
-        for (int i = 0; i < windows.length(); i++) {
-            JSONObject w = windows.getJSONObject(i);
-            JSONObject screenData = w.getJSONObject("screen_data");
-            String putType = w.getString("put_type");
-            String windowName = w.getString("window");
-            if (putType.matches("new") || putType.matches("current")) {
-                Node node = uiControl.getNode(windowName);
-                uiControl.setWidget(node.getInterface(), windowName, screenData);
-                uiControl.showWindow(windowName);
-            }
-        }
-        uiControl.setFocus(focusedWindow, focusedWidget);
-    }
-
-    public void sendEvent(String windowName, String widgetName, String event) {
-        try {
-            JSONObject screenData = null;
-            JSONObject windowData = windowStack.getJSONObject("window_data");
-            JSONArray windows = windowData.getJSONArray("windows");
-            for (int i = 0; i < windows.length(); i++) {
-                JSONObject winObj = windows.getJSONObject(i);
-                if (winObj.has("window") && winObj.getString("window").matches(windowName)) {
-                    screenData = winObj.getJSONObject("screen_data");
-                    break;
-                }
-            }
-            if (screenData != null) {
-                uiControl.updateScreenData(null, windowName, screenData);
-                uiControl.clearChangedWidget();
-                JSONObject eventData = new JSONObject();
-                eventData.put("window", windowName);
-                eventData.put("widget", widgetName);
-                eventData.put("event", event);
-                eventData.put("screen_data", screenData);
-                JSONObject params = new JSONObject();
-                params.put("event_data", eventData);
-                windowStack = protocol.sendEvent(params);
-                updateScreen();
-            }
-        } catch (JSONException | IOException ex) {
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
