@@ -34,8 +34,8 @@ import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.widgets.*;
 
 /**
@@ -44,13 +44,12 @@ import org.montsuqi.widgets.*;
  */
 abstract class Connector {
 
-    private static Map<String,Connector> connectors;
+    private static Map<String, Connector> connectors;
     protected static final Logger logger = LogManager.getLogger(Connector.class);
 
-    abstract void connect(Protocol con, Component target, SignalHandler handler, Object other);
+    abstract void connect(UIControl uiControl, Component target, SignalHandler handler, Object other);
 
     public static Connector getConnector(String signalName) {
-        logger.entry(signalName);
         if (connectors.containsKey(signalName)) {
             final Connector connector = connectors.get(signalName);
             logger.exit();
@@ -58,7 +57,6 @@ abstract class Connector {
         }
         logger.debug("connector not found for signal {0}", signalName);
         final Connector connector = getConnector(null);
-        logger.exit();
         return connector;
     }
 
@@ -70,29 +68,24 @@ abstract class Connector {
      * and its eception handling. All IOExceptions are catched and notified via
      * exceptionOccured.</p>
      */
-    static void invoke(final Protocol con, final SignalHandler handler, final Component target, final Object other) {
-        logger.entry(new Object[]{handler, target, other});
+    static void invoke(final UIControl con, final SignalHandler handler, final Component target, final Object other) {
         try {
             handler.handle(con, target, other);
         } catch (IOException e) {
             con.exceptionOccured(e);
         }
-        logger.exit();
     }
 
     private static void registerConnector(String signalName, Connector connector) {
-        logger.entry(signalName, connector);
         connectors.put(signalName, connector);
-        logger.exit();
     }
 
     static {
         connectors = new HashMap<>();
 
         registerConnector(null, new Connector() {
-
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 // do nothing
             }
         });
@@ -100,7 +93,7 @@ abstract class Connector {
         registerConnector("clicked", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof AbstractButton)) {
                     return;
                 }
@@ -113,9 +106,7 @@ abstract class Connector {
 
                     @Override
                     public void actionPerformed(ActionEvent event) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -126,16 +117,14 @@ abstract class Connector {
         registerConnector("key_press_event", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 target.addKeyListener(new KeyAdapter() {
 
                     @Override
                     public void keyPressed(KeyEvent e) {
-                        logger.entry();
                         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                             invoke(con, handler, target, other);
                         }
-                        logger.exit();
                     }
                 });
             }
@@ -144,7 +133,7 @@ abstract class Connector {
         registerConnector("changed", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaCombo) {
                     final PandaCombo combo = (PandaCombo) target;
                     ComboBoxModel model = combo.getModel();
@@ -153,9 +142,7 @@ abstract class Connector {
 
                         @Override
                         public void contentsChanged(ListDataEvent e) {
-                            logger.entry();
                             invoke(con, handler, c, other);
-                            logger.exit();
                         }
 
                         @Override
@@ -172,9 +159,7 @@ abstract class Connector {
 
                         @Override
                         public void itemStateChanged(ItemEvent e) {
-                            logger.entry();
                             invoke(con, handler, c, other);
-                            logger.exit();
                         }
                     });
                 } else if (target instanceof JTextComponent) {
@@ -183,23 +168,17 @@ abstract class Connector {
 
                         @Override
                         public void insertUpdate(DocumentEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
 
                         @Override
                         public void removeUpdate(DocumentEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
 
                         @Override
                         public void changedUpdate(DocumentEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -209,7 +188,7 @@ abstract class Connector {
         registerConnector("activate", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaCombo) {
                     PandaCombo combo = (PandaCombo) target;
                     Component c = combo.getEditor().getEditorComponent();
@@ -220,9 +199,7 @@ abstract class Connector {
 
                         @Override
                         public void actionPerformed(ActionEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 } else if (target instanceof JTextArea) {
@@ -231,9 +208,7 @@ abstract class Connector {
                         @Override
                         public void keyPressed(KeyEvent e) {
                             if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                logger.entry();
                                 invoke(con, handler, target, other);
-                                logger.exit();
                             }
                         }
 
@@ -251,9 +226,7 @@ abstract class Connector {
 
                         @Override
                         public void actionPerformed(ActionEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -265,14 +238,12 @@ abstract class Connector {
         registerConnector("focus_in_event", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
 
                     @Override
                     public void focusGained(FocusEvent e) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -281,14 +252,12 @@ abstract class Connector {
         registerConnector("focus_out_event", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
 
                     @Override
                     public void focusLost(FocusEvent e) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -297,16 +266,14 @@ abstract class Connector {
         registerConnector("map_event", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
                     Window window = (Window) target;
                     window.addWindowListener(new WindowAdapter() {
 
                         @Override
                         public void windowOpened(WindowEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 } else {
@@ -314,9 +281,7 @@ abstract class Connector {
 
                         @Override
                         public void componentShown(ComponentEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -326,16 +291,14 @@ abstract class Connector {
         registerConnector("delete_event", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
                     Window window = (Window) target;
                     window.addWindowListener(new WindowAdapter() {
 
                         @Override
                         public void windowClosing(WindowEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 } else {
@@ -343,9 +306,7 @@ abstract class Connector {
 
                         @Override
                         public void componentHidden(ComponentEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -355,16 +316,14 @@ abstract class Connector {
         registerConnector("destroy", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof Window) {
                     Window window = (Window) target;
                     window.addWindowListener(new WindowAdapter() {
 
                         @Override
                         public void windowClosed(WindowEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 } else {
@@ -372,9 +331,7 @@ abstract class Connector {
 
                         @Override
                         public void componentHidden(ComponentEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -384,14 +341,12 @@ abstract class Connector {
         registerConnector("set_focus", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 target.addFocusListener(new FocusAdapter() {
 
                     @Override
                     public void focusGained(FocusEvent e) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -400,16 +355,14 @@ abstract class Connector {
         registerConnector("select_row", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
 
                 if (target instanceof PandaCList) {
                     PandaCList table = (PandaCList) target;
                     table.addChangeListener(new ChangeListener() {
                         @Override
                         public void stateChanged(ChangeEvent e) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -419,7 +372,7 @@ abstract class Connector {
         registerConnector("unselect_row", new Connector() {
 
             @Override
-            public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
+            public void connect(UIControl con, Component target, SignalHandler handler, Object other) {
                 // XxxSelectionModels don't care selection/unselection so use connectSelectRow
                 // Object[] args = { target, handler, other};
                 // logger.debug("unselect_row: target={0}, handler={1}, other={2}", args);
@@ -432,16 +385,15 @@ abstract class Connector {
         registerConnector("click_column", new Connector() {
 
             @Override
-            public void connect(Protocol con, Component target, SignalHandler handler, Object other) {
+            public void connect(UIControl con, Component target, SignalHandler handler, Object other) {
                 Object[] args = {target, handler, other};
-                logger.debug("click_column: target={0}, handler={1}, other={2}", args);
             }
         });
 
         registerConnector("switch_page", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof JTabbedPane)) {
                     return;
                 }
@@ -457,9 +409,7 @@ abstract class Connector {
 
                     @Override
                     public void stateChanged(ChangeEvent event) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -468,7 +418,7 @@ abstract class Connector {
         registerConnector("toggled", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof JToggleButton)) {
                     return;
                 }
@@ -479,11 +429,9 @@ abstract class Connector {
 
                         @Override
                         public void mousePressed(MouseEvent e) {
-                            logger.entry();
                             ButtonGroup g = (ButtonGroup) toggle.getClientProperty("group");
                             JRadioButton deselected = null;
                             if (g == null) {
-                                logger.exit();
                                 return;
                             }
                             Enumeration elements = g.getElements();
@@ -495,7 +443,6 @@ abstract class Connector {
                                 }
                             }
                             if (deselected == null) {
-                                logger.exit();
                                 return;
                             }
                             JRadioButton none = (JRadioButton) deselected.getClientProperty("none");
@@ -509,7 +456,6 @@ abstract class Connector {
                             toggle.setSelected(true);
                             invoke(con, handler, target, o);
                             invoke(con, sendEvent, target, o);
-                            logger.exit();
                         }
                     });
                 } else {
@@ -517,11 +463,9 @@ abstract class Connector {
 
                         @Override
                         public void stateChanged(ChangeEvent e) {
-                            logger.entry();
                             if (toggle.isSelected()) {
                                 invoke(con, handler, target, other);
                             }
-                            logger.exit();
                         }
                     });
                 }
@@ -531,7 +475,7 @@ abstract class Connector {
         registerConnector("timeout", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof PandaTimer)) {
                     return;
                 }
@@ -540,9 +484,7 @@ abstract class Connector {
 
                     @Override
                     public void timerSignaled(TimerEvent e) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -551,7 +493,7 @@ abstract class Connector {
         registerConnector("day_selected", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (!(target instanceof Calendar)) {
                     return;
                 }
@@ -560,9 +502,7 @@ abstract class Connector {
 
                     @Override
                     public void stateChanged(ChangeEvent e) {
-                        logger.entry();
                         invoke(con, handler, target, other);
-                        logger.exit();
                     }
                 });
             }
@@ -571,16 +511,14 @@ abstract class Connector {
         registerConnector("selection_get", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof JMenuItem) {
                     JMenuItem item = (JMenuItem) target;
                     item.addActionListener(new ActionListener() {
 
                         @Override
                         public void actionPerformed(ActionEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -590,16 +528,14 @@ abstract class Connector {
         registerConnector("file_set", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof FileChooserButton) {
                     FileChooserButton fcb = (FileChooserButton) target;
                     fcb.getBrowseButton().addActionListener(new ActionListener() {
 
                         @Override
                         public void actionPerformed(ActionEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -609,16 +545,14 @@ abstract class Connector {
         registerConnector("color_set", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof ColorButton) {
                     ColorButton cb = (ColorButton) target;
                     cb.addActionListener(new ActionListener() {
 
                         @Override
                         public void actionPerformed(ActionEvent event) {
-                            logger.entry();
                             invoke(con, handler, target, other);
-                            logger.exit();
                         }
                     });
                 }
@@ -628,7 +562,7 @@ abstract class Connector {
         registerConnector("cell_edited", new Connector() {
 
             @Override
-            public void connect(final Protocol con, final Component target, final SignalHandler handler, final Object other) {
+            public void connect(final UIControl con, final Component target, final SignalHandler handler, final Object other) {
                 if (target instanceof PandaTable) {
                     final PandaTable table = (PandaTable) target;
                     table.getModel().addTableModelListener(
@@ -636,7 +570,6 @@ abstract class Connector {
 
                                 @Override
                                 public void tableChanged(TableModelEvent te) {
-                                    logger.entry();
                                     if (table.isEnterPressed()) {
                                         int row = te.getLastRow();
                                         int col = te.getColumn();
@@ -646,7 +579,6 @@ abstract class Connector {
                                         invoke(con, handler, target, other);
                                     }
                                     table.setEnterPressed(false);
-                                    logger.exit();
                                 }
                             });
                 }

@@ -43,14 +43,23 @@ public class JMAReceiptLauncher extends Launcher {
 
     /**
      * <p>Application entry point.</p>
+     * @param args
      */
     public static void main(String[] args) {
+        logger.info("---- start monsiaj");
+        logger.info("version : {}", org.montsuqi.client.Messages.getString("application.version"));
+        logger.info("java : {}", System.getProperty("java.version"));
+        logger.info("os : {}-{}-{}",
+                System.getProperty("os.name"),
+                System.getProperty("os.version"),
+                System.getProperty("os.arch"));        
         Launcher launcher = new JMAReceiptLauncher(Messages.getString("application.title")); 
         launcher.launch(args);
     }
 
     /**
      * <p>Creates icon to display on the left.</p>
+     * @return 
      */
     @Override
     protected Icon createIcon() {

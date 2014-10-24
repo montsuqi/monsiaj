@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.widgets.PandaTable;
 
 /**
@@ -47,7 +47,8 @@ class PandaTableHandler extends WidgetHandler {
         widgetList = new ArrayList<>();
     }
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaTable table = (PandaTable) widget;
 
         this.setCommonAttribute(widget, obj, styleMap);
@@ -143,7 +144,8 @@ class PandaTableHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         PandaTable table = (PandaTable) widget;
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         obj.put("trow", table.getChangedRow() + 1);

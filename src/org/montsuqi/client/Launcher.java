@@ -34,7 +34,9 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -50,10 +52,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
@@ -131,7 +135,7 @@ public class Launcher {
                 } else {
                     UIManager.setLookAndFeel(cname);
                 }
-            } catch (Exception e) {
+            } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 logger.catching(Level.WARN, e);
                 return true;
             }
@@ -147,7 +151,7 @@ public class Launcher {
                     return true;
                 }
             }
-            
+
             /*
              * confirm certificate password when the certificate password not
              * preserved
@@ -373,18 +377,14 @@ public class Launcher {
 
     private void connect() {
         conf.save();
-        Client client = new Client(conf);
-
         try {
+            Client client = new Client(conf);
             client.connect();
             client.run();
-            //Thread t = new Thread(client);
-            //t.start();
-            //t.join();
-        } catch (Exception e) {
+        } catch (IOException | GeneralSecurityException | JSONException e) {
             logger.catching(Level.FATAL, e);
             ExceptionDialog.showExceptionDialog(e);
-            client.exitSystem();
+            System.exit(1);
         }
     }
 

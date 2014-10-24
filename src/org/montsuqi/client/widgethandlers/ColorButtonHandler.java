@@ -26,7 +26,7 @@ import java.awt.Component;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.widgets.ColorButton;
 
 /**
@@ -35,7 +35,8 @@ import org.montsuqi.widgets.ColorButton;
  */
 class ColorButtonHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         ColorButton button = (ColorButton) widget;
         this.setCommonAttribute(widget, obj, styleMap);
 
@@ -44,7 +45,8 @@ class ColorButtonHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         ColorButton button = (ColorButton) widget;
         obj.put("color", button.getColorStr());
     }

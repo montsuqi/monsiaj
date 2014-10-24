@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 
 /**
  * <p>
@@ -35,7 +35,8 @@ import org.montsuqi.client.Protocol;
  */
 class ButtonHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         AbstractButton button = (AbstractButton) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         if (obj.has("label")) {
@@ -46,7 +47,8 @@ class ButtonHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         AbstractButton button = (AbstractButton) widget;
         obj.put("isactive", button.isSelected());
     }

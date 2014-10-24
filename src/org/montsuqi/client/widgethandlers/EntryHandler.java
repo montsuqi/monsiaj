@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.swing.JTextField;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 
 /**
  * <p>
@@ -35,7 +35,8 @@ import org.montsuqi.client.Protocol;
  */
 class EntryHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JTextField entry = (JTextField) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         this.setEditable(widget, obj);
@@ -45,7 +46,8 @@ class EntryHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         JTextField entry = (JTextField) widget;
         obj.put("textdata", entry.getText());
     }

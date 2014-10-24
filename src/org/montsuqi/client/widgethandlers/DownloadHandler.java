@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.PandaDownload;
 
@@ -40,7 +40,8 @@ import org.montsuqi.widgets.PandaDownload;
  */
 public class DownloadHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaDownload download = (PandaDownload) widget;
         String fileName = "";
         String description = "";
@@ -58,7 +59,7 @@ public class DownloadHandler extends WidgetHandler {
                 File temp = TempFile.createTempFile("pandadonwload", fileName);
                 temp.deleteOnExit();
                 String blobid = obj.getString("objectdata");
-                int status = con.getBLOB(blobid, new BufferedOutputStream(new FileOutputStream(temp)));
+                int status = con.getClient().getProtocol().getBLOB(blobid, new BufferedOutputStream(new FileOutputStream(temp)));
                 if (status == 200) {
                     download.showDialog(fileName, description, temp);
                 }
@@ -68,6 +69,7 @@ public class DownloadHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
     }
 }

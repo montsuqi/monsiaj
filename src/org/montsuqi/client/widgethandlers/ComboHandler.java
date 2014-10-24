@@ -30,10 +30,11 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 
 /**
  * <p>
@@ -41,13 +42,12 @@ import org.montsuqi.client.Protocol;
  */
 class ComboHandler extends WidgetHandler {
 
-    
     @Override
-    public void set(Protocol con,Component widget, JSONObject obj, Map styleMap) throws JSONException {
-        //@SuppressWarnings("unchecked")
-        JComboBox<String> combo = (JComboBox<String>) widget;
+    @SuppressWarnings("unchecked")
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+        JComboBox<String> combo = ((JComboBox<String>) widget);
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) combo.getModel();
-        
+
         this.setCommonAttribute(widget, obj, styleMap);
 
         int count = 0;
@@ -81,22 +81,22 @@ class ComboHandler extends WidgetHandler {
             } else if (key.matches("item")) {
                 // do nothing
             } else {
-/*                
-                JSONObject entryObj = obj.getJSONObject(key);
-                EntryHandler entryHandler = new EntryHandler();
-                entryHandler.set(con,editor,entryObj,styleMap);
-                entryString = ((JTextField)editor).getText();
-*/
+                /*                
+                 JSONObject entryObj = obj.getJSONObject(key);
+                 EntryHandler entryHandler = new EntryHandler();
+                 entryHandler.set(con,editor,entryObj,styleMap);
+                 entryString = ((JTextField)editor).getText();
+                 */
                 entryString = obj.getJSONObject(key).getString("textdata");
             }
         }
         if (entryString != null) {
             combo.setSelectedItem(entryString);
             widget.dispatchEvent(new KeyEvent(editor, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_UNDEFINED, KeyEvent.CHAR_UNDEFINED));
-        }        
+        }
     }
 
     @Override
-    public void get(Protocol con,Component widget, JSONObject obj) throws JSONException {
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
     }
 }

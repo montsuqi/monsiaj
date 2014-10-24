@@ -23,20 +23,14 @@
 package org.montsuqi.client;
 
 import java.awt.Component;
-import java.awt.Window;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +57,7 @@ public abstract class SignalHandler {
         return signalName;
     }
 
-    public abstract void handle(Protocol con, Component widget, Object userData) throws IOException;
+    public abstract void handle(UIControl uiControl, Component widget, Object userData) throws IOException;
 
     /**
      * <p>
@@ -85,7 +79,7 @@ public abstract class SignalHandler {
         logger.exit();
         return handler;
     }
-    static Map<String,SignalHandler> handlers;
+    static Map<String, SignalHandler> handlers;
     static Timer timer;
     static TimerTask timerTask;
     static boolean timerBlocked;
@@ -97,26 +91,11 @@ public abstract class SignalHandler {
     }
 
     static void blockChangedHandlers() {
-        logger.entry();
         timerBlocked = true;
-        logger.exit();
     }
 
     static void unblockChangedHandlers() {
-        logger.entry();
         timerBlocked = false;
-        logger.exit();
-    }
-
-    static private String getWidgetName(String str) {
-        int index;
-
-        index = str.lastIndexOf('.');
-        if (index == -1) {
-            return str;
-        } else {
-            return str.substring(index + 1);
-        }
     }
 
     static {
@@ -147,7 +126,7 @@ public abstract class SignalHandler {
         registerHandler(null, new SignalHandler() {
 
             @Override
-            public void handle(Protocol con, Component widget, Object userData) {
+            public void handle(UIControl con, Component widget, Object userData) {
                 // do nothing
             }
         });
@@ -159,7 +138,7 @@ public abstract class SignalHandler {
         registerHandler("select_all", new SignalHandler() {
 
             @Override
-            public void handle(Protocol con, Component widget, Object userData) {
+            public void handle(UIControl con, Component widget, Object userData) {
                 JTextField field = (JTextField) widget;
                 field.selectAll();
             }
@@ -172,7 +151,7 @@ public abstract class SignalHandler {
         registerHandler("unselect_all", new SignalHandler() {
 
             @Override
-            public void handle(Protocol con, Component widget, Object userData) {
+            public void handle(UIControl con, Component widget, Object userData) {
                 JTextField field = (JTextField) widget;
                 field.select(0, 0);
             }
@@ -183,99 +162,34 @@ public abstract class SignalHandler {
          * A signal handler which sends event and parameters.</p>
          */
         final SignalHandler sendEvent = new SignalHandler() {
-
-            private String getTitle(Window window) {
-                String title = "";
-                if (window instanceof JFrame) {
-                    title = ((JFrame) window).getTitle();
-                } else if (window instanceof JDialog) {
-                    title = ((JDialog) window).getTitle();
-                }
-                return title;
-            }
-
-            private void setTitle(Window window, String title) {
-                if (window instanceof JFrame) {
-                    ((JFrame) window).setTitle(title);
-                } else if (window instanceof JDialog) {
-                    ((JDialog) window).setTitle(title);
-                }
-            }
-
             @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                synchronized (con) {
-                    if (timerTask != null) {
-                        timerTask.cancel();
-                        timerTask = null;
-                    }
-                    if (con.isReceiving()) {
-                        return;
-                    }
-                    try {
-                        con.startReceiving();
-                        if (widget instanceof JComponent) {
-                            if (((JComponent) widget).getClientProperty("panda combo editor") == Boolean.TRUE) {
-                                con._addChangedWidget(widget);
-                            }
-                        }
-                        Window window;
-                        if (widget instanceof JMenuItem) {
-                            JComponent c = (JComponent) widget;
-                            window = (Window) c.getClientProperty("window");
-                        } else {
-                            window = SwingUtilities.windowForComponent(widget);
-                        }
-                        if (window == null || widget == null) {
-                            return;
-                        }
-                        if (!window.getName().equals(con.getWindowName())) {
-                            return;
-                        }
-
-                        String oldTitle = getTitle(window);
-                        setTitle(window, Messages.getString("Client.loading"));
-
-                        String windowName = getWidgetName(window.getName());
-                        String widgetName = getWidgetName(widget.getName());
-                        String event;
-                        if (userData == null) {
-                            event = widgetName;
-                        } else {
-                            event = userData.toString();
-                            if (event.length() == 0) {
-                                event = widgetName;
-                            }
-                        }
-                        org.montsuqi.widgets.Window.busyAllWindows();
-                        con.sendEvent(windowName, widgetName, event);
-                        synchronized (con) {
-                            blockChangedHandlers();
-                            con.updateScreen();
-                            unblockChangedHandlers();
-                        }
-
-                        if (Messages.getString("Client.loading").equals(getTitle(window))) {
-                            setTitle(window, oldTitle);
-                        }
-                    } finally {
-                        con.stopReceiving();
-                    }
-                }
+            public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                if (timerTask != null) {
+                    timerTask.cancel();
+                    timerTask = null;
+                }                
+                blockChangedHandlers();
+                con.sendEvent(widget, userData);
+                unblockChangedHandlers();
             }
         };
 
-        /**
-         * <p>
-         * A signal handler which registers the target widget as "changed."</p>
-         */
         final SignalHandler changed = new SignalHandler() {
 
             @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
+            public void handle(UIControl con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
             }
         };
+        registerHandler("changed", changed);
+        registerHandler("entry_changed", changed);
+        registerHandler("text_changed", changed);
+        registerHandler("button_toggled", changed);
+        registerHandler("selection_changed", changed);
+        registerHandler("click_column", changed);
+        registerHandler("day_selected", changed);
+        registerHandler("switch_page", changed);
+        registerHandler("no_switch_page", changed);        
 
         /**
          * <p>
@@ -288,7 +202,7 @@ public abstract class SignalHandler {
         SignalHandler sendEventWhenIdle = new SignalHandler() {
 
             @Override
-            public synchronized void handle(final Protocol con, final Component widget, final Object userData) {
+            public void handle(final UIControl con, final Component widget, final Object userData) {
                 if (timerTask != null) {
                     timerTask.cancel();
                     timerTask = null;
@@ -300,22 +214,17 @@ public abstract class SignalHandler {
 
                     @Override
                     public void run() {
-                        synchronized (con) {
-                            if (con.isReceiving()) {
-                                return;
-                            }
-                            JTextComponent text = (JTextComponent) widget;
-                            String t = text.getText();
-                            int length = t.length();
-                            if (length > 0) {
-                                char c = t.charAt(length - 1);
-                                if (isKana(c) || isKanji(c) || isSymbol(c)) {
-                                    try {
-                                        changed.handle(con, widget, userData);
-                                        sendEvent.handle(con, widget, userData);
-                                    } catch (IOException e) {
-                                        con.exceptionOccured(e);
-                                    }
+                        JTextComponent text = (JTextComponent) widget;
+                        String t = text.getText();
+                        int length = t.length();
+                        if (length > 0) {
+                            char c = t.charAt(length - 1);
+                            if (isKana(c) || isKanji(c) || isSymbol(c)) {
+                                try {
+                                    con.addChangedWidget(widget);
+                                    sendEvent.handle(con, widget, userData);
+                                } catch (IOException e) {
+                                    con.exceptionOccured(e);
                                 }
                             }
                         }
@@ -346,174 +255,138 @@ public abstract class SignalHandler {
 
         registerHandler("send_event", sendEvent);
         registerHandler("send_event_when_idle", sendEventWhenIdle);
-        registerHandler("send_event_on_focus_out", sendEvent);
-
+        registerHandler("send_event_on_focus_out", sendEvent);      
+        
         /**
          * <p>
          * A signal handler which registers the taret widget as "changed" and
          * sends "SELECT" event.</p>
          */
-        registerHandler("clist_send_event", new SignalHandler() {
+        registerHandler(
+                "clist_send_event", new SignalHandler() {
 
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                con.addChangedWidget(widget);
-                sendEvent.handle(con, widget, "SELECT");
-            }
-        });
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                        con.addChangedWidget(widget);
+                        sendEvent.handle(con, widget, "SELECT");
+                    }
+                }
+        );
 
-        registerHandler("notebook_send_event", new SignalHandler() {
+        registerHandler(
+                "notebook_send_event", new SignalHandler() {
 
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                con.addChangedWidget(widget);
-                sendEvent.handle(con, widget, "SWITCH");
-            }
-        });
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                        con.addChangedWidget(widget);
+                        sendEvent.handle(con, widget, "SWITCH");
+                    }
+                }
+        );
 
-        registerHandler("table_send_event", new SignalHandler() {
+        registerHandler(
+                "table_send_event", new SignalHandler() {
 
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                con.addChangedWidget(widget);
-                sendEvent.handle(con, widget, userData);
-            }
-        });
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                        con.addChangedWidget(widget);
+                        sendEvent.handle(con, widget, userData);
+                    }
+                }
+        );
 
         /**
          * <p>
          * A signal handler which sends an "ACTIVATE".</p>
          */
-        registerHandler("activate_widget", new SignalHandler() {
+        registerHandler(
+                "activate_widget", new SignalHandler() {
 
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                sendEvent.handle(con, widget, "ACTIVATE");
-            }
-        });
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                        sendEvent.handle(con, widget, "ACTIVATE");
+                    }
+                }
+        );
 
         /**
          * <p>
          * A signal handler which moves the focus to the widget of given
          * name.</p>
          */
-        registerHandler("entry_next_focus", new SignalHandler() {
+        registerHandler(
+                "entry_next_focus", new SignalHandler() {
 
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                Node node = con.getNode(widget);
-                if (node != null) {
-                    Component nextWidget = node.getInterface().getWidget(userData.toString());
-                    if (nextWidget != null) {
-                        nextWidget.requestFocus();
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData
+                    ) {
+                        Node node = con.getNode(widget);
+                        if (node != null) {
+                            Component nextWidget = node.getInterface().getWidget(userData.toString());
+                            if (nextWidget != null) {
+                                nextWidget.requestFocus();
+                            }
+                        }
                     }
                 }
-            }
-        });
+        );
 
-        registerHandler("changed", changed);
-        registerHandler("entry_changed", changed);
-        registerHandler("text_changed", changed);
-        registerHandler("button_toggled", changed);
-        registerHandler("selection_changed", changed);
-        registerHandler("click_column", changed);
-        registerHandler("day_selected", changed);
-        registerHandler("switch_page", changed);
-        registerHandler("no_switch_page", changed);
+        registerHandler(
+                "window_destroy", new SignalHandler() {
 
-        registerHandler("entry_set_editable", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                // do nothing?
-            }
-        });
-
-        /**
-         * <p>
-         * A signal handler which removes all changed widgets from all
-         * windows.</p>
-         */
-        registerHandler("map_event", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-            }
-        });
-
-        /**
-         * do nothing for now
-         */
-        registerHandler("set_focus", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                // Node node = con.getNode(widget);
-                // FocusedScreen = node; // this variable is referred from nowhere.
-            }
-        });
-
-        /**
-         * <p>
-         * A signal handler to close the window on which target widget is.</p>
-         */
-        registerHandler("window_close", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-            }
-        });
-
-        registerHandler("window_destroy", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                con.exit();
-            }
-        });
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData
+                    ) {
+                        con.getClient().exitSystem();
+                    }
+                }
+        );
 
         /**
          * <p>
          * A signal handler to open the given URL on target JTextPane
          * widget.</p>
          */
-        registerHandler("open_browser", new SignalHandler() {
+        registerHandler(
+                "open_browser", new SignalHandler() {
 
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) throws IOException {
-                if (!(widget instanceof JTextPane)) {
-                    return;
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                        if (!(widget instanceof JTextPane)) {
+                            return;
+                        }
+                        JTextPane pane = (JTextPane) widget;
+                        URL uri;
+                        uri = new URL((String) userData);
+                        pane.setPage(uri);
+                    }
                 }
-                JTextPane pane = (JTextPane) widget;
-                URL uri;
-                uri = new URL((String) userData);
-                pane.setPage(uri);
-            }
-        });
+        );
 
-        registerHandler("keypress_filter", new SignalHandler() {
+        registerHandler(
+                "keypress_filter", new SignalHandler() {
 
+                    @Override
+                    public void handle(UIControl con, Component widget, Object userData
+                    ) {
+                        Component next = con.getInterface().getWidget((String) userData);
+                        next.requestFocus();
+                    }
+                }
+        );
+
+        final SignalHandler doNothing = new SignalHandler() {
             @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                Component next = con.getInterface().getWidget((String) userData);
-                next.requestFocus();
+            public void handle(UIControl con, Component widget, Object userData) throws IOException {
+                con.addChangedWidget(widget);
             }
-        });
+        };
 
-        registerHandler("press_filter", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                //logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); 
-            }
-        });
-
-        registerHandler("gtk_true", new SignalHandler() {
-
-            @Override
-            public void handle(Protocol con, Component widget, Object userData) {
-                // callback placeholder wich has no effect
-            }
-        });
+        registerHandler("entry_set_editable", doNothing);
+        registerHandler("map_event", doNothing);
+        registerHandler("set_focus", doNothing);
+        registerHandler("window_close", doNothing);
+        registerHandler("press_filter", doNothing);
+        registerHandler("gtk_true", doNothing);
     }
 }

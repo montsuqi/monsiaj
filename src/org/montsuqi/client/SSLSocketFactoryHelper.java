@@ -44,19 +44,51 @@ import org.montsuqi.util.TempFile;
 public class SSLSocketFactoryHelper {
 
     private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
+    
+    public static SSLSocketFactory getFactory(String caCert,String p12File,String p12Pass) throws IOException, GeneralSecurityException {
+        SSLSocketFactory factory;
+        final KeyManager[] keyManagers;
+        final TrustManager[] trustManagers;
 
-    public static SSLSocketFactory getFactory(Config conf) throws IOException, GeneralSecurityException {
-        int num = conf.getCurrent();
-        if (!conf.getUseSSL(num)) {
-            return null;
-        }
-
-        if (conf.getUsePKCS11(num)) {
-            return createPKCS11Factory(conf);
+        if (!p12File.isEmpty()) {
+            keyManagers = createKeyManagers(p12File, p12Pass);
         } else {
-            return createFactory(conf);
+            keyManagers = new KeyManager[]{};
         }
+
+        if (caCert == null || caCert.isEmpty()) {
+            trustManagers = createSystemDefaultTrustManagers();
+        } else {
+            trustManagers = createCAFileTrustManagers(caCert);
+        }
+
+        final SSLContext ctx;
+        ctx = SSLContext.getInstance("TLS");
+        ctx.init(keyManagers, trustManagers, null);
+        factory = ctx.getSocketFactory();
+        SSLContext.setDefault(ctx);
+        return factory;
     }
+
+    public static SSLSocketFactory getFactoryPKCS11(String caCert,String p11Lib,String p11Slot) throws IOException, GeneralSecurityException {        
+        SSLSocketFactory factory;
+        final KeyManager[] keyManagers;
+        final TrustManager[] trustManagers;
+
+        final KeyStore.Builder builder = createPKCS11KeyStoreBuilder(p11Lib,p11Slot);
+        final SSLContext ctx;
+        ctx = SSLContext.getInstance("TLS");
+        keyManagers = createPKCS11KeyManagers(builder);
+        if (caCert == null || caCert.isEmpty()) {
+            trustManagers = createPKCS11TrustManagers(builder);
+        } else {
+            trustManagers = createCAFileTrustManagers(caCert);
+        }
+        ctx.init(keyManagers, trustManagers, null);
+        factory = ctx.getSocketFactory();
+        SSLContext.setDefault(ctx);
+        return factory;        
+    }    
 
     private static KeyStore.Builder createPKCS11KeyStoreBuilder(String lib,String slot) throws IOException, GeneralSecurityException {
         /*
@@ -114,60 +146,6 @@ public class SSLSocketFactoryHelper {
                 }
             }
         }
-    }
-
-    private static SSLSocketFactory createPKCS11Factory(Config conf) throws IOException, GeneralSecurityException {
-        SSLSocketFactory factory;
-        final KeyManager[] keyManagers;
-        final TrustManager[] trustManagers;
-        int num = conf.getCurrent();
-        String caCert = conf.getCACertificateFile(num);
-        String pkcs11Lib = conf.getPKCS11Lib(num);
-        String pkcs11Slot = conf.getPKCS11Slot(num);
-
-        final KeyStore.Builder builder = createPKCS11KeyStoreBuilder(pkcs11Lib,pkcs11Slot);
-        final SSLContext ctx;
-        ctx = SSLContext.getInstance("TLS");
-        keyManagers = createPKCS11KeyManagers(builder);
-        if (caCert == null || caCert.isEmpty()) {
-            trustManagers = createPKCS11TrustManagers(builder);
-        } else {
-            trustManagers = createCAFileTrustManagers(caCert);
-        }
-        ctx.init(keyManagers, trustManagers, null);
-        factory = ctx.getSocketFactory();
-        SSLContext.setDefault(ctx);
-        return factory;
-    }
-
-    private static SSLSocketFactory createFactory(Config conf) throws IOException, GeneralSecurityException {
-        SSLSocketFactory factory;
-        final KeyManager[] keyManagers;
-        final TrustManager[] trustManagers;
-        int num = conf.getCurrent();
-
-        String caCert = conf.getCACertificateFile(num);
-        String p12 = conf.getClientCertificateFile(num);
-        String p12Password = conf.getClientCertificatePassword(num);
-
-        if (!p12.isEmpty()) {
-            keyManagers = createKeyManagers(p12, p12Password);
-        } else {
-            keyManagers = new KeyManager[]{};
-        }
-
-        if (caCert == null || caCert.isEmpty()) {
-            trustManagers = createSystemDefaultTrustManagers();
-        } else {
-            trustManagers = createCAFileTrustManagers(caCert);
-        }
-
-        final SSLContext ctx;
-        ctx = SSLContext.getInstance("TLS");
-        ctx.init(keyManagers, trustManagers, null);
-        factory = ctx.getSocketFactory();
-        SSLContext.setDefault(ctx);
-        return factory;
     }
 
     private static byte[] parseDERFromPEM(byte[] pem, String beginDelimiter, String endDelimiter) {

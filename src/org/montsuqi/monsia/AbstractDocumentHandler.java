@@ -28,7 +28,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -183,9 +183,9 @@ abstract class AbstractDocumentHandler extends DefaultHandler {
      * @param protocol the protocol used for event binding(connecting).
      * @return the Interface instance.
      */
-    protected Interface getInterface(Protocol protocol) {
+    protected Interface getInterface(UIControl uiControl) {
         if (isFinished()) {
-            return new Interface(topLevels, protocol);
+            return new Interface(topLevels, uiControl);
         }
         throw new IllegalStateException("parsing is not finished yet");
     }

@@ -27,7 +27,7 @@ import java.awt.Component;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PopupNotify;
 import org.montsuqi.util.SafeColorDecoder;
@@ -39,7 +39,8 @@ import org.montsuqi.util.SafeColorDecoder;
  */
 public class WindowHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
 
         if (obj.has("title")) {
             con.setSessionTitle(obj.getString("title"));
@@ -74,6 +75,7 @@ public class WindowHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
     }
 }

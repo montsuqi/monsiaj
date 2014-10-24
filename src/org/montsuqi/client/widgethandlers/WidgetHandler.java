@@ -37,7 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.monsia.Style;
 import org.montsuqi.widgets.Calendar;
 import org.montsuqi.widgets.ColorButton;
@@ -87,9 +87,9 @@ public abstract class WidgetHandler {
         registerHandler(Window.class, new WindowHandler());
     }
 
-    public abstract void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException;
+    public abstract void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException;
 
-    public abstract void get(Protocol con, Component widget, JSONObject obj) throws JSONException;
+    public abstract void get(UIControl con, Component widget, JSONObject obj) throws JSONException;
 
     public void setStyle(Map styleMap, Component widget, String styleName) {
         Style style;

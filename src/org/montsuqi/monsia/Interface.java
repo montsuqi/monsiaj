@@ -50,17 +50,19 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.client.Protocol;
 import org.montsuqi.client.SignalHandler;
+import org.montsuqi.client.UIControl;
 import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.ParameterConverter;
 import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaFocusManager;
+import org.xml.sax.SAXException;
 
 /** <p>An class that represents the result of parsing Glade's interface definition.
  */
@@ -70,7 +72,7 @@ public class Interface {
     private Map<String, Component> widgetLongNameTable;
     private Map<String, Map<String,String>> propertyTable;
     private Map<String, ButtonGroup> buttonGroups;
-    private Protocol protocol;
+    private UIControl uiControl;
     private Component topLevel;
     private List<SignalData> signals;
     private Component focusWidget;
@@ -102,7 +104,7 @@ public class Interface {
         parserFactory.setNamespaceAware(true);
         try {
             saxParser = parserFactory.newSAXParser();
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -119,10 +121,10 @@ public class Interface {
      * <li>Otherwise, new handler is used.</li>
      * </ol>
      * @param input source input stream from which the Glade file is read.
-     * @param protocol protocol(connection) object passed to signal connectors.
+     * @param uiControl
      * @return an Interface instance.
      */
-    public static Interface parseInput(InputStream input, Protocol protocol) {
+    public static Interface parseInput(InputStream input, UIControl uiControl) {
         try {
             if (!(input instanceof BufferedInputStream)) {
                 input = new BufferedInputStream(input);
@@ -137,8 +139,8 @@ public class Interface {
             AbstractDocumentHandler handler = (AbstractDocumentHandler) handlerClass.newInstance();
 
             saxParser.parse(input, handler);
-            return handler.getInterface(protocol);
-        } catch (Exception e) {
+            return handler.getInterface(uiControl);
+        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException | SAXException e) {
             throw new InterfaceBuildingException(e);
         }
     }
@@ -162,7 +164,7 @@ public class Interface {
             }
             saxParser.parse(input, handler);
             return handler.getInterface();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException | SAXException e) {
             throw new InterfaceBuildingException(e);
         }
     }
@@ -187,9 +189,9 @@ public class Interface {
         focusWidget = null;
     }
 
-    public Interface(List roots, Protocol protocol) {
+    public Interface(List roots, UIControl uiControl) {
         initMember();
-        this.protocol = protocol;
+        this.uiControl = uiControl;
         buildWidgetTree(roots);
         signalAutoConnect();
     }
@@ -220,7 +222,7 @@ public class Interface {
             }
         }
         Connector connector = Connector.getConnector(data.getName());
-        connector.connect(protocol, target, handler, data.getObject());
+        connector.connect(uiControl, target, handler, data.getObject());
     }
 
     private void connectAfter(SignalHandler handler, SignalData data) {
@@ -314,8 +316,7 @@ public class Interface {
 
     private void setWindowForMenuElements(JFrame f, MenuElement me) {
         MenuElement[] subs = me.getSubElements();
-        for (int i = 0; i < subs.length; i++) {
-            MenuElement sub = subs[i];
+        for (MenuElement sub : subs) {
             JComponent c = (JComponent) sub.getComponent();
             c.putClientProperty("window", f); 
             setWindowForMenuElements(f, sub);

@@ -22,59 +22,28 @@
  */
 package org.montsuqi.client;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.HeadlessException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.widgethandlers.WidgetHandler;
-import org.montsuqi.monsia.Interface;
-import org.montsuqi.util.GtkStockIcon;
-import org.montsuqi.util.PDFPrint;
-import org.montsuqi.util.PopupNotify;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
-import org.montsuqi.widgets.Button;
-import org.montsuqi.widgets.ExceptionDialog;
-import org.montsuqi.widgets.PandaDownload;
-import org.montsuqi.widgets.PandaPreview;
-import org.montsuqi.widgets.PandaTimer;
-import org.montsuqi.widgets.TopWindow;
-import org.montsuqi.widgets.Window;
 
 /**
  * <p>
@@ -83,83 +52,46 @@ import org.montsuqi.widgets.Window;
  */
 public class Protocol {
 
-    private final Config conf;
     private boolean isReceiving;
-    private final long timerPeriod;
-    private final HashMap<String, Node> nodeTable;
-    private String sessionTitle;
-    private Color sessionBGColor;
-    private StringBuffer widgetName;
-    private Interface xml;
     static final Logger logger = LogManager.getLogger(Protocol.class);
-    private final TopWindow topWindow;
-    private final ArrayList<Component> dialogStack;
-    private static final int PingTimerPeriod = 10 * 1000;
-    private javax.swing.Timer pingTimer;
-    private String windowName;
-    private Map styleMap;
-    private Map<String, Component> changedWidgetMap;
-
     // jsonrpc
     private String protocolVersion;
     private String applicationVersion;
     private String serverType;
     private int rpcId;
     private String sessionId;
-    private String rpcUri;
+    private String rpcURI;
     private String restURIRoot;
-    private JSONObject resultJSON;
+    private String authURI;
 
     private final SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
 
-    public String getWindowName() {
-        return windowName;
-    }
-
-    public String getWindowName(Component widget) {
-        String name = widget.getName();
-        return name.substring(0, name.indexOf("."));
-    }
-
-    public Window getTopWindow() {
-        return topWindow;
-    }
-
-    Protocol(Config conf, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
-        this.conf = conf;
+    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
         isReceiving = false;
-        nodeTable = new HashMap<>();
-        this.styleMap = styleMap;
-        this.timerPeriod = timerPeriod;
-        sessionTitle = "";
-        sessionBGColor = null;
-        topWindow = new TopWindow();
-        dialogStack = new ArrayList<>();
         rpcId = 1;
-        changedWidgetMap = new HashMap<>();
-
-        int num = conf.getCurrent();
-        final String user = this.conf.getUser(num);
-        final String password = this.conf.getPassword(num);
-
-        if (!this.conf.getSavePassword(num)) {
-            this.conf.setPassword(num, "");
-            this.conf.save();
-        }
-
-        if (System.getProperty("monsia.config.reset_user") != null) {
-            conf.setUser(num, "");
-            conf.save();
-        }
-
+        sslSocketFactory = null;
+        this.authURI = authURI;
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password.toCharArray());
+                return new PasswordAuthentication(user, pass.toCharArray());
             }
         });
-        sslSocketFactory = SSLSocketFactoryHelper.getFactory(conf);
+    }
+
+    public Protocol(String authURI, String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
+        isReceiving = false;
+        rpcId = 1;
+        this.authURI = authURI;
+        sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, p12File, p12Pass);
+    }
+
+    public Protocol(String authURI, String caCert, String p11Lib, String p11Slot, String dummy) throws IOException, GeneralSecurityException {
+        isReceiving = false;
+        rpcId = 1;
+        this.authURI = authURI;
+        sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
@@ -277,317 +209,111 @@ public class Protocol {
         return result;
     }
 
-    public void getServerInfo() {
-        try {
-            int num = conf.getCurrent();
-            String url = conf.getAuthURI(num);
+    public void getServerInfo() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject result = (JSONObject) jsonRPC(authURI, "get_server_info", params);
+        this.protocolVersion = result.getString("protocol_version");
+        this.applicationVersion = result.getString("application_version");
+        this.serverType = result.getString("server_type");
 
-            JSONObject params = new JSONObject();
-            JSONObject result = (JSONObject) jsonRPC(url, "get_server_info", params);
-            this.protocolVersion = result.getString("protocol_version");
-            this.applicationVersion = result.getString("application_version");
-            this.serverType = result.getString("server_type");
-
-            logger.debug("protocol_version:" + this.protocolVersion);
-            logger.debug("application_version:" + this.applicationVersion);
-            logger.debug("server_type:" + this.serverType);
-
-        } catch (IOException | JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
+        logger.debug("protocol_version:" + this.protocolVersion);
+        logger.debug("application_version:" + this.applicationVersion);
+        logger.debug("server_type:" + this.serverType);
     }
 
-    public void startSession() {
-        try {
-            int num = conf.getCurrent();
-            String url = conf.getAuthURI(num);
+    public void startSession() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        params.put("meta", meta);
 
-            JSONObject params = new JSONObject();
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            params.put("meta", meta);
+        JSONObject result = (JSONObject) jsonRPC(authURI, "start_session", params);
+        meta = result.getJSONObject("meta");
 
-            JSONObject result = (JSONObject) jsonRPC(url, "start_session", params);
-            meta = result.getJSONObject("meta");
+        this.sessionId = meta.getString("session_id");
 
-            this.sessionId = meta.getString("session_id");
-
-            if (this.serverType.startsWith("glserver")) {
-                this.rpcUri = url;
-                this.restURIRoot = url.replaceFirst("/rpc/", "/rest/");
-            } else {
-                this.rpcUri = result.getString("app_rpc_endpoint_uri");
-                this.restURIRoot = result.getString("app_rest_api_uri_root");
-            }
-
-            logger.debug("session_id:" + this.sessionId);
-            logger.debug("rpcURI:" + this.rpcUri);
-            logger.debug("restURIRoot:" + this.restURIRoot);
-        } catch (IOException | JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
+        if (this.serverType.startsWith("glserver")) {
+            this.rpcURI = authURI;
+            this.restURIRoot = authURI.replaceFirst("/rpc/", "/rest/");
+        } else {
+            this.rpcURI = result.getString("app_rpc_endpoint_uri");
+            this.restURIRoot = result.getString("app_rest_api_uri_root");
         }
+
+        logger.debug("session_id:" + this.sessionId);
+        logger.debug("rpcURI:" + this.rpcURI);
+        logger.debug("restURIRoot:" + this.restURIRoot);
     }
 
     public String getServerType() {
         return serverType;
     }
 
-    public void endSession() {
-        try {
-            JSONObject params = new JSONObject();
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            meta.put("session_id", this.sessionId);
-            params.put("meta", meta);
+    public void endSession() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        meta.put("session_id", this.sessionId);
+        params.put("meta", meta);
 
-            JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "end_session", params);
-        } catch (IOException | JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
+        JSONObject result = (JSONObject) jsonRPC(this.rpcURI, "end_session", params);
+
     }
 
-    public void getWindow() {
-        try {
-            JSONObject params = new JSONObject();
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            meta.put("session_id", this.sessionId);
-            params.put("meta", meta);
+    public JSONObject getWindow() throws IOException, JSONException {
 
-            this.resultJSON = (JSONObject) jsonRPC(this.rpcUri, "get_window", params);
+        JSONObject params = new JSONObject();
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        meta.put("session_id", this.sessionId);
+        params.put("meta", meta);
 
-        } catch (IOException | JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
+        return (JSONObject) jsonRPC(this.rpcURI, "get_window", params);
+
     }
 
-    public String getScreenDefine(String wname) {
-        try {
-            JSONObject params = new JSONObject();
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            meta.put("session_id", this.sessionId);
-            params.put("meta", meta);
-            params.put("window", wname);
+    public String getScreenDefine(String wname) throws IOException, JSONException {
 
-            JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "get_screen_define", params);
-            return result.getString("screen_define");
-        } catch (IOException | JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
-        return null;
+        JSONObject params = new JSONObject();
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        meta.put("session_id", this.sessionId);
+        params.put("meta", meta);
+        params.put("window", wname);
+
+        JSONObject result = (JSONObject) jsonRPC(this.rpcURI, "get_screen_define", params);
+        return result.getString("screen_define");
+
     }
 
-    public void sendEvent(JSONObject params) {
-        try {
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            meta.put("session_id", this.sessionId);
-            params.put("meta", meta);
+    public JSONObject sendEvent(JSONObject params) throws IOException, JSONException {
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        meta.put("session_id", this.sessionId);
+        params.put("meta", meta);
 
-            this.resultJSON = (JSONObject) jsonRPC(this.rpcUri, "send_event", params);
-        } catch (IOException | JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
+        return (JSONObject) jsonRPC(this.rpcURI, "send_event", params);
+
     }
 
-    public void getMessage() {
-        try {
-            JSONObject params = new JSONObject();
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            meta.put("session_id", this.sessionId);
-            params.put("meta", meta);
+    public JSONObject getMessage() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        meta.put("session_id", this.sessionId);
+        params.put("meta", meta);
 
-            JSONObject result = (JSONObject) jsonRPC(this.rpcUri, "get_message", params);
-            if (result.has("abort")) {
-                String abort = result.getString("abort");
-                if (!abort.isEmpty()) {
-                    JOptionPane.showMessageDialog(topWindow, abort);
-                    System.exit(0);
-                }
-            }
-
-            if (result.has("popup")) {
-                String popup = result.getString("popup");
-                if (!popup.isEmpty()) {
-                    PopupNotify.popup(Messages.getString("Protocol.message_notify_summary"), popup, GtkStockIcon.get("gtk-dialog-info"), 0);
-                    return;
-                }
-            }
-
-            if (result.has("dialog")) {
-                String dialog = result.getString("dialog");
-                if (!dialog.isEmpty()) {
-                    JOptionPane.showMessageDialog(topWindow, dialog);
-                }
-            }
-
-        } catch (JSONException | IOException | HeadlessException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
+        return (JSONObject) jsonRPC(this.rpcURI, "get_message", params);
     }
 
-    private void showReportDialog(String title, File file) throws IOException {
-        final JDialog dialog = new JDialog();
-        Button closeButton = new Button(new AbstractAction(Messages.getString("PrintReport.close")) {
+    public JSONArray listDownloads() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject meta = new JSONObject();
+        meta.put("client_version", PANDA_CLIENT_VERSION);
+        meta.put("session_id", this.sessionId);
+        params.put("meta", meta);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-            }
-        });
-        Container container = dialog.getContentPane();
-        container.setLayout(new BorderLayout(5, 5));
-        PandaPreview preview = new PandaPreview();
-        dialog.setSize(new Dimension(800, 600));
-        dialog.setLocationRelativeTo(null);
-        dialog.setTitle(Messages.getString("PrintReport.title") + title);
-        container.add(preview, BorderLayout.CENTER);
-        container.add(closeButton, BorderLayout.SOUTH);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-        preview.setSize(800, 600);
-        preview.load(file.getAbsolutePath());
-        preview.setVisible(true);
-
-        dialog.setModal(true);
-        dialog.setResizable(false);
-        dialog.setVisible(true);
-        closeButton.requestFocus();
-    }
-
-    private void printReport(JSONObject item) {
-        try {
-            if (!item.has("object_id")) {
-                return;
-            }
-            String oid = item.getString("object_id");
-
-            String printer = null;
-            if (item.has("printer")) {
-                printer = item.getString("printer");
-            }
-
-            String title = "";
-            if (item.has("title")) {
-                printer = item.getString("title");
-            }
-
-            boolean showdialog = false;
-            if (item.has("showdialog")) {
-                showdialog = item.getBoolean("showdialog");
-            }
-            if (oid == null || oid.equals("0")) {
-                return;
-            }
-
-            try {
-                File temp = TempFile.createTempFile("report", "pdf");
-                temp.deleteOnExit();
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
-                this.getBLOB(oid, out);
-                if (showdialog) {
-                    showReportDialog(title, temp);
-                } else {
-                    PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
-                            Messages.getString("PrintReport.notify_print_start") + "\n\n"
-                            + Messages.getString("PrintReport.printer") + printer + "\n\n"
-                            + Messages.getString("PrintReport.title") + title,
-                            GtkStockIcon.get("gtk-print"), 0);
-                    if (printer != null) {
-                        PDFPrint print = new PDFPrint(temp, printer);
-                        print.start();
-                    } else {
-                        PDFPrint print = new PDFPrint(temp, false);
-                        print.start();
-                    }
-                }
-            } catch (IOException ex) {
-                logger.warn(ex,ex);
-                PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
-                        Messages.getString("PrintReport.notify_print_fail") + "\n\n"
-                        + Messages.getString("PrintReport.printer") + printer + "\n"
-                        + Messages.getString("PrintReport.title") + title,
-                        GtkStockIcon.get("gtk-dialog-error"), 0);
-            }
-        } catch (JSONException ex) {
-            logger.warn(ex,ex);
-        }
-    }
-
-    private void downloadFile(JSONObject item) {
-        try {
-            if (!item.has("object_id")) {
-                return;
-            }
-            String oid = item.getString("object_id");
-
-            String filename = "";
-            if (item.has("filename")) {
-                filename = item.getString("filename");
-            }
-            String desc = "";
-            if (item.has("description")) {
-                desc = item.getString("description");
-            }
-            if (oid == null || oid.equals("0")) {
-                return;
-            }
-            try {
-                File temp = TempFile.createTempFile("downloadfile", "dat");
-                temp.deleteOnExit();
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
-                this.getBLOB(oid, out);
-                PandaDownload pd = new PandaDownload();
-                pd.showDialog(filename, desc, temp);
-            } catch (IOException ex) {
-                logger.warn(ex,ex);
-                PopupNotify.popup(Messages.getString("DownloadFile.notify_summary"),
-                        Messages.getString("DownloadFile.fail") + "\n\n"
-                        + Messages.getString("DownloadFile.filename") + filename + "\n"
-                        + Messages.getString("DownloadFile.description") + desc,
-                        GtkStockIcon.get("gtk-dialog-error"), 0);
-            }
-        } catch (JSONException ex) {
-            logger.warn(ex,ex);
-        }
-    }
-
-    public void listDownloads() {
-        try {
-            JSONObject params = new JSONObject();
-            JSONObject meta = new JSONObject();
-            meta.put("client_version", PANDA_CLIENT_VERSION);
-            meta.put("session_id", this.sessionId);
-            params.put("meta", meta);
-
-            JSONArray array = (JSONArray) jsonRPC(this.rpcUri, "list_downloads", params);
-            for (int j = 0; j < array.length(); j++) {
-                JSONObject item = array.getJSONObject(j);
-
-                String type = null;
-                if (item.has("type")) {
-                    type = item.getString("type");
-                }
-                if (type != null) {
-                    if (type.equals("report")) {
-                        printReport(item);
-                    } else {
-                        downloadFile(item);
-                    }
-                }
-            }
-        } catch (JSONException | IOException ex) {
-            logger.warn(ex,ex);
-        }
+        return (JSONArray) jsonRPC(this.rpcURI, "list_downloads", params);
     }
 
     public int getBLOB(String oid, OutputStream out) throws IOException {
@@ -626,348 +352,34 @@ public class Protocol {
         return con.getResponseCode();
     }
 
-    public String postBLOB(byte[] in) {
-        try {
-            URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    public String postBLOB(byte[] in) throws IOException {
+        URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            String protocol = url.getProtocol();
-            switch (protocol) {
-                case "https":
-                    if (sslSocketFactory != null) {
-                        ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                    }
-                    break;
-                case "http":
-                    break;
-                default:
-                    throw new IOException("bad protocol");
-            }
-
-            con.setInstanceFollowRedirects(false);
-            con.setRequestMethod("POST");
-            con.setDoOutput(true);
-            //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
-            con.setRequestProperty("Content-Type", "application/octet-stream");
-            try (OutputStream os = con.getOutputStream()) {
-                os.write(in);
-                os.flush();
-            }
-            con.disconnect();
-            return con.getHeaderField("x-blob-id");
-        } catch (IOException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
-        }
-        return null;
-    }
-
-    private void updateScreenData(Interface xml, String name, Object obj) throws JSONException {
-        if (obj instanceof JSONObject) {
-            JSONObject object = (JSONObject) obj;
-            for (Iterator i = object.keys(); i.hasNext();) {
-                String key = (String) i.next();
-                String childName = name + "." + key;
-                Object child = object.get(key);
-                if (child instanceof JSONObject || child instanceof JSONArray) {
-                    updateScreenData(xml, childName, object.get(key));
+        String protocol = url.getProtocol();
+        switch (protocol) {
+            case "https":
+                if (sslSocketFactory != null) {
+                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
                 }
-            }
-            Component widget = xml.getWidgetByLongName(name);
-            if (widget != null && changedWidgetMap.containsKey(widget.getName())) {
-                Class clazz = widget.getClass();
-                WidgetHandler handler = WidgetHandler.getHandler(clazz);
-                if (handler != null) {
-                    handler.get(this, widget, (JSONObject) obj);
-                }
-            }
-        } else if (obj instanceof JSONArray) {
-            JSONArray array = (JSONArray) obj;
-            for (int i = 0; i < array.length(); i++) {
-                String childName = name + "[" + i + "]";
-                Object child = array.get(i);
-                if (child instanceof JSONObject || child instanceof JSONArray) {
-                    updateScreenData(xml, childName, child);
-                }
-            }
-        }
-    }
-
-    public void sendEvent(String windowName, String widgetName, String eventName) {
-        try {
-            JSONObject screenData = null;
-            JSONObject windowData = this.resultJSON.getJSONObject("window_data");
-            JSONArray windows = windowData.getJSONArray("windows");
-            for (int i = 0; i < windows.length(); i++) {
-                JSONObject winObj = windows.getJSONObject(i);
-                if (winObj.has("window") && winObj.getString("window").matches(windowName)) {
-                    screenData = winObj.getJSONObject("screen_data");
-                    break;
-                }
-            }
-            if (screenData != null) {
-                Node node = getNode(windowName);
-                if (windowName.startsWith("_")) {
-                    screenData = new JSONObject();
-                } else {
-                    updateScreenData(node.getInterface(), windowName, screenData);
-                }
-                changedWidgetMap.clear();
-
-                JSONObject eventData = new JSONObject();
-                eventData.put("window", windowName);
-                eventData.put("widget", widgetName);
-                eventData.put("event", eventName);
-                eventData.put("screen_data", screenData);
-                JSONObject params = new JSONObject();
-                params.put("event_data", eventData);
-                this.sendEvent(params);
-            }
-        } catch (JSONException ex) {
-            logger.warn(ex,ex);
-        }
-    }
-
-    private synchronized void setWidgetData(Interface xml, String name, Object obj) throws JSONException {
-        Component widget = xml.getWidgetByLongName(name);
-        if (widget != null) {
-            Class clazz = widget.getClass();
-            WidgetHandler handler = WidgetHandler.getHandler(clazz);
-            if (handler != null) {
-                handler.set(this, widget, (JSONObject) obj, styleMap);
-            }
-        }
-        if (obj instanceof JSONObject) {
-            JSONObject j = (JSONObject) obj;
-            for (Iterator i = j.keys(); i.hasNext();) {
-                String key = (String) i.next();
-                String childName = name + "." + key;
-                setWidgetData(xml, childName, j.get(key));
-            }
-        } else if (obj instanceof JSONArray) {
-            JSONArray a = (JSONArray) obj;
-            for (int i = 0; i < a.length(); i++) {
-                String childName = name + "[" + i + "]";
-                setWidgetData(xml, childName, a.get(i));
-            }
-        }
-    }
-
-    private void setWindowData(JSONObject w) throws JSONException {
-        String putType = w.getString("put_type");
-        String _windowName = w.getString("window");
-        logger.debug("window[" + _windowName + "] put_type[" + putType + "]");
-
-        Node node = getNode(_windowName);
-        if (node == null) {
-            String gladeData = this.getScreenDefine(_windowName);
-            try {
-                node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), this), _windowName);
-            } catch (UnsupportedEncodingException ex) {
-                logger.info(ex,ex);
-                return;
-            }
-            nodeTable.put(_windowName, node);
-        }
-        if (putType.matches("new") || putType.matches("current")) {
-            this.windowName = _windowName;
-            Object screenData = w.get("screen_data");
-            setWidgetData(node.getInterface(), _windowName, screenData);
-            if (_windowName.startsWith("_")) {
-                // do nothing for dummy window
-                return;
-            }
-            showWindow(_windowName);
-        } else {
-            closeWindow(_windowName);
+                break;
+            case "http":
+                break;
+            default:
+                throw new IOException("bad protocol");
         }
 
-    }
-
-    public void updateScreen() {
-        try {
-            JSONObject windowData = this.resultJSON.getJSONObject("window_data");
-            String focusedWindow = windowData.getString("focused_window");
-            String focusedWidget = windowData.getString("focused_widget");
-            JSONArray windows = windowData.getJSONArray("windows");
-            for (int i = 0; i < windows.length(); i++) {
-                setWindowData(windows.getJSONObject(i));
-            }
-            if (!focusedWindow.startsWith("_")) {
-                setFocus(focusedWindow, focusedWidget);
-            }
-        } catch (JSONException ex) {
-            ExceptionDialog.showExceptionDialog(ex);
-            System.exit(1);
+        con.setInstanceFollowRedirects(false);
+        con.setRequestMethod("POST");
+        con.setDoOutput(true);
+        //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
+        con.setRequestProperty("Content-Type", "application/octet-stream");
+        try (OutputStream os = con.getOutputStream()) {
+            os.write(in);
+            os.flush();
         }
-    }
-
-    public long getTimerPeriod() {
-        return timerPeriod;
-    }
-
-    public Interface getInterface() {
-        return xml;
-    }
-
-    private void showWindow(String name) {
-        Node node = getNode(name);
-        if (node == null) {
-            return;
-        }
-        xml = node.getInterface();
-        topWindow.setXml(xml);
-        topWindow.ReScale();
-
-        Window window = node.getWindow();
-        window.setSessionTitle(sessionTitle);
-
-        if (window.isDialog()) {
-            Component parent = topWindow;
-            JDialog dialog = window.getDialog();
-
-            topWindow.showBusyCursor();
-            if (!dialogStack.contains(dialog)) {
-                for (Component c : dialogStack) {
-                    parent = c;
-                    parent.setEnabled(false);
-                    stopTimer(parent);
-                }
-                if (SystemEnvironment.isWindows()) {
-                    dialog = window.createDialog(topWindow, topWindow);
-                } else {
-                    dialog = window.createDialog(parent, topWindow);
-                }
-                dialogStack.add(dialog);
-            } else {
-                window.createDialog(parent, topWindow);
-            }
-            window.getChild().setBackground(this.sessionBGColor);
-            dialog.validate();
-            resetTimer(dialog);
-        } else {
-            topWindow.showWindow(window);
-            window.getChild().setBackground(this.sessionBGColor);
-            resetTimer(window.getChild());
-            topWindow.validate();
-        }
-    }
-
-    private void closeWindow(String name) {
-        Node node = getNode(name);
-        if (node == null) {
-            return;
-        }
-        Window window = node.getWindow();
-
-        if (window.isDialog()) {
-            JDialog dialog = window.getDialog();
-            if (dialogStack.contains(dialog)) {
-                dialogStack.remove(dialog);
-            }
-            stopTimer(window.getDialog());
-            window.destroyDialog();
-        } else {
-            stopTimer(window.getChild());
-            window.getChild().setEnabled(false);
-        }
-    }
-
-    private synchronized void stopTimer(Component widget) {
-        if (widget instanceof PandaTimer) {
-            ((PandaTimer) widget).stopTimer();
-        } else if (widget instanceof Container) {
-            Container container = (Container) widget;
-            for (int i = 0, n = container.getComponentCount(); i < n; i++) {
-                stopTimer(container.getComponent(i));
-            }
-        }
-    }
-
-    private synchronized void resetTimer(Component widget) {
-        if (widget instanceof PandaTimer) {
-            ((PandaTimer) widget).reset();
-        } else if (widget instanceof Container) {
-            Container container = (Container) widget;
-            for (int i = 0, n = container.getComponentCount(); i < n; i++) {
-                resetTimer(container.getComponent(i));
-            }
-        }
-    }
-
-    private synchronized void setFocus(String focusWindowName, String focusWidgetName) {
-        if (focusWindowName == null || focusWidgetName == null) {
-            return;
-        }
-        if (focusWindowName.startsWith("_")) {
-            return;
-        }
-        Node node = getNode(focusWindowName);
-
-        if (node != null && node.getInterface() != null && focusWindowName.equals(this.windowName)) {
-            Interface thisXML = node.getInterface();
-            Component widget = thisXML.getWidget(focusWidgetName);
-            if (widget == null || !widget.isFocusable()) {
-                widget = thisXML.getAnyWidget();
-            }
-            final Component focusWidget = widget;
-            if (focusWidget != null && focusWidget.isFocusable()) {
-                if (SystemEnvironment.isMacOSX()) {
-                    EventQueue.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            focusWidget.requestFocus();
-
-                        }
-                    });
-                } else {
-                    focusWidget.requestFocusInWindow();
-                }
-            }
-        }
-    }
-
-    public synchronized void setSessionTitle(String title) {
-        sessionTitle = title;
-    }
-
-    public synchronized void setSessionBGColor(Color color) {
-        sessionBGColor = color;
-    }
-
-    public void startPing() {
-        pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Protocol.this.sendPing();
-                } catch (IOException ioe) {
-                    exceptionOccured(ioe);
-                }
-            }
-        });
-        pingTimer.start();
-    }
-
-    private synchronized void sendPing() throws IOException {
-        if (!isReceiving) {
-            this.startReceiving();
-            listDownloads();
-            getMessage();
-            this.stopReceiving();
-        }
-    }
-
-    synchronized void addChangedWidget(Component widget) {
-        if (isReceiving) {
-            return;
-        }
-        _addChangedWidget(widget);
-    }
-
-    synchronized public void _addChangedWidget(Component widget) {
-        changedWidgetMap.put(widget.getName(), widget);
+        con.disconnect();
+        return con.getHeaderField("x-blob-id");
     }
 
     public boolean isReceiving() {
@@ -980,28 +392,5 @@ public class Protocol {
 
     public void stopReceiving() {
         this.isReceiving = false;
-    }
-
-    private Node getNode(String name) {
-        return (Node) nodeTable.get(name);
-    }
-
-    Node getNode(Component component) {
-        return getNode(getWindowName(component));
-    }
-
-    synchronized void exit() {
-        isReceiving = true;
-        this.endSession();
-        System.exit(0);
-    }
-
-    public StringBuffer getWidgetNameBuffer() {
-        return widgetName;
-    }
-
-    public void exceptionOccured(IOException e) {
-        ExceptionDialog.showExceptionDialog(e);
-        System.exit(1);
     }
 }

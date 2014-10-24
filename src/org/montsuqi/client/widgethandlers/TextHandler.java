@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.swing.text.JTextComponent;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.client.Protocol;
+import org.montsuqi.client.UIControl;
 
 /**
  * <
@@ -36,7 +36,8 @@ import org.montsuqi.client.Protocol;
  */
 class TextHandler extends WidgetHandler {
 
-    public void set(Protocol con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
+    @Override
+    public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JTextComponent text = (JTextComponent) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         if (obj.has("textdata")) {
@@ -47,7 +48,8 @@ class TextHandler extends WidgetHandler {
         }
     }
 
-    public void get(Protocol con, Component widget, JSONObject obj) throws JSONException {
+    @Override
+    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         JTextComponent text = (JTextComponent) widget;
         obj.put("textdata", text.getText());
     }
