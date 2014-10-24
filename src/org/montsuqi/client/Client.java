@@ -79,26 +79,6 @@ public class Client {
         isReceiving = false;
     }
 
-    public boolean isReceiving() {
-        return isReceiving;
-    }
-
-    public void startReceiving() {
-        this.isReceiving = true;
-    }
-
-    public void stopReceiving() {
-        this.isReceiving = false;
-    }
-
-    public String getFocusedWindow() {
-        return focusedWindow;
-    }
-
-    public Protocol getProtocol() {
-        return protocol;
-    }
-
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
@@ -121,73 +101,18 @@ public class Client {
                 conf.save();
             }
         }
+
         protocol.getServerInfo();
         protocol.startSession();
-    }
-
-    public void updateScreen() throws JSONException, IOException {
-        JSONObject windowData = windowStack.getJSONObject("window_data");
-        focusedWindow = windowData.getString("focused_window");
-        focusedWidget = windowData.getString("focused_widget");
-        JSONArray windows = windowData.getJSONArray("windows");
-        for (int i = 0; i < windows.length(); i++) {
-            JSONObject w = windows.getJSONObject(i);
-            String putType = w.getString("put_type");
-            String windowName = w.getString("window");
-            Node node = uiControl.getNode(windowName);
-            if (node == null) {
-                String gladeData = protocol.getScreenDefine(windowName);
-                try {
-                    node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), uiControl), windowName);
-                } catch (UnsupportedEncodingException ex) {
-                    logger.info(ex, ex);
-                    return;
-                }
-                uiControl.putNode(windowName, node);
-            }
-            logger.debug("window[" + windowName + "] put_type[" + putType + "]");
-        }
-        for (int i = 0; i < windows.length(); i++) {
-            JSONObject w = windows.getJSONObject(i);
-            String putType = w.getString("put_type");
-            String windowName = w.getString("window");
-            if (putType.matches("new") || putType.matches("current")) {
-            } else {
-                uiControl.closeWindow(windowName);
-            }
-        }
-        for (int i = 0; i < windows.length(); i++) {
-            JSONObject w = windows.getJSONObject(i);
-            JSONObject screenData = w.getJSONObject("screen_data");
-            String putType = w.getString("put_type");
-            String windowName = w.getString("window");
-            if (putType.matches("new") || putType.matches("current")) {
-                Node node = uiControl.getNode(windowName);
-                uiControl.setWidget(node.getInterface(), windowName, screenData);
-                uiControl.showWindow(windowName);
-            }
-        }
-        uiControl.setFocus(focusedWindow, focusedWidget);
-    }
-
-    public void run() throws IOException, JSONException {
         startReceiving();
         windowStack = protocol.getWindow();
         updateScreen();
         stopReceiving();
     }
 
-    /**
-     * <p>
-     * Terminates the application.</p>
-     * <p>
-     * Sends end packet to the server and exists.</p>
-     */
-    void exitSystem() {
+    void disconnect() {
         try {
-            synchronized (this) {
-                protocol.endSession();
-            }
+            protocol.endSession();
         } catch (IOException | JSONException e) {
             logger.warn(e, e);
         } finally {
@@ -391,6 +316,51 @@ public class Client {
         }
     }
 
+    public void updateScreen() throws JSONException, IOException {
+        JSONObject windowData = windowStack.getJSONObject("window_data");
+        focusedWindow = windowData.getString("focused_window");
+        focusedWidget = windowData.getString("focused_widget");
+        JSONArray windows = windowData.getJSONArray("windows");
+        for (int i = 0; i < windows.length(); i++) {
+            JSONObject w = windows.getJSONObject(i);
+            String putType = w.getString("put_type");
+            String windowName = w.getString("window");
+            Node node = uiControl.getNode(windowName);
+            if (node == null) {
+                String gladeData = protocol.getScreenDefine(windowName);
+                try {
+                    node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), uiControl), windowName);
+                } catch (UnsupportedEncodingException ex) {
+                    logger.info(ex, ex);
+                    return;
+                }
+                uiControl.putNode(windowName, node);
+            }
+            logger.debug("window[" + windowName + "] put_type[" + putType + "]");
+        }
+        for (int i = 0; i < windows.length(); i++) {
+            JSONObject w = windows.getJSONObject(i);
+            String putType = w.getString("put_type");
+            String windowName = w.getString("window");
+            if (putType.matches("new") || putType.matches("current")) {
+            } else {
+                uiControl.closeWindow(windowName);
+            }
+        }
+        for (int i = 0; i < windows.length(); i++) {
+            JSONObject w = windows.getJSONObject(i);
+            JSONObject screenData = w.getJSONObject("screen_data");
+            String putType = w.getString("put_type");
+            String windowName = w.getString("window");
+            if (putType.matches("new") || putType.matches("current")) {
+                Node node = uiControl.getNode(windowName);
+                uiControl.setWidget(node.getInterface(), windowName, screenData);
+                uiControl.showWindow(windowName);
+            }
+        }
+        uiControl.setFocus(focusedWindow, focusedWidget);
+    }
+
     public void sendEvent(String windowName, String widgetName, String event) {
         try {
             JSONObject screenData = null;
@@ -422,4 +392,23 @@ public class Client {
         }
     }
 
+    public boolean isReceiving() {
+        return isReceiving;
+    }
+
+    public void startReceiving() {
+        this.isReceiving = true;
+    }
+
+    public void stopReceiving() {
+        this.isReceiving = false;
+    }
+
+    public String getFocusedWindow() {
+        return focusedWindow;
+    }
+
+    public Protocol getProtocol() {
+        return protocol;
+    }
 }

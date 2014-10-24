@@ -380,7 +380,6 @@ public class Launcher {
         try {
             Client client = new Client(conf);
             client.connect();
-            client.run();
         } catch (IOException | GeneralSecurityException | JSONException e) {
             logger.catching(Level.FATAL, e);
             ExceptionDialog.showExceptionDialog(e);

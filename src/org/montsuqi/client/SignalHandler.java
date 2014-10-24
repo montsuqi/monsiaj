@@ -337,7 +337,7 @@ public abstract class SignalHandler {
                     @Override
                     public void handle(UIControl con, Component widget, Object userData
                     ) {
-                        con.getClient().exitSystem();
+                        con.getClient().disconnect();
                     }
                 }
         );
