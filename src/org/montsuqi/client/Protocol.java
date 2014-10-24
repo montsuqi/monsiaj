@@ -52,7 +52,6 @@ import org.montsuqi.util.TempFile;
  */
 public class Protocol {
 
-    private boolean isReceiving;
     static final Logger logger = LogManager.getLogger(Protocol.class);
     // jsonrpc
     private String protocolVersion;
@@ -68,7 +67,6 @@ public class Protocol {
     static final String PANDA_CLIENT_VERSION = "2.0.0";
 
     public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
-        isReceiving = false;
         rpcId = 1;
         sslSocketFactory = null;
         this.authURI = authURI;
@@ -81,14 +79,12 @@ public class Protocol {
     }
 
     public Protocol(String authURI, String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
-        isReceiving = false;
         rpcId = 1;
         this.authURI = authURI;
         sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, p12File, p12Pass);
     }
 
     public Protocol(String authURI, String caCert, String p11Lib, String p11Slot, String dummy) throws IOException, GeneralSecurityException {
-        isReceiving = false;
         rpcId = 1;
         this.authURI = authURI;
         sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
@@ -380,17 +376,5 @@ public class Protocol {
         }
         con.disconnect();
         return con.getHeaderField("x-blob-id");
-    }
-
-    public boolean isReceiving() {
-        return isReceiving;
-    }
-
-    public void startReceiving() {
-        this.isReceiving = true;
-    }
-
-    public void stopReceiving() {
-        this.isReceiving = false;
     }
 }

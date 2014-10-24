@@ -61,6 +61,7 @@ import org.montsuqi.widgets.PandaPreview;
  */
 public class Client {
 
+    private boolean isReceiving;
     private final Config conf;
     private static final Logger logger = LogManager.getLogger(Client.class);
     private Protocol protocol;
@@ -75,6 +76,19 @@ public class Client {
         this.conf = conf;
         int n = conf.getCurrent();
         uiControl = new UIControl(this, conf.getStyleURL(n), conf.getTimerPeriod(n));
+        isReceiving = false;
+    }
+
+    public boolean isReceiving() {
+        return isReceiving;
+    }
+
+    public void startReceiving() {
+        this.isReceiving = true;
+    }
+
+    public void stopReceiving() {
+        this.isReceiving = false;
     }
 
     public String getFocusedWindow() {
@@ -157,10 +171,10 @@ public class Client {
     }
 
     public void run() throws IOException, JSONException {
-        protocol.startReceiving();
+        startReceiving();
         windowStack = protocol.getWindow();
         updateScreen();
-        protocol.stopReceiving();
+        stopReceiving();
     }
 
     /**
@@ -364,11 +378,11 @@ public class Client {
 
     private synchronized void sendPing() {
         try {
-            if (!protocol.isReceiving()) {
-                protocol.startReceiving();
+            if (!isReceiving()) {
+                startReceiving();
                 listDownloads();
                 getMessage();
-                protocol.stopReceiving();
+                stopReceiving();
             }
         } catch (IOException | JSONException ex) {
             logger.catching(Level.FATAL, ex);

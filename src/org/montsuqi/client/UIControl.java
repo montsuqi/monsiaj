@@ -278,12 +278,11 @@ public class UIControl {
     }
 
     public void sendEvent(Component widget, Object userData) {
-        Protocol protocol = client.getProtocol();
-        if (protocol.isReceiving()) {  
+        if (client.isReceiving()) {  
             return;
         }
         try {
-            protocol.startReceiving();
+            client.startReceiving();
 
             java.awt.Window window;
             if (widget instanceof JMenuItem) {
@@ -320,12 +319,12 @@ public class UIControl {
                 setTitle(window, oldTitle);
             }
         } finally {
-            protocol.stopReceiving();
+            client.stopReceiving();
         }
     }
 
     public void addChangedWidget(Component widget) {
-        if (client.getProtocol().isReceiving()) {
+        if (client.isReceiving()) {
             return;
         }
         _addChangedWidget(widget);
