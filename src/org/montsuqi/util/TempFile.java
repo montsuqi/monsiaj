@@ -38,14 +38,11 @@ public class TempFile {
 
     public static void cleanOld() {
         for (File f : tempDirRoot.listFiles()) {
-            System.out.println("file:" + f + " lastmodified:" + f.lastModified());
             try {
                 long elaps = System.currentTimeMillis() - f.lastModified();
                 if (elaps > 86400000) { /* 1day */
                     deleteAll(f);
-                    System.out.println("delete");
                 } else {
-                    System.out.println("no delete");
                 }
             } catch (SecurityException e) {
             }
