@@ -82,7 +82,7 @@ public class Client {
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
-
+        logger.info("try connect " + authURI);
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
                 protocol = new Protocol(authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num), "dummy");
@@ -103,7 +103,8 @@ public class Client {
         }
 
         protocol.getServerInfo();
-        protocol.startSession();
+        protocol.startSession();        
+        logger.info("connected session_id:" + protocol.getSessionId());
         startReceiving();
         windowStack = protocol.getWindow();
         updateScreen();
@@ -114,6 +115,7 @@ public class Client {
     void disconnect() {
         try {
             protocol.endSession();
+            logger.info("disconnect session_id:" + protocol.getSessionId());
         } catch (IOException | JSONException e) {
             logger.warn(e, e);
         } finally {

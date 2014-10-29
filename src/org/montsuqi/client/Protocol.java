@@ -172,6 +172,9 @@ public class Protocol {
 
     private Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         String reqStr = makeJSONRPCRequest(method, params);
+        logger.debug("---- JSONRPC request");
+        logger.debug(reqStr);
+        logger.debug("----");
         HttpURLConnection con = getHttpURLConnection(url);
 
         con.setDoOutput(true);
@@ -200,7 +203,11 @@ public class Protocol {
                 }
             }
             con.disconnect();
-            result = checkJSONRPCResponse(bytes.toString("UTF-8"));
+            String resStr = bytes.toString("UTF-8");
+            logger.debug("---- JSONRPC response");
+            logger.debug(resStr);
+            logger.debug("----");
+            result = checkJSONRPCResponse(resStr);
         }
         return result;
     }
@@ -253,7 +260,6 @@ public class Protocol {
         params.put("meta", meta);
 
         JSONObject result = (JSONObject) jsonRPC(this.rpcURI, "end_session", params);
-
     }
 
     public JSONObject getWindow() throws IOException, JSONException {
@@ -376,5 +382,9 @@ public class Protocol {
         }
         con.disconnect();
         return con.getHeaderField("x-blob-id");
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 }
