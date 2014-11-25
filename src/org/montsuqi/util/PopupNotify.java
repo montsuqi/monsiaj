@@ -4,6 +4,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -15,7 +17,8 @@ import javax.swing.*;
  */
 public class PopupNotify {
 
-    private static List<JDialog> dialogs = new ArrayList<JDialog>();
+    protected static final Logger logger = LogManager.getLogger(PopupNotify.class);
+    private static final List<JDialog> dialogs = new ArrayList<>();
 
     public static void popup(final String summary, final String body, final Icon icon, final int timeout) {
         final JDialog dialog = new JDialog();
@@ -89,11 +92,11 @@ public class PopupNotify {
                     try {
                         Thread.sleep(to);
                     } catch (InterruptedException ie) {
-                        ie.printStackTrace();
+                        logger.warn(ie, ie);
                         return null;
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    logger.warn(ex,ex);
                 }
 
                 return null;
@@ -124,7 +127,7 @@ public class PopupNotify {
             try {
                 Thread.sleep(100); //3000ミリ秒Sleepする
             } catch (InterruptedException e) {
-            };
+            }
         }
     }
 }
