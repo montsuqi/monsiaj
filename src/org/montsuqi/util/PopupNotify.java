@@ -71,9 +71,9 @@ public class PopupNotify {
                     }
                 }
                 dialog.setLocation(x, y);
-                dialog.setVisible(true);
                 dialog.setFocusable(false);
                 dialog.setFocusableWindowState(false);
+                dialog.setVisible(true);
                 dialogs.add(dialog);
             }
         });
@@ -95,7 +95,6 @@ public class PopupNotify {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
 
                 return null;
             }
