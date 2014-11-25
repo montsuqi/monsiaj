@@ -230,7 +230,9 @@ public class Client {
 
         preview.setSize(800, 600);
         preview.load(file.getAbsolutePath());
-        preview.setVisible(true);
+        preview.setFocusable(true);
+        
+        closeButton.setFocusable(true);
 
         dialog.setModal(true);
         dialog.setResizable(false);
