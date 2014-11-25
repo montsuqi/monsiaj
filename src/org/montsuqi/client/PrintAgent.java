@@ -14,7 +14,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.prefs.Preferences;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.AbstractAction;
@@ -42,7 +41,7 @@ public class PrintAgent extends Thread {
     private String port;
     private SSLSocketFactory sslSocketFactory;
 
-    public PrintAgent(String port, final String user, final String password,SSLSocketFactory factory) throws IOException, GeneralSecurityException {
+    public PrintAgent(String port, final String user, final String password, SSLSocketFactory factory) throws IOException, GeneralSecurityException {
         printQ = new ConcurrentLinkedQueue<>();
         this.port = port;
         this.sslSocketFactory = factory;
@@ -129,7 +128,9 @@ public class PrintAgent extends Thread {
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             preview.setSize(800, 600);
             preview.load(file.getAbsolutePath());
-            preview.setVisible(true);
+            preview.setFocusable(true);
+            closeButton.setFocusable(true);
+            closeButton.setVisible(true);
             dialog.setModal(true);
             dialog.setVisible(true);
             closeButton.requestFocus();

@@ -304,6 +304,7 @@ public class Launcher {
 
         Button run = new Button(new AbstractAction(Messages.getString("Launcher.run_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 int num = conf.getConfigByDescription((String) configCombo.getSelectedItem());
                 configPanel.saveConfig(num);
@@ -317,6 +318,7 @@ public class Launcher {
 
         Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 logger.info("launcher canceled");
                 System.exit(0);
@@ -326,6 +328,7 @@ public class Launcher {
 
         Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 logger.info("view server configs");
                 viewer.run(f);
