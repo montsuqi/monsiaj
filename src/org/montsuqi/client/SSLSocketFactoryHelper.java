@@ -33,6 +33,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.xml.bind.DatatypeConverter;
@@ -44,8 +45,8 @@ import org.montsuqi.util.TempFile;
 public class SSLSocketFactoryHelper {
 
     private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
-    
-    public static SSLSocketFactory getFactory(String caCert,String p12File,String p12Pass) throws IOException, GeneralSecurityException {
+
+    public static SSLSocketFactory getFactory(String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
         final TrustManager[] trustManagers;
@@ -70,12 +71,12 @@ public class SSLSocketFactoryHelper {
         return factory;
     }
 
-    public static SSLSocketFactory getFactoryPKCS11(String caCert,String p11Lib,String p11Slot) throws IOException, GeneralSecurityException {        
+    public static SSLSocketFactory getFactoryPKCS11(String caCert, String p11Lib, String p11Slot) throws IOException, GeneralSecurityException {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
         final TrustManager[] trustManagers;
 
-        final KeyStore.Builder builder = createPKCS11KeyStoreBuilder(p11Lib,p11Slot);
+        final KeyStore.Builder builder = createPKCS11KeyStoreBuilder(p11Lib, p11Slot);
         final SSLContext ctx;
         ctx = SSLContext.getInstance("TLS");
         keyManagers = createPKCS11KeyManagers(builder);
@@ -87,19 +88,13 @@ public class SSLSocketFactoryHelper {
         ctx.init(keyManagers, trustManagers, null);
         factory = ctx.getSocketFactory();
         SSLContext.setDefault(ctx);
-        return factory;        
-    }    
+        return factory;
+    }
 
-    private static KeyStore.Builder createPKCS11KeyStoreBuilder(String lib,String slot) throws IOException, GeneralSecurityException {
-        /*
-         *   ---- pkcs11.cfg
-         *   name=test
-         *   library=C:\FULLPATH\yourpkcs11.dll
-         *   slot=1
-         *   ----
-         *
-         *   see docs.oracle.com/javase/7/docs/technotes/guides/security/p11guide.html
-         */
+    private static KeyStore.Builder createPKCS11KeyStoreBuilder(String lib, String slot) throws IOException, GeneralSecurityException {
+        if (slot.isEmpty()) {
+            slot = "1";
+        }
         String configStr = "name=monsiaj\nlibrary=" + lib + "\nslot=" + slot;
         File temp = TempFile.createTempFile("pkcs11", "cfg");
         temp.deleteOnExit();
@@ -107,7 +102,6 @@ public class SSLSocketFactoryHelper {
             out.write(configStr.getBytes());
             out.close();
         }
-
         Provider p = new sun.security.pkcs11.SunPKCS11(temp.getAbsolutePath());
         Security.removeProvider("IAIK");
         Security.addProvider(p);
@@ -128,6 +122,24 @@ public class SSLSocketFactoryHelper {
         return trustManagerFactory.getTrustManagers();
     }
 
+    private static boolean getSavePIN() {
+        Config conf = new Config();
+        return conf.getSavePIN(conf.getCurrent());
+    }
+
+    private static String getPIN() {
+        Config conf = new Config();
+        return conf.getPIN(conf.getCurrent());
+    }
+
+    public static void setPIN(String pin, boolean savePin) {
+        Config conf = new Config();
+        int n = conf.getCurrent();
+        conf.setPIN(n, pin);
+        conf.setSavePIN(n, savePin);
+        conf.save();
+    }
+
     private static class MyCallbackHandler implements CallbackHandler {
 
         @Override
@@ -135,11 +147,21 @@ public class SSLSocketFactoryHelper {
             for (Callback cb : callbacks) {
                 if (cb instanceof PasswordCallback) {
                     PasswordCallback pcb = (PasswordCallback) cb;
-                    JPasswordField pf = new JPasswordField();
-                    Object[] message = {"pin", pf};
-                    int resp = JOptionPane.showConfirmDialog(null, message, "pin:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resp == JOptionPane.OK_OPTION) {
-                        pcb.setPassword(pf.getPassword());
+                    if (getSavePIN()) {
+                        pcb.setPassword(getPIN().toCharArray());
+                    } else {
+                        JPasswordField pf = new JPasswordField();
+                        JCheckBox check = new JCheckBox(Messages.getString("SSLSocketFactoryHelper.save_pin"), false);
+                        Object[] message = {"PIN", pf, check};
+                        int resp = JOptionPane.showConfirmDialog(null, message, "pin:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (resp == JOptionPane.OK_OPTION) {
+                            pcb.setPassword(pf.getPassword());
+                            if (check.isSelected()) {
+                                setPIN(new String(pf.getPassword()),true);
+                            } else {
+                                setPIN("",false);
+                            }
+                        }
                     }
                 } else {
                     throw new UnsupportedCallbackException(callbacks[0]);

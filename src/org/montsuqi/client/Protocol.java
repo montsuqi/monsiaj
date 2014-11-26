@@ -191,6 +191,7 @@ public class Protocol {
         if (responseCode == 401 || responseCode == 403) {
             JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
             logger.info("auth error:" + responseCode);
+            SSLSocketFactoryHelper.setPIN("", false);
             System.exit(1);
         }
         Object result;

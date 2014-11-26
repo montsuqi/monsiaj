@@ -87,7 +87,7 @@ public class Client {
             if (conf.getUsePKCS11(num)) {
                 protocol = new Protocol(authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num), "dummy");
             } else {
-                protocol = new Protocol(authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num), "dummy");
+                protocol = new Protocol(authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
             }
         } else {
             protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num));

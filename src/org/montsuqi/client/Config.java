@@ -344,6 +344,27 @@ public class Config {
         setValue(i, "pkcs11Slot", v);
     }
 
+    public boolean getSavePIN(int i) {
+        String value = getValue(i, "savePIN");
+        if (value.isEmpty()) {
+            return false;
+        }
+        return Boolean.valueOf(value);
+    }
+
+    public void setSavePIN(int i, boolean v) {
+        setValue(i, "savePIN", Boolean.toString(v));
+    }
+
+    public String getPIN(int i) {
+        String value = getValue(i, "pin");
+        return value;
+    }
+
+    public void setPIN(int i, String v) {
+        setValue(i, "pin", v);
+    }
+
     // styleFile
     public String getStyleFile(int i) {
         String value = getValue(i, "styleFile");
