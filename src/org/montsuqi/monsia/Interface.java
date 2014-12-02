@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -46,7 +45,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -59,7 +57,6 @@ import org.montsuqi.client.SignalHandler;
 import org.montsuqi.client.UIControl;
 import org.montsuqi.monsia.builders.WidgetBuilder;
 import org.montsuqi.util.ParameterConverter;
-import org.montsuqi.widgets.OptionMenu;
 import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaFocusManager;
 import org.xml.sax.SAXException;
@@ -215,12 +212,6 @@ public class Interface {
 
     private void connect(SignalHandler handler, SignalData data) {
         Component target = data.getTarget();
-        if (target instanceof JTextField) {
-            Component parent = target.getParent();
-            if (parent instanceof JComboBox && !(parent instanceof OptionMenu)) {
-                target = parent;
-            }
-        }
         Connector connector = Connector.getConnector(data.getName());
         connector.connect(uiControl, target, handler, data.getObject());
     }

@@ -49,6 +49,6 @@ class EntryHandler extends WidgetHandler {
     @Override
     public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         JTextField entry = (JTextField) widget;
-        obj.put("textdata", entry.getText());
+        obj.put("textdata", entry.getText());   
     }
 }

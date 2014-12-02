@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

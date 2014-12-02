@@ -361,7 +361,7 @@ public class UIControl {
                 }
             }
             Component widget = xml.getWidgetByLongName(name);
-            if (widget != null && changedWidgetMap.containsKey(widget.getName())) {
+            if (widget != null && changedWidgetMap.containsKey(widget.getName())) {                          
                 Class clazz = widget.getClass();
                 WidgetHandler handler = WidgetHandler.getHandler(clazz);
                 if (handler != null) {
