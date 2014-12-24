@@ -45,6 +45,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import static org.montsuqi.client.Protocol.logger;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
@@ -103,7 +104,7 @@ public class Client {
         }
 
         protocol.getServerInfo();
-        protocol.startSession();        
+        protocol.startSession();
         logger.info("connected session_id:" + protocol.getSessionId());
         startReceiving();
         windowStack = protocol.getWindow();
@@ -200,8 +201,20 @@ public class Client {
                 eventData.put("screen_data", screenData);
                 JSONObject params = new JSONObject();
                 params.put("event_data", eventData);
+
+                if (System.getProperty("monsia.do_profile") != null) {
+                    logger.info("---- profile ----");
+                    logger.info("window:" + windowName + " widget:" + widgetName + " event:" + event);
+                }
+                long st = System.currentTimeMillis();
+
                 windowStack = protocol.sendEvent(params);
                 updateScreen();
+
+                long et = System.currentTimeMillis();
+                if (System.getProperty("monsia.do_profile") != null) {
+                    logger.info("total:" + (et - st) + "ms");
+                }
             }
         } catch (JSONException | IOException ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -231,7 +244,7 @@ public class Client {
         preview.setSize(800, 600);
         preview.load(file.getAbsolutePath());
         preview.setFocusable(true);
-        
+
         closeButton.setFocusable(true);
 
         dialog.setModal(true);
@@ -387,7 +400,9 @@ public class Client {
             if (!isReceiving()) {
                 startReceiving();
                 listDownloads();
-                getMessage();
+                if (!this.protocol.getServerType().equals("ginbee")) {
+                    getMessage();
+                }
                 stopReceiving();
             }
         } catch (IOException | JSONException ex) {

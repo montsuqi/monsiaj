@@ -25,8 +25,6 @@ package org.montsuqi.client;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -43,7 +41,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.montsuqi.util.TempFile;
 
 /**
  * <p>
@@ -96,8 +93,10 @@ public class Protocol {
         String protocol = url.getProtocol();
         switch (protocol) {
             case "https":
-                if (sslSocketFactory != null) {
-                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                if (strURL.equals(this.authURI)) {
+                    if (sslSocketFactory != null) {
+                        ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+                    }
                 }
                 break;
             case "http":
@@ -106,37 +105,6 @@ public class Protocol {
                 throw new IOException("bad protocol");
         }
         return con;
-    }
-
-    public File apiDownload(String path, String filename) throws IOException {
-        File temp = TempFile.createTempFile("monsiaj_apidownload_", "__" + filename);
-        HttpURLConnection con = getHttpURLConnection(this.restURIRoot + path);
-
-        con.setDoOutput(true);
-        con.setInstanceFollowRedirects(false);
-        con.setRequestMethod("GET");
-        //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
-        con.setRequestProperty("Content-Type", "application/json");
-
-        int responseCode = con.getResponseCode();
-
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            con.disconnect();
-            throw new IOException("" + responseCode);
-        }
-        BufferedInputStream in = new BufferedInputStream(con.getInputStream());
-        int length, size = 0;
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
-            while ((length = in.read()) != -1) {
-                size += length;
-                out.write(length);
-            }
-        }
-        con.disconnect();
-        if (size == 0) {
-            return null;
-        }
-        return temp;
     }
 
     private String makeJSONRPCRequest(String method, JSONObject params) throws JSONException {
@@ -171,6 +139,7 @@ public class Protocol {
     }
 
     private Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
+        long st = System.currentTimeMillis();
         String reqStr = makeJSONRPCRequest(method, params);
         logger.debug("---- JSONRPC request");
         logger.debug(reqStr);
@@ -204,6 +173,12 @@ public class Protocol {
                 }
             }
             con.disconnect();
+
+            long et = System.currentTimeMillis();
+            if (System.getProperty("monsia.do_profile") != null) {
+                logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
+            }
+
             String resStr = bytes.toString("UTF-8");
             logger.debug("---- JSONRPC response");
             logger.debug(resStr);
