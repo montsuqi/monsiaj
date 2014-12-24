@@ -165,6 +165,7 @@ public class Client implements Runnable {
      * <p>
      * Kick the application.</p>
      */
+    @Override
     public void run() {
         try {
             protocol.checkScreens(true);
@@ -202,6 +203,7 @@ public class Client implements Runnable {
      * <p>
      * Dispose connection if it exists.</p>
      */
+    @Override
     protected void finalize() {
         try {
             super.finalize();
