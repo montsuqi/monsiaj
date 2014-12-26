@@ -152,12 +152,35 @@ class PandaTableHandler extends WidgetHandler {
         obj.put("tcolumn", table.getChangedRow() + 1);
         obj.put("tvalue", table.getChangedValue());
 
+        int k = 0;
+        if (obj.has("rowdata")) {
+            JSONArray array = obj.getJSONArray("rowdata");
+            for (int i = 0; i < array.length(); i++) {
+                boolean rowChanged = false;
+                JSONObject rowObj = array.getJSONObject(i);
+                for (int j = 0; j < table.getColumns(); j++) {
+                    String key = "column" + (j + 1);
+                    if (rowObj.has(key)) {
+                        JSONObject colObj = rowObj.getJSONObject(key);
+                        if (colObj.has("celldata")) {
+                            if (!colObj.getString("celldata").equals((String) tableModel.getValueAt(i, j))) {
+                                rowChanged = true;
+                            }
+                        }
+                    }
+                }
+                if (rowChanged) {
+                    k = i + 1;
+                }
+            }
+        }
+
         JSONArray array = new JSONArray();
         obj.put("rowdata", array);
 
-        for (int i = 0; i < table.getRows(); i++) {
+        for (int i = 0; i < k; i++) {
             JSONObject rowObj = new JSONObject();
-            array.put(i,rowObj);
+            array.put(i, rowObj);
             for (int j = 0; j < table.getColumns(); j++) {
                 String key = "column" + (j + 1);
                 JSONObject colObj = new JSONObject();

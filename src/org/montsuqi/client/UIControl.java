@@ -109,7 +109,7 @@ public class UIControl {
                 handler.set(this, widget, (JSONObject) obj, styleMap);
             }
         }
-                if (obj instanceof JSONObject) {
+        if (obj instanceof JSONObject) {
             JSONObject j = (JSONObject) obj;
             for (Iterator i = j.keys(); i.hasNext();) {
                 String key = (String) i.next();
@@ -278,7 +278,7 @@ public class UIControl {
     }
 
     public void sendEvent(Component widget, Object userData) {
-        if (client.isReceiving()) {  
+        if (client.isReceiving()) {
             return;
         }
         try {
@@ -291,7 +291,7 @@ public class UIControl {
             } else {
                 window = SwingUtilities.windowForComponent(widget);
             }
-            if (window == null || widget == null) {               
+            if (window == null || widget == null) {
                 return;
             }
             if (!window.getName().equals(client.getFocusedWindow())) {
@@ -342,14 +342,16 @@ public class UIControl {
         return xml;
     }
 
-    public void updateScreenData(Interface xml, String name, Object obj) throws JSONException {
+    public boolean updateScreenData(Interface xml, String name, Object obj) throws JSONException {
+        boolean changed = false;
         if (xml == null) {
             Node node = getNode(name);
             if (node == null) {
-                return;
+                return true;
             }
             xml = node.getInterface();
         }
+        ArrayList<String> removeList = new ArrayList();
         if (obj instanceof JSONObject) {
             JSONObject object = (JSONObject) obj;
             for (Iterator i = object.keys(); i.hasNext();) {
@@ -357,15 +359,29 @@ public class UIControl {
                 String childName = name + "." + key;
                 Object child = object.get(key);
                 if (child instanceof JSONObject || child instanceof JSONArray) {
-                    updateScreenData(xml, childName, object.get(key));
+                    boolean _changed = updateScreenData(xml, childName, object.get(key));
+                    if (_changed) {
+                        changed = true;
+                    } else {
+                        Component widget = xml.getWidgetByLongName(childName);
+                        if (widget != null) {
+                            removeList.add(key);
+                        }
+                    }
                 }
             }
+            for (String key : removeList) {
+                object.remove(key);
+            }
             Component widget = xml.getWidgetByLongName(name);
-            if (widget != null && changedWidgetMap.containsKey(widget.getName())) {                          
-                Class clazz = widget.getClass();
-                WidgetHandler handler = WidgetHandler.getHandler(clazz);
-                if (handler != null) {
-                    handler.get(this, widget, (JSONObject) obj);
+            if (widget != null) {
+                if (changedWidgetMap.containsKey(widget.getName())) {
+                    Class clazz = widget.getClass();
+                    WidgetHandler handler = WidgetHandler.getHandler(clazz);
+                    if (handler != null) {
+                        handler.get(this, widget, (JSONObject) obj);
+                        changed = true;
+                    }
                 }
             }
         } else if (obj instanceof JSONArray) {
@@ -374,10 +390,14 @@ public class UIControl {
                 String childName = name + "[" + i + "]";
                 Object child = array.get(i);
                 if (child instanceof JSONObject || child instanceof JSONArray) {
-                    updateScreenData(xml, childName, child);
+                    boolean _changed = updateScreenData(xml, childName, child);
+                    if (_changed) {
+                        changed = true;
+                    }
                 }
             }
         }
+        return changed;
     }
 
     public synchronized void setSessionTitle(String title) {

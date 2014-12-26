@@ -180,13 +180,15 @@ class CListHandler extends WidgetHandler {
                 break;
             }
         }
-
         JSONArray array = new JSONArray();
-        obj.put("selectdata",array);
+        obj.put("selectdata", array);
         boolean[] selection = clist.getSelection();
         for (int j = 0; j < selection.length; j++) {
             array.put(j, selection[j]);
         }
+        obj.put("item", new JSONObject());
+        obj.put("bgcolor", new JSONObject());
+        obj.put("fgcolor", new JSONObject());
     }
 
     private boolean isVisibleRow(JTable table, int row) {

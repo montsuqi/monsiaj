@@ -144,7 +144,7 @@ public class Protocol {
         logger.debug("---- JSONRPC request");
         logger.debug(reqStr);
         logger.debug("----");
-        HttpURLConnection con = getHttpURLConnection(url);
+        HttpURLConnection con = getHttpURLConnection(url);    
 
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -219,9 +219,9 @@ public class Protocol {
             this.restURIRoot = result.getString("app_rest_api_uri_root");
         }
 
-        logger.debug("session_id:" + this.sessionId);
-        logger.debug("rpcURI:" + this.rpcURI);
-        logger.debug("restURIRoot:" + this.restURIRoot);
+        logger.info("session_id:" + this.sessionId);
+        logger.info("rpcURI:" + this.rpcURI);
+        logger.info("restURIRoot:" + this.restURIRoot);
     }
 
     public String getServerType() {

@@ -6,7 +6,7 @@ and open the template in the editor.
 
 <configuration>
     <Properties>
-        <Property name="monsiaj.log.level">info</Property>
+        <Property name="monsia.log.level">info</Property>
     </Properties>    
     <appenders>
         <RollingFile 
@@ -25,7 +25,7 @@ and open the template in the editor.
         </Console>
     </appenders>
     <loggers>
-        <root level="${sys:monsiaj.log.level}">
+        <root level="${sys:monsia.log.level}">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
         </root>
