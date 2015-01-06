@@ -344,13 +344,6 @@ public class UIControl {
 
     public boolean updateScreenData(Interface xml, String name, Object obj) throws JSONException {
         boolean changed = false;
-        if (xml == null) {
-            Node node = getNode(name);
-            if (node == null) {
-                return true;
-            }
-            xml = node.getInterface();
-        }
         ArrayList<String> removeList = new ArrayList();
         if (obj instanceof JSONObject) {
             JSONObject object = (JSONObject) obj;

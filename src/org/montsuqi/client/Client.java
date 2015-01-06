@@ -192,7 +192,12 @@ public class Client {
                 }
             }
             if (screenData != null) {
-                uiControl.updateScreenData(null, windowName, screenData);
+                Node node = uiControl.getNode(windowName);
+                if (node == null) {
+                    throw new IOException("invalid window:"+windowName);
+                }
+                Interface xml = node.getInterface();
+                uiControl.updateScreenData(xml, windowName, screenData);
                 uiControl.clearChangedWidget();
                 JSONObject eventData = new JSONObject();
                 eventData.put("window", windowName);
