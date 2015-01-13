@@ -573,8 +573,8 @@ abstract class Connector {
                                     if (table.isEnterPressed()) {
                                         int row = te.getLastRow();
                                         int col = te.getColumn();
-                                        table.setChangedRow(te.getLastRow());
-                                        table.setChangedColumn(te.getColumn());
+                                        table.setChangedRow(row);
+                                        table.setChangedColumn(col);
                                         table.setChangedValue(table.getStringValueAt(row, col));
                                         invoke(con, handler, target, other);
                                     }

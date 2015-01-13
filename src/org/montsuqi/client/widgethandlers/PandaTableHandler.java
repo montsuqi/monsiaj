@@ -149,7 +149,7 @@ class PandaTableHandler extends WidgetHandler {
         PandaTable table = (PandaTable) widget;
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         obj.put("trow", table.getChangedRow() + 1);
-        obj.put("tcolumn", table.getChangedRow() + 1);
+        obj.put("tcolumn", table.getChangedColumn() + 1);
         obj.put("tvalue", table.getChangedValue());
 
         int k = 0;
