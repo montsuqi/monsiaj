@@ -138,25 +138,32 @@ public class Client {
         focusedWindow = windowData.getString("focused_window");
         focusedWidget = windowData.getString("focused_widget");
         JSONArray windows = windowData.getJSONArray("windows");
-        
+
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
             String windowName = w.getString("window");
             Node node = uiControl.getNode(windowName);
             if (node == null) {
+                long t1 = System.currentTimeMillis();
                 String gladeData = protocol.getScreenDefine(windowName);
+                long t2 = System.currentTimeMillis();
                 try {
                     node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), uiControl), windowName);
                 } catch (UnsupportedEncodingException ex) {
                     logger.info(ex, ex);
                     return;
                 }
+                long t3 = System.currentTimeMillis();
                 uiControl.putNode(windowName, node);
+                long t4 = System.currentTimeMillis();
+                if (System.getProperty("monsia.do_profile") != null) {
+                    logger.info("getScreenDefine:" + (t2 - t1) + "ms newNode[" + windowName + "]:" + (t3 - t2) + "ms putNode:"+(t4-t3)+"ms");
+                }
             }
             logger.debug("window[" + windowName + "] put_type[" + putType + "]");
         }
-        
+
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
@@ -166,7 +173,7 @@ public class Client {
                 uiControl.closeWindow(windowName);
             }
         }
-        
+
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             JSONObject screenData = w.getJSONObject("screen_data");
@@ -174,8 +181,14 @@ public class Client {
             String windowName = w.getString("window");
             if (putType.matches("new") || putType.matches("current")) {
                 Node node = uiControl.getNode(windowName);
-                uiControl.setWidget(node.getInterface(), windowName, screenData);
+                long t1 = System.currentTimeMillis();
+                uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), windowName, screenData);
+                long t2 = System.currentTimeMillis();
                 uiControl.showWindow(windowName);
+                long t3 = System.currentTimeMillis();
+                if (System.getProperty("monsia.do_profile") != null) {
+                    logger.info("setWidget:" + (t2 - t1) + "ms showWindow:" + (t3 - t2) + "ms");
+                }
             }
         }
         uiControl.setFocus(focusedWindow, focusedWidget);
@@ -197,7 +210,7 @@ public class Client {
             if (screenData != null) {
                 Node node = uiControl.getNode(windowName);
                 if (node == null) {
-                    throw new IOException("invalid window:"+windowName);
+                    throw new IOException("invalid window:" + windowName);
                 }
                 Interface xml = node.getInterface();
                 uiControl.updateScreenData(xml, windowName, screenData);
@@ -222,7 +235,7 @@ public class Client {
 
                 long et = System.currentTimeMillis();
                 if (System.getProperty("monsia.do_profile") != null) {
-                    logger.info("total:" + (et - st) + "ms protocol.sendEvent:" + (t1-st) + "ms updateScreen:" + (et-t1) + "ms");
+                    logger.info("total:" + (et - st) + "ms protocol.sendEvent:" + (t1 - st) + "ms updateScreen:" + (et - t1) + "ms");
                 }
             }
         } catch (JSONException | IOException ex) {

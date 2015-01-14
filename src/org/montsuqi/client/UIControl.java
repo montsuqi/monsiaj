@@ -100,8 +100,7 @@ public class UIControl {
         nodeTable.put(wName, node);
     }
 
-    public void setWidget(Interface xml, String name, Object obj) throws JSONException {
-        Component widget = xml.getWidgetByLongName(name);
+    public void setWidget(Interface xml, Component widget, String name, Object obj) throws JSONException {
         if (widget != null) {
             Class clazz = widget.getClass();
             WidgetHandler handler = WidgetHandler.getHandler(clazz);
@@ -110,7 +109,7 @@ public class UIControl {
                 handler.set(this, widget, (JSONObject) obj, styleMap);
                 long t2 = System.currentTimeMillis();
                 if (System.getProperty("monsia.do_profile") != null) {
-                    logger.info("" + (t2-t1) + "ms " + clazz.getName()+ " " + name);
+                    //logger.info("" + (t2-t1) + "ms " + clazz.getName()+ " " + name);
                 }
             }
         }
@@ -119,13 +118,19 @@ public class UIControl {
             for (Iterator i = j.keys(); i.hasNext();) {
                 String key = (String) i.next();
                 String childName = name + "." + key;
-                setWidget(xml, childName, j.get(key));
+                Component child = xml.getWidgetByLongName(childName);
+                if (child != null) {
+                    setWidget(xml, child, childName, j.get(key));
+                }
             }
         } else if (obj instanceof JSONArray) {
             JSONArray a = (JSONArray) obj;
             for (int i = 0; i < a.length(); i++) {
                 String childName = name + "[" + i + "]";
-                setWidget(xml, childName, a.get(i));
+                Component child = xml.getWidgetByLongName(childName);
+                if (child != null) {
+                    setWidget(xml, child, childName, a.get(i));
+                }
             }
         }
     }
