@@ -31,6 +31,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,20 +51,12 @@ class CListHandler extends WidgetHandler {
         JTable table = (JTable) widget;
         PandaCList clist = (PandaCList) widget;
 
+        widget.setVisible(true);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-
-        this.setCommonAttribute(widget, obj, styleMap);
 
         int count = 0;
         if (obj.has("count")) {
             count = obj.getInt("count");
-        }
-
-        int row = 0;
-        if (obj.has("row")) {
-            row = obj.getInt("row");
-            int row2 = row > 1 ? row - 1 : 0;
-            clist.changeSelection(row2, 0, false, false);
         }
 
         double rowattr = 0.0;
@@ -92,17 +85,35 @@ class CListHandler extends WidgetHandler {
             JSONArray array = obj.getJSONArray("item");
             int n = array.length();
             n = n > count ? count : n;
-            while (tableModel.getRowCount() > 0) {
-                tableModel.removeRow(0);
+            int rows = tableModel.getRowCount();
+            int columns = tableModel.getColumnCount();
+
+            TableModelListener[] listeners = tableModel.getTableModelListeners();
+            for (TableModelListener l : listeners) {
+                tableModel.removeTableModelListener(l);
             }
+            if (n < rows) {
+                for (int i = rows; i > n; i--) {
+                    tableModel.removeRow(i - 1);
+                }
+            } else if (n > rows) {
+                Object rowData[] = new String[columns];
+                for (int i = rows; i < n; i++) {
+                    tableModel.addRow(rowData);
+                }
+            }
+
             for (int i = 0; i < n; i++) {
                 JSONObject rowObj = array.getJSONObject(i);
-                Object rowData[] = new String[rowObj.length()];
-                for (int j = 0; j < clist.getColumnCount(); j++) {
+
+                for (int j = 0; j < columns; j++) {
                     String key = "column" + (j + 1);
-                    rowData[j] = rowObj.getString(key);
+                    tableModel.setValueAt(rowObj.getString(key), i, j);
                 }
-                tableModel.addRow(rowData);
+            }
+
+            for (TableModelListener l : listeners) {
+                tableModel.addTableModelListener(l);
             }
         }
 
@@ -128,6 +139,13 @@ class CListHandler extends WidgetHandler {
                 }
             }
             clist.setFGColors(fgcolors);
+        }
+
+        int row = 0;
+        if (obj.has("row")) {
+            row = obj.getInt("row");
+            int row2 = row > 1 ? row - 1 : 0;
+            clist.changeSelection(row2, 0, false, false);
         }
 
         if (obj.has("selectdata")) {
@@ -166,6 +184,7 @@ class CListHandler extends WidgetHandler {
                 model.setValue(0);
             }
         }
+        this.setCommonAttribute(widget, obj, styleMap);
         widget.setVisible(true);
     }
 
