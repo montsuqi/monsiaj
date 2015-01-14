@@ -106,7 +106,12 @@ public class UIControl {
             Class clazz = widget.getClass();
             WidgetHandler handler = WidgetHandler.getHandler(clazz);
             if (handler != null) {
+                long t1 = System.currentTimeMillis();
                 handler.set(this, widget, (JSONObject) obj, styleMap);
+                long t2 = System.currentTimeMillis();
+                if (System.getProperty("monsia.do_profile") != null) {
+                    logger.info("" + (t2-t1) + "ms " + clazz.getName()+ " " + name);
+                }
             }
         }
         if (obj instanceof JSONObject) {

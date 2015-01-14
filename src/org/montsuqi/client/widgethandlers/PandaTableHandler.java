@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +52,8 @@ class PandaTableHandler extends WidgetHandler {
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaTable table = (PandaTable) widget;
 
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+
         this.setCommonAttribute(widget, obj, styleMap);
 
         int trow = 0;
@@ -58,6 +61,9 @@ class PandaTableHandler extends WidgetHandler {
             trow = obj.getInt("trow");
             if (trow >= 1) {
                 trow -= 1;
+            }
+            if (trow >= tableModel.getRowCount()) {
+                trow = tableModel.getRowCount() - 1;
             }
         }
 
@@ -88,6 +94,9 @@ class PandaTableHandler extends WidgetHandler {
             tcolumn = obj.getInt("tcolumn");
             if (tcolumn >= 1) {
                 tcolumn -= 1;
+            }
+            if (tcolumn >= tableModel.getColumnCount()) {
+                tcolumn = tableModel.getColumnCount() - 1;
             }
         }
 
@@ -142,6 +151,7 @@ class PandaTableHandler extends WidgetHandler {
                 model.setValue(value);
             }
         }
+
     }
 
     @Override

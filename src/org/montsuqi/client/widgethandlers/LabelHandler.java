@@ -41,7 +41,10 @@ class LabelHandler extends WidgetHandler {
         JLabel label = (JLabel) widget;
         this.setCommonAttribute(widget, obj, styleMap);
         if (obj.has("textdata")) {
-            String text = "<html>" + obj.getString("textdata") + "</html>";
+            String text = obj.getString("textdata");
+            if (text.matches("<span\\s+color=")) {
+                text = "<html>" + text + "</html>";
+            }
             label.setText(text);
         }
     }

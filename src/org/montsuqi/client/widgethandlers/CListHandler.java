@@ -31,6 +31,9 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
@@ -51,8 +54,8 @@ class CListHandler extends WidgetHandler {
         JTable table = (JTable) widget;
         PandaCList clist = (PandaCList) widget;
 
-        widget.setVisible(true);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        TableModelListener[] listeners = tableModel.getTableModelListeners();
 
         int count = 0;
         if (obj.has("count")) {
@@ -88,10 +91,10 @@ class CListHandler extends WidgetHandler {
             int rows = tableModel.getRowCount();
             int columns = tableModel.getColumnCount();
 
-            TableModelListener[] listeners = tableModel.getTableModelListeners();
             for (TableModelListener l : listeners) {
                 tableModel.removeTableModelListener(l);
             }
+
             if (n < rows) {
                 for (int i = rows; i > n; i--) {
                     tableModel.removeRow(i - 1);
@@ -144,8 +147,18 @@ class CListHandler extends WidgetHandler {
         int row = 0;
         if (obj.has("row")) {
             row = obj.getInt("row");
-            int row2 = row > 1 ? row - 1 : 0;
-            clist.changeSelection(row2, 0, false, false);
+            int row2;
+            if (row <= 0) {
+                row2 = 0;
+            } else {
+                row2 = row - 1;
+            }
+            if (row2 >= count) {
+                row2 = count - 1;
+            }
+            if (row2 >= 0) {
+                clist.changeSelection(row2, 0, false, false);
+            }
         }
 
         if (obj.has("selectdata")) {
@@ -162,6 +175,7 @@ class CListHandler extends WidgetHandler {
             }
             clist.setSelection(selection);
         }
+
         JScrollBar vScroll = getVerticalScrollBar(table);
         if (vScroll != null) {
             BoundedRangeModel model = vScroll.getModel();
@@ -185,7 +199,6 @@ class CListHandler extends WidgetHandler {
             }
         }
         this.setCommonAttribute(widget, obj, styleMap);
-        widget.setVisible(true);
     }
 
     @Override
@@ -205,9 +218,6 @@ class CListHandler extends WidgetHandler {
         for (int j = 0; j < selection.length; j++) {
             array.put(j, selection[j]);
         }
-        obj.put("item", new JSONObject());
-        obj.put("bgcolor", new JSONObject());
-        obj.put("fgcolor", new JSONObject());
     }
 
     private boolean isVisibleRow(JTable table, int row) {
