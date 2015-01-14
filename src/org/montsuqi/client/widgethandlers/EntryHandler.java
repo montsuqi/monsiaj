@@ -41,7 +41,10 @@ class EntryHandler extends WidgetHandler {
         this.setCommonAttribute(widget, obj, styleMap);
         this.setEditable(widget, obj);
         if (obj.has("textdata")) {
-            entry.setText(obj.getString("textdata"));
+            String text = obj.getString("textdata");
+            if (!text.equals(entry.getText())) {
+                entry.setText(text);
+            }
             entry.setCaretPosition(0);
         }
     }
@@ -49,6 +52,6 @@ class EntryHandler extends WidgetHandler {
     @Override
     public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
         JTextField entry = (JTextField) widget;
-        obj.put("textdata", entry.getText());   
+        obj.put("textdata", entry.getText());
     }
 }

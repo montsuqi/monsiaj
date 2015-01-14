@@ -45,7 +45,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static org.montsuqi.client.Protocol.logger;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
@@ -139,6 +138,7 @@ public class Client {
         focusedWindow = windowData.getString("focused_window");
         focusedWidget = windowData.getString("focused_widget");
         JSONArray windows = windowData.getJSONArray("windows");
+        
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
@@ -156,6 +156,7 @@ public class Client {
             }
             logger.debug("window[" + windowName + "] put_type[" + putType + "]");
         }
+        
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
@@ -165,6 +166,7 @@ public class Client {
                 uiControl.closeWindow(windowName);
             }
         }
+        
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             JSONObject screenData = w.getJSONObject("screen_data");
@@ -177,6 +179,7 @@ public class Client {
             }
         }
         uiControl.setFocus(focusedWindow, focusedWidget);
+
     }
 
     public void sendEvent(String windowName, String widgetName, String event) {
@@ -214,11 +217,12 @@ public class Client {
                 long st = System.currentTimeMillis();
 
                 windowStack = protocol.sendEvent(params);
+                long t1 = System.currentTimeMillis();
                 updateScreen();
 
                 long et = System.currentTimeMillis();
                 if (System.getProperty("monsia.do_profile") != null) {
-                    logger.info("total:" + (et - st) + "ms");
+                    logger.info("total:" + (et - st) + "ms protocol.sendEvent:" + (t1-st) + "ms updateScreen:" + (et-t1) + "ms");
                 }
             }
         } catch (JSONException | IOException ex) {

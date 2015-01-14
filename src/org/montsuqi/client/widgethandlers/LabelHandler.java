@@ -45,7 +45,9 @@ class LabelHandler extends WidgetHandler {
             if (text.matches("<span\\s+color=")) {
                 text = "<html>" + text + "</html>";
             }
-            label.setText(text);
+            if (!text.equals(label.getText())) {
+                label.setText(text);
+            }
         }
     }
 

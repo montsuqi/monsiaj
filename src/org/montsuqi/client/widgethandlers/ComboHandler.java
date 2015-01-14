@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.event.ListDataListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +56,11 @@ class ComboHandler extends WidgetHandler {
         }
 
         if (obj.has("item")) {
+            ListDataListener[] listeners = model.getListDataListeners();
+            for (ListDataListener l : listeners) {
+                model.removeListDataListener(l);
+            }
+
             JSONArray array = obj.getJSONArray("item");
             List<String> list = new ArrayList<>();
             list.add("");
@@ -66,6 +72,10 @@ class ComboHandler extends WidgetHandler {
             model.removeAllElements();
             for (String s : list) {
                 model.addElement(s);
+            }
+
+            for (ListDataListener l : listeners) {
+                model.addListDataListener(l);
             }
         }
 
