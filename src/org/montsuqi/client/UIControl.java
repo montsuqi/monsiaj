@@ -101,16 +101,17 @@ public class UIControl {
     }
 
     public void setWidget(Interface xml, Component widget, Object obj) throws JSONException {
-        if (widget != null) {
-            Class clazz = widget.getClass();
-            WidgetHandler handler = WidgetHandler.getHandler(clazz);
-            if (handler != null) {
-                long t1 = System.currentTimeMillis();
-                handler.set(this, widget, (JSONObject) obj, styleMap);
-                long t2 = System.currentTimeMillis();
-                if (System.getProperty("monsia.do_profile") != null) {
-                    //logger.info("" + (t2-t1) + "ms " + clazz.getName()+ " " + name);
-                }
+        if (widget == null) {
+            return;
+        }
+        Class clazz = widget.getClass();
+        WidgetHandler handler = WidgetHandler.getHandler(clazz);
+        if (handler != null) {
+            long t1 = System.currentTimeMillis();
+            handler.set(this, widget, (JSONObject) obj, styleMap);
+            long t2 = System.currentTimeMillis();
+            if (System.getProperty("monsia.do_profile") != null) {
+                //logger.info("" + (t2-t1) + "ms " + clazz.getName()+ " " + name);
             }
         }
         if (obj instanceof JSONObject) {
@@ -120,14 +121,6 @@ public class UIControl {
                 Component child = xml.getWidgetByLongName(widget.getName() + "." + key);
                 if (child != null) {
                     setWidget(xml, child, j.get(key));
-                }
-            }
-        } else if (obj instanceof JSONArray) {
-            JSONArray a = (JSONArray) obj;
-            for (int i = 0; i < a.length(); i++) {
-                Component child = xml.getWidgetByLongName(widget.getName() + "[" + i + "]");
-                if (child != null) {
-                    setWidget(xml, child, a.get(i));
                 }
             }
         }
@@ -386,18 +379,6 @@ public class UIControl {
                 }
             }
 
-        } else if (obj instanceof JSONArray) {
-            JSONArray array = (JSONArray) obj;
-            for (int i = 0; i < array.length(); i++) {
-                Component child = xml.getWidgetByLongName(widget.getName() + "[" + i + "]");
-                Object childObj = array.get(i);
-                if (childObj instanceof JSONObject || childObj instanceof JSONArray) {
-                    boolean _changed = updateScreenData(xml, child, childObj);
-                    if (_changed) {
-                        changed = true;
-                    }
-                }
-            }
         }
         return changed;
     }
