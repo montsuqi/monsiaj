@@ -145,7 +145,7 @@ public class Protocol {
         logger.debug(reqStr);
         logger.debug("----");
         HttpURLConnection con = getHttpURLConnection(url);
-
+        
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("POST");
@@ -182,7 +182,7 @@ public class Protocol {
             String resStr = bytes.toString("UTF-8");
             logger.debug("---- JSONRPC response");
             logger.debug(resStr);
-            logger.debug("----");      
+            logger.debug("----");
             result = checkJSONRPCResponse(resStr);
         }
         return result;

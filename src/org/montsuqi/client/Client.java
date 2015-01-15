@@ -213,7 +213,7 @@ public class Client {
                     throw new IOException("invalid window:" + windowName);
                 }
                 Interface xml = node.getInterface();
-                uiControl.updateScreenData(xml, windowName, screenData);
+                uiControl.updateScreenData(xml, xml.getWidgetByLongName(windowName), screenData);
                 uiControl.clearChangedWidget();
                 JSONObject eventData = new JSONObject();
                 eventData.put("window", windowName);
