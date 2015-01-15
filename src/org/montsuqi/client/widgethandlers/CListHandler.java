@@ -31,6 +31,9 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
@@ -53,7 +56,7 @@ class CListHandler extends WidgetHandler {
 
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         TableModelListener[] listeners = tableModel.getTableModelListeners();
-        
+
         int count = 0;
         if (obj.has("count")) {
             count = obj.getInt("count");

@@ -352,52 +352,50 @@ public class UIControl {
         return xml;
     }
 
-    public boolean updateScreenData(Interface xml, Component widget, Object obj) throws JSONException {
+    public boolean updateScreenData(Interface xml, String name, Object obj) throws JSONException {
         boolean changed = false;
         ArrayList<String> removeList = new ArrayList();
         if (obj instanceof JSONObject) {
             JSONObject object = (JSONObject) obj;
             for (Iterator i = object.keys(); i.hasNext();) {
                 String key = (String) i.next();
-                Component child = xml.getWidgetByLongName(widget.getName() + "." + key);
-                if (child != null) {
-                    Object childObj = object.get(key);
-                    if (childObj instanceof JSONObject || childObj instanceof JSONArray) {
-                        boolean _changed = updateScreenData(xml, child, childObj);
-                        if (_changed) {
-                            changed = true;
-                        } else {
+                String childName = name + "." + key;
+                Object child = object.get(key);
+                if (child instanceof JSONObject || child instanceof JSONArray) {
+                    boolean _changed = updateScreenData(xml, childName, object.get(key));
+                    if (_changed) {
+                        changed = true;
+                    } else {
+                        Component widget = xml.getWidgetByLongName(childName);
+                        if (widget != null) {
                             removeList.add(key);
                         }
-                    }
-                } else {
-                    if (!changedWidgetMap.containsKey(widget.getName())) {
-                        removeList.add(key);
                     }
                 }
             }
             for (String key : removeList) {
                 object.remove(key);
             }
-            if (changedWidgetMap.containsKey(widget.getName())) {
-                Class clazz = widget.getClass();
-                WidgetHandler handler = WidgetHandler.getHandler(clazz);
-                if (handler != null) {
-                    handler.get(this, widget, (JSONObject) obj);
-                    changed = true;
+            Component widget = xml.getWidgetByLongName(name);
+            if (widget != null) {
+                if (changedWidgetMap.containsKey(widget.getName())) {
+                    Class clazz = widget.getClass();
+                    WidgetHandler handler = WidgetHandler.getHandler(clazz);
+                    if (handler != null) {
+                        handler.get(this, widget, (JSONObject) obj);
+                        changed = true;
+                    }
                 }
             }
         } else if (obj instanceof JSONArray) {
             JSONArray array = (JSONArray) obj;
             for (int i = 0; i < array.length(); i++) {
-                Component child = xml.getWidgetByLongName(widget.getName() + "[" + i + "]");
-                if (child != null) {
-                    Object childObj = array.get(i);
-                    if (childObj instanceof JSONObject || childObj instanceof JSONArray) {
-                        boolean _changed = updateScreenData(xml, child, childObj);
-                        if (_changed) {
-                            changed = true;
-                        }
+                String childName = name + "[" + i + "]";
+                Object child = array.get(i);
+                if (child instanceof JSONObject || child instanceof JSONArray) {
+                    boolean _changed = updateScreenData(xml, childName, child);
+                    if (_changed) {
+                        changed = true;
                     }
                 }
             }
