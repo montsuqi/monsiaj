@@ -100,7 +100,7 @@ public class UIControl {
         nodeTable.put(wName, node);
     }
 
-    public void setWidget(Interface xml, Component widget, String name, Object obj) throws JSONException {
+    public void setWidget(Interface xml, Component widget, Object obj) throws JSONException {
         if (widget != null) {
             Class clazz = widget.getClass();
             WidgetHandler handler = WidgetHandler.getHandler(clazz);
@@ -117,19 +117,17 @@ public class UIControl {
             JSONObject j = (JSONObject) obj;
             for (Iterator i = j.keys(); i.hasNext();) {
                 String key = (String) i.next();
-                String childName = name + "." + key;
-                Component child = xml.getWidgetByLongName(childName);
+                Component child = xml.getWidgetByLongName(widget.getName() + "." + key);
                 if (child != null) {
-                    setWidget(xml, child, childName, j.get(key));
+                    setWidget(xml, child, j.get(key));
                 }
             }
         } else if (obj instanceof JSONArray) {
             JSONArray a = (JSONArray) obj;
             for (int i = 0; i < a.length(); i++) {
-                String childName = name + "[" + i + "]";
-                Component child = xml.getWidgetByLongName(childName);
+                Component child = xml.getWidgetByLongName(widget.getName() + "[" + i + "]");
                 if (child != null) {
-                    setWidget(xml, child, childName, a.get(i));
+                    setWidget(xml, child, a.get(i));
                 }
             }
         }
@@ -352,48 +350,49 @@ public class UIControl {
         return xml;
     }
 
-    public boolean updateScreenData(Interface xml, String name, Object obj) throws JSONException {
+    public boolean updateScreenData(Interface xml, Component widget, Object obj) throws JSONException {
         boolean changed = false;
         ArrayList<String> removeList = new ArrayList();
         if (obj instanceof JSONObject) {
             JSONObject object = (JSONObject) obj;
             for (Iterator i = object.keys(); i.hasNext();) {
                 String key = (String) i.next();
-                String childName = name + "." + key;
-                Object child = object.get(key);
-                if (child instanceof JSONObject || child instanceof JSONArray) {
-                    boolean _changed = updateScreenData(xml, childName, object.get(key));
-                    if (_changed) {
-                        changed = true;
-                    } else {
-                        Component widget = xml.getWidgetByLongName(childName);
-                        if (widget != null) {
+                Component child = xml.getWidgetByLongName(widget.getName() + "." + key);
+                Object childObj = object.get(key);
+                if (child != null) {
+                    if (childObj instanceof JSONObject || childObj instanceof JSONArray) {
+                        boolean _changed = updateScreenData(xml, child, childObj);
+                        if (_changed) {
+                            changed = true;
+                        } else {
                             removeList.add(key);
                         }
+                    }
+                } else {
+                    if (!changedWidgetMap.containsKey(widget.getName())) {
+                        removeList.add(key);
                     }
                 }
             }
             for (String key : removeList) {
                 object.remove(key);
             }
-            Component widget = xml.getWidgetByLongName(name);
-            if (widget != null) {
-                if (changedWidgetMap.containsKey(widget.getName())) {
-                    Class clazz = widget.getClass();
-                    WidgetHandler handler = WidgetHandler.getHandler(clazz);
-                    if (handler != null) {
-                        handler.get(this, widget, (JSONObject) obj);
-                        changed = true;
-                    }
+            if (changedWidgetMap.containsKey(widget.getName())) {
+                Class clazz = widget.getClass();
+                WidgetHandler handler = WidgetHandler.getHandler(clazz);
+                if (handler != null) {
+                    handler.get(this, widget, (JSONObject) obj);
+                    changed = true;
                 }
             }
+
         } else if (obj instanceof JSONArray) {
             JSONArray array = (JSONArray) obj;
             for (int i = 0; i < array.length(); i++) {
-                String childName = name + "[" + i + "]";
-                Object child = array.get(i);
-                if (child instanceof JSONObject || child instanceof JSONArray) {
-                    boolean _changed = updateScreenData(xml, childName, child);
+                Component child = xml.getWidgetByLongName(widget.getName() + "[" + i + "]");
+                Object childObj = array.get(i);
+                if (childObj instanceof JSONObject || childObj instanceof JSONArray) {
+                    boolean _changed = updateScreenData(xml, child, childObj);
                     if (_changed) {
                         changed = true;
                     }

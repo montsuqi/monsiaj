@@ -145,7 +145,6 @@ public class Protocol {
         logger.debug(reqStr);
         logger.debug("----");
         HttpURLConnection con = getHttpURLConnection(url);
-
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("POST");

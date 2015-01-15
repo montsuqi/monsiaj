@@ -182,7 +182,7 @@ public class Client {
             if (putType.matches("new") || putType.matches("current")) {
                 Node node = uiControl.getNode(windowName);
                 long t1 = System.currentTimeMillis();
-                uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), windowName, screenData);
+                uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), screenData);
                 long t2 = System.currentTimeMillis();
                 uiControl.showWindow(windowName);
                 long t3 = System.currentTimeMillis();
@@ -213,7 +213,7 @@ public class Client {
                     throw new IOException("invalid window:" + windowName);
                 }
                 Interface xml = node.getInterface();
-                uiControl.updateScreenData(xml, windowName, screenData);
+                uiControl.updateScreenData(xml, xml.getWidgetByLongName(windowName), screenData);
                 uiControl.clearChangedWidget();
                 JSONObject eventData = new JSONObject();
                 eventData.put("window", windowName);
