@@ -19,6 +19,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
@@ -35,6 +37,8 @@ import org.montsuqi.widgets.PandaPreview;
  * @author mihara
  */
 public class PrintAgent extends Thread {
+
+    static final Logger logger = LogManager.getLogger(PrintAgent.class);
 
     private final int DELAY = 3000;
     private ConcurrentLinkedQueue<PrintRequest> printQ;
@@ -67,6 +71,7 @@ public class PrintAgent extends Thread {
                 }
             } catch (InterruptedException e) {
                 System.out.println(e);
+                logger.info(e);
             }
         }
     }
@@ -93,6 +98,8 @@ public class PrintAgent extends Thread {
             }
         } catch (IOException ex) {
             if (!ex.getMessage().equals("204")) {
+                logger.info(request.path);
+                logger.info(ex);
                 request.showOtherError();
             }
         }
@@ -143,14 +150,13 @@ public class PrintAgent extends Thread {
         try {
             RandomAccessFile raf = new RandomAccessFile(file, "r");
             FileChannel channel = raf.getChannel();
-            ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
-                    0, channel.size());
+            ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
             PDFFile pdf = new PDFFile(buf);
             if (pdf != null) {
                 return pdf.getNumPages();
             }
         } catch (Exception ex) {
-            System.out.println(ex);
+            logger.info(ex);
         }
         return 0;
     }
@@ -159,6 +165,8 @@ public class PrintAgent extends Thread {
         File temp = TempFile.createTempFile("monsiaj_printagent_", "__" + filename);
         String strURL = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
 
+        logger.info(strURL);
+        
         URL url = new URL(strURL);
         String scheme = url.getProtocol();
         HttpURLConnection con = (HttpURLConnection) url.openConnection();

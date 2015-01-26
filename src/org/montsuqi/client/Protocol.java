@@ -578,7 +578,7 @@ public class Protocol extends Connection {
                 Object[] args = {Integer.toHexString(pc)};
                 throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args));
         }
-        printAgent = new PrintAgent(this.socket.getInetAddress().getHostAddress(),user, pass,client.createSSLSocketFactory());        
+        printAgent = new PrintAgent(this.socket.getInetAddress().getHostAddress() +":"+ this.socket.getPort(),user, pass,client.createSSLSocketFactory());        
         printAgent.start();
         logger.exit();
     }
