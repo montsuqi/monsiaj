@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.OptionParser;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
 
@@ -69,6 +70,7 @@ public class Launcher {
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
         installLookAndFeels();
+        TempFile.cleanOld();
     }
 
     private void installLookAndFeels() {

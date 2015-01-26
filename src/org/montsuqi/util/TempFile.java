@@ -21,7 +21,6 @@ public class TempFile {
         tempDirRoot = new File(new File(new File(System.getProperty("user.home")), ".monsiaj"), "tmp");
         tempDir = new File(tempDirRoot, UUID.randomUUID().toString());
         tempDir.mkdirs();
-        cleanOld();
     }
     
     private TempFile() {
