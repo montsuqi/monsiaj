@@ -31,6 +31,8 @@ import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.event.ListDataListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,26 +43,28 @@ import org.montsuqi.client.UIControl;
  * A class to send/receive Combo data.</p>
  */
 class ComboHandler extends WidgetHandler {
-
+    
+    static final Logger logger = LogManager.getLogger(ComboHandler.class);
+    
     @Override
     @SuppressWarnings("unchecked")
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JComboBox<String> combo = ((JComboBox<String>) widget);
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) combo.getModel();
-
+        
         this.setCommonAttribute(widget, obj, styleMap);
-
+        
         int count = 0;
         if (obj.has("count")) {
             count = obj.getInt("count");
         }
-
+        
         if (obj.has("item")) {
             ListDataListener[] listeners = model.getListDataListeners();
             for (ListDataListener l : listeners) {
                 model.removeListDataListener(l);
             }
-
+            
             JSONArray array = obj.getJSONArray("item");
             List<String> list = new ArrayList<>();
             list.add("");
@@ -73,12 +77,12 @@ class ComboHandler extends WidgetHandler {
             for (String s : list) {
                 model.addElement(s);
             }
-
+            
             for (ListDataListener l : listeners) {
                 model.addListDataListener(l);
             }
         }
-
+        
         Component editor = combo.getEditor().getEditorComponent();
         String entryString = null;
         for (Iterator i = obj.keys(); i.hasNext();) {
@@ -96,7 +100,12 @@ class ComboHandler extends WidgetHandler {
                  entryHandler.set(con,editor,entryObj,styleMap);
                  entryString = ((JTextField)editor).getText();
                  */
-                entryString = obj.getJSONObject(key).getString("textdata");
+                JSONObject entryObj = obj.getJSONObject(key);
+                if (entryObj.has("textdata")) {
+                    entryString = entryObj.getString("textdata");
+                } else {
+                    logger.warn("" + editor.getName() + " does not hava [textdata] attribute");
+                }
             }
         }
         if (entryString != null) {
@@ -104,7 +113,7 @@ class ComboHandler extends WidgetHandler {
             widget.dispatchEvent(new KeyEvent(editor, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_UNDEFINED, KeyEvent.CHAR_UNDEFINED));
         }
     }
-
+    
     @Override
     public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
     }
