@@ -50,6 +50,22 @@ public class Client implements Runnable {
     protected static final Logger logger = LogManager.getLogger(Launcher.class);
     private String user;
     private String host;
+
+    public Config getConf() {
+        return conf;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
     private int port;
 
     /**
