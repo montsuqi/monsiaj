@@ -271,7 +271,7 @@
             packagenames="org.montsuqi.*,jp.or.med.orca.jmareceipt.*"
             excludepackagenames="org.montsuqi.certman.*,org.montsuqi.tools.*,org.montsuqi.widgets.Test*"
             sourcepath="${src.dir}"
-            source="1.6"
+            source="1.7"
             destdir="${doc.dir}"
             access="package"
             classpathref="project.class.path"/>
