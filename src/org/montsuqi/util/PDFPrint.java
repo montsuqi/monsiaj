@@ -89,7 +89,7 @@ public class PDFPrint extends Thread {
 
             book.append(pages, pf, pdfFile.getNumPages());
             pjob.setPageable(book);
-
+            
             if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
                 PrintService service = pjob.getPrintService();
                 System.out.println("PrintService:" + service);
@@ -100,7 +100,7 @@ public class PDFPrint extends Thread {
                     System.out.println("   " + attr1);
                 }
             }
-            pjob.print();
+            pjob.print(reqset);
         } catch (PrinterException ex) {
             logger.warn(ex);
         } catch (java.io.IOException ex) {
