@@ -87,7 +87,6 @@ class CListHandler extends WidgetHandler {
             n = n > count ? count : n;
             int rows = tableModel.getRowCount();
             int columns = tableModel.getColumnCount();
-
             for (TableModelListener l : listeners) {
                 tableModel.removeTableModelListener(l);
             }
@@ -196,6 +195,8 @@ class CListHandler extends WidgetHandler {
             }
         }
         this.setCommonAttribute(widget, obj, styleMap);
+        widget.setVisible(false);
+        widget.setVisible(true);
     }
 
     @Override
