@@ -67,7 +67,7 @@ class CalendarHandler extends WidgetHandler {
         Date date = calendarWidget.getDate();
         cal.setTime(date);
         obj.put("year", cal.get(Calendar.YEAR));
-        obj.put("month", cal.get(Calendar.MONTH));
+        obj.put("month", cal.get(Calendar.MONTH)+1);
         obj.put("day", cal.get(Calendar.DATE));
     }
 }
