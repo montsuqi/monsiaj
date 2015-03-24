@@ -49,7 +49,7 @@ class CalendarHandler extends WidgetHandler {
             calendar.set(Calendar.YEAR, year);
         }
         if (obj.has("month")) {
-            calendar.set(Calendar.MONTH, obj.getInt("month"));
+            calendar.set(Calendar.MONTH, obj.getInt("month") - 1);
         }
         if (obj.has("day")) {
             calendar.set(Calendar.DATE, obj.getInt("day"));
