@@ -277,6 +277,7 @@ public class Client {
 
     private void printReport(JSONObject item) {
         try {
+            logger.debug("printReport:" + item.toString());
             if (!item.has("object_id")) {
                 return;
             }
@@ -300,6 +301,10 @@ public class Client {
                 return;
             }
 
+            if (System.getProperty("monsia.printreport.showdialog") != null) {
+                showdialog = true;
+            }
+            
             try {
                 File temp = TempFile.createTempFile("report", "pdf");
                 temp.deleteOnExit();

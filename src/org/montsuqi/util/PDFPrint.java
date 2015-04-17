@@ -101,10 +101,8 @@ public class PDFPrint extends Thread {
                 }
             }
             pjob.print(reqset);
-        } catch (PrinterException ex) {
-            logger.warn(ex);
-        } catch (java.io.IOException ex) {
-            logger.warn(ex);
+        } catch (PrinterException | java.io.IOException ex) {
+            logger.warn(ex,ex);
         }
     }
 
