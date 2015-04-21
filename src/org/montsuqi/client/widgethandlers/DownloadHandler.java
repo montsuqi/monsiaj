@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.UIControl;
@@ -39,6 +41,8 @@ import org.montsuqi.widgets.PandaDownload;
  * A class to send/receive Timer data.</p>
  */
 public class DownloadHandler extends WidgetHandler {
+
+    protected static final Logger logger = LogManager.getLogger(DownloadHandler.class);
 
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {

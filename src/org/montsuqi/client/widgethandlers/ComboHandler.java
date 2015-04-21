@@ -59,12 +59,7 @@ class ComboHandler extends WidgetHandler {
             count = obj.getInt("count");
         }
         
-        if (obj.has("item")) {
-            ListDataListener[] listeners = model.getListDataListeners();
-            for (ListDataListener l : listeners) {
-                model.removeListDataListener(l);
-            }
-            
+        if (obj.has("item")) {            
             JSONArray array = obj.getJSONArray("item");
             List<String> list = new ArrayList<>();
             list.add("");
@@ -76,10 +71,6 @@ class ComboHandler extends WidgetHandler {
             model.removeAllElements();
             for (String s : list) {
                 model.addElement(s);
-            }
-            
-            for (ListDataListener l : listeners) {
-                model.addListDataListener(l);
             }
         }
         

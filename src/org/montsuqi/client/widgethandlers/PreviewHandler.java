@@ -29,6 +29,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.UIControl;
@@ -45,6 +47,8 @@ class PreviewHandler extends WidgetHandler {
     private static final String TEMP_PREFIX = "pandapreview";
     private static final String TEMP_SUFFIX = ".pdf";
 
+    static final Logger logger = LogManager.getLogger(PreviewHandler.class);
+
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaPreview preview = (PandaPreview) widget;
@@ -56,7 +60,7 @@ class PreviewHandler extends WidgetHandler {
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 con.getClient().getProtocol().getBLOB(obj.getString("objectdata"), out);
                 preview.load(temp.getAbsolutePath());
-            } catch (    IOException | JSONException ex) {
+            } catch (IOException | JSONException ex) {
                 logger.warn(ex);
             }
         }

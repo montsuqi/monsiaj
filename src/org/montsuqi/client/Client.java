@@ -379,6 +379,7 @@ public class Client {
 
     private void listDownloads() throws IOException, JSONException {
         JSONArray array = protocol.listDownloads();
+        logger.debug(array);
         for (int j = 0; j < array.length(); j++) {
             JSONObject item = array.getJSONObject(j);
 

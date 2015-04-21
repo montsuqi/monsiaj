@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.UIControl;
@@ -39,6 +41,8 @@ import org.montsuqi.widgets.Pixmap;
  * A class to send/receive Pixmap data.</p>
  */
 public class PixmapHandler extends WidgetHandler {
+
+    static final Logger logger = LogManager.getLogger(PixmapHandler.class);
 
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {

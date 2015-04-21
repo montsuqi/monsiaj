@@ -60,7 +60,6 @@ import org.montsuqi.widgets.Window;
  */
 public abstract class WidgetHandler {
 
-    protected static final Logger logger = LogManager.getLogger(WidgetHandler.class);
     private static final Map<Class,WidgetHandler> classTable;
 
     static {

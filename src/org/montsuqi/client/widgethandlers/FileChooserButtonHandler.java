@@ -25,6 +25,8 @@ package org.montsuqi.client.widgethandlers;
 import java.awt.Component;
 import java.io.IOException;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.UIControl;
@@ -35,7 +37,8 @@ import org.montsuqi.widgets.FileChooserButton;
  * A class to send/receive FileChooserButton data.</p>
  */
 class FileChooserButtonHandler extends WidgetHandler {
-
+    static final Logger logger = LogManager.getLogger(FileChooserButtonHandler.class);
+    
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         FileChooserButton fcb = (FileChooserButton) widget;
