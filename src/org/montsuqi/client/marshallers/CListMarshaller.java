@@ -181,7 +181,7 @@ class CListMarshaller extends WidgetMarshaller {
             }
         }
         widget.setVisible(true);
-//        clist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        clist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     @Override
