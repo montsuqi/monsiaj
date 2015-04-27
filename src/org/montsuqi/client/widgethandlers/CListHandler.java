@@ -31,6 +31,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
@@ -197,6 +198,7 @@ class CListHandler extends WidgetHandler {
         this.setCommonAttribute(widget, obj, styleMap);
         widget.setVisible(false);
         widget.setVisible(true);
+        clist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     @Override
