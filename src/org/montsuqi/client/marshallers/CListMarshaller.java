@@ -36,7 +36,8 @@ import org.montsuqi.util.SafeColorDecoder;
 import org.montsuqi.widgets.PandaCList;
 
 /**
- * <p>A class to send/receive CList data.</p>
+ * <p>
+ * A class to send/receive CList data.</p>
  */
 class CListMarshaller extends WidgetMarshaller {
 
@@ -64,13 +65,13 @@ class CListMarshaller extends WidgetMarshaller {
                 con.receiveValue(label, offset + 1 + name.length());
             } else if (handleCommonAttribute(manager, widget, name)) {
                 //
-            } else if ("count".equals(name)) { 
+            } else if ("count".equals(name)) {
                 count = con.receiveIntData();
-            } else if ("row".equals(name)) { 
+            } else if ("row".equals(name)) {
                 row = con.receiveIntData();
                 int row2 = row > 1 ? row - 1 : 0;
                 clist.changeSelection(row2, 0, false, false);
-            } else if ("rowattr".equals(name)) { 
+            } else if ("rowattr".equals(name)) {
                 int rowattr = con.receiveIntData();
                 switch (rowattr) {
                     case 1: // DOWN
@@ -89,11 +90,11 @@ class CListMarshaller extends WidgetMarshaller {
                         rowattrw = 0.0; // [0] TOP
                         break;
                 }
-            } else if ("column".equals(name)) { 
-				/*
+            } else if ("column".equals(name)) {
+                /*
                  * int dummy =
                  */ con.receiveIntData();
-            } else if ("item".equals(name)) { 
+            } else if ("item".equals(name)) {
                 while (tableModel.getRowCount() > 0) {
                     tableModel.removeRow(0);
                 }
@@ -180,13 +181,14 @@ class CListMarshaller extends WidgetMarshaller {
             }
         }
         widget.setVisible(true);
+//        clist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     @Override
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTable table = (JTable) widget;
-        PandaCList clist = (PandaCList)widget;
+        PandaCList clist = (PandaCList) widget;
         ValueAttribute va = manager.getAttribute(name);
         boolean visibleRow = false;
         int rows = table.getRowCount();
@@ -194,10 +196,10 @@ class CListMarshaller extends WidgetMarshaller {
         for (int i = 0; i < rows; i++) {
             con.sendPacketClass(PacketClass.ScreenData);
             con.sendName(va.getValueName() + '.' + va.getNameSuffix() + '[' + String.valueOf(i) + ']');
-            con.sendBooleanData(Type.BOOL,selection[i]);
+            con.sendBooleanData(Type.BOOL, selection[i]);
             if (!visibleRow && isVisibleRow(table, i)) {
                 con.sendPacketClass(PacketClass.ScreenData);
-                con.sendName(va.getValueName() + ".row"); 
+                con.sendName(va.getValueName() + ".row");
                 con.sendIntegerData(Type.INT, i + 1);
                 visibleRow = true;
             }
