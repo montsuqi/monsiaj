@@ -42,7 +42,7 @@ class LabelHandler extends WidgetHandler {
         this.setCommonAttribute(widget, obj, styleMap);
         if (obj.has("textdata")) {
             String text = obj.getString("textdata");
-            if (text.matches("<span\\s+color=")) {
+            if (text.matches(".*<span\\scolor.*")) {          
                 text = "<html>" + text + "</html>";
             }
             if (!text.equals(label.getText())) {
