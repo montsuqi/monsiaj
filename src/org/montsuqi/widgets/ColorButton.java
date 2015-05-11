@@ -79,6 +79,7 @@ public class ColorButton extends JButton {
 
     private class ColorChooseAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             Color color;
             color = JColorChooser.showDialog(null, Messages.getString("ColorButton.dialog_title"), ColorButton.this.color);

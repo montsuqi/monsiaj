@@ -39,10 +39,10 @@ class ColorButtonHandler extends WidgetHandler {
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         ColorButton button = (ColorButton) widget;
         this.setCommonAttribute(widget, obj, styleMap);
-
         if (obj.has("color")) {
             button.setColorStr(obj.getString("color"));
         }
+        con._addChangedWidget(widget);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class SafeColorDecoder {
     public static Color decode(String str) {
         try {
             return Color.decode(str);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             //e.printStackTrace();
         }
         return null;

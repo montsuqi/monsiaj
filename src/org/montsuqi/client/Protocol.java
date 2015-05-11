@@ -268,7 +268,6 @@ public class Protocol {
         meta.put("client_version", PANDA_CLIENT_VERSION);
         meta.put("session_id", this.sessionId);
         params.put("meta", meta);
-
         return (JSONObject) jsonRPC(this.rpcURI, "send_event", params);
 
     }
