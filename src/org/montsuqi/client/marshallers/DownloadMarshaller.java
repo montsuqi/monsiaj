@@ -41,6 +41,7 @@ public class DownloadMarshaller extends WidgetMarshaller {
         byte[] binary = null;
         String fileName = "";
         String description = "";
+        String tmpFileName = "download.dat";
 
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
@@ -49,13 +50,14 @@ public class DownloadMarshaller extends WidgetMarshaller {
                 binary = con.receiveBinaryData();
             } else if ("filename".equals(name)) {
                 fileName = con.receiveStringData();
+                tmpFileName = fileName;
             } else if ("description".equals(name)) {
                 description = con.receiveStringData();                
             } else if (handleCommonAttribute(manager, widget, name)) {
             }
         }
         if (binary != null && binary.length > 0) {
-            File temp = TempFile.createTempFile("PandaDownload","download.dat");
+            File temp = TempFile.createTempFile("PandaDownload",tmpFileName);
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
                 out.write(binary);
                 out.flush();
