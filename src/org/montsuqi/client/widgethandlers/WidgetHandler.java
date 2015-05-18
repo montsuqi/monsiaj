@@ -33,8 +33,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.montsuqi.client.UIControl;
@@ -60,7 +58,7 @@ import org.montsuqi.widgets.Window;
  */
 public abstract class WidgetHandler {
 
-    private static final Map<Class,WidgetHandler> classTable;
+    private static final Map<Class, WidgetHandler> classTable;
 
     static {
         classTable = new HashMap<>();
@@ -114,11 +112,13 @@ public abstract class WidgetHandler {
              } GtkStateType;
              */
             boolean flag = state != 4;
-            widget.setEnabled(flag);
+
             widget.setFocusable(flag);
             if (widget instanceof JTextComponent) {
                 JTextComponent text = (JTextComponent) widget;
                 text.setEditable(flag);
+            } else {
+                widget.setEnabled(flag);
             }
         }
         if (obj.has("style")) {
