@@ -36,6 +36,7 @@ import org.montsuqi.client.Type;
  */
 class EntryMarshaller extends WidgetMarshaller {
 
+    @Override
     public synchronized void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTextField entry = (JTextField) widget;
@@ -56,6 +57,7 @@ class EntryMarshaller extends WidgetMarshaller {
         }
     }
 
+    @Override
     public synchronized void send(WidgetValueManager manager, String name, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         JTextField entry = (JTextField) widget;

@@ -91,12 +91,13 @@ public abstract class WidgetMarshaller {
             GTK_STATE_INSENSITIVE => 4
             } GtkStateType;
              */
-            final boolean flag = state != 4;
-            widget.setEnabled(flag);
+            final boolean flag = state != 4;            
             widget.setFocusable(flag);
             if (widget instanceof JTextComponent) {
                 JTextComponent text = (JTextComponent) widget;
                 text.setEditable(flag);
+            } else {
+                widget.setEnabled(flag);
             }
             return true;
         } else if ("style".equals(name)) { 
