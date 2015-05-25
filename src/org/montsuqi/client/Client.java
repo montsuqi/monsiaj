@@ -75,7 +75,11 @@ public class Client {
     public Client(Config conf) throws IOException {
         this.conf = conf;
         int n = conf.getCurrent();
-        uiControl = new UIControl(this, conf.getStyleURL(n), conf.getTimerPeriod(n));
+        int delay = conf.getTimerPeriod(n);
+        if (!conf.getUseTimer(n)) {
+            delay = 0;
+        }
+        uiControl = new UIControl(this, conf.getStyleURL(n), delay);
         isReceiving = false;
     }
 
