@@ -143,7 +143,7 @@ public class Protocol {
         String reqStr = makeJSONRPCRequest(method, params);
         logger.debug("---- JSONRPC request");
         logger.debug(reqStr);
-        logger.debug("----");
+        logger.debug("----");      
         HttpURLConnection con = getHttpURLConnection(url);
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);

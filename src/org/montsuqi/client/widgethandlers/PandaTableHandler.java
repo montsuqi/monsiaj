@@ -99,14 +99,16 @@ class PandaTableHandler extends WidgetHandler {
             }
         }
 
-        if (obj.has("rowdata")) {
+        if (obj.has("rowdata")) {           
             JSONArray array = obj.getJSONArray("rowdata");
+//System.out.println("rowdata length:"+array.length());                            
             for (int i = 0; i < array.length(); i++) {
                 JSONObject rowObj = array.getJSONObject(i);
                 for (int j = 0; j < table.getColumns(); j++) {
-                    String key = "column" + (j + 1);
+                    String key = "column" + (j + 1);                    
                     if (rowObj.has(key)) {
                         JSONObject colObj = rowObj.getJSONObject(key);
+//System.out.println(key + " " + colObj.toString());                        
                         if (colObj.has("celldata")) {
                             table.setCell(i, j, colObj.getString("celldata"));
                         }
@@ -162,29 +164,26 @@ class PandaTableHandler extends WidgetHandler {
         obj.put("tvalue", table.getChangedValue());
 
         int k = 0;
-        if (obj.has("rowdata")) {
-            JSONArray array = obj.getJSONArray("rowdata");
-            for (int i = 0; i < array.length(); i++) {
-                boolean rowChanged = false;
-                JSONObject rowObj = array.getJSONObject(i);
-                for (int j = 0; j < table.getColumns(); j++) {
-                    String key = "column" + (j + 1);
-                    if (rowObj.has(key)) {
-                        JSONObject colObj = rowObj.getJSONObject(key);
-                        if (colObj.has("celldata")) {
-                            if (!colObj.getString("celldata").equals((String) tableModel.getValueAt(i, j))) {
-                                rowChanged = true;
-                            }
+        JSONArray array = new JSONArray();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            boolean rowChanged = false;
+            JSONObject rowObj = new JSONObject();
+            for (int j = 0; j < table.getColumns(); j++) {
+                String key = "column" + (j + 1);
+                if (rowObj.has(key)) {
+                    JSONObject colObj = rowObj.getJSONObject(key);
+                    if (colObj.has("celldata")) {
+                        if (!colObj.getString("celldata").equals((String) tableModel.getValueAt(i, j))) {
+                            rowChanged = true;
                         }
                     }
                 }
-                if (rowChanged) {
-                    k = i + 1;
-                }
+            }
+            array.put(i, rowObj);
+            if (rowChanged) {
+                k = i + 1;
             }
         }
-
-        JSONArray array = new JSONArray();
         obj.put("rowdata", array);
 
         for (int i = 0; i < k; i++) {

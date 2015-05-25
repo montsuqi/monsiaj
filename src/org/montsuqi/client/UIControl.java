@@ -21,11 +21,13 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import static org.montsuqi.client.Launcher.logger;
 import org.montsuqi.client.widgethandlers.WidgetHandler;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Style;
@@ -50,6 +52,7 @@ public class UIControl {
     private final ArrayList<Component> dialogStack;
     private final Map styleMap;
     private final Map<String, Component> changedWidgetMap;
+    private final Map<String, Object> screenTemplateMap;
     private final Client client;
     private final long timerPeriod;
 
@@ -60,9 +63,114 @@ public class UIControl {
         topWindow = new TopWindow();
         dialogStack = new ArrayList<>();
         changedWidgetMap = new HashMap<>();
+        screenTemplateMap = new HashMap<>();
         this.client = client;
         styleMap = loadStyles(styleURL);
         this.timerPeriod = timerPeriod;
+    }
+
+    public Object getScreenTemplate(String window) {
+        return screenTemplateMap.get(window);
+    }
+
+    public void addScreenTemplate(String window, Object object) {
+        screenTemplateMap.put(window, object);
+    }
+
+    public void updateScreenTemplate(Object tmpl, Object upd) {
+        try {
+            if (upd != null && tmpl.getClass() == upd.getClass()) {
+                if (tmpl instanceof JSONObject) {
+                    JSONObject tmplObj = (JSONObject) tmpl;
+                    JSONObject updObj = (JSONObject) upd;
+                    for (Iterator i = tmplObj.keys(); i.hasNext();) {
+                        String key = (String) i.next();
+                        Object c1 = tmplObj.get(key);
+                        Object c2 = null;
+                        if (updObj.has(key)) {
+                            c2 = updObj.get(key);
+                        }
+                        if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
+                            updateScreenTemplate(c1, c2);
+                        } else {
+                            if (c2 != null && c1.getClass() == c2.getClass()) {
+                                tmplObj.put(key, c2);
+                            } else if (c1 instanceof java.lang.Boolean) {
+                                tmplObj.put(key, true);
+                            } else if (c1 instanceof java.lang.Integer) {
+                                tmplObj.put(key, 0);
+                            } else if (c1 instanceof java.lang.Double) {
+                                tmplObj.put(key, 0.0);
+                            } else if (c1 instanceof java.lang.String) {
+                                tmplObj.put(key, "");
+                            }
+                        }
+                    }
+                } else if (tmpl instanceof JSONArray) {
+                    JSONArray tmplArr = (JSONArray) tmpl;
+                    JSONArray updArr = (JSONArray) upd;
+                    for (int i = 0; i < tmplArr.length(); i++) {
+                        Object c1 = tmplArr.get(i);
+                        Object c2 = null;
+                        if (i <= updArr.length()) {
+                            c2 = updArr.get(i);
+                        }
+                        if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
+                            updateScreenTemplate(c1, c2);
+                        } else {
+                            if (c2 != null && c1.getClass() == c2.getClass()) {
+                                tmplArr.put(i, c2);
+                            } else if (c1 instanceof java.lang.Boolean) {
+                                tmplArr.put(i, true);
+                            } else if (c1 instanceof java.lang.Integer) {
+                                tmplArr.put(i, 0);
+                            } else if (c1 instanceof java.lang.Double) {
+                                tmplArr.put(i, 0.0);
+                            } else if (c1 instanceof java.lang.String) {
+                                tmplArr.put(i, "");
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (tmpl instanceof JSONObject) {
+                    JSONObject tmplObj = (JSONObject) tmpl;
+                    for (Iterator i = tmplObj.keys(); i.hasNext();) {
+                        String key = (String) i.next();
+                        Object c1 = tmplObj.get(key);
+                        if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
+                            updateScreenTemplate(c1, null);
+                        } else if (c1 instanceof java.lang.Boolean) {
+                            tmplObj.put(key, true);
+                        } else if (c1 instanceof java.lang.Integer) {
+                            tmplObj.put(key, 0);
+                        } else if (c1 instanceof java.lang.Double) {
+                            tmplObj.put(key, 0.0);
+                        } else if (c1 instanceof java.lang.String) {
+                            tmplObj.put(key, "");
+                        }
+                    }
+                } else if (tmpl instanceof JSONArray) {
+                    JSONArray tmplArr = (JSONArray) tmpl;
+                    for (int i = 0; i < tmplArr.length(); i++) {
+                        Object c1 = tmplArr.get(i);
+                        if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
+                            updateScreenTemplate(c1, null);
+                        } else if (c1 instanceof java.lang.Boolean) {
+                            tmplArr.put(i, true);
+                        } else if (c1 instanceof java.lang.Integer) {
+                            tmplArr.put(i, 0);
+                        } else if (c1 instanceof java.lang.Double) {
+                            tmplArr.put(i, 0.0);
+                        } else if (c1 instanceof java.lang.String) {
+                            tmplArr.put(i, "");
+                        }
+                    }
+                }
+            }
+        } catch (JSONException ex) {
+            logger.catching(Level.FATAL, ex);
+        }
     }
 
     public long getTimerPeriod() {
@@ -102,6 +210,9 @@ public class UIControl {
 
     public void setWidget(Interface xml, Component widget, Object obj) throws JSONException {
         if (widget == null) {
+            return;
+        }
+        if (obj == null) {
             return;
         }
         Class clazz = widget.getClass();
@@ -343,44 +454,36 @@ public class UIControl {
         return xml;
     }
 
-    public boolean updateScreenData(Interface xml, Component widget, Object obj) throws JSONException {
-        boolean changed = false;
-        ArrayList<String> removeList = new ArrayList();
-        if (obj instanceof JSONObject) {
-            JSONObject object = (JSONObject) obj;
-            for (Iterator i = object.keys(); i.hasNext();) {
-                String key = (String) i.next();
-                Component child = xml.getWidgetByLongName(widget.getName() + "." + key);
-                Object childObj = object.get(key);
-                if (child != null) {
-                    if (childObj instanceof JSONObject || childObj instanceof JSONArray) {
-                        boolean _changed = updateScreenData(xml, child, childObj);
-                        if (_changed) {
-                            changed = true;
-                        } else {
-                            removeList.add(key);
-                        }
-                    }
-                } else {
-                    if (!changedWidgetMap.containsKey(widget.getName())) {
-                        removeList.add(key);
-                    }
-                }
-            }
-            for (String key : removeList) {
-                object.remove(key);
-            }
-            if (changedWidgetMap.containsKey(widget.getName())) {
-                Class clazz = widget.getClass();
-                WidgetHandler handler = WidgetHandler.getHandler(clazz);
-                if (handler != null) {
-                    handler.get(this, widget, (JSONObject) obj);
-                    changed = true;
-                }
-            }
+    public JSONObject updateScreenData(Interface xml, Component widget, Object obj) throws JSONException {
 
+        if (!(obj instanceof JSONObject)) {
+            return null;
         }
-        return changed;
+        JSONObject ret = new JSONObject();
+
+        JSONObject jobj = (JSONObject) obj;
+        for (Iterator i = jobj.keys(); i.hasNext();) {
+            String key = (String) i.next();
+            Component child = xml.getWidgetByLongName(widget.getName() + "." + key);
+            Object childObj = jobj.get(key);
+            if (child != null) {
+                JSONObject childRet = updateScreenData(xml, child, childObj);
+                if (childRet != null) {
+                    ret.put(key, childRet);
+                }
+            }
+        }
+        if (changedWidgetMap.containsKey(widget.getName())) {
+            Class clazz = widget.getClass();
+            WidgetHandler handler = WidgetHandler.getHandler(clazz);
+            if (handler != null) {
+                handler.get(this, widget, ret);
+            }
+        }
+        if (ret.length() <= 0) {
+            return null;
+        }
+        return ret;
     }
 
     public synchronized void setSessionTitle(String title) {

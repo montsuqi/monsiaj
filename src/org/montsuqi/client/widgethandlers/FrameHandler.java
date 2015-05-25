@@ -47,6 +47,6 @@ class FrameHandler extends WidgetHandler {
     }
 
     @Override
-    public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
+    public void get(UIControl con, Component widget,JSONObject obj) throws JSONException {
     }
 }

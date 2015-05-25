@@ -173,16 +173,24 @@ public class Client {
                 uiControl.closeWindow(windowName);
             }
         }
-
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             JSONObject screenData = w.getJSONObject("screen_data");
             String putType = w.getString("put_type");
-            String windowName = w.getString("window");
+            String windowName = w.getString("window");           
+            JSONObject tmpl = (JSONObject)uiControl.getScreenTemplate(windowName);
+            if (tmpl == null) {
+                if (screenData.length() > 0) {
+                    uiControl.addScreenTemplate(windowName, screenData);
+                    tmpl = screenData;
+                }
+            } else {
+                uiControl.updateScreenTemplate(tmpl,screenData);
+            }
             if (putType.matches("new") || putType.matches("current")) {
                 Node node = uiControl.getNode(windowName);
                 long t1 = System.currentTimeMillis();
-                uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), screenData);
+                uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), tmpl);
                 long t2 = System.currentTimeMillis();
                 uiControl.showWindow(windowName);
                 long t3 = System.currentTimeMillis();
@@ -190,36 +198,31 @@ public class Client {
                     logger.info("setWidget:" + (t2 - t1) + "ms showWindow:" + (t3 - t2) + "ms");
                 }
             }
-        }
+        }      
         uiControl.setFocus(focusedWindow, focusedWidget);
 
     }
 
     public void sendEvent(String windowName, String widgetName, String event) {
         try {
-            JSONObject screenData = null;
-            JSONObject windowData = windowStack.getJSONObject("window_data");
-            JSONArray windows = windowData.getJSONArray("windows");
-            for (int i = 0; i < windows.length(); i++) {
-                JSONObject winObj = windows.getJSONObject(i);
-                if (winObj.has("window") && winObj.getString("window").matches(windowName)) {
-                    screenData = winObj.getJSONObject("screen_data");
-                    break;
-                }
-            }
-            if (screenData != null) {
+            JSONObject tmpl = null;
+            tmpl = (JSONObject)uiControl.getScreenTemplate(windowName);
+            if (tmpl != null) {
                 Node node = uiControl.getNode(windowName);
                 if (node == null) {
                     throw new IOException("invalid window:" + windowName);
                 }
                 Interface xml = node.getInterface();
-                uiControl.updateScreenData(xml, xml.getWidgetByLongName(windowName), screenData);
+                JSONObject newScreenData = uiControl.updateScreenData(xml, xml.getWidgetByLongName(windowName), tmpl);
+                if (newScreenData == null) {
+                    newScreenData = new JSONObject();
+                }
                 uiControl.clearChangedWidget();
                 JSONObject eventData = new JSONObject();
                 eventData.put("window", windowName);
                 eventData.put("widget", widgetName);
                 eventData.put("event", event);
-                eventData.put("screen_data", screenData);
+                eventData.put("screen_data", newScreenData);
                 JSONObject params = new JSONObject();
                 params.put("event_data", eventData);
 
