@@ -34,6 +34,8 @@ import java.net.URL;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.PDFPrint;
 
@@ -43,6 +45,8 @@ import org.montsuqi.util.PDFPrint;
  * Preview pane with control buttons and display of current scale.</p>
  */
 public class PandaPreview extends JPanel {
+
+    private static final Logger logger = LogManager.getLogger(PandaPreview.class);
 
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
@@ -200,6 +204,7 @@ public class PandaPreview extends JPanel {
                     }
                     out.close();
                 } catch (Exception ex) {
+                    logger.warn(ex,ex);
                     System.out.println(ex);
                 }
             }
@@ -388,9 +393,7 @@ public class PandaPreview extends JPanel {
             pageEntry.setValue(1);
             this.setScale();
         } catch (Exception ex) {
-            if (!ex.getMessage().contains("This may not be a PDF File")) {
-                System.out.println(ex);
-            }
+            logger.warn(ex,ex);
         }
     }
 
@@ -470,9 +473,8 @@ public class PandaPreview extends JPanel {
         PandaPreview preview = new PandaPreview();
         f.add(preview);
         f.setVisible(true);
-        JFileChooser chooser = new JFileChooser();
-        chooser.showOpenDialog(preview);
-        preview.load(chooser.getSelectedFile().getAbsolutePath());
+        File file = new File(args[0]);
+        preview.load(file.getAbsolutePath());
         preview.revalidate();
         preview.repaint();
         f.pack();
