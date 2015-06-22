@@ -37,6 +37,7 @@ import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -96,7 +97,6 @@ public class Protocol extends Connection {
         return topWindow;
     }
 
-
     Protocol(Client client, Map styleMap, long timerPeriod) throws IOException, GeneralSecurityException {
         super(client.createSocket(), isNetworkByteOrder());
         this.client = client;
@@ -110,7 +110,7 @@ public class Protocol extends Connection {
         dialogStack = new ArrayList<>();
         enablePing = false;
     }
-    
+
     public long getTimerPeriod() {
         return timerPeriod;
     }
@@ -578,7 +578,7 @@ public class Protocol extends Connection {
                 Object[] args = {Integer.toHexString(pc)};
                 throw new ConnectException(MessageFormat.format("cannot connect to server(other protocol error {0})", args));
         }
-        printAgent = new PrintAgent(this.client.getHost()+":"+ this.client.getPort(),user, pass,client.createSSLSocketFactory());        
+        printAgent = new PrintAgent(this.client.getHost() + ":" + this.client.getPort(), user, pass, client.createSSLSocketFactory());
         printAgent.start();
         logger.exit();
     }
@@ -593,8 +593,6 @@ public class Protocol extends Connection {
                         Protocol.this.sendPing();
                     } catch (IOException ioe) {
                         exceptionOccured(ioe);
-                    } catch (JSONException ex) {
-                        exceptionOccured(ex);
                     }
                 }
             });
@@ -620,28 +618,29 @@ public class Protocol extends Connection {
         return this.receiveBinary();
     }
 
-    private synchronized void printReport(JSONObject obj) throws JSONException, IOException {
+    private synchronized void printReport(JSONObject obj) throws JSONException {
         String printer = null;
         String title = "";
         boolean showDialog = false;
 
-        if (!obj.has("object_id")) {
-            return;
-        }
-        String oid = obj.getString("object_id");
-        if (obj.has("printer")) {
-            printer = obj.getString("printer");
-        }
-        if (obj.has("title")) {
-            title = obj.getString("title");
-        }
-        if (obj.has("showdialog")) {
-            showDialog = true;
-        }
         try {
+            if (!obj.has("object_id")) {
+                return;
+            }
+            String oid = obj.getString("object_id");
+            if (obj.has("printer")) {
+                printer = obj.getString("printer");
+            }
+            if (obj.has("title")) {
+                title = obj.getString("title");
+            }
+            if (obj.has("showdialog")) {
+                showDialog = true;
+            }
+
             byte[] bin = receiveBLOB(oid);
             if (bin != null && bin.length > 0) {
-                File temp = TempFile.createTempFile("clientPrint", "report.pdf");                
+                File temp = TempFile.createTempFile("clientPrint", "report.pdf");
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
                     os.write(bin);
                     os.flush();
@@ -664,7 +663,7 @@ public class Protocol extends Connection {
                 }
             }
         } catch (IOException ex) {
-            logger.warn(ex);
+            logger.catching(Level.WARN, ex);
             PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
                     Messages.getString("PrintAgent.notify_print_fail") + "\n\n"
                     + Messages.getString("PrintAgent.title") + title,
@@ -698,30 +697,35 @@ public class Protocol extends Connection {
                 pd.showDialog(filename, desc, temp);
             }
         } catch (IOException ex) {
-            logger.warn(ex);
+            logger.catching(Level.WARN, ex);
         }
     }
 
-    private synchronized void sendPing() throws IOException, JSONException {
+    private synchronized void sendPing() throws IOException {
         if (!isReceiving) {
             // for orca 4.8
             if (serverVersion >= 14900) {
-                this.startReceiving();
-                this.sendPacketClass(PacketClass.ListDownloads);
-                JSONObject obj = new JSONObject(this.receiveString());
-                if (obj.has("result")) {
-                    JSONArray array = obj.getJSONArray("result");
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject child = array.getJSONObject(i);
-                        String type = child.getString("type");
-                        if (type.startsWith("report")) {
-                            printReport(child);
-                        } else {
-                            downloadFile(child);
+                try {
+                    this.startReceiving();
+                    this.sendPacketClass(PacketClass.ListDownloads);
+                    String jsonStr = this.receiveString();
+                    JSONObject obj = new JSONObject(jsonStr);
+                    if (obj.has("result")) {
+                        JSONArray array = obj.getJSONArray("result");
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject child = array.getJSONObject(i);
+                            String type = child.getString("type");
+                            if (type.startsWith("report")) {
+                                printReport(child);
+                            } else {
+                                downloadFile(child);
+                            }
                         }
                     }
+                    this.stopReceiving();
+                } catch (JSONException ex) {
+                    logger.catching(Level.WARN, ex);
                 }
-                this.stopReceiving();
             }
             // for orca 4.7
             if (serverVersion >= 14700) {
@@ -886,6 +890,11 @@ public class Protocol extends Connection {
 
     synchronized void exit() {
         isReceiving = true;
+        try {
+            sendPacketClass(PacketClass.END);
+        } catch (IOException ex) {
+            logger.catching(Level.WARN, ex);
+        }
         client.exitSystem();
     }
 
