@@ -836,7 +836,7 @@ public class Protocol extends Connection {
             try {
                 node.addChangedWidget(widget.getName(), widget);
             } catch (IllegalArgumentException e) {
-                logger.warn(e);
+                logger.catching(Level.WARN,e);
             }
         }
         logger.exit();
@@ -849,7 +849,7 @@ public class Protocol extends Connection {
             try {
                 node.addChangedWidget(widget.getName(), widget);
             } catch (IllegalArgumentException e) {
-                logger.warn(e);
+                logger.catching(Level.WARN,e);
             }
         }
         logger.exit();
@@ -862,7 +862,7 @@ public class Protocol extends Connection {
             try {
                 node.addAlwaysSendWidget(widget.getName(), widget);
             } catch (IllegalArgumentException e) {
-                logger.warn(e);
+                logger.catching(Level.WARN,e);
             }
         }
         logger.exit();

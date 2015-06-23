@@ -32,8 +32,8 @@ import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.net.ssl.SSLSocketFactory;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsia.Style;
@@ -208,7 +208,7 @@ public class Client implements Runnable {
                 }
             }
         } catch (Exception e) {
-            logger.warn(e);
+            logger.catching(Level.WARN,e);
         } finally {
             logger.info("disconnect {}@{}:{} {}", user, host, port, this);
             System.exit(0);
@@ -225,7 +225,7 @@ public class Client implements Runnable {
             super.finalize();
             exitSystem();
         } catch (Throwable ex) {
-            java.util.logging.Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            logger.catching(Level.WARN,ex);
         }
     }
 }

@@ -18,6 +18,7 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PDFPrint.PDFPrintPage;
@@ -102,9 +103,9 @@ public class PDFPrint extends Thread {
             }
             pjob.print(reqset);
         } catch (PrinterException ex) {
-            logger.warn(ex);
+            logger.catching(Level.WARN,ex);
         } catch (java.io.IOException ex) {
-            logger.warn(ex);
+            logger.catching(Level.WARN,ex);
         }
     }
 

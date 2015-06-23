@@ -360,7 +360,7 @@ public class Launcher {
             //t.start();
             //t.join();
         } catch (Exception e) {
-            logger.catching(e);
+            logger.catching(Level.WARN,e);
             ExceptionDialog.showExceptionDialog(e);
             client.exitSystem();
         }
