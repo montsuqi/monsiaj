@@ -162,7 +162,7 @@ public class Client {
                 uiControl.putNode(windowName, node);
                 long t4 = System.currentTimeMillis();
                 if (System.getProperty("monsia.do_profile") != null) {
-                    logger.info("getScreenDefine:" + (t2 - t1) + "ms newNode[" + windowName + "]:" + (t3 - t2) + "ms putNode:"+(t4-t3)+"ms");
+                    logger.info("getScreenDefine:" + (t2 - t1) + "ms newNode[" + windowName + "]:" + (t3 - t2) + "ms putNode:" + (t4 - t3) + "ms");
                 }
             }
             logger.debug("window[" + windowName + "] put_type[" + putType + "]");
@@ -181,15 +181,15 @@ public class Client {
             JSONObject w = windows.getJSONObject(i);
             JSONObject screenData = w.getJSONObject("screen_data");
             String putType = w.getString("put_type");
-            String windowName = w.getString("window");           
-            JSONObject tmpl = (JSONObject)uiControl.getScreenTemplate(windowName);
+            String windowName = w.getString("window");
+            JSONObject tmpl = (JSONObject) uiControl.getScreenTemplate(windowName);
             if (tmpl == null) {
                 if (screenData.length() > 0) {
                     uiControl.addScreenTemplate(windowName, screenData);
                     tmpl = screenData;
                 }
             } else {
-                uiControl.updateScreenTemplate(tmpl,screenData);
+                uiControl.updateScreenTemplate(tmpl, screenData);
             }
             if (putType.matches("new") || putType.matches("current")) {
                 Node node = uiControl.getNode(windowName);
@@ -202,7 +202,7 @@ public class Client {
                     logger.info("setWidget:" + (t2 - t1) + "ms showWindow:" + (t3 - t2) + "ms");
                 }
             }
-        }      
+        }
         uiControl.setFocus(focusedWindow, focusedWidget);
 
     }
@@ -210,7 +210,7 @@ public class Client {
     public void sendEvent(String windowName, String widgetName, String event) {
         try {
             JSONObject tmpl = null;
-            tmpl = (JSONObject)uiControl.getScreenTemplate(windowName);
+            tmpl = (JSONObject) uiControl.getScreenTemplate(windowName);
             if (tmpl != null) {
                 Node node = uiControl.getNode(windowName);
                 if (node == null) {
@@ -311,7 +311,7 @@ public class Client {
             if (System.getProperty("monsia.printreport.showdialog") != null) {
                 showdialog = true;
             }
-            
+
             try {
                 File temp = TempFile.createTempFile("report", "pdf");
                 temp.deleteOnExit();
@@ -334,7 +334,7 @@ public class Client {
                     }
                 }
             } catch (IOException ex) {
-                logger.warn(ex, ex);
+                logger.catching(Level.WARN, ex);
                 PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
                         Messages.getString("PrintReport.notify_print_fail") + "\n\n"
                         + Messages.getString("PrintReport.printer") + printer + "\n"
@@ -342,7 +342,7 @@ public class Client {
                         GtkStockIcon.get("gtk-dialog-error"), 0);
             }
         } catch (JSONException ex) {
-            logger.warn(ex, ex);
+            logger.catching(Level.WARN, ex);
         }
     }
 
@@ -372,7 +372,7 @@ public class Client {
                 PandaDownload pd = new PandaDownload();
                 pd.showDialog(filename, desc, temp);
             } catch (IOException ex) {
-                logger.warn(ex, ex);
+                logger.catching(Level.WARN, ex);
                 PopupNotify.popup(Messages.getString("DownloadFile.notify_summary"),
                         Messages.getString("DownloadFile.fail") + "\n\n"
                         + Messages.getString("DownloadFile.filename") + filename + "\n"
@@ -380,7 +380,7 @@ public class Client {
                         GtkStockIcon.get("gtk-dialog-error"), 0);
             }
         } catch (JSONException ex) {
-            logger.warn(ex, ex);
+            logger.catching(Level.WARN, ex);
         }
     }
 
