@@ -34,6 +34,9 @@ import java.net.URL;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.ExtensionFileFilter;
 import org.montsuqi.util.PDFPrint;
 
@@ -44,6 +47,7 @@ import org.montsuqi.util.PDFPrint;
  */
 public class PandaPreview extends JPanel {
 
+    static final Logger logger = LogManager.getLogger(PandaPreview.class);
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     class HandScrollListener extends MouseInputAdapter {
@@ -122,12 +126,12 @@ public class PandaPreview extends JPanel {
     private final class NextAction extends AbstractAction {
 
         NextAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.next")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.next"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description"));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -143,12 +147,12 @@ public class PandaPreview extends JPanel {
     private final class PrevAction extends AbstractAction {
 
         PrevAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.prev")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.prev"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description"));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -164,12 +168,12 @@ public class PandaPreview extends JPanel {
     private final class SaveAction extends AbstractAction {
 
         SaveAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.save")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.save"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description"));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -205,12 +209,12 @@ public class PandaPreview extends JPanel {
     private final class PrintAction extends AbstractAction {
 
         PrintAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png"); 
+            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
-            putValue(Action.NAME, Messages.getString("PandaPreview.print")); 
-            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description")); 
+            putValue(Action.NAME, Messages.getString("PandaPreview.print"));
+            putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.print_short_description"));
         }
 
         @Override
@@ -346,7 +350,7 @@ public class PandaPreview extends JPanel {
         scroll.getViewport().addMouseListener(hsl);
         add(scroll, BorderLayout.CENTER);
 
-        zoom = Double.parseDouble(prefs.get("zoom",SCALE_FIT_PAGE_WIDTH_STR));
+        zoom = Double.parseDouble(prefs.get("zoom", SCALE_FIT_PAGE_WIDTH_STR));
         this.updateCombo();
 
         ActionMap actionMap = getActionMap();
@@ -374,7 +378,7 @@ public class PandaPreview extends JPanel {
         inputMap.put(KeyStroke.getKeyStroke("shift F8"), "zoomIn");
     }
 
-    public void load(String fileName) throws IOException {
+    public void load(String fileName) {
         try {
             this.fileName = fileName;
             panel.clear();
@@ -384,9 +388,7 @@ public class PandaPreview extends JPanel {
             pageEntry.setValue(1);
             this.setScale();
         } catch (Exception ex) {
-            if (!ex.getMessage().contains("This may not be a PDF File")) {
-                System.out.println(ex);
-            }
+            logger.catching(Level.WARN, ex);
         }
     }
 
@@ -456,7 +458,7 @@ public class PandaPreview extends JPanel {
     }
 
     private void setScale() {
-        prefs.put("zoom",Double.toString(zoom));
+        prefs.put("zoom", Double.toString(zoom));
         panel.setScale(getRealZoom());
     }
 

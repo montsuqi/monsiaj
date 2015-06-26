@@ -705,9 +705,9 @@ public class Protocol extends Connection {
         if (!isReceiving) {
             // for orca 4.8
             if (serverVersion >= 14900) {
+                this.startReceiving();
+                this.sendPacketClass(PacketClass.ListDownloads);
                 try {
-                    this.startReceiving();
-                    this.sendPacketClass(PacketClass.ListDownloads);
                     String jsonStr = this.receiveString();
                     JSONObject obj = new JSONObject(jsonStr);
                     if (obj.has("result")) {
@@ -722,9 +722,10 @@ public class Protocol extends Connection {
                             }
                         }
                     }
-                    this.stopReceiving();
                 } catch (JSONException ex) {
                     logger.catching(Level.WARN, ex);
+                } finally {
+                    this.stopReceiving();
                 }
             }
             // for orca 4.7
@@ -836,7 +837,7 @@ public class Protocol extends Connection {
             try {
                 node.addChangedWidget(widget.getName(), widget);
             } catch (IllegalArgumentException e) {
-                logger.catching(Level.WARN,e);
+                logger.catching(Level.WARN, e);
             }
         }
         logger.exit();
@@ -849,7 +850,7 @@ public class Protocol extends Connection {
             try {
                 node.addChangedWidget(widget.getName(), widget);
             } catch (IllegalArgumentException e) {
-                logger.catching(Level.WARN,e);
+                logger.catching(Level.WARN, e);
             }
         }
         logger.exit();
@@ -862,7 +863,7 @@ public class Protocol extends Connection {
             try {
                 node.addAlwaysSendWidget(widget.getName(), widget);
             } catch (IllegalArgumentException e) {
-                logger.catching(Level.WARN,e);
+                logger.catching(Level.WARN, e);
             }
         }
         logger.exit();
