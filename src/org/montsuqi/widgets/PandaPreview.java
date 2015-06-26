@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.ExtensionFileFilter;
@@ -46,8 +47,7 @@ import org.montsuqi.util.PDFPrint;
  */
 public class PandaPreview extends JPanel {
 
-    private static final Logger logger = LogManager.getLogger(PandaPreview.class);
-
+    static final Logger logger = LogManager.getLogger(PandaPreview.class);
     private final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
     class HandScrollListener extends MouseInputAdapter {
@@ -203,8 +203,7 @@ public class PandaPreview extends JPanel {
                         }
                     }
                     out.close();
-                } catch (Exception ex) {
-                    logger.warn(ex,ex);
+                } catch (IOException ex) {
                     System.out.println(ex);
                 }
             }
@@ -383,7 +382,7 @@ public class PandaPreview extends JPanel {
         inputMap.put(KeyStroke.getKeyStroke("shift F8"), "zoomIn");
     }
 
-    public void load(String fileName) throws IOException {
+    public void load(String fileName) {
         try {
             this.fileName = fileName;
             panel.clear();
@@ -393,7 +392,7 @@ public class PandaPreview extends JPanel {
             pageEntry.setValue(1);
             this.setScale();
         } catch (Exception ex) {
-            logger.warn(ex,ex);
+            logger.catching(Level.WARN, ex);
         }
     }
 
@@ -473,8 +472,9 @@ public class PandaPreview extends JPanel {
         PandaPreview preview = new PandaPreview();
         f.add(preview);
         f.setVisible(true);
-        File file = new File(args[0]);
-        preview.load(file.getAbsolutePath());
+        JFileChooser chooser = new JFileChooser();
+        chooser.showOpenDialog(preview);
+        preview.load(chooser.getSelectedFile().getAbsolutePath());
         preview.revalidate();
         preview.repaint();
         f.pack();

@@ -33,7 +33,6 @@ import javax.swing.*;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * <
@@ -42,8 +41,8 @@ import org.apache.logging.log4j.Logger;
  */
 class PDFPanel extends JPanel {
 
-    private static final Logger logger = LogManager.getLogger(PDFPanel.class);
-
+    static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PDFPanel.class);    
+    
     private PDFFile pdffile;
     private PDFPage page;
     private int pagenum;
@@ -64,23 +63,23 @@ class PDFPanel extends JPanel {
         scale = 1.0;
     }
 
-    public void load(String fileName) throws IOException {
+    public void load(String fileName) {
         load(new File(fileName));
     }
 
-    public void load(File file) throws IOException {
-        page = null;
-        pagenum = 1;
-        RandomAccessFile raf = new RandomAccessFile(file, "r");
-        FileChannel channel = raf.getChannel();
-        ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
-                0, channel.size());
-        pdffile = new PDFFile(buf);
-        page = pdffile.getPage(pagenum);
+    public void load(File file) {
         try {
+            page = null;
+            pagenum = 1;
+            RandomAccessFile raf = new RandomAccessFile(file, "r");
+            FileChannel channel = raf.getChannel();
+            ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+            pdffile = new PDFFile(buf);
+            page = pdffile.getPage(pagenum);
             page.waitForFinish();
         } catch (Exception ex) {
-            logger.warn(ex, ex);
+            /* catch illegalArgumentException */
+            logger.catching(org.apache.logging.log4j.Level.WARN, ex);
         }
         showPage();
     }
@@ -97,7 +96,7 @@ class PDFPanel extends JPanel {
         try {
             page.waitForFinish();
         } catch (Exception ex) {
-            logger.warn(ex, ex);
+            logger.catching(org.apache.logging.log4j.Level.WARN, ex);            
         }
         showPage();
     }
