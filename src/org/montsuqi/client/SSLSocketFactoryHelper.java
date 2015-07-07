@@ -28,11 +28,19 @@ import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.*;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.net.ssl.*;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.x500.X500Principal;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -43,9 +51,83 @@ import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
 
 public class SSLSocketFactoryHelper {
+    
+    static {
+        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+                new javax.net.ssl.HostnameVerifier() {
 
-    private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
+                    @Override
+                    public boolean verify(String hostname,javax.net.ssl.SSLSession sslSession) {
+                        try {
+                            SSLSocketFactoryHelper.validatePeerCertificates(sslSession.getPeerCertificates(), hostname);
+                        } catch (SSLException ex) {
+                            java.util.logging.Logger.getLogger(SSLSocketFactoryHelper.class.getName()).log(Level.SEVERE, null, ex);
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+        );
+    }
 
+    private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class
+    );
+
+    private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
+        final Certificate serverCertificate = certificates[0];
+        if (serverCertificate instanceof X509Certificate) {
+            checkHostNameInCertificate((X509Certificate) serverCertificate, host);
+        } else {
+            System.out.println("Server Certificate is not a X.509 Certificate");
+        }
+    }
+
+    private static void checkHostNameInCertificate(final X509Certificate certificate, final String host) throws SSLPeerUnverifiedException {
+        // no check against these hostnames.
+        if ("localhost".equalsIgnoreCase(host) // $NON-NLS-1$
+                || "127.0.0.1".equals(host) // $NON-NLS-1$
+                || "::1".equals(host)) { // $NON-NLS-1$
+            return;
+        }
+        // check subjectAlternativeNames first.
+        try {
+            final Collection subjectAlternativeNames = certificate.getSubjectAlternativeNames();
+            if (subjectAlternativeNames == null) {
+                System.out.println("Server certificate does not have subjectAlternativeNames.");
+            } else {
+                final Iterator i = subjectAlternativeNames.iterator();
+                while (i.hasNext()) {
+                    final List alternativeName = (List) i.next();
+                    final Integer type = (Integer) alternativeName.get(0);
+                    if (type.intValue() == 2) { // dNSName == 2. Symbolic names not defined :/
+                        final String value = (String) alternativeName.get(1);
+                        if (value.equalsIgnoreCase(host)) {
+                            System.out.println("One of subjectAlternativeNames matches.");
+                            return;
+                        }
+                    }
+                }
+            }
+        } catch (CertificateParsingException e) {
+            final String message = e.getMessage();
+            final SSLPeerUnverifiedException sslpue = new SSLPeerUnverifiedException(message);
+            sslpue.initCause(e);
+            throw sslpue;
+        }
+        // If the flow comes here, check commonName then.
+        final X500Principal principal = certificate.getSubjectX500Principal();
+        final String name = principal.getName();
+        final Pattern pattern = Pattern.compile("CN\\s*=\\s*([^;,\\s]+)", Pattern.CASE_INSENSITIVE);
+        final Matcher matcher = pattern.matcher(name);
+        if (!matcher.find() || !matcher.group(1).equalsIgnoreCase(host)) {
+            final String format = Messages.getString("Client.hostname_mismatch_format");
+            final Object[] args = new Object[]{matcher.group(1), host};
+            final String message = MessageFormat.format(format, args);
+            throw new SSLPeerUnverifiedException(message);
+        }
+        System.out.println("CN matches.");
+    }
+    
     public static SSLSocketFactory getFactory(String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
@@ -157,9 +239,9 @@ public class SSLSocketFactoryHelper {
                         if (resp == JOptionPane.OK_OPTION) {
                             pcb.setPassword(pf.getPassword());
                             if (check.isSelected()) {
-                                setPIN(new String(pf.getPassword()),true);
+                                setPIN(new String(pf.getPassword()), true);
                             } else {
-                                setPIN("",false);
+                                setPIN("", false);
                             }
                         }
                     }

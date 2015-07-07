@@ -77,6 +77,7 @@ public class ConfigViewer {
 
         Button newButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.new")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
                 editConfig(f, num, true);
@@ -87,6 +88,7 @@ public class ConfigViewer {
 
         Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
@@ -100,6 +102,7 @@ public class ConfigViewer {
 
         Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
@@ -117,6 +120,7 @@ public class ConfigViewer {
 
         Button closeButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.close")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
             }
@@ -208,6 +212,7 @@ public class ConfigViewer {
 
         Button editOKButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_ok")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String entryName = configNameEntry.getText();
                 configPanel.saveConfig(num, entryName);
@@ -219,6 +224,7 @@ public class ConfigViewer {
 
         Button editCancelButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit_cancel")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
             }

@@ -89,12 +89,12 @@ public class Client {
         logger.info("try connect " + authURI);
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
-                protocol = new Protocol(authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num), "dummy");
+                protocol = new Protocol(Protocol.TYPE_PKCS11,authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
             } else {
-                protocol = new Protocol(authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
+                protocol = new Protocol(Protocol.TYPE_CERT_FILE,authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
             }
         } else {
-            protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num));
+            protocol = new Protocol(Protocol.TYPE_USER_PASSWORD,authURI, conf.getCACertificateFile(num), conf.getUser(num), conf.getPassword(num));
             if (!this.conf.getSavePassword(num)) {
                 this.conf.setPassword(num, "");
                 this.conf.save();

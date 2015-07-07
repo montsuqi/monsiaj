@@ -23,13 +23,13 @@ import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PDFPrint.PDFPrintPage;
 
 public class PDFPrint extends Thread {
-
+    
     private final File file;
     private String printer;
     private boolean showDialog;
 
     protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
-
+    
     public PDFPrint(File file, boolean showDialog) {
         this.file = file;
         this.showDialog = showDialog;

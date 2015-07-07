@@ -303,7 +303,6 @@ public class ConfigPanel extends JPanel {
         propertiesText.setText(systemProperties);
 
         this.updatePKCS11PanelComponentsEnabled();
-        this.updateSSLPanelComponentsEnabled();
     }
 
     protected void saveConfig(int num, String desc) {
@@ -449,16 +448,9 @@ public class ConfigPanel extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         useSSLCheckbox = new JCheckBox();
-        useSSLCheckbox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSSLPanelComponentsEnabled();
-            }
-        });
         caCertificateEntry = createTextField();
         caCertificateButton = new JButton();
-        caCertificateButton.setAction(new FileSelectionAction(caCertificateEntry, ".pem", caCertificateDescription));
+        caCertificateButton.setAction(new FileSelectionAction(caCertificateEntry,".crt", caCertificateDescription));
         clientCertificateEntry = createTextField();
         clientCertificateButton = new JButton();
         clientCertificateButton.setAction(new FileSelectionAction(clientCertificateEntry, ".p12", clientCertificateDescription));
@@ -479,7 +471,7 @@ public class ConfigPanel extends JPanel {
         pkcs11SlotEntry = createTextField();
 
         y = 0;
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl")),
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl_client_verification")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(useSSLCheckbox,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));

@@ -63,28 +63,38 @@ public class Protocol {
     private final SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
 
-    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
-        rpcId = 1;
-        sslSocketFactory = null;
-        this.authURI = authURI;
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, pass.toCharArray());
-            }
-        });
-    }
+    public static final int TYPE_USER_PASSWORD = 1;
+    public static final int TYPE_CERT_FILE = 2;
+    public static final int TYPE_PKCS11 = 3;
 
-    public Protocol(String authURI, String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
+    public Protocol(int type, String authURI, final String s1, final String s2, final String s3) throws IOException, GeneralSecurityException {
         rpcId = 1;
         this.authURI = authURI;
-        sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, p12File, p12Pass);
-    }
-
-    public Protocol(String authURI, String caCert, String p11Lib, String p11Slot, String dummy) throws IOException, GeneralSecurityException {
-        rpcId = 1;
-        this.authURI = authURI;
-        sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
+        switch (type) {
+            case TYPE_USER_PASSWORD:
+                if (!s1.isEmpty()) {
+                    sslSocketFactory = SSLSocketFactoryHelper.getFactory(s1, "", "");
+                } else {
+                    sslSocketFactory = null;
+                }
+                this.authURI = authURI;
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(s2, s3.toCharArray());
+                    }
+                });
+                break;
+            case TYPE_CERT_FILE:
+                sslSocketFactory = SSLSocketFactoryHelper.getFactory(s1, s2, s3);
+                break;
+            case TYPE_PKCS11:
+                sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(s1, s2, s3);
+                break;
+            default:
+                sslSocketFactory = null;
+                break;
+        }
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
@@ -143,7 +153,7 @@ public class Protocol {
         String reqStr = makeJSONRPCRequest(method, params);
         logger.debug("---- JSONRPC request");
         logger.debug(reqStr);
-        logger.debug("----");      
+        logger.debug("----");
         HttpURLConnection con = getHttpURLConnection(url);
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -181,7 +191,7 @@ public class Protocol {
             String resStr = bytes.toString("UTF-8");
             logger.debug("---- JSONRPC response");
             logger.debug(resStr);
-            logger.debug("----");      
+            logger.debug("----");
             result = checkJSONRPCResponse(resStr);
         }
         return result;
