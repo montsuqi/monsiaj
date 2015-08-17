@@ -71,44 +71,48 @@ import org.montsuqi.util.SystemEnvironment;
 
 public class ConfigPanel extends JPanel {
 
-    protected static final Logger logger = LogManager.getLogger(ConfigPanel.class);
-    protected Config conf;
-    protected JPanel basicPanel;
-    protected JPanel sslPanel;
-    protected JPanel othersPanel;
-    protected JPanel infoPanel;
+    private static final Logger logger = LogManager.getLogger(ConfigPanel.class);
+    private final Config conf;
+
     // Basic Tab
-    protected JTextField userEntry;
-    protected JPasswordField passwordEntry;
-    protected JCheckBox savePasswordCheckbox;
-    protected JTextField authURIEntry;
+    private final JPanel basicPanel;
+    private JTextField userEntry;
+    private JPasswordField passwordEntry;
+    private JCheckBox savePasswordCheckbox;
+    private JTextField authURIEntry;
     // SSL Tab
-    protected JCheckBox useSSLCheckbox;
-    protected JButton caCertificateButton;
-    protected JTextField caCertificateEntry;
-    protected JButton clientCertificateButton;
-    protected JTextField clientCertificateEntry;
-    protected JPasswordField exportPasswordEntry;
-    protected JCheckBox saveClientCertificatePasswordCheckbox;
-    protected JCheckBox usePKCS11Checkbox;
-    protected JButton pkcs11LibButton;
-    protected JTextField pkcs11LibEntry;
-    protected JTextField pkcs11SlotEntry;
+    private final JPanel sslPanel;
+    private JCheckBox useSSLCheckbox;
+    private JButton caCertificateButton;
+    private JTextField caCertificateEntry;
+    private JButton clientCertificateButton;
+    private JTextField clientCertificateEntry;
+    private JPasswordField exportPasswordEntry;
+    private JCheckBox saveClientCertificatePasswordCheckbox;
+    private JCheckBox usePKCS11Checkbox;
+    private JButton pkcs11LibButton;
+    private JTextField pkcs11LibEntry;
+    private JTextField pkcs11SlotEntry;
+    // Print Tab
+    private final PrinterConfigPanel printerConfigPanel;
     // Others Tab
-    protected JTextField styleEntry;
-    protected JComboBox<String> lookAndFeelCombo;
-    protected JTextField lafThemeEntry;
-    protected JButton lafThemeButton;
-    protected JCheckBox useTimerCheck;
-    protected JTextField timerPeriodEntry;
-    protected JTextArea propertiesText;
-    protected LookAndFeelInfo[] lafs;
+    private final JPanel othersPanel;
+    private JTextField styleEntry;
+    private JComboBox<String> lookAndFeelCombo;
+    private JTextField lafThemeEntry;
+    private JButton lafThemeButton;
+    private JCheckBox useTimerCheck;
+    private JTextField timerPeriodEntry;
+    private JTextArea propertiesText;
+    private LookAndFeelInfo[] lafs;
     private static final int MAX_PANEL_ROWS = 12;
     private static final int MAX_PANEL_COLUMNS = 4;
     private final boolean doPadding;
     private final boolean doChangeLookAndFeel;
     private final MetalTheme systemMetalTheme;
-
+    // Info Tab
+    protected JPanel infoPanel;
+  
     /**
      * <p>
      * An action to pop a fiel selection dialog.</p>
@@ -246,6 +250,7 @@ public class ConfigPanel extends JPanel {
         this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
         basicPanel = createBasicPanel();
         sslPanel = createSSLPanel();
+        printerConfigPanel = new PrinterConfigPanel(conf.getPrinterList());        
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
     }
@@ -282,6 +287,9 @@ public class ConfigPanel extends JPanel {
         usePKCS11Checkbox.setSelected(usePKCS11);
         pkcs11LibEntry.setText(pkcs11Lib);
         pkcs11SlotEntry.setText(slot);
+        
+        // Printer tab
+        printerConfigPanel.setPrinterConfigMap(conf.getPrinterConfig(num));
 
         // Others tab
         String styleFile = conf.getStyleFile(num);
@@ -328,6 +336,9 @@ public class ConfigPanel extends JPanel {
         conf.setUsePKCS11(num, usePKCS11Checkbox.isSelected());
         conf.setPKCS11Lib(num, pkcs11LibEntry.getText());
         conf.setPKCS11Slot(num, pkcs11SlotEntry.getText());
+        
+        // Printer Tab
+        conf.setPrinterConfig(num, printerConfigPanel.getPrinterConfigMap());
 
         // Others Tab
         conf.setStyleFile(num, styleEntry.getText());
@@ -412,13 +423,13 @@ public class ConfigPanel extends JPanel {
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
-                panel.add(new JLabel(" "),createConstraints(0, i, MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
+                panel.add(new JLabel(" "), createConstraints(0, i, MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
             }
         }
         return panel;
     }
 
-    private void updateSSLPanelComponentsEnabled() {  
+    private void updateSSLPanelComponentsEnabled() {
         final boolean useSsl = useSSLCheckbox.isSelected();
         clientCertificateEntry.setEnabled(useSsl);
         clientCertificateButton.setEnabled(useSsl);
@@ -450,7 +461,7 @@ public class ConfigPanel extends JPanel {
         useSSLCheckbox = new JCheckBox();
         caCertificateEntry = createTextField();
         caCertificateButton = new JButton();
-        caCertificateButton.setAction(new FileSelectionAction(caCertificateEntry,".crt", caCertificateDescription));
+        caCertificateButton.setAction(new FileSelectionAction(caCertificateEntry, ".crt", caCertificateDescription));
         clientCertificateEntry = createTextField();
         clientCertificateButton = new JButton();
         clientCertificateButton.setAction(new FileSelectionAction(clientCertificateEntry, ".p12", clientCertificateDescription));
@@ -748,6 +759,10 @@ public class ConfigPanel extends JPanel {
 
     public JPanel getSSLPanel() {
         return sslPanel;
+    }
+    
+    public PrinterConfigPanel getPrinterConfigPanel() {
+        return printerConfigPanel;
     }
 
     public JPanel getOthersPanel() {

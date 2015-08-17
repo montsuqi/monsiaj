@@ -199,6 +199,7 @@ public class Launcher {
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel());
         tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.printer_config_tab_label"), configPanel.getPrinterConfigPanel());        
         tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel());
         tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel());
 

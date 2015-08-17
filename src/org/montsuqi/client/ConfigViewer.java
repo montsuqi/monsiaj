@@ -183,6 +183,7 @@ public class ConfigViewer {
 
         JPanel basicPanel = configPanel.getBasicPanel();
         JPanel sslPanel = configPanel.getSSLPanel();
+        PrinterConfigPanel printerConfigPanel = configPanel.getPrinterConfigPanel();
         JPanel othersPanel = configPanel.getOthersPanel();
 
         Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, (Color) SystemColor.controlDkShadow);
@@ -192,7 +193,9 @@ public class ConfigViewer {
         sslPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
                         Messages.getString("ConfigurationPanel.ssl_tab_label")));
-
+        printerConfigPanel.setBorder(
+                BorderFactory.createTitledBorder(border,
+                        Messages.getString("ConfigurationPanel.printer_config_tab_label")));        
         othersPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
                         Messages.getString("ConfigurationPanel.others_tab_label")));
@@ -201,7 +204,8 @@ public class ConfigViewer {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(configNamePanel);
         mainPanel.add(basicPanel);
-        mainPanel.add(sslPanel);        
+        mainPanel.add(sslPanel);
+        mainPanel.add(printerConfigPanel);
         mainPanel.add(othersPanel);
         container.add(mainPanel, BorderLayout.CENTER);
 
@@ -231,7 +235,7 @@ public class ConfigViewer {
         });
         bar.add(editCancelButton);
 
-        f.setSize(480, 700);
+        f.setSize(480, 900);
         f.setVisible(true);
 
         f.setLocationRelativeTo(null);
