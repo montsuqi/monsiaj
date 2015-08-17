@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,6 +44,10 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +68,48 @@ public class ConfigViewer {
         container.setLayout(new BorderLayout(5, 5));
         final JTable table = new JTable();
         table.setRowSelectionAllowed(true);
-        updateConfigList(table);
+
+        DefaultCellEditor ce = (DefaultCellEditor) table.getDefaultEditor(Object.class);
+        ce.addCellEditorListener(new CellEditorListener() {
+            @Override
+            public void editingStopped(ChangeEvent e) {
+                int row = table.getSelectedRow();
+                int col = table.getSelectedColumn();
+                if (row != -1 && col == 0) {
+                    int num = (int) table.getValueAt(row, 3);
+                    String configName = (String) (table.getValueAt(row, col));
+                    conf.setDescription(num, configName);
+                }
+            }
+
+            @Override
+            public void editingCanceled(ChangeEvent e) {
+            }
+        });
+
+        java.util.List<Integer> list = conf.getList();
+        final String[] ColumnNames = {
+            Messages.getString("ConfigurationViewer.config_name"),
+            Messages.getString("ConfigurationViewer.authuri"),
+            Messages.getString("ConfigurationViewer.user"),
+            Messages.getString("ConfigurationViewer.num")
+        };
+        Object[][] tableData = new Object[list.size()][4];
+        int j = 0;
+        for (int i : list) {
+            tableData[j][0] = conf.getDescription(i);
+            tableData[j][1] = conf.getAuthURI(i);
+            tableData[j][2] = conf.getUser(i);
+            tableData[j][3] = i;
+            j++;
+        }
+        DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 0;
+            }
+        };
+        table.setModel(model);
 
         JScrollPane scroll = new JScrollPane(table,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -80,38 +126,33 @@ public class ConfigViewer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int num = conf.getNext();
-                editConfig(f, num, true);
+                conf.setDescription(num, "server" + num);
+                conf.save();
                 updateConfigList(table);
+                int selectedRow = 0;
+                for(int i=0;i<table.getRowCount();i++){
+                    if (num == (int)table.getValueAt(i, 3)) {
+                        selectedRow = i;
+                    }
+                }
+                table.changeSelection(selectedRow, 0, false, false);
             }
         });
         bar.add(newButton);
-
-        Button editButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.edit")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow >= 0) {
-                    int num = conf.getList().get(selectedRow);
-                    editConfig(f, num, false);
-                    updateConfigList(table);
-                }
-            }
-        });
-        bar.add(editButton);
 
         Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow >= 0) {
+                int row = table.getSelectedRow();
+                if (row >= 0) {
                     int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
-                        String configName = (String) (table.getValueAt(selectedRow, 0));
-                        conf.deleteConfig(conf.getConfigByDescription(configName));
+                        int num = (int) table.getValueAt(row, 3);
+                        String name = (String)table.getValueAt(row, 0);
+                        conf.deleteConfig(num);
                         updateConfigList(table);
-                        logger.info("server config:" + configName + " deleted");
+                        logger.info("server name:" + name + " num:" + num + " deleted");
                     }
                 }
             }
@@ -134,29 +175,18 @@ public class ConfigViewer {
     }
 
     private void updateConfigList(JTable table) {
-        final String[] ColumnNames = {
-            Messages.getString("ConfigurationViewer.config_name"),
-            Messages.getString("ConfigurationViewer.authuri"),
-            Messages.getString("ConfigurationViewer.user")
-        };
-
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
         java.util.List<Integer> list = conf.getList();
-        Object[][] tableData = new Object[list.size()][ColumnNames.length];
-        int j = 0;
+        Object[] tableData = new Object[4];
         for (int i : list) {
-            tableData[j][0] = conf.getDescription(i);
-            tableData[j][1] = conf.getAuthURI(i);
-            tableData[j][2] = conf.getUser(i);
-            j++;
+            tableData[0] = conf.getDescription(i);
+            tableData[1] = conf.getAuthURI(i);
+            tableData[2] = conf.getUser(i);
+            tableData[3] = i;
+            model.addRow(tableData);
         }
-        DefaultTableModel model = new DefaultTableModel(tableData, ColumnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        table.setModel(model);
-    }
+    }  
 
     protected ConfigPanel createConfigPanel(Config conf) {
         return new ConfigPanel(conf, false, false);
@@ -195,7 +225,7 @@ public class ConfigViewer {
                         Messages.getString("ConfigurationPanel.ssl_tab_label")));
         printerConfigPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
-                        Messages.getString("ConfigurationPanel.printer_config_tab_label")));        
+                        Messages.getString("ConfigurationPanel.printer_config_tab_label")));
         othersPanel.setBorder(
                 BorderFactory.createTitledBorder(border,
                         Messages.getString("ConfigurationPanel.others_tab_label")));

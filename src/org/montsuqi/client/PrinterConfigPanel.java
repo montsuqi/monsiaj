@@ -58,7 +58,7 @@ public class PrinterConfigPanel extends JPanel {
                     printer = p;
                     break;
                 }
-                model.addRow(new String[]{"printer", printer});
+                model.addRow(new String[]{"printer" + (table.getRowCount() + 1), printer});
             }
         });
         buttonPanel.add(button1);
@@ -83,22 +83,22 @@ public class PrinterConfigPanel extends JPanel {
     }
     
     public TreeMap<String,String> getPrinterConfigMap() {
-        TreeMap map = new TreeMap();
+        TreeMap<String,String> map = new TreeMap<>();
         for(int i = 0;i < model.getRowCount(); i++) {
-            map.put(model.getValueAt(i, 0),model.getValueAt(i, 1));
+            map.put((String)model.getValueAt(i, 0),(String)model.getValueAt(i, 1));
         }
         return map;
     }
 
     private class PrinterConfigCellEditor extends AbstractCellEditor implements TableCellEditor {
 
-        private final JComboBox combo;
+        private final JComboBox<String> combo;
         private Object value;
 
         private Component editor;
 
         public PrinterConfigCellEditor(List<String> printerList) {
-            combo = new JComboBox();
+            combo = new JComboBox<>();
             combo.removeAllItems();
             for (String printer : printerList) {
                 combo.addItem(printer);

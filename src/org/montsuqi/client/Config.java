@@ -78,7 +78,7 @@ public class Config {
     }
 
     public Config() {
-        printerConfigMap = new HashMap();
+        printerConfigMap = new HashMap<>();
         initProp();
         readProp();
     }
@@ -479,7 +479,7 @@ public class Config {
     }
 
     public Map<String, String> getPrinterConfig(int i) {
-        TreeMap<String, String> map = new TreeMap();
+        TreeMap<String, String> map = new TreeMap<>();
         String confStr = getValue(i, "printerConfig");
         String[] set = confStr.split(",");
         for (String kv : set) {
