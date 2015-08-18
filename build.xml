@@ -230,7 +230,6 @@
                 <include name="org/montsuqi/**"/>
                 <include name="**/*.png"/>
                 <include name="com/sun/pdfview/font/res/cmap/*"/>
-                <include name="jp/or/med/orca/jmareceipt/**"/>  
                 <include name="*.xml"/>
                 <exclude name="org/montsuqi/tools/**"/>                
             </fileset>
@@ -268,7 +267,7 @@
     <target name="javadoc" description="Creates Javadoc documents">
         <javadoc
             locale="en"
-            packagenames="org.montsuqi.*,jp.or.med.orca.jmareceipt.*"
+            packagenames="org.montsuqi.*"
             excludepackagenames="org.montsuqi.certman.*,org.montsuqi.tools.*,org.montsuqi.widgets.Test*"
             sourcepath="${src.dir}"
             source="1.7"
@@ -330,16 +329,6 @@
         </java>
     </target>
         
-    <target name="jmareceipt" depends="compile">
-        <java classname="jp.or.med.orca.jmareceipt.JMAReceiptLauncher">
-            <classpath>
-                <pathelement path="bin:src" />
-                <fileset dir="libs">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </classpath>
-        </java>
-    </target>
     
     <target name="monsiaj" depends="compile">
         <java classname="jp.or.med.orca.monsiaj.Loader">
