@@ -80,7 +80,7 @@ public class UIControl {
     public void updateScreenTemplate(Object tmpl, Object upd) {
         try {
             if (upd != null && tmpl.getClass() == upd.getClass()) {
-                if (tmpl instanceof JSONObject) {
+                if (tmpl instanceof JSONObject && upd instanceof JSONObject) {
                     JSONObject tmplObj = (JSONObject) tmpl;
                     JSONObject updObj = (JSONObject) upd;
                     for (Iterator i = tmplObj.keys(); i.hasNext();) {
@@ -106,13 +106,13 @@ public class UIControl {
                             }
                         }
                     }
-                } else if (tmpl instanceof JSONArray) {
+                } else if (tmpl instanceof JSONArray && upd instanceof JSONArray) {
                     JSONArray tmplArr = (JSONArray) tmpl;
                     JSONArray updArr = (JSONArray) upd;
                     for (int i = 0; i < tmplArr.length(); i++) {
                         Object c1 = tmplArr.get(i);
                         Object c2 = null;
-                        if (i <= updArr.length()) {
+                        if (i < updArr.length()) {
                             c2 = updArr.get(i);
                         }
                         if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
@@ -131,6 +131,11 @@ public class UIControl {
                             }
                         }
                     }
+                } else {
+                    System.out.println("tmpl ----");
+                    System.out.println(tmpl);
+                    System.out.println("upd ----");
+                    System.out.println(upd);                    
                 }
             } else {
                 if (tmpl instanceof JSONObject) {

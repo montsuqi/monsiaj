@@ -510,7 +510,11 @@ public class Config {
     }
     
     public PrintService getPrintService(String printer) {
-        return printerConfigMap.get(printer);
+        PrintService ps = printerConfigMap.get(printer);
+        if (ps == null) {
+            ps = printerConfigMap.get("default");
+        }
+        return ps;
     } 
 
     public void list() {

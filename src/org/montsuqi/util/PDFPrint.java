@@ -23,23 +23,20 @@ import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.PDFPrint.PDFPrintPage;
 
 public class PDFPrint extends Thread {
-    
+
     private final File file;
-    private String printer;
-    private boolean showDialog;
+    private PrintService printService;
 
     protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
-    
-    public PDFPrint(File file, boolean showDialog) {
+
+    public PDFPrint(File file) {
         this.file = file;
-        this.showDialog = showDialog;
-        this.printer = null;
+        this.printService = null;
     }
 
-    public PDFPrint(File file, String printer) {
+    public PDFPrint(File file, PrintService printService) {
         this.file = file;
-        this.showDialog = false;
-        this.printer = printer;
+        this.printService = printService;
     }
 
     @Override
@@ -55,26 +52,11 @@ public class PDFPrint extends Thread {
             PrinterJob pjob = PrinterJob.getPrinterJob();
             pjob.setJobName(file.getName());
 
-            if (System.getProperty("monsia.util.PDFPrint.force_use_default_printer") != null) {
-                showDialog = false;
-            }
-            String printer_ = System.getProperty("monsia.util.PDFPrint.printer");
-            if (printer_ != null) {
-                printer = printer_;
-                showDialog = false;
-            }            
-            if (showDialog) {
+            if (printService != null) {
+                pjob.setPrintService(printService);
+            } else {
                 if (!pjob.printDialog(reqset)) {
                     return;
-                }
-            } else {
-                if (printer != null) {
-                    PrintService[] pss = PrintServiceLookup.lookupPrintServices(null, null);
-                    for (PrintService ps : pss) {
-                        if (printer.equals(ps.getName())) {
-                            pjob.setPrintService(ps);
-                        }
-                    }
                 }
             }
 
@@ -89,7 +71,7 @@ public class PDFPrint extends Thread {
 
             book.append(pages, pf, pdfFile.getNumPages());
             pjob.setPageable(book);
-            
+
             if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
                 PrintService service = pjob.getPrintService();
                 System.out.println("PrintService:" + service);
@@ -102,12 +84,12 @@ public class PDFPrint extends Thread {
             }
             pjob.print(reqset);
         } catch (PrinterException | java.io.IOException ex) {
-            logger.warn(ex,ex);
+            logger.warn(ex, ex);
         }
     }
 
     public static void main(String args[]) throws Exception {
-        PDFPrint printer = new PDFPrint(new File(args[0]), args[1]);
+        PDFPrint printer = new PDFPrint(new File(args[0]));
         printer.start();
     }
 

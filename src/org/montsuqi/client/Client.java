@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import javax.print.PrintService;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -89,12 +90,12 @@ public class Client {
         logger.info("try connect " + authURI);
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
-                protocol = new Protocol(Protocol.TYPE_PKCS11,authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
+                protocol = new Protocol(Protocol.TYPE_PKCS11, authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
             } else {
-                protocol = new Protocol(Protocol.TYPE_CERT_FILE,authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
+                protocol = new Protocol(Protocol.TYPE_CERT_FILE, authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
             }
         } else {
-            protocol = new Protocol(Protocol.TYPE_USER_PASSWORD,authURI, conf.getCACertificateFile(num), conf.getUser(num), conf.getPassword(num));
+            protocol = new Protocol(Protocol.TYPE_USER_PASSWORD, authURI, conf.getCACertificateFile(num), conf.getUser(num), conf.getPassword(num));
             if (!this.conf.getSavePassword(num)) {
                 this.conf.setPassword(num, "");
                 this.conf.save();
@@ -325,11 +326,15 @@ public class Client {
                             + Messages.getString("PrintReport.printer") + printer + "\n\n"
                             + Messages.getString("PrintReport.title") + title,
                             GtkStockIcon.get("gtk-print"), 0);
+                    PrintService ps = null;
                     if (printer != null) {
-                        PDFPrint print = new PDFPrint(temp, printer);
+                        ps = conf.getPrintService(printer);
+                    }
+                    if (ps != null) {
+                        PDFPrint print = new PDFPrint(temp, ps);
                         print.start();
                     } else {
-                        PDFPrint print = new PDFPrint(temp, false);
+                        PDFPrint print = new PDFPrint(temp);
                         print.start();
                     }
                 }

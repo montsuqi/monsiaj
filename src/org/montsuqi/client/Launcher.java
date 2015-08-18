@@ -410,7 +410,7 @@ public class Launcher {
     }
 
     protected Icon createIcon() {
-        URL iconURL = getClass().getResource("/jp/or/med/orca/jmareceipt/standard60.png");
+        URL iconURL = getClass().getResource("/org/montsuqi/client/standard60.png");
         if (iconURL != null) {
             return new ImageIcon(iconURL);
         }
