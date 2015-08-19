@@ -334,8 +334,7 @@ public class Client {
                         PDFPrint print = new PDFPrint(temp, ps);
                         print.start();
                     } else {
-                        PDFPrint print = new PDFPrint(temp);
-                        print.start();
+                        showReportDialog(title, temp);
                     }
                 }
             } catch (IOException ex) {
