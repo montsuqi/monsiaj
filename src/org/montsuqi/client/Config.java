@@ -188,6 +188,28 @@ public class Config {
         }
     }
 
+    public int copyConfig(int num) {
+        int ret = this.getNext();
+        Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\." + num + "\\.(.*)");
+        for (Enumeration e = prop.keys(); e.hasMoreElements();) {
+            String k = (String) e.nextElement();
+            if (k.startsWith(Config.CONFIG_KEY)) {
+                Matcher m = p.matcher(k);
+                if (!m.find()) {
+                    continue;
+                }
+                String key = m.group(1);
+                String k2 = Config.CONFIG_KEY + "." + ret + "." + key;
+                String value = prop.getProperty(k);
+                if (key.equals("description")) {
+                    value = value + "_" + ret;
+                }
+                prop.setProperty(k2, value);
+            }
+        }
+        return ret;
+    }
+
     public ArrayList<Integer> getList() {
         ArrayList<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
@@ -492,30 +514,30 @@ public class Config {
         }
         return map;
     }
-    
-    public void setPrinterConfig(int i,Map<String,String> map) {
+
+    public void setPrinterConfig(int i, Map<String, String> map) {
         printerConfigMap.clear();
         String str = "";
         int j = 0;
-        for(Map.Entry<String,String> e : map.entrySet()) {
+        for (Map.Entry<String, String> e : map.entrySet()) {
             if (j == 0) {
-            str = str + e.getKey() + ":" + e.getValue();
+                str = str + e.getKey() + ":" + e.getValue();
             } else {
                 str = str + "," + e.getKey() + ":" + e.getValue();
             }
             j++;
-            printerConfigMap.put(e.getKey(),printerServiceMap.get(e.getValue()));
+            printerConfigMap.put(e.getKey(), printerServiceMap.get(e.getValue()));
         }
-        setValue(i,"printerConfig",str);
+        setValue(i, "printerConfig", str);
     }
-    
+
     public PrintService getPrintService(String printer) {
         PrintService ps = printerConfigMap.get(printer);
         if (ps == null) {
             ps = printerConfigMap.get("default");
         }
         return ps;
-    } 
+    }
 
     public void list() {
         System.out.println("----");

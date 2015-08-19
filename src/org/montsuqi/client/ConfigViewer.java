@@ -46,8 +46,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -130,8 +128,8 @@ public class ConfigViewer {
                 conf.save();
                 updateConfigList(table);
                 int selectedRow = 0;
-                for(int i=0;i<table.getRowCount();i++){
-                    if (num == (int)table.getValueAt(i, 3)) {
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    if (num == (int) table.getValueAt(i, 3)) {
                         selectedRow = i;
                     }
                 }
@@ -139,6 +137,27 @@ public class ConfigViewer {
             }
         });
         bar.add(newButton);
+
+        Button copyButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.copy")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if (row >= 0) {
+                    int num = conf.copyConfig((int) table.getValueAt(row, 3));
+                    conf.save();
+                    updateConfigList(table);
+                    int selectedRow = 0;
+                    for (int i = 0; i < table.getRowCount(); i++) {
+                        if (num == (int) table.getValueAt(i, 3)) {
+                            selectedRow = i;
+                        }
+                    }
+                    table.changeSelection(selectedRow, 0, false, false);
+                }
+            }
+        });
+        bar.add(copyButton);
 
         Button deleteButton = new Button(new AbstractAction(Messages.getString("ConfigurationViewer.delete")) {
 
@@ -149,7 +168,7 @@ public class ConfigViewer {
                     int result = JOptionPane.showConfirmDialog(f, Messages.getString("ConfigurationViewer.delete_confirm_message"), Messages.getString("ConfigurationViewer.delete_confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
                     if (result == JOptionPane.YES_OPTION) {
                         int num = (int) table.getValueAt(row, 3);
-                        String name = (String)table.getValueAt(row, 0);
+                        String name = (String) table.getValueAt(row, 0);
                         conf.deleteConfig(num);
                         updateConfigList(table);
                         logger.info("server name:" + name + " num:" + num + " deleted");
@@ -186,7 +205,7 @@ public class ConfigViewer {
             tableData[3] = i;
             model.addRow(tableData);
         }
-    }  
+    }
 
     protected ConfigPanel createConfigPanel(Config conf) {
         return new ConfigPanel(conf, false, false);

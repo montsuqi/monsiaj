@@ -14,7 +14,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
@@ -25,7 +24,7 @@ import org.montsuqi.util.PDFPrint.PDFPrintPage;
 public class PDFPrint extends Thread {
 
     private final File file;
-    private PrintService printService;
+    private final PrintService printService;
 
     protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
 
