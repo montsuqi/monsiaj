@@ -318,19 +318,20 @@ public class Client {
                 temp.deleteOnExit();
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 protocol.getBLOB(oid, out);
+                logger.info(item);
                 if (showdialog) {
                     showReportDialog(title, temp);
                 } else {
-                    PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
-                            Messages.getString("PrintReport.notify_print_start") + "\n\n"
-                            + Messages.getString("PrintReport.printer") + printer + "\n\n"
-                            + Messages.getString("PrintReport.title") + title,
-                            GtkStockIcon.get("gtk-print"), 0);
                     PrintService ps = null;
                     if (printer != null) {
                         ps = conf.getPrintService(printer);
                     }
                     if (ps != null) {
+                        PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
+                                Messages.getString("PrintReport.notify_print_start") + "\n\n"
+                                + Messages.getString("PrintReport.printer") + printer + "\n\n"
+                                + Messages.getString("PrintReport.title") + title,
+                                GtkStockIcon.get("gtk-print"), 0);
                         PDFPrint print = new PDFPrint(temp, ps);
                         print.start();
                     } else {

@@ -58,7 +58,7 @@ public class PrinterConfigPanel extends JPanel {
                     printer = p;
                     break;
                 }
-                model.addRow(new String[]{"printer" + (table.getRowCount() + 1), printer});
+                model.addRow(new String[]{"printer",printer});
             }
         });
         buttonPanel.add(button1);
