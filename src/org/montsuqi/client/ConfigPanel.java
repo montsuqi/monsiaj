@@ -29,14 +29,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Enumeration;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.text.JTextComponent;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.ExtensionFileFilter;
@@ -57,6 +58,8 @@ public class ConfigPanel extends JPanel {
     protected JTextField hostEntry;
     protected JTextField portEntry;
     protected JTextField appEntry;
+    // Print Tab
+    private final PrinterConfigPanel printerConfigPanel;
     // SSL Tab
     protected JCheckBox useSSLCheckbox;
     protected JButton clientCertificateButton;
@@ -90,6 +93,7 @@ public class ConfigPanel extends JPanel {
             this.checkbox = checkbox;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (checkbox.isSelected()) {
                 int result = JOptionPane.showConfirmDialog(ConfigPanel.this, Messages.getString("ConfigurationPanel.save_password_confirm"), Messages.getString("ConfigurationPanel.confirm"), JOptionPane.YES_NO_OPTION);  //$NON-NLS-2$
@@ -109,9 +113,9 @@ public class ConfigPanel extends JPanel {
      */
     private final class FileSelectionAction extends AbstractAction {
 
-        private JTextComponent entry;
-        private String extension;
-        private String description;
+        private final JTextComponent entry;
+        private final String extension;
+        private final String description;
 
         /**
          * <p>
@@ -124,12 +128,13 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         FileSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); 
+            super(Messages.getString("ConfigurationPanel.browse"));
             this.entry = entry;
             this.extension = extension;
             this.description = description;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser(entry.getText());
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
@@ -143,9 +148,9 @@ public class ConfigPanel extends JPanel {
 
     private final class ThemeSelectionAction extends AbstractAction {
 
-        private JTextComponent entry;
-        private String extension;
-        private String description;
+        private final JTextComponent entry;
+        private final String extension;
+        private final String description;
 
         /**
          * <p>
@@ -158,14 +163,15 @@ public class ConfigPanel extends JPanel {
          * @param description ditto.
          */
         ThemeSelectionAction(JTextComponent entry, String extension, String description) {
-            super(Messages.getString("ConfigurationPanel.browse")); 
+            super(Messages.getString("ConfigurationPanel.browse"));
             this.entry = entry;
             this.extension = extension;
             this.description = description;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser(entry.getText()); 
+            JFileChooser fileChooser = new JFileChooser(entry.getText());
             fileChooser.setFileFilter(new ExtensionFileFilter(extension, description));
             int ret = fileChooser.showOpenDialog(null);
             if (ret == JFileChooser.APPROVE_OPTION) {
@@ -207,11 +213,12 @@ public class ConfigPanel extends JPanel {
                 if (SystemEnvironment.isMacOSX() && (!className.startsWith("apple.laf.AquaLookAndFeel"))) {
                     updateFont(new Font("Osaka", Font.PLAIN, 12));
                 }
-            } catch (Exception e) {
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
                 logger.catching(e);
             }
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     Component root = SwingUtilities.getRoot(basicPanel);
                     try {
@@ -234,6 +241,7 @@ public class ConfigPanel extends JPanel {
         this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
         basicPanel = createBasicPanel();
         sslPanel = createSSLPanel();
+        printerConfigPanel = new PrinterConfigPanel(conf.getPrinterList());
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
     }
@@ -277,12 +285,15 @@ public class ConfigPanel extends JPanel {
         exportPasswordEntry.setText(clientCertificatePassword);
         saveClientCertificatePasswordCheckbox.setSelected(saveClientCertificatePassword);
 
+        // Printer tab
+        printerConfigPanel.setPrinterConfigMap(conf.getPrinterConfig(num));
+
         // Others Tab
         styleEntry.setText(styleFile);
         lafThemeEntry.setText(lookAndFeelThemeFile);
-        for (int i = 0; i < lafs.length; i++) {
-            if (lookAndFeel.equals(lafs[i].getClassName())) {
-                lookAndFeelCombo.setSelectedItem(lafs[i].getName());
+        for (LookAndFeelInfo laf : lafs) {
+            if (lookAndFeel.equals(laf.getClassName())) {
+                lookAndFeelCombo.setSelectedItem(laf.getName());
             }
         }
         useTimerCheck.setSelected(useTimer);
@@ -313,6 +324,9 @@ public class ConfigPanel extends JPanel {
         conf.setClientCertificateFile(num, clientCertificateEntry.getText());
         conf.setClientCertificatePassword(num, new String(exportPasswordEntry.getPassword()));
         conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
+
+        // Printer Tab
+        conf.setPrinterConfig(num, printerConfigPanel.getPrinterConfigMap());
 
         // Others Tab
         conf.setStyleFile(num, styleEntry.getText());
@@ -426,7 +440,7 @@ public class ConfigPanel extends JPanel {
 
     private JPanel createSSLPanel() {
         int y;
-        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description"); 
+        final String clientCertificateDescription = Messages.getString("ConfigurationPanel.client_certificate_description");
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -434,6 +448,7 @@ public class ConfigPanel extends JPanel {
         useSSLCheckbox = new JCheckBox();
         useSSLCheckbox.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 updateSSLPanelComponentsEnabled();
             }
@@ -517,11 +532,12 @@ public class ConfigPanel extends JPanel {
         }
         lookAndFeelCombo = new JComboBox<>();
         lookAndFeelCombo.setEditable(false);
-        for (int i = 0; i < lafNames.length; i++) {
-            lookAndFeelCombo.addItem(lafNames[i]);
+        for (String lafName : lafNames) {
+            lookAndFeelCombo.addItem(lafName);
         }
         lookAndFeelCombo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 updateLAFThemeEnabled();
                 changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
@@ -538,6 +554,7 @@ public class ConfigPanel extends JPanel {
         useTimerCheck = new JCheckBox();
         useTimerCheck.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 timerPeriodEntry.setEnabled(useTimerCheck.isSelected());
             }
@@ -610,13 +627,14 @@ public class ConfigPanel extends JPanel {
         JButton orcaButton = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
         orcaButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Desktop d = Desktop.getDesktop();
                 if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
                     try {
                         d.browse(new URI(Messages.getString("ConfigurationPanel.info_orca_url")));
-                    } catch (Exception ex) {
-                        System.out.println(ex);
+                    } catch (IOException | URISyntaxException ex) {
+                        logger.catching(ex);
                     }
                 }
             }
@@ -624,13 +642,14 @@ public class ConfigPanel extends JPanel {
         JButton montsuqiButton = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
         montsuqiButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Desktop d = Desktop.getDesktop();
                 if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
                     try {
                         d.browse(new URI(Messages.getString("ConfigurationPanel.info_montsuqi_url")));
-                    } catch (Exception ex) {
-                        System.out.println(ex);
+                    } catch (IOException | URISyntaxException ex) {
+                        logger.catching(ex);
                     }
                 }
             }
@@ -691,6 +710,10 @@ public class ConfigPanel extends JPanel {
 
     public JPanel getSSLPanel() {
         return sslPanel;
+    }
+
+    public PrinterConfigPanel getPrinterConfigPanel() {
+        return printerConfigPanel;
     }
 
     public JPanel getOthersPanel() {

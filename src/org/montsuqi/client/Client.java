@@ -214,18 +214,4 @@ public class Client implements Runnable {
             System.exit(0);
         }
     }
-
-    /**
-     * <p>
-     * Dispose connection if it exists.</p>
-     */
-    @Override
-    protected void finalize() {
-        try {
-            super.finalize();
-            exitSystem();
-        } catch (Throwable ex) {
-            logger.catching(Level.WARN,ex);
-        }
-    }
 }

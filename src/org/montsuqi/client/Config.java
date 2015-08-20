@@ -16,12 +16,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.print.DocFlavor;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -40,7 +46,39 @@ public class Config {
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
     private static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/client/style.properties";
-    protected static final Logger logger = LogManager.getLogger(Launcher.class);
+    protected static final Logger logger = LogManager.getLogger(Config.class);
+    private static final TreeMap<String, PrintService> printerServiceMap;
+    private static final ArrayList<String> printerList;
+    private final HashMap<String, PrintService> printerConfigMap;
+
+    static {
+        printerServiceMap = new TreeMap<>();
+        printerList = new ArrayList<>();
+        DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
+        PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
+        for (PrintService ps : pss) {
+            printerServiceMap.put(ps.getName(), ps);
+            printerList.add(ps.getName());
+        }
+        Collections.sort(printerList, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                String n1 = (String) o1;
+                String n2 = (String) o2;
+                return n1.compareTo(n2);
+            }
+        });
+    }
+
+    public Config() {
+        printerConfigMap = new HashMap<>();
+        initProp();
+        readProp();
+    }
+
+    public ArrayList<String> getPrinterList() {
+        return printerList;
+    }
 
     public int getCurrent() {
         return current;
@@ -88,11 +126,6 @@ public class Config {
             }
         }
         return max + 1;
-    }
-
-    public Config() {
-        initProp();
-        readProp();
     }
 
     private void convertOldConfig() {
@@ -184,6 +217,28 @@ public class Config {
         }
     }
 
+    public int copyConfig(int num) {
+        int ret = this.getNext();
+        Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\." + num + "\\.(.*)");
+        for (Enumeration e = prop.keys(); e.hasMoreElements();) {
+            String k = (String) e.nextElement();
+            if (k.startsWith(Config.CONFIG_KEY)) {
+                Matcher m = p.matcher(k);
+                if (!m.find()) {
+                    continue;
+                }
+                String key = m.group(1);
+                String k2 = Config.CONFIG_KEY + "." + ret + "." + key;
+                String value = prop.getProperty(k);
+                if (key.equals("description")) {
+                    value = value + "_" + ret;
+                }
+                prop.setProperty(k2, value);
+            }
+        }
+        return ret;
+    }
+
     public ArrayList<Integer> getList() {
         ArrayList<Integer> list = new ArrayList<>();
         Pattern p = Pattern.compile(Config.CONFIG_KEY + "\\.(\\d+)\\.");
@@ -203,8 +258,8 @@ public class Config {
         Collections.sort(list, new Comparator<Object>() {
             @Override
             public int compare(Object o1, Object o2) {
-                String n1 = Config.this.getDescription((Integer)o1);
-                String n2 = Config.this.getDescription((Integer)o2);
+                String n1 = Config.this.getDescription((Integer) o1);
+                String n2 = Config.this.getDescription((Integer) o2);
                 return n1.compareTo(n2);
             }
         });
@@ -435,6 +490,45 @@ public class Config {
         setValue(i, "systemProperties", v);
     }
 
+    public Map<String, String> getPrinterConfig(int i) {
+        TreeMap<String, String> map = new TreeMap<>();
+        String confStr = getValue(i, "printerConfig");
+        String[] set = confStr.split(",");
+        for (String kv : set) {
+            String[] e = kv.split(":");
+            if (e.length == 2) {
+                map.put(e[0], e[1]);
+            } else {
+                logger.warn("invalid printer config! skip this. [" + kv + "]");
+            }
+        }
+        return map;
+    }
+
+    public void setPrinterConfig(int i, Map<String, String> map) {
+        printerConfigMap.clear();
+        String str = "";
+        int j = 0;
+        for (Map.Entry<String, String> e : map.entrySet()) {
+            if (j == 0) {
+                str = str + e.getKey() + ":" + e.getValue();
+            } else {
+                str = str + "," + e.getKey() + ":" + e.getValue();
+            }
+            j++;
+            printerConfigMap.put(e.getKey(), printerServiceMap.get(e.getValue()));
+        }
+        setValue(i, "printerConfig", str);
+    }
+
+    public PrintService getPrintService(String printer) {
+        PrintService ps = printerConfigMap.get(printer);
+        if (ps == null) {
+            ps = printerConfigMap.get("default");
+        }
+        return ps;
+    }
+
     public void list() {
         System.out.println("----");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
@@ -465,7 +559,7 @@ public class Config {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                String[] pair = line.split("\\s*=\\s*"); 
+                String[] pair = line.split("\\s*=\\s*");
                 if (pair.length == 2) {
                     String key = pair[0].trim();
                     String value = pair[1].trim();

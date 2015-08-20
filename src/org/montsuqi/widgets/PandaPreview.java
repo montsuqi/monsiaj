@@ -134,6 +134,7 @@ public class PandaPreview extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.next_short_description"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int numPages = panel.getNumPages();
             int pageNum = panel.getPageNum();
@@ -155,6 +156,7 @@ public class PandaPreview extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.prev_short_description"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int numPages = panel.getNumPages();
             int pageNum = panel.getPageNum();
@@ -176,6 +178,7 @@ public class PandaPreview extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, Messages.getString("PandaPreview.save_short_description"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser fc = new JFileChooser();
             fc.setFileFilter(new ExtensionFileFilter(".pdf", "PDF (*.pdf)"));
@@ -191,15 +194,16 @@ public class PandaPreview extends JPanel {
                     } else {
                         file = fc.getSelectedFile();
                     }
-                    FileInputStream in = new FileInputStream(fileName);
-                    FileOutputStream out = new FileOutputStream(file);
-                    b = new byte[in.available()];
-                    while (in.read(b) > 0) {
-                        out.write(b);
+                    FileOutputStream out;
+                    try (FileInputStream in = new FileInputStream(fileName)) {
+                        out = new FileOutputStream(file);
+                        b = new byte[in.available()];
+                        while (in.read(b) > 0) {
+                            out.write(b);
+                        }
                     }
-                    in.close();
                     out.close();
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     System.out.println(ex);
                 }
             }
@@ -219,7 +223,7 @@ public class PandaPreview extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            PDFPrint printer = new PDFPrint(new File(fileName), true);
+            PDFPrint printer = new PDFPrint(new File(fileName));
             printer.start();
         }
     }

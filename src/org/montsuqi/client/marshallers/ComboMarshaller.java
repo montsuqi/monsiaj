@@ -52,7 +52,7 @@ class ComboMarshaller extends WidgetMarshaller {
         JComboBox combo = (JComboBox)widget;
         Component sub = null;
 
-        DefaultComboBoxModel model = (DefaultComboBoxModel)combo.getModel();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel)combo.getModel();
         Interface xml = con.getInterface();
         con.receiveDataTypeWithCheck(Type.RECORD);
         String selectedItem = null;
@@ -80,7 +80,7 @@ class ComboMarshaller extends WidgetMarshaller {
                     }
                 }
                 model.removeAllElements();
-                Iterator iter = list.iterator();
+                Iterator<String> iter = list.iterator();
                 while (iter.hasNext()) {
                     model.addElement(iter.next());
                 }

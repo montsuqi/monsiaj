@@ -143,6 +143,7 @@ public abstract class SignalHandler {
          */
         registerHandler(null, new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 // do nothing
             }
@@ -154,6 +155,7 @@ public abstract class SignalHandler {
          */
         registerHandler("select_all", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 JTextField field = (JTextField) widget;
                 field.selectAll();
@@ -166,6 +168,7 @@ public abstract class SignalHandler {
          */
         registerHandler("unselect_all", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 JTextField field = (JTextField) widget;
                 field.select(0, 0);
@@ -196,6 +199,7 @@ public abstract class SignalHandler {
                 }
             }
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 synchronized (con) {
                     if (timerTask != null) {
@@ -286,6 +290,7 @@ public abstract class SignalHandler {
          */
         final SignalHandler changed = new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
             }
@@ -301,6 +306,7 @@ public abstract class SignalHandler {
          */
         SignalHandler sendEventWhenIdle = new SignalHandler() {
 
+            @Override
             public synchronized void handle(final Protocol con, final Component widget, final Object userData) {
                 if (timerTask != null) {
                     timerTask.cancel();
@@ -311,6 +317,7 @@ public abstract class SignalHandler {
                 }
                 timerTask = new TimerTask() {
 
+                    @Override
                     public void run() {
                         synchronized (con) {
                             if (con.isReceiving()) {
@@ -367,6 +374,7 @@ public abstract class SignalHandler {
          */
         registerHandler("clist_send_event", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
                 sendEvent.handle(con, widget, "SELECT");
@@ -375,6 +383,7 @@ public abstract class SignalHandler {
 
         registerHandler("notebook_send_event", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
                 sendEvent.handle(con, widget, "SWITCH");
@@ -383,6 +392,7 @@ public abstract class SignalHandler {
 
         registerHandler("table_send_event", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 con.addChangedWidget(widget);
                 sendEvent.handle(con, widget, userData);
@@ -395,6 +405,7 @@ public abstract class SignalHandler {
          */
         registerHandler("activate_widget", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 sendEvent.handle(con, widget, "ACTIVATE");
             }
@@ -407,6 +418,7 @@ public abstract class SignalHandler {
          */
         registerHandler("entry_next_focus", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 Node node = con.getNode(widget);
                 if (node != null) {
@@ -430,6 +442,7 @@ public abstract class SignalHandler {
 
         registerHandler("fileentry_changed", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 Container parent;
                 while ((parent = widget.getParent()) != null) {
@@ -444,6 +457,7 @@ public abstract class SignalHandler {
 
         registerHandler("entry_set_editable", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 // do nothing?
             }
@@ -456,6 +470,7 @@ public abstract class SignalHandler {
          */
         registerHandler("map_event", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 con.clearWindowTable();
             }
@@ -466,6 +481,7 @@ public abstract class SignalHandler {
          */
         registerHandler("set_focus", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 // Node node = con.getNode(widget);
                 // FocusedScreen = node; // this variable is referred from nowhere.
@@ -478,6 +494,7 @@ public abstract class SignalHandler {
          */
         registerHandler("window_close", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 con.closeWindow(widget);
             }
@@ -485,6 +502,7 @@ public abstract class SignalHandler {
 
         registerHandler("window_destroy", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 con.exit();
             }
@@ -497,6 +515,7 @@ public abstract class SignalHandler {
          */
         registerHandler("open_browser", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) throws IOException {
                 if (!(widget instanceof JTextPane)) {
                     return;
@@ -510,6 +529,7 @@ public abstract class SignalHandler {
 
         registerHandler("keypress_filter", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 Component next = con.getInterface().getWidget((String) userData);
                 next.requestFocus();
@@ -518,6 +538,7 @@ public abstract class SignalHandler {
 
         registerHandler("press_filter", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 //logger.warn(Messages.getString("Protocol.press_filter_is_not_impremented_yet")); 
             }
@@ -525,6 +546,7 @@ public abstract class SignalHandler {
 
         registerHandler("gtk_true", new SignalHandler() {
 
+            @Override
             public void handle(Protocol con, Component widget, Object userData) {
                 // callback placeholder wich has no effect
             }

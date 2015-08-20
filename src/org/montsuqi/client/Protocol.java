@@ -36,6 +36,7 @@ import java.net.ConnectException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.*;
+import javax.print.PrintService;
 import javax.swing.*;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -600,6 +601,10 @@ public class Protocol extends Connection {
         }
     }
 
+    public void stopPing() {
+        pingTimer.stop();
+    }
+
     public int getServerVersion() {
         return serverVersion;
     }
@@ -640,6 +645,7 @@ public class Protocol extends Connection {
 
             byte[] bin = receiveBLOB(oid);
             if (bin != null && bin.length > 0) {
+                logger.info(obj);
                 File temp = TempFile.createTempFile("clientPrint", "report.pdf");
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
                     os.write(bin);
@@ -648,18 +654,22 @@ public class Protocol extends Connection {
                 if (showDialog) {
                     PrintAgent.showDialog(title, temp);
                 } else {
+                    PrintService ps = null;
                     if (printer != null) {
-                        PDFPrint pdfPrint = new PDFPrint(temp, false);
-                        pdfPrint.start();
-                    } else {
-                        PDFPrint pdfPrint = new PDFPrint(temp, printer);
-                        pdfPrint.start();
+                        ps = client.getConf().getPrintService(printer);
                     }
-                    PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
-                            Messages.getString("PrintAgent.notify_print_start") + "\n\n"
-                            + Messages.getString("PrintAgent.title") + title + "\n"
-                            + Messages.getString("PrintAgent.printer") + printer,
-                            GtkStockIcon.get("gtk-print"), 0);
+                    if (ps != null) {
+                        logger.info("printer:" + printer + " ps:" + ps.getName());
+                        PDFPrint pdfPrint = new PDFPrint(temp, ps);
+                        pdfPrint.start();
+                        PopupNotify.popup(Messages.getString("PrintAgent.notify_summary"),
+                                Messages.getString("PrintAgent.notify_print_start") + "\n\n"
+                                + Messages.getString("PrintAgent.title") + title + "\n"
+                                + Messages.getString("PrintAgent.printer") + printer,
+                                GtkStockIcon.get("gtk-print"), 0);
+                    } else {
+                        PrintAgent.showDialog(title, temp);
+                    }
                 }
             }
         } catch (IOException ex) {

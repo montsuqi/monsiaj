@@ -14,7 +14,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.print.attribute.Attribute;
 import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
@@ -26,21 +25,18 @@ import org.montsuqi.util.PDFPrint.PDFPrintPage;
 public class PDFPrint extends Thread {
 
     private final File file;
-    private String printer;
-    private boolean showDialog;
+    private final PrintService printService;
 
     protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
 
-    public PDFPrint(File file, boolean showDialog) {
+    public PDFPrint(File file) {
         this.file = file;
-        this.showDialog = showDialog;
-        this.printer = null;
+        this.printService = null;
     }
 
-    public PDFPrint(File file, String printer) {
+    public PDFPrint(File file, PrintService printService) {
         this.file = file;
-        this.showDialog = false;
-        this.printer = printer;
+        this.printService = printService;
     }
 
     @Override
@@ -55,27 +51,12 @@ public class PDFPrint extends Thread {
             PDFPrintPage pages = new PDFPrintPage(pdfFile);
             PrinterJob pjob = PrinterJob.getPrinterJob();
             pjob.setJobName(file.getName());
-
-            if (System.getProperty("monsia.util.PDFPrint.force_use_default_printer") != null) {
-                showDialog = false;
-            }
-            String printer_ = System.getProperty("monsia.util.PDFPrint.printer");
-            if (printer_ != null) {
-                printer = printer_;
-                showDialog = false;
-            }            
-            if (showDialog) {
+         
+            if (printService != null) {
+                pjob.setPrintService(printService);
+            } else {
                 if (!pjob.printDialog(reqset)) {
                     return;
-                }
-            } else {
-                if (printer != null) {
-                    PrintService[] pss = PrintServiceLookup.lookupPrintServices(null, null);
-                    for (PrintService ps : pss) {
-                        if (printer.equals(ps.getName())) {
-                            pjob.setPrintService(ps);
-                        }
-                    }
                 }
             }
 
@@ -102,15 +83,13 @@ public class PDFPrint extends Thread {
                 }
             }
             pjob.print(reqset);
-        } catch (PrinterException ex) {
-            logger.catching(Level.WARN,ex);
-        } catch (java.io.IOException ex) {
+        } catch (PrinterException | java.io.IOException ex) {
             logger.catching(Level.WARN,ex);
         }
     }
 
     public static void main(String args[]) throws Exception {
-        PDFPrint printer = new PDFPrint(new File(args[0]), args[1]);
+        PDFPrint printer = new PDFPrint(new File(args[0]));
         printer.start();
     }
 
@@ -119,15 +98,15 @@ public class PDFPrint extends Thread {
         /**
          * The PDFFile to be printed
          */
-        private PDFFile file;
+        private final PDFFile printPageFile;
 
         /**
          * Create a new PDFPrintPage object for a particular PDFFile.
          *
-         * @param file the PDFFile to be printed.
+         * @param f
          */
-        public PDFPrintPage(PDFFile file) {
-            PDFPrintPage.this.file = file;
+        public PDFPrintPage(PDFFile f) {
+            printPageFile = f;
         }
 
         // from Printable interface:  prints a single page, given a Graphics
@@ -193,10 +172,10 @@ public class PDFPrint extends Thread {
             int pagenum = index + 1;
 
             // don't bother if the page number is out of range.
-            if ((pagenum >= 1) && (pagenum <= file.getNumPages())) {
+            if ((pagenum >= 1) && (pagenum <= printPageFile.getNumPages())) {
 
                 // fit the PDFPage into the printing area
-                PDFPage page = file.getPage(pagenum);
+                PDFPage page = printPageFile.getPage(pagenum);
                 int width = (int) page.getWidth();
                 int height = (int) page.getHeight();
 

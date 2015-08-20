@@ -40,7 +40,7 @@ import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
 
 public class Launcher {
-    
+
     protected static final Logger logger = LogManager.getLogger(Launcher.class);
     protected String title;
     protected Config conf;
@@ -62,10 +62,10 @@ public class Launcher {
     }
 
     public Launcher(String title) {
-        if (System.getProperty("monsia.log.level")!=null) {
+        if (System.getProperty("monsia.log.level") != null) {
         } else {
             System.setProperty("monsia.log.level", "info");
-        }        
+        }
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
@@ -172,6 +172,7 @@ public class Launcher {
         tabbed.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbed.addTab(Messages.getString("ConfigurationPanel.basic_tab_label"), configPanel.getBasicPanel());
         tabbed.addTab(Messages.getString("ConfigurationPanel.ssl_tab_label"), configPanel.getSSLPanel());
+        tabbed.addTab(Messages.getString("ConfigurationPanel.printer_config_tab_label"), configPanel.getPrinterConfigPanel());
         tabbed.addTab(Messages.getString("ConfigurationPanel.others_tab_label"), configPanel.getOthersPanel());
         tabbed.addTab(Messages.getString("ConfigurationPanel.info_tab_label"), configPanel.getInfoPanel());
 
@@ -266,6 +267,7 @@ public class Launcher {
             checkBox.setSelected(checked);
             checkBox.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     prefs.put(Launcher.class.getName() + ".security_risk_agreement", checkBox.isSelected() ? "yes" : "no");
                 }
@@ -318,6 +320,17 @@ public class Launcher {
         });
         bar.add(run);
 
+        Button save = new Button(new AbstractAction(Messages.getString("Launcher.save_label")) {
+
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+                int num = conf.getCurrent();
+                configPanel.saveConfig(num);
+                conf.save();
+            }
+        });
+        bar.add(save);
+
         Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
             @Override
@@ -360,7 +373,7 @@ public class Launcher {
             //t.start();
             //t.join();
         } catch (Exception e) {
-            logger.catching(Level.WARN,e);
+            logger.catching(Level.WARN, e);
             ExceptionDialog.showExceptionDialog(e);
             client.exitSystem();
         }

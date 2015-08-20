@@ -16,6 +16,8 @@ import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
@@ -166,7 +168,7 @@ public class PrintAgent extends Thread {
         String strURL = (sslSocketFactory == null ? "http" : "https") + "://" + port + "/" + path;
 
         logger.info(strURL);
-        
+
         URL url = new URL(strURL);
         String scheme = url.getProtocol();
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -266,8 +268,11 @@ public class PrintAgent extends Thread {
                         Messages.getString("PrintAgent.notify_print_start") + "\n\n"
                         + Messages.getString("PrintAgent.title") + this.getTitle(),
                         GtkStockIcon.get("gtk-print"), 0);
-                PDFPrint printer = new PDFPrint(file, false);
-                printer.start();
+                PrintService[] pss = PrintServiceLookup.lookupPrintServices(null, null);
+                if (pss.length > 0) {
+                    PDFPrint printer = new PDFPrint(file, pss[0]);
+                    printer.start();
+                }
             }
         }
 
