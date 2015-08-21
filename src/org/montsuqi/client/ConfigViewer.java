@@ -25,7 +25,6 @@ package org.montsuqi.client;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
@@ -70,7 +69,7 @@ public class ConfigViewer {
         java.util.List<Integer> list = conf.getList();
         final String[] ColumnNames = {
             Messages.getString("ConfigurationViewer.config_name"),
-            Messages.getString("ConfigurationViewer.authuri"),
+            Messages.getString("ConfigurationViewer.host"),
             Messages.getString("ConfigurationViewer.user"),
             Messages.getString("ConfigurationViewer.num")
         };
