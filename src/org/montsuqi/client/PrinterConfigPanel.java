@@ -46,6 +46,13 @@ public class PrinterConfigPanel extends JPanel {
         JScrollPane sp = new JScrollPane(table);
         this.add(sp, BorderLayout.CENTER);
 
+        if (System.getProperty("monsia.pandaclist.rowheight") != null) {
+            int rowheight = Integer.parseInt(System.getProperty("monsia.pandaclist.rowheight"));
+            table.setRowHeight(rowheight);
+        } else {
+            table.setRowHeight(30);
+        }
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         this.add(buttonPanel, BorderLayout.SOUTH);
@@ -58,7 +65,7 @@ public class PrinterConfigPanel extends JPanel {
                     printer = p;
                     break;
                 }
-                model.addRow(new String[]{"printer",printer});
+                model.addRow(new String[]{"printer", printer});
             }
         });
         buttonPanel.add(button1);
@@ -74,18 +81,18 @@ public class PrinterConfigPanel extends JPanel {
         });
         buttonPanel.add(button2);
     }
-    
-    public void setPrinterConfigMap(Map<String,String> map) {
+
+    public void setPrinterConfigMap(Map<String, String> map) {
         model.setRowCount(0);
-        for (Map.Entry<String,String> e : map.entrySet()) {
-            model.addRow(new String[] {e.getKey(),e.getValue()});
+        for (Map.Entry<String, String> e : map.entrySet()) {
+            model.addRow(new String[]{e.getKey(), e.getValue()});
         }
     }
-    
-    public TreeMap<String,String> getPrinterConfigMap() {
-        TreeMap<String,String> map = new TreeMap<>();
-        for(int i = 0;i < model.getRowCount(); i++) {
-            map.put((String)model.getValueAt(i, 0),(String)model.getValueAt(i, 1));
+
+    public TreeMap<String, String> getPrinterConfigMap() {
+        TreeMap<String, String> map = new TreeMap<>();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            map.put((String) model.getValueAt(i, 0), (String) model.getValueAt(i, 1));
         }
         return map;
     }
