@@ -50,6 +50,13 @@ public class PrinterConfigPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         this.add(buttonPanel, BorderLayout.SOUTH);
+        
+        if (System.getProperty("monsia.pandaclist.rowheight") != null) {
+            int rowheight = Integer.parseInt(System.getProperty("monsia.pandaclist.rowheight"));
+            table.setRowHeight(rowheight);
+        } else {
+            table.setRowHeight(30);
+        }
 
         JButton button1 = new JButton(new AbstractAction("追加") {
             @Override
@@ -58,7 +65,7 @@ public class PrinterConfigPanel extends JPanel {
                 for (String p : printerList) {
                     printer = p;
                     break;
-                }                
+                }
                 model.addRow(new String[]{"printer", printer});
             }
         });

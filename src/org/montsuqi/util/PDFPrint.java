@@ -12,11 +12,13 @@ import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFRenderer;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import javax.print.attribute.Attribute;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.print.PrintService;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.MediaSizeName;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +29,7 @@ public class PDFPrint extends Thread {
     private final File file;
     private final PrintService printService;
 
-    protected static final Logger logger = LogManager.getLogger(PDFPrint.class);
+    private static final Logger logger = LogManager.getLogger(PDFPrint.class);
 
     public PDFPrint(File file) {
         this.file = file;
@@ -39,6 +41,84 @@ public class PDFPrint extends Thread {
         this.printService = printService;
     }
 
+    private void print(PDFFile pdfFile, PrintService printService) {
+        HashMap<MediaSizeName, ArrayList<PDFPage>> map = new HashMap<>();
+        for (int i = 0; i < pdfFile.getNumPages(); i++) {
+            PDFPage page = pdfFile.getPage(i + 1);
+            MediaSizeName mediaSizeName = PDFPaperSize.getPDFPaperSize(page);
+            ArrayList<PDFPage> list = map.get(mediaSizeName);
+            if (list != null) {
+                list.add(page);
+            } else {
+                ArrayList<PDFPage> newList = new ArrayList<>();
+                newList.add(page);
+                map.put(mediaSizeName, newList);
+            }
+        }
+        for (Map.Entry<MediaSizeName, ArrayList<PDFPage>> e : map.entrySet()) {
+            try {
+                ArrayList<PDFPage> list = e.getValue();
+                PDFPage[] pages = new PDFPage[list.size()];
+                for(int i=0;i<list.size();i++) {
+                    pages[i] = list.get(i);
+                }
+                PDFPrintPage printPage = new PDFPrintPage(pages);            
+                MediaSizeName mediaSizeName = e.getKey();
+                PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
+                PrinterJob pjob = PrinterJob.getPrinterJob();              
+                pjob.setJobName(file.getName());             
+                pjob.setPrintService(printService);
+
+                if (mediaSizeName != MediaSizeName.A) {
+                    reqset.add(mediaSizeName);
+                }
+                PageFormat pf = pjob.getPageFormat(reqset);
+                Paper paper = pf.getPaper();
+
+                paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+                pf.setPaper(paper);
+                
+                Book book = new Book();
+                book.append(printPage, pf, pages.length);
+                pjob.setPageable(book);
+                pjob.print(reqset);
+            } catch (PrinterException ex) {
+                logger.catching(Level.WARN, ex);
+            }
+        }
+    }
+
+    private void print(PDFFile pdfFile) {
+        PDFPage[] pages = new PDFPage[pdfFile.getNumPages() + 1];
+        for (int i = 0; i < pdfFile.getNumPages(); i++) {
+            pages[i] = pdfFile.getPage(i + 1);
+        }
+        PDFPrintPage printPage = new PDFPrintPage(pages);
+
+        PrinterJob pjob = PrinterJob.getPrinterJob();
+        pjob.setJobName(file.getName());
+        PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
+
+        if (!pjob.printDialog(reqset)) {
+            return;
+        }
+        PageFormat pf = pjob.getPageFormat(reqset);
+        Paper paper = pf.getPaper();
+
+        paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+        pf.setPaper(paper);
+        Book book = new Book();
+
+        book.append(printPage, pf, pdfFile.getNumPages());
+        pjob.setPageable(book);
+
+        try {
+            pjob.print(reqset);
+        } catch (PrinterException ex) {
+            logger.catching(Level.WARN, ex);
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -46,45 +126,13 @@ public class PDFPrint extends Thread {
             FileChannel fc = fis.getChannel();
             ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
-            PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
-
-            PDFPrintPage pages = new PDFPrintPage(pdfFile);
-            PrinterJob pjob = PrinterJob.getPrinterJob();
-            pjob.setJobName(file.getName());
-         
             if (printService != null) {
-                pjob.setPrintService(printService);
+                print(pdfFile, printService);
             } else {
-                if (!pjob.printDialog(reqset)) {
-                    return;
-                }
+                print(pdfFile);
             }
-
-            // validate the page against the chosen printer to correct
-            // paper settings and margins
-            PageFormat pf = pjob.getPageFormat(reqset);
-            Paper paper = pf.getPaper();
-
-            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-            pf.setPaper(paper);
-            Book book = new Book();
-
-            book.append(pages, pf, pdfFile.getNumPages());
-            pjob.setPageable(book);
-            
-            if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
-                PrintService service = pjob.getPrintService();
-                System.out.println("PrintService:" + service);
-                PrintServiceAttributeSet myAset = service.getAttributes();
-                Attribute[] attr = myAset.toArray();
-                System.out.println("Attributes set:");
-                for (Attribute attr1 : attr) {
-                    System.out.println("   " + attr1);
-                }
-            }
-            pjob.print(reqset);
-        } catch (PrinterException | java.io.IOException ex) {
-            logger.catching(Level.WARN,ex);
+        } catch (java.io.IOException ex) {
+            logger.catching(Level.WARN, ex);
         }
     }
 
@@ -98,15 +146,15 @@ public class PDFPrint extends Thread {
         /**
          * The PDFFile to be printed
          */
-        private final PDFFile printPageFile;
+        private final PDFPage[] pages;
 
         /**
          * Create a new PDFPrintPage object for a particular PDFFile.
          *
-         * @param f
+         * @param _pages
          */
-        public PDFPrintPage(PDFFile f) {
-            printPageFile = f;
+        public PDFPrintPage(PDFPage[] _pages) {
+            pages = _pages;
         }
 
         // from Printable interface:  prints a single page, given a Graphics
@@ -169,46 +217,44 @@ public class PDFPrint extends Thread {
                 g2.drawRect((int) pageable.x, (int) pageable.y,
                         (int) pageable.width, (int) pageable.height);
             }
-            int pagenum = index + 1;
-
-            // don't bother if the page number is out of range.
-            if ((pagenum >= 1) && (pagenum <= printPageFile.getNumPages())) {
-
-                // fit the PDFPage into the printing area
-                PDFPage page = printPageFile.getPage(pagenum);
-                int width = (int) page.getWidth();
-                int height = (int) page.getHeight();
-
-                double scale = 1.0;
-
-                if (format.getOrientation() == PageFormat.PORTRAIT) {
-                    if (height > width) {
-                        g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
-                    } else {
-                        g2.transform(new AffineTransform(0f, -1.0 * scale, scale, 0f, voffset, -hoffset + width));
-                    }
-                } else if (format.getOrientation() == PageFormat.LANDSCAPE) {
-                    if (width > height) {
-                        g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
-                    } else {
-                        g2.transform(new AffineTransform(0f, scale, -1.0 * scale, 0f, -voffset + height, hoffset));
-                    }
-                }
-                if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
-                    System.out.println("scale:" + scale);
-                }
-
-                // render the page
-                PDFRenderer pgs = new PDFRenderer(page, g2, new Rectangle(0, 0, width, height), null, null);
-                try {
-                    page.waitForFinish();
-                    pgs.run();
-                } catch (InterruptedException ie) {
-                }
-                return PAGE_EXISTS;
-            } else {
+            if (index < 0 || index >= pages.length) {
+                logger.warn("no such page index:" + index + " pages.length:" + pages.length);
                 return NO_SUCH_PAGE;
             }
+
+            // fit the PDFPage into the printing area                
+            PDFPage page = pages[index];
+            int width = (int) page.getWidth();
+            int height = (int) page.getHeight();
+
+            double scale = 1.0;
+
+            if (format.getOrientation() == PageFormat.PORTRAIT) {
+                if (height > width) {
+                    g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
+                } else {
+                    g2.transform(new AffineTransform(0f, -1.0 * scale, scale, 0f, voffset, -hoffset + width));
+                }
+            } else if (format.getOrientation() == PageFormat.LANDSCAPE) {
+                if (width > height) {
+                    g2.transform(new AffineTransform(scale, 0f, 0f, scale, hoffset, voffset));
+                } else {
+                    g2.transform(new AffineTransform(0f, scale, -1.0 * scale, 0f, -voffset + height, hoffset));
+                }
+            }
+            if (System.getProperty("monsia.util.PDFPrint.debug") != null) {
+                System.out.println("scale:" + scale);
+            }
+
+            // render the page
+            PDFRenderer pgs = new PDFRenderer(page, g2, new Rectangle(0, 0, width, height), null, null);
+            try {
+                page.waitForFinish();
+                pgs.run();
+            } catch (InterruptedException ie) {
+                logger.catching(Level.WARN, ie);
+            }
+            return PAGE_EXISTS;
         }
     }
 
