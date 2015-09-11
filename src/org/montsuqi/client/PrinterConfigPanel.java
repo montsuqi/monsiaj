@@ -122,7 +122,10 @@ public class PrinterConfigPanel extends JPanel {
         public boolean stopCellEditing() {
             value = "";
             if (editor instanceof JComboBox) {
-                value = ((JComboBox) editor).getSelectedItem();
+                JComboBox combo1 = (JComboBox) editor;
+                if (combo1.getItemCount() > 0) {
+                    value = combo1.getSelectedItem();
+                }
             }
             return super.stopCellEditing();
         }
