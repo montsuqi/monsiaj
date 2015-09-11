@@ -9,13 +9,13 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -50,7 +50,7 @@ public class PrinterConfigPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         this.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         if (System.getProperty("monsia.pandaclist.rowheight") != null) {
             int rowheight = Integer.parseInt(System.getProperty("monsia.pandaclist.rowheight"));
             table.setRowHeight(rowheight);
@@ -123,7 +123,10 @@ public class PrinterConfigPanel extends JPanel {
         public boolean stopCellEditing() {
             value = "";
             if (editor instanceof JComboBox) {
-                value = ((JComboBox) editor).getSelectedItem();
+                JComboBox combo1 = (JComboBox) editor;
+                if (combo1.getItemCount() > 0) {
+                    value = combo1.getSelectedItem();
+                }
             }
             return super.stopCellEditing();
         }
