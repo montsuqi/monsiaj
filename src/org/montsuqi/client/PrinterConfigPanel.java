@@ -9,6 +9,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -111,6 +113,12 @@ public class PrinterConfigPanel extends JPanel {
                 combo.addItem(printer);
             }
             combo.setBorder(BorderFactory.createEmptyBorder());
+            combo.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    stopCellEditing();
+                }
+            });
         }
 
         @Override
