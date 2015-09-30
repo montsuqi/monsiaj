@@ -9,6 +9,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,12 +33,12 @@ import javax.swing.table.TableColumn;
  * @author mihara
  */
 public class PrinterConfigPanel extends JPanel {
-
+    
     private PrinterConfigTableModel model;
-
+    
     public PrinterConfigPanel(final List<String> printerList) {
         super();
-
+        
         this.setLayout(new BorderLayout(10, 5));
         model = new PrinterConfigTableModel();
         final JTable table = new JTable();
@@ -46,18 +48,18 @@ public class PrinterConfigPanel extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane sp = new JScrollPane(table);
         this.add(sp, BorderLayout.CENTER);
-
+        
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         this.add(buttonPanel, BorderLayout.SOUTH);
-
+        
         if (System.getProperty("monsia.pandaclist.rowheight") != null) {
             int rowheight = Integer.parseInt(System.getProperty("monsia.pandaclist.rowheight"));
             table.setRowHeight(rowheight);
         } else {
             table.setRowHeight(30);
         }
-
+        
         JButton button1 = new JButton(new AbstractAction("追加") {
             @Override
             public void actionPerformed(ActionEvent ev) {
@@ -70,7 +72,7 @@ public class PrinterConfigPanel extends JPanel {
             }
         });
         buttonPanel.add(button1);
-
+        
         JButton button2 = new JButton(new AbstractAction("削除") {
             @Override
             public void actionPerformed(ActionEvent ev) {
@@ -82,14 +84,14 @@ public class PrinterConfigPanel extends JPanel {
         });
         buttonPanel.add(button2);
     }
-
+    
     public void setPrinterConfigMap(Map<String, String> map) {
         model.setRowCount(0);
         for (Map.Entry<String, String> e : map.entrySet()) {
             model.addRow(new String[]{e.getKey(), e.getValue()});
         }
     }
-
+    
     public TreeMap<String, String> getPrinterConfigMap() {
         TreeMap<String, String> map = new TreeMap<>();
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -97,14 +99,14 @@ public class PrinterConfigPanel extends JPanel {
         }
         return map;
     }
-
+    
     private class PrinterConfigCellEditor extends AbstractCellEditor implements TableCellEditor {
-
+        
         private final JComboBox<String> combo;
         private Object value;
-
+        
         private Component editor;
-
+        
         public PrinterConfigCellEditor(List<String> printerList) {
             combo = new JComboBox<>();
             combo.removeAllItems();
@@ -112,13 +114,19 @@ public class PrinterConfigPanel extends JPanel {
                 combo.addItem(printer);
             }
             combo.setBorder(BorderFactory.createEmptyBorder());
+            combo.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    stopCellEditing();
+                }
+            });
         }
-
+        
         @Override
         public Object getCellEditorValue() {
             return value;
         }
-
+        
         @Override
         public boolean stopCellEditing() {
             value = "";
@@ -130,7 +138,7 @@ public class PrinterConfigPanel extends JPanel {
             }
             return super.stopCellEditing();
         }
-
+        
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value,
                 boolean isSelected, int row, int column) {
@@ -139,20 +147,20 @@ public class PrinterConfigPanel extends JPanel {
             return editor;
         }
     }
-
+    
     private class PrinterConfigTableModel extends DefaultTableModel {
-
+        
         public PrinterConfigTableModel() {
             super();
             this.setColumnCount(2);
             this.setRowCount(0);
         }
-
+        
         @Override
         public boolean isCellEditable(int row, int col) {
             return true;
         }
-
+        
         @Override
         public String getColumnName(int column) {
             if (column == 0) {
