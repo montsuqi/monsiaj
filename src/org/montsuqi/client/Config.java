@@ -54,20 +54,29 @@ public class Config {
     static {
         printerServiceMap = new TreeMap<>();
         printerList = new ArrayList<>();
-        DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
-        PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
-        for (PrintService ps : pss) {
-            printerServiceMap.put(ps.getName(), ps);
-            printerList.add(ps.getName());
-        }
-        Collections.sort(printerList, new Comparator<Object>() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                String n1 = (String) o1;
-                String n2 = (String) o2;
-                return n1.compareTo(n2);
+        if (System.getProperty("monsiaj.debug.printer_list") != null) {
+            printerServiceMap.put("p1", null);
+            printerServiceMap.put("p2", null);
+            printerServiceMap.put("p3", null);   
+            printerList.add("p1");
+            printerList.add("p2");
+            printerList.add("p3");
+        } else {
+            DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
+            PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
+            for (PrintService ps : pss) {
+                printerServiceMap.put(ps.getName(), ps);
+                printerList.add(ps.getName());
             }
-        });
+            Collections.sort(printerList, new Comparator<Object>() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    String n1 = (String) o1;
+                    String n2 = (String) o2;
+                    return n1.compareTo(n2);
+                }
+            });
+        }
     }
 
     public Config() {
@@ -495,7 +504,7 @@ public class Config {
         String confStr = getValue(i, "printerConfig");
         String[] set = confStr.split(",");
         for (String kv : set) {
-            String[] e = kv.split(":");
+            String[] e = kv.split(":=:");
             if (e.length == 2) {
                 map.put(e[0], e[1]);
             } else {
@@ -511,9 +520,9 @@ public class Config {
         int j = 0;
         for (Map.Entry<String, String> e : map.entrySet()) {
             if (j == 0) {
-                str = str + e.getKey() + ":" + e.getValue();
+                str = str + e.getKey() + ":=:" + e.getValue();
             } else {
-                str = str + "," + e.getKey() + ":" + e.getValue();
+                str = str + "," + e.getKey() + ":=:" + e.getValue();
             }
             j++;
             printerConfigMap.put(e.getKey(), printerServiceMap.get(e.getValue()));

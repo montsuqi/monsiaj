@@ -6,168 +6,96 @@
 package org.montsuqi.client;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.swing.AbstractAction;
-import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
+import javax.swing.JTextField;
 
 /**
  *
  * @author mihara
  */
 public class PrinterConfigPanel extends JPanel {
-    
-    private PrinterConfigTableModel model;
-    
-    public PrinterConfigPanel(final List<String> printerList) {
+
+    private static final int SIZE = 10;
+
+    private final ArrayList<JTextField> nameList;
+    private final ArrayList<JComboBox<String>> printerList;
+
+    public PrinterConfigPanel(final List<String> list) {
         super();
-        
-        this.setLayout(new BorderLayout(10, 5));
-        model = new PrinterConfigTableModel();
-        final JTable table = new JTable();
-        table.setModel(model);
-        TableColumn col = table.getColumnModel().getColumn(1);
-        col.setCellEditor(new PrinterConfigCellEditor(printerList));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane sp = new JScrollPane(table);
-        this.add(sp, BorderLayout.CENTER);
-        
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
-        this.add(buttonPanel, BorderLayout.SOUTH);
-        
-        if (System.getProperty("monsia.pandaclist.rowheight") != null) {
-            int rowheight = Integer.parseInt(System.getProperty("monsia.pandaclist.rowheight"));
-            table.setRowHeight(rowheight);
-        } else {
-            table.setRowHeight(30);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEtchedBorder());
+
+        nameList = new ArrayList<>();
+        printerList = new ArrayList<>();
+        for (int i = 0; i < SIZE; i++) {
+            nameList.add(new JTextField());
+            JComboBox<String> combo = new JComboBox<>();
+            for(String p:list) {
+                combo.addItem(p);
+            }
+            printerList.add(combo);
+        }
+
+        int y = 0;
+        panel.add(new JLabel("プリンタ名"), createConstraints(0, y, 1, 1, 1.0, 0.0));
+        panel.add(new JLabel("割り当てプリンタ"), createConstraints(1, y, 1, 1, 1.0, 0.0));
+
+        for (int i = 0; i < SIZE; i++) {
+            y += 1;
+            panel.add(nameList.get(i), createConstraints(0, y, 1, 1, 1.0, 0.0));
+            panel.add(printerList.get(i), createConstraints(1, y, 1, 1, 1.0, 0.0));
         }
         
-        JButton button1 = new JButton(new AbstractAction("追加") {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                String printer = "";
-                for (String p : printerList) {
-                    printer = p;
-                    break;
-                }
-                model.addRow(new String[]{"printer", printer});
-            }
-        });
-        buttonPanel.add(button1);
-        
-        JButton button2 = new JButton(new AbstractAction("削除") {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                int row = table.getSelectedRow();
-                if (row >= 0) {
-                    model.removeRow(table.getSelectedRow());
-                }
-            }
-        });
-        buttonPanel.add(button2);
+        this.setLayout(new BorderLayout(0, 0));
+        this.add(panel, BorderLayout.NORTH);
     }
-    
+
     public void setPrinterConfigMap(Map<String, String> map) {
-        model.setRowCount(0);
+        int i = 0;
         for (Map.Entry<String, String> e : map.entrySet()) {
-            model.addRow(new String[]{e.getKey(), e.getValue()});
+            if (i < SIZE) {
+                JTextField name = nameList.get(i);
+                JComboBox printer = printerList.get(i);
+                name.setText(e.getKey());
+                printer.setSelectedItem(e.getValue());
+            }
+            i++;
         }
     }
-    
+
     public TreeMap<String, String> getPrinterConfigMap() {
         TreeMap<String, String> map = new TreeMap<>();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            map.put((String) model.getValueAt(i, 0), (String) model.getValueAt(i, 1));
+        for (int i = 0; i < SIZE; i++) {
+            String name = nameList.get(i).getText();
+            String printer = (String)printerList.get(i).getSelectedItem();
+            if (!name.isEmpty()) {
+                map.put(name,printer);
+            }
         }
         return map;
     }
-    
-    private class PrinterConfigCellEditor extends AbstractCellEditor implements TableCellEditor {
-        
-        private final JComboBox<String> combo;
-        private Object value;
-        
-        private Component editor;
-        
-        public PrinterConfigCellEditor(List<String> printerList) {
-            combo = new JComboBox<>();
-            combo.removeAllItems();
-            for (String printer : printerList) {
-                combo.addItem(printer);
-            }
-            combo.setBorder(BorderFactory.createEmptyBorder());
-            combo.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    stopCellEditing();
-                }
-            });
-        }
-        
-        @Override
-        public Object getCellEditorValue() {
-            return value;
-        }
-        
-        @Override
-        public boolean stopCellEditing() {
-            value = "";
-            if (editor instanceof JComboBox) {
-                JComboBox combo1 = (JComboBox) editor;
-                if (combo1.getItemCount() > 0) {
-                    value = combo1.getSelectedItem();
-                }
-            }
-            return super.stopCellEditing();
-        }
-        
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
-            combo.setSelectedItem(value);
-            editor = combo;
-            return editor;
-        }
-    }
-    
-    private class PrinterConfigTableModel extends DefaultTableModel {
-        
-        public PrinterConfigTableModel() {
-            super();
-            this.setColumnCount(2);
-            this.setRowCount(0);
-        }
-        
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return true;
-        }
-        
-        @Override
-        public String getColumnName(int column) {
-            if (column == 0) {
-                return "プリンタ名";
-            } else {
-                return "割り当てプリンタ";
-            }
-        }
+
+    public static GridBagConstraints createConstraints(int x, int y, int width, int height, double weightx, double weighty) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = width;
+        gbc.gridheight = height;
+        gbc.weightx = weightx;
+        gbc.weighty = weighty;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        return gbc;
     }
 }
