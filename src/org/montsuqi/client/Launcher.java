@@ -96,18 +96,20 @@ public class Launcher {
         }
         if (!configName.equals("")) {
             conf.setCurrentByDescription(configName);
+
+            int n = conf.getCurrent();
             /*
              * set properties
              */
-            conf.applySystemProperties(conf.getCurrent());
+            conf.applySystemProperties(n);
 
             /*
              * set look and feel
              */
             try {
-                String cname = conf.getLookAndFeel(conf.getCurrent());
+                String cname = conf.getLookAndFeel(n);
                 if (cname.startsWith("com.nilo.plaf.nimrod")) {
-                    System.setProperty("nimrodlf.themeFile", conf.getLookAndFeelThemeFile(conf.getCurrent()));
+                    System.setProperty("nimrodlf.themeFile", conf.getLookAndFeelThemeFile(n));
                     UIManager.setLookAndFeel(new NimRODLookAndFeel());
                 } else {
                     UIManager.setLookAndFeel(cname);
@@ -125,6 +127,7 @@ public class Launcher {
                 Object[] message = {Messages.getString("Launcher.input_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (resp != JOptionPane.OK_OPTION) {
+                    conf.setPassword(n, String.valueOf(pwd.getPassword()));
                     return true;
                 }
             }
@@ -139,6 +142,7 @@ public class Launcher {
                 Object[] message = {Messages.getString("Launcher.input_certificate_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_certificate_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (resp != JOptionPane.OK_OPTION) {
+                    conf.setPassword(n, String.valueOf(pwd.getPassword()));
                     return true;
                 }
             }
