@@ -34,7 +34,7 @@ public class PopupNotify {
                 textPanel.setBackground((Color) SystemColor.menu);
 
                 JLabel summaryLabel = new JLabel(summary);
-                summaryLabel.setFont(new Font("Serif", Font.BOLD, 16));
+                summaryLabel.setFont(new Font("Suns", Font.BOLD, 16));
                 JTextPane bodyText = new JTextPane();
                 bodyText.setText(body);
                 bodyText.setOpaque(false);
