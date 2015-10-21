@@ -1,6 +1,8 @@
 package org.montsuqi.util;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -15,7 +17,7 @@ import javax.swing.*;
  */
 public class PopupNotify {
 
-    private static List<JDialog> dialogs = new ArrayList<JDialog>();
+    private static final List<JDialog> dialogs = new ArrayList<>();
 
     public static void popup(final String summary, final String body, final Icon icon, final int timeout) {
         final JDialog dialog = new JDialog();
@@ -23,7 +25,7 @@ public class PopupNotify {
 
             @Override
             public void run() {
-                JPanel panel = new JPanel(new BorderLayout(5, 5));
+                final JPanel panel = new JPanel(new BorderLayout(5, 5));
                 panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
                 panel.setBackground((Color) SystemColor.menu);
 
@@ -73,6 +75,28 @@ public class PopupNotify {
                 dialog.setLocation(x, y);
                 dialog.setFocusable(false);
                 dialog.setFocusableWindowState(false);
+                dialog.addMouseListener(new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        dialog.setOpacity(0.5f);
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                    }
+                });
                 dialog.setVisible(true);
                 dialogs.add(dialog);
             }
@@ -117,14 +141,14 @@ public class PopupNotify {
                 GtkStockIcon.get("gtk-dialog-error"), 60);
         PopupNotify.popup("Warning", "まあふつう\n\n\n\n\n\n\n\n\n\n\n",
                 GtkStockIcon.get("gtk-dialog-error"), 10);
-
-        for (int i = 0; i < 100; i++) {
-            PopupNotify.popup("Warning", "警告警告",
-                    GtkStockIcon.get("gtk-dialog-error"), 2);
-            try {
-                Thread.sleep(100); //3000ミリ秒Sleepする
-            } catch (InterruptedException e) {
-            };
-        }
+        /*
+         for (int i = 0; i < 100; i++) {
+         PopupNotify.popup("Warning", "警告警告",
+         GtkStockIcon.get("gtk-dialog-error"), 2);
+         try {
+         Thread.sleep(100); //3000ミリ秒Sleepする
+         } catch (InterruptedException e) {
+         };
+         }*/
     }
 }
