@@ -1,6 +1,8 @@
 package org.montsuqi.util;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -76,6 +78,28 @@ public class PopupNotify {
                 dialog.setLocation(x, y);
                 dialog.setFocusable(false);
                 dialog.setFocusableWindowState(false);
+                dialog.addMouseListener(new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        dialog.setOpacity(0.5f);
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                    }
+                });
                 dialog.setVisible(true);
                 dialogs.add(dialog);
             }
@@ -96,7 +120,7 @@ public class PopupNotify {
                         return null;
                     }
                 } catch (Exception ex) {
-                    logger.warn(ex,ex);
+                    logger.warn(ex, ex);
                 }
 
                 return null;
