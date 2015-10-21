@@ -54,28 +54,103 @@ public class PopupNotify {
                 Rectangle rect = panel.getBounds();
                 int scrWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
                 int scrHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
-                int y = 0;
-                int x = scrWidth - rect.width;
-                if (dialogs.size() > 0) {
-                    for (JDialog d2 : dialogs) {
-                        if (d2.getBounds().x < x) {
-                            x = d2.getBounds().x;
-                        }
-                    }
-                    JDialog d = dialogs.get(dialogs.size() - 1);
-                    Rectangle r = d.getBounds();
-                    y = r.y + r.height;
-                    if (y + rect.height > scrHeight) {
+                int y;
+                int x;
+                String pos = System.getProperty("monsia.popup_notify_position");
+                if (pos == null) {
+                    pos = "rightup";
+                }
+                switch (pos) {
+                    case "leftup":
+                        x = 0;
                         y = 0;
-                        x -= rect.width;
-                    }
-                    if (x < 0) {
+                        if (dialogs.size() > 0) {
+                            for (JDialog d2 : dialogs) {
+                                if (d2.getBounds().x > x) {
+                                    x = d2.getBounds().x;
+                                }
+                            }
+                            JDialog d = dialogs.get(dialogs.size() - 1);
+                            Rectangle r = d.getBounds();
+                            y = r.y + r.height;
+                            if (y + rect.height > scrHeight) {
+                                y = 0;
+                                x += rect.width;
+                            }
+                            if (x > scrWidth) {
+                                y = 0;
+                                x = 0;
+                                dialogs.clear();
+                            }
+                        }   break;
+                    case "leftbottom":
+                        x = 0;
+                        y = scrHeight - rect.height;
+                        if (dialogs.size() > 0) {
+                            for (JDialog d2 : dialogs) {
+                                if (d2.getBounds().x > x) {
+                                    x = d2.getBounds().x;
+                                }
+                            }
+                            JDialog d = dialogs.get(dialogs.size() - 1);
+                            Rectangle r = d.getBounds();
+                            y = r.y - rect.height;
+                            if (y < 0) {
+                                y = scrHeight - rect.height;
+                                x += rect.width;
+                            }
+                            if (x > scrWidth) {
+                                y = 0;
+                                x = 0;
+                                dialogs.clear();
+                            }
+                        }   break;
+                    case "rightbottom":
+                        x = scrWidth - rect.width;
+                        y = scrHeight - rect.height;
+                        if (dialogs.size() > 0) {
+                            for (JDialog d2 : dialogs) {
+                                if (d2.getBounds().x < x) {
+                                    x = d2.getBounds().x;
+                                }
+                            }
+                            JDialog d = dialogs.get(dialogs.size() - 1);
+                            Rectangle r = d.getBounds();
+                            y = r.y - rect.height;
+                            if (y < 0) {
+                                y = scrHeight - rect.height;
+                                x -= rect.width;
+                            }
+                            if (x < 0) {
+                                y = scrHeight - rect.height;
+                                x = scrWidth - rect.width;
+                                dialogs.clear();
+                            }
+                        }   break;
+                    default:
+                        // rightup
                         y = 0;
                         x = scrWidth - rect.width;
-                        dialogs.clear();
-                    }
+                        if (dialogs.size() > 0) {
+                            for (JDialog d2 : dialogs) {
+                                if (d2.getBounds().x < x) {
+                                    x = d2.getBounds().x;
+                                }
+                            }
+                            JDialog d = dialogs.get(dialogs.size() - 1);
+                            Rectangle r = d.getBounds();
+                            y = r.y + r.height;
+                            if (y + rect.height > scrHeight) {
+                                y = 0;
+                                x -= rect.width;
+                            }
+                            if (x < 0) {
+                                y = 0;
+                                x = scrWidth - rect.width;
+                                dialogs.clear();
+                            }
+                        }   break;
                 }
-                dialog.setLocation(x, y);
                 dialog.setFocusable(false);
                 dialog.setFocusableWindowState(false);
                 dialog.addMouseListener(new MouseListener() {
@@ -101,6 +176,7 @@ public class PopupNotify {
                     }
                 });
                 dialog.setVisible(true);
+                dialog.setLocation(x, y);                
                 dialogs.add(dialog);
             }
         });
