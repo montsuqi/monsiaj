@@ -61,7 +61,7 @@ public class Config {
     static {
         printerServiceMap = new TreeMap<>();
         printerList = new ArrayList<>();
-        if (System.getProperty("monsiaj.debug.printer_list") != null) {
+        if (System.getProperty("monsia.debug.printer_list") != null) {
             printerServiceMap.put("p1", null);
             printerServiceMap.put("p2", null);
             printerServiceMap.put("p3", null);   

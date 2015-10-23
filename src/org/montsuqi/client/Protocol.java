@@ -70,6 +70,12 @@ public class Protocol {
     public Protocol(int type, String authURI, final String s1, final String s2, final String s3) throws IOException, GeneralSecurityException {
         rpcId = 1;
         this.authURI = authURI;
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(s2, s3.toCharArray());
+            }
+        });
         switch (type) {
             case TYPE_USER_PASSWORD:
                 if (!s1.isEmpty()) {
@@ -77,13 +83,6 @@ public class Protocol {
                 } else {
                     sslSocketFactory = null;
                 }
-                this.authURI = authURI;
-                Authenticator.setDefault(new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(s2, s3.toCharArray());
-                    }
-                });
                 break;
             case TYPE_CERT_FILE:
                 sslSocketFactory = SSLSocketFactoryHelper.getFactory(s1, s2, s3);
