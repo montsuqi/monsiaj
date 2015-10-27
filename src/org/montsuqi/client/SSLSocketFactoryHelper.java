@@ -132,7 +132,7 @@ public class SSLSocketFactoryHelper {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
         final TrustManager[] trustManagers;
-
+        
         if (!p12File.isEmpty()) {
             keyManagers = createKeyManagers(p12File, p12Pass);
         } else {

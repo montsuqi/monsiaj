@@ -88,23 +88,27 @@ public class Client {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
         logger.info("try connect " + authURI);
+        protocol = new Protocol(Protocol.TYPE_USER_PASSWORD, authURI, conf.getUser(num), conf.getPassword(num));
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
-                protocol = new Protocol(Protocol.TYPE_PKCS11, authURI, conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
+                protocol.makeSSLSocketFactoryPKCS11(conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
             } else {
-                protocol = new Protocol(Protocol.TYPE_CERT_FILE, authURI, conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
+                protocol.makeSSLSocketFactoryPKCS12(conf.getCACertificateFile(num), conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
             }
         } else {
-            protocol = new Protocol(Protocol.TYPE_USER_PASSWORD, authURI, conf.getCACertificateFile(num), conf.getUser(num), conf.getPassword(num));
-            if (!this.conf.getSavePassword(num)) {
-                this.conf.setPassword(num, "");
-                this.conf.save();
-            }
-
-            if (System.getProperty("monsia.config.reset_user") != null) {
-                conf.setUser(num, "");
-                conf.save();
-            }
+            protocol.makeSSLSocketFactory(conf.getCACertificateFile(num));
+        }
+        if (!conf.getSavePassword(num)) {
+            conf.setPassword(num, "");
+            conf.save();
+        }
+        if (!conf.getSaveClientCertificatePassword(num)) {
+            conf.setClientCertificatePassword(num, "");
+            conf.save();
+        }
+        if (System.getProperty("monsia.config.reset_user") != null) {
+            conf.setUser(num, "");
+            conf.save();
         }
 
         protocol.getServerInfo();

@@ -60,40 +60,38 @@ public class Protocol {
     private String restURIRoot;
     private String authURI;
 
-    private final SSLSocketFactory sslSocketFactory;
+    private SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
 
     public static final int TYPE_USER_PASSWORD = 1;
     public static final int TYPE_CERT_FILE = 2;
     public static final int TYPE_PKCS11 = 3;
 
-    public Protocol(int type, String authURI, final String s1, final String s2, final String s3) throws IOException, GeneralSecurityException {
+    public Protocol(int type, String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
         rpcId = 1;
         this.authURI = authURI;
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(s2, s3.toCharArray());
+                return new PasswordAuthentication(user, pass.toCharArray());
             }
         });
-        switch (type) {
-            case TYPE_USER_PASSWORD:
-                if (!s1.isEmpty()) {
-                    sslSocketFactory = SSLSocketFactoryHelper.getFactory(s1, "", "");
-                } else {
-                    sslSocketFactory = null;
-                }
-                break;
-            case TYPE_CERT_FILE:
-                sslSocketFactory = SSLSocketFactoryHelper.getFactory(s1, s2, s3);
-                break;
-            case TYPE_PKCS11:
-                sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(s1, s2, s3);
-                break;
-            default:
-                sslSocketFactory = null;
-                break;
+    }
+
+    public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
+        if (caCert == null || caCert.isEmpty()) {
+            sslSocketFactory = null;
+        } else {
+            sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, "", "");
         }
+    }
+
+    public void makeSSLSocketFactoryPKCS12(final String caCert, final String certFile, final String certFilePass) throws IOException, GeneralSecurityException {
+        sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, certFile, certFilePass);
+    }
+
+    public void makeSSLSocketFactoryPKCS11(final String caCert, final String p11Lib, final String p11Slot) throws IOException, GeneralSecurityException {
+        sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
