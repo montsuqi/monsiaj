@@ -271,6 +271,8 @@ public class PandaCList extends JTable {
         Component c = super.prepareRenderer(renderer, row, column);
         if (fgColors != null && row < fgColors.length && fgColors[row] != null) {
             c.setForeground(fgColors[row]);
+        } else {
+            c.setForeground(Color.BLACK);
         }
         if (selection[row]) {
             c.setBackground(this.selectionBGColor);
@@ -291,7 +293,6 @@ public class PandaCList extends JTable {
             } else {
                 c.setBackground(Color.white);
             }
-            c.setForeground(Color.BLACK);
         }
         return c;
     }
