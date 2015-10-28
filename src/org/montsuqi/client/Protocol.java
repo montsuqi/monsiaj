@@ -58,7 +58,9 @@ public class Protocol {
     private String sessionId;
     private String rpcURI;
     private String restURIRoot;
-    private String authURI;
+    private final String authURI;
+    private final String user;
+    private final String pass;
 
     private SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
@@ -68,14 +70,11 @@ public class Protocol {
     public static final int TYPE_PKCS11 = 3;
 
     public Protocol(int type, String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
-        rpcId = 1;
+        this.rpcId = 1;
         this.authURI = authURI;
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, pass.toCharArray());
-            }
-        });
+        this.user = user;
+        this.pass = pass;
+        this.serverType = null;
     }
 
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
@@ -97,19 +96,27 @@ public class Protocol {
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
         URL url = new URL(strURL);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        String protocol = url.getProtocol();
-        switch (protocol) {
-            case "https":
-                if (strURL.equals(this.authURI)) {
-                    if (sslSocketFactory != null) {
-                        ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                    }
+        
+        if (serverType == null || serverType.equals("ginbee")) {
+            if (strURL.equals(this.authURI)) {
+                if (sslSocketFactory != null) {
+                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
                 }
-                break;
-            case "http":
-                break;
-            default:
-                throw new IOException("bad protocol");
+            }
+        } else {
+            if (sslSocketFactory != null) {
+                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+            }
+        }
+        if (strURL.equals(authURI)) {
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(user, pass.toCharArray());
+                }
+            });
+        } else {
+            Authenticator.setDefault(null);
         }
         return con;
     }
