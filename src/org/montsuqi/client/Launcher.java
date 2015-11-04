@@ -150,8 +150,9 @@ public class Launcher {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (resp != JOptionPane.OK_OPTION) {
+                if (resp == JOptionPane.OK_OPTION) {
                     conf.setPassword(n, String.valueOf(pwd.getPassword()));
+                } else {
                     return true;
                 }
             }
@@ -166,12 +167,13 @@ public class Launcher {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_certificate_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_certificate_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (resp != JOptionPane.OK_OPTION) {
-                    conf.setPassword(n, String.valueOf(pwd.getPassword()));
+                if (resp == JOptionPane.OK_OPTION) {
+                    conf.setClientCertificatePassword(n, String.valueOf(pwd.getPassword()));
+                } else {
                     return true;
                 }
             }
-
+            conf.save();
             connect();
             return true;
         }
