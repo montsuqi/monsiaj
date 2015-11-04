@@ -103,7 +103,7 @@ public class Client implements Runnable {
         }
         String password = conf.getPassword(num);
         String application = conf.getApplication(num);
-
+        
         if (!conf.getSavePassword(num)) {
             conf.setPassword(num, "");
             conf.save();
