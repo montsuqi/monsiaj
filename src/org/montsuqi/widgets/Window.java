@@ -77,7 +77,7 @@ public class Window extends JFrame {
             }
             dialog.setName(this.getName());
             dialog.getContentPane().add(child);
-            dialog.setResizable(this.getAllow_Grow() && this.getAllow_Shrink());
+            dialog.setResizable(true);
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             if (location != null) {
                 dialog.setLocation(location);
