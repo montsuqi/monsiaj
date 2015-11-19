@@ -67,11 +67,24 @@ public class Client {
     private static final Logger logger = LogManager.getLogger(Client.class);
     private Protocol protocol;
     private final UIControl uiControl;
-    private static final int PingTimerPeriod = 10 * 1000;
+    private static final int PingTimerPeriod;
     private javax.swing.Timer pingTimer;
     private JSONObject windowStack;
     private String focusedWindow;
     private String focusedWidget;
+
+    static {
+        if (System.getProperty("monsia.ping_timer_period") != null) {
+            int period = Integer.parseInt(System.getProperty("monsia.ping_timer_period")) * 1000;
+            if (period < 1000) {
+                PingTimerPeriod = 10 * 1000;
+            } else {
+                PingTimerPeriod = period;
+            }
+        } else {
+            PingTimerPeriod = 10 * 1000;
+        }
+    }
 
     public Client(Config conf) throws IOException {
         this.conf = conf;
