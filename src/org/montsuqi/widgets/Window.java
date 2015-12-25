@@ -50,11 +50,9 @@ public class Window extends JFrame {
     private boolean allow_shrink;
     private Component child = null;
     private JDialog dialog = null;
-    private Point location = null;
 
     public void destroyDialog() {
         if (dialog != null) {
-            location = dialog.getLocation();
             child.setEnabled(false);
             child.setVisible(false);
             dialog.setEnabled(false);
@@ -79,27 +77,25 @@ public class Window extends JFrame {
             dialog.getContentPane().add(child);
             dialog.setResizable(true);
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-            if (location != null) {
-                dialog.setLocation(location);
-            } else {
-                int x = tw.getX() + (int) (this.getX() * tw.getHScale());
-                int y = tw.getY() + (int) (this.getY() * tw.getVScale());
-                Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-                if (x + this.getWidth() > scrBounds.width) {
-                    x += scrBounds.width - (x + this.getWidth());
-                }
-                if (y + this.getHeight() > scrBounds.height) {
-                    y += scrBounds.height - (y + this.getHeight());
-                }
-                if (x < 0) {
-                    x = 0;
-                }
-                if (y < 0) {
-                    y = 0;
-                }
-                dialog.setLocation(x, y);
+
+            int x = tw.getX() + (int) (this.getX() * tw.getHScale());
+            int y = tw.getY() + (int) (this.getY() * tw.getVScale());
+            Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            if (x + this.getWidth() > scrBounds.width) {
+                x += scrBounds.width - (x + this.getWidth());
             }
+            if (y + this.getHeight() > scrBounds.height) {
+                y += scrBounds.height - (y + this.getHeight());
+            }
+            if (x < 0) {
+                x = 0;
+            }
+            if (y < 0) {
+                y = 0;
+            }
+            dialog.setLocation(x, y);
         }
+
         dialog.setTitle(this.getTitle());
         if (!dialog.isEnabled()) {
             dialog.setEnabled(true);
