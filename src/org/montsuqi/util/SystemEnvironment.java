@@ -46,7 +46,7 @@ public class SystemEnvironment {
     public static boolean isMacOSX() {
         return System.getProperty("os.name").toLowerCase().startsWith("mac os x");  //$NON-NLS-2$
     }
-
+    
     public static boolean isJavaVersionMatch(String version) {
         return System.getProperty("java.version").startsWith(version);
     }

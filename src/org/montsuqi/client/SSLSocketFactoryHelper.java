@@ -23,12 +23,17 @@
 package org.montsuqi.client;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.*;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -51,13 +56,13 @@ import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
 
 public class SSLSocketFactoryHelper {
-    
+
     static {
         javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
                 new javax.net.ssl.HostnameVerifier() {
 
                     @Override
-                    public boolean verify(String hostname,javax.net.ssl.SSLSession sslSession) {
+                    public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
                         try {
                             SSLSocketFactoryHelper.validatePeerCertificates(sslSession.getPeerCertificates(), hostname);
                         } catch (SSLException ex) {
@@ -70,8 +75,7 @@ public class SSLSocketFactoryHelper {
         );
     }
 
-    private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class
-    );
+    private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
         final Certificate serverCertificate = certificates[0];
@@ -99,7 +103,7 @@ public class SSLSocketFactoryHelper {
                 while (i.hasNext()) {
                     final List alternativeName = (List) i.next();
                     final Integer type = (Integer) alternativeName.get(0);
-                    if (type.intValue() == 2) { // dNSName == 2. Symbolic names not defined :/
+                    if (type == 2) { // dNSName == 2. Symbolic names not defined :/
                         final String value = (String) alternativeName.get(1);
                         if (value.equalsIgnoreCase(host)) {
                             System.out.println("One of subjectAlternativeNames matches.");
@@ -127,12 +131,12 @@ public class SSLSocketFactoryHelper {
         }
         System.out.println("CN matches.");
     }
-    
+
     public static SSLSocketFactory getFactory(String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
         final TrustManager[] trustManagers;
-        
+
         if (!p12File.isEmpty()) {
             keyManagers = createKeyManagers(p12File, p12Pass);
         } else {
@@ -140,7 +144,7 @@ public class SSLSocketFactoryHelper {
         }
 
         if (caCert == null || caCert.isEmpty()) {
-            trustManagers = createSystemDefaultTrustManagers();
+            trustManagers = createSystemTrustManagers();
         } else {
             trustManagers = createCAFileTrustManagers(caCert);
         }
@@ -252,85 +256,62 @@ public class SSLSocketFactoryHelper {
         }
     }
 
-    private static byte[] parseDERFromPEM(byte[] pem, String beginDelimiter, String endDelimiter) {
-        String data = new String(pem);
-        if (data.contains(beginDelimiter) && data.contains(endDelimiter)) {
-            String[] tokens = data.split(beginDelimiter);
-            tokens = tokens[1].split(endDelimiter);
-            return DatatypeConverter.parseBase64Binary(tokens[0]);
-        } else {
-            return pem;
-        }
-    }
-
-    private static X509Certificate generateCertificateFromDER(byte[] certBytes) throws CertificateException {
+    private static X509Certificate parseCertPem(String pem) throws CertificateException {
+        byte[] der = DatatypeConverter.parseBase64Binary(pem);
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
-
-        return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(certBytes));
+        return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(der));
     }
 
-    private static byte[] fileToBytes(File file) throws IOException {
-        byte[] bytes = new byte[(int) file.length()];
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            inputStream.read(bytes);
+    private static String[] splitCertFile(String path) throws FileNotFoundException, IOException {
+
+        byte[] fileContentBytes = Files.readAllBytes(Paths.get(path));
+        String str = new String(fileContentBytes, StandardCharsets.UTF_8);
+
+        Pattern pattern = Pattern.compile("-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(str);
+        List<String> list = new ArrayList<>();
+        while (matcher.find()) {
+            list.add(matcher.group());
         }
-        return bytes;
+        String[] strs = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            s = s.replace("-----BEGIN CERTIFICATE-----", "");
+            strs[i] = s.replace("-----END CERTIFICATE-----", "");
+        }
+        return strs;
+    }
+
+    private static void loadSystemCaCerts(KeyStore ks) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+        final File trustStorePath = new File(SystemEnvironment.createFilePath(new String[]{System.getProperty("java.home"), "lib", "security"}), "cacerts");
+        try (InputStream is = new FileInputStream(trustStorePath)) {
+            ks.load(is, null);
+        }
     }
 
     private static TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
-        byte[] certPem = fileToBytes(new File(caCertPath));
-        byte[] certBytes = parseDERFromPEM(certPem, "-----BEGIN CERTIFICATE-----", "-----END CERTIFICATE-----");
-        X509Certificate cert = generateCertificateFromDER(certBytes);
-
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(null);
-        keystore.setCertificateEntry("cert-alias", cert);
+
+        String pemStrs[] = splitCertFile(caCertPath);
+        for (String pem : pemStrs) {
+            X509Certificate cert = parseCertPem(pem);
+            keystore.setCertificateEntry(cert.toString(), cert);
+        }
+        loadSystemCaCerts(keystore);
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(keystore);
+
         return trustManagerFactory.getTrustManagers();
     }
 
-    private static TrustManager[] createSystemDefaultTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
-        if (SystemEnvironment.isMacOSX()) {
-            System.setProperty("javax.net.ssl.trustStoreType", "KeychainStore");
-            System.setProperty("javax.net.ssl.trustStoreProvider", "Apple");
-            final File trustStorePath = getTrustStorePath();
-            final KeyStore ks;
-            try (InputStream is = new FileInputStream(trustStorePath)) {
-                ks = KeyStore.getInstance("KeychainStore", "Apple");
-                ks.load(is, null);
-            }
-            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            tmf.init(ks);
-            return tmf.getTrustManagers();
-        } else {
-            final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-            final File trustStorePath = getTrustStorePath();
-            try (InputStream is = new FileInputStream(trustStorePath)) {
-                ks.load(is, null);
-            }
-            final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
-            tmf.init(ks);
-            return tmf.getTrustManagers();
-        }
-    }
-
-    private static File getTrustStorePath() {
-        String home = System.getProperty("user.home");
-        String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("windows vista")
-                || osName.startsWith("windows 7")
-                || osName.startsWith("windows 8")
-                || osName.startsWith("windows 9")
-                || osName.startsWith("windows 10")) {
-            return new File(SystemEnvironment.createFilePath(new String[]{home, "AppData", "LocalLow", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
-        } else if (SystemEnvironment.isWindows()) {
-            return new File(SystemEnvironment.createFilePath(new String[]{home, "Application Data", "Sun", "Java", "Deployment", "security"}), "trusted.jssecacerts");
-        } else if (SystemEnvironment.isMacOSX()) {
-            return new File(SystemEnvironment.createFilePath(new String[]{home, "Library", "Keychains"}), "login.keychain");
-        } else {
-            return new File(SystemEnvironment.createFilePath(new String[]{home, ".java", "deployment", "security"}), "trusted.jssecacerts");
-        }
+    private static TrustManager[] createSystemTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(null);
+        loadSystemCaCerts(keystore);
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keystore);
+        return trustManagerFactory.getTrustManagers();
     }
 
     private static KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
