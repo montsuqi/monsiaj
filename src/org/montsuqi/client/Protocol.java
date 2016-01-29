@@ -81,16 +81,19 @@ public class Protocol {
         if (caCert == null || caCert.isEmpty()) {
             sslSocketFactory = null;
         } else {
-            sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, "", "");
+            SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
+            sslSocketFactory = helper.getFactory(caCert, "", "");
         }
     }
 
     public void makeSSLSocketFactoryPKCS12(final String caCert, final String certFile, final String certFilePass) throws IOException, GeneralSecurityException {
-        sslSocketFactory = SSLSocketFactoryHelper.getFactory(caCert, certFile, certFilePass);
+        SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
+        sslSocketFactory = helper.getFactory(caCert, certFile, certFilePass);
     }
 
     public void makeSSLSocketFactoryPKCS11(final String caCert, final String p11Lib, final String p11Slot) throws IOException, GeneralSecurityException {
-        sslSocketFactory = SSLSocketFactoryHelper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
+        SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
+        sslSocketFactory = helper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {

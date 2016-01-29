@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.*;
@@ -54,6 +55,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
+import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketFactoryHelper {
 
@@ -74,7 +76,7 @@ public class SSLSocketFactoryHelper {
                 }
         );
     }
-
+    
     private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
@@ -132,7 +134,7 @@ public class SSLSocketFactoryHelper {
         System.out.println("CN matches.");
     }
 
-    public static SSLSocketFactory getFactory(String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
+    public SSLSocketFactory getFactory(String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
         final TrustManager[] trustManagers;
@@ -157,7 +159,7 @@ public class SSLSocketFactoryHelper {
         return factory;
     }
 
-    public static SSLSocketFactory getFactoryPKCS11(String caCert, String p11Lib, String p11Slot) throws IOException, GeneralSecurityException {
+    public SSLSocketFactory getFactoryPKCS11(String caCert, String p11Lib, String p11Slot) throws IOException, GeneralSecurityException {
         SSLSocketFactory factory;
         final KeyManager[] keyManagers;
         final TrustManager[] trustManagers;
@@ -289,7 +291,7 @@ public class SSLSocketFactoryHelper {
         }
     }
 
-    private static TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
+    private TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(null);
 
@@ -299,19 +301,34 @@ public class SSLSocketFactoryHelper {
             keystore.setCertificateEntry(cert.toString(), cert);
         }
         loadSystemCaCerts(keystore);
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init(keystore);
-
-        return trustManagerFactory.getTrustManagers();
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keystore);
+        final TrustManager[] tms = tmf.getTrustManagers();
+        for (TrustManager tm1 : tms) {
+            if (tm1 instanceof X509TrustManager) {
+                final X509TrustManager delegatee = (X509TrustManager) tm1;
+                final TrustManager tm = new MyTrustManager(delegatee);
+                return new TrustManager[]{tm};
+            }
+        }
+        return tms;
     }
 
-    private static TrustManager[] createSystemTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+    private TrustManager[] createSystemTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(null);
         loadSystemCaCerts(keystore);
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init(keystore);
-        return trustManagerFactory.getTrustManagers();
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keystore);
+        final TrustManager[] tms = tmf.getTrustManagers();
+        for (TrustManager tm1 : tms) {
+            if (tm1 instanceof X509TrustManager) {
+                final X509TrustManager delegatee = (X509TrustManager) tm1;
+                final TrustManager tm = new MyTrustManager(delegatee);
+                return new TrustManager[]{tm};
+            }
+        }
+        return tms;
     }
 
     private static KeyManager[] createKeyManagers(final String fileName, final String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
@@ -325,4 +342,83 @@ public class SSLSocketFactoryHelper {
         kmf.init(ks, pass.toCharArray());
         return kmf.getKeyManagers();
     }
+
+    final class MyTrustManager implements X509TrustManager {
+
+        private final X509TrustManager delegatee;
+
+        MyTrustManager(X509TrustManager _delegatee) {
+            delegatee = _delegatee;
+        }
+
+        private boolean isSelfCertificate(X509Certificate[] chain) {
+            final Principal subjectDN = chain[0].getSubjectDN();
+            final Principal issuerDN = chain[0].getIssuerDN();
+            return chain.length == 1 && subjectDN.equals(issuerDN);
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            if (isSelfCertificate(chain)) {
+                return;
+            }
+            try {
+                delegatee.checkClientTrusted(chain, authType);
+            } catch (CertificateException e) {
+                final String messageForDialog = Messages.getString("Client.client_certificate_verify_failed_proceed_connection_p");
+                final String messageForException = Messages.getString("Client.untrusted_client_certificate");
+                showAuthenticationFailure(chain, messageForDialog, messageForException);
+            }
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            try {
+                delegatee.checkServerTrusted(chain, authType);
+            } catch (CertificateException e) {
+                final String messageForDialog = Messages.getString("Client.server_certificate_verify_failed_proceed_connection_p");
+                final String messageForException = Messages.getString("Client.server_certificate_could_not_be_trusted");
+                showAuthenticationFailure(chain, messageForDialog, messageForException);
+            }
+        }
+        private static final int PROCEED_OPTION = 0;
+        private static final int CHECK_OPTION = 1;
+
+        private void showAuthenticationFailure(X509Certificate[] chain, String messageForDialog, String messageForException) throws CertificateException {
+            Object[] options = {
+                Messages.getString("Client.proceed"),
+                Messages.getString("Client.check_certificates"),
+                Messages.getString("Client.cancel")
+            };
+            CONFIRMATION_LOOP:
+            while (true) {
+                int n = JOptionPane.showOptionDialog(null,
+                        messageForDialog,
+                        Messages.getString("Client.warning_title"),
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[2]);
+                switch (n) {
+                    case PROCEED_OPTION:
+                        break CONFIRMATION_LOOP;
+                    case CHECK_OPTION:
+                        final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
+                        certificatePanel.setCertificateChain(chain);
+                        final String title = Messages.getString("Client.checking_certificate_chain");
+                        JOptionPane.showMessageDialog(null, certificatePanel, title, JOptionPane.PLAIN_MESSAGE);
+                        continue;
+                    default:
+                        throw new CertificateException(messageForException);
+                }
+            }
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return delegatee.getAcceptedIssuers();
+        }
+    }
+
 }
