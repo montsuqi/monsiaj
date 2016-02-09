@@ -509,6 +509,20 @@ public class Config {
         setValue(i, "systemProperties", v);
     }
 
+    public void LoadPrinterConfig(int i) {
+        printerConfigMap.clear();
+        String confStr = getValue(i, "printerConfig");
+        String[] set = confStr.split(",");
+        for (String kv : set) {
+            String[] e = kv.split(":=:");
+            if (e.length == 2) {
+                printerConfigMap.put(e[0], printerServiceMap.get(e[1]));
+            } else {
+                logger.warn("invalid printer config! skip this. [" + kv + "]");
+            }
+        }
+    }
+
     public Map<String, String> getPrinterConfig(int i) {
         TreeMap<String, String> map = new TreeMap<>();
         String confStr = getValue(i, "printerConfig");
