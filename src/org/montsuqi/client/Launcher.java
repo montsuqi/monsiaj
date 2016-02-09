@@ -102,6 +102,9 @@ public class Launcher {
              * set properties
              */
             conf.applySystemProperties(n);
+            
+            /* set printer config */
+            conf.LoadPrinterConfig(n);
 
             /*
              * set look and feel

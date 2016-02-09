@@ -57,7 +57,7 @@ public class Config {
         if (System.getProperty("monsiaj.debug.printer_list") != null) {
             printerServiceMap.put("p1", null);
             printerServiceMap.put("p2", null);
-            printerServiceMap.put("p3", null);   
+            printerServiceMap.put("p3", null);
             printerList.add("p1");
             printerList.add("p2");
             printerList.add("p3");
@@ -498,6 +498,20 @@ public class Config {
     public void setSystemProperties(int i, String v) {
         setValue(i, "systemProperties", v);
     }
+    
+    public void LoadPrinterConfig(int i) {
+        printerConfigMap.clear();
+        String confStr = getValue(i, "printerConfig");
+        String[] set = confStr.split(",");
+        for (String kv : set) {
+            String[] e = kv.split(":=:");
+            if (e.length == 2) {
+                printerConfigMap.put(e[0], printerServiceMap.get(e[1]));
+            } else {
+                logger.warn("invalid printer config! skip this. [" + kv + "]");
+            }
+        }
+    }
 
     public Map<String, String> getPrinterConfig(int i) {
         TreeMap<String, String> map = new TreeMap<>();
@@ -507,7 +521,7 @@ public class Config {
             String[] e = kv.split(":=:");
             if (e.length == 2) {
                 map.put(e[0], e[1]);
-            } else {
+             } else {
                 logger.warn("invalid printer config! skip this. [" + kv + "]");
             }
         }
