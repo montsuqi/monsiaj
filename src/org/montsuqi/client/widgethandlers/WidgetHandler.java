@@ -127,8 +127,10 @@ public abstract class WidgetHandler {
         }
         if (obj.has("visible")) {
             boolean visible = obj.getBoolean("visible");
-            widget.setEnabled(visible);
             widget.setVisible(visible);
+            if (!visible) {
+                widget.setEnabled(false);
+            }
         }
     }
 
