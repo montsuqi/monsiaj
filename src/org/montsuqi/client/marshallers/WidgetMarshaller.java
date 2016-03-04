@@ -106,8 +106,11 @@ public abstract class WidgetMarshaller {
             return true;
         } else if ("visible".equals(name)) { 
             boolean visible = con.receiveBooleanData();
-            widget.setEnabled(visible);
+            
             widget.setVisible(visible);
+            if (!visible) {
+                widget.setEnabled(false);
+            }
             return true;            
         } else {
             return false;
