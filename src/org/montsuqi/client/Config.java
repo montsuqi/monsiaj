@@ -533,6 +533,11 @@ public class Config {
         String str = "";
         int j = 0;
         for (Map.Entry<String, String> e : map.entrySet()) {
+            String key = e.getKey();
+            String val = e.getValue();
+            if (key == null || val == null) {
+                continue;
+            }
             if (j == 0) {
                 str = str + e.getKey() + ":=:" + e.getValue();
             } else {
