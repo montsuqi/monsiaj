@@ -63,20 +63,20 @@ public class SSLSocketFactoryHelper {
         javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
                 new javax.net.ssl.HostnameVerifier() {
 
-                    @Override
-                    public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
-                        try {
-                            SSLSocketFactoryHelper.validatePeerCertificates(sslSession.getPeerCertificates(), hostname);
-                        } catch (SSLException ex) {
-                            java.util.logging.Logger.getLogger(SSLSocketFactoryHelper.class.getName()).log(Level.SEVERE, null, ex);
-                            return false;
-                        }
-                        return true;
-                    }
+            @Override
+            public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
+                try {
+                    SSLSocketFactoryHelper.validatePeerCertificates(sslSession.getPeerCertificates(), hostname);
+                } catch (SSLException ex) {
+                    java.util.logging.Logger.getLogger(SSLSocketFactoryHelper.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
                 }
+                return true;
+            }
+        }
         );
     }
-    
+
     private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
@@ -373,6 +373,11 @@ public class SSLSocketFactoryHelper {
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            if (System.getProperty("monsia.ssl_enable_server_selfsigned_cert") != null) {
+            if (isSelfCertificate(chain)) {
+                return;
+            }
+            }
             try {
                 delegatee.checkServerTrusted(chain, authType);
             } catch (CertificateException e) {
