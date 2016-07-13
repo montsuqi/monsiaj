@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.Provider;
 import java.security.Security;
@@ -53,7 +52,6 @@ import javax.swing.JPasswordField;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.CertificateDetailPanel;
 
@@ -77,14 +75,14 @@ public class SSLSocketFactoryHelper {
         );
     }
 
-    private static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger(SSLSocketFactoryHelper.class);
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
         final Certificate serverCertificate = certificates[0];
         if (serverCertificate instanceof X509Certificate) {
             checkHostNameInCertificate((X509Certificate) serverCertificate, host);
         } else {
-            System.out.println("Server Certificate is not a X.509 Certificate");
+            LOGGER.info("Server Certificate is not a X.509 Certificate");
         }
     }
 
@@ -144,13 +142,7 @@ public class SSLSocketFactoryHelper {
         } else {
             keyManagers = new KeyManager[]{};
         }
-
-        if (caCert == null || caCert.isEmpty()) {
-            trustManagers = createSystemTrustManagers();
-        } else {
-            trustManagers = createCAFileTrustManagers(caCert);
-        }
-
+        trustManagers = createCAFileTrustManagers(caCert);
         final SSLContext ctx;
         ctx = SSLContext.getInstance("TLS");
         ctx.init(keyManagers, trustManagers, null);
@@ -168,11 +160,7 @@ public class SSLSocketFactoryHelper {
         final SSLContext ctx;
         ctx = SSLContext.getInstance("TLS");
         keyManagers = createPKCS11KeyManagers(builder);
-        if (caCert == null || caCert.isEmpty()) {
-            trustManagers = createPKCS11TrustManagers(builder);
-        } else {
-            trustManagers = createCAFileTrustManagers(caCert);
-        }
+        trustManagers = createCAFileTrustManagers(caCert);
         ctx.init(keyManagers, trustManagers, null);
         factory = ctx.getSocketFactory();
         SSLContext.setDefault(ctx);
@@ -284,13 +272,6 @@ public class SSLSocketFactoryHelper {
         return strs;
     }
 
-    private static void loadSystemCaCerts(KeyStore ks) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
-        final File trustStorePath = new File(SystemEnvironment.createFilePath(new String[]{System.getProperty("java.home"), "lib", "security"}), "cacerts");
-        try (InputStream is = new FileInputStream(trustStorePath)) {
-            ks.load(is, null);
-        }
-    }
-
     private TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(null);
@@ -298,26 +279,8 @@ public class SSLSocketFactoryHelper {
         String pemStrs[] = splitCertFile(caCertPath);
         for (String pem : pemStrs) {
             X509Certificate cert = parseCertPem(pem);
-            keystore.setCertificateEntry(cert.toString(), cert);
+            keystore.setCertificateEntry(cert.getSubjectDN().toString(), cert);
         }
-        loadSystemCaCerts(keystore);
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(keystore);
-        final TrustManager[] tms = tmf.getTrustManagers();
-        for (TrustManager tm1 : tms) {
-            if (tm1 instanceof X509TrustManager) {
-                final X509TrustManager delegatee = (X509TrustManager) tm1;
-                final TrustManager tm = new MyTrustManager(delegatee);
-                return new TrustManager[]{tm};
-            }
-        }
-        return tms;
-    }
-
-    private TrustManager[] createSystemTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
-        KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(null);
-        loadSystemCaCerts(keystore);
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(keystore);
         final TrustManager[] tms = tmf.getTrustManagers();
@@ -374,9 +337,9 @@ public class SSLSocketFactoryHelper {
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             if (System.getProperty("monsia.ssl_enable_server_selfsigned_cert") != null) {
-            if (isSelfCertificate(chain)) {
-                return;
-            }
+                if (isSelfCertificate(chain)) {
+                    return;
+                }
             }
             try {
                 delegatee.checkServerTrusted(chain, authType);
