@@ -97,7 +97,7 @@ public class SSLSocketFactoryHelper {
         try {
             final Collection subjectAlternativeNames = certificate.getSubjectAlternativeNames();
             if (subjectAlternativeNames == null) {
-                System.out.println("Server certificate does not have subjectAlternativeNames.");
+                LOGGER.debug("Server certificate does not have subjectAlternativeNames.");
             } else {
                 final Iterator i = subjectAlternativeNames.iterator();
                 while (i.hasNext()) {
@@ -106,7 +106,7 @@ public class SSLSocketFactoryHelper {
                     if (type == 2) { // dNSName == 2. Symbolic names not defined :/
                         final String value = (String) alternativeName.get(1);
                         if (value.equalsIgnoreCase(host)) {
-                            System.out.println("One of subjectAlternativeNames matches.");
+                            LOGGER.debug("One of subjectAlternativeNames matches.");
                             return;
                         }
                     }
@@ -129,7 +129,7 @@ public class SSLSocketFactoryHelper {
             final String message = MessageFormat.format(format, args);
             throw new SSLPeerUnverifiedException(message);
         }
-        System.out.println("CN matches.");
+        LOGGER.debug("CN matches.");
     }
 
     public SSLSocketFactory getFactory(String caCert, String p12File, String p12Pass) throws IOException, GeneralSecurityException {
@@ -336,11 +336,6 @@ public class SSLSocketFactoryHelper {
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            if (System.getProperty("monsia.ssl_enable_server_selfsigned_cert") != null) {
-                if (isSelfCertificate(chain)) {
-                    return;
-                }
-            }
             try {
                 delegatee.checkServerTrusted(chain, authType);
             } catch (CertificateException e) {
