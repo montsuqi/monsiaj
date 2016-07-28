@@ -77,12 +77,12 @@ public class Client {
         if (System.getProperty("monsia.ping_timer_period") != null) {
             int period = Integer.parseInt(System.getProperty("monsia.ping_timer_period")) * 1000;
             if (period < 1000) {
-                PingTimerPeriod = 10 * 1000;
+                PingTimerPeriod = 7 * 1000;
             } else {
                 PingTimerPeriod = period;
             }
         } else {
-            PingTimerPeriod = 10 * 1000;
+            PingTimerPeriod = 7 * 1000;
         }
     }
 
