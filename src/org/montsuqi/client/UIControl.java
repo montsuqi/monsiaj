@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static org.montsuqi.client.Launcher.logger;
 import org.montsuqi.client.widgethandlers.WidgetHandler;
 import org.montsuqi.monsia.Interface;
 import org.montsuqi.monsia.Style;

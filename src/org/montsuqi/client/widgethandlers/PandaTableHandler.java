@@ -152,7 +152,7 @@ class PandaTableHandler extends WidgetHandler {
                 model.setValue(value);
             }
         }
-
+        con._addChangedWidget(widget);
     }
 
     @Override
@@ -165,27 +165,15 @@ class PandaTableHandler extends WidgetHandler {
 
         int k = 0;
         JSONArray array = new JSONArray();
+        obj.put("rowdata", array);        
         for (int i = 0; i < tableModel.getRowCount(); i++) {
-            boolean rowChanged = false;
-            JSONObject rowObj = new JSONObject();
             for (int j = 0; j < table.getColumns(); j++) {
-                String key = "column" + (j + 1);
-                if (rowObj.has(key)) {
-                    JSONObject colObj = rowObj.getJSONObject(key);
-                    if (colObj.has("celldata")) {
-                        if (!colObj.getString("celldata").equals((String) tableModel.getValueAt(i, j))) {
-                            rowChanged = true;
-                        }
-                    }
+                String val = (String)tableModel.getValueAt(i, j);
+                if (!val.isEmpty()) {
+                    k = i + 1;
                 }
             }
-            array.put(i, rowObj);
-            if (rowChanged) {
-                k = i + 1;
-            }
         }
-        obj.put("rowdata", array);
-
         for (int i = 0; i < k; i++) {
             JSONObject rowObj = new JSONObject();
             array.put(i, rowObj);

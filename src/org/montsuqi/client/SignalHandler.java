@@ -168,6 +168,7 @@ public abstract class SignalHandler {
                     timerTask.cancel();
                     timerTask = null;
                 }                
+                widget.requestFocusInWindow();                
                 blockChangedHandlers();
                 con.sendEvent(widget, userData);
                 unblockChangedHandlers();

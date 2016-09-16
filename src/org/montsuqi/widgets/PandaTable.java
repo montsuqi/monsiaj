@@ -240,7 +240,7 @@ public class PandaTable extends JTable {
                         ic.selectInputMethod(Locale.ENGLISH);
                     }
                 }
-                ce.stopCellEditing();
+                ce.stopCellEditing();                
             }
         });
 
