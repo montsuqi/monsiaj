@@ -34,8 +34,7 @@ import javax.swing.LayoutFocusTraversalPolicy;
 import org.montsuqi.monsia.Interface;
 
 /**
- * <
- * p>
+ * <p>
  * A JFrame wrapper.</p>
  */
 public class TopWindow extends Window implements ComponentListener {
@@ -84,8 +83,7 @@ public class TopWindow extends Window implements ComponentListener {
     }
 
     /**
-     * <
-     * p>
+     * <p>
      * Constructs a Window instance.</p>
      */
     public TopWindow() {
@@ -137,21 +135,25 @@ public class TopWindow extends Window implements ComponentListener {
         this.xml = xml;
     }
 
+    @Override
     public void componentResized(ComponentEvent ce) {
         ReScale();
         prefs.putInt(this.getClass().getName() + ".width", this.getWidth());
         prefs.putInt(this.getClass().getName() + ".height", this.getHeight());
     }
 
+    @Override
     public void componentMoved(ComponentEvent ce) {
         prefs.putInt(this.getClass().getName() + ".x", this.getX());
         prefs.putInt(this.getClass().getName() + ".y", this.getY());
     }
 
+    @Override
     public void componentShown(ComponentEvent ce) {
         // do nothing
     }
 
+    @Override
     public void componentHidden(ComponentEvent ce) {
         // do nothing
     }

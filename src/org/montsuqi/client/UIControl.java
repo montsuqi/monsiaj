@@ -48,7 +48,6 @@ public class UIControl {
     private Color sessionBGColor;
     private Interface xml;
     private final TopWindow topWindow;
-    private final ArrayList<Component> dialogStack;
     private final Map styleMap;
     private final Map<String, Component> changedWidgetMap;
     private final Map<String, Object> screenTemplateMap;
@@ -60,7 +59,6 @@ public class UIControl {
         sessionTitle = "";
         sessionBGColor = null;
         topWindow = new TopWindow();
-        dialogStack = new ArrayList<>();
         changedWidgetMap = new HashMap<>();
         screenTemplateMap = new HashMap<>();
         this.client = client;
@@ -91,18 +89,16 @@ public class UIControl {
                         }
                         if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
                             updateScreenTemplate(c1, c2);
-                        } else {
-                            if (c2 != null && c1.getClass() == c2.getClass()) {
-                                tmplObj.put(key, c2);
-                            } else if (c1 instanceof java.lang.Boolean) {
-                                tmplObj.put(key, true);
-                            } else if (c1 instanceof java.lang.Integer) {
-                                tmplObj.put(key, 0);
-                            } else if (c1 instanceof java.lang.Double) {
-                                tmplObj.put(key, 0.0);
-                            } else if (c1 instanceof java.lang.String) {
-                                tmplObj.put(key, "");
-                            }
+                        } else if (c2 != null && c1.getClass() == c2.getClass()) {
+                            tmplObj.put(key, c2);
+                        } else if (c1 instanceof java.lang.Boolean) {
+                            tmplObj.put(key, true);
+                        } else if (c1 instanceof java.lang.Integer) {
+                            tmplObj.put(key, 0);
+                        } else if (c1 instanceof java.lang.Double) {
+                            tmplObj.put(key, 0.0);
+                        } else if (c1 instanceof java.lang.String) {
+                            tmplObj.put(key, "");
                         }
                     }
                 } else if (tmpl instanceof JSONArray && upd instanceof JSONArray) {
@@ -116,50 +112,8 @@ public class UIControl {
                         }
                         if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
                             updateScreenTemplate(c1, c2);
-                        } else {
-                            if (c2 != null && c1.getClass() == c2.getClass()) {
-                                tmplArr.put(i, c2);
-                            } else if (c1 instanceof java.lang.Boolean) {
-                                tmplArr.put(i, true);
-                            } else if (c1 instanceof java.lang.Integer) {
-                                tmplArr.put(i, 0);
-                            } else if (c1 instanceof java.lang.Double) {
-                                tmplArr.put(i, 0.0);
-                            } else if (c1 instanceof java.lang.String) {
-                                tmplArr.put(i, "");
-                            }
-                        }
-                    }
-                } else {
-                    System.out.println("tmpl ----");
-                    System.out.println(tmpl);
-                    System.out.println("upd ----");
-                    System.out.println(upd);                    
-                }
-            } else {
-                if (tmpl instanceof JSONObject) {
-                    JSONObject tmplObj = (JSONObject) tmpl;
-                    for (Iterator i = tmplObj.keys(); i.hasNext();) {
-                        String key = (String) i.next();
-                        Object c1 = tmplObj.get(key);
-                        if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
-                            updateScreenTemplate(c1, null);
-                        } else if (c1 instanceof java.lang.Boolean) {
-                            tmplObj.put(key, true);
-                        } else if (c1 instanceof java.lang.Integer) {
-                            tmplObj.put(key, 0);
-                        } else if (c1 instanceof java.lang.Double) {
-                            tmplObj.put(key, 0.0);
-                        } else if (c1 instanceof java.lang.String) {
-                            tmplObj.put(key, "");
-                        }
-                    }
-                } else if (tmpl instanceof JSONArray) {
-                    JSONArray tmplArr = (JSONArray) tmpl;
-                    for (int i = 0; i < tmplArr.length(); i++) {
-                        Object c1 = tmplArr.get(i);
-                        if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
-                            updateScreenTemplate(c1, null);
+                        } else if (c2 != null && c1.getClass() == c2.getClass()) {
+                            tmplArr.put(i, c2);
                         } else if (c1 instanceof java.lang.Boolean) {
                             tmplArr.put(i, true);
                         } else if (c1 instanceof java.lang.Integer) {
@@ -169,6 +123,44 @@ public class UIControl {
                         } else if (c1 instanceof java.lang.String) {
                             tmplArr.put(i, "");
                         }
+                    }
+                } else {
+                    System.out.println("tmpl ----");
+                    System.out.println(tmpl);
+                    System.out.println("upd ----");
+                    System.out.println(upd);
+                }
+            } else if (tmpl instanceof JSONObject) {
+                JSONObject tmplObj = (JSONObject) tmpl;
+                for (Iterator i = tmplObj.keys(); i.hasNext();) {
+                    String key = (String) i.next();
+                    Object c1 = tmplObj.get(key);
+                    if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
+                        updateScreenTemplate(c1, null);
+                    } else if (c1 instanceof java.lang.Boolean) {
+                        tmplObj.put(key, true);
+                    } else if (c1 instanceof java.lang.Integer) {
+                        tmplObj.put(key, 0);
+                    } else if (c1 instanceof java.lang.Double) {
+                        tmplObj.put(key, 0.0);
+                    } else if (c1 instanceof java.lang.String) {
+                        tmplObj.put(key, "");
+                    }
+                }
+            } else if (tmpl instanceof JSONArray) {
+                JSONArray tmplArr = (JSONArray) tmpl;
+                for (int i = 0; i < tmplArr.length(); i++) {
+                    Object c1 = tmplArr.get(i);
+                    if (c1 instanceof JSONObject || c1 instanceof JSONArray) {
+                        updateScreenTemplate(c1, null);
+                    } else if (c1 instanceof java.lang.Boolean) {
+                        tmplArr.put(i, true);
+                    } else if (c1 instanceof java.lang.Integer) {
+                        tmplArr.put(i, 0);
+                    } else if (c1 instanceof java.lang.Double) {
+                        tmplArr.put(i, 0.0);
+                    } else if (c1 instanceof java.lang.String) {
+                        tmplArr.put(i, "");
                     }
                 }
             }
@@ -258,21 +250,8 @@ public class UIControl {
             JDialog dialog = window.getDialog();
 
             topWindow.showBusyCursor();
-            if (!dialogStack.contains(dialog)) {
-                for (Component c : dialogStack) {
-                    parent = c;
-                    parent.setEnabled(false);
-                    stopTimer(parent);
-                }
-                if (SystemEnvironment.isWindows()) {
-                    dialog = window.createDialog(topWindow, topWindow);
-                } else {
-                    dialog = window.createDialog(parent, topWindow);
-                }
-                dialogStack.add(dialog);
-            } else {
-                window.createDialog(parent, topWindow);
-            }
+            dialog = window.createDialog(topWindow, topWindow);
+
             window.getChild().setBackground(this.sessionBGColor);
             dialog.validate();
             resetTimer(dialog);
@@ -293,9 +272,6 @@ public class UIControl {
 
         if (window.isDialog()) {
             JDialog dialog = window.getDialog();
-            if (dialogStack.contains(dialog)) {
-                dialogStack.remove(dialog);
-            }
             stopTimer(window.getDialog());
             window.destroyDialog();
         } else {

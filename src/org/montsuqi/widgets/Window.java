@@ -139,8 +139,7 @@ public class Window extends JFrame {
     private boolean isDialog = false;
 
     /**
-     * <
-     * p>
+     * <p>
      * Constructs a Window instance.</p>
      */
     public Window() {
@@ -169,8 +168,7 @@ public class Window extends JFrame {
     }
 
     /**
-     * <
-     * p>
+     * <p>
      * Show the window is busy by changing the mouse cursor to wait cursor.
      * Accepts no input.</p>
      */
@@ -185,8 +183,7 @@ public class Window extends JFrame {
     }
 
     /**
-     * <
-     * p>
+     * <p>
      * Cancel the busy state of this window.</p>
      */
     public void hideBusyCursor() {
@@ -211,8 +208,7 @@ public class Window extends JFrame {
     }
 
     /**
-     * <
-     * p>
+     * <p>
      * Make <em>all</em> window busy.</p>
      */
     public static void busyAllWindows() {
@@ -223,8 +219,7 @@ public class Window extends JFrame {
     }
 
     /**
-     * <
-     * p>
+     * <p>
      * Returns all java.awt.Frames which are instances of this class.</p>
      *
      * @return array of Frames which are instances of this class.
