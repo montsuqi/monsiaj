@@ -387,7 +387,7 @@ public class Client {
                 return;
             }
             try {
-                File temp = TempFile.createTempFile("downloadfile", "dat");
+                File temp = TempFile.createTempFile("downloadfile", filename);
                 temp.deleteOnExit();
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
                 protocol.getBLOB(oid, out);

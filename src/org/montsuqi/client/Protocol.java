@@ -99,17 +99,15 @@ public class Protocol {
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
         URL url = new URL(strURL);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        
+
         if (serverType == null || serverType.equals("ginbee")) {
             if (strURL.equals(this.authURI)) {
                 if (sslSocketFactory != null) {
                     ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
                 }
             }
-        } else {
-            if (sslSocketFactory != null) {
-                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-            }
+        } else if (sslSocketFactory != null) {
+            ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
         }
         if (strURL.equals(authURI)) {
             Authenticator.setDefault(new Authenticator() {
@@ -158,9 +156,11 @@ public class Protocol {
     private Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         long st = System.currentTimeMillis();
         String reqStr = makeJSONRPCRequest(method, params);
-        logger.debug("---- JSONRPC request");
-        logger.debug(reqStr);
-        logger.debug("----");
+        if (System.getProperty("monsia.debug.jsonrpc") != null) {
+            logger.info("---- JSONRPC request");
+            logger.info(reqStr);
+            logger.info("----");
+        }
         HttpURLConnection con = getHttpURLConnection(url);
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -196,9 +196,11 @@ public class Protocol {
             }
 
             String resStr = bytes.toString("UTF-8");
-            logger.debug("---- JSONRPC response");
-            logger.debug(resStr);
-            logger.debug("----");
+            if (System.getProperty("monsia.debug.jsonrpc") != null) {
+                logger.info("---- JSONRPC response");
+                logger.info(resStr);
+                logger.info("----");
+            }
             result = checkJSONRPCResponse(resStr);
         }
         return result;
