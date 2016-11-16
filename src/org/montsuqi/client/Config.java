@@ -62,19 +62,16 @@ public class Config {
         printerServiceMap = new TreeMap<>();
         printerList = new ArrayList<>();
         if (System.getProperty("monsia.debug.printer_list") != null) {
-            printerServiceMap.put("p1", null);
-            printerServiceMap.put("p2", null);
-            printerServiceMap.put("p3", null);   
-            printerList.add("p1");
-            printerList.add("p2");
-            printerList.add("p3");
         } else {
             DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
             PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
+            logger.debug("-----");             
             for (PrintService ps : pss) {
+                logger.debug(ps.getName() + "#:#" + ps);                
                 printerServiceMap.put(ps.getName(), ps);
                 printerList.add(ps.getName());
             }
+            logger.debug("-----");                         
             Collections.sort(printerList, new Comparator<Object>() {
                 @Override
                 public int compare(Object o1, Object o2) {
@@ -563,7 +560,7 @@ public class Config {
         PrintService ps = printerConfigMap.get(printer);
         if (ps == null) {
             ps = printerConfigMap.get("default");
-        }
+        } 
         return ps;
     }
 

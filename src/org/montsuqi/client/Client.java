@@ -315,7 +315,7 @@ public class Client {
 
             String title = "";
             if (item.has("title")) {
-                printer = item.getString("title");
+                title = item.getString("title");
             }
 
             boolean showdialog = false;
