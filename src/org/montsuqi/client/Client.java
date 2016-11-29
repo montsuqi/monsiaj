@@ -457,9 +457,7 @@ public class Client {
             if (!isReceiving()) {
                 startReceiving();
                 listDownloads();
-                if (!this.protocol.getServerType().equals("ginbee")) {
-                    getMessage();
-                }
+                getMessage();
                 stopReceiving();
             }
         } catch (IOException | JSONException ex) {

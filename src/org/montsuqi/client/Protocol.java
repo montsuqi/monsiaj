@@ -100,13 +100,7 @@ public class Protocol {
         URL url = new URL(strURL);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-        if (serverType == null || serverType.equals("ginbee")) {
-            if (strURL.equals(this.authURI)) {
-                if (sslSocketFactory != null) {
-                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                }
-            }
-        } else if (sslSocketFactory != null) {
+        if (sslSocketFactory != null) {
             ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
         }
         if (strURL.equals(authURI)) {
