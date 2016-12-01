@@ -26,7 +26,9 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Frame;
-import java.awt.Point;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
@@ -80,18 +82,22 @@ public class Window extends JFrame {
 
             int x = tw.getX() + (int) (this.getX() * tw.getHScale());
             int y = tw.getY() + (int) (this.getY() * tw.getVScale());
-            Rectangle scrBounds = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-            if (x + this.getWidth() > scrBounds.width) {
-                x += scrBounds.width - (x + this.getWidth());
-            }
-            if (y + this.getHeight() > scrBounds.height) {
-                y += scrBounds.height - (y + this.getHeight());
-            }
-            if (x < 0) {
-                x = 0;
-            }
-            if (y < 0) {
-                y = 0;
+
+            java.awt.GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice[] gs = ge.getScreenDevices();
+            for (GraphicsDevice gd : gs) {
+                GraphicsConfiguration[] gc = gd.getConfigurations();
+                for (GraphicsConfiguration gc1 : gc) {
+                    Rectangle scrBounds = gc1.getBounds();
+                    if (scrBounds.contains(x, y)) {
+                        if (x + this.getWidth() > scrBounds.width) {
+                            x += scrBounds.width - (x + this.getWidth());
+                        }
+                        if (y + this.getHeight() > scrBounds.height) {
+                            y += scrBounds.height - (y + this.getHeight());
+                        }
+                    }
+                }
             }
             dialog.setLocation(x, y);
         }
