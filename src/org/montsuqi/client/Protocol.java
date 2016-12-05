@@ -100,8 +100,10 @@ public class Protocol {
         URL url = new URL(strURL);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-        if (sslSocketFactory != null) {
-            ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+        if (strURL.startsWith("https")) {
+            if (sslSocketFactory != null) {
+                ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
+            }
         }
         if (strURL.equals(authURI)) {
             Authenticator.setDefault(new Authenticator() {
