@@ -15,7 +15,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import javax.print.DocFlavor;
 import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
@@ -59,14 +62,14 @@ public class PDFPrint extends Thread {
             try {
                 ArrayList<PDFPage> list = e.getValue();
                 PDFPage[] pages = new PDFPage[list.size()];
-                for(int i=0;i<list.size();i++) {
+                for (int i = 0; i < list.size(); i++) {
                     pages[i] = list.get(i);
                 }
-                PDFPrintPage printPage = new PDFPrintPage(pages);            
+                PDFPrintPage printPage = new PDFPrintPage(pages);
                 MediaSizeName mediaSizeName = e.getKey();
                 PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
-                PrinterJob pjob = PrinterJob.getPrinterJob();              
-                pjob.setJobName(file.getName());             
+                PrinterJob pjob = PrinterJob.getPrinterJob();
+                pjob.setJobName(file.getName());
                 pjob.setPrintService(printService);
 
                 if (mediaSizeName != MediaSizeName.A) {
@@ -77,7 +80,7 @@ public class PDFPrint extends Thread {
 
                 paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
                 pf.setPaper(paper);
-                
+
                 Book book = new Book();
                 book.append(printPage, pf, pages.length);
                 pjob.setPageable(book);
@@ -121,6 +124,7 @@ public class PDFPrint extends Thread {
 
     @Override
     public void run() {
+        logger.info("print start - " + file);
         try {
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
@@ -134,11 +138,31 @@ public class PDFPrint extends Thread {
         } catch (java.io.IOException ex) {
             logger.catching(Level.WARN, ex);
         }
+        logger.info("print end   - " + file);        
     }
 
     public static void main(String args[]) throws Exception {
-        PDFPrint printer = new PDFPrint(new File(args[0]));
-        printer.start();
+        DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
+        PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
+        PrintService ps = null;
+        System.out.println("---- print service");
+        for (PrintService _ps : pss) {
+           System.out.println(_ps.getName());            
+            if (_ps.getName().equals(args[0])) {
+                ps = _ps;
+            }
+        }
+        for(int i=0;i<1;i++) {
+        if (ps == null) {
+            PDFPrint printer = new PDFPrint(new File(args[1]));
+            printer.start();
+        } else {
+            PDFPrint printer = new PDFPrint(new File(args[1]), ps);
+            printer.start();
+        }
+        System.out.println(i);
+        Thread.sleep(2000);
+        }
     }
 
     public static class PDFPrintPage implements Printable {

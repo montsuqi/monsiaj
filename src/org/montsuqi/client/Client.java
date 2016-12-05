@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.print.PrintService;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
@@ -50,6 +52,7 @@ import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
+import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
@@ -331,13 +334,19 @@ public class Client {
             }
 
             try {
-                File temp = TempFile.createTempFile("report", "pdf");
-                temp.deleteOnExit();
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+                Date date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+                String prefix = "report_" + sdf.format(date) + "_";
+                File file = TempFile.createTempFile(prefix, "pdf");
+                if (System.getProperty("monsia.save.print_data") != null) {
+                } else {
+                    file.deleteOnExit();
+                }
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
                 protocol.getBLOB(oid, out);
                 logger.info(item);
                 if (showdialog) {
-                    showReportDialog(title, temp);
+                    showReportDialog(title, file);
                 } else {
                     PrintService ps = null;
                     if (printer != null) {
@@ -349,10 +358,10 @@ public class Client {
                                 + Messages.getString("PrintReport.printer") + printer + "\n\n"
                                 + Messages.getString("PrintReport.title") + title,
                                 GtkStockIcon.get("gtk-print"), 0);
-                        PDFPrint print = new PDFPrint(temp, ps);
+                        PDFPrint print = new PDFPrint(file, ps);
                         print.start();
                     } else {
-                        showReportDialog(title, temp);
+                        showReportDialog(title, file);
                     }
                 }
             } catch (IOException ex) {
