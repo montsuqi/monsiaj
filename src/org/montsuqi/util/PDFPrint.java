@@ -15,7 +15,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;

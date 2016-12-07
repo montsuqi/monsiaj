@@ -440,6 +440,7 @@ public class Client {
         if (result.has("abort")) {
             String abort = result.getString("abort");
             if (!abort.isEmpty()) {
+                protocol.endSession();
                 JOptionPane.showMessageDialog(uiControl.getTopWindow(), abort);
                 System.exit(0);
             }
