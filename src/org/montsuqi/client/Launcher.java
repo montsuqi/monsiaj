@@ -320,7 +320,7 @@ public class Launcher {
     }
 
     public void launch(String[] args) {
-        checkJavaVersion();
+        //checkJavaVersion();
         if (checkCommandLineOption(args)) {
             return;
         }
