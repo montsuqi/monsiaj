@@ -366,7 +366,7 @@ public class ConfigPanel extends JPanel {
     public static JLabel createLabel(String str) {
         JLabel label = new JLabel(str);
         label.setHorizontalAlignment(SwingConstants.RIGHT);
-        label.setPreferredSize(new Dimension(170, 20));
+        label.setPreferredSize(new Dimension(200, 20));
         label.setMinimumSize(new Dimension(170, 20));
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         return label;

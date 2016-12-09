@@ -387,7 +387,7 @@ public class Launcher {
         });
         bar.add(config);
 
-        f.setSize(760, 480);
+        f.setSize(800, 480);
         f.setResizable(true);
 
         f.setLocationRelativeTo(null);

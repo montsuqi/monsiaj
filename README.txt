@@ -11,12 +11,9 @@
 
 4種類の配布物があります。
 
-* monsiaj本体パッケージ monsiaj-bin-YYYYMMDD.zip
-* monsiaj本体パッケージ(MacOS X アプリケーションバンドル版) monsiaj-bin-macos-YYYYMMDD.zip
-* ソースパッケージ monsiaj-src-YYYYMMDD.zip
-* monsiaj自動更新ランチャーパッケージ monsiaj-YYYYMMDD.zip
-
-YYYYMMDDは配布物作成の年月日を表します。
+* monsiaj本体パッケージ monsiaj-bin-x.y.z.zip
+* ソースパッケージ monsiaj-src-x.y.z.zip
+* monsiaj自動更新ランチャーパッケージ monsiaj-z.y.z.zip
 
 ## monsiaj本体パッケージ
 
