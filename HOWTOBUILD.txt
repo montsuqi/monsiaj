@@ -38,6 +38,7 @@
 
     do.sign=true
     alias=署名する鍵のエイリアス
+    tsa=タイムスタンプURL(http://timestamp.globalsign.com/scripts/timstamp.dll)
     keystore=キーストアファイル名
     webstart.url=http://... jwsを設置するURL
     webstart.vendor=ベンダー名
