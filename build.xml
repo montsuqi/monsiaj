@@ -249,19 +249,11 @@
 
     <target name="sign-jars" depends="create-unsigned-jars" if="do.sign">
         <input message="Input the store password" addproperty="storepass"/>
-        <signjar alias="${alias}" storepass="${storepass}" keystore="${keystore}">
+        <signjar alias="${alias}" tsaurl="${tsa}" storepass="${storepass}" keystore="${keystore}">
             <fileset dir="${build.dir}">
                 <include name="*.jar"/>
             </fileset>
         </signjar>
-        <apply executable="jarsigner">
-            <arg value="-verify"/>
-            <arg value="-keystore"/>
-            <arg value="${keystore}"/>
-            <fileset dir="${build.dir}">
-                <include name="*.jar"/>
-            </fileset>
-        </apply>
     </target>
 
     <target name="javadoc" description="Creates Javadoc documents">
