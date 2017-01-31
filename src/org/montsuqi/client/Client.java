@@ -103,6 +103,11 @@ public class Client {
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
+        if (conf.getUseSSL(num)) {
+            if (authURI.contains("http://")) {
+                authURI = authURI.replace("http://", "https://");
+            }
+        }
         logger.info("try connect " + authURI);
         protocol = new Protocol(Protocol.TYPE_USER_PASSWORD, authURI, conf.getUser(num), conf.getPassword(num));
         if (conf.getUseSSL(num)) {
