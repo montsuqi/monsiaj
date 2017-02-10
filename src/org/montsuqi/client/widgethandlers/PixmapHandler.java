@@ -51,14 +51,17 @@ public class PixmapHandler extends WidgetHandler {
         if (obj.has("objectdata")) {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             try {
-                int status = con.getClient().getProtocol().getBLOB(obj.getString("objectdata"), bytes);
-                if (status == 200 && bytes.size() > 0) {
-                    Icon icon = new ImageIcon(bytes.toByteArray());
-                    pixmap.setText("");
-                    pixmap.setIcon(icon);
-                    pixmap.validate();
+                pixmap.setIcon(null);
+                String oid = obj.getString("objectdata");
+                if (oid.isEmpty() || oid.equals("0")) {
                 } else {
-                    pixmap.setIcon(null);
+                    int status = con.getClient().getProtocol().getBLOB(oid, bytes);
+                    if (status == 200 && bytes.size() > 0) {
+                        Icon icon = new ImageIcon(bytes.toByteArray());
+                        pixmap.setText("");
+                        pixmap.setIcon(icon);
+                        pixmap.validate();
+                    }
                 }
             } catch (IOException ex) {
                 logger.warn(ex);

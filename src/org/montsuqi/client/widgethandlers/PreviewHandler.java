@@ -52,14 +52,19 @@ class PreviewHandler extends WidgetHandler {
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         PandaPreview preview = (PandaPreview) widget;
+        preview.clear();
         this.setCommonAttribute(widget, obj, styleMap);
         if (obj.has("objectdata")) {
             try {
-                File temp = TempFile.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
-                temp.deleteOnExit();
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
-                con.getClient().getProtocol().getBLOB(obj.getString("objectdata"), out);
-                preview.load(temp.getAbsolutePath());
+                String oid = obj.getString("objectdata");
+                if (oid.isEmpty() || oid.equals("0")) {
+                } else {
+                    File temp = TempFile.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
+                    temp.deleteOnExit();
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
+                    con.getClient().getProtocol().getBLOB(oid, out);
+                    preview.load(temp.getAbsolutePath());
+                }
             } catch (IOException | JSONException ex) {
                 logger.warn(ex);
             }

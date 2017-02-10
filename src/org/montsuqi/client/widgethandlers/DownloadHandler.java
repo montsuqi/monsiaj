@@ -60,12 +60,15 @@ public class DownloadHandler extends WidgetHandler {
 
         if (obj.has("objectdata")) {
             try {
-                File temp = TempFile.createTempFile("pandadonwload", fileName);
-                temp.deleteOnExit();
-                String blobid = obj.getString("objectdata");
-                int status = con.getClient().getProtocol().getBLOB(blobid, new BufferedOutputStream(new FileOutputStream(temp)));
-                if (status == 200) {
-                    download.showDialog(fileName, description, temp);
+                String oid = obj.getString("objectdata");
+                if (oid.isEmpty() || oid.equals("0")) {
+                } else {
+                    File temp = TempFile.createTempFile("pandadonwload", fileName);
+                    temp.deleteOnExit();
+                    int status = con.getClient().getProtocol().getBLOB(oid, new BufferedOutputStream(new FileOutputStream(temp)));
+                    if (status == 200) {
+                        download.showDialog(fileName, description, temp);
+                    }
                 }
             } catch (IOException ex) {
                 logger.warn(ex);

@@ -310,6 +310,7 @@ public class Protocol {
     public int getBLOB(String oid, OutputStream out) throws IOException {
         if (oid.equals("0")) {
             // empty object id
+            out.close();
             return 404;
         }
 
