@@ -25,11 +25,14 @@ package org.montsuqi.widgets;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
@@ -80,21 +83,37 @@ public class Window extends JFrame {
             dialog.setResizable(true);
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
+            int twx = tw.getX();
+            int twy = tw.getY();
+            
+            int tcx = tw.getX() + tw.getWidth() / 2;
+            int tcy = tw.getY() + tw.getHeight() / 2;
+
             int x = tw.getX() + (int) (this.getX() * tw.getHScale());
             int y = tw.getY() + (int) (this.getY() * tw.getVScale());
+            Dimension d = this.getSize();
 
+            
             java.awt.GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             GraphicsDevice[] gs = ge.getScreenDevices();
             for (GraphicsDevice gd : gs) {
                 GraphicsConfiguration[] gc = gd.getConfigurations();
                 for (GraphicsConfiguration gc1 : gc) {
                     Rectangle scrBounds = gc1.getBounds();
-                    if (scrBounds.contains(x, y)) {
-                        if (x + this.getWidth() > scrBounds.width) {
-                            x += scrBounds.width - (x + this.getWidth());
+                    Insets scrInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc1);
+
+                    if (scrBounds.contains(tcx, tcy)) {
+                        if (x < scrBounds.x + scrInsets.left) {
+                            x = scrBounds.x + scrInsets.left;
                         }
-                        if (y + this.getHeight() > scrBounds.height) {
-                            y += scrBounds.height - (y + this.getHeight());
+                        if (y < scrBounds.y + scrInsets.top) {
+                            y = scrBounds.y + scrInsets.top;
+                        }
+                        if (x + d.width > scrBounds.x + scrBounds.width - scrInsets.right) {
+                            x = scrBounds.x + scrBounds.width - scrInsets.right - d.width;
+                        }
+                        if (y + d.height > scrBounds.y + scrBounds.height - scrInsets.bottom) {                         
+                            y = scrBounds.y + scrBounds.height - scrInsets.bottom - d.height;                   
                         }
                     }
                 }
