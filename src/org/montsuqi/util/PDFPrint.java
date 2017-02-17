@@ -134,11 +134,31 @@ public class PDFPrint extends Thread {
         } catch (java.io.IOException ex) {
             logger.catching(Level.WARN, ex);
         }
+        logger.info("print end   - " + file);
     }
 
     public static void main(String args[]) throws Exception {
-        PDFPrint printer = new PDFPrint(new File(args[0]));
-        printer.start();
+        DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
+        PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
+        PrintService ps = null;
+        System.out.println("---- print service");
+        for (PrintService _ps : pss) {
+            System.out.println(_ps.getName());
+            if (_ps.getName().equals(args[0])) {
+                ps = _ps;
+            }
+        }
+        for (int i = 0; i < 1; i++) {
+            if (ps == null) {
+                PDFPrint printer = new PDFPrint(new File(args[1]));
+                printer.start();
+            } else {
+                PDFPrint printer = new PDFPrint(new File(args[1]), ps);
+                printer.start();
+            }
+            System.out.println(i);
+            Thread.sleep(2000);
+        }
     }
 
     public static class PDFPrintPage implements Printable {
@@ -167,8 +187,9 @@ public class PDFPrint extends Thread {
             double vmargin = GetPrintOption("monsia.util.PDFPrint.vmargin");
             double hoffset = GetPrintOption("monsia.util.PDFPrint.hoffset");
             double voffset = GetPrintOption("monsia.util.PDFPrint.voffset");
-            double hratio = 1.0;
-            double vratio = 1.0;
+            double hratio  = 1.0;
+            double vratio  = 1.0;
+            double scale;
 
             if (hmargin != 0.0) {
                 hratio = hmargin / format.getImageableWidth();
@@ -183,6 +204,7 @@ public class PDFPrint extends Thread {
                     hmargin = vratio * format.getImageableWidth();
                 }
             }
+            scale =  (format.getImageableWidth() - hmargin * 2) / format.getImageableWidth() * 1.0;
             hoffset += hmargin;
             voffset += vmargin;
             pageable = new Rectangle2D.Double(hoffset, voffset,
@@ -226,8 +248,6 @@ public class PDFPrint extends Thread {
             PDFPage page = pages[index];
             int width = (int) page.getWidth();
             int height = (int) page.getHeight();
-
-            double scale = 1.0;
 
             if (format.getOrientation() == PageFormat.PORTRAIT) {
                 if (height > width) {
