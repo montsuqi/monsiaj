@@ -5,6 +5,7 @@ cache
 .project
 .settings
 .classpath
+.swp
 report
 doc
 tmp
