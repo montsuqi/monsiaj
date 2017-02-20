@@ -43,7 +43,7 @@
     </target>
 
     <target name="set-version" depends="prepare" unless="version">
-        <property name="version" value="2.0.1"/>
+        <property name="version" value="2.0.1b"/>
     </target>
 
     <target name="set-javac-options" depends="set-javac-debug,set-javac-debuglevel">
