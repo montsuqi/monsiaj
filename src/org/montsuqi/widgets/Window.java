@@ -85,7 +85,7 @@ public class Window extends JFrame {
 
             int twx = tw.getX();
             int twy = tw.getY();
-            
+
             int tcx = tw.getX() + tw.getWidth() / 2;
             int tcy = tw.getY() + tw.getHeight() / 2;
 
@@ -93,7 +93,6 @@ public class Window extends JFrame {
             int y = tw.getY() + (int) (this.getY() * tw.getVScale());
             Dimension d = this.getSize();
 
-            
             java.awt.GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             GraphicsDevice[] gs = ge.getScreenDevices();
             for (GraphicsDevice gd : gs) {
@@ -101,6 +100,17 @@ public class Window extends JFrame {
                 for (GraphicsConfiguration gc1 : gc) {
                     Rectangle scrBounds = gc1.getBounds();
                     Insets scrInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc1);
+                    
+                    // some windows env can not get insets
+                    String ratio = System.getProperty("monsia.widgets.window.insets_ratio");
+                    if (ratio != null) {
+                        int r = Integer.valueOf(ratio);
+                        if (r <= 0 || r >= 50) {
+                            r = 10;
+                        }
+                        scrInsets.left = scrInsets.right  = (int) (scrBounds.width  * (r/100.0));
+                        scrInsets.top  = scrInsets.bottom = (int) (scrBounds.height * (r/100.0));
+                    }
 
                     if (scrBounds.contains(tcx, tcy)) {
                         if (x < scrBounds.x + scrInsets.left) {
@@ -109,11 +119,17 @@ public class Window extends JFrame {
                         if (y < scrBounds.y + scrInsets.top) {
                             y = scrBounds.y + scrInsets.top;
                         }
-                        if (x + d.width > scrBounds.x + scrBounds.width - scrInsets.right) {
+                        if ((x + d.width) > (scrBounds.x + scrBounds.width - scrInsets.right)) {
                             x = scrBounds.x + scrBounds.width - scrInsets.right - d.width;
+                            if (x < scrBounds.x) {
+                                x = (int)(scrBounds.x + scrBounds.width / 2.0 - d.width / 2.0);
+                            }
                         }
-                        if (y + d.height > scrBounds.y + scrBounds.height - scrInsets.bottom) {                         
-                            y = scrBounds.y + scrBounds.height - scrInsets.bottom - d.height;                   
+                        if ((y + d.height) > (scrBounds.y + scrBounds.height - scrInsets.bottom)) {
+                            y = scrBounds.y + scrBounds.height - scrInsets.bottom - d.height;
+                            if (y < scrBounds.y) {
+                                y = (int)(scrBounds.y + scrBounds.height / 2.0 - d.height / 2.0);
+                            }
                         }
                     }
                 }
