@@ -303,7 +303,7 @@ public class Client {
         closeButton.setFocusable(true);
 
         dialog.setModal(true);
-        dialog.setResizable(false);
+        dialog.setResizable(true);
         dialog.setVisible(true);
         closeButton.requestFocus();
     }
