@@ -16,7 +16,7 @@ and open the template in the editor.
         >
             <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
             <Policies>
-                <SizeBasedTriggeringPolicy size="512 KB"/>
+                <SizeBasedTriggeringPolicy size="2048 KB"/>
             </Policies>
             <DefaultRolloverStrategy max="5" fileindex="min"/>
         </RollingFile>

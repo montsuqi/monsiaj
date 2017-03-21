@@ -70,15 +70,15 @@ public abstract class SignalHandler {
      * @return a SignalHandler instance.
      */
     public static SignalHandler getSignalHandler(String handlerName) {
-        logger.entry(handlerName);
+
         if (handlers.containsKey(handlerName)) {
             final SignalHandler handler = (SignalHandler) handlers.get(handlerName);
-            logger.exit();
+
             return handler;
         }
         logger.debug("signal handler for {0} is not found", handlerName);
         final SignalHandler handler = getSignalHandler(null);
-        logger.exit();
+
         return handler;
     }
 
@@ -94,15 +94,15 @@ public abstract class SignalHandler {
     }
 
     static void blockChangedHandlers() {
-        logger.entry();
+
         timerBlocked = true;
-        logger.exit();
+
     }
 
     static void unblockChangedHandlers() {
-        logger.entry();
+
         timerBlocked = false;
-        logger.exit();
+
     }
 
     static private String getWidgetName(String str) {

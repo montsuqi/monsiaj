@@ -16,8 +16,8 @@
     <resources>
         <j2se version="1.8+"/>
         <jar href="jmareceipt.jar"/>
-        <jar href="log4j-api-2.0.1.jar"/>
-        <jar href="log4j-core-2.0.1.jar"/>        
+        <jar href="log4j-api-2.8.1.jar"/>
+        <jar href="log4j-core-2.8.1.jar"/>        
         <jar href="ilf-gpl.jar"/>        
         <jar href="nimrodlf.jar"/>
         <jar href="PDFRenderer.jar"/>
