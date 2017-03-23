@@ -83,9 +83,6 @@ public class Window extends JFrame {
             dialog.setResizable(true);
             dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-            int twx = tw.getX();
-            int twy = tw.getY();
-
             int tcx = tw.getX() + tw.getWidth() / 2;
             int tcy = tw.getY() + tw.getHeight() / 2;
 
