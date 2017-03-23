@@ -16,7 +16,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 /**
@@ -41,7 +40,7 @@ public class PrinterConfigPanel extends JPanel {
         for (int i = 0; i < SIZE; i++) {
             nameList.add(new JTextField());
             JComboBox<String> combo = new JComboBox<>();
-            for(String p:list) {
+            for (String p : list) {
                 combo.addItem(p);
             }
             printerList.add(combo);
@@ -56,13 +55,18 @@ public class PrinterConfigPanel extends JPanel {
             panel.add(nameList.get(i), createConstraints(0, y, 1, 1, 1.0, 0.0));
             panel.add(printerList.get(i), createConstraints(1, y, 1, 1, 1.0, 0.0));
         }
-        
+
         this.setLayout(new BorderLayout(0, 0));
         this.add(panel, BorderLayout.NORTH);
     }
 
     public void setPrinterConfigMap(Map<String, String> map) {
-        int i = 0;
+        int i;
+        for (i = 0; i < SIZE; i++) {
+            JTextField name = nameList.get(i);
+            name.setText("");
+        }
+        i = 0;
         for (Map.Entry<String, String> e : map.entrySet()) {
             if (i < SIZE) {
                 JTextField name = nameList.get(i);
@@ -78,9 +82,9 @@ public class PrinterConfigPanel extends JPanel {
         TreeMap<String, String> map = new TreeMap<>();
         for (int i = 0; i < SIZE; i++) {
             String name = nameList.get(i).getText();
-            String printer = (String)printerList.get(i).getSelectedItem();
+            String printer = (String) printerList.get(i).getSelectedItem();
             if (!name.isEmpty()) {
-                map.put(name,printer);
+                map.put(name, printer);
             }
         }
         return map;

@@ -199,6 +199,7 @@ public class Launcher {
                 int current = list.get(configCombo.getSelectedIndex());
                 conf.setCurrent(current);
                 configPanel.loadConfig(current);
+                conf.LoadPrinterConfig(current);
             }
         });
         configPanel = createConfigurationPanel();

@@ -52,7 +52,6 @@ import org.montsuqi.monsia.Interface;
 import org.montsuqi.util.GtkStockIcon;
 import org.montsuqi.util.PDFPrint;
 import org.montsuqi.util.PopupNotify;
-import org.montsuqi.util.SystemEnvironment;
 import org.montsuqi.util.TempFile;
 import org.montsuqi.widgets.Button;
 import org.montsuqi.widgets.ExceptionDialog;
@@ -70,7 +69,7 @@ public class Client {
     private static final Logger logger = LogManager.getLogger(Client.class);
     private Protocol protocol;
     private final UIControl uiControl;
-    private static final int PingTimerPeriod;
+    private static final int PING_TIMER_PERIOD;
     private javax.swing.Timer pingTimer;
     private JSONObject windowStack;
     private String focusedWindow;
@@ -80,12 +79,12 @@ public class Client {
         if (System.getProperty("monsia.ping_timer_period") != null) {
             int period = Integer.parseInt(System.getProperty("monsia.ping_timer_period")) * 1000;
             if (period < 1000) {
-                PingTimerPeriod = 7 * 1000;
+                PING_TIMER_PERIOD = 7 * 1000;
             } else {
-                PingTimerPeriod = period;
+                PING_TIMER_PERIOD = period;
             }
         } else {
-            PingTimerPeriod = 7 * 1000;
+            PING_TIMER_PERIOD = 7 * 1000;
         }
     }
 
@@ -154,7 +153,7 @@ public class Client {
     }
 
     public void startPing() {
-        pingTimer = new javax.swing.Timer(PingTimerPeriod, new ActionListener() {
+        pingTimer = new javax.swing.Timer(PING_TIMER_PERIOD, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendPing();
