@@ -66,7 +66,9 @@ public class PrinterConfigPanel extends JPanel {
             JTextField name = nameList.get(i);
             name.setText("");
             JComboBox printer = printerList.get(i);
-            printer.setSelectedIndex(0);
+            if (printer.getItemCount() > 1) {
+                printer.setSelectedIndex(0);
+            }
         }
         i = 0;
         for (Map.Entry<String, String> e : map.entrySet()) {
