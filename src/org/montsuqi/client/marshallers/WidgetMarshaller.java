@@ -33,12 +33,15 @@ import org.apache.logging.log4j.Logger;
 import org.montsuqi.client.Protocol;
 import org.montsuqi.widgets.*;
 
-/** <p>Superclass for all widget marshallers.</p>
+/**
+ * <
+ * p>
+ * Superclass for all widget marshallers.</p>
  */
 public abstract class WidgetMarshaller {
 
     protected static final Logger logger = LogManager.getLogger(WidgetMarshaller.class);
-    private static final Map<Class,WidgetMarshaller> classTable;
+    private static final Map<Class, WidgetMarshaller> classTable;
 
     static {
         classTable = new HashMap<>();
@@ -54,10 +57,10 @@ public abstract class WidgetMarshaller {
         registerMarshaller(PandaPreview.class, new PreviewMarshaller());
         registerMarshaller(Frame.class, new FrameMarshaller());
         registerMarshaller(FileChooserButton.class, new FileChooserButtonMarshaller());
-        registerMarshaller(ColorButton.class, new ColorButtonMarshaller());        
+        registerMarshaller(ColorButton.class, new ColorButtonMarshaller());
         registerMarshaller(PandaTimer.class, new TimerMarshaller());
         registerMarshaller(PandaDownload.class, new DownloadMarshaller());
-        registerMarshaller(PandaDownload2.class, new Download2Marshaller());        
+        registerMarshaller(PandaDownload2.class, new Download2Marshaller());
         registerMarshaller(PandaPrint.class, new PrintMarshaller());
         registerMarshaller(Pixmap.class, new PixmapMarshaller());
         registerMarshaller(PandaHTML.class, new PandaHTMLMarshaller());
@@ -70,7 +73,11 @@ public abstract class WidgetMarshaller {
 
     public abstract void send(WidgetValueManager manager, String name, Component widget) throws IOException;
 
-    /** <p>Handles parameters common for all widget types: "state" and "style".</p>
+    /**
+     * <
+     * p>
+     * Handles parameters common for all widget types: "state" and "style".</p>
+     *
      * @param manager value manager.
      * @param widget target widget.
      * @param name parameter name.
@@ -79,7 +86,7 @@ public abstract class WidgetMarshaller {
      */
     protected boolean handleCommonAttribute(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
-        if ("state".equals(name)) { 
+        if ("state".equals(name)) {
             int state = con.receiveIntData();
             /* Widget states from gtkenums.h
             typedef enum
@@ -91,7 +98,7 @@ public abstract class WidgetMarshaller {
             GTK_STATE_INSENSITIVE => 4
             } GtkStateType;
              */
-            final boolean flag = state != 4;            
+            final boolean flag = state != 4;
             widget.setFocusable(flag);
             if (widget instanceof JTextComponent) {
                 JTextComponent text = (JTextComponent) widget;
@@ -100,18 +107,14 @@ public abstract class WidgetMarshaller {
                 widget.setEnabled(flag);
             }
             return true;
-        } else if ("style".equals(name)) { 
+        } else if ("style".equals(name)) {
             String buff = con.receiveStringData();
             manager.setStyle(widget, buff);
             return true;
-        } else if ("visible".equals(name)) { 
+        } else if ("visible".equals(name)) {
             boolean visible = con.receiveBooleanData();
-            
             widget.setVisible(visible);
-            if (!visible) {
-                widget.setEnabled(false);
-            }
-            return true;            
+            return true;
         } else {
             return false;
         }
@@ -119,9 +122,9 @@ public abstract class WidgetMarshaller {
 
     protected boolean handleEditable(WidgetValueManager manager, Component widget, String name) throws IOException {
         Protocol con = manager.getProtocol();
-        JTextField entry = (JTextField)widget;
-        if ("editable".equals(name)) { 
-            
+        JTextField entry = (JTextField) widget;
+        if ("editable".equals(name)) {
+
             boolean editable = con.receiveBooleanData();
             entry.setEditable(editable);
             return true;
