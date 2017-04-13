@@ -274,10 +274,14 @@ public class SSLSocketBuilder {
             System.setProperty("javax.net.ssl.trustStoreType", "KeychainStore");
             System.setProperty("javax.net.ssl.trustStoreProvider", "Apple");
             final File trustStorePath = getTrustStorePath();
-            final InputStream is = new FileInputStream(trustStorePath);
-            final KeyStore ks = KeyStore.getInstance("KeychainStore", "Apple");
-            ks.load(is, null);
-            is.close();
+            final KeyStore ks;
+            ks = KeyStore.getInstance("KeychainStore", "Apple");
+            try (InputStream is = new FileInputStream(trustStorePath)) {
+                ks.load(is, null);
+            } catch (IOException ex) { // for 10.12 Sierra
+                InputStream is = new FileInputStream(trustStorePath + "-db");
+                ks.load(is, null);
+            }
             final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
             tmf.init(ks);
             final TrustManager[] tms = tmf.getTrustManagers();
@@ -293,9 +297,9 @@ public class SSLSocketBuilder {
         } else {
             final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
             final File trustStorePath = getTrustStorePath();
-            final InputStream is = new FileInputStream(trustStorePath);
-            ks.load(is, null);
-            is.close();
+            try (InputStream is = new FileInputStream(trustStorePath)) {
+                ks.load(is, null);
+            }
             final TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //$NON-NLS-1$
             tmf.init(ks);
             final TrustManager[] tms = tmf.getTrustManagers();
