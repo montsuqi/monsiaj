@@ -24,6 +24,9 @@ package org.montsuqi.client;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Principal;
@@ -37,6 +40,7 @@ import javax.crypto.BadPaddingException;
 import javax.net.ssl.*;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.JOptionPane;
+import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.util.SystemEnvironment;
@@ -44,8 +48,8 @@ import org.montsuqi.widgets.CertificateDetailPanel;
 
 public class SSLSocketBuilder {
 
-    private static final int DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD = 30;
-    private static Logger logger = LogManager.getLogger(SSLSocketBuilder.class);
+    private static final int CERT_EXPIRATION_THRESHOLD = 30;
+    private static final Logger logger = LogManager.getLogger(SSLSocketBuilder.class);
     private final SSLSocketFactory factory;
     private final KeyManager[] keyManagers;
     final TrustManager[] trustManagers;
@@ -53,12 +57,13 @@ public class SSLSocketBuilder {
 
     public static class CommonNameVerifier implements HostnameVerifier {
 
+        @Override
         public boolean verify(String hostname, SSLSession session) {
             try {
                 SSLSocketBuilder.validatePeerCertificates(session.getPeerCertificates(), hostname);
                 return true;
             } catch (SSLException e) {
-                e.printStackTrace();
+                logger.info(e, e);
                 return false;
             }
         }
@@ -73,7 +78,12 @@ public class SSLSocketBuilder {
         try {
             keyManagers = createKeyManagers(fileName, password);
             keyManagerIsReady = true;
-            trustManagers = createTrustManagers();
+            String caPath = System.getProperty("monsia.ssl.cafile");
+            if (caPath != null) {
+                trustManagers = createCAFileTrustManagers(caPath);
+            } else {
+                trustManagers = createTrustManagers();
+            }
             final SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(keyManagers, trustManagers, null);
             factory = ctx.getSocketFactory();
@@ -164,7 +174,7 @@ public class SSLSocketBuilder {
                 while (i.hasNext()) {
                     final List alternativeName = (List) i.next();
                     final Integer type = (Integer) alternativeName.get(0);
-                    if (type.intValue() == 2) { // dNSName == 2. Symbolic names not defined :/
+                    if (type == 2) { // dNSName == 2. Symbolic names not defined :/
                         final String value = (String) alternativeName.get(1);
                         if (value.equalsIgnoreCase(host)) {
                             System.out.println("One of subjectAlternativeNames matches.");
@@ -198,8 +208,8 @@ public class SSLSocketBuilder {
      * Test if the given message means that passphrase is missing.</p>
      */
     private boolean isMissingPassphraseMessage(String message) {
-        return message != null && message.indexOf("Default SSL context init failed") >= 0
-                && message.indexOf("/ by zero") >= 0;
+        return message != null && message.contains("Default SSL context init failed")
+                && message.contains("/ by zero");
     }
 
     /**
@@ -210,7 +220,55 @@ public class SSLSocketBuilder {
         return message != null && message.toLowerCase().startsWith("broken pipe");
     }
 
-    TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
+    private static X509Certificate parseCertPem(String pem) throws CertificateException {
+        byte[] der = DatatypeConverter.parseBase64Binary(pem);
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(der));
+    }
+
+    private static String[] splitCertFile(String path) throws FileNotFoundException, IOException {
+
+        byte[] fileContentBytes = Files.readAllBytes(Paths.get(path));
+        String str = new String(fileContentBytes, StandardCharsets.UTF_8);
+
+        Pattern pattern = Pattern.compile("-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(str);
+        List<String> list = new ArrayList<>();
+        while (matcher.find()) {
+            list.add(matcher.group());
+        }
+        String[] strs = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            s = s.replace("-----BEGIN CERTIFICATE-----", "");
+            strs[i] = s.replace("-----END CERTIFICATE-----", "");
+        }
+        return strs;
+    }
+
+    private TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(null);
+
+        String pemStrs[] = splitCertFile(caCertPath);
+        for (String pem : pemStrs) {
+            X509Certificate cert = parseCertPem(pem);
+            keystore.setCertificateEntry(cert.getSubjectDN().toString(), cert);
+        }
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keystore);
+        final TrustManager[] tms = tmf.getTrustManagers();
+        for (TrustManager tm1 : tms) {
+            if (tm1 instanceof X509TrustManager) {
+                final X509TrustManager delegatee = (X509TrustManager) tm1;
+                final TrustManager tm = new MyTrustManager(delegatee);
+                return new TrustManager[]{tm};
+            }
+        }
+        return tms;
+    }
+
+    private TrustManager[] createTrustManagers() throws GeneralSecurityException, FileNotFoundException, IOException {
 
         if (SystemEnvironment.isMacOSX()) {
             System.setProperty("javax.net.ssl.trustStoreType", "KeychainStore");
@@ -362,7 +420,7 @@ public class SSLSocketBuilder {
     }
 
     private int getWarnCertificateExpirationThreashold() {
-        int before = DEFAULT_WARN_CERTIFICATE_EXPIRATION_THRESHOLD;
+        int before = CERT_EXPIRATION_THRESHOLD;
         final String warnExpirationThreshold = System.getProperty("monsia.warn.certificate.expiration.before");
         if (warnExpirationThreshold != null) {
             try {
