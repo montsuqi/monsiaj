@@ -94,7 +94,7 @@ public class Launcher {
             conf.listConfig();
             return true;
         }
-        if (!configName.equals("")) {
+        if (!configName.isEmpty()) {
             conf.setCurrentByDescription(configName);
 
             int n = conf.getCurrent();
@@ -117,7 +117,7 @@ public class Launcher {
                 } else {
                     UIManager.setLookAndFeel(cname);
                 }
-            } catch (Exception e) {
+            } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 logger.catching(Level.WARN, e);
                 return true;
             }
@@ -125,7 +125,7 @@ public class Launcher {
             /*
              * confirm password when the password not preserved
              */
-            if (!conf.getSavePassword(conf.getCurrent())) {
+            if (!conf.getUseSSL(conf.getCurrent()) && !conf.getSavePassword(conf.getCurrent())) {
                 JPasswordField pwd = new JPasswordField();
                 Object[] message = {Messages.getString("Launcher.input_password_message"), pwd};
                 int resp = JOptionPane.showConfirmDialog(null, message, Messages.getString("Launcher.input_password_message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);

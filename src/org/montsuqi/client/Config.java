@@ -384,6 +384,16 @@ public class Config {
         setValue(i, "useSSL", Boolean.toString(v));
     }
 
+    public String getCACertificateFile(int i) {
+        String value = getValue(i, "caCertificateFile");
+        return value;
+    }
+
+    public void setCACertificateFile(int i, String v) {
+        setValue(i, "caCertificateFile", v);
+    }
+    
+    
     // clientCertificateFile
     public String getClientCertificateFile(int i) {
         String value = getValue(i, "clientCertificateFile");

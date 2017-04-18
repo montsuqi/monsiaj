@@ -151,8 +151,9 @@ public class Client implements Runnable {
             return socket;
         } else {
             String fileName = conf.getClientCertificateFile(num);
+            String caFileName = conf.getCACertificateFile(num);            
             String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
+            SSLSocketBuilder builder = new SSLSocketBuilder(caFileName,fileName, password);
             return builder.createSSLSocket(socket, hostName, portNum);
         }
     }
@@ -170,9 +171,10 @@ public class Client implements Runnable {
         if (!conf.getUseSSL(num)) {
             return null;
         } else {
+            String caFileName = conf.getCACertificateFile(num);                        
             String fileName = conf.getClientCertificateFile(num);
             String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(fileName, password);
+            SSLSocketBuilder builder = new SSLSocketBuilder(caFileName,fileName, password);
             return builder.getFactory();
         }
     }

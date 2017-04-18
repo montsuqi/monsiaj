@@ -73,16 +73,15 @@ public class SSLSocketBuilder {
         return factory;
     }
 
-    public SSLSocketBuilder(String fileName, String password) throws IOException {
+    public SSLSocketBuilder(String caFileName, String fileName, String password) throws IOException {
         boolean keyManagerIsReady = false;
         try {
             keyManagers = createKeyManagers(fileName, password);
             keyManagerIsReady = true;
-            String caPath = System.getProperty("monsia.ssl.cafile");
-            if (caPath != null) {
-                trustManagers = createCAFileTrustManagers(caPath);
-            } else {
+            if (caFileName.isEmpty() || caFileName.matches("^\\s*$")) {
                 trustManagers = createTrustManagers();
+            } else {
+                trustManagers = createCAFileTrustManagers(caFileName);               
             }
             final SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(keyManagers, trustManagers, null);
