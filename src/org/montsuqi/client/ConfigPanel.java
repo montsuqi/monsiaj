@@ -438,6 +438,7 @@ public class ConfigPanel extends JPanel {
     private void updateSSLPanelComponentsEnabled() {
         final boolean useSsl = useSSLCheckbox.isSelected();
         caCertificateEntry.setEnabled(useSsl);
+        caCertificateButton.setEnabled(useSsl);        
         clientCertificateEntry.setEnabled(useSsl);
         exportPasswordEntry.setEnabled(useSsl);
         clientCertificateButton.setEnabled(useSsl);
