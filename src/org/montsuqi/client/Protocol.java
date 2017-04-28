@@ -225,13 +225,8 @@ public class Protocol {
 
         this.sessionId = meta.getString("session_id");
 
-        if (this.serverType.startsWith("glserver")) {
-            this.rpcURI = authURI;
-            this.restURIRoot = authURI.replaceFirst("/rpc/", "/rest/");
-        } else {
-            this.rpcURI = result.getString("app_rpc_endpoint_uri");
-            this.restURIRoot = result.getString("app_rest_api_uri_root");
-        }
+        this.rpcURI = result.getString("app_rpc_endpoint_uri");
+        this.restURIRoot = result.getString("app_rest_api_uri_root");
 
         logger.info("session_id:" + this.sessionId);
         logger.info("rpcURI:" + this.rpcURI);

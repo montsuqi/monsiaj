@@ -102,10 +102,12 @@ public class Client {
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
+        authURI = authURI.replace("http://","");
+        authURI = authURI.replace("https://","");
         if (conf.getUseSSL(num)) {
-            if (authURI.contains("http://")) {
-                authURI = authURI.replace("http://", "https://");
-            }
+            authURI = "https://" + authURI;
+        } else {
+            authURI = "http://" + authURI;
         }
         logger.info("try connect " + authURI);
         protocol = new Protocol(Protocol.TYPE_USER_PASSWORD, authURI, conf.getUser(num), conf.getPassword(num));
