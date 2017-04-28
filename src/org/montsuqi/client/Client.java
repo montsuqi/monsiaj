@@ -231,12 +231,11 @@ public class Client {
             }
         }
         uiControl.setFocus(focusedWindow, focusedWidget);
-
     }
 
     public void sendEvent(String windowName, String widgetName, String event) {
         try {
-            JSONObject tmpl = null;
+            JSONObject tmpl;
             tmpl = (JSONObject) uiControl.getScreenTemplate(windowName);
             if (tmpl != null) {
                 Node node = uiControl.getNode(windowName);
