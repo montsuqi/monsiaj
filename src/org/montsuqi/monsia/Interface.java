@@ -61,13 +61,16 @@ import org.montsuqi.widgets.PandaCList;
 import org.montsuqi.widgets.PandaFocusManager;
 import org.xml.sax.SAXException;
 
-/** <p>An class that represents the result of parsing Glade's interface definition.
+/**
+ * <
+ * p>
+ * An class that represents the result of parsing Glade's interface definition.
  */
 public class Interface {
 
     private Map<String, Component> widgetNameTable;
     private Map<String, Component> widgetLongNameTable;
-    private Map<String, Map<String,String>> propertyTable;
+    private Map<String, Map<String, String>> propertyTable;
     private Map<String, ButtonGroup> buttonGroups;
     private UIControl uiControl;
     private Component topLevel;
@@ -76,7 +79,7 @@ public class Interface {
     private Component defaultWidget;
     private JMenuBar menuBar;
     private static final Logger logger = LogManager.getLogger(Interface.class);
-    private static Map<String,AccelHandler> accelHandlers;
+    private static Map<String, AccelHandler> accelHandlers;
     private double phScale = 1.0;
     private double pvScale = 1.0;
 
@@ -84,8 +87,8 @@ public class Interface {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
         accelHandlers = new HashMap<>();
     }
-    private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler"; 
-    private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler"; 
+    private static final String OLD_HANDLER = "org.montsuqi.monsia.Glade1Handler";
+    private static final String NEW_HANDLER = "org.montsuqi.monsia.MonsiaHandler";
 
     public void setDefaultWidget(Component widget) {
         defaultWidget = widget;
@@ -107,16 +110,23 @@ public class Interface {
     }
     private static final int OLD_PROLOGUE_LENGTH = 128;
 
-    /** <p>A factory method that builds an Interface instance.</p>
-     * <p>This method takes its source XML from <var>input</var> InputStream and parses
-     * it using a SAX parser.</p>
-     * <p>SAX parser is selected in following way:</p>
+    /**
+     * <
+     * p>
+     * A factory method that builds an Interface instance.</p>
+     * <p>
+     * This method takes its source XML from <var>input</var> InputStream and
+     * parses it using a SAX parser.</p>
+     * <p>
+     * SAX parser is selected in following way:</p>
      * <ol>
      * <li>If system property "monsia.document.handler" is set, use it.</li>
-     * <li>Otherwise, if the input's beginning looks like old interface definition(root element
-     * is GTK-Interface and such), old handler is used.</li>
+     * <li>Otherwise, if the input's beginning looks like old interface
+     * definition(root element is GTK-Interface and such), old handler is
+     * used.</li>
      * <li>Otherwise, new handler is used.</li>
      * </ol>
+     *
      * @param input source input stream from which the Glade file is read.
      * @param uiControl
      * @return an Interface instance.
@@ -127,7 +137,7 @@ public class Interface {
                 input = new BufferedInputStream(input);
             }
 
-            String handlerClassName = System.getProperty("monsia.document.handler"); 
+            String handlerClassName = System.getProperty("monsia.document.handler");
             if (handlerClassName == null) {
                 handlerClassName = isNewScreenDefinition(input) ? NEW_HANDLER : OLD_HANDLER;
             }
@@ -148,7 +158,7 @@ public class Interface {
                 input = new BufferedInputStream(input);
             }
 
-            String handlerClassName = System.getProperty("monsia.document.handler"); 
+            String handlerClassName = System.getProperty("monsia.document.handler");
             if (handlerClassName == null) {
                 handlerClassName = isNewScreenDefinition(input) ? NEW_HANDLER : OLD_HANDLER;
             }
@@ -172,7 +182,7 @@ public class Interface {
         input.read(bytes);
         String head = new String(bytes);
         input.reset();
-        return head.indexOf("GTK-Interface") < 0; 
+        return !head.contains("GTK-Interface");
     }
 
     private void initMember() {
@@ -222,23 +232,23 @@ public class Interface {
 
     public Component getWidget(String name) {
         if (name == null) {
-            throw new NullPointerException("name is null."); 
+            throw new NullPointerException("name is null.");
         }
         return (Component) widgetNameTable.get(name);
     }
 
     public Component getAnyWidget() {
-        for (Component c: widgetNameTable.values()) {
+        for (Component c : widgetNameTable.values()) {
             if (c.isFocusable()) {
                 return c;
             }
         }
         return null;
     }
-    
+
     public Component getWidgetByLongName(String longName) {
         if (longName == null) {
-            throw new NullPointerException("long name is null."); 
+            throw new NullPointerException("long name is null.");
         }
         return (Component) widgetLongNameTable.get(longName);
     }
@@ -250,17 +260,17 @@ public class Interface {
             group = new ButtonGroup();
             buttonGroups.put(groupName, group);
             none = new JRadioButton();
-            none.putClientProperty("none", none); 
+            none.putClientProperty("none", none);
             group.add(none);
         } else {
             group = (ButtonGroup) buttonGroups.get(groupName);
             assert group.getButtonCount() > 0;
             JRadioButton first = (JRadioButton) group.getElements().nextElement();
-            none = (JRadioButton) first.getClientProperty("none"); 
+            none = (JRadioButton) first.getClientProperty("none");
         }
         group.add(button);
-        button.putClientProperty("group", group); 
-        button.putClientProperty("none", none); 
+        button.putClientProperty("group", group);
+        button.putClientProperty("none", none);
     }
 
     public void setTopLevel(Component widget) {
@@ -309,7 +319,7 @@ public class Interface {
         MenuElement[] subs = me.getSubElements();
         for (MenuElement sub : subs) {
             JComponent c = (JComponent) sub.getComponent();
-            c.putClientProperty("window", f); 
+            c.putClientProperty("window", f);
             setWindowForMenuElements(f, sub);
         }
     }
@@ -324,12 +334,12 @@ public class Interface {
 
     public void setWidgetLongNameTable(String longName, Component widget) {
         if (widgetLongNameTable.containsKey(longName)) {
-            logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName); 
+            logger.warn("widget named \"{0}\" already exists, replaceing with new one.", longName);
         }
         widgetLongNameTable.put(longName, widget);
     }
 
-    public void setProperties(String longName, Map<String,String> properties) {
+    public void setProperties(String longName, Map<String, String> properties) {
         this.propertyTable.put(longName, properties);
     }
 
@@ -344,18 +354,18 @@ public class Interface {
         if (!propertyTable.containsKey(longName)) {
             return;
         }
-        propertyTable.get(longName).put(key,value);
+        propertyTable.get(longName).put(key, value);
     }
 
     public void scaleWidget(double hScale, double vScale, Insets insets) {
-        
-        if (hScale == phScale && vScale == pvScale ) {
+
+        if (hScale == phScale && vScale == pvScale) {
             return;
         }
-        
+
         phScale = hScale;
         pvScale = vScale;
-        
+
         for (Map.Entry<String, Component> e : widgetLongNameTable.entrySet()) {
             String key = e.getKey();
             Component component = e.getValue();
@@ -401,18 +411,23 @@ public class Interface {
                     component.setSize(width, height);
                 }
             }
-
             String column_widths = getProperty(key, "column_widths");
             if (column_widths != null && component instanceof PandaCList) {
-                StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
-                TableColumnModel model = ((JTable) component).getColumnModel();
-                for (int i = 0; tokens.hasMoreTokens() && i < model.getColumnCount(); i++) {
-                    TableColumn column = model.getColumn(i);
-                    int width = ParameterConverter.toInteger(tokens.nextToken());
-                    width += 8;// FIXME do not use immediate value like this
-                    width = (int) (width * hScale);
-                    column.setPreferredWidth(width);
-                    column.setWidth(width);
+                
+                System.out.println(key + ".column_widths [" + System.getProperty(key + ".column_widths") + "]");
+                if (System.getProperty(key + ".column_widths") == null) {
+                    System.out.println();
+                
+                    StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
+                    TableColumnModel model = ((JTable) component).getColumnModel();
+                    for (int i = 0; tokens.hasMoreTokens() && i < model.getColumnCount(); i++) {
+                        TableColumn column = model.getColumn(i);
+                        int width = ParameterConverter.toInteger(tokens.nextToken());
+                        width += 8;// FIXME do not use immediate value like this
+                        width = (int) (width * hScale);
+                        column.setPreferredWidth(width);
+                        column.setWidth(width);
+                    }
                 }
             }
             component.validate();
@@ -438,7 +453,7 @@ public class Interface {
 
     public void setMenuBar(JMenuBar menuBar) {
         if (this.menuBar != null && this.menuBar != menuBar) {
-            logger.warn("menubar is already set, replacing with new one."); 
+            logger.warn("menubar is already set, replacing with new one.");
         }
         this.menuBar = menuBar;
     }
