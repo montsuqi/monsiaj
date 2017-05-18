@@ -607,10 +607,6 @@ abstract class WidgetPropertySetter {
                 }
 
                 StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
-                int columns = tokens.countTokens();
-                if (columns > model.getColumnCount()) {
-                    columns = model.getColumnCount();
-                }
 
                 int totalWidth = 0;
                 for (int i = 0; i < model.getColumnCount() && tokens.hasMoreTokens(); i++) {
@@ -636,7 +632,7 @@ abstract class WidgetPropertySetter {
                 }
 
                 if (totalWidth < parentWidth) {
-                    TableColumn lastColumn = model.getColumn(columns - 1);
+                    TableColumn lastColumn = model.getColumn(model.getColumnCount() - 1);
                     int width = lastColumn.getPreferredWidth();
                     width += parentWidth - totalWidth;
                     lastColumn.setPreferredWidth(width);
