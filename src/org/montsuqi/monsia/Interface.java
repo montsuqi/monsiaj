@@ -160,7 +160,7 @@ public class Interface {
         input.read(bytes);
         String head = new String(bytes);
         input.reset();
-        return head.indexOf("GTK-Interface") < 0; 
+        return !head.contains("GTK-Interface"); 
     }
 
     private void initMember() {

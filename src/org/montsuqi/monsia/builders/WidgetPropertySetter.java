@@ -226,7 +226,7 @@ abstract class WidgetPropertySetter {
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JLabel label = (JLabel) widget;
                 value = value.replaceFirst("\\s+\\z", "");  //$NON-NLS-2$
-                label.setText(value.indexOf("\n") >= 0 ? makeHTML(value) : value);
+                label.setText(value.contains("\n") ? makeHTML(value) : value);
             }
 
             // convert multi-line label value into HTML
@@ -452,7 +452,7 @@ abstract class WidgetPropertySetter {
                 text.setXIMEnabled(ParameterConverter.toBoolean(value));
             }
         });
-        
+
         registerProperty(JProgressBar.class, "lower", new WidgetPropertySetter() {
 
             @Override
@@ -599,14 +599,12 @@ abstract class WidgetPropertySetter {
             public void set(Interface xml, Container parent, Component widget, String value) {
                 JTable table = (JTable) widget;
                 TableColumnModel model = table.getColumnModel();
-                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
-                int columns = tokens.countTokens();
-                if (model.getColumnCount() < columns) {
-                    WidgetPropertySetter setter = getSetter(JTable.class, "columns");
-                    setter.set(xml, parent, widget, String.valueOf(columns));
+                String k = widget.getName() + ".column_widths";
+                String v = System.getProperty(k);
+                if (v != null) {
+                    value = v;
                 }
-                assert columns == model.getColumnCount();
-
+                StringTokenizer tokens = new StringTokenizer(value, String.valueOf(','));
                 int totalWidth = 0;
                 for (int i = 0; i < model.getColumnCount() && tokens.hasMoreTokens(); i++) {
                     TableColumn column = model.getColumn(i);
@@ -631,7 +629,7 @@ abstract class WidgetPropertySetter {
                 }
 
                 if (totalWidth < parentWidth) {
-                    TableColumn lastColumn = model.getColumn(columns - 1);
+                    TableColumn lastColumn = model.getColumn(model.getColumnCount() - 1);
                     int width = lastColumn.getPreferredWidth();
                     width += parentWidth - totalWidth;
                     lastColumn.setPreferredWidth(width);
@@ -644,6 +642,15 @@ abstract class WidgetPropertySetter {
                         new_column_widths = "" + width;
                     }
                     xml.setProperty(widget.getName(), "column_widths", new_column_widths);
+                }
+
+                if (v != null) {
+                    for (int i = 0; i < model.getColumnCount(); i++) {
+                        TableColumn column = model.getColumn(i);
+                        column.setResizable(false);
+                        column.setMaxWidth(column.getWidth());
+                        column.setMinWidth(column.getWidth());
+                    }
                 }
             }
         });
