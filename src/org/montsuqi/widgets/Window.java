@@ -44,8 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.LayoutFocusTraversalPolicy;
 
 /**
- * <
- * p>
+ * <p>
  * A JFrame wrapper.</p>
  */
 public class Window extends JFrame {
@@ -97,7 +96,7 @@ public class Window extends JFrame {
                 for (GraphicsConfiguration gc1 : gc) {
                     Rectangle scrBounds = gc1.getBounds();
                     Insets scrInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc1);
-                    
+
                     // some windows env can not get insets
                     String ratio = System.getProperty("monsia.widgets.window.insets_ratio");
                     if (ratio != null) {
@@ -105,27 +104,53 @@ public class Window extends JFrame {
                         if (r <= 0 || r >= 50) {
                             r = 10;
                         }
-                        scrInsets.left = scrInsets.right  = (int) (scrBounds.width  * (r/100.0));
-                        scrInsets.top  = scrInsets.bottom = (int) (scrBounds.height * (r/100.0));
+                        scrInsets.left = scrInsets.right = (int) (scrBounds.width * (r / 100.0));
+                        scrInsets.top = scrInsets.bottom = (int) (scrBounds.height * (r / 100.0));
                     }
 
                     if (scrBounds.contains(tcx, tcy)) {
-                        if (x < scrBounds.x + scrInsets.left) {
-                            x = scrBounds.x + scrInsets.left;
-                        }
-                        if (y < scrBounds.y + scrInsets.top) {
-                            y = scrBounds.y + scrInsets.top;
-                        }
-                        if ((x + d.width) > (scrBounds.x + scrBounds.width - scrInsets.right)) {
-                            x = scrBounds.x + scrBounds.width - scrInsets.right - d.width;
-                            if (x < scrBounds.x) {
-                                x = (int)(scrBounds.x + scrBounds.width / 2.0 - d.width / 2.0);
+                        String location = System.getProperty("monsia.dialog.location");
+                        if (location != null) {
+                            switch (location.toLowerCase()) {
+                                case "topleft":
+                                    x = scrBounds.x + scrInsets.left;
+                                    y = scrBounds.y + scrInsets.top;
+                                    break;
+                                case "topright":
+                                    x = (int) (scrBounds.x + scrBounds.width - d.width - scrInsets.right);
+                                    y = scrBounds.y + scrInsets.top;
+                                    break;
+                                case "bottomleft":
+                                    x = scrBounds.x + scrInsets.left;
+                                    y = (int) (scrBounds.y + scrBounds.height - d.height - scrInsets.bottom);
+                                    break;
+                                case "bottomright":
+                                    x = (int) (scrBounds.x + scrBounds.width - d.width - scrInsets.right);
+                                    y = (int) (scrBounds.y + scrBounds.height - d.height - scrInsets.bottom);
+                                    break;
+                                default:
+                                    x = (int) (scrBounds.getCenterX() - d.width / 2.0);
+                                    y = (int) (scrBounds.getCenterY() - d.height / 2.0);
+                                    break;
                             }
-                        }
-                        if ((y + d.height) > (scrBounds.y + scrBounds.height - scrInsets.bottom)) {
-                            y = scrBounds.y + scrBounds.height - scrInsets.bottom - d.height;
-                            if (y < scrBounds.y) {
-                                y = (int)(scrBounds.y + scrBounds.height / 2.0 - d.height / 2.0);
+                        } else {
+                            if (x < scrBounds.x + scrInsets.left) {
+                                x = scrBounds.x + scrInsets.left;
+                            }
+                            if (y < scrBounds.y + scrInsets.top) {
+                                y = scrBounds.y + scrInsets.top;
+                            }
+                            if ((x + d.width) > (scrBounds.x + scrBounds.width - scrInsets.right)) {
+                                x = scrBounds.x + scrBounds.width - scrInsets.right - d.width;
+                                if (x < scrBounds.x) {
+                                    x = (int) (scrBounds.x + scrBounds.width / 2.0 - d.width / 2.0);
+                                }
+                            }
+                            if ((y + d.height) > (scrBounds.y + scrBounds.height - scrInsets.bottom)) {
+                                y = scrBounds.y + scrBounds.height - scrInsets.bottom - d.height;
+                                if (y < scrBounds.y) {
+                                    y = (int) (scrBounds.y + scrBounds.height / 2.0 - d.height / 2.0);
+                                }
                             }
                         }
                     }

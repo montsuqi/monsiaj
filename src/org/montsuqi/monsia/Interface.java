@@ -413,21 +413,15 @@ public class Interface {
             }
             String column_widths = getProperty(key, "column_widths");
             if (column_widths != null && component instanceof PandaCList) {
-                
-                System.out.println(key + ".column_widths [" + System.getProperty(key + ".column_widths") + "]");
-                if (System.getProperty(key + ".column_widths") == null) {
-                    System.out.println();
-                
-                    StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
-                    TableColumnModel model = ((JTable) component).getColumnModel();
-                    for (int i = 0; tokens.hasMoreTokens() && i < model.getColumnCount(); i++) {
-                        TableColumn column = model.getColumn(i);
-                        int width = ParameterConverter.toInteger(tokens.nextToken());
-                        width += 8;// FIXME do not use immediate value like this
-                        width = (int) (width * hScale);
-                        column.setPreferredWidth(width);
-                        column.setWidth(width);
-                    }
+                StringTokenizer tokens = new StringTokenizer(column_widths, String.valueOf(','));
+                TableColumnModel model = ((JTable) component).getColumnModel();
+                for (int i = 0; tokens.hasMoreTokens() && i < model.getColumnCount(); i++) {
+                    TableColumn column = model.getColumn(i);
+                    int width = ParameterConverter.toInteger(tokens.nextToken());
+                    width += 8;// FIXME do not use immediate value like this
+                    width = (int) (width * hScale);
+                    column.setPreferredWidth(width);
+                    column.setWidth(width);
                 }
             }
             component.validate();
