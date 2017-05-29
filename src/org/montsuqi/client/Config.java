@@ -425,9 +425,6 @@ public class Config {
 
     public void setSaveClientCertificatePassword(int i, boolean v) {
         setValue(i, "saveClientCertificatePassword", Boolean.toString(v));
-        if (!v) {
-            this.setClientCertificatePassword(i, "");
-        }
     }
 
     // styleFile

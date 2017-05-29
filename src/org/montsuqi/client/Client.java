@@ -50,6 +50,8 @@ public class Client implements Runnable {
     protected static final Logger logger = LogManager.getLogger(Launcher.class);
     private String user;
     private String host;
+    private String certificatePassword;
+    private String password;
 
     public Config getConf() {
         return conf;
@@ -76,6 +78,16 @@ public class Client implements Runnable {
      */
     public Client(Config conf) {
         this.conf = conf;
+        int num = conf.getCurrent();
+
+        this.password = conf.getPassword(num);
+        if (!conf.getSavePassword(num)) {
+            conf.setPassword(num, "");
+        }
+        this.certificatePassword = conf.getClientCertificatePassword(num);
+        if (!conf.getSaveClientCertificatePassword(num)) {
+            conf.setClientCertificatePassword(num, "");
+        }
     }
 
     /**
@@ -101,16 +113,15 @@ public class Client implements Runnable {
             conf.setUser(num, "");
             conf.save();
         }
-        String password = conf.getPassword(num);
         String application = conf.getApplication(num);
-        
+
         if (!conf.getSavePassword(num)) {
             conf.setPassword(num, "");
             conf.save();
         }
 
         logger.info("connect {}@{}:{} {}", user, host, port, this);
-        protocol.sendConnect(user, password, application);
+        protocol.sendConnect(user, this.password, application);
     }
 
     private Map loadStyles() {
@@ -151,9 +162,8 @@ public class Client implements Runnable {
             return socket;
         } else {
             String fileName = conf.getClientCertificateFile(num);
-            String caFileName = conf.getCACertificateFile(num);            
-            String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(caFileName,fileName, password);
+            String caFileName = conf.getCACertificateFile(num);
+            SSLSocketBuilder builder = new SSLSocketBuilder(caFileName, fileName, this.certificatePassword);
             return builder.createSSLSocket(socket, hostName, portNum);
         }
     }
@@ -171,10 +181,9 @@ public class Client implements Runnable {
         if (!conf.getUseSSL(num)) {
             return null;
         } else {
-            String caFileName = conf.getCACertificateFile(num);                        
+            String caFileName = conf.getCACertificateFile(num);
             String fileName = conf.getClientCertificateFile(num);
-            String password = conf.getClientCertificatePassword(num);
-            SSLSocketBuilder builder = new SSLSocketBuilder(caFileName,fileName, password);
+            SSLSocketBuilder builder = new SSLSocketBuilder(caFileName, fileName, this.certificatePassword);
             return builder.getFactory();
         }
     }
@@ -210,7 +219,7 @@ public class Client implements Runnable {
                 }
             }
         } catch (Exception e) {
-            logger.catching(Level.WARN,e);
+            logger.catching(Level.WARN, e);
         } finally {
             logger.info("disconnect {}@{}:{} {}", user, host, port, this);
             System.exit(0);
