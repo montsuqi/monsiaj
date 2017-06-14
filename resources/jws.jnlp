@@ -23,5 +23,5 @@
         <jar href="PDFRenderer.jar"/>
         <jar href="org.json-20120521.jar"/>        
     </resources>
-    <application-desc main-class="org.montsuqi.client.Launcher"/>
+    <application-desc main-class="org.montsuqi.monsiaj.client.Launcher"/>
 </jnlp>
