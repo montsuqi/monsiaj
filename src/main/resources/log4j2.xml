@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<configuration>
+    <Properties>
+        <Property name="monsia.log.level">info</Property>
+    </Properties>    
+    <appenders>
+        <RollingFile 
+            name="RollingFile" 
+            fileName="${sys:user.home}/.monsiaj/monsiaj.log.txt"
+            filePattern="${sys:user.home}/.monsiaj/monsiaj.log.txt.%i"
+        >
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="2048 KB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5" fileindex="min"/>
+        </RollingFile>
+        <Console name="Console">            
+            <PatternLayout pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"/>
+        </Console>
+    </appenders>
+    <loggers>
+        <root level="${sys:monsia.log.level}">
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>  
+</configuration>
