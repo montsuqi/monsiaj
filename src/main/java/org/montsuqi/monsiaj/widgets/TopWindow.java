@@ -89,7 +89,7 @@ public class TopWindow extends Window implements ComponentListener {
     public TopWindow() {
         super();
 
-        URL iconURL = getClass().getResource("/org/montsuqi/monsiaj/widgets/images/orca.png");
+        URL iconURL = getClass().getResource("/images/orca.png");
         setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
 
         int x, y, width, height;

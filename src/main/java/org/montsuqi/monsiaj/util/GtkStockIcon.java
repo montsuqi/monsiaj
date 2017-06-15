@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 public class GtkStockIcon {
     
     static public Icon get(final String iconName) {
-        URL url = GtkStockIcon.class.getResource("/org/montsuqi/widgets/images/stock-icons/" + iconName + ".png");
+        URL url = GtkStockIcon.class.getResource("/images/stock-icons/" + iconName + ".png");
         if (url == null) {
             return null;
         }

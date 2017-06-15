@@ -87,8 +87,8 @@ public class Interface {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
         accelHandlers = new HashMap<>();
     }
-    private static final String OLD_HANDLER = "org.montsuqi.monsiaj.monsia.Glade1Handler";
-    private static final String NEW_HANDLER = "org.montsuqi.monsiaj.monsia.MonsiaHandler";
+    private static final String OLD_HANDLER = "main.java.org.montsuqi.monsiaj.monsia.Glade1Handler";
+    private static final String NEW_HANDLER = "main.java.org.montsuqi.monsiaj.monsia.MonsiaHandler";
 
     public void setDefaultWidget(Component widget) {
         defaultWidget = widget;

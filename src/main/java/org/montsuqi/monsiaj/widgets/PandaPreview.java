@@ -21,6 +21,7 @@
  copies.
  */
 package main.java.org.montsuqi.monsiaj.widgets;
+import main.java.org.montsuqi.monsiaj.util.Messages;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -126,7 +127,7 @@ public class PandaPreview extends JPanel {
     private final class NextAction extends AbstractAction {
 
         NextAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/next.png");
+            URL iconURL = getClass().getResource("/images/next.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
@@ -148,7 +149,7 @@ public class PandaPreview extends JPanel {
     private final class PrevAction extends AbstractAction {
 
         PrevAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/prev.png");
+            URL iconURL = getClass().getResource("/images/prev.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
@@ -170,7 +171,7 @@ public class PandaPreview extends JPanel {
     private final class SaveAction extends AbstractAction {
 
         SaveAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/save.png");
+            URL iconURL = getClass().getResource("/images/save.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }
@@ -213,7 +214,7 @@ public class PandaPreview extends JPanel {
     private final class PrintAction extends AbstractAction {
 
         PrintAction() {
-            URL iconURL = getClass().getResource("/org/montsuqi/widgets/images/print.png");
+            URL iconURL = getClass().getResource("/images/print.png");
             if (iconURL != null) {
                 putValue(Action.SMALL_ICON, new ImageIcon(iconURL));
             }

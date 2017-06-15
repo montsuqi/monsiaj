@@ -22,6 +22,7 @@
  */
 package main.java.org.montsuqi.monsiaj.client;
 
+import main.java.org.montsuqi.monsiaj.util.Messages;
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.BorderLayout;
 import java.awt.Container;

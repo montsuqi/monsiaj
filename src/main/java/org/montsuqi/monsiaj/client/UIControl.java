@@ -5,6 +5,7 @@
  */
 package main.java.org.montsuqi.monsiaj.client;
 
+import main.java.org.montsuqi.monsiaj.util.Messages;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;

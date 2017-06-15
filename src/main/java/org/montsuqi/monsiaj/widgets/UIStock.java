@@ -46,7 +46,7 @@ public class UIStock {
         stocks = new HashMap<>();
     }
 
-    private static final String BUNDLE_NAME = "org.montsuqi.monsiaj.widgets.uistocks";
+    private static final String BUNDLE_NAME = "uistocks";
     private static final ResourceBundle RESOURCE_BUNDLE
             = ResourceBundle.getBundle(BUNDLE_NAME);
 

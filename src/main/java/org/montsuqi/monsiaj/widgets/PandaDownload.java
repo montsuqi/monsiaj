@@ -21,7 +21,7 @@
  copies.
  */
 package main.java.org.montsuqi.monsiaj.widgets;
-
+import main.java.org.montsuqi.monsiaj.util.Messages;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -35,7 +35,6 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.client.Launcher;
 import main.java.org.montsuqi.monsiaj.util.GtkStockIcon;
 import main.java.org.montsuqi.monsiaj.util.PopupNotify;
 

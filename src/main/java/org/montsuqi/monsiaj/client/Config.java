@@ -4,6 +4,7 @@
  */
 package main.java.org.montsuqi.monsiaj.client;
 
+import main.java.org.montsuqi.monsiaj.util.Messages;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,7 +52,7 @@ public class Config {
     private static final String PROP_PATH = SystemEnvironment.createFilePath(PROP_PATH_ELEM).getAbsolutePath();
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
-    private static final String DEFAULT_STYLE_RESOURCE_NAME = "/org/montsuqi/monsiaj/client/style.properties";
+    private static final String DEFAULT_STYLE_RESOURCE_NAME = "/style.properties";
     private static final Logger LOGGER = LogManager.getLogger(Config.class);
 
     private static final TreeMap<String, PrintService> PRINTER_SERVICE_MAP;

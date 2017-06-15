@@ -21,7 +21,7 @@
  copies.
  */
 package main.java.org.montsuqi.monsiaj.widgets;
-
+import main.java.org.montsuqi.monsiaj.util.Messages;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;

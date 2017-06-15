@@ -22,6 +22,7 @@
  */
 package main.java.org.montsuqi.monsiaj.client;
 
+import main.java.org.montsuqi.monsiaj.util.Messages;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
