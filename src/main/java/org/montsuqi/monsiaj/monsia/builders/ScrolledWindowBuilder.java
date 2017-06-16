@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -29,9 +29,9 @@ import java.awt.Container;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
-import main.java.org.montsuqi.monsiaj.monsia.ChildInfo;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.monsia.ChildInfo;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
 
 /** <p>A builder to create ScrolledWindow widgets.</p>
  */

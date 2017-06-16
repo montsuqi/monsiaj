@@ -20,12 +20,12 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
-import main.java.org.montsuqi.monsiaj.util.Messages;
+package org.montsuqi.monsiaj.widgets;
+import org.montsuqi.monsiaj.util.Messages;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import main.java.org.montsuqi.monsiaj.util.SafeColorDecoder;
+import org.montsuqi.monsiaj.util.SafeColorDecoder;
 
 /**
  * <p>A class that simulates Gtk+'s ColorButton.</p>

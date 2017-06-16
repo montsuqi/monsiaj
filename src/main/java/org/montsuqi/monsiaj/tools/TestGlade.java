@@ -2,15 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.org.montsuqi.monsiaj.tools;
+package org.montsuqi.monsiaj.tools;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.widgets.TopWindow;
-import main.java.org.montsuqi.monsiaj.widgets.Window;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.widgets.TopWindow;
+import org.montsuqi.monsiaj.widgets.Window;
 
 /**
  *

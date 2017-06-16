@@ -20,18 +20,18 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia;
+package org.montsuqi.monsiaj.monsia;
 
-import main.java.org.montsuqi.monsiaj.widgets.ColorButton;
-import main.java.org.montsuqi.monsiaj.widgets.FileChooserButton;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCombo;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCList;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTimer;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTable;
-import main.java.org.montsuqi.monsiaj.widgets.TimerListener;
-import main.java.org.montsuqi.monsiaj.widgets.TimerEvent;
-import main.java.org.montsuqi.monsiaj.widgets.Calendar;
-import main.java.org.montsuqi.monsiaj.widgets.Notebook;
+import org.montsuqi.monsiaj.widgets.ColorButton;
+import org.montsuqi.monsiaj.widgets.FileChooserButton;
+import org.montsuqi.monsiaj.widgets.PandaCombo;
+import org.montsuqi.monsiaj.widgets.PandaCList;
+import org.montsuqi.monsiaj.widgets.PandaTimer;
+import org.montsuqi.monsiaj.widgets.PandaTable;
+import org.montsuqi.monsiaj.widgets.TimerListener;
+import org.montsuqi.monsiaj.widgets.TimerEvent;
+import org.montsuqi.monsiaj.widgets.Calendar;
+import org.montsuqi.monsiaj.widgets.Notebook;
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.*;
@@ -44,8 +44,8 @@ import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.client.SignalHandler;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.client.SignalHandler;
+import org.montsuqi.monsiaj.client.UIControl;
 
 /**
  * <p>

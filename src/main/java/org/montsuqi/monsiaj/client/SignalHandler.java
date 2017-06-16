@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
 import java.awt.Component;
 import java.io.IOException;

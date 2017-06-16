@@ -20,17 +20,17 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client.widgethandlers;
+package org.montsuqi.monsiaj.client.widgethandlers;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
-import main.java.org.montsuqi.monsiaj.util.GtkStockIcon;
-import main.java.org.montsuqi.monsiaj.util.PopupNotify;
-import main.java.org.montsuqi.monsiaj.util.SafeColorDecoder;
+import org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.util.GtkStockIcon;
+import org.montsuqi.monsiaj.util.PopupNotify;
+import org.montsuqi.monsiaj.util.SafeColorDecoder;
 
 /**
  * <

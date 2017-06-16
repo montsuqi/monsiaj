@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client.widgethandlers;
+package org.montsuqi.monsiaj.client.widgethandlers;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -37,9 +37,9 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
-import main.java.org.montsuqi.monsiaj.util.SafeColorDecoder;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCList;
+import org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.util.SafeColorDecoder;
+import org.montsuqi.monsiaj.widgets.PandaCList;
 
 /**
  * <p>

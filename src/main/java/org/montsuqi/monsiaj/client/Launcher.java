@@ -20,9 +20,9 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -55,11 +55,11 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
-import main.java.org.montsuqi.monsiaj.util.OptionParser;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
-import main.java.org.montsuqi.monsiaj.util.TempFile;
-import main.java.org.montsuqi.monsiaj.widgets.Button;
-import main.java.org.montsuqi.monsiaj.widgets.ExceptionDialog;
+import org.montsuqi.monsiaj.util.OptionParser;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.TempFile;
+import org.montsuqi.monsiaj.widgets.Button;
+import org.montsuqi.monsiaj.widgets.ExceptionDialog;
 
 public class Launcher {
 

@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 class WidgetBuildingException extends RuntimeException {
 

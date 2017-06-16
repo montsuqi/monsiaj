@@ -1,4 +1,4 @@
-package main.java.org.montsuqi.monsiaj.util;
+package org.montsuqi.monsiaj.util;
 
 import java.awt.*;
 import java.awt.print.*;
@@ -24,7 +24,7 @@ import javax.print.attribute.standard.MediaSizeName;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.util.PDFPrint.PDFPrintPage;
+import org.montsuqi.monsiaj.util.PDFPrint.PDFPrintPage;
 
 public class PDFPrint extends Thread {
 

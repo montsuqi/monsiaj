@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +31,7 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 /**
  *

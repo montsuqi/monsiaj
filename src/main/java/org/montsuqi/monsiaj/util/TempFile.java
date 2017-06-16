@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.org.montsuqi.monsiaj.util;
+package org.montsuqi.monsiaj.util;
 
 import java.io.File;
 import java.util.UUID;

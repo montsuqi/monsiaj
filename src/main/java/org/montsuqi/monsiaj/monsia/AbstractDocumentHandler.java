@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia;
+package org.montsuqi.monsiaj.monsia;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -28,7 +28,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.client.UIControl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;

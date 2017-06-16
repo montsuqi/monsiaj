@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

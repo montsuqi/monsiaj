@@ -20,16 +20,16 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
 import javax.swing.JComponent;
 import javax.swing.table.DefaultTableModel;
-import main.java.org.montsuqi.monsiaj.monsia.ChildInfo;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCList;
+import org.montsuqi.monsiaj.monsia.ChildInfo;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.widgets.PandaCList;
 
 /** <p>A builder to create clist widgets.</p>
  * <p>This component assigns a CListHeaderRenderer for each column headers.</p>

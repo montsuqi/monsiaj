@@ -20,18 +20,18 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
-import main.java.org.montsuqi.monsiaj.monsia.ChildInfo;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
-import main.java.org.montsuqi.monsiaj.util.ParameterConverter;
-import main.java.org.montsuqi.monsiaj.widgets.Notebook;
-import main.java.org.montsuqi.monsiaj.widgets.NotebookDummyButton;
+import org.montsuqi.monsiaj.monsia.ChildInfo;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.util.ParameterConverter;
+import org.montsuqi.monsiaj.widgets.Notebook;
+import org.montsuqi.monsiaj.widgets.NotebookDummyButton;
 
 /**
  * <p>A builder to create Notebook widget.</p> <p>For each tab, a

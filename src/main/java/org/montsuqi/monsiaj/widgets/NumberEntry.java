@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -44,8 +44,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.util.PrecisionScale;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.PrecisionScale;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 /**
  * <

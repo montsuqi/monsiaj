@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia;
+package org.montsuqi.monsiaj.monsia;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -31,7 +31,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import main.java.org.montsuqi.monsiaj.util.SafeColorDecoder;
+import org.montsuqi.monsiaj.util.SafeColorDecoder;
 
 public class Style {
 

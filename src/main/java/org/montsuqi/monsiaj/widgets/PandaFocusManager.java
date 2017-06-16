@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 import java.awt.Component;
 import java.awt.DefaultKeyboardFocusManager;
@@ -29,7 +29,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.SwingUtilities;
 
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.Interface;
 
 /** <p>A focus manager which delegates actions to Interface object first.</p>
  * 

@@ -20,13 +20,13 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
 /**
  * <p>A class which manages a top-level window and its changed widgets.</p>
  */
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.widgets.Window;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.widgets.Window;
 
 public class Node {
 

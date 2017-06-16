@@ -20,7 +20,7 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -34,7 +34,7 @@ import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 /** <p>A class that simulates GtkPandaButton widget.</p>
  */

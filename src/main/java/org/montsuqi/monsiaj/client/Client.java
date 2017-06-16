@@ -20,9 +20,9 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -49,15 +49,15 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.util.GtkStockIcon;
-import main.java.org.montsuqi.monsiaj.util.PDFPrint;
-import main.java.org.montsuqi.monsiaj.util.PopupNotify;
-import main.java.org.montsuqi.monsiaj.util.TempFile;
-import main.java.org.montsuqi.monsiaj.widgets.Button;
-import main.java.org.montsuqi.monsiaj.widgets.ExceptionDialog;
-import main.java.org.montsuqi.monsiaj.widgets.PandaDownload;
-import main.java.org.montsuqi.monsiaj.widgets.PandaPreview;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.util.GtkStockIcon;
+import org.montsuqi.monsiaj.util.PDFPrint;
+import org.montsuqi.monsiaj.util.PopupNotify;
+import org.montsuqi.monsiaj.util.TempFile;
+import org.montsuqi.monsiaj.widgets.Button;
+import org.montsuqi.monsiaj.widgets.ExceptionDialog;
+import org.montsuqi.monsiaj.widgets.PandaDownload;
+import org.montsuqi.monsiaj.widgets.PandaPreview;
 
 /**
  * <p>

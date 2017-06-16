@@ -20,9 +20,9 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.Color;
 import java.awt.Component;
@@ -67,8 +67,8 @@ import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.util.ExtensionFileFilter;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.ExtensionFileFilter;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 public class ConfigPanel extends JPanel {
 

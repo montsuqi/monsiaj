@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -42,41 +42,41 @@ import javax.swing.JViewport;
 import javax.swing.UIManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.InterfaceBuildingException;
-import main.java.org.montsuqi.monsiaj.monsia.SignalData;
-import main.java.org.montsuqi.monsiaj.monsia.SignalInfo;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
-import main.java.org.montsuqi.monsiaj.widgets.Button;
-import main.java.org.montsuqi.monsiaj.widgets.Calendar;
-import main.java.org.montsuqi.monsiaj.widgets.CheckBox;
-import main.java.org.montsuqi.monsiaj.widgets.ColorButton;
-import main.java.org.montsuqi.monsiaj.widgets.Entry;
-import main.java.org.montsuqi.monsiaj.widgets.FileChooserButton;
-import main.java.org.montsuqi.monsiaj.widgets.Fixed;
-import main.java.org.montsuqi.monsiaj.widgets.Frame;
-import main.java.org.montsuqi.monsiaj.widgets.HBox;
-import main.java.org.montsuqi.monsiaj.widgets.HPaned;
-import main.java.org.montsuqi.monsiaj.widgets.HSeparator;
-import main.java.org.montsuqi.monsiaj.widgets.Notebook;
-import main.java.org.montsuqi.monsiaj.widgets.NumberEntry;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCList;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCombo;
-import main.java.org.montsuqi.monsiaj.widgets.PandaDownload;
-import main.java.org.montsuqi.monsiaj.widgets.PandaEntry;
-import main.java.org.montsuqi.monsiaj.widgets.PandaHTML;
-import main.java.org.montsuqi.monsiaj.widgets.PandaPreview;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTable;
-import main.java.org.montsuqi.monsiaj.widgets.PandaText;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTimer;
-import main.java.org.montsuqi.monsiaj.widgets.Pixmap;
-import main.java.org.montsuqi.monsiaj.widgets.RadioButton;
-import main.java.org.montsuqi.monsiaj.widgets.Table;
-import main.java.org.montsuqi.monsiaj.widgets.ToggleButton;
-import main.java.org.montsuqi.monsiaj.widgets.VBox;
-import main.java.org.montsuqi.monsiaj.widgets.VPaned;
-import main.java.org.montsuqi.monsiaj.widgets.VSeparator;
-import main.java.org.montsuqi.monsiaj.widgets.Window;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.InterfaceBuildingException;
+import org.montsuqi.monsiaj.monsia.SignalData;
+import org.montsuqi.monsiaj.monsia.SignalInfo;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.widgets.Button;
+import org.montsuqi.monsiaj.widgets.Calendar;
+import org.montsuqi.monsiaj.widgets.CheckBox;
+import org.montsuqi.monsiaj.widgets.ColorButton;
+import org.montsuqi.monsiaj.widgets.Entry;
+import org.montsuqi.monsiaj.widgets.FileChooserButton;
+import org.montsuqi.monsiaj.widgets.Fixed;
+import org.montsuqi.monsiaj.widgets.Frame;
+import org.montsuqi.monsiaj.widgets.HBox;
+import org.montsuqi.monsiaj.widgets.HPaned;
+import org.montsuqi.monsiaj.widgets.HSeparator;
+import org.montsuqi.monsiaj.widgets.Notebook;
+import org.montsuqi.monsiaj.widgets.NumberEntry;
+import org.montsuqi.monsiaj.widgets.PandaCList;
+import org.montsuqi.monsiaj.widgets.PandaCombo;
+import org.montsuqi.monsiaj.widgets.PandaDownload;
+import org.montsuqi.monsiaj.widgets.PandaEntry;
+import org.montsuqi.monsiaj.widgets.PandaHTML;
+import org.montsuqi.monsiaj.widgets.PandaPreview;
+import org.montsuqi.monsiaj.widgets.PandaTable;
+import org.montsuqi.monsiaj.widgets.PandaText;
+import org.montsuqi.monsiaj.widgets.PandaTimer;
+import org.montsuqi.monsiaj.widgets.Pixmap;
+import org.montsuqi.monsiaj.widgets.RadioButton;
+import org.montsuqi.monsiaj.widgets.Table;
+import org.montsuqi.monsiaj.widgets.ToggleButton;
+import org.montsuqi.monsiaj.widgets.VBox;
+import org.montsuqi.monsiaj.widgets.VPaned;
+import org.montsuqi.monsiaj.widgets.VSeparator;
+import org.montsuqi.monsiaj.widgets.Window;
 
 /**
  * <p>

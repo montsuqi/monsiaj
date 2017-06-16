@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client.widgethandlers;
+package org.montsuqi.monsiaj.client.widgethandlers;
 
 import java.awt.Component;
 import java.util.Calendar;
@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.client.UIControl;
 
 /**
  * <
@@ -39,7 +39,7 @@ class CalendarHandler extends WidgetHandler {
 
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
-        main.java.org.montsuqi.monsiaj.widgets.Calendar calendarWidget = (main.java.org.montsuqi.monsiaj.widgets.Calendar) widget;
+        org.montsuqi.monsiaj.widgets.Calendar calendarWidget = (org.montsuqi.monsiaj.widgets.Calendar) widget;
         Calendar calendar = Calendar.getInstance();
         this.setCommonAttribute(widget, obj, styleMap);
 
@@ -62,7 +62,7 @@ class CalendarHandler extends WidgetHandler {
 
     @Override
     public void get(UIControl con, Component widget, JSONObject obj) throws JSONException {
-        main.java.org.montsuqi.monsiaj.widgets.Calendar calendarWidget = (main.java.org.montsuqi.monsiaj.widgets.Calendar) widget;
+        org.montsuqi.monsiaj.widgets.Calendar calendarWidget = (org.montsuqi.monsiaj.widgets.Calendar) widget;
         Calendar cal = Calendar.getInstance();
         Date date = calendarWidget.getDate();
         cal.setTime(date);

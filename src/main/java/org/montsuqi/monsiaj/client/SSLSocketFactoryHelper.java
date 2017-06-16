@@ -20,9 +20,9 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,8 +53,8 @@ import javax.swing.JPasswordField;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.util.TempFile;
-import main.java.org.montsuqi.monsiaj.widgets.CertificateDetailPanel;
+import org.montsuqi.monsiaj.util.TempFile;
+import org.montsuqi.monsiaj.widgets.CertificateDetailPanel;
 
 public class SSLSocketFactoryHelper {
 

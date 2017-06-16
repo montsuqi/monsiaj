@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.monsia;
+package org.montsuqi.monsiaj.monsia;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

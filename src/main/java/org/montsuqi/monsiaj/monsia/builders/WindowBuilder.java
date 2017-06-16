@@ -20,7 +20,7 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -28,11 +28,11 @@ import java.awt.Container;
 import java.util.Iterator;
 import javax.swing.JMenuBar;
 import javax.swing.RootPaneContainer;
-import main.java.org.montsuqi.monsiaj.monsia.ChildInfo;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
-import main.java.org.montsuqi.monsiaj.widgets.Fixed;
-import main.java.org.montsuqi.monsiaj.widgets.Window;
+import org.montsuqi.monsiaj.monsia.ChildInfo;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.widgets.Fixed;
+import org.montsuqi.monsiaj.widgets.Window;
 
 /** <p>A builder to create Window(top level) widget.</p>
  * <p>Since dialogs are variation of windows in Gtk+ while dialogs and windows are 

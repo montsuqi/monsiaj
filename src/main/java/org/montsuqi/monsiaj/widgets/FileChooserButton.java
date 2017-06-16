@@ -20,8 +20,8 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
-import main.java.org.montsuqi.monsiaj.util.Messages;
+package org.montsuqi.monsiaj.widgets;
+import org.montsuqi.monsiaj.util.Messages;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -29,7 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
-import main.java.org.montsuqi.monsiaj.util.GtkStockIcon;
+import org.montsuqi.monsiaj.util.GtkStockIcon;
 
 /**
  * <p>A class that simulates Gtk+'s FileChooserButton.</p>

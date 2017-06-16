@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 /**
  *
@@ -20,8 +20,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import main.java.org.montsuqi.monsiaj.util.SafeColorDecoder;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.SafeColorDecoder;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 public class PandaTable extends JTable {
 

@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia;
+package org.montsuqi.monsiaj.monsia;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;

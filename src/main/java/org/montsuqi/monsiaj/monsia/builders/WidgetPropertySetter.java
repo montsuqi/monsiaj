@@ -20,19 +20,19 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
-import main.java.org.montsuqi.monsiaj.widgets.PandaCList;
-import main.java.org.montsuqi.monsiaj.widgets.PandaEntry;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTimer;
-import main.java.org.montsuqi.monsiaj.widgets.UIStock;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTable;
-import main.java.org.montsuqi.monsiaj.widgets.Entry;
-import main.java.org.montsuqi.monsiaj.widgets.PandaHTML;
-import main.java.org.montsuqi.monsiaj.widgets.NumberEntry;
-import main.java.org.montsuqi.monsiaj.widgets.PandaText;
-import main.java.org.montsuqi.monsiaj.widgets.Window;
-import main.java.org.montsuqi.monsiaj.widgets.Pixmap;
+import org.montsuqi.monsiaj.widgets.PandaCList;
+import org.montsuqi.monsiaj.widgets.PandaEntry;
+import org.montsuqi.monsiaj.widgets.PandaTimer;
+import org.montsuqi.monsiaj.widgets.UIStock;
+import org.montsuqi.monsiaj.widgets.PandaTable;
+import org.montsuqi.monsiaj.widgets.Entry;
+import org.montsuqi.monsiaj.widgets.PandaHTML;
+import org.montsuqi.monsiaj.widgets.NumberEntry;
+import org.montsuqi.monsiaj.widgets.PandaText;
+import org.montsuqi.monsiaj.widgets.Window;
+import org.montsuqi.monsiaj.widgets.Pixmap;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -50,8 +50,8 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.util.ParameterConverter;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.util.ParameterConverter;
 
 /**
  * <p>
@@ -717,11 +717,11 @@ abstract class WidgetPropertySetter {
             }
         });
 
-        registerProperty(main.java.org.montsuqi.monsiaj.widgets.Frame.class, "label", new WidgetPropertySetter() {
+        registerProperty(org.montsuqi.monsiaj.widgets.Frame.class, "label", new WidgetPropertySetter() {
 
             @Override
             public void set(Interface xml, Container parent, Component widget, String value) {
-                main.java.org.montsuqi.monsiaj.widgets.Frame frame = (main.java.org.montsuqi.monsiaj.widgets.Frame) widget;
+                org.montsuqi.monsiaj.widgets.Frame frame = (org.montsuqi.monsiaj.widgets.Frame) widget;
                 frame.setBorder(BorderFactory.createTitledBorder(value));
             }
         });

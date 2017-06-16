@@ -20,14 +20,14 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client.widgethandlers;
+package org.montsuqi.monsiaj.client.widgethandlers;
 
 import java.awt.Component;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
-import main.java.org.montsuqi.monsiaj.widgets.Notebook;
+import org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.widgets.Notebook;
 
 /**
  * <p>

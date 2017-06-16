@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -34,7 +34,7 @@ import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 
 import javax.swing.UIManager;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 /** <p>A class that simulates Gtk+'s RadioButton.</p>
  * 

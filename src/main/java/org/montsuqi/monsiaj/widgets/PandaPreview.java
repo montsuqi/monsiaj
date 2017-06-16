@@ -20,8 +20,8 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
-import main.java.org.montsuqi.monsiaj.util.Messages;
+package org.montsuqi.monsiaj.widgets;
+import org.montsuqi.monsiaj.util.Messages;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -38,8 +38,8 @@ import javax.swing.event.MouseInputAdapter;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.util.ExtensionFileFilter;
-import main.java.org.montsuqi.monsiaj.util.PDFPrint;
+import org.montsuqi.monsiaj.util.ExtensionFileFilter;
+import org.montsuqi.monsiaj.util.PDFPrint;
 
 /**
  * <

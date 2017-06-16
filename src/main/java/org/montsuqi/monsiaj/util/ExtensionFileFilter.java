@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.util;
+package org.montsuqi.monsiaj.util;
 
 import java.io.File;
 import javax.swing.filechooser.FileFilter;

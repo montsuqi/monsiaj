@@ -20,9 +20,9 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -50,7 +50,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.widgets.Button;
+import org.montsuqi.monsiaj.widgets.Button;
 
 public class ConfigViewer {
 

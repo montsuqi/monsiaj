@@ -20,7 +20,7 @@ responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
  */
-package main.java.org.montsuqi.monsiaj.monsia;
+package org.montsuqi.monsiaj.monsia;
 
 import java.awt.Component;
 import java.awt.Dialog;
@@ -53,12 +53,12 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import main.java.org.montsuqi.monsiaj.client.SignalHandler;
-import main.java.org.montsuqi.monsiaj.client.UIControl;
-import main.java.org.montsuqi.monsiaj.monsia.builders.WidgetBuilder;
-import main.java.org.montsuqi.monsiaj.util.ParameterConverter;
-import main.java.org.montsuqi.monsiaj.widgets.PandaCList;
-import main.java.org.montsuqi.monsiaj.widgets.PandaFocusManager;
+import org.montsuqi.monsiaj.client.SignalHandler;
+import org.montsuqi.monsiaj.client.UIControl;
+import org.montsuqi.monsiaj.monsia.builders.WidgetBuilder;
+import org.montsuqi.monsiaj.util.ParameterConverter;
+import org.montsuqi.monsiaj.widgets.PandaCList;
+import org.montsuqi.monsiaj.widgets.PandaFocusManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -87,8 +87,8 @@ public class Interface {
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new PandaFocusManager());
         accelHandlers = new HashMap<>();
     }
-    private static final String OLD_HANDLER = "main.java.org.montsuqi.monsiaj.monsia.Glade1Handler";
-    private static final String NEW_HANDLER = "main.java.org.montsuqi.monsiaj.monsia.MonsiaHandler";
+    private static final String OLD_HANDLER = "org.montsuqi.monsiaj.monsia.Glade1Handler";
+    private static final String NEW_HANDLER = "org.montsuqi.monsiaj.monsia.MonsiaHandler";
 
     public void setDefaultWidget(Component widget) {
         defaultWidget = widget;

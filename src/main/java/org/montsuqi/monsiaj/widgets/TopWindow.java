@@ -20,7 +20,7 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
+package org.montsuqi.monsiaj.widgets;
 
 import java.awt.Component;
 import java.awt.Insets;
@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.prefs.Preferences;
 import javax.swing.JComponent;
 import javax.swing.LayoutFocusTraversalPolicy;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.Interface;
 
 /**
  * <p>

@@ -20,8 +20,8 @@
  things, the copyright notice and this notice must be preserved on all
  copies.
  */
-package main.java.org.montsuqi.monsiaj.widgets;
-import main.java.org.montsuqi.monsiaj.util.Messages;
+package org.montsuqi.monsiaj.widgets;
+import org.montsuqi.monsiaj.util.Messages;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;

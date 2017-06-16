@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.org.montsuqi.monsiaj.client;
+package org.montsuqi.monsiaj.client;
 
-import main.java.org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.Messages;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -27,14 +27,14 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import main.java.org.montsuqi.monsiaj.client.widgethandlers.WidgetHandler;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.Style;
-import main.java.org.montsuqi.monsiaj.util.SystemEnvironment;
-import main.java.org.montsuqi.monsiaj.widgets.ExceptionDialog;
-import main.java.org.montsuqi.monsiaj.widgets.PandaTimer;
-import main.java.org.montsuqi.monsiaj.widgets.TopWindow;
-import main.java.org.montsuqi.monsiaj.widgets.Window;
+import org.montsuqi.monsiaj.client.widgethandlers.WidgetHandler;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.Style;
+import org.montsuqi.monsiaj.util.SystemEnvironment;
+import org.montsuqi.monsiaj.widgets.ExceptionDialog;
+import org.montsuqi.monsiaj.widgets.PandaTimer;
+import org.montsuqi.monsiaj.widgets.TopWindow;
+import org.montsuqi.monsiaj.widgets.Window;
 
 /**
  *
@@ -404,7 +404,7 @@ public class UIControl {
                     event = _widgetName;
                 }
             }
-            main.java.org.montsuqi.monsiaj.widgets.Window.busyAllWindows();
+            org.montsuqi.monsiaj.widgets.Window.busyAllWindows();
             client.sendEvent(_windowName, _widgetName, event);
 
             if (Messages.getString("Client.loading").equals(getTitle(window))) {

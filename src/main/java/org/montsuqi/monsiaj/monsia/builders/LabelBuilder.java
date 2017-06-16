@@ -21,18 +21,17 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
-import javax.swing.BorderFactory;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
-import main.java.org.montsuqi.monsiaj.util.ParameterConverter;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.util.ParameterConverter;
 
 /** <p>A builder to create Label widgets.</p>
  */

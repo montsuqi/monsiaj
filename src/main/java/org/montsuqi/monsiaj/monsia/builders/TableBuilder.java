@@ -21,18 +21,18 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.monsia.builders;
+package org.montsuqi.monsiaj.monsia.builders;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.util.Map;
 
-import main.java.org.montsuqi.monsiaj.monsia.ChildInfo;
-import main.java.org.montsuqi.monsiaj.monsia.Interface;
-import main.java.org.montsuqi.monsiaj.monsia.WidgetInfo;
-import main.java.org.montsuqi.monsiaj.util.ParameterConverter;
-import main.java.org.montsuqi.monsiaj.widgets.TableConstraints;
-import main.java.org.montsuqi.monsiaj.widgets.TableLayout;
+import org.montsuqi.monsiaj.monsia.ChildInfo;
+import org.montsuqi.monsiaj.monsia.Interface;
+import org.montsuqi.monsiaj.monsia.WidgetInfo;
+import org.montsuqi.monsiaj.util.ParameterConverter;
+import org.montsuqi.monsiaj.widgets.TableConstraints;
+import org.montsuqi.monsiaj.widgets.TableLayout;
 
 /** <p>A builder to create Gtk+'s Table container widget.</p>
  * <p>This class uses TableLayout as its layout manager.</p>

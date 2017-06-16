@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.org.montsuqi.monsiaj.util;
+package org.montsuqi.monsiaj.util;
 
 import java.net.URL;
 import javax.swing.Icon;

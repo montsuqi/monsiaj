@@ -21,7 +21,7 @@ things, the copyright notice and this notice must be preserved on all
 copies.
 */
 
-package main.java.org.montsuqi.monsiaj.util;
+package org.montsuqi.monsiaj.util;
 
 class OptionParserException extends RuntimeException {
 

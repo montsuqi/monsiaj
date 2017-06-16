@@ -1,4 +1,4 @@
-package main.java.org.montsuqi.monsiaj.util;
+package org.montsuqi.monsiaj.util;
 
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
