@@ -6,15 +6,95 @@
   <packaging>jar</packaging>
   <version>2.0.2b</version>
   <name>monsiaj</name>
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/montsuqi/monsiaj</url>
+  <description>montsuqi panda client for java</description>
+  <organization>
+    <name>montsuqi.org</name>
+  </organization>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://central.maven.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <plugins>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+              <finalName>jmareceipt</finalName>
+              <archive>
+                 <manifest>
+                   <addClasspath>true</addClasspath>
+                   <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
+                 </manifest>
+                 <manifestEntries>
+                    <permissions>all-permissions</permissions>
+                 </manifestEntries>
+              </archive>
+          </configuration>
+      </plugin>
+      <!-- jnlp -->
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>webstart-maven-plugin</artifactId>
+          <version>1.0-beta-7</version>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>jnlp</goal>
+                  </goals>
+              </execution>
+          </executions>
+          <configuration>
+              <codebase>http://orca-m1.orca.med.or.jp/~mihara/monsiaj</codebase>
+              <excludeTransitive>true</excludeTransitive>
+              <outputJarVersions>true</outputJarVersions>
+
+              <dependencies>
+                <includes>
+                </includes>
+              </dependencies>
+
+              <jnlp>
+                  <offlineAllowed>true</offlineAllowed>
+                  <j2seVersion>1.8+</j2seVersion>
+                  <outputFile>jws.jnlp</outputFile>
+                  <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
+              </jnlp>
+<!--
+              <sign>
+                  <keystore>${project.basedir}/keystore</keystore>
+                  <keypass>keypass</keypass> 
+                  <storepass>storepass</storepass>
+                  <alias>alias</alias>
+                  <tsaLocation>http://timestamp.globalsign.com/scripts/timstamp.dll</tsaLocation>
+                  <verify>true</verify>
+              </sign>
+-->
+              <gzip>true</gzip> 
+              <outputJarVersions>false</outputJarVersions>
+              <verbose>true</verbose>
+          </configuration>
+      </plugin>
+      <!-- install local repo -->
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
@@ -36,33 +116,6 @@
                   </goals>
               </execution>
           </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <finalName>${project.artifactId}-${project.version}</finalName>
-          <appendAssemblyId>false</appendAssemblyId>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>main.java.org.montsuqi.monsiaj.client.Launcher</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -14,3 +14,4 @@ bin
 dist
 nbproject/
 target/
+keystore
