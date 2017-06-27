@@ -32,13 +32,13 @@
     </pluginRepository>
   </pluginRepositories>
 
+
   <build>
     <plugins>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <configuration>
-              <finalName>jmareceipt</finalName>
               <archive>
                  <manifest>
                    <addClasspath>true</addClasspath>
@@ -94,6 +94,35 @@
               <verbose>true</verbose>
           </configuration>
       </plugin>
+
+      <!-- make bin package -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <finalName>monsiaj-${version}</finalName>
+          <descriptors>
+            <descriptor>src/assembly/bin.xml</descriptor>
+            <descriptor>src/assembly/src.xml</descriptor>
+            <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+          </descriptors>
+          <archive>
+            <manifest>
+              <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-bin-zip</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- install local repo -->
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>

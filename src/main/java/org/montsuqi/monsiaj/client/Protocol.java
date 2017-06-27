@@ -33,6 +33,7 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.net.Proxy;
 import java.security.GeneralSecurityException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
@@ -99,7 +100,7 @@ public class Protocol {
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
         URL url = new URL(strURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
 
         if (strURL.startsWith("https")) {
             if (sslSocketFactory != null) {
