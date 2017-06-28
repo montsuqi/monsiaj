@@ -669,7 +669,7 @@ public class ConfigPanel extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JLabel version = new JLabel("monsiaj ver." + Messages.getString("application.version"));
+        JLabel version = new JLabel("monsiaj ver." + ConfigPanel.class.getPackage().getImplementationVersion());
         version.setHorizontalAlignment(SwingConstants.CENTER);
         version.setFont(new Font(null, Font.BOLD, 20));
         JLabel copy = new JLabel("Copyright (C) 2017 ORCA Project");

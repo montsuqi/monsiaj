@@ -72,7 +72,7 @@ public class Launcher {
 
     public static void main(String[] args) {
         logger.info("---- start monsiaj");
-        logger.info("version : {}", Messages.getString("application.version"));
+        logger.info("version : {}", Launcher.class.getPackage().getImplementationVersion());
         logger.info("java : {}", System.getProperty("java.version"));
         logger.info("os : {}-{}-{}",
                 System.getProperty("os.name"),
@@ -253,7 +253,6 @@ public class Launcher {
     }
 
     public void launch(String[] args) {
-        //checkJavaVersion();
         if (checkCommandLineOption(args)) {
             return;
         }

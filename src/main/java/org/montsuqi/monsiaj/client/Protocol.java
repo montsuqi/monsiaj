@@ -167,7 +167,7 @@ public class Protocol {
         con.setRequestProperty("Content-Type", "application/json");
         String osVersion = System.getProperty("os.name") + "-" + System.getProperty("os.version");
         String javaVersion = "Java_" + System.getProperty("java.version");
-        String monsiajVersion = "monsiaj/"+Messages.getString("application.version");
+        String monsiajVersion = "monsiaj/"+this.getClass().getPackage().getImplementationVersion();
         String ua = monsiajVersion + " ("+ osVersion + "; " + javaVersion + ")";
         con.setRequestProperty("User-Agent", ua);
         try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
