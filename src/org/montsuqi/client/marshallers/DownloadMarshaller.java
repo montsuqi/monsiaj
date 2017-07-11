@@ -38,31 +38,26 @@ public class DownloadMarshaller extends WidgetMarshaller {
     public void receive(WidgetValueManager manager, Component widget) throws IOException {
         Protocol con = manager.getProtocol();
         PandaDownload download = (PandaDownload) widget;
-        byte[] binary = null;
+        File temp = null;
         String fileName = "";
         String description = "";
-        String tmpFileName = "download.dat";
-
+        
         con.receiveDataTypeWithCheck(Type.RECORD);
         for (int i = 0, n = con.receiveInt(); i < n; i++) {
             String name = con.receiveName();
             if ("objectdata".equals(name)) { 
-                binary = con.receiveBinaryData();
+                temp = con.receiveBinaryDataTempFile();
             } else if ("filename".equals(name)) {
                 fileName = con.receiveStringData();
-                tmpFileName = fileName;
             } else if ("description".equals(name)) {
                 description = con.receiveStringData();                
             } else if (handleCommonAttribute(manager, widget, name)) {
             }
         }
-        if (binary != null && binary.length > 0) {
-            File temp = TempFile.createTempFile("PandaDownload",tmpFileName);
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
-                out.write(binary);
-                out.flush();
-            }
-            download.showDialog(fileName, description, temp);
+        if (temp != null) {
+            File newFile = new File(temp.getAbsolutePath()+fileName);
+            temp.renameTo(newFile);
+            download.showDialog(fileName, description, newFile);
         }
     }
 

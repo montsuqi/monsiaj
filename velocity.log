@@ -1,0 +1,36 @@
+Tue Jun 27 17:58:00 JST 2017  [debug] AvalonLogSystem initialized using logfile 'velocity.log'
+Tue Jun 27 17:58:00 JST 2017   [info] ************************************************************** 
+Tue Jun 27 17:58:00 JST 2017   [info] Starting Jakarta Velocity v1.4
+Tue Jun 27 17:58:00 JST 2017   [info] RuntimeInstance initializing.
+Tue Jun 27 17:58:00 JST 2017   [info] Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+Tue Jun 27 17:58:00 JST 2017   [info] Trying to use logger class org.apache.velocity.runtime.log.AvalonLogSystem
+Tue Jun 27 17:58:00 JST 2017   [info] Using logger class org.apache.velocity.runtime.log.AvalonLogSystem
+Tue Jun 27 17:58:00 JST 2017   [info] Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+Tue Jun 27 17:58:00 JST 2017   [info] Resource Loader Instantiated: org.apache.velocity.runtime.resource.loader.JarResourceLoader
+Tue Jun 27 17:58:00 JST 2017   [info] JarResourceLoader : initialization starting.
+Tue Jun 27 17:58:00 JST 2017   [info] JarResourceLoader # of paths : 1
+Tue Jun 27 17:58:00 JST 2017   [info] JarResourceLoader : trying to load: jar:file:/home/mihara/.m2/repository/org/codehaus/mojo/webstart-maven-plugin/1.0-beta-7/webstart-maven-plugin-1.0-beta-7.jar!/
+Tue Jun 27 17:58:00 JST 2017   [info]   JarHolder : attempting to connect to jar:file:/home/mihara/.m2/repository/org/codehaus/mojo/webstart-maven-plugin/1.0-beta-7/webstart-maven-plugin-1.0-beta-7.jar!/
+Tue Jun 27 17:58:00 JST 2017   [info]   JarHolder : initialized JAR: jar:file:/home/mihara/.m2/repository/org/codehaus/mojo/webstart-maven-plugin/1.0-beta-7/webstart-maven-plugin-1.0-beta-7.jar!/
+Tue Jun 27 17:58:00 JST 2017   [info] JarResourceLoader : initialization complete.
+Tue Jun 27 17:58:00 JST 2017   [info] ResourceCache : initialized. (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+Tue Jun 27 17:58:00 JST 2017   [info] Default ResourceManager initialization complete.
+Tue Jun 27 17:58:00 JST 2017   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+Tue Jun 27 17:58:00 JST 2017   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+Tue Jun 27 17:58:00 JST 2017   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+Tue Jun 27 17:58:00 JST 2017   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Include
+Tue Jun 27 17:58:00 JST 2017   [info] Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+Tue Jun 27 17:58:00 JST 2017   [info] Created: 20 parsers.
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : initialization starting.
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : adding VMs from VM library template : VM_global_library.vm
+Tue Jun 27 17:58:00 JST 2017  [error] ResourceManager : unable to find resource 'VM_global_library.vm' in any resource loader.
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : error using  VM library template VM_global_library.vm : org.apache.velocity.exception.ResourceNotFoundException: Unable to find resource 'VM_global_library.vm'
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro :  VM library template macro registration complete.
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : allowInline = true : VMs can be defined inline in templates
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : allowInlineLocal = false : VMs defined inline will be  global in scope if allowed.
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : messages on  : VM system will output logging messages
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : autoload off  : VM system will not automatically reload global library macros
+Tue Jun 27 17:58:00 JST 2017   [info] Velocimacro : initialization complete.
+Tue Jun 27 17:58:00 JST 2017   [info] Velocity successfully started.
+Tue Jun 27 17:58:00 JST 2017   [info] ResourceManager : found default-jnlp-template.vm with loader org.apache.velocity.runtime.resource.loader.JarResourceLoader

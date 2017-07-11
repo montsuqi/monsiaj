@@ -28,11 +28,14 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.text.MessageFormat;
 import org.montsuqi.util.SystemEnvironment;
+import org.montsuqi.util.TempFile;
 
 /**
- * <p>A class that represents client/server connection.</p> <p>This class
- * implements methods for sending/receiving basic data types such as booleans,
- * integers and strings.</p>
+ * <p>
+ * A class that represents client/server connection.</p>
+ * <p>
+ * This class implements methods for sending/receiving basic data types such as
+ * booleans, integers and strings.</p>
  */
 public class Connection {
 
@@ -51,8 +54,11 @@ public class Connection {
     private int dataType;
 
     /**
-     * <p>Constructs a Connection instance.</p> <p>Input/Output streams are
-     * initialized correctly by <var>networkByteOrder</var>.
+     * <p>
+     * Constructs a Connection instance.</p>
+     * <p>
+     * Input/Output streams are initialized correctly by
+     * <var>networkByteOrder</var>.
      *
      * @param s the socket to communicate.
      * @param networkByteOrder true if networkByteOrder(Big Endian) is used.
@@ -73,7 +79,8 @@ public class Connection {
     }
 
     /**
-     * <p>Sends a packet class.</p>
+     * <p>
+     * Sends a packet class.</p>
      *
      * @param c packet class. should use constants defined in PacketClass.
      * @throws IOException on I/O error.
@@ -84,7 +91,8 @@ public class Connection {
     }
 
     /**
-     * <p>Receives a packet class.</p>
+     * <p>
+     * Receives a packet class.</p>
      *
      * @return a byte representing packet class.
      * @throws IOException on I/O error.
@@ -95,7 +103,8 @@ public class Connection {
     }
 
     /**
-     * <p>Sends a data type.</p>
+     * <p>
+     * Sends a data type.</p>
      *
      * @param c data type. should use constants defined in Type.
      * @throws IOException on I/O error.
@@ -106,7 +115,8 @@ public class Connection {
     }
 
     /**
-     * <p>Receives a data type.</p>
+     * <p>
+     * Receives a data type.</p>
      *
      * @return a byte representing data type.
      * @throws IOException on I/O error.
@@ -120,7 +130,8 @@ public class Connection {
     }
 
     /**
-     * <p>Receives a data type. If the type does not match to
+     * <p>
+     * Receives a data type. If the type does not match to
      * <var>expected</var> type, an IOException is thrown.</p>
      *
      * @param expected data type that should have been sent from the server.
@@ -136,7 +147,8 @@ public class Connection {
     }
 
     /**
-     * <p>Returns the last(latest) data type received.</p>
+     * <p>
+     * Returns the last(latest) data type received.</p>
      *
      * @return the latest result of recevieDataType().
      */
@@ -145,7 +157,8 @@ public class Connection {
     }
 
     /**
-     * <p>Sends length of 4-byte long.</p>
+     * <p>
+     * Sends length of 4-byte long.</p>
      *
      * @param size the length to send.
      * @throws IOException on I/O error.
@@ -156,7 +169,8 @@ public class Connection {
     }
 
     /**
-     * <p>Receives length of 4-byte long.</p>
+     * <p>
+     * Receives length of 4-byte long.</p>
      *
      * @return the length received.
      * @throws IOException on I/O error.
@@ -166,8 +180,11 @@ public class Connection {
     }
 
     /**
-     * <p>Sends a string.</p> <p>If the client environment uses MS932
-     * characters, incompatible characters are converted to compatible ones.</p>
+     * <p>
+     * Sends a string.</p>
+     * <p>
+     * If the client environment uses MS932 characters, incompatible characters
+     * are converted to compatible ones.</p>
      *
      * @param s the string to send.
      * @throws IOException on I/O error.
@@ -183,7 +200,8 @@ public class Connection {
     }
 
     /**
-     * <p>Converts MS932 characters to compatible characters.</p>
+     * <p>
+     * Converts MS932 characters to compatible characters.</p>
      */
     private String fromMS932(String s) {
         char[] chars = s.toCharArray();
@@ -213,7 +231,8 @@ public class Connection {
     }
 
     /**
-     * <p>Converts characters to MS932 characters.</p>
+     * <p>
+     * Converts characters to MS932 characters.</p>
      */
     private String toMS932(String s) {
         char[] chars = s.toCharArray();
@@ -243,7 +262,8 @@ public class Connection {
     }
 
     /**
-     * <p>Receives string data part of given size.</p>
+     * <p>
+     * Receives string data part of given size.</p>
      *
      * @param size the size of the data to be received.
      * @return a String instance.
@@ -257,9 +277,11 @@ public class Connection {
     }
 
     /**
-     * <p>Receives a string </p> <p>At first, the length of the string is
-     * received. Then the string's data of that length are received and built
-     * into a String.
+     * <p>
+     * Receives a string </p>
+     * <p>
+     * At first, the length of the string is received. Then the string's data of
+     * that length are received and built into a String.
      *
      * @return a String instance.
      * @throws IOException on I/O error.
@@ -269,7 +291,8 @@ public class Connection {
     }
 
     /**
-     * <p>Receives an integer of 4-byte long.</p>
+     * <p>
+     * Receives an integer of 4-byte long.</p>
      *
      * @return the integer received.
      * @throws IOException on I/O error.
@@ -332,7 +355,7 @@ public class Connection {
     synchronized void sendFixed(BigDecimal xval) throws IOException {
         String s;
         if (xval.equals(ZERO)) {
-            sendString("0"); 
+            sendString("0");
             return;
         }
         if (xval.signum() >= 0) {
@@ -387,7 +410,7 @@ public class Connection {
         if (receiveDataType() == Type.NUMBER) {
             return receiveFixed();
         }
-        throw new IllegalArgumentException("invalid data conversion"); 
+        throw new IllegalArgumentException("invalid data conversion");
     }
 
     public synchronized void sendFixedData(int type, BigDecimal xval) throws IOException {
@@ -409,7 +432,7 @@ public class Connection {
             //	sendFixed(xval);
             //	break;
             default:
-                throw new IllegalArgumentException("invalid data conversion"); 
+                throw new IllegalArgumentException("invalid data conversion");
         }
     }
 
@@ -448,7 +471,7 @@ public class Connection {
                 return receiveString();
             default:
                 Object[] args = {Integer.toHexString(type)};
-                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); 
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args));
         }
     }
 
@@ -545,7 +568,44 @@ public class Connection {
                 return receiveBinary();
             default:
                 Object[] args = {Integer.toHexString(type)};
-                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); 
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args));
+        }
+    }
+
+    public synchronized File receiveBinaryDataTempFile() throws IOException {
+        int type = receiveDataType();
+        switch (type) {
+            case Type.CHAR:
+            case Type.VARCHAR:
+            case Type.DBCODE:
+            case Type.TEXT:
+            case Type.BINARY:
+            case Type.BYTE:
+            case Type.OBJECT:
+                File temp = TempFile.createTempFile(this.getClass().toString(), "");
+                int size = receiveLength();
+                if (size <= 0) {
+                    return null;
+                }
+                byte[] binary = new byte[1000];
+                try (OutputStream os = new BufferedOutputStream(new FileOutputStream(temp))) {
+                    while (size > 0) {
+                        if (size > 1000) {
+                            in.readFully(binary, 0, 1000);
+                            os.write(binary);
+                            size -= 1000;
+                        } else {
+                            in.readFully(binary, 0, size);                            
+                            os.write(binary, 0, size);
+                            size = 0;
+                        }
+                    }
+                    os.flush();
+                }
+                return temp;
+            default:
+                Object[] args = {Integer.toHexString(type)};
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args));
         }
     }
 
@@ -572,7 +632,7 @@ public class Connection {
                 break;
             default:
                 Object[] args = {Integer.toHexString(type)};
-                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args)); 
+                throw new IllegalArgumentException(MessageFormat.format("invalid data type(0x{0})", args));
         }
     }
 

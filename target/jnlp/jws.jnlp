@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+    spec="1.0+"
+    codebase="http://orca-m1.orca.med.or.jp/~mihara/monsiaj"
+    href="jws.jnlp">
+  <information>
+    <title>monsiaj</title>
+    <vendor>montsuqi.org</vendor>
+    <homepage href="https://github.com/montsuqi/monsiaj"/>
+    <description>montsuqi panda client for java</description>
+    <offline-allowed/>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.8+"/>
+         
+    <jar href="monsiaj-2.0.2b.jar" main="true"/>
+    <jar href="json-20170516.jar"/>
+    <jar href="nimrodlf-1.1.jar"/>
+    <jar href="ilf-gpl-1.6.1.jar"/>
+    <jar href="log4j-core-2.8.1.jar"/>
+    <jar href="log4j-api-2.8.1.jar"/>
+    <jar href="pdfrenderer-10.0.jar"/>
+
+     
+  </resources>
+  <application-desc main-class="org.montsuqi.monsiaj.client.Launcher">
+      
+  </application-desc>
+</jnlp>
+
