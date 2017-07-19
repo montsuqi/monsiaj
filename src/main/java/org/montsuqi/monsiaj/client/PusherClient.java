@@ -41,6 +41,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.json.JSONObject;
 
 /**
  *
@@ -53,8 +54,11 @@ public class PusherClient extends Thread {
     private final String auth;
     private final SslContextFactory sslContextFactory;
     private final Protocol protocol;
+    private final Config conf;
+    private String subID;
 
-    public PusherClient(Protocol protocol) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+    public PusherClient(Config conf, Protocol protocol) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+        this.conf = conf;
         this.protocol = protocol;
         uri = new URI(protocol.getPusherURI());
         String auth_in = protocol.getUser() + ":" + protocol.getPassword();
@@ -101,7 +105,7 @@ public class PusherClient extends Thread {
             client.connect(socket, this.uri, request);
             Thread.sleep(Long.MAX_VALUE);
         } catch (Exception ex) {
-            logger.info(ex,ex);
+            logger.info(ex, ex);
         } finally {
             try {
                 client.stop();
@@ -133,6 +137,7 @@ public class PusherClient extends Thread {
         public void onMessage(String message) {
             logger.info("---- onMessage");
             logger.info(message);
+            messageHandler(message);
         }
 
         @OnWebSocketClose
@@ -147,6 +152,61 @@ public class PusherClient extends Thread {
 
         public boolean getConnected() {
             return this.connected;
+        }
+    }
+
+    private void messageHandler(String message) {
+        JSONObject obj = new JSONObject(message);
+        switch (obj.getString("command")) {
+            case "subscribed":
+                this.subID = obj.getString("sub.id");
+                break;
+            case "event":
+                JSONObject data = obj.getJSONObject("data");
+                switch (data.getString("event")) {
+                    case "client_data_ready":
+                        clientDataReadyHandler(data.getJSONObject("body"));
+                        break;
+                }
+                break;
+        }
+    }
+
+    private void clientDataReadyHandler(JSONObject obj) {
+        DownloadThread thread = new DownloadThread(conf, protocol, obj);
+        thread.start();
+    }
+
+    private void printReport(JSONObject obj) {
+
+    }
+
+    private void downloadFile(JSONObject obj) {
+
+    }
+
+    private class DownloadThread extends Thread {
+
+        private final Config conf;
+        private final Protocol protocol;
+        private final JSONObject obj;
+
+        public DownloadThread(Config conf, Protocol protocol, JSONObject obj) {
+            this.conf = conf;
+            this.protocol = protocol;
+            this.obj = obj;
+        }
+
+        @Override
+        public void run() {
+            switch (obj.getString("type")) {
+                case "report":
+                    Download.printReport(conf, protocol, obj);
+                    break;
+                case "misc":
+                    Download.downloadFile(conf, protocol, obj);
+                    break;
+            }
         }
     }
 
