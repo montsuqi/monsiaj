@@ -113,6 +113,7 @@ public class PandaDownload extends JComponent {
 
         Button openButton = new Button(new AbstractAction(Messages.getString("PandaDownload.open")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Desktop d = Desktop.getDesktop();
                 if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.OPEN)) {
@@ -129,6 +130,7 @@ public class PandaDownload extends JComponent {
 
         Button saveButton = new Button(new AbstractAction(Messages.getString("PandaDownload.save")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String dir = prefs.get(PandaDownload.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);
@@ -165,6 +167,7 @@ public class PandaDownload extends JComponent {
 
         Button closeButton = new Button(new AbstractAction(Messages.getString("PandaDownload.close")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.dispose();
             }

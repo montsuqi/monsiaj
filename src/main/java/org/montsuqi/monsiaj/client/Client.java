@@ -31,11 +31,16 @@ import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.print.PrintService;
@@ -75,6 +80,7 @@ public class Client {
     private JSONObject windowStack;
     private String focusedWindow;
     private String focusedWidget;
+    private PusherClient pusherClient;
 
     static {
         if (System.getProperty("monsia.ping_timer_period") != null) {
@@ -103,15 +109,15 @@ public class Client {
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
-        authURI = authURI.replace("http://","");
-        authURI = authURI.replace("https://","");
+        authURI = authURI.replace("http://", "");
+        authURI = authURI.replace("https://", "");
         if (conf.getUseSSL(num)) {
             authURI = "https://" + authURI;
         } else {
             authURI = "http://" + authURI;
         }
         logger.info("try connect " + authURI);
-        protocol = new Protocol(Protocol.TYPE_USER_PASSWORD, authURI, conf.getUser(num), conf.getPassword(num));
+        protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num));
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
                 protocol.makeSSLSocketFactoryPKCS11(conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
@@ -142,6 +148,15 @@ public class Client {
         updateScreen();
         stopReceiving();
         startPing();
+        
+        if (protocol.getPusherURI() != null) {
+            try {
+                pusherClient = new PusherClient(protocol);
+                pusherClient.start();
+            } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
+                logger.info(ex,ex);
+            }            
+        }
     }
 
     void disconnect() {
@@ -472,7 +487,9 @@ public class Client {
         try {
             if (!isReceiving()) {
                 startReceiving();
-                listDownloads();
+                if (this.getProtocol().getPusherURI() == null) {
+                    listDownloads();
+                }
                 getMessage();
                 stopReceiving();
             }

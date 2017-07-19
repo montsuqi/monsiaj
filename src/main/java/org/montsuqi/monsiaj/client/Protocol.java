@@ -60,23 +60,60 @@ public class Protocol {
     private String sessionId;
     private String rpcURI;
     private String restURIRoot;
+    private String pusherURI;
     private final String authURI;
     private final String user;
-    private final String pass;
+    private final String password;
 
     private SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
 
-    public static final int TYPE_USER_PASSWORD = 1;
-    public static final int TYPE_CERT_FILE = 2;
-    public static final int TYPE_PKCS11 = 3;
+    private int sslType;
 
-    public Protocol(int type, String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
+    public String getPusherURI() {
+        return pusherURI;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getSslType() {
+        return sslType;
+    }
+
+    public String getCaCert() {
+        return caCert;
+    }
+
+    public String getCertFile() {
+        return certFile;
+    }
+
+    public String getCertFilePassphrase() {
+        return certFilePassphrase;
+    }
+
+    public static final int TYPE_NO_SSL = 0;
+    public static final int TYPE_SSL_NO_CERT = 1;
+    public static final int TYPE_SSL_PKCS12 = 2;
+    public static final int TYPE_SSL_PKCS11 = 3;
+
+    private String caCert;
+    private String certFile;
+    private String certFilePassphrase;
+
+    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
         this.rpcId = 1;
         this.authURI = authURI;
         this.user = user;
-        this.pass = pass;
+        this.password = pass;
         this.serverType = null;
+        this.sslType = TYPE_NO_SSL;
     }
 
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
@@ -85,17 +122,24 @@ public class Protocol {
         } else {
             SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
             sslSocketFactory = helper.getFactory(caCert, "", "");
+            sslType = TYPE_SSL_NO_CERT;
+            this.caCert = caCert;
         }
     }
 
     public void makeSSLSocketFactoryPKCS12(final String caCert, final String certFile, final String certFilePass) throws IOException, GeneralSecurityException {
         SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
         sslSocketFactory = helper.getFactory(caCert, certFile, certFilePass);
+        this.sslType = TYPE_SSL_PKCS12;
+        this.caCert = caCert;
+        this.certFile = certFile;
+        this.certFilePassphrase = certFilePass;
     }
 
     public void makeSSLSocketFactoryPKCS11(final String caCert, final String p11Lib, final String p11Slot) throws IOException, GeneralSecurityException {
         SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
         sslSocketFactory = helper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
+        this.sslType = TYPE_SSL_PKCS11;
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
@@ -111,7 +155,7 @@ public class Protocol {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, pass.toCharArray());
+                    return new PasswordAuthentication(user, password.toCharArray());
                 }
             });
         } else {
@@ -151,7 +195,7 @@ public class Protocol {
         return obj.get("result");
     }
 
-    private Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
+    private synchronized Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         long st = System.currentTimeMillis();
         String reqStr = makeJSONRPCRequest(method, params);
         if (System.getProperty("monsia.debug.jsonrpc") != null) {
@@ -167,8 +211,8 @@ public class Protocol {
         con.setRequestProperty("Content-Type", "application/json");
         String osVersion = System.getProperty("os.name") + "-" + System.getProperty("os.version");
         String javaVersion = "Java_" + System.getProperty("java.version");
-        String monsiajVersion = "monsiaj/"+this.getClass().getPackage().getImplementationVersion();
-        String ua = monsiajVersion + " ("+ osVersion + "; " + javaVersion + ")";
+        String monsiajVersion = "monsiaj/" + this.getClass().getPackage().getImplementationVersion();
+        String ua = monsiajVersion + " (" + osVersion + "; " + javaVersion + ")";
         con.setRequestProperty("User-Agent", ua);
         try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
             osw.write(reqStr);
@@ -234,17 +278,21 @@ public class Protocol {
 
         this.rpcURI = result.getString("app_rpc_endpoint_uri");
         this.restURIRoot = result.getString("app_rest_api_uri_root");
-
+        this.pusherURI = System.getProperty("monsia.pusher_uri");
+        if (result.has("pusher_uri")) {
+            this.pusherURI = result.getString("pusher_uri");
+        }
         logger.info("session_id:" + this.sessionId);
         logger.info("rpcURI:" + this.rpcURI);
         logger.info("restURIRoot:" + this.restURIRoot);
+        logger.info("pusherURI:" + this.pusherURI);
     }
 
     public String getServerType() {
         return serverType;
     }
 
-    public void endSession() throws IOException, JSONException {
+    public synchronized void endSession() throws IOException, JSONException {
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
@@ -254,7 +302,7 @@ public class Protocol {
         JSONObject result = (JSONObject) jsonRPC(this.rpcURI, "end_session", params);
     }
 
-    public JSONObject getWindow() throws IOException, JSONException {
+    public synchronized JSONObject getWindow() throws IOException, JSONException {
 
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
@@ -266,7 +314,7 @@ public class Protocol {
 
     }
 
-    public String getScreenDefine(String wname) throws IOException, JSONException {
+    public synchronized String getScreenDefine(String wname) throws IOException, JSONException {
 
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
@@ -280,7 +328,7 @@ public class Protocol {
 
     }
 
-    public JSONObject sendEvent(JSONObject params) throws IOException, JSONException {
+    public synchronized JSONObject sendEvent(JSONObject params) throws IOException, JSONException {
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
         meta.put("session_id", this.sessionId);
@@ -289,7 +337,7 @@ public class Protocol {
 
     }
 
-    public JSONObject getMessage() throws IOException, JSONException {
+    public synchronized JSONObject getMessage() throws IOException, JSONException {
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
@@ -299,7 +347,7 @@ public class Protocol {
         return (JSONObject) jsonRPC(this.rpcURI, "get_message", params);
     }
 
-    public JSONArray listDownloads() throws IOException, JSONException {
+    public synchronized JSONArray listDownloads() throws IOException, JSONException {
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
@@ -309,7 +357,7 @@ public class Protocol {
         return (JSONArray) jsonRPC(this.rpcURI, "list_downloads", params);
     }
 
-    public int getBLOB(String oid, OutputStream out) throws IOException {
+    public synchronized int getBLOB(String oid, OutputStream out) throws IOException {
         if (oid.equals("0")) {
             // empty object id
             out.close();
@@ -346,7 +394,7 @@ public class Protocol {
         return con.getResponseCode();
     }
 
-    public String postBLOB(byte[] in) throws IOException {
+    public synchronized String postBLOB(byte[] in) throws IOException {
         URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
