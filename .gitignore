@@ -5,7 +5,7 @@ cache
 .project
 .settings
 .classpath
-.swp
+*.swp
 report
 doc
 tmp
@@ -13,3 +13,6 @@ tmp
 bin
 dist
 nbproject/
+target/
+keystore
+velocity.log
