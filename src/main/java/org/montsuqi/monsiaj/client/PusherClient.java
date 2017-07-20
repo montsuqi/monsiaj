@@ -126,7 +126,13 @@ public class PusherClient extends Thread {
         public void onConnect(Session session) {
             logger.info("---- onConnect");
             try {
-                session.getRemote().sendString("{\"command\":\"subscribe\",\"req.id\":\"" + reqID + "\",\"event\":\"*\"}");
+                String subStr = "{" +
+                        " \"command\"    : \"subscribe\"," +
+                        " \"req.id\"     : \"" + reqID + "\"," +
+                        " \"event\"      : \"*\"," +
+                        " \"session_id\" : \"" + protocol.getSessionId() + "\"" +
+                        "}";
+                session.getRemote().sendString(subStr);
                 connected = true;
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(PusherClient.class.getName()).log(Level.SEVERE, null, ex);
