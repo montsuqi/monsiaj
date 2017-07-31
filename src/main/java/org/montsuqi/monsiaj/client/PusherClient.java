@@ -62,9 +62,15 @@ public class PusherClient extends Thread {
         this.protocol = protocol;
         uri = new URI(protocol.getPusherURI());
         String auth_in = protocol.getUser() + ":" + protocol.getPassword();
-        this.auth = Base64.getEncoder().encodeToString(auth_in.getBytes());
+        this.auth = Base64.getEncoder().encodeToString(auth_in.getBytes());        
         switch (protocol.getSslType()) {
             case Protocol.TYPE_SSL_NO_CERT:
+                sslContextFactory = new SslContextFactory();
+                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));
+                break;
+            case Protocol.TYPE_SSL_PKCS11:
+                throw new java.lang.UnsupportedOperationException("PKCS11 Unsupported");
+            case Protocol.TYPE_SSL_PKCS12:
                 sslContextFactory = new SslContextFactory();
                 KeyStore ks = KeyStore.getInstance("PKCS12");
                 InputStream is = new FileInputStream(protocol.getCertFile());
@@ -72,13 +78,7 @@ public class PusherClient extends Thread {
                 ks.load(is, passphrase.toCharArray());
                 sslContextFactory.setKeyStore(ks);
                 sslContextFactory.setKeyStorePassword(passphrase);
-                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));
-                break;
-            case Protocol.TYPE_SSL_PKCS11:
-                throw new java.lang.UnsupportedOperationException("PKCS11 Unsupported");
-            case Protocol.TYPE_SSL_PKCS12:
-                sslContextFactory = new SslContextFactory();
-                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));
+                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));                
                 break;
             default:
                 this.sslContextFactory = null;
@@ -97,6 +97,7 @@ public class PusherClient extends Thread {
 
         PusherWebSocket socket = new PusherWebSocket();
         try {
+            client.setMaxIdleTimeout(Long.MAX_VALUE);
             client.start();
             ClientUpgradeRequest request = new ClientUpgradeRequest();
             request.setHeader("Authorization", "Basic " + this.auth);
