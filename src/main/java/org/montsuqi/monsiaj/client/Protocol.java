@@ -202,7 +202,7 @@ public class Protocol {
             logger.info("---- JSONRPC request");
             logger.info(reqStr);
             logger.info("----");
-        }
+        }        
         HttpURLConnection con = getHttpURLConnection(url);
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);

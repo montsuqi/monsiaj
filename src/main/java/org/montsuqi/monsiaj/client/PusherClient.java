@@ -62,7 +62,7 @@ public class PusherClient extends Thread {
         this.protocol = protocol;
         uri = new URI(protocol.getPusherURI());
         String auth_in = protocol.getUser() + ":" + protocol.getPassword();
-        this.auth = Base64.getEncoder().encodeToString(auth_in.getBytes());        
+        this.auth = Base64.getEncoder().encodeToString(auth_in.getBytes());
         switch (protocol.getSslType()) {
             case Protocol.TYPE_SSL_NO_CERT:
                 sslContextFactory = new SslContextFactory();
@@ -78,7 +78,7 @@ public class PusherClient extends Thread {
                 ks.load(is, passphrase.toCharArray());
                 sslContextFactory.setKeyStore(ks);
                 sslContextFactory.setKeyStorePassword(passphrase);
-                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));                
+                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));
                 break;
             default:
                 this.sslContextFactory = null;
@@ -86,32 +86,52 @@ public class PusherClient extends Thread {
         }
     }
 
+    private class NotConnectException extends Exception {
+
+        public NotConnectException(String str) {
+            super(str);
+        }
+    }
+
     @Override
     public void run() {
-        WebSocketClient client;
-        if (this.sslContextFactory != null) {
-            client = new WebSocketClient(sslContextFactory);
-        } else {
-            client = new WebSocketClient();
-        }
-
-        PusherWebSocket socket = new PusherWebSocket();
-        try {
-            client.setMaxIdleTimeout(Long.MAX_VALUE);
-            client.start();
-            ClientUpgradeRequest request = new ClientUpgradeRequest();
-            request.setHeader("Authorization", "Basic " + this.auth);
-            request.setHeader("X-GINBEE-TENANT-ID", "1");
-            logger.info("Connecting to : " + this.uri);
-            client.connect(socket, this.uri, request);
-            Thread.sleep(Long.MAX_VALUE);
-        } catch (Exception ex) {
-            logger.info(ex, ex);
-        } finally {
+        long wait = 5000;
+        while (true) {
+            WebSocketClient client;
+            if (this.sslContextFactory != null) {
+                client = new WebSocketClient(sslContextFactory);
+            } else {
+                client = new WebSocketClient();
+            }
+            PusherWebSocket socket = new PusherWebSocket();
             try {
-                client.stop();
-            } catch (Exception e) {
-                logger.info(e, e);
+                client.setMaxIdleTimeout(Long.MAX_VALUE);
+                client.start();
+                ClientUpgradeRequest request = new ClientUpgradeRequest();
+                request.setHeader("Authorization", "Basic " + this.auth);
+                request.setHeader("X-GINBEE-TENANT-ID", "1");
+                logger.info("Connecting to : " + this.uri);
+                client.connect(socket, this.uri, request);
+                Thread.sleep(wait);
+                if (socket.getConnected()) {
+                    wait = 5000;
+                    while (!socket.getClosed()) {
+                        Thread.sleep(10000);
+                    }
+                } else {
+                    if (wait < 3600 * 1000) {
+                        wait *= 2;
+                    }
+                    logger.info("wait for reconnect: " + wait);
+                }
+            } catch (Exception ex) {
+                logger.info(ex, ex);
+            } finally {
+                try {
+                    client.stop();
+                } catch (Exception e) {
+                    logger.info(e, e);
+                }
             }
         }
     }
@@ -122,17 +142,18 @@ public class PusherClient extends Thread {
         private final String reqID = UUID.randomUUID().toString();
         private final CountDownLatch closeLatch = new CountDownLatch(1);
         private boolean connected = false;
+        private boolean closed = false;
 
         @OnWebSocketConnect
         public void onConnect(Session session) {
             logger.info("---- onConnect");
             try {
-                String subStr = "{" +
-                        " \"command\"    : \"subscribe\"," +
-                        " \"req.id\"     : \"" + reqID + "\"," +
-                        " \"event\"      : \"*\"," +
-                        " \"session_id\" : \"" + protocol.getSessionId() + "\"" +
-                        "}";
+                String subStr = "{"
+                        + " \"command\"    : \"subscribe\","
+                        + " \"req.id\"     : \"" + reqID + "\","
+                        + " \"event\"      : \"*\","
+                        + " \"session_id\" : \"" + protocol.getSessionId() + "\""
+                        + "}";
                 session.getRemote().sendString(subStr);
                 connected = true;
             } catch (IOException ex) {
@@ -151,6 +172,7 @@ public class PusherClient extends Thread {
         public void onClose(int statusCode, String reason) {
             logger.info("---- onClose");
             logger.info(statusCode);
+            closed = true;
         }
 
         public boolean awaitClose(int duration, TimeUnit unit) throws InterruptedException {
@@ -159,6 +181,10 @@ public class PusherClient extends Thread {
 
         public boolean getConnected() {
             return this.connected;
+        }
+
+        public boolean getClosed() {
+            return this.closed;
         }
     }
 
