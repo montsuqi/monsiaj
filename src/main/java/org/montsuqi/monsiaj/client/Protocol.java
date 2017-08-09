@@ -195,6 +195,39 @@ public class Protocol {
         return obj.get("result");
     }
 
+    private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) throws IOException {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
+                BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
+                int length;
+                while ((length = bis.read()) != -1) {
+                    bos.write(length);
+                }
+            }
+            return bytes;
+        }
+    }
+    
+    private ByteArrayOutputStream getHTTPErrorBody(HttpURLConnection con) throws IOException {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
+                BufferedInputStream bis = new BufferedInputStream(con.getErrorStream());
+                int length;
+                while ((length = bis.read()) != -1) {
+                    bos.write(length);
+                }
+            }
+            return bytes;
+        }
+    }    
+
+    private void showHTTPErrorMessage(int code, String message) {
+        logger.info("http error: " + code + " " + message);
+        JOptionPane.showMessageDialog(null,"http status code: " + code + "\n\n" + message , "http error", JOptionPane.ERROR_MESSAGE);
+        SSLSocketFactoryHelper.setPIN("", false);
+        System.exit(1);
+    }
+
     private synchronized Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         long st = System.currentTimeMillis();
         String reqStr = makeJSONRPCRequest(method, params);
@@ -202,7 +235,7 @@ public class Protocol {
             logger.info("---- JSONRPC request");
             logger.info(reqStr);
             logger.info("----");
-        }        
+        }
         HttpURLConnection con = getHttpURLConnection(url);
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -214,42 +247,58 @@ public class Protocol {
         String monsiajVersion = "monsiaj/" + this.getClass().getPackage().getImplementationVersion();
         String ua = monsiajVersion + " (" + osVersion + "; " + javaVersion + ")";
         con.setRequestProperty("User-Agent", ua);
+
         try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
             osw.write(reqStr);
             osw.flush();
         }
 
-        int responseCode = con.getResponseCode();
-        if (responseCode == 401 || responseCode == 403) {
-            JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
-            logger.info("auth error:" + responseCode);
-            SSLSocketFactoryHelper.setPIN("", false);
-            System.exit(1);
-        }
-        Object result;
-        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
-                BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-                int length;
-                while ((length = bis.read()) != -1) {
-                    bos.write(length);
+        int resCode = con.getResponseCode();
+        String resMessage = con.getResponseMessage();
+ 
+        switch (resCode) {
+            case 200:
+                // do nothing
+                break;
+            case 401:
+            case 403:
+                logger.info("auth error:" + resCode);
+                JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
+                SSLSocketFactoryHelper.setPIN("", false);
+                System.exit(1);
+                break;
+            case 503:
+                String body = getHTTPErrorBody(con).toString("UTF-8");
+                if (body.equalsIgnoreCase("GINBEE_MAINTENANCE")) {
+                    logger.info("server maintenance ... exit");
+                    JOptionPane.showMessageDialog(null, Messages.getString("Protocol.maintenance_error_message"), Messages.getString("Protocol.maintenance_error"), JOptionPane.ERROR_MESSAGE);
+                    System.exit(0);
+                } else {
+                    showHTTPError(resCode, resMessage);
                 }
-            }
-            con.disconnect();
-
-            long et = System.currentTimeMillis();
-            if (System.getProperty("monsia.do_profile") != null) {
-                logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
-            }
-
-            String resStr = bytes.toString("UTF-8");
-            if (System.getProperty("monsia.debug.jsonrpc") != null) {
-                logger.info("---- JSONRPC response");
-                logger.info(resStr);
-                logger.info("----");
-            }
-            result = checkJSONRPCResponse(resStr);
+                break;
+            default:
+                showHTTPError(resCode, resMessage);
+                break;
         }
+
+        ByteArrayOutputStream bytes = getHTTPBody(con);
+        con.disconnect();
+
+        
+        long et = System.currentTimeMillis();
+        if (System.getProperty("monsia.do_profile") != null) {
+            logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
+        }
+
+        String resStr = bytes.toString("UTF-8");    
+        
+        if (System.getProperty("monsia.debug.jsonrpc") != null) {
+            logger.info("---- JSONRPC response");
+            logger.info(resStr);
+            logger.info("----");
+        }
+        Object result = checkJSONRPCResponse(resStr);
         return result;
     }
 
