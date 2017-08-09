@@ -56,6 +56,8 @@ public class PusherClient extends Thread {
     private final Protocol protocol;
     private final Config conf;
     private String subID;
+    static final long WAIT_INIT = 2 * 1000;
+    static final long WAIT_MAX = 600 * 1000;
 
     public PusherClient(Config conf, Protocol protocol) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
         this.conf = conf;
@@ -86,51 +88,48 @@ public class PusherClient extends Thread {
         }
     }
 
-    private class NotConnectException extends Exception {
-
-        public NotConnectException(String str) {
-            super(str);
-        }
-    }
-
     @Override
     public void run() {
-        long wait = 5000;
+        long waitMs = WAIT_INIT;
         while (true) {
-            WebSocketClient client;
-            if (this.sslContextFactory != null) {
-                client = new WebSocketClient(sslContextFactory);
-            } else {
-                client = new WebSocketClient();
-            }
-            PusherWebSocket socket = new PusherWebSocket();
-            try {
-                client.setMaxIdleTimeout(Long.MAX_VALUE);
-                client.start();
-                ClientUpgradeRequest request = new ClientUpgradeRequest();
-                request.setHeader("Authorization", "Basic " + this.auth);
-                request.setHeader("X-GINBEE-TENANT-ID", "1");
-                logger.info("Connecting to : " + this.uri);
-                client.connect(socket, this.uri, request);
-                Thread.sleep(wait);
-                if (socket.getConnected()) {
-                    wait = 5000;
-                    while (!socket.getClosed()) {
-                        Thread.sleep(10000);
-                    }
+            synchronized (this) {
+                WebSocketClient client;
+                if (this.sslContextFactory != null) {
+                    client = new WebSocketClient(sslContextFactory);
                 } else {
-                    if (wait < 3600 * 1000) {
-                        wait *= 2;
-                    }
-                    logger.info("wait for reconnect: " + wait);
+                    client = new WebSocketClient();
                 }
-            } catch (Exception ex) {
-                logger.info(ex, ex);
-            } finally {
+                PusherWebSocket socket = new PusherWebSocket();
                 try {
-                    client.stop();
-                } catch (Exception e) {
-                    logger.info(e, e);
+                    wait(waitMs);                    
+                    client.setMaxIdleTimeout(Long.MAX_VALUE);
+                    client.start();
+                    ClientUpgradeRequest request = new ClientUpgradeRequest();
+                    request.setHeader("Authorization", "Basic " + this.auth);
+                    request.setHeader("X-GINBEE-TENANT-ID", "1");
+                    logger.info("Connecting to : " + this.uri);
+                    client.connect(socket, this.uri, request);
+                    wait(5 * 1000);
+                    if (socket.getConnected()) {
+                        waitMs = WAIT_INIT;
+                        while (!socket.getClosed()) {
+                            wait(10 * 1000);
+                        }
+                    } else {
+                        waitMs *= 2;
+                        if (waitMs > WAIT_MAX) {
+                            waitMs = WAIT_MAX;
+                        }
+                        logger.info("wait for reconnect: " + waitMs);
+                    }
+                } catch (Exception ex) {
+                    logger.info(ex, ex);
+                } finally {
+                    try {
+                        client.stop();
+                    } catch (Exception e) {
+                        logger.info(e, e);
+                    }
                 }
             }
         }
@@ -208,14 +207,6 @@ public class PusherClient extends Thread {
     private void clientDataReadyHandler(JSONObject obj) {
         DownloadThread thread = new DownloadThread(conf, protocol, obj);
         thread.start();
-    }
-
-    private void printReport(JSONObject obj) {
-
-    }
-
-    private void downloadFile(JSONObject obj) {
-
     }
 
     private class DownloadThread extends Thread {
