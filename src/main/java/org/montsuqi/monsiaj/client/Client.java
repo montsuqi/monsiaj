@@ -24,7 +24,6 @@ package org.montsuqi.monsiaj.client;
 
 import org.montsuqi.monsiaj.util.Messages;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -130,14 +129,14 @@ public class Client {
         updateScreen();
         stopReceiving();
         startPing();
-        
-        if (protocol.getPusherURI() != null) {
+
+        if (protocol.isUsePushClient()) {
             try {
-                pusherClient = new PusherClient(conf,protocol);
+                pusherClient = new PusherClient(conf, protocol);
                 pusherClient.start();
             } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
-                logger.info(ex,ex);
-            }            
+                logger.info(ex, ex);
+            }
         }
     }
 
@@ -153,11 +152,8 @@ public class Client {
     }
 
     public void startPing() {
-        pingTimer = new javax.swing.Timer(PING_TIMER_PERIOD, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendPing();
-            }
+        pingTimer = new javax.swing.Timer(PING_TIMER_PERIOD, (ActionEvent e) -> {
+            sendPing();
         });
         pingTimer.start();
     }
@@ -287,9 +283,9 @@ public class Client {
             }
             if (type != null) {
                 if (type.equals("report")) {
-                    Download.printReport(conf,protocol,item);
+                    Download.printReport(conf, protocol, item);
                 } else {
-                    Download.downloadFile(conf,protocol,item);
+                    Download.downloadFile(conf, protocol, item);
                 }
             }
         }
@@ -326,7 +322,7 @@ public class Client {
         try {
             if (!isReceiving()) {
                 startReceiving();
-                if (this.getProtocol().getPusherURI() == null) {
+                if (!this.getProtocol().isUsePushClient()) {
                     listDownloads();
                 }
                 getMessage();

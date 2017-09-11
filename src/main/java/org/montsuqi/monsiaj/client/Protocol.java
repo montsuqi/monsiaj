@@ -64,6 +64,11 @@ public class Protocol {
     private final String authURI;
     private final String user;
     private final String password;
+    private boolean usePushClient;
+
+    public boolean isUsePushClient() {
+        return usePushClient;
+    }
 
     private SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
@@ -113,6 +118,7 @@ public class Protocol {
         this.user = user;
         this.password = pass;
         this.serverType = null;
+        this.usePushClient = false;
         this.sslType = TYPE_NO_SSL;
     }
 
@@ -207,7 +213,7 @@ public class Protocol {
             return bytes;
         }
     }
-    
+
     private ByteArrayOutputStream getHTTPErrorBody(HttpURLConnection con) throws IOException {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
@@ -219,11 +225,11 @@ public class Protocol {
             }
             return bytes;
         }
-    }    
+    }
 
     private void showHTTPErrorMessage(int code, String message) {
         logger.info("http error: " + code + " " + message);
-        JOptionPane.showMessageDialog(null,"http status code: " + code + "\n\n" + message , "http error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, "http status code: " + code + "\n\n" + message, "http error", JOptionPane.ERROR_MESSAGE);
         SSLSocketFactoryHelper.setPIN("", false);
         System.exit(1);
     }
@@ -255,7 +261,7 @@ public class Protocol {
 
         int resCode = con.getResponseCode();
         String resMessage = con.getResponseMessage();
- 
+
         switch (resCode) {
             case 200:
                 // do nothing
@@ -274,25 +280,24 @@ public class Protocol {
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.maintenance_error_message"), Messages.getString("Protocol.maintenance_error"), JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 } else {
-                    showHTTPError(resCode, resMessage);
+                    showHTTPErrorMessage(resCode, resMessage);
                 }
                 break;
             default:
-                showHTTPError(resCode, resMessage);
+                showHTTPErrorMessage(resCode, resMessage);
                 break;
         }
 
         ByteArrayOutputStream bytes = getHTTPBody(con);
         con.disconnect();
 
-        
         long et = System.currentTimeMillis();
         if (System.getProperty("monsia.do_profile") != null) {
             logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
         }
 
-        String resStr = bytes.toString("UTF-8");    
-        
+        String resStr = bytes.toString("UTF-8");
+
         if (System.getProperty("monsia.debug.jsonrpc") != null) {
             logger.info("---- JSONRPC response");
             logger.info(resStr);
@@ -329,7 +334,11 @@ public class Protocol {
         this.restURIRoot = result.getString("app_rest_api_uri_root");
         this.pusherURI = System.getProperty("monsia.pusher_uri");
         if (result.has("pusher_uri")) {
-            this.pusherURI = result.getString("pusher_uri");
+            String uri = result.getString("pusher_uri");
+            if (uri != null && !uri.isEmpty()) {
+                this.usePushClient = true;
+                this.pusherURI = result.getString("pusher_uri");
+            }
         }
         logger.info("session_id:" + this.sessionId);
         logger.info("rpcURI:" + this.rpcURI);
