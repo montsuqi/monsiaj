@@ -5,6 +5,14 @@
   <formats>
     <format>zip</format>
   </formats>
+  <baseDirectory>monsiaj-bin-${project.version}</baseDirectory>
+  <files>
+    <file>
+      <source>${project.build.directory}/monsiaj-${project.version}-all.jar</source>
+      <destName>jmareceipt.jar</destName>
+      <outputDirectory>/</outputDirectory>
+    </file>
+  </files>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}</directory>
@@ -14,6 +22,7 @@
         <include>COPYING</include>
       </includes>
     </fileSet>
+    <!--
     <fileSet>
       <directory>${project.build.directory}</directory>
       <outputDirectory>/</outputDirectory>
@@ -21,10 +30,7 @@
         <include>*-all.jar</include>
       </includes>
     </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/site</directory>
-      <outputDirectory>docs</outputDirectory>
-    </fileSet>
+    -->
     <fileSet>
       <directory>src/main/resources/themes</directory>
       <outputDirectory>/themes</outputDirectory>

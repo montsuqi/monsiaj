@@ -1,72 +1,83 @@
-# antを用いたビルド方法
+# monsiajのビルド
 
-## もっとも単純なビルド
+monsiajのビルドにはmavenを利用します。
+maven3以降が必要となります。
 
-コマンドラインから、
+## ビルド方法
 
- $ ant [ENTER]
+以下のコマンドを実行します。
 
-を実行します。
+```
+$ cd monsiaj-src
+$ mvn clean
+$ mvn package
+```
 
-ターゲット dist が実行され、dist/ディレクトリの下に
+ビルドに成功するとtargetディレクトリが作成され、そこにいくつかのファイルやディレクトリが作成されます。
+重要なのは以下のファイルです。
 
-* dist/monsiaj-bin-YYYYMMDD.zip
-* dist/monsiaj-bin-macosx-YYYYMMDD.zip
-* dist/monsiaj-src-YYYYMMDD.zip
+* monsiaj-bin-$VERSION.zip
+    * 配布用バイナリアーカイブ
+        * 単体起動可能jarパッケージとREADME.txtやNimrodテーマファイルを格納
+* monsiaj-src-$VERSION.zip
+    * 配布用ソースアーカイブ
+* monsiaj-$VERSION.zip
+    * Java Web Start配布用アーカイブ
 
-が生成されます。(YYYYNNDD=ビルド時の日付)
+## Java Web Start配布用アーカイブの設定
 
-このビルドの場合、
+Java Web Start配布用アーカイブの作成はmavenのwebstart-maven-pluginで行う。pom.xmlのwebstart-maven-pluginの設定を編集してビルドすることでJava Web Start配布URLの設定とjarファイルの署名ができる。
 
-* 署名は行われません。
-* クラスファイルにはデバッグ情報が含まれます。
+### Java Web Start配布URLの設定
 
-## ビルドのカスタマイズ
+pom.xml、webstart-maven-pluginのcodebaseの部分を編集する。
 
-ビルドの動作をカスタマイズするには、プロパティファイルを用います。
+<plugin>
+    ... 省略 ...
+    <artifactId>webstart-maven-plugin</artifactId>
+    ... 省略 ... 
+    <configuration>
+        ... 省略 ...
+        <codebase>http://ftp.orca.med.or.jp/pub/java-client2/archives/monsiaj</codebase>
+        ... 省略 ...
+    </configuration>
+</plugin>
+```
 
-テキストファイル build.properties(名前は任意) を作成して、
-目的に応じたプロパティの設定を記述し、
+### 署名の設定
 
- $ ant -propertyfile build.properties dist
+pom.xml、webstart-maven-pluginのsignの部分をコメント解除し編集する。
+Java Web Startの起動には署名が必須のため必ず設定する。
 
-のように実行してください。
+```
+<plugin>
+    ... 省略 ...
+    <artifactId>webstart-maven-plugin</artifactId>
+    ... 省略 ...
+    <configuration>
+        ... 省略 ...
+        <sign>
+            <keystore>${project.basedir}/keystore</keystore>
+            <keypass>keypass</keypass> 
+            <storepass>storepass</storepass>
+            <alias>alias</alias>
+            <tsaLocation>http://timestamp.globalsign.com/scripts/timstamp.dll</tsaLocation>
+            <verify>true</verify>
+        </sign>
+        ... 省略 ...
+    </configuration>
+</plugin>
+```
 
-### 署名を行う場合
+* keystore
+    * keystoreファイルのパスを入力する
+    * ${project.basedir}はpom.xmlのあるディレクトリに置換される
+* keypass
+    * keystoreに格納されている秘密鍵のパスフレーズを入力する
+* storepass
+    * keystoreのパスフレーズを入力する
+* alias
+    * 証明書のaliasを指定する
+* tsaLocation
+    * 証明書のTSAのURLを指定する
 
-プロパティファイルに、
-
-    do.sign=true
-    alias=署名する鍵のエイリアス
-    tsa=タイムスタンプURL(http://timestamp.globalsign.com/scripts/timstamp.dll)
-    keystore=キーストアファイル名
-    webstart.url=http://... jwsを設置するURL
-    webstart.vendor=ベンダー名
-
-を設定して実行します。途中でキーストアのパスワードと鍵パスワードを
-聞かれるので答えますが、
-画面にエコーバック(表示)されるので安全に留意してください。
-
-sign-jars:
-    [input] Input the store password
-XXXXXXX[Return]
-    [input] Input the key password
-XXXXXXX[Return]
-
-do.signプロパティを設定してある場合、dist/ に置かれたファイル内の
-jarファイルは署名済みのものとなります。
-
-### デバッグオプションを外す場合
-
-デフォルトでは、コンパイルはデバッグオプション付きとなります。
-これを外すためには、プロパティファイルに
-
-    javac.debug=no
-
-を設定してください。
-
-含めるデバッグ情報の種別は、
-
-     javac.debuglevel=lines,vars,source
-
-のように、含めたいものをコンマで区切って指定します。

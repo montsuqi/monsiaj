@@ -68,7 +68,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <codebase>http://ftp.orca.med.or.jp/pub/java-client2/archives/monsiaj</codebase>
+                    <codebase>http://ftp.orca.med.or.jp/pub/java-client2/archives/${project.version}</codebase>
                     <excludeTransitive>true</excludeTransitive>
                     <outputJarVersions>true</outputJarVersions>
                     <dependencies>
@@ -102,16 +102,16 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <finalName>monsiaj-${version}</finalName>
+                    <finalName>monsiaj-${project.version}</finalName>
                     <descriptors>
+                        <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
                         <descriptor>src/assembly/bin.xml</descriptor>
                         <descriptor>src/assembly/src.xml</descriptor>
-                        <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>                            
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
                             <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
                         </manifest>
                         <manifestEntries>
@@ -126,6 +126,29 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+ 
+            <!-- rename distribution archive  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>rename-dist-archives</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>rename-dist-archives</echo>
+                                <move file="${project.build.directory}/monsiaj-${project.version}-bin.zip" tofile="${project.build.directory}/monsiaj-bin-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-src.zip" tofile="${project.build.directory}/monsiaj-src-${project.version}.zip" />
+                            </tasks>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

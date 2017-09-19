@@ -5,6 +5,7 @@
   <formats>
     <format>zip</format>
   </formats>
+  <baseDirectory>monsiaj-src-${project.version}</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}/lib</directory>
