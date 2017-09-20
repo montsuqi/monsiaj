@@ -9,7 +9,6 @@ maven3以降が必要となります。
 
 ```
 $ cd monsiaj-src
-$ mvn clean
 $ mvn package
 ```
 
