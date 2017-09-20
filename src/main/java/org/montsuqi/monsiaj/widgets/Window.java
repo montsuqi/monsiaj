@@ -109,9 +109,9 @@ public class Window extends JFrame {
                     }
 
                     if (scrBounds.contains(tcx, tcy)) {
-                        String location = System.getProperty("monsia.dialog.location");
-                        if (location != null) {
-                            switch (location.toLowerCase()) {
+                        String pos = System.getProperty("monsia.dialog.position");
+                        if (pos != null) {
+                            switch (pos.toLowerCase()) {
                                 case "topleft":
                                     x = scrBounds.x + scrInsets.left;
                                     y = scrBounds.y + scrInsets.top;
