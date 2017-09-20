@@ -160,7 +160,7 @@
                 <executions>
                     <execution>
                         <id>install-local-jar</id>
-                        <phase>clean</phase>
+                        <phase>validate</phase>
                         <configuration>
                             <file>${basedir}/lib/pdfrenderer.jar</file>
                             <repositoryLayout>default</repositoryLayout>
