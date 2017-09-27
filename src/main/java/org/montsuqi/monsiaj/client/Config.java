@@ -15,7 +15,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +38,7 @@ import org.montsuqi.monsiaj.util.SystemEnvironment;
  */
 public class Config {
 
-    private String propPath;
-    private Properties prop;
-    private int current;
+    private static final Logger logger = LogManager.getLogger(Config.class);    
 
     private static final String PROP_FILENAME = "monsiaj.jsonrpc.properties";
     private static final String JARPATH = System.getProperty("java.class.path");
@@ -53,45 +50,21 @@ public class Config {
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
     private static final String DEFAULT_STYLE_RESOURCE_NAME = "/style.properties";
-    private static final Logger LOGGER = LogManager.getLogger(Config.class);
-
-    private static final TreeMap<String, PrintService> PRINTER_SERVICE_MAP;
-    private static final ArrayList<String> PRINTER_LIST;
-    private final HashMap<String, PrintService> PRINTER_CONFIG_MAP;
-
-    static {
-        PRINTER_SERVICE_MAP = new TreeMap<>();
-        PRINTER_LIST = new ArrayList<>();
-        if (System.getProperty("monsia.debug.printer_list") != null) {
-        } else {
-            DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
-            PrintService[] pss = PrintServiceLookup.lookupPrintServices(flavor, null);
-            LOGGER.debug("-----");             
-            for (PrintService ps : pss) {
-                LOGGER.debug(ps.getName() + "#:#" + ps);                
-                PRINTER_SERVICE_MAP.put(ps.getName(), ps);
-                PRINTER_LIST.add(ps.getName());
-            }
-            LOGGER.debug("-----");                         
-            Collections.sort(PRINTER_LIST, new Comparator<Object>() {
-                @Override
-                public int compare(Object o1, Object o2) {
-                    String n1 = (String) o1;
-                    String n2 = (String) o2;
-                    return n1.compareTo(n2);
-                }
-            });
-        }
-    }
-
+    
+    private String propPath;
+    private Properties prop;
+    private int current;
+    
+    private final PrinterConfig printerConfig;
+    
     public Config() {
-        PRINTER_CONFIG_MAP = new HashMap<>();
         initProp();
         readProp();
+        printerConfig = new PrinterConfig();
     }
-
+    
     public ArrayList<String> getPrinterList() {
-        return PRINTER_LIST;
+        return printerConfig.getPrinterList();
     }
 
     public int getCurrent() {
@@ -191,7 +164,7 @@ public class Config {
         try {
             tmp.store(new FileOutputStream(propPath), "monsiaj setting");
         } catch (IOException ex) {
-            LOGGER.catching(ex);
+            logger.catching(ex);
         }
     }
 
@@ -233,13 +206,10 @@ public class Config {
                 }
             }
         }
-        Collections.sort(list, new Comparator<Object>() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                String n1 = Config.this.getDescription((Integer) o1);
-                String n2 = Config.this.getDescription((Integer) o2);
-                return n1.compareTo(n2);
-            }
+        Collections.sort(list, (Object o1, Object o2) -> {
+            String n1 = Config.this.getDescription((Integer) o1);
+            String n2 = Config.this.getDescription((Integer) o2);
+            return n1.compareTo(n2);
         });
         return list;
     }
@@ -507,64 +477,30 @@ public class Config {
         setValue(i, "systemProperties", v);
     }
 
-    public void LoadPrinterConfig(int i) {
-        PRINTER_CONFIG_MAP.clear();
+    public void loadPrinterConfig(int i) {
         String confStr = getValue(i, "printerConfig");
-        String[] set = confStr.split(",");
-        for (String kv : set) {
-            String[] e = kv.split(":=:");
-            if (e.length == 2) {
-                PRINTER_CONFIG_MAP.put(e[0], PRINTER_SERVICE_MAP.get(e[1]));
-            } else {
-                LOGGER.warn("invalid printer config! skip this. [" + kv + "]");
-            }
-        }
+        printerConfig.loadPrinterConfig(confStr);
     }
 
     public Map<String, String> getPrinterConfig(int i) {
-        TreeMap<String, String> map = new TreeMap<>();
-        String confStr = getValue(i, "printerConfig");
-        String[] set = confStr.split(",");
-        for (String kv : set) {
-            String[] e = kv.split(":=:");
-            if (e.length == 2) {
-                map.put(e[0], e[1]);
-            } else {
-                LOGGER.warn("invalid printer config! skip this. [" + kv + "]");
-            }
-        }
-        return map;
+        loadPrinterConfig(i);
+        return printerConfig.getPrinterConfigMap();
     }
 
     public void setPrinterConfig(int i, Map<String, String> map) {
-        PRINTER_CONFIG_MAP.clear();
-        String str = "";
-        int j = 0;
-        for (Map.Entry<String, String> e : map.entrySet()) {
-            String key = e.getKey();
-            String val = e.getValue();
-            if (key == null || val == null) {
-                continue;
-            }
-            if (j == 0) {
-                str = str + e.getKey() + ":=:" + e.getValue();
-            } else {
-                str = str + "," + e.getKey() + ":=:" + e.getValue();
-            }
-            j++;
-            PRINTER_CONFIG_MAP.put(e.getKey(), PRINTER_SERVICE_MAP.get(e.getValue()));
-        }
-        setValue(i, "printerConfig", str);
+        printerConfig.updatePrinterConfig(map);
+        setValue(i, "printerConfig", printerConfig.savePrinterConfig());
     }
 
     public PrintService getPrintService(String printer) {
-        PrintService ps = PRINTER_CONFIG_MAP.get(printer);
-        if (ps == null) {
-            ps = PRINTER_CONFIG_MAP.get("default");
-        } 
-        return ps;
+        return printerConfig.getPrintService(printer);
     }
 
+    public int getCopies(String printer) {
+        return printerConfig.getCopies(printer);
+    }
+            
+    
     public void list() {
         System.out.println("----");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {
