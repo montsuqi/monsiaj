@@ -8,13 +8,6 @@
   <baseDirectory>monsiaj-src-${project.version}</baseDirectory>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/lib</directory>
-      <includes>
-        <include>*.jar</include>
-      </includes>
-      <useDefaultExcludes>true</useDefaultExcludes>
-    </fileSet>
-    <fileSet>
       <directory>${project.basedir}</directory>
       <includes>
         <include>README*</include>

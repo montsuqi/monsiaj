@@ -152,30 +152,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- install local repo -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>install-local-jar</id>
-                        <phase>validate</phase>
-                        <configuration>
-                            <file>${basedir}/lib/pdfrenderer.jar</file>
-                            <repositoryLayout>default</repositoryLayout>
-                            <groupId>com.sun.pdfview</groupId>
-                            <artifactId>pdfrenderer</artifactId>
-                            <version>10.0</version>
-                            <packaging>jar</packaging>
-                            <generatePom>true</generatePom>
-                        </configuration>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -227,11 +203,6 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>2.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.pdfview</groupId>
-            <artifactId>pdfrenderer</artifactId>
-            <version>10.0</version>
         </dependency>
     </dependencies>    
 </project>
