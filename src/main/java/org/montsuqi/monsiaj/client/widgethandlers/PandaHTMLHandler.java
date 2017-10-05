@@ -32,8 +32,7 @@ import org.montsuqi.monsiaj.client.UIControl;
 import org.montsuqi.monsiaj.widgets.PandaHTML;
 
 /**
- * <
- * p>
+ * <p>
  * A class to send/receive PandaHTML data.</p>
  */
 public class PandaHTMLHandler extends WidgetHandler {
@@ -47,7 +46,7 @@ public class PandaHTMLHandler extends WidgetHandler {
                 String urlStr = obj.getString("uri");
                 if (urlStr != null && !urlStr.isEmpty()) {
                     URL url = new URL(urlStr);
-                    html.setURI(url);
+                    html.setURL(url);
                 }
             } catch (MalformedURLException e) {
                 html.setText("");
