@@ -701,7 +701,7 @@ abstract class WidgetPropertySetter {
                         return;
                     }
                     URL uri = new URL(value);
-                    pane.setURL(uri);
+                    pane.setURI(uri);
                 } catch (MalformedURLException e) {
                     logger.warn(e);
                 }

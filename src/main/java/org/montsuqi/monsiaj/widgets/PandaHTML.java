@@ -23,101 +23,107 @@
 package org.montsuqi.monsiaj.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import java.util.concurrent.Executor;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.html.HTML;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.fit.cssbox.swingbox.BrowserPane;
-import org.fit.cssbox.swingbox.util.Anchor;
-import org.fit.cssbox.swingbox.util.Constants;
 
 /**
- * <p>
- * A HTML viewer for platforms other than MacOS X.</p>
- * <p>
- * This component uses JEditorPane to render HTML.</p>
+ * <p>A HTML viewer for platforms other than MacOS X.</p> <p>This component uses
+ * JEditorPane to render HTML.</p>
  */
 public class PandaHTML extends JPanel {
 
-    private static final Logger logger = LogManager.getLogger(PandaHTML.class);
-    private final BrowserPane browserPane;
-    protected ArrayList<URL> history;
+    protected static final Logger logger = LogManager.getLogger(PandaHTML.class);
+    protected Component html;
 
     public PandaHTML() {
-        history = new ArrayList<>();
-
         setLayout(new BorderLayout());
-        browserPane = new BrowserPane();
-        browserPane.addHyperlinkListener((HyperlinkEvent event) -> {
-            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                AttributeSet attrs = event.getSourceElement().getAttributes();
-                Anchor anchor = (Anchor) attrs.getAttribute(Constants.ATTRIBUTE_ANCHOR_REFERENCE);
-                String target = (String) anchor.getProperties().get(Constants.ELEMENT_A_ATTRIBUTE_TARGET);
-                if (target.equals("_blank")) {
-                    Desktop d = Desktop.getDesktop();
-                    if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
-                        try {
-                            d.browse(event.getURL().toURI());
-                        } catch (IOException | URISyntaxException ex) {
-                            logger.warn(ex, ex);
+        initComponents();
+    }
+
+    protected void initComponents() {
+        JEditorPane editorPane = new JEditorPane();
+        AbstractDocument doc = (AbstractDocument) editorPane.getDocument();
+        doc.setAsynchronousLoadPriority(1); // load documents asynchronously
+        editorPane.setEditable(false);
+        editorPane.addHyperlinkListener(new HyperlinkListener() {
+
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    AttributeSet attribs = event.getSourceElement().getAttributes();
+                    AttributeSet tagAttribs = (AttributeSet) attribs.getAttribute(HTML.Tag.A);
+                    String target = (String) tagAttribs.getAttribute(HTML.Attribute.TARGET);
+                    if (target == null) {
+                        setURI(event.getURL());
+                    } else {
+                        Desktop d = Desktop.getDesktop();
+                        if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
+                            try {
+                                d.browse(event.getURL().toURI());
+                            } catch (Exception ex) {
+                                System.out.println(ex);
+                            }
                         }
                     }
-                } else {
-                    setURL(event.getURL());
                 }
             }
         });
-        browserPane.setComponentPopupMenu(new PandaHTMLPopupMenu());
-
+        html = editorPane;
         JScrollPane scroll = new JScrollPane();
-        scroll.setViewportView(browserPane);
+        scroll.setViewportView(editorPane);
         add(scroll, BorderLayout.CENTER);
     }
 
     /**
-     * <p>
-     * Loads a HTML from the given URL and render it.</p>
+     * <p>Loads a HTML from the given URL and render it.</p>
      *
-     * @param url source URL of the document.
+     * @param uri source URL of the document.
      */
-    public void setURL(URL url) {
-        try {
-            logger.debug("load " + url);
-            browserPane.setPage(url);
-            history.add(url);
-            System.out.println("add " + url);
-        } catch (IOException ex) {
-            logger.info(ex, ex);
-        }
+    public void setURI(URL uri) {
+        Runnable loader = createLoader(uri);
+        logger.debug("loading: {0}", uri); 
+        Executor executor = new ThreadPerTaskExecutor();
+        executor.execute(loader);
     }
-
-    public void back() {
-        try {
-            int size = history.size();
-            if (size > 1) {
-                browserPane.setPage(history.get(size - 2));
-                history.remove(size - 1);
-            }
-        } catch (IOException ex) {
-            logger.info(ex, ex);
-        }
-    }
-
+    
     public void setText(String text) {
-        browserPane.setText(text);
+        ((JEditorPane)html).setText(text);
+    }
+
+    protected class ThreadPerTaskExecutor implements Executor {
+
+        public void execute(Runnable r) {
+            new Thread(r, "ThreadPerTaskExecutor").start();
+        }
+    }
+
+    protected Runnable createLoader(final URL uri) {
+        return new Runnable() {
+
+            public void run() {
+                try {
+                    JEditorPane editorPane = (JEditorPane) html;
+                    editorPane.setPage(uri);
+                } catch (IOException e) {
+                    logger.catching(Level.WARN, e);
+                }
+            }
+        };
     }
 
     public static void main(String[] args) throws IOException {
@@ -126,32 +132,9 @@ public class PandaHTML extends JPanel {
         PandaHTML html = new PandaHTML();
         f.add(html);
         f.setVisible(true);
-        html.setURL(new URL(args[0]));
+        html.setURI(new URL(args[0]));
         f.pack();
-        f.setSize(600, 800);
+        f.setSize(400, 600);
         f.validate();
-    }
-
-    class PandaHTMLPopupMenu extends JPopupMenu {
-
-        private static final String BACK = "Back";
-        private final Action backAction = new BackAction(BACK);
-
-        protected PandaHTMLPopupMenu() {
-            super();
-            add(backAction);
-        }
-
-        class BackAction extends AbstractAction {
-
-            protected BackAction(String label) {
-                super(label);
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                back();
-            }
-        }
-    }
+    }    
 }
