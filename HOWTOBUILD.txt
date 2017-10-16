@@ -20,53 +20,41 @@ $ mvn package
         * 単体起動可能jarパッケージとREADME.txtやNimrodテーマファイルを格納
 * monsiaj-src-$VERSION.zip
     * 配布用ソースアーカイブ
-* monsiaj-$VERSION.zip
-    * Java Web Start配布用アーカイブ
+* monsiaj-$VERSION-all.zip
+    * Java Web Start用署名済みjarファイル
 
-## Java Web Start配布用アーカイブの設定
+## 署名の設定
 
-Java Web Start配布用アーカイブの作成はmavenのwebstart-maven-pluginで行う。pom.xmlのwebstart-maven-pluginの設定を編集してビルドすることでJava Web Start配布URLの設定とjarファイルの署名ができる。
-
-### Java Web Start配布URLの設定
-
-pom.xml、webstart-maven-pluginのcodebaseの部分を編集する。
-
-<plugin>
-    ... 省略 ...
-    <artifactId>webstart-maven-plugin</artifactId>
-    ... 省略 ... 
-    <configuration>
-        ... 省略 ...
-        <codebase>http://ftp.orca.med.or.jp/pub/java-client2/archives/monsiaj</codebase>
-        ... 省略 ...
-    </configuration>
-</plugin>
-```
-
-### 署名の設定
-
-pom.xml、webstart-maven-pluginのsignの部分をコメント解除し編集する。
-Java Web Startの起動には署名が必須のため必ず設定する。
+pom.xml、maven-jarsigner-pluginプラグインのコメントを解除し編集する。
 
 ```
-<plugin>
-    ... 省略 ...
-    <artifactId>webstart-maven-plugin</artifactId>
-    ... 省略 ...
-    <configuration>
-        ... 省略 ...
-        <sign>
-            <keystore>${project.basedir}/keystore</keystore>
-            <keypass>keypass</keypass> 
-            <storepass>storepass</storepass>
-            <alias>alias</alias>
-            <tsaLocation>http://timestamp.globalsign.com/scripts/timstamp.dll</tsaLocation>
-            <verify>true</verify>
-        </sign>
-        ... 省略 ...
-    </configuration>
-</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jarsigner-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign</id>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archiveDirectory>${project.build.directory}</archiveDirectory>
+                    <includes>
+                       <include>*.jar</include>
+                    </includes>
+                    <keystore>${project.basedir}/keystore</keystore>
+                    <alias>alias</alias>
+                    <storepass>storepass</storepass>
+                    <keypass>keypass</keypass>
+                    <tsaLocation>http://timestamp.globalsign.com/scripts/timstamp.dll</tsaLocation>                    
+                </configuration>
+            </plugin>
 ```
+
+署名用のキーストアの設定を以下の項目で行う。
 
 * keystore
     * keystoreファイルのパスを入力する
