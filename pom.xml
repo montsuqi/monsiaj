@@ -55,17 +55,6 @@
                 </configuration>
             </plugin>
 
-                    <!--
-                                  <sign>
-                                      <keystore>${project.basedir}/keystore</keystore>
-                                      <keypass>keypass</keypass> 
-                                      <storepass>storepass</storepass>
-                                      <alias>alias</alias>
-                                      <tsaLocation>http://timestamp.globalsign.com/scripts/timstamp.dll</tsaLocation>
-                                      <verify>true</verify>
-                                  </sign>
-                    -->
-
             <!-- make bin package -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
