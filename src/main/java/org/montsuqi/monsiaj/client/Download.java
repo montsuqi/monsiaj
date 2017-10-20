@@ -117,9 +117,11 @@ public class Download {
                 if (showdialog) {
                     showReportDialog(title, file);
                 } else {
+                    int cp = 1;
                     PrintService ps = null;
                     if (printer != null) {
                         ps = conf.getPrintService(printer);
+                        cp = conf.getCopies(printer);
                     }
                     if (ps != null) {
                         PopupNotify.popup(Messages.getString("PrintReport.notify_summary"),
@@ -127,8 +129,7 @@ public class Download {
                                 + Messages.getString("PrintReport.printer") + printer + "\n\n"
                                 + Messages.getString("PrintReport.title") + title,
                                 GtkStockIcon.get("gtk-print"), 0);
-                        PDFPrint print = new PDFPrint(file, ps);
-                        print.start();
+                        PDFPrint.print(file.getAbsolutePath(),cp,ps);
                     } else {
                         showReportDialog(title, file);
                     }

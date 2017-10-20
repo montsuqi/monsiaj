@@ -124,7 +124,7 @@ public class Launcher {
             conf.applySystemProperties(n);
 
             /* set printer config  */
-            conf.LoadPrinterConfig(n);
+            conf.loadPrinterConfig(n);
 
             /*
              * set look and feel
@@ -187,15 +187,11 @@ public class Launcher {
         JLabel configLabel = new JLabel(Messages.getString("ConfigurationPanel.config_label"));
         configCombo = new JComboBox<>();
         updateConfigCombo();
-        configCombo.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                java.util.List<Integer> list = conf.getList();
-                int current = list.get(configCombo.getSelectedIndex());
-                conf.setCurrent(current);
-                configPanel.loadConfig(current);
-            }
+        configCombo.addActionListener((ActionEvent evt) -> {
+            java.util.List<Integer> list = conf.getList();
+            int current = list.get(configCombo.getSelectedIndex());
+            conf.setCurrent(current);
+            configPanel.loadConfig(current);
         });
         configPanel = createConfigurationPanel();
         configPanel.loadConfig(conf.getCurrent());
@@ -243,9 +239,9 @@ public class Launcher {
             configCombo.removeActionListener(listener);
         }
         configCombo.removeAllItems();
-        for (int i : conf.getList()) {
+        conf.getList().forEach((i) -> {
             configCombo.addItem(conf.getDescription(i));
-        }
+        });
         for (ActionListener listener : listeners) {
             configCombo.addActionListener(listener);
         }

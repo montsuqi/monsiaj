@@ -40,9 +40,9 @@ public class PrinterConfigPanel extends JPanel {
         for (int i = 0; i < SIZE; i++) {
             nameList.add(new JTextField());
             JComboBox<String> combo = new JComboBox<>();
-            for (String p : list) {
+            list.forEach((p) -> {
                 combo.addItem(p);
-            }
+            });
             printerList.add(combo);
         }
 
