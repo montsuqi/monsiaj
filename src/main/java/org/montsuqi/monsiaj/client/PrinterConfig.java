@@ -71,7 +71,7 @@ public class PrinterConfig {
                 int cp = Integer.parseInt(m.group(2));
                 if (cp > MAX_COPIES) {
                     cp = MAX_COPIES;
-                    logger.warn("max copies limit; prnter " + pr + " set #" + cp);
+                    logger.warn("max copies limit; printer " + pr + " set #" + cp);
                 }
                 PRINTER_CONFIG_MAP.put(pr, new PrinterConfigEntry(ps, cp));
             } else {
