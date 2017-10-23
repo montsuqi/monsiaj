@@ -29,6 +29,7 @@ public class PrinterConfig {
     private static final TreeMap<String, PrintService> PRINT_SERVICE_MAP;
     private static final ArrayList<String> PRINTER_LIST;
     private final HashMap<String, PrinterConfigEntry> PRINTER_CONFIG_MAP;
+    private final int MAX_COPIES = 99;
 
     static {
         PRINT_SERVICE_MAP = new TreeMap<>();
@@ -66,8 +67,13 @@ public class PrinterConfig {
             PrintService ps = PrinterConfig.PRINT_SERVICE_MAP.get(e.getValue());
             Matcher m = p.matcher(e.getKey());
             if (m.find()) {
+                String pr = m.group(1);
                 int cp = Integer.parseInt(m.group(2));
-                PRINTER_CONFIG_MAP.put(m.group(1), new PrinterConfigEntry(ps, cp));
+                if (cp > MAX_COPIES) {
+                    cp = MAX_COPIES;
+                    logger.warn("max copies limit; prnter " + pr + " set #" + cp);
+                }
+                PRINTER_CONFIG_MAP.put(pr, new PrinterConfigEntry(ps, cp));
             } else {
                 PRINTER_CONFIG_MAP.put(e.getKey(), new PrinterConfigEntry(ps, 1));
             }

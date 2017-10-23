@@ -4,7 +4,7 @@
     <groupId>org.montsuqi.monsiaj</groupId>
     <artifactId>monsiaj</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <name>monsiaj</name>
     <url>https://github.com/montsuqi/monsiaj</url>
     <description>montsuqi panda client for java</description>
@@ -13,8 +13,6 @@
     </organization>
 
     <properties>
-        <!--     
-        <monsia.version>${version}</monsia.version>-->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>

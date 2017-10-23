@@ -26,23 +26,24 @@ public class PDFPrint {
 
     public static void print(String file, int copies, PrintService ps) {
         try {
-            PDDocument document = PDDocument.load(new File(file));
-            MediaSizeName size = getMediaSizeName(document);
-
-            PrinterJob job = PrinterJob.getPrinterJob();
-            job.setPrintService(ps);
-            job.setPageable(new PDFPageable(document));
-            PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-            attr.add(size);
-            attr.add(new Copies(copies));
-            attr.add(new JobName(file, null));
-
-            PageFormat pf = job.getPageFormat(attr);
-            Paper paper = pf.getPaper();
-            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-            pf.setPaper(paper);
-
-            job.print(attr);
+            try (PDDocument document = PDDocument.load(new File(file))) {
+                MediaSizeName size = getMediaSizeName(document);
+                
+                PrinterJob job = PrinterJob.getPrinterJob();
+                job.setPrintService(ps);
+                job.setPageable(new PDFPageable(document));
+                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+                attr.add(size);
+                attr.add(new Copies(copies));
+                attr.add(new JobName(file, null));
+                
+                PageFormat pf = job.getPageFormat(attr);
+                Paper paper = pf.getPaper();
+                paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+                pf.setPaper(paper);
+                
+                job.print(attr);
+            }
         } catch (IOException | PrinterException ex) {
             logger.warn(ex, ex);
         }
@@ -50,24 +51,25 @@ public class PDFPrint {
 
     public static void print(String file) {
         try {
-            PDDocument document = PDDocument.load(new File(file));
-            MediaSizeName size = getMediaSizeName(document);
-
-            PrinterJob job = PrinterJob.getPrinterJob();
-            job.setPageable(new PDFPageable(document));
-            PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-            attr.add(size);
-            attr.add(new JobName(file, null));            
-            
-            if (!job.printDialog(attr)) {
-                return;
+            try (PDDocument document = PDDocument.load(new File(file))) {
+                MediaSizeName size = getMediaSizeName(document);
+                
+                PrinterJob job = PrinterJob.getPrinterJob();
+                job.setPageable(new PDFPageable(document));
+                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+                attr.add(size);
+                attr.add(new JobName(file, null));
+                
+                if (!job.printDialog(attr)) {
+                    return;
+                }
+                PageFormat pf = job.getPageFormat(attr);
+                Paper paper = pf.getPaper();
+                paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+                pf.setPaper(paper);
+                
+                job.print(attr);
             }
-            PageFormat pf = job.getPageFormat(attr);
-            Paper paper = pf.getPaper();
-            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-            pf.setPaper(paper);
-            
-            job.print(attr);
         } catch (IOException | PrinterException ex) {
             logger.warn(ex, ex);
         }
