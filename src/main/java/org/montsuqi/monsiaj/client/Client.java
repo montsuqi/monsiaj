@@ -232,6 +232,9 @@ public class Client {
             JSONObject tmpl;
             tmpl = (JSONObject) uiControl.getScreenTemplate(windowName);
             if (tmpl != null) {
+
+                long t1 = System.currentTimeMillis();
+
                 Node node = uiControl.getNode(windowName);
                 if (node == null) {
                     throw new IOException("invalid window:" + windowName);
@@ -250,20 +253,24 @@ public class Client {
                 JSONObject params = new JSONObject();
                 params.put("event_data", eventData);
 
-                if (System.getProperty("monsia.do_profile") != null) {
-                    logger.info("---- profile ----");
-                    logger.info("window:" + windowName + " widget:" + widgetName + " event:" + event);
-                }
-                long st = System.currentTimeMillis();
+                long t2 = System.currentTimeMillis();
 
                 windowStack = protocol.sendEvent(params);
-                long t1 = System.currentTimeMillis();
+
+                long t3 = System.currentTimeMillis();
+
                 updateScreen();
 
-                long et = System.currentTimeMillis();
-                if (System.getProperty("monsia.do_profile") != null) {
-                    logger.info("total:" + (et - st) + "ms protocol.sendEvent:" + (t1 - st) + "ms updateScreen:" + (et - t1) + "ms");
-                }
+                long t4 = System.currentTimeMillis();
+                
+                String msg = "[send_event_exec_time] ";
+                msg += "total:" + (t4-t1) + "ms ";
+                msg += "make_event_data:" + (t2-t1) + "ms ";
+                msg += "rpc_exec:" + (t3-t2) + "ms ";
+                msg += "server_exec:" + protocol.getTotalExecTime() + "ms ";
+                msg += "app_exec:" + protocol.getAppExecTime() + "ms ";
+                msg += "update_screen:" + (t4-t3) + "ms";
+                logger.info(msg);
             }
         } catch (JSONException | IOException ex) {
             ExceptionDialog.showExceptionDialog(ex);
