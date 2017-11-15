@@ -66,14 +66,38 @@ public class Protocol {
     private final String password;
     private boolean usePushClient;
 
-    public boolean isUsePushClient() {
-        return usePushClient;
-    }
+    private int totalExecTime;
+    private int appExecTime;
 
     private SSLSocketFactory sslSocketFactory;
     static final String PANDA_CLIENT_VERSION = "2.0.0";
 
     private int sslType;
+
+    public static final int TYPE_NO_SSL = 0;
+    public static final int TYPE_SSL_NO_CERT = 1;
+    public static final int TYPE_SSL_PKCS12 = 2;
+    public static final int TYPE_SSL_PKCS11 = 3;
+
+    private String caCert;
+    private String certFile;
+    private String certFilePassphrase;
+
+    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
+        this.rpcId = 1;
+        this.authURI = authURI;
+        this.user = user;
+        this.password = pass;
+        this.serverType = null;
+        this.usePushClient = false;
+        this.sslType = TYPE_NO_SSL;
+        this.totalExecTime = 0;
+        this.appExecTime = 0;
+    }
+
+    public boolean isUsePushClient() {
+        return usePushClient;
+    }
 
     public String getPusherURI() {
         return pusherURI;
@@ -103,25 +127,14 @@ public class Protocol {
         return certFilePassphrase;
     }
 
-    public static final int TYPE_NO_SSL = 0;
-    public static final int TYPE_SSL_NO_CERT = 1;
-    public static final int TYPE_SSL_PKCS12 = 2;
-    public static final int TYPE_SSL_PKCS11 = 3;
-
-    private String caCert;
-    private String certFile;
-    private String certFilePassphrase;
-
-    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
-        this.rpcId = 1;
-        this.authURI = authURI;
-        this.user = user;
-        this.password = pass;
-        this.serverType = null;
-        this.usePushClient = false;
-        this.sslType = TYPE_NO_SSL;
+    public int getTotalExecTime() {
+        return totalExecTime;
     }
 
+    public int getAppExecTime() {
+        return appExecTime;
+    }
+    
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
         if (caCert == null || caCert.isEmpty()) {
             sslSocketFactory = null;
@@ -181,6 +194,9 @@ public class Protocol {
     }
 
     private Object checkJSONRPCResponse(String jsonStr) throws JSONException {
+        totalExecTime = 0;
+        appExecTime = 0;
+        
         JSONObject obj = new JSONObject(jsonStr);
         if (!obj.getString("jsonrpc").matches("2.0")) {
             throw new JSONException("invalid jsonrpc version");
@@ -198,7 +214,21 @@ public class Protocol {
         if (!obj.has("result")) {
             throw new JSONException("no result object");
         }
-        return obj.get("result");
+        Object result = obj.get("result");
+        if (result instanceof JSONObject) {
+            JSONObject res = (JSONObject) result;
+            if (res.has("meta")) {
+                JSONObject meta = (JSONObject) ((JSONObject) result).getJSONObject("meta");
+                if (meta.has("total_exec_time")) {
+                    totalExecTime = meta.getInt("total_exec_time");
+                }
+                if (meta.has("app_exec_time")) {
+                    appExecTime = meta.getInt("app_exec_time");
+                }                
+            }
+        }
+
+        return result;
     }
 
     private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) throws IOException {

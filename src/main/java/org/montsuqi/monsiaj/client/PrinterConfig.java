@@ -89,7 +89,10 @@ public class PrinterConfig {
             if (cp > 1) {
                 k = k + "#" + cp;
             }
-            map.put(k, ent.getPrintService().getName());
+            PrintService ps = ent.getPrintService();
+            if (ps != null) {
+                map.put(k, ps.getName());
+            }
         });
         return map;
     }
