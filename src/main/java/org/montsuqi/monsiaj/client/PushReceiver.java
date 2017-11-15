@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -47,9 +48,9 @@ import org.json.JSONObject;
  *
  * @author mihara
  */
-public class PusherClient extends Thread {
+public class PushReceiver implements Runnable {
 
-    static final Logger logger = LogManager.getLogger(PusherClient.class);
+    static final Logger logger = LogManager.getLogger(PushReceiver.class);
     private final URI uri;
     private final String auth;
     private final SslContextFactory sslContextFactory;
@@ -58,8 +59,9 @@ public class PusherClient extends Thread {
     private String subID;
     static final long WAIT_INIT = 2 * 1000;
     static final long WAIT_MAX = 600 * 1000;
+    private final BlockingQueue queue;
 
-    public PusherClient(Config conf, Protocol protocol) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+    public PushReceiver(Config conf, Protocol protocol, BlockingQueue queue) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
         this.conf = conf;
         this.protocol = protocol;
         uri = new URI(protocol.getPusherURI());
@@ -86,6 +88,7 @@ public class PusherClient extends Thread {
                 this.sslContextFactory = null;
                 break;
         }
+        this.queue = queue;
     }
 
     @Override
@@ -101,7 +104,7 @@ public class PusherClient extends Thread {
                 }
                 PusherWebSocket socket = new PusherWebSocket();
                 try {
-                    wait(waitMs);                    
+                    wait(waitMs);
                     client.setMaxIdleTimeout(Long.MAX_VALUE);
                     client.start();
                     ClientUpgradeRequest request = new ClientUpgradeRequest();
@@ -156,7 +159,7 @@ public class PusherClient extends Thread {
                 session.getRemote().sendString(subStr);
                 connected = true;
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(PusherClient.class.getName()).log(Level.SEVERE, null, ex);
+                java.util.logging.Logger.getLogger(PushReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -195,42 +198,12 @@ public class PusherClient extends Thread {
                 break;
             case "event":
                 JSONObject data = obj.getJSONObject("data");
-                switch (data.getString("event")) {
-                    case "client_data_ready":
-                        clientDataReadyHandler(data.getJSONObject("body"));
-                        break;
+                try {
+                    queue.put(data);
+                } catch (InterruptedException ex) {
+                    logger.error(ex, ex);
                 }
                 break;
-        }
-    }
-
-    private void clientDataReadyHandler(JSONObject obj) {
-        DownloadThread thread = new DownloadThread(conf, protocol, obj);
-        thread.start();
-    }
-
-    private class DownloadThread extends Thread {
-
-        private final Config conf;
-        private final Protocol protocol;
-        private final JSONObject obj;
-
-        public DownloadThread(Config conf, Protocol protocol, JSONObject obj) {
-            this.conf = conf;
-            this.protocol = protocol;
-            this.obj = obj;
-        }
-
-        @Override
-        public void run() {
-            switch (obj.getString("type")) {
-                case "report":
-                    Download.printReport(conf, protocol, obj);
-                    break;
-                case "misc":
-                    Download.downloadFile(conf, protocol, obj);
-                    break;
-            }
         }
     }
 

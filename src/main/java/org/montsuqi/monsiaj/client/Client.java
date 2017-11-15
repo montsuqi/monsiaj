@@ -33,6 +33,8 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -61,7 +63,6 @@ public class Client {
     private JSONObject windowStack;
     private String focusedWindow;
     private String focusedWidget;
-    private PusherClient pusherClient;
 
     static {
         if (System.getProperty("monsia.ping_timer_period") != null) {
@@ -132,8 +133,11 @@ public class Client {
 
         if (protocol.isUsePushClient()) {
             try {
-                pusherClient = new PusherClient(conf, protocol);
-                pusherClient.start();
+                BlockingQueue q = new LinkedBlockingQueue();
+                PushReceiver receiver = new PushReceiver(conf, protocol,q);
+                PushHandler handler = new PushHandler(conf,protocol,q);
+                new Thread(receiver).start();
+                new Thread(handler).start();                
             } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
                 logger.info(ex, ex);
             }

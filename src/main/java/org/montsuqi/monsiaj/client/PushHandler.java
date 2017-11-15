@@ -1,0 +1,61 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.montsuqi.monsiaj.client;
+
+import java.util.concurrent.BlockingQueue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author mihara
+ */
+public class PushHandler implements Runnable {
+
+    static final Logger logger = LogManager.getLogger(PushHandler.class);
+
+    private final Config conf;
+    private final Protocol protocol;
+    private final BlockingQueue queue;
+
+    public PushHandler(Config conf, Protocol protocol,BlockingQueue queue) {
+        this.conf = conf;
+        this.protocol = protocol;
+        this.queue = queue;
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                eventHandler((JSONObject) queue.take());
+            }
+        } catch (InterruptedException ex) {
+            logger.error(ex, ex);
+        }
+    }
+
+    public void eventHandler(JSONObject obj) {
+        switch (obj.getString("event")) {
+            case "client_data_ready":
+                clientDataReadyHandler(obj.getJSONObject("body"));
+                break;
+        }
+    }
+    
+    public void clientDataReadyHandler(JSONObject obj) {
+        switch (obj.getString("type")) {
+            case "report":
+                Download.printReport(conf, protocol, obj);
+                break;
+            case "misc":
+                Download.downloadFile(conf, protocol, obj);
+                break;
+        }
+    }
+
+}
