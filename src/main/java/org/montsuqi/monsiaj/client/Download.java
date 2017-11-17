@@ -74,7 +74,7 @@ public class Download {
 
     public static void printReport(Config conf, Protocol protocol, JSONObject item) {
         try {
-            logger.debug("printReport:" + item.toString());
+            logger.info("printReport:" + item.toString());
             if (!item.has("object_id")) {
                 return;
             }
@@ -113,7 +113,6 @@ public class Download {
                 }
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
                 protocol.getBLOB(oid, out);
-                logger.info(item);
                 if (showdialog) {
                     showReportDialog(title, file);
                 } else {
@@ -149,6 +148,7 @@ public class Download {
     
     public static void downloadFile(Config conf,Protocol protocol, JSONObject item)  {
         try {
+            logger.info("downloadFile:" + item.toString());            
             if (!item.has("object_id")) {
                 return;
             }
