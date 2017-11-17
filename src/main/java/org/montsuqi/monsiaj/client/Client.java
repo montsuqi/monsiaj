@@ -134,10 +134,10 @@ public class Client {
         if (protocol.isUsePushClient()) {
             try {
                 BlockingQueue q = new LinkedBlockingQueue();
-                PushReceiver receiver = new PushReceiver(conf, protocol,q);
-                PushHandler handler = new PushHandler(conf,protocol,q);
+                PushReceiver receiver = new PushReceiver(conf, protocol, q);
+                PushHandler handler = new PushHandler(conf, protocol, q);
                 new Thread(receiver).start();
-                new Thread(handler).start();                
+                new Thread(handler).start();
             } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
                 logger.info(ex, ex);
             }
@@ -260,20 +260,22 @@ public class Client {
                 long t2 = System.currentTimeMillis();
 
                 windowStack = protocol.sendEvent(params);
+                int total_exec_time = protocol.getTotalExecTime();
+                int app_exec_time = protocol.getAppExecTime();
 
                 long t3 = System.currentTimeMillis();
 
                 updateScreen();
 
                 long t4 = System.currentTimeMillis();
-                
+
                 String msg = "[send_event_exec_time] ";
-                msg += "total:" + (t4-t1) + "ms ";
-                msg += "make_event_data:" + (t2-t1) + "ms ";
-                msg += "rpc_exec:" + (t3-t2) + "ms ";
-                msg += "server_exec:" + protocol.getTotalExecTime() + "ms ";
-                msg += "app_exec:" + protocol.getAppExecTime() + "ms ";
-                msg += "update_screen:" + (t4-t3) + "ms";
+                msg += "total:" + (t4 - t1) + "ms ";
+                msg += "make_event_data:" + (t2 - t1) + "ms ";
+                msg += "rpc_exec:" + (t3 - t2) + "ms ";
+                msg += "server_exec:" + total_exec_time + "ms ";
+                msg += "app_exec:" + app_exec_time + "ms ";
+                msg += "update_screen:" + (t4 - t3) + "ms";
                 logger.info(msg);
             }
         } catch (JSONException | IOException ex) {
