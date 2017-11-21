@@ -134,7 +134,7 @@ public class Protocol {
     public int getAppExecTime() {
         return appExecTime;
     }
-    
+
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
         if (caCert == null || caCert.isEmpty()) {
             sslSocketFactory = null;
@@ -196,7 +196,7 @@ public class Protocol {
     private Object checkJSONRPCResponse(String jsonStr) throws JSONException {
         totalExecTime = 0;
         appExecTime = 0;
-        
+
         JSONObject obj = new JSONObject(jsonStr);
         if (!obj.getString("jsonrpc").matches("2.0")) {
             throw new JSONException("invalid jsonrpc version");
@@ -224,7 +224,7 @@ public class Protocol {
                 }
                 if (meta.has("app_exec_time")) {
                     appExecTime = meta.getInt("app_exec_time");
-                }                
+                }
             }
         }
 
@@ -363,16 +363,21 @@ public class Protocol {
         this.rpcURI = result.getString("app_rpc_endpoint_uri");
         this.restURIRoot = result.getString("app_rest_api_uri_root");
         this.pusherURI = System.getProperty("monsia.pusher_uri");
-        if (result.has("pusher_uri")) {
-            String uri = result.getString("pusher_uri");
-            if (uri != null && !uri.isEmpty()) {
-                this.usePushClient = true;
+        if (this.pusherURI == null) {
+            if (result.has("pusher_uri")) {
                 this.pusherURI = result.getString("pusher_uri");
             }
+        }
+        if (this.pusherURI != null && !this.pusherURI.isEmpty()) {
+            this.usePushClient = true;
+        }
+        if (System.getProperty("monsia.disable_push_client") != null) {
+            this.usePushClient = false;
         }
         logger.info("session_id:" + this.sessionId);
         logger.info("rpcURI:" + this.rpcURI);
         logger.info("restURIRoot:" + this.restURIRoot);
+        logger.info("usePushClient:" + this.usePushClient);        
         logger.info("pusherURI:" + this.pusherURI);
     }
 
