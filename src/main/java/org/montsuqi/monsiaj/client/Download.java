@@ -39,8 +39,9 @@ import org.montsuqi.monsiaj.widgets.PandaPreview;
  * @author mihara
  */
 public class Download {
+
     private static final Logger logger = LogManager.getLogger(Download.class);
-    
+
     private static void showReportDialog(String title, File file) throws IOException {
         final JDialog dialog = new JDialog();
         Button closeButton = new Button(new AbstractAction(Messages.getString("PrintReport.close")) {
@@ -128,7 +129,8 @@ public class Download {
                                 + Messages.getString("PrintReport.printer") + printer + "\n\n"
                                 + Messages.getString("PrintReport.title") + title,
                                 GtkStockIcon.get("gtk-print"), 0);
-                        PDFPrint.print(file.getAbsolutePath(),cp,ps);
+                        PDFPrint print = new PDFPrint(file, ps);
+                        print.start();
                     } else {
                         showReportDialog(title, file);
                     }
@@ -144,11 +146,11 @@ public class Download {
         } catch (JSONException ex) {
             logger.catching(Level.WARN, ex);
         }
-    }    
-    
-    public static void downloadFile(Config conf,Protocol protocol, JSONObject item)  {
+    }
+
+    public static void downloadFile(Config conf, Protocol protocol, JSONObject item) {
         try {
-            logger.info("downloadFile:" + item.toString());            
+            logger.info("downloadFile:" + item.toString());
             if (!item.has("object_id")) {
                 return;
             }
@@ -183,5 +185,5 @@ public class Download {
         } catch (JSONException ex) {
             logger.catching(Level.WARN, ex);
         }
-    }    
+    }
 }
