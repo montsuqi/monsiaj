@@ -79,6 +79,11 @@ public class Protocol {
     public static final int TYPE_SSL_PKCS12 = 2;
     public static final int TYPE_SSL_PKCS11 = 3;
 
+    private static final String OS_VERSION = System.getProperty("os.name") + "-" + System.getProperty("os.version");
+    private static final String JAVA_VERSION = "Java_" + System.getProperty("java.version");
+    private static final String MONSIAJ_VERSION = "monsiaj/" + Protocol.class.getPackage().getImplementationVersion();
+    private static final String USER_AGENT = MONSIAJ_VERSION + " (" + OS_VERSION + "; " + JAVA_VERSION + ")";
+
     private String caCert;
     private String certFile;
     private String certFilePassphrase;
@@ -278,11 +283,7 @@ public class Protocol {
         con.setRequestMethod("POST");
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
-        String osVersion = System.getProperty("os.name") + "-" + System.getProperty("os.version");
-        String javaVersion = "Java_" + System.getProperty("java.version");
-        String monsiajVersion = "monsiaj/" + this.getClass().getPackage().getImplementationVersion();
-        String ua = monsiajVersion + " (" + osVersion + "; " + javaVersion + ")";
-        con.setRequestProperty("User-Agent", ua);
+        con.setRequestProperty("User-Agent", USER_AGENT);
 
         try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
             osw.write(reqStr);
@@ -377,7 +378,7 @@ public class Protocol {
         logger.info("session_id:" + this.sessionId);
         logger.info("rpcURI:" + this.rpcURI);
         logger.info("restURIRoot:" + this.restURIRoot);
-        logger.info("usePushClient:" + this.usePushClient);        
+        logger.info("usePushClient:" + this.usePushClient);
         logger.info("pusherURI:" + this.pusherURI);
     }
 
@@ -475,6 +476,7 @@ public class Protocol {
 
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", USER_AGENT);
 
         BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
         int length;
@@ -509,6 +511,7 @@ public class Protocol {
         con.setDoOutput(true);
         //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
         con.setRequestProperty("Content-Type", "application/octet-stream");
+        con.setRequestProperty("User-Agent", USER_AGENT);
         try (OutputStream os = con.getOutputStream()) {
             os.write(in);
             os.flush();
