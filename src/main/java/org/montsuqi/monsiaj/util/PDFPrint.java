@@ -14,12 +14,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
 import javax.print.attribute.standard.MediaSizeName;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -30,20 +30,23 @@ public class PDFPrint extends Thread {
 
     private final File file;
     private final PrintService printService;
+    private final int copies;
 
     private static final Logger logger = LogManager.getLogger(PDFPrint.class);
 
     public PDFPrint(File file) {
         this.file = file;
         this.printService = null;
+        this.copies = 1;
     }
 
-    public PDFPrint(File file, PrintService printService) {
+    public PDFPrint(File file,int copies,PrintService printService) {
         this.file = file;
         this.printService = printService;
+        this.copies = copies;
     }
 
-    private void print(PDFFile pdfFile, PrintService printService) {
+    private void print(PDFFile pdfFile,int copies,PrintService printService) {
         HashMap<MediaSizeName, ArrayList<PDFPage>> map = new HashMap<>();
         for (int i = 0; i < pdfFile.getNumPages(); i++) {
             PDFPage page = pdfFile.getPage(i + 1);
@@ -57,7 +60,7 @@ public class PDFPrint extends Thread {
                 map.put(mediaSizeName, newList);
             }
         }
-        for (Map.Entry<MediaSizeName, ArrayList<PDFPage>> e : map.entrySet()) {
+        map.entrySet().forEach((e) -> {
             try {
                 ArrayList<PDFPage> list = e.getValue();
                 PDFPage[] pages = new PDFPage[list.size()];
@@ -74,6 +77,7 @@ public class PDFPrint extends Thread {
                 if (mediaSizeName != MediaSizeName.A) {
                     reqset.add(mediaSizeName);
                 }
+                reqset.add(new Copies(copies));
                 PageFormat pf = pjob.getPageFormat(reqset);
                 Paper paper = pf.getPaper();
 
@@ -87,7 +91,7 @@ public class PDFPrint extends Thread {
             } catch (PrinterException ex) {
                 logger.catching(Level.WARN, ex);
             }
-        }
+        });
     }
 
     private void print(PDFFile pdfFile) {
@@ -130,7 +134,7 @@ public class PDFPrint extends Thread {
             ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
             if (printService != null) {
-                print(pdfFile, printService);
+                print(pdfFile, copies, printService);
             } else {
                 print(pdfFile);
             }
@@ -156,7 +160,7 @@ public class PDFPrint extends Thread {
                 PDFPrint printer = new PDFPrint(new File(args[1]));
                 printer.start();
             } else {
-                PDFPrint printer = new PDFPrint(new File(args[1]), ps);
+                PDFPrint printer = new PDFPrint(new File(args[1]),1,ps);
                 printer.start();
             }
             System.out.println(i);

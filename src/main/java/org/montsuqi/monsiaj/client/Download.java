@@ -129,7 +129,7 @@ public class Download {
                                 + Messages.getString("PrintReport.printer") + printer + "\n\n"
                                 + Messages.getString("PrintReport.title") + title,
                                 GtkStockIcon.get("gtk-print"), 0);
-                        PDFPrint print = new PDFPrint(file, ps);
+                        PDFPrint print = new PDFPrint(file,cp,ps);
                         print.start();
                     } else {
                         showReportDialog(title, file);
