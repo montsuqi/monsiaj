@@ -129,7 +129,6 @@ public class Client {
         windowStack = protocol.getWindow();
         updateScreen();
         stopReceiving();
-        startPing();
 
         if (protocol.isUsePushClient()) {
             try {
@@ -141,6 +140,8 @@ public class Client {
             } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
                 logger.info(ex, ex);
             }
+        } else {
+            startPing();
         }
     }
 
@@ -170,7 +171,7 @@ public class Client {
 
         logger.info("----");
         logger.info("focused_window[" + focusedWindow + "]");
-        
+
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
@@ -246,8 +247,8 @@ public class Client {
                 eventData.put("screen_data", newScreenData);
                 JSONObject params = new JSONObject();
                 params.put("event_data", eventData);
-                
-                logger.info("window:" + windowName + " widget:" + widgetName + " event:"+event);
+
+                logger.info("window:" + windowName + " widget:" + widgetName + " event:" + event);
 
                 long t2 = System.currentTimeMillis();
 
@@ -327,9 +328,7 @@ public class Client {
         try {
             if (!isReceiving()) {
                 startReceiving();
-                if (!this.getProtocol().isUsePushClient()) {
-                    listDownloads();
-                }
+                listDownloads();
                 getMessage();
                 stopReceiving();
             }
