@@ -461,9 +461,22 @@ public class Config {
 
     public void setTimerPeriod(int i, int p) {
         setValue(i, "timerPeriod", Integer.toString(p));
+    }    
+    
+    // startup popup message
+    public boolean getShowStartupMessage(int i) {
+        String value = getValue(i, "showStartupMessage");
+        if (value.isEmpty()) {
+            return true;
+        }
+        return Boolean.valueOf(value);
     }
 
-    // LookAndFeelThemeFile
+    public void setShowStartupMessage(int i, boolean v) {
+        setValue(i, "showStartupMessage", Boolean.toString(v));
+    }    
+
+    // system properties
     public String getSystemProperties(int i) {
         String value = getValue(i, "systemProperties");
         return value;
