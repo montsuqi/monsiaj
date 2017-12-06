@@ -55,14 +55,13 @@ public class PushReceiver implements Runnable {
     private final String auth;
     private final SslContextFactory sslContextFactory;
     private final Protocol protocol;
-    private final Config conf;
-    private String subID;
     static final long WAIT_INIT = 2 * 1000;
     static final long WAIT_MAX = 600 * 1000;
     private final BlockingQueue queue;
+    private WebSocketClient client;
+    private boolean loop;
 
-    public PushReceiver(Config conf, Protocol protocol, BlockingQueue queue) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
-        this.conf = conf;
+    public PushReceiver(Protocol protocol, BlockingQueue queue) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
         this.protocol = protocol;
         uri = new URI(protocol.getPusherURI());
         String auth_in = protocol.getUser() + ":" + protocol.getPassword();
@@ -89,14 +88,26 @@ public class PushReceiver implements Runnable {
                 break;
         }
         this.queue = queue;
+        client = null;
+        loop = true;
+    }
+
+    public void stop() {
+        loop = false;
+        if (client != null) {
+            try {
+                client.stop();
+            } catch (Exception ex) {
+                logger.info(ex, ex);
+            }
+        }
     }
 
     @Override
     public void run() {
         long waitMs = WAIT_INIT;
-        while (true) {
+        while (loop) {
             synchronized (this) {
-                WebSocketClient client;
                 if (this.sslContextFactory != null) {
                     client = new WebSocketClient(sslContextFactory);
                 } else {
@@ -127,12 +138,6 @@ public class PushReceiver implements Runnable {
                     }
                 } catch (Exception ex) {
                     logger.info(ex, ex);
-                } finally {
-                    try {
-                        client.stop();
-                    } catch (Exception e) {
-                        logger.info(e, e);
-                    }
                 }
             }
         }
@@ -141,7 +146,6 @@ public class PushReceiver implements Runnable {
     @WebSocket
     public class PusherWebSocket {
 
-        private final String reqID = UUID.randomUUID().toString();
         private final CountDownLatch closeLatch = new CountDownLatch(1);
         private boolean connected = false;
         private boolean closed = false;
@@ -152,11 +156,21 @@ public class PushReceiver implements Runnable {
             try {
                 String subStr = "{"
                         + " \"command\"    : \"subscribe\","
-                        + " \"req.id\"     : \"" + reqID + "\","
+                        + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
                         + " \"event\"      : \"*\","
                         + " \"session_id\" : \"" + protocol.getSessionId() + "\""
                         + "}";
                 session.getRemote().sendString(subStr);
+                String gid = protocol.getGroupId();
+                if (gid != null) {
+                    subStr = "{"
+                            + " \"command\"    : \"subscribe\","
+                            + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
+                            + " \"event\"      : \"*\","
+                            + " \"group_id\" : \"" + "1" + "\""
+                            + "}";
+                    session.getRemote().sendString(subStr);
+                }
                 connected = true;
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(PushReceiver.class.getName()).log(Level.SEVERE, null, ex);
@@ -194,7 +208,7 @@ public class PushReceiver implements Runnable {
         JSONObject obj = new JSONObject(message);
         switch (obj.getString("command")) {
             case "subscribed":
-                this.subID = obj.getString("sub.id");
+                logger.debug("subject_id:" + obj.getString("sub.id"));
                 break;
             case "event":
                 JSONObject data = obj.getJSONObject("data");
