@@ -21,7 +21,7 @@ public class PopupNotify {
 
     protected static final Logger logger = LogManager.getLogger(PopupNotify.class);
     private static final List<JDialog> dialogs = new ArrayList<>();
-
+    
     public static void popup(final String summary, final String body, final Icon icon, final int timeout) {
         final JDialog dialog = new JDialog();
         EventQueue.invokeLater(() -> {
@@ -173,6 +173,7 @@ public class PopupNotify {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     dialog.setOpacity(0.5f);
+                    dialog.toBack();
                 }
 
                 @Override

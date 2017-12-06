@@ -63,6 +63,7 @@ public class Client {
     private JSONObject windowStack;
     private String focusedWindow;
     private String focusedWidget;
+    private PushReceiver pushReceiver;
 
     static {
         if (System.getProperty("monsia.ping_timer_period") != null) {
@@ -86,6 +87,7 @@ public class Client {
         }
         uiControl = new UIControl(this, conf.getStyleURL(n), delay);
         isReceiving = false;
+        pushReceiver = null;
     }
 
     void connect() throws IOException, GeneralSecurityException, JSONException {
@@ -133,9 +135,9 @@ public class Client {
         if (protocol.isUsePushClient()) {
             try {
                 BlockingQueue q = new LinkedBlockingQueue();
-                PushReceiver receiver = new PushReceiver(conf, protocol, q);
+                pushReceiver = new PushReceiver(protocol, q);
                 PushHandler handler = new PushHandler(conf, protocol, q);
-                new Thread(receiver).start();
+                new Thread(pushReceiver).start();
                 new Thread(handler).start();
             } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
                 logger.info(ex, ex);
@@ -143,11 +145,20 @@ public class Client {
         } else {
             startPing();
         }
+        if (conf.getShowStartupMessage(num)) {
+            String msg = protocol.getStartupMessage();
+            if (msg != null && !msg.isEmpty()) {
+                PopupNotify.popup(Messages.getString("PushHandler.announcement"),
+                        msg,
+                        GtkStockIcon.get("gtk-dialog-info"), 30);
+            }
+        }
     }
 
     void disconnect() {
         try {
             protocol.endSession();
+            pushReceiver.stop();
             logger.info("disconnect session_id:" + protocol.getSessionId());
         } catch (IOException | JSONException e) {
             logger.warn(e, e);

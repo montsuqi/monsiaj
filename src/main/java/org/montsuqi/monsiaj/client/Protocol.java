@@ -58,10 +58,13 @@ public class Protocol {
     private String serverType;
     private int rpcId;
     private String sessionId;
+    private String tenantId;
+    private String groupId;
     private String rpcURI;
     private String restURIRoot;
     private String pusherURI;
     private final String authURI;
+    private String startupMessage;
     private final String user;
     private final String password;
     private boolean usePushClient;
@@ -98,10 +101,25 @@ public class Protocol {
         this.sslType = TYPE_NO_SSL;
         this.totalExecTime = 0;
         this.appExecTime = 0;
+        this.tenantId = null;
+        this.groupId = null;
+        this.startupMessage = null;
     }
 
     public boolean isUsePushClient() {
         return usePushClient;
+    }
+
+    public String getStartupMessage() {
+        return startupMessage;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 
     public String getPusherURI() {
@@ -360,6 +378,12 @@ public class Protocol {
         meta = result.getJSONObject("meta");
 
         this.sessionId = meta.getString("session_id");
+        if (meta.has("tenant_id")) {
+            this.tenantId = meta.getString("tenant_id");
+        }
+        if (meta.has("group_id")) {
+            this.groupId = meta.getString("group_id");
+        }
 
         this.rpcURI = result.getString("app_rpc_endpoint_uri");
         this.restURIRoot = result.getString("app_rest_api_uri_root");
@@ -375,6 +399,12 @@ public class Protocol {
         if (System.getProperty("monsia.disable_push_client") != null) {
             this.usePushClient = false;
         }
+        if (result.has("startup_message")) {
+            this.startupMessage = result.getString("startup_message");
+        }
+
+        logger.info("tenant_id:" + this.tenantId);
+        logger.info("group_id:" + this.groupId);
         logger.info("session_id:" + this.sessionId);
         logger.info("rpcURI:" + this.rpcURI);
         logger.info("restURIRoot:" + this.restURIRoot);
