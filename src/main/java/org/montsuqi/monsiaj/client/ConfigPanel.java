@@ -34,7 +34,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
@@ -104,6 +103,7 @@ public class ConfigPanel extends JPanel {
     private JButton lafThemeButton;
     private JCheckBox useTimerCheck;
     private JTextField timerPeriodEntry;
+    private JCheckBox showStartupMessageCheck;
     private JTextArea propertiesText;
     private LookAndFeelInfo[] lafs;
     private static final int MAX_PANEL_ROWS = 12;
@@ -113,7 +113,7 @@ public class ConfigPanel extends JPanel {
     private final MetalTheme systemMetalTheme;
     // Info Tab
     protected JPanel infoPanel;
-  
+
     /**
      * <p>
      * An action to pop a fiel selection dialog.</p>
@@ -226,19 +226,15 @@ public class ConfigPanel extends JPanel {
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
                 logger.warn(e);
             }
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    Component root = SwingUtilities.getRoot(basicPanel);
-                    try {
-                        if (root != null) {
-                            SwingUtilities.updateComponentTreeUI(root);
-                        }
-
-                    } catch (Exception e) {
-                        logger.catching(Level.WARN, e);
+            SwingUtilities.invokeLater(() -> {
+                Component root = SwingUtilities.getRoot(basicPanel);
+                try {
+                    if (root != null) {
+                        SwingUtilities.updateComponentTreeUI(root);
                     }
+
+                } catch (Exception e) {
+                    logger.catching(Level.WARN, e);
                 }
             });
         }
@@ -251,7 +247,7 @@ public class ConfigPanel extends JPanel {
         this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
         basicPanel = createBasicPanel();
         sslPanel = createSSLPanel();
-        printerConfigPanel = new PrinterConfigPanel(conf.getPrinterList());        
+        printerConfigPanel = new PrinterConfigPanel(conf.getPrinterList());
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
     }
@@ -288,7 +284,7 @@ public class ConfigPanel extends JPanel {
         usePKCS11Checkbox.setSelected(usePKCS11);
         pkcs11LibEntry.setText(pkcs11Lib);
         pkcs11SlotEntry.setText(slot);
-        
+
         // Printer tab
         printerConfigPanel.setPrinterConfigMap(conf.getPrinterConfig(num));
 
@@ -298,6 +294,7 @@ public class ConfigPanel extends JPanel {
         String lookAndFeelThemeFile = conf.getLookAndFeelThemeFile(num);
         boolean useTimer = conf.getUseTimer(num);
         long timerPeriod = conf.getTimerPeriod(num);
+        boolean showStartupMessage = conf.getShowStartupMessage(num);
         String systemProperties = conf.getSystemProperties(num);
 
         styleEntry.setText(styleFile);
@@ -309,6 +306,7 @@ public class ConfigPanel extends JPanel {
         }
         useTimerCheck.setSelected(useTimer);
         timerPeriodEntry.setText(String.valueOf(timerPeriod));
+        showStartupMessageCheck.setSelected(showStartupMessage);
         propertiesText.setText(systemProperties);
 
         this.updatePKCS11PanelComponentsEnabled();
@@ -337,7 +335,7 @@ public class ConfigPanel extends JPanel {
         conf.setUsePKCS11(num, usePKCS11Checkbox.isSelected());
         conf.setPKCS11Lib(num, pkcs11LibEntry.getText());
         conf.setPKCS11Slot(num, pkcs11SlotEntry.getText());
-        
+
         // Printer Tab
         conf.setPrinterConfig(num, printerConfigPanel.getPrinterConfigMap());
 
@@ -347,6 +345,7 @@ public class ConfigPanel extends JPanel {
         conf.setLookAndFeelThemeFile(num, lafThemeEntry.getText());
         conf.setUseTimer(num, useTimerCheck.isSelected());
         conf.setTimerPeriod(num, Integer.valueOf(timerPeriodEntry.getText()));
+        conf.setShowStartupMessage(num, showStartupMessageCheck.isSelected());
         conf.setSystemProperties(num, propertiesText.getText());
         conf.save();
     }
@@ -470,12 +469,8 @@ public class ConfigPanel extends JPanel {
         saveClientCertificatePasswordCheckbox = new JCheckBox();
 
         usePKCS11Checkbox = new JCheckBox();
-        usePKCS11Checkbox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updatePKCS11PanelComponentsEnabled();
-            }
+        usePKCS11Checkbox.addActionListener((ActionEvent e) -> {
+            updatePKCS11PanelComponentsEnabled();
         });
         pkcs11LibEntry = createTextField();
         pkcs11LibButton = new JButton();
@@ -568,13 +563,14 @@ public class ConfigPanel extends JPanel {
     private JPanel createOthersPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 2, 5, 2));
 
         styleEntry = createTextField();
         JButton styleButton = new JButton();
         styleButton.setAction(
                 new FileSelectionAction(styleEntry, ".properties",
                         Messages.getString("ConfigurationPanel.style_filter_pattern")));
+
         lafs = UIManager.getInstalledLookAndFeels();
         String[] lafNames = new String[lafs.length];
         for (int i = 0; i < lafNames.length; i++) {
@@ -585,13 +581,9 @@ public class ConfigPanel extends JPanel {
         for (String lafName : lafNames) {
             lookAndFeelCombo.addItem(lafName);
         }
-        lookAndFeelCombo.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateLAFThemeEnabled();
-                changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
-            }
+        lookAndFeelCombo.addActionListener((ActionEvent e) -> {
+            updateLAFThemeEnabled();
+            changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
         });
         lafThemeEntry = createTextField();
         lafThemeButton = new JButton();
@@ -601,22 +593,22 @@ public class ConfigPanel extends JPanel {
 
         JPanel timerPanel = new JPanel();
         timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.X_AXIS));
+        timerPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
         useTimerCheck = new JCheckBox();
-        useTimerCheck.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                timerPeriodEntry.setEnabled(useTimerCheck.isSelected());
-            }
+        useTimerCheck.addActionListener((ActionEvent e) -> {
+            timerPeriodEntry.setEnabled(useTimerCheck.isSelected());
         });
         timerPanel.add(useTimerCheck);
         JPanel timerPeriodEntryPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        timerPeriodEntryPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
         timerPeriodEntryPanel.add(new JLabel(Messages.getString("ConfigurationPanel.timer_period")));
         timerPeriodEntry = new JTextField(5);
         timerPeriodEntryPanel.add(timerPeriodEntry);
         timerPanel.add(timerPeriodEntryPanel);
 
-        propertiesText = new JTextArea(10, 30);
+        showStartupMessageCheck = new JCheckBox();
+
+        propertiesText = new JTextArea(10, 50);
         propertiesText.addFocusListener(new TextAreaSelected());
         JScrollPane propertiesScroll = new JScrollPane(propertiesText, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         propertiesScroll.setMinimumSize(new Dimension(0, 100));
@@ -650,6 +642,12 @@ public class ConfigPanel extends JPanel {
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.show_startup_message")),
+                createConstraints(0, y, 1, 1, 0.0, 1.0));
+        panel.add(showStartupMessageCheck,
+                createConstraints(1, y, 3, 1, 1.0, 0.0));
+        y++;
+
         panel.add(createLabel(Messages.getString("ConfigurationPanel.additional_system_properties")),
                 createConstraints(0, y, 1, 6, 0.0, 1.0));
         panel.add(propertiesScroll,
@@ -675,32 +673,24 @@ public class ConfigPanel extends JPanel {
         JLabel copy = new JLabel("Copyright (C) 2017 ORCA Project");
         copy.setHorizontalAlignment(SwingConstants.CENTER);
         JButton orcaButton = new JButton("<html><a href=\"\">ORCA Project Website</a></html>");
-        orcaButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Desktop d = Desktop.getDesktop();
-                if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        d.browse(new URI(Messages.getString("ConfigurationPanel.info_orca_url")));
-                    } catch (URISyntaxException | IOException ex) {
-                        logger.warn(ex);
-                    }
+        orcaButton.addActionListener((ActionEvent e) -> {
+            Desktop d = Desktop.getDesktop();
+            if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    d.browse(new URI(Messages.getString("ConfigurationPanel.info_orca_url")));
+                } catch (URISyntaxException | IOException ex) {
+                    logger.warn(ex);
                 }
             }
         });
         JButton montsuqiButton = new JButton("<html><a href=\"\">montsuqi.org</a></html>");
-        montsuqiButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Desktop d = Desktop.getDesktop();
-                if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        d.browse(new URI(Messages.getString("ConfigurationPanel.info_montsuqi_url")));
-                    } catch (URISyntaxException | IOException ex) {
-                        logger.warn(ex);
-                    }
+        montsuqiButton.addActionListener((ActionEvent e) -> {
+            Desktop d = Desktop.getDesktop();
+            if (Desktop.isDesktopSupported() && d.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    d.browse(new URI(Messages.getString("ConfigurationPanel.info_montsuqi_url")));
+                } catch (URISyntaxException | IOException ex) {
+                    logger.warn(ex);
                 }
             }
         });
@@ -761,7 +751,7 @@ public class ConfigPanel extends JPanel {
     public JPanel getSSLPanel() {
         return sslPanel;
     }
-    
+
     public PrinterConfigPanel getPrinterConfigPanel() {
         return printerConfigPanel;
     }

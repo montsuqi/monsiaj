@@ -145,11 +145,13 @@ public class Client {
         } else {
             startPing();
         }
-        String msg = protocol.getStartupMessage();
-        if (msg != null && !msg.isEmpty()) {
-            PopupNotify.popup(Messages.getString("PushHandler.announcement"),
-                    msg,
-                    GtkStockIcon.get("gtk-dialog-info"), 30);
+        if (conf.getShowStartupMessage(num)) {
+            String msg = protocol.getStartupMessage();
+            if (msg != null && !msg.isEmpty()) {
+                PopupNotify.popup(Messages.getString("PushHandler.announcement"),
+                        msg,
+                        GtkStockIcon.get("gtk-dialog-info"), 30);
+            }
         }
     }
 
