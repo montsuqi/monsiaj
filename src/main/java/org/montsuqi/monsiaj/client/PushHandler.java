@@ -9,6 +9,9 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.montsuqi.monsiaj.util.GtkStockIcon;
+import org.montsuqi.monsiaj.util.Messages;
+import org.montsuqi.monsiaj.util.PopupNotify;
 
 /**
  *
@@ -22,7 +25,7 @@ public class PushHandler implements Runnable {
     private final Protocol protocol;
     private final BlockingQueue queue;
 
-    public PushHandler(Config conf, Protocol protocol,BlockingQueue queue) {
+    public PushHandler(Config conf, Protocol protocol, BlockingQueue queue) {
         this.conf = conf;
         this.protocol = protocol;
         this.queue = queue;
@@ -44,9 +47,12 @@ public class PushHandler implements Runnable {
             case "client_data_ready":
                 clientDataReadyHandler(obj.getJSONObject("body"));
                 break;
+            case "announcement":
+                announcementHandler(obj.getJSONObject("body"));
+                break;
         }
     }
-    
+
     public void clientDataReadyHandler(JSONObject obj) {
         switch (obj.getString("type")) {
             case "report":
@@ -56,6 +62,12 @@ public class PushHandler implements Runnable {
                 Download.downloadFile(conf, protocol, obj);
                 break;
         }
+    }
+
+    public void announcementHandler(JSONObject obj) {
+        PopupNotify.popup(Messages.getString("PushHandler.announcement"),
+                obj.getString("message"),
+                GtkStockIcon.get("gtk-dialog-info"), 30);
     }
 
 }
