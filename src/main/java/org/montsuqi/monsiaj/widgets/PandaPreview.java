@@ -72,14 +72,14 @@ public class PandaPreview extends JPanel {
     private static final float[] SCALE_VALUE = {
         SCALE_FIT_PAGE,
         SCALE_FIT_PAGE_WIDTH,
-        0.7071067811f,
-        0.8408964152f,
+        0.5f,
+        0.75f,
         1.0f,
-        1.1892071149f,
-        1.4142135623f,
-        1.6817928304f,
+        1.125f,
+        1.5f,
+        1.74f,
         2.0f,
-        2.8284271247f
+        3.0f
     };
     private final JToolBar toolbar;
     private NumberEntry pageEntry;
@@ -592,7 +592,7 @@ public class PandaPreview extends JPanel {
         PandaPreview preview = new PandaPreview();
         f.add(preview);
         f.pack();
-        f.setSize(400, 500);
+        f.setSize(1024, 800);
         f.validate();
         f.setVisible(true);
         preview.load(args[0]);
