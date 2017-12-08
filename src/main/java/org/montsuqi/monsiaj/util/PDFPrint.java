@@ -2,29 +2,21 @@ package org.montsuqi.monsiaj.util;
 
 import java.awt.*;
 import java.awt.print.*;
+import java.awt.geom.*;
 import java.nio.channels.FileChannel;
-import java.io.FileInputStream;
 import java.nio.ByteBuffer;
-import java.io.File;
-
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
-import com.sun.pdfview.PDFRenderer;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import javax.print.DocFlavor;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
-import javax.print.attribute.standard.MediaSizeName;
+import java.io.*;
+import java.util.*;
+import java.util.prefs.Preferences;
+import javax.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+import com.sun.pdfview.*;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsiaj.util.PDFPrint.PDFPrintPage;
+import org.montsuqi.monsiaj.client.PrinterConfig;
 
 public class PDFPrint extends Thread {
 
@@ -33,6 +25,7 @@ public class PDFPrint extends Thread {
     private final int copies;
 
     private static final Logger logger = LogManager.getLogger(PDFPrint.class);
+    private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
 
     public PDFPrint(File file) {
         this.file = file;
@@ -40,13 +33,13 @@ public class PDFPrint extends Thread {
         this.copies = 1;
     }
 
-    public PDFPrint(File file,int copies,PrintService printService) {
+    public PDFPrint(File file, int copies, PrintService printService) {
         this.file = file;
         this.printService = printService;
         this.copies = copies;
     }
 
-    private void print(PDFFile pdfFile,int copies,PrintService printService) {
+    private void print(PDFFile pdfFile, int copies, PrintService printService) {
         HashMap<MediaSizeName, ArrayList<PDFPage>> map = new HashMap<>();
         for (int i = 0; i < pdfFile.getNumPages(); i++) {
             PDFPage page = pdfFile.getPage(i + 1);
@@ -94,32 +87,78 @@ public class PDFPrint extends Thread {
         });
     }
 
-    private void print(PDFFile pdfFile) {
-        PDFPage[] pages = new PDFPage[pdfFile.getNumPages() + 1];
-        for (int i = 0; i < pdfFile.getNumPages(); i++) {
-            pages[i] = pdfFile.getPage(i + 1);
-        }
-        PDFPrintPage printPage = new PDFPrintPage(pages);
+    public static PrintService loadPrintService() {
+        return PrinterConfig.getPrintService(prefs.get("printService", ""));
+    }
 
-        PrinterJob pjob = PrinterJob.getPrinterJob();
-        pjob.setJobName(file.getName());
-        PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
+    public static void savePrintService(PrintService ps) {
+        prefs.put("printService", ps.getName());
+    }
 
-        if (!pjob.printDialog(reqset)) {
-            return;
-        }
-        PageFormat pf = pjob.getPageFormat(reqset);
-        Paper paper = pf.getPaper();
-
-        paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-        pf.setPaper(paper);
-        Book book = new Book();
-
-        book.append(printPage, pf, pdfFile.getNumPages());
-        pjob.setPageable(book);
-
+    public static PrintRequestAttributeSet loadPrintRequestAttributeSet() {
         try {
+            byte[] array = prefs.getByteArray("printRequestAttributeSet", new byte[0]);
+            ByteArrayInputStream bais = new ByteArrayInputStream(array);
+            PrintRequestAttributeSet attr;
+            try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+                attr = (PrintRequestAttributeSet) ois.readObject();
+            }
+            return attr;
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.warn("can not load printRequestAttributeSet");
+            logger.debug(ex, ex);
+        }
+        return null;
+    }
+
+    public static void savePrintRequestAttributeSet(PrintRequestAttributeSet attr) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(attr);
+                oos.flush();
+            }
+            prefs.putByteArray("printRequestAttributeSet", baos.toByteArray());
+        } catch (IOException ex) {
+            logger.warn(ex, ex);
+        }
+    }
+
+    private void print(PDFFile pdfFile) {
+        try {
+            PDFPage[] pages = new PDFPage[pdfFile.getNumPages() + 1];
+            for (int i = 0; i < pdfFile.getNumPages(); i++) {
+                pages[i] = pdfFile.getPage(i + 1);
+            }
+            PDFPrintPage printPage = new PDFPrintPage(pages);
+
+            PrinterJob pjob = PrinterJob.getPrinterJob();
+            pjob.setJobName(file.getName());
+            PrintService ps = loadPrintService();
+            if (ps != null) {
+                pjob.setPrintService(ps);
+            }
+            PrintRequestAttributeSet reqset = loadPrintRequestAttributeSet();
+            if (reqset == null) {
+                reqset = new HashPrintRequestAttributeSet();
+            }
+
+            if (!pjob.printDialog(reqset)) {
+                return;
+            }
+            PageFormat pf = pjob.getPageFormat(reqset);
+            Paper paper = pf.getPaper();
+
+            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+            pf.setPaper(paper);
+            Book book = new Book();
+
+            book.append(printPage, pf, pdfFile.getNumPages());
+            pjob.setPageable(book);
+
             pjob.print(reqset);
+            savePrintService(pjob.getPrintService());
+            savePrintRequestAttributeSet(reqset);
         } catch (PrinterException ex) {
             logger.catching(Level.WARN, ex);
         }
@@ -160,7 +199,7 @@ public class PDFPrint extends Thread {
                 PDFPrint printer = new PDFPrint(new File(args[1]));
                 printer.start();
             } else {
-                PDFPrint printer = new PDFPrint(new File(args[1]),1,ps);
+                PDFPrint printer = new PDFPrint(new File(args[1]), 1, ps);
                 printer.start();
             }
             System.out.println(i);
@@ -194,8 +233,8 @@ public class PDFPrint extends Thread {
             double vmargin = GetPrintOption("monsia.util.PDFPrint.vmargin");
             double hoffset = GetPrintOption("monsia.util.PDFPrint.hoffset");
             double voffset = GetPrintOption("monsia.util.PDFPrint.voffset");
-            double hratio  = 1.0;
-            double vratio  = 1.0;
+            double hratio = 1.0;
+            double vratio = 1.0;
             double scale;
 
             if (hmargin != 0.0) {
@@ -211,7 +250,7 @@ public class PDFPrint extends Thread {
                     hmargin = vratio * format.getImageableWidth();
                 }
             }
-            scale =  (format.getImageableWidth() - hmargin * 2) / format.getImageableWidth() * 1.0;
+            scale = (format.getImageableWidth() - hmargin * 2) / format.getImageableWidth() * 1.0;
             hoffset += hmargin;
             voffset += vmargin;
             pageable = new Rectangle2D.Double(hoffset, voffset,

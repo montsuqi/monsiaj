@@ -42,9 +42,7 @@ import org.montsuqi.monsiaj.util.ExtensionFileFilter;
 import org.montsuqi.monsiaj.util.PDFPrint;
 
 /**
- * <
- * p>
- * Preview pane with control buttons and display of current scale.</p>
+ * <p>Preview pane with control buttons and display of current scale.</p>
  */
 public class PandaPreview extends JPanel {
 
@@ -98,14 +96,14 @@ public class PandaPreview extends JPanel {
     private static final double[] SCALE_VALUE = {
         SCALE_FIT_PAGE,
         SCALE_FIT_PAGE_WIDTH,
-        0.7071067811,
-        0.8408964152,
-        1.0,
-        1.1892071149,
-        1.4142135623,
-        1.6817928304,
-        2.0,
-        2.8284271247
+        0.5f,
+        0.75f,
+        1.0f,
+        1.125f,
+        1.5f,
+        1.74f,
+        2.0f,
+        3.0f
     };
     private final JToolBar toolbar;
     private NumberEntry pageEntry;
@@ -286,21 +284,17 @@ public class PandaPreview extends JPanel {
         pageEntry.setFormat("------");
         pageEntry.setMinimumSize(new Dimension(55, 1));
         pageEntry.setMaximumSize(new Dimension(55, 40));
-        pageEntry.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int pagenum;
-                try {
-                    pagenum = Integer.parseInt(pageEntry.getText());
-                } catch (NumberFormatException ex) {
-                    pagenum = panel.getPageNum();
-                }
-                if (1 <= pagenum && pagenum <= panel.getNumPages()) {
-                    panel.setPage(pagenum);
-                } else {
-                    pageEntry.setValue(panel.getPageNum());
-                }
+        pageEntry.addActionListener((ActionEvent e) -> {
+            int pagenum;
+            try {
+                pagenum = Integer.parseInt(pageEntry.getText());
+            } catch (NumberFormatException ex) {
+                pagenum = panel.getPageNum();
+            }
+            if (1 <= pagenum && pagenum <= panel.getNumPages()) {
+                panel.setPage(pagenum);
+            } else {
+                pageEntry.setValue(panel.getPageNum());
             }
         });
         pageLabel = new JLabel("/");
@@ -314,13 +308,9 @@ public class PandaPreview extends JPanel {
         fitPageWidthAction = new FitPageWidthAction();
 
         combo = new JComboBox<>(SCALE_STRING);
-        combo.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent anEvent) {
-                zoom = SCALE_VALUE[combo.getSelectedIndex()];
-                setScale();
-            }
+        combo.addActionListener((ActionEvent anEvent) -> {
+            zoom = SCALE_VALUE[combo.getSelectedIndex()];
+            setScale();
         });
         final Dimension preferredSize = combo.getPreferredSize();
         combo.setMaximumSize(preferredSize);
@@ -479,6 +469,7 @@ public class PandaPreview extends JPanel {
         preview.revalidate();
         preview.repaint();
         f.pack();
+        f.setSize(1024, 800);
         f.validate();
     }
 }
