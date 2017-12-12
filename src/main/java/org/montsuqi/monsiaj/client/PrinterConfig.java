@@ -53,6 +53,11 @@ public class PrinterConfig {
         }
     }
 
+    public static PrintService getPrintService_(String name)
+    {
+      return PRINT_SERVICE_MAP.get(name);
+    }
+
     public PrinterConfig() {
         PRINTER_CONFIG_MAP = new HashMap<>();
     }
