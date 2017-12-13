@@ -502,11 +502,11 @@ public class Config {
     }
 
     public PrintService getPrintService(String printer) {
-        return printerConfig.getPrintService(printer);
+        return printerConfig.getPrintServiceByConfName(printer);
     }
 
     public int getCopies(String printer) {
-        return printerConfig.getCopies(printer);
+        return printerConfig.getCopiesByConfName(printer);
     }
             
     

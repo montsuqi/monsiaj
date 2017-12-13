@@ -2,9 +2,10 @@ package org.montsuqi.monsiaj.util;
 
 import java.awt.print.*;
 import java.io.File;
+import java.io.*;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.util.prefs.Preferences;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -20,9 +21,11 @@ import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.montsuqi.monsiaj.client.PrinterConfig;
 
 public class PDFPrint {
     private static final Logger logger = LogManager.getLogger(PDFPrint.class);
+    private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
 
     public static void print(String file, int copies, PrintService ps) {
         try {
@@ -56,8 +59,15 @@ public class PDFPrint {
                 
                 PrinterJob job = PrinterJob.getPrinterJob();
                 job.setPageable(new PDFPageable(document));
-                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-                attr.add(size);
+                PrintService ps = loadPrintService();
+                if (ps != null) {
+                  job.setPrintService(ps);
+                }
+                PrintRequestAttributeSet attr = loadPrintRequestAttributeSet();
+                if (attr == null) {
+                  attr = new HashPrintRequestAttributeSet();
+                  attr.add(size);
+                }
                 attr.add(new JobName(file, null));
                 
                 if (!job.printDialog(attr)) {
@@ -69,10 +79,49 @@ public class PDFPrint {
                 pf.setPaper(paper);
                 
                 job.print(attr);
+                savePrintService(job.getPrintService());
+                savePrintRequestAttributeSet(attr);
             }
         } catch (IOException | PrinterException ex) {
             logger.warn(ex, ex);
         }
+    }
+
+    public static PrintService loadPrintService() {
+      return PrinterConfig.getPrintService(prefs.get("printService",""));
+    }
+
+    public static void savePrintService(PrintService ps) {
+      prefs.put("printService",ps.getName());
+    }
+
+    public static PrintRequestAttributeSet loadPrintRequestAttributeSet() {
+      try {
+        byte[] array = prefs.getByteArray("printRequestAttributeSet",new byte[0]);
+        ByteArrayInputStream bais = new ByteArrayInputStream(array);
+        PrintRequestAttributeSet attr;
+          try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+              attr = (PrintRequestAttributeSet)ois.readObject();
+          }
+        return attr;
+      } catch (IOException |ClassNotFoundException ex) {
+        logger.warn("can not load printRequestAttributeSet");
+        logger.debug(ex, ex);
+      }
+      return null;
+    }
+
+    public static void savePrintRequestAttributeSet(PrintRequestAttributeSet attr) {
+      try {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+              oos.writeObject(attr);
+              oos.flush();
+          }
+        prefs.putByteArray("printRequestAttributeSet",baos.toByteArray());
+      } catch (IOException ex) {
+        logger.warn(ex, ex);
+      }
     }
 
     public static MediaSizeName getMediaSizeName(PDDocument document) throws IOException {
@@ -108,5 +157,4 @@ public class PDFPrint {
             }
         }
     }
-
 }
