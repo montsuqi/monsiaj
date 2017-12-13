@@ -53,7 +53,7 @@ public class PrinterConfig {
         }
     }
 
-    public static PrintService getPrintService_(String name)
+    public static PrintService getPrintService(String name)
     {
       return PRINT_SERVICE_MAP.get(name);
     }
@@ -150,7 +150,7 @@ public class PrinterConfig {
         return PRINTER_LIST;
     }
 
-    public PrintService getPrintService(String name) {
+    public PrintService getPrintServiceByConfName(String name) {
         PrinterConfigEntry entry = PRINTER_CONFIG_MAP.get(name);
         if (entry == null) {
             entry = PRINTER_CONFIG_MAP.get("default");
@@ -161,7 +161,7 @@ public class PrinterConfig {
         return entry.getPrintService();
     }
 
-    public int getCopies(String name) {
+    public int getCopiesByConfName(String name) {
         PrinterConfigEntry entry = PRINTER_CONFIG_MAP.get(name);
         if (entry == null) {
             return 1;

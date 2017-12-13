@@ -4,7 +4,6 @@ import java.awt.print.*;
 import java.io.File;
 import java.io.*;
 
-//import java.lang.ClassNotFoundException;
 import java.awt.image.BufferedImage;
 import java.util.prefs.Preferences;
 import javax.print.DocFlavor;
@@ -89,7 +88,7 @@ public class PDFPrint {
     }
 
     public static PrintService loadPrintService() {
-      return PrinterConfig.getPrintService_(prefs.get("printService",""));
+      return PrinterConfig.getPrintService(prefs.get("printService",""));
     }
 
     public static void savePrintService(PrintService ps) {
@@ -100,12 +99,14 @@ public class PDFPrint {
       try {
         byte[] array = prefs.getByteArray("printRequestAttributeSet",new byte[0]);
         ByteArrayInputStream bais = new ByteArrayInputStream(array);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        PrintRequestAttributeSet attr = (PrintRequestAttributeSet)ois.readObject();
-        ois.close();
+        PrintRequestAttributeSet attr;
+          try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+              attr = (PrintRequestAttributeSet)ois.readObject();
+          }
         return attr;
       } catch (IOException |ClassNotFoundException ex) {
-        logger.warn(ex, ex);
+        logger.warn("can not load printRequestAttributeSet");
+        logger.debug(ex, ex);
       }
       return null;
     }
@@ -113,10 +114,10 @@ public class PDFPrint {
     public static void savePrintRequestAttributeSet(PrintRequestAttributeSet attr) {
       try {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(attr);
-        oos.flush();
-        oos.close();
+          try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+              oos.writeObject(attr);
+              oos.flush();
+          }
         prefs.putByteArray("printRequestAttributeSet",baos.toByteArray());
       } catch (IOException ex) {
         logger.warn(ex, ex);
@@ -156,5 +157,4 @@ public class PDFPrint {
             }
         }
     }
-
 }
