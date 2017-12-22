@@ -22,7 +22,9 @@ public class PDFPrint {
     private static final Logger logger = LogManager.getLogger(PDFPrint.class);
     private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
 
+    /* 指定printServiceへ印刷 */
     public static void print(File file, int copies, PrintService printService) {
+        logger.debug("print start - " + file);
         try {
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
@@ -33,7 +35,7 @@ public class PDFPrint {
             PDFPage[] pages = new PDFPage[pdfFile.getNumPages() + 1];
             for (int i = 0; i < pdfFile.getNumPages(); i++) {
                 pages[i] = pdfFile.getPage(i + 1);
-                if (i==0) {
+                if (i == 0) {
                     mediaSizeName = PDFPaperSize.getPDFPaperSize(pages[i]);
                 }
             }
@@ -63,6 +65,7 @@ public class PDFPrint {
         } catch (PrinterException | IOException ex) {
             logger.catching(Level.WARN, ex);
         }
+        logger.debug("print end - " + file);
     }
 
     public static PrintService loadPrintService() {
@@ -102,7 +105,9 @@ public class PDFPrint {
         }
     }
 
+    /* 印刷ダイアログ表示 */
     public static void print(File file) {
+        logger.debug("print start - " + file);
         try {
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
@@ -145,6 +150,7 @@ public class PDFPrint {
         } catch (PrinterException | IOException ex) {
             logger.catching(Level.WARN, ex);
         }
+        logger.debug("print end - " + file);
     }
 
     public static void main(String args[]) throws Exception {
