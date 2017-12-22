@@ -21,6 +21,7 @@
  copies.
  */
 package org.montsuqi.monsiaj.widgets;
+
 import org.montsuqi.monsiaj.util.Messages;
 
 import java.awt.*;
@@ -42,7 +43,8 @@ import org.montsuqi.monsiaj.util.ExtensionFileFilter;
 import org.montsuqi.monsiaj.util.PDFPrint;
 
 /**
- * <p>Preview pane with control buttons and display of current scale.</p>
+ * <p>
+ * Preview pane with control buttons and display of current scale.</p>
  */
 public class PandaPreview extends JPanel {
 
@@ -222,8 +224,7 @@ public class PandaPreview extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            PDFPrint printer = new PDFPrint(new File(fileName));
-            printer.start();
+            PDFPrint.print(new File(fileName));
         }
     }
 
