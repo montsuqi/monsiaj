@@ -27,9 +27,9 @@ public class PDFPrint {
     private static final Logger logger = LogManager.getLogger(PDFPrint.class);
     private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
 
-    public static void print(String file, int copies, PrintService ps) {
+    public static void print(File file, int copies, PrintService ps) {
         try {
-            try (PDDocument document = PDDocument.load(new File(file))) {
+            try (PDDocument document = PDDocument.load(file)) {
                 MediaSizeName size = getMediaSizeName(document);
                 
                 PrinterJob job = PrinterJob.getPrinterJob();
@@ -38,7 +38,7 @@ public class PDFPrint {
                 PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
                 attr.add(size);
                 attr.add(new Copies(copies));
-                attr.add(new JobName(file, null));
+                attr.add(new JobName(file.getName(), null));
                 
                 PageFormat pf = job.getPageFormat(attr);
                 Paper paper = pf.getPaper();
@@ -52,9 +52,9 @@ public class PDFPrint {
         }
     }
 
-    public static void print(String file) {
+    public static void print(File file) {
         try {
-            try (PDDocument document = PDDocument.load(new File(file))) {
+            try (PDDocument document = PDDocument.load(file)) {
                 MediaSizeName size = getMediaSizeName(document);
                 
                 PrinterJob job = PrinterJob.getPrinterJob();
@@ -68,7 +68,7 @@ public class PDFPrint {
                   attr = new HashPrintRequestAttributeSet();
                   attr.add(size);
                 }
-                attr.add(new JobName(file, null));
+                attr.add(new JobName(file.getName(), null));
                 
                 if (!job.printDialog(attr)) {
                     return;
@@ -151,9 +151,9 @@ public class PDFPrint {
         }
         for (int i = 0; i < 1; i++) {
             if (ps == null) {
-                PDFPrint.print(args[1]);
+                PDFPrint.print(new File(args[1]));
             } else {
-                PDFPrint.print(args[1],1,ps);
+                PDFPrint.print(new File(args[1]),1,ps);
             }
         }
     }

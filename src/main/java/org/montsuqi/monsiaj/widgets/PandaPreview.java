@@ -537,7 +537,7 @@ public class PandaPreview extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (fileName != null) {
-                PDFPrint.print(fileName);
+                PDFPrint.print(new File(fileName));
             }
         }
     }
