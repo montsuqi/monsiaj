@@ -6,7 +6,6 @@ import java.awt.geom.*;
 import java.nio.channels.FileChannel;
 import java.nio.ByteBuffer;
 import java.io.*;
-import java.util.*;
 import java.util.prefs.Preferences;
 import javax.print.*;
 import javax.print.attribute.*;
@@ -18,73 +17,55 @@ import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsiaj.util.PDFPrint.PDFPrintPage;
 import org.montsuqi.monsiaj.client.PrinterConfig;
 
-public class PDFPrint extends Thread {
-
-    private final File file;
-    private final PrintService printService;
-    private final int copies;
+public class PDFPrint {
 
     private static final Logger logger = LogManager.getLogger(PDFPrint.class);
     private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
 
-    public PDFPrint(File file) {
-        this.file = file;
-        this.printService = null;
-        this.copies = 1;
-    }
+    /* 指定printServiceへ印刷 */
+    public static void print(File file, int copies, PrintService printService) {
+        logger.debug("print start - " + file);
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            FileChannel fc = fis.getChannel();
+            ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            PDFFile pdfFile = new PDFFile(bb);
+            MediaSizeName mediaSizeName = MediaSizeName.A;
 
-    public PDFPrint(File file, int copies, PrintService printService) {
-        this.file = file;
-        this.printService = printService;
-        this.copies = copies;
-    }
-
-    private void print(PDFFile pdfFile, int copies, PrintService printService) {
-        HashMap<MediaSizeName, ArrayList<PDFPage>> map = new HashMap<>();
-        for (int i = 0; i < pdfFile.getNumPages(); i++) {
-            PDFPage page = pdfFile.getPage(i + 1);
-            MediaSizeName mediaSizeName = PDFPaperSize.getPDFPaperSize(page);
-            ArrayList<PDFPage> list = map.get(mediaSizeName);
-            if (list != null) {
-                list.add(page);
-            } else {
-                ArrayList<PDFPage> newList = new ArrayList<>();
-                newList.add(page);
-                map.put(mediaSizeName, newList);
+            PDFPage[] pages = new PDFPage[pdfFile.getNumPages() + 1];
+            for (int i = 0; i < pdfFile.getNumPages(); i++) {
+                pages[i] = pdfFile.getPage(i + 1);
+                if (i == 0) {
+                    mediaSizeName = PDFPaperSize.getPDFPaperSize(pages[i]);
+                }
             }
+            PDFPrintPage printPage = new PDFPrintPage(pages);
+
+            PrinterJob pjob = PrinterJob.getPrinterJob();
+            pjob.setJobName(file.getName());
+            pjob.setPrintService(printService);
+
+            PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
+            if (mediaSizeName != MediaSizeName.A) {
+                reqset.add(mediaSizeName);
+            }
+            reqset.add(new Copies(copies));
+
+            PageFormat pf = pjob.getPageFormat(reqset);
+            Paper paper = pf.getPaper();
+
+            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+            pf.setPaper(paper);
+            Book book = new Book();
+
+            book.append(printPage, pf, pdfFile.getNumPages());
+            pjob.setPageable(book);
+
+            pjob.print(reqset);
+        } catch (PrinterException | IOException ex) {
+            logger.catching(Level.WARN, ex);
         }
-        map.entrySet().forEach((e) -> {
-            try {
-                ArrayList<PDFPage> list = e.getValue();
-                PDFPage[] pages = new PDFPage[list.size()];
-                for (int i = 0; i < list.size(); i++) {
-                    pages[i] = list.get(i);
-                }
-                PDFPrintPage printPage = new PDFPrintPage(pages);
-                MediaSizeName mediaSizeName = e.getKey();
-                PrintRequestAttributeSet reqset = new HashPrintRequestAttributeSet();
-                PrinterJob pjob = PrinterJob.getPrinterJob();
-                pjob.setJobName(file.getName());
-                pjob.setPrintService(printService);
-
-                if (mediaSizeName != MediaSizeName.A) {
-                    reqset.add(mediaSizeName);
-                }
-                reqset.add(new Copies(copies));
-                PageFormat pf = pjob.getPageFormat(reqset);
-                Paper paper = pf.getPaper();
-
-                paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-                pf.setPaper(paper);
-
-                Book book = new Book();
-                book.append(printPage, pf, pages.length);
-                pjob.setPageable(book);
-                pjob.print(reqset);
-            } catch (PrinterException ex) {
-                logger.catching(Level.WARN, ex);
-            }
-        });
+        logger.debug("print end - " + file);
     }
 
     public static PrintService loadPrintService() {
@@ -124,8 +105,15 @@ public class PDFPrint extends Thread {
         }
     }
 
-    private void print(PDFFile pdfFile) {
+    /* 印刷ダイアログ表示 */
+    public static void print(File file) {
+        logger.debug("print start - " + file);
         try {
+            FileInputStream fis = new FileInputStream(file);
+            FileChannel fc = fis.getChannel();
+            ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            PDFFile pdfFile = new PDFFile(bb);
+
             PDFPage[] pages = new PDFPage[pdfFile.getNumPages() + 1];
             for (int i = 0; i < pdfFile.getNumPages(); i++) {
                 pages[i] = pdfFile.getPage(i + 1);
@@ -159,28 +147,10 @@ public class PDFPrint extends Thread {
             pjob.print(reqset);
             savePrintService(pjob.getPrintService());
             savePrintRequestAttributeSet(reqset);
-        } catch (PrinterException ex) {
+        } catch (PrinterException | IOException ex) {
             logger.catching(Level.WARN, ex);
         }
-    }
-
-    @Override
-    public void run() {
-        logger.info("print start - " + file);
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            FileChannel fc = fis.getChannel();
-            ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
-            if (printService != null) {
-                print(pdfFile, copies, printService);
-            } else {
-                print(pdfFile);
-            }
-        } catch (java.io.IOException ex) {
-            logger.catching(Level.WARN, ex);
-        }
-        logger.info("print end   - " + file);
+        logger.debug("print end - " + file);
     }
 
     public static void main(String args[]) throws Exception {
@@ -196,11 +166,9 @@ public class PDFPrint extends Thread {
         }
         for (int i = 0; i < 1; i++) {
             if (ps == null) {
-                PDFPrint printer = new PDFPrint(new File(args[1]));
-                printer.start();
+                PDFPrint.print(new File(args[1]));
             } else {
-                PDFPrint printer = new PDFPrint(new File(args[1]), 1, ps);
-                printer.start();
+                PDFPrint.print(new File(args[1]), 1, ps);
             }
             System.out.println(i);
             Thread.sleep(2000);
