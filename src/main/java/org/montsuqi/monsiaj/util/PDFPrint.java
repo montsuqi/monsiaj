@@ -28,6 +28,7 @@ public class PDFPrint {
     private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
 
     public static void print(File file, int copies, PrintService ps) {
+        logger.debug("print start - " + file);
         try {
             try (PDDocument document = PDDocument.load(file)) {
                 MediaSizeName size = getMediaSizeName(document);
@@ -50,6 +51,7 @@ public class PDFPrint {
         } catch (IOException | PrinterException ex) {
             logger.warn(ex, ex);
         }
+        logger.debug("print end - " + file);
     }
 
     public static void print(File file) {
