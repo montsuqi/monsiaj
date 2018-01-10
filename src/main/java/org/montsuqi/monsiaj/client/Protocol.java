@@ -106,7 +106,7 @@ public class Protocol {
         this.startupMessage = null;
     }
 
-    public boolean isUsePushClient() {
+    public boolean enablePushClient() {
         return usePushClient;
     }
 
