@@ -59,7 +59,7 @@ public class Client {
     private Protocol protocol;
     private final UIControl uiControl;
     private static final int DEFAULT_PING_TIMER_PERIOD = 7 * 1000;
-    private static final int PUSH_CLIENT_PING_TIMER_PERIOD = 600 * 1000;
+    private static final int PUSH_CLIENT_PING_TIMER_PERIOD = 180 * 1000;
     private javax.swing.Timer pingTimer;
     private JSONObject windowStack;
     private String focusedWindow;
@@ -156,11 +156,11 @@ public class Client {
     
     public void startPing() {
         int period = DEFAULT_PING_TIMER_PERIOD;
-        if (System.getProperty("monsia.ping_timer_period") != null) {
-            period = Integer.parseInt(System.getProperty("monsia.ping_timer_period")) * 1000;
-        }
         if (protocol.enablePushClient()) {
             period = PUSH_CLIENT_PING_TIMER_PERIOD;
+        }
+        if (System.getProperty("monsia.ping_timer_period") != null) {
+            period = Integer.parseInt(System.getProperty("monsia.ping_timer_period")) * 1000;
         }
         pingTimer = new javax.swing.Timer(period, (ActionEvent e) -> {
             sendPing();
