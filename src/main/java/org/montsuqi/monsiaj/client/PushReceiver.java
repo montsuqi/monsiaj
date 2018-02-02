@@ -55,6 +55,7 @@ public class PushReceiver implements Runnable {
     static final long WAIT_MAX = 600 * 1000;
     static final long WAIT_CONN = 10 * 1000;
     static final long IDLE_TIMEOUT = 30 * 1000;
+    static final long PING_TIMEOUT = 30 * 1000;
 
     static final Logger logger = LogManager.getLogger(PushReceiver.class);
     private final URI uri;
@@ -125,7 +126,7 @@ public class PushReceiver implements Runnable {
                     ClientUpgradeRequest request = new ClientUpgradeRequest();
                     request.setHeader("Authorization", "Basic " + this.auth);
                     request.setHeader("X-GINBEE-TENANT-ID", "1");
-                    request.setHeader("Sec-WebSocket-Version", "13");                    
+                    request.setHeader("Sec-WebSocket-Version", "13");
                     logger.info("Connecting to : " + this.uri);
                     client.connect(socket, this.uri, request);
                     wait(5 * 1000);
@@ -142,11 +143,16 @@ public class PushReceiver implements Runnable {
                         }
                         logger.info("wait for reconnect: " + waitMs);
                     }
+                } catch (PusherPingTimeout ex) {
+                    logger.info("websocket ping timeout");
                 } catch (Exception ex) {
                     logger.info(ex, ex);
                 }
             }
         }
+    }
+
+    private class PusherPingTimeout extends Exception {
     }
 
     @WebSocket
@@ -155,6 +161,11 @@ public class PushReceiver implements Runnable {
         private boolean connected = false;
         private boolean closed = false;
         private Session session = null;
+        private long lastPongTime;
+
+        public PusherWebSocket() {
+            lastPongTime = System.currentTimeMillis();
+        }
 
         @OnWebSocketConnect
         public void onConnect(Session session) {
@@ -207,9 +218,12 @@ public class PushReceiver implements Runnable {
         }
 
         @OnWebSocketFrame
-        public void onFrame(Session session,Frame frame) {
-            logger.info("---- onFrame");
-            logger.info(frame);
+        public void onFrame(Session session, Frame frame) {
+            logger.debug("---- onFrame");
+            logger.debug(frame);
+            if (frame.getOpCode() == 0x0A) {
+                lastPongTime = System.currentTimeMillis();
+            }
         }
 
         public boolean getConnected() {
@@ -220,9 +234,11 @@ public class PushReceiver implements Runnable {
             return this.closed;
         }
 
-        public void sendPing() {
+        public void sendPing() throws PusherPingTimeout {
             try {
-                logger.info("websocket ping");
+                if ((System.currentTimeMillis() - lastPongTime) > PING_TIMEOUT) {
+                    throw new PusherPingTimeout();
+                }
                 session.getRemote().sendPing(ByteBuffer.wrap("ping".getBytes()));
             } catch (IOException ex) {
                 logger.info(ex, ex);
