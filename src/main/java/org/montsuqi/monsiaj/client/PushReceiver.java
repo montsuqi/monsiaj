@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,9 +27,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.bind.DatatypeConverter;
@@ -38,8 +36,11 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketFrame;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.api.extensions.Frame;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.json.JSONObject;
@@ -50,13 +51,17 @@ import org.json.JSONObject;
  */
 public class PushReceiver implements Runnable {
 
+    static final long WAIT_INIT = 2 * 1000;
+    static final long WAIT_MAX = 600 * 1000;
+    static final long WAIT_CONN = 10 * 1000;
+    static final long IDLE_TIMEOUT = 30 * 1000;
+    static final long PING_TIMEOUT = 30 * 1000;
+
     static final Logger logger = LogManager.getLogger(PushReceiver.class);
     private final URI uri;
     private final String auth;
     private final SslContextFactory sslContextFactory;
     private final Protocol protocol;
-    static final long WAIT_INIT = 2 * 1000;
-    static final long WAIT_MAX = 600 * 1000;
     private final BlockingQueue queue;
     private WebSocketClient client;
     private boolean loop;
@@ -116,18 +121,20 @@ public class PushReceiver implements Runnable {
                 PusherWebSocket socket = new PusherWebSocket();
                 try {
                     wait(waitMs);
-                    client.setMaxIdleTimeout(Long.MAX_VALUE);
+                    client.setMaxIdleTimeout(IDLE_TIMEOUT);
                     client.start();
                     ClientUpgradeRequest request = new ClientUpgradeRequest();
                     request.setHeader("Authorization", "Basic " + this.auth);
                     request.setHeader("X-GINBEE-TENANT-ID", "1");
+                    request.setHeader("Sec-WebSocket-Version", "13");
                     logger.info("Connecting to : " + this.uri);
                     client.connect(socket, this.uri, request);
                     wait(5 * 1000);
                     if (socket.getConnected()) {
                         waitMs = WAIT_INIT;
                         while (!socket.getClosed()) {
-                            wait(10 * 1000);
+                            wait(WAIT_CONN);
+                            socket.sendPing();
                         }
                     } else {
                         waitMs *= 2;
@@ -136,6 +143,8 @@ public class PushReceiver implements Runnable {
                         }
                         logger.info("wait for reconnect: " + waitMs);
                     }
+                } catch (PusherPingTimeout ex) {
+                    logger.info("websocket ping timeout");
                 } catch (Exception ex) {
                     logger.info(ex, ex);
                 }
@@ -143,16 +152,28 @@ public class PushReceiver implements Runnable {
         }
     }
 
+    private class PusherPingTimeout extends Exception {
+    }
+    
+    private class PusherErrorCommand extends Exception {
+    }    
+
     @WebSocket
     public class PusherWebSocket {
 
-        private final CountDownLatch closeLatch = new CountDownLatch(1);
         private boolean connected = false;
         private boolean closed = false;
+        private Session session = null;
+        private long lastPongTime;
+
+        public PusherWebSocket() {
+            lastPongTime = System.currentTimeMillis();
+        }
 
         @OnWebSocketConnect
         public void onConnect(Session session) {
             logger.info("---- onConnect");
+            session.setIdleTimeout(IDLE_TIMEOUT);
             try {
                 String subStr = "{"
                         + " \"command\"    : \"subscribe\","
@@ -172,13 +193,14 @@ public class PushReceiver implements Runnable {
                     session.getRemote().sendString(subStr);
                 }
                 connected = true;
+                this.session = session;
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(PushReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                logger.info(ex, ex);
             }
         }
 
         @OnWebSocketMessage
-        public void onMessage(String message) {
+        public void onMessage(String message) throws PusherErrorCommand {
             logger.info("---- onMessage");
             logger.info(message);
             messageHandler(message);
@@ -191,8 +213,20 @@ public class PushReceiver implements Runnable {
             closed = true;
         }
 
-        public boolean awaitClose(int duration, TimeUnit unit) throws InterruptedException {
-            return this.closeLatch.await(duration, unit);
+        @OnWebSocketError
+        public void onError(Session session, Throwable cause) {
+            logger.info("---- onError");
+            logger.info("Error " + session + " " + cause);
+            closed = true;
+        }
+
+        @OnWebSocketFrame
+        public void onFrame(Session session, Frame frame) {
+            logger.debug("---- onFrame");
+            logger.debug(frame);
+            if (frame.getOpCode() == 0x0A) {
+                lastPongTime = System.currentTimeMillis();
+            }
         }
 
         public boolean getConnected() {
@@ -202,9 +236,20 @@ public class PushReceiver implements Runnable {
         public boolean getClosed() {
             return this.closed;
         }
+
+        public void sendPing() throws PusherPingTimeout {
+            try {
+                if ((System.currentTimeMillis() - lastPongTime) > PING_TIMEOUT) {
+                    throw new PusherPingTimeout();
+                }
+                session.getRemote().sendPing(ByteBuffer.wrap("ping".getBytes()));
+            } catch (IOException ex) {
+                logger.info(ex, ex);
+            }
+        }
     }
 
-    private void messageHandler(String message) {
+    private void messageHandler(String message) throws PusherErrorCommand {
         JSONObject obj = new JSONObject(message);
         switch (obj.getString("command")) {
             case "subscribed":
@@ -218,6 +263,8 @@ public class PushReceiver implements Runnable {
                     logger.error(ex, ex);
                 }
                 break;
+            case "error":
+                throw new PusherErrorCommand();
         }
     }
 
