@@ -154,6 +154,9 @@ public class PushReceiver implements Runnable {
 
     private class PusherPingTimeout extends Exception {
     }
+    
+    private class PusherErrorCommand extends Exception {
+    }    
 
     @WebSocket
     public class PusherWebSocket {
@@ -197,7 +200,7 @@ public class PushReceiver implements Runnable {
         }
 
         @OnWebSocketMessage
-        public void onMessage(String message) {
+        public void onMessage(String message) throws PusherErrorCommand {
             logger.info("---- onMessage");
             logger.info(message);
             messageHandler(message);
@@ -246,7 +249,7 @@ public class PushReceiver implements Runnable {
         }
     }
 
-    private void messageHandler(String message) {
+    private void messageHandler(String message) throws PusherErrorCommand {
         JSONObject obj = new JSONObject(message);
         switch (obj.getString("command")) {
             case "subscribed":
@@ -260,6 +263,8 @@ public class PushReceiver implements Runnable {
                     logger.error(ex, ex);
                 }
                 break;
+            case "error":
+                throw new PusherErrorCommand();
         }
     }
 
