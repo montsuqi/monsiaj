@@ -73,6 +73,9 @@ public class AccelHandler {
             if (!(widget instanceof AbstractButton)) {
                 continue;
             }
+            if (!widget.isVisible()) {
+                continue;
+            }
             AbstractButton button = (AbstractButton) widget;
             AccelInfo accel = pair.accel;
             if (accel.getKey() == e.getKeyCode() && accel.getModifiers() == e.getModifiers()) {
