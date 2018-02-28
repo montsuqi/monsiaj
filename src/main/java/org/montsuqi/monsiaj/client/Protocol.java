@@ -323,7 +323,7 @@ public class Protocol {
             case 401:
             case 403:
                 body = getHTTPErrorBody(con).toString("UTF-8");
-                if (body.equalsIgnoreCase("NOT_PERMITTED_CERTIFICATE")) {
+                if (body.equalsIgnoreCase("NOT PERMITTED CERTIFICATE")) {
                     logger.info("403 not permitted certificate");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.certificate_error_message"), Messages.getString("Protocol.certificate_error"), JOptionPane.ERROR_MESSAGE);
                 } else {
