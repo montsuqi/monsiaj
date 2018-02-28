@@ -35,6 +35,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
+import java.util.logging.Level;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -254,7 +255,7 @@ public class Protocol {
         return result;
     }
 
-    private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) throws IOException {
+    private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
                 BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
@@ -264,10 +265,12 @@ public class Protocol {
                 }
             }
             return bytes;
+        } catch (IOException ex) {
+            return new ByteArrayOutputStream();
         }
     }
 
-    private ByteArrayOutputStream getHTTPErrorBody(HttpURLConnection con) throws IOException {
+    private ByteArrayOutputStream getHTTPErrorBody(HttpURLConnection con) {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
                 BufferedInputStream bis = new BufferedInputStream(con.getErrorStream());
@@ -277,14 +280,15 @@ public class Protocol {
                 }
             }
             return bytes;
+        } catch (IOException ex) {
+            return new ByteArrayOutputStream();
         }
     }
 
     private void showHTTPErrorMessage(int code, String message) {
         logger.info("http error: " + code + " " + message);
         JOptionPane.showMessageDialog(null, "http status code: " + code + "\n\n" + message, "http error", JOptionPane.ERROR_MESSAGE);
-        SSLSocketFactoryHelper.setPIN("", false);
-        System.exit(1);
+        System.exit(0);
     }
 
     private synchronized Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
@@ -310,6 +314,7 @@ public class Protocol {
 
         int resCode = con.getResponseCode();
         String resMessage = con.getResponseMessage();
+        String body;
 
         switch (resCode) {
             case 200:
@@ -317,15 +322,20 @@ public class Protocol {
                 break;
             case 401:
             case 403:
-                logger.info("auth error:" + resCode);
-                JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
-                SSLSocketFactoryHelper.setPIN("", false);
-                System.exit(1);
+                body = getHTTPErrorBody(con).toString("UTF-8");
+                if (body.equalsIgnoreCase("NOT PERMITTED CERTIFICATE")) {
+                    logger.info("403 not permitted certificate");
+                    JOptionPane.showMessageDialog(null, Messages.getString("Protocol.certificate_error_message"), Messages.getString("Protocol.certificate_error"), JOptionPane.ERROR_MESSAGE);
+                } else {
+                    logger.info("" + resCode + " auth error ... " + body);
+                    JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
+                }
+                System.exit(0);
                 break;
             case 503:
-                String body = getHTTPErrorBody(con).toString("UTF-8");
+                body = getHTTPErrorBody(con).toString("UTF-8");
                 if (body.equalsIgnoreCase("GINBEE_MAINTENANCE")) {
-                    logger.info("server maintenance ... exit");
+                    logger.info("503 server maintenance ... exit");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.maintenance_error_message"), Messages.getString("Protocol.maintenance_error"), JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 } else {
