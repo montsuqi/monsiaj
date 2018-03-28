@@ -188,7 +188,7 @@ public class PushReceiver implements Runnable {
                             + " \"command\"    : \"subscribe\","
                             + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
                             + " \"event\"      : \"*\","
-                            + " \"group_id\" : \"" + "1" + "\""
+                            + " \"group_id\" : \"" + gid + "\""
                             + "}";
                     session.getRemote().sendString(subStr);
                 }
