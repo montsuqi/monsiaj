@@ -65,6 +65,7 @@ public class PushReceiver implements Runnable {
     private final BlockingQueue queue;
     private WebSocketClient client;
     private boolean loop;
+    private boolean connWarned;
 
     public PushReceiver(Protocol protocol, BlockingQueue queue) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
         this.protocol = protocol;
@@ -95,6 +96,7 @@ public class PushReceiver implements Runnable {
         this.queue = queue;
         client = null;
         loop = true;
+        connWarned = false;
     }
 
     public void stop() {
@@ -154,9 +156,9 @@ public class PushReceiver implements Runnable {
 
     private class PusherPingTimeout extends Exception {
     }
-    
+
     private class PusherErrorCommand extends Exception {
-    }    
+    }
 
     @WebSocket
     public class PusherWebSocket {
@@ -193,6 +195,7 @@ public class PushReceiver implements Runnable {
                     session.getRemote().sendString(subStr);
                 }
                 connected = true;
+                warnReconnect();
                 this.session = session;
             } catch (IOException ex) {
                 logger.info(ex, ex);
@@ -211,6 +214,7 @@ public class PushReceiver implements Runnable {
             logger.info("---- onClose");
             logger.info(statusCode);
             closed = true;
+            warnDisconnect();
         }
 
         @OnWebSocketError
@@ -218,6 +222,7 @@ public class PushReceiver implements Runnable {
             logger.info("---- onError");
             logger.info("Error " + session + " " + cause);
             closed = true;
+            warnDisconnect();
         }
 
         @OnWebSocketFrame
@@ -247,6 +252,34 @@ public class PushReceiver implements Runnable {
                 logger.info(ex, ex);
             }
         }
+    }
+
+    private void warnReconnect() {
+        if (!connWarned) {
+            return;
+        }
+        connWarned = false;
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("event", "websocket_reconnect");
+            queue.put(obj);
+        } catch (InterruptedException ex) {
+            logger.error(ex, ex);
+        }
+    }
+
+    private void warnDisconnect() {
+        if (connWarned) {
+            return;
+        }
+        connWarned = true;
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("event", "websocket_disconnect");
+            queue.put(obj);
+        } catch (InterruptedException ex) {
+            logger.error(ex, ex);
+        }        
     }
 
     private void messageHandler(String message) throws PusherErrorCommand {
