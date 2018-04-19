@@ -50,6 +50,16 @@ public class PushHandler implements Runnable {
             case "announcement":
                 announcementHandler(obj.getJSONObject("body"));
                 break;
+            case "websocket_reconnect":
+                PopupNotify.popup(Messages.getString("PushHandler.websocket_reconnect"),
+                        Messages.getString("PushHandler.websocket_reconnect_message"),
+                        GtkStockIcon.get("gtk-dialog-info"), 30);
+                break;
+            case "websocket_disconnect":
+                PopupNotify.popup(Messages.getString("PushHandler.websocket_disconnect"),
+                        Messages.getString("PushHandler.websocket_disconnect_message"),
+                        GtkStockIcon.get("gtk-dialog-warning"), 30);
+                break;
         }
     }
 
