@@ -74,7 +74,7 @@ public class Protocol {
     private int appExecTime;
 
     private SSLSocketFactory sslSocketFactory;
-    static final String PANDA_CLIENT_VERSION = "2.0.0";
+    static final String PANDA_CLIENT_VERSION = "2.0.1";
 
     private int sslType;
 
