@@ -131,7 +131,7 @@ public class PushReceiver implements Runnable {
                     request.setHeader("Sec-WebSocket-Version", "13");
                     logger.info("Connecting to : " + this.uri);
                     client.connect(socket, this.uri, request);
-                    wait(5 * 1000);
+                    wait(WAIT_CONN);
                     if (socket.getConnected()) {
                         waitMs = WAIT_INIT;
                         while (!socket.getClosed()) {
@@ -139,6 +139,8 @@ public class PushReceiver implements Runnable {
                             socket.sendPing();
                         }
                     } else {
+                        client.stop();
+                        client.destroy();
                         waitMs *= 2;
                         if (waitMs > WAIT_MAX) {
                             waitMs = WAIT_MAX;
