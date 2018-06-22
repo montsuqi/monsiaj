@@ -52,7 +52,7 @@ import org.montsuqi.monsiaj.widgets.ExceptionDialog;
  * The main application class for panda client.</p>
  */
 public class Client {
-    
+
     private boolean isReceiving;
     private final Config conf;
     private static final Logger logger = LogManager.getLogger(Client.class);
@@ -65,7 +65,7 @@ public class Client {
     private String focusedWindow;
     private String focusedWidget;
     private PushReceiver pushReceiver;
-    
+
     public Client(Config conf) throws IOException {
         this.conf = conf;
         int n = conf.getCurrent();
@@ -77,7 +77,7 @@ public class Client {
         isReceiving = false;
         pushReceiver = null;
     }
-    
+
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
         String authURI = conf.getAuthURI(num);
@@ -111,7 +111,7 @@ public class Client {
             conf.setUser(num, "");
             conf.save();
         }
-        
+
         protocol.getServerInfo();
         protocol.startSession();
         logger.info("connected session_id:" + protocol.getSessionId());
@@ -119,7 +119,7 @@ public class Client {
         windowStack = protocol.getWindow();
         updateScreen();
         stopReceiving();
-        
+
         if (protocol.enablePushClient()) {
             try {
                 BlockingQueue q = new LinkedBlockingQueue();
@@ -141,7 +141,7 @@ public class Client {
             }
         }
     }
-    
+
     void disconnect() {
         try {
             protocol.endSession();
@@ -153,7 +153,7 @@ public class Client {
             System.exit(0);
         }
     }
-    
+
     public void startPing() {
         int period = DEFAULT_PING_TIMER_PERIOD;
         if (protocol.enablePushClient()) {
@@ -167,16 +167,16 @@ public class Client {
         });
         pingTimer.start();
     }
-    
+
     public void updateScreen() throws JSONException, IOException {
         JSONObject windowData = windowStack.getJSONObject("window_data");
         focusedWindow = windowData.getString("focused_window");
         focusedWidget = windowData.getString("focused_widget");
         JSONArray windows = windowData.getJSONArray("windows");
-        
+
         logger.info("----");
         logger.info("focused_window[" + focusedWindow + "]");
-        
+
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
@@ -194,7 +194,7 @@ public class Client {
             }
             logger.info("show window[" + windowName + "] put_type[" + putType + "]");
         }
-        
+
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
             String putType = w.getString("put_type");
@@ -220,21 +220,23 @@ public class Client {
             }
             if (putType.matches("new") || putType.matches("current")) {
                 Node node = uiControl.getNode(windowName);
-                uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), tmpl);
+                if (windowName.equals(focusedWindow)) {
+                    uiControl.setWidget(node.getInterface(), node.getInterface().getWidgetByLongName(windowName), tmpl);
+                }
                 uiControl.showWindow(windowName);
             }
         }
         uiControl.setFocus(focusedWindow, focusedWidget);
     }
-    
+
     public void sendEvent(String windowName, String widgetName, String event) {
         try {
             JSONObject tmpl;
             tmpl = (JSONObject) uiControl.getScreenTemplate(windowName);
             if (tmpl != null) {
-                
+
                 long t1 = System.currentTimeMillis();
-                
+
                 Node node = uiControl.getNode(windowName);
                 if (node == null) {
                     throw new IOException("invalid window:" + windowName);
@@ -252,21 +254,21 @@ public class Client {
                 eventData.put("screen_data", newScreenData);
                 JSONObject params = new JSONObject();
                 params.put("event_data", eventData);
-                
+
                 logger.info("window:" + windowName + " widget:" + widgetName + " event:" + event);
-                
+
                 long t2 = System.currentTimeMillis();
-                
+
                 windowStack = protocol.sendEvent(params);
                 int total_exec_time = protocol.getTotalExecTime();
                 int app_exec_time = protocol.getAppExecTime();
-                
+
                 long t3 = System.currentTimeMillis();
-                
+
                 updateScreen();
-                
+
                 long t4 = System.currentTimeMillis();
-                
+
                 String msg = "[send_event] ";
                 msg += "total:" + (t4 - t1) + "ms ";
                 msg += "make_event_data:" + (t2 - t1) + "ms ";
@@ -281,13 +283,13 @@ public class Client {
             System.exit(1);
         }
     }
-    
+
     private void listDownloads() throws IOException, JSONException {
         JSONArray array = protocol.listDownloads();
         logger.debug(array);
         for (int j = 0; j < array.length(); j++) {
             JSONObject item = array.getJSONObject(j);
-            
+
             String type = null;
             if (item.has("type")) {
                 type = item.getString("type");
@@ -301,7 +303,7 @@ public class Client {
             }
         }
     }
-    
+
     private void getMessage() throws IOException, JSONException {
         JSONObject result = protocol.getMessage();
         if (result.has("abort")) {
@@ -312,7 +314,7 @@ public class Client {
                 System.exit(0);
             }
         }
-        
+
         if (result.has("popup")) {
             String popup = result.getString("popup");
             if (!popup.isEmpty()) {
@@ -320,7 +322,7 @@ public class Client {
                 return;
             }
         }
-        
+
         if (result.has("dialog")) {
             String dialog = result.getString("dialog");
             if (!dialog.isEmpty()) {
@@ -328,7 +330,7 @@ public class Client {
             }
         }
     }
-    
+
     private synchronized void sendPing() {
         try {
             if (!isReceiving()) {
@@ -346,23 +348,23 @@ public class Client {
             System.exit(1);
         }
     }
-    
+
     public boolean isReceiving() {
         return isReceiving;
     }
-    
+
     public void startReceiving() {
         this.isReceiving = true;
     }
-    
+
     public void stopReceiving() {
         this.isReceiving = false;
     }
-    
+
     public String getFocusedWindow() {
         return focusedWindow;
     }
-    
+
     public Protocol getProtocol() {
         return protocol;
     }
