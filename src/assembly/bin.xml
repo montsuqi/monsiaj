@@ -9,7 +9,7 @@
   <files>
     <file>
       <source>${project.build.directory}/monsiaj-${project.version}-all.jar</source>
-      <destName>jmareceipt.jar</destName>
+      <destName>orcamoclient.jar</destName>
       <outputDirectory>/</outputDirectory>
     </file>
   </files>
