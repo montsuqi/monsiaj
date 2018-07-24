@@ -347,22 +347,19 @@ public class Protocol {
                 break;
         }
 
-        ByteArrayOutputStream bytes = getHTTPBody(con);
-        con.disconnect();
-
-        long et = System.currentTimeMillis();
-        if (System.getProperty("monsia.do_profile") != null) {
-            logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
+        Object result;
+        try (ByteArrayOutputStream bytes = getHTTPBody(con)) {
+            con.disconnect();
+            long et = System.currentTimeMillis();
+            if (System.getProperty("monsia.do_profile") != null) {
+                logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
+            }   String resStr = bytes.toString("UTF-8");
+            if (System.getProperty("monsia.debug.jsonrpc") != null) {
+                logger.info("---- JSONRPC response");
+                logger.info(resStr);
+                logger.info("----");
+            }   result = checkJSONRPCResponse(resStr);
         }
-
-        String resStr = bytes.toString("UTF-8");
-
-        if (System.getProperty("monsia.debug.jsonrpc") != null) {
-            logger.info("---- JSONRPC response");
-            logger.info(resStr);
-            logger.info("----");
-        }
-        Object result = checkJSONRPCResponse(resStr);
         return result;
     }
 
@@ -518,12 +515,13 @@ public class Protocol {
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
 
-        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-        int length;
-        while ((length = bis.read()) != -1) {
-            out.write(length);
+        try (BufferedInputStream bis = new BufferedInputStream(con.getInputStream())) {
+            int length;
+            while ((length = bis.read()) != -1) {
+                out.write(length);
+            }
+            out.close();
         }
-        out.close();
         con.disconnect();
 
         return con.getResponseCode();
