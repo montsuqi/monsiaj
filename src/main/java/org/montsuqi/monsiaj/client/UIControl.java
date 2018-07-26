@@ -246,11 +246,8 @@ public class UIControl {
         window.setSessionTitle(sessionTitle);
 
         if (window.isDialog()) {
-            Component parent = topWindow;
-            JDialog dialog = window.getDialog();
-
             topWindow.showBusyCursor();
-            dialog = window.createDialog(topWindow, topWindow);
+            JDialog dialog = window.createDialog(topWindow);
 
             window.getChild().setBackground(this.sessionBGColor);
             dialog.validate();
