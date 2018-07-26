@@ -67,16 +67,9 @@ public class Window extends JFrame {
         }
     }
 
-    public JDialog createDialog(Component parent, TopWindow tw) {
+    public JDialog createDialog(TopWindow tw) {
         if (dialog == null) {
-            if (parent instanceof Frame) {
-                dialog = new JDialog((Frame) parent, this.getTitle(), false);
-            } else if (parent instanceof Dialog) {
-                dialog = new JDialog((Dialog) parent, this.getTitle(), false);
-            } else {
-                dialog = new JDialog();
-                dialog.setModal(false);
-            }
+            dialog = new JDialog((Frame) tw, this.getTitle(), false);
             dialog.setName(this.getName());
             dialog.getContentPane().add(child);
             dialog.setResizable(true);
