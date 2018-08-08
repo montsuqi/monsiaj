@@ -35,7 +35,6 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
-import java.util.logging.Level;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -349,17 +348,19 @@ public class Protocol {
 
         Object result;
         try (ByteArrayOutputStream bytes = getHTTPBody(con)) {
-            con.disconnect();
             long et = System.currentTimeMillis();
             if (System.getProperty("monsia.do_profile") != null) {
                 logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
-            }   String resStr = bytes.toString("UTF-8");
+            }
+            String resStr = bytes.toString("UTF-8");
             if (System.getProperty("monsia.debug.jsonrpc") != null) {
                 logger.info("---- JSONRPC response");
                 logger.info(resStr);
                 logger.info("----");
-            }   result = checkJSONRPCResponse(resStr);
+            }
+            result = checkJSONRPCResponse(resStr);
         }
+        con.disconnect();
         return result;
     }
 
