@@ -54,26 +54,21 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsiaj.util.TempFile;
-import org.montsuqi.monsiaj.widgets.CertificateDetailPanel;
 
 public class SSLSocketFactoryHelper {
 
-    static {
-        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-                new javax.net.ssl.HostnameVerifier() {
+    static final Logger logger = LogManager.getLogger(SSLSocketFactoryHelper.class);
 
-            @Override
-            public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
-                try {
-                    SSLSocketFactoryHelper.validatePeerCertificates(sslSession.getPeerCertificates(), hostname);
-                } catch (SSLException ex) {
-                    java.util.logging.Logger.getLogger(SSLSocketFactoryHelper.class.getName()).log(Level.SEVERE, null, ex);
-                    return false;
-                }
-                return true;
+    static {
+        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((String hostname, javax.net.ssl.SSLSession sslSession) -> {
+            try {
+                SSLSocketFactoryHelper.validatePeerCertificates(sslSession.getPeerCertificates(), hostname);
+            } catch (SSLException ex) {
+                java.util.logging.Logger.getLogger(SSLSocketFactoryHelper.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
             }
-        }
-        );
+            return true;
+        });
     }
 
     private static final Logger LOGGER = LogManager.getLogger(SSLSocketFactoryHelper.class);
@@ -328,10 +323,10 @@ public class SSLSocketFactoryHelper {
             }
             try {
                 delegatee.checkClientTrusted(chain, authType);
-            } catch (CertificateException e) {
-                final String messageForDialog = Messages.getString("Client.client_certificate_verify_failed_proceed_connection_p");
-                final String messageForException = Messages.getString("Client.untrusted_client_certificate");
-                showAuthenticationFailure(chain, messageForDialog, messageForException);
+            } catch (CertificateException ex) {
+                logger.info(ex, ex);
+                JOptionPane.showMessageDialog(null, Messages.getString("Client.client_certificate_verify_failed_proceed_connection_p"), Messages.getString("Client.certificate_error"), JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
             }
         }
 
@@ -339,43 +334,10 @@ public class SSLSocketFactoryHelper {
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             try {
                 delegatee.checkServerTrusted(chain, authType);
-            } catch (CertificateException e) {
-                final String messageForDialog = Messages.getString("Client.server_certificate_verify_failed_proceed_connection_p");
-                final String messageForException = Messages.getString("Client.server_certificate_could_not_be_trusted");
-                showAuthenticationFailure(chain, messageForDialog, messageForException);
-            }
-        }
-        private static final int PROCEED_OPTION = 0;
-        private static final int CHECK_OPTION = 1;
-
-        private void showAuthenticationFailure(X509Certificate[] chain, String messageForDialog, String messageForException) throws CertificateException {
-            Object[] options = {
-                Messages.getString("Client.proceed"),
-                Messages.getString("Client.check_certificates"),
-                Messages.getString("Client.cancel")
-            };
-            CONFIRMATION_LOOP:
-            while (true) {
-                int n = JOptionPane.showOptionDialog(null,
-                        messageForDialog,
-                        Messages.getString("Client.warning_title"),
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        options,
-                        options[2]);
-                switch (n) {
-                    case PROCEED_OPTION:
-                        break CONFIRMATION_LOOP;
-                    case CHECK_OPTION:
-                        final CertificateDetailPanel certificatePanel = new CertificateDetailPanel();
-                        certificatePanel.setCertificateChain(chain);
-                        final String title = Messages.getString("Client.checking_certificate_chain");
-                        JOptionPane.showMessageDialog(null, certificatePanel, title, JOptionPane.PLAIN_MESSAGE);
-                        continue;
-                    default:
-                        throw new CertificateException(messageForException);
-                }
+            } catch (CertificateException ex) {
+                logger.info(ex, ex);
+                JOptionPane.showMessageDialog(null, Messages.getString("Client.server_certificate_verify_failed_proceed_connection_p"), Messages.getString("Client.certificate_error"), JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
             }
         }
 
