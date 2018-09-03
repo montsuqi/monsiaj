@@ -389,6 +389,7 @@ public class PandaPreview extends JPanel {
     }
 
     public void clear() {
+        fileName = null;
         panel.clear();
         panel.setVisible(false);
     }
