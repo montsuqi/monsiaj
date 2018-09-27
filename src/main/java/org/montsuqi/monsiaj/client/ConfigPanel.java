@@ -305,6 +305,18 @@ public class ConfigPanel extends JPanel {
         boolean showStartupMessage = conf.getShowStartupMessage(num);
         String systemProperties = conf.getSystemProperties(num);
 
+        // SSO tab
+        boolean use_sso = conf.getUseSSO(num);
+        String ssoUser = conf.getSSOUser(num);
+        String ssoPassword = conf.getSSOPassword(num);
+        String ssoSPURI = conf.getSSOSPURI(num);
+        String ssoIPURI = conf.getSSOIPURI(num);
+        useSSOCheckbox.setSelected(use_sso);
+        ssoUserEntry.setText(ssoUser);
+        ssoPasswordEntry.setText(ssoPassword);
+        ssoSPURIEntry.setText(ssoSPURI);
+        ssoIPURIEntry.setText(ssoIPURI);
+
         styleEntry.setText(styleFile);
         lafThemeEntry.setText(lookAndFeelThemeFile);
         for (LookAndFeelInfo laf : lafs) {
@@ -355,6 +367,14 @@ public class ConfigPanel extends JPanel {
         conf.setTimerPeriod(num, Integer.valueOf(timerPeriodEntry.getText()));
         conf.setShowStartupMessage(num, showStartupMessageCheck.isSelected());
         conf.setSystemProperties(num, propertiesText.getText());
+
+        // SSO Tab
+        conf.setUseSSO(num, useSSOCheckbox.isSelected());
+        conf.setSSOUser(num, ssoUserEntry.getText());
+        conf.setSSOPassword(num, new String(ssoPasswordEntry.getPassword()));
+        conf.setSSOSPURI(num, ssoSPURIEntry.getText());
+        conf.setSSOIPURI(num, ssoIPURIEntry.getText());
+
         conf.save();
     }
 
