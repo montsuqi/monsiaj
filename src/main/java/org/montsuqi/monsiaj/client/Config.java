@@ -526,15 +526,6 @@ public class Config {
       return value;
     }
 
-    public void setSSOIPURI(int i, String v) {
-        setValue(i, "sso_ip_uri", v);
-    }
-
-    public String getSSOIPURI(int i) {
-      String value = getValue(i, "sso_ip_uri");
-      return value;
-    }
-
     public void loadPrinterConfig(int i) {
         String confStr = getValue(i, "printerConfig");
         printerConfig.loadPrinterConfig(confStr);

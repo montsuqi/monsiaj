@@ -119,7 +119,6 @@ public class ConfigPanel extends JPanel {
     private JTextField ssoUserEntry;
     private JPasswordField ssoPasswordEntry;
     private JTextField ssoSPURIEntry;
-    private JTextField ssoIPURIEntry;
 
     /**
      * <p>
@@ -310,12 +309,10 @@ public class ConfigPanel extends JPanel {
         String ssoUser = conf.getSSOUser(num);
         String ssoPassword = conf.getSSOPassword(num);
         String ssoSPURI = conf.getSSOSPURI(num);
-        String ssoIPURI = conf.getSSOIPURI(num);
         useSSOCheckbox.setSelected(use_sso);
         ssoUserEntry.setText(ssoUser);
         ssoPasswordEntry.setText(ssoPassword);
         ssoSPURIEntry.setText(ssoSPURI);
-        ssoIPURIEntry.setText(ssoIPURI);
 
         styleEntry.setText(styleFile);
         lafThemeEntry.setText(lookAndFeelThemeFile);
@@ -373,7 +370,6 @@ public class ConfigPanel extends JPanel {
         conf.setSSOUser(num, ssoUserEntry.getText());
         conf.setSSOPassword(num, new String(ssoPasswordEntry.getPassword()));
         conf.setSSOSPURI(num, ssoSPURIEntry.getText());
-        conf.setSSOIPURI(num, ssoIPURIEntry.getText());
 
         conf.save();
     }
@@ -779,7 +775,6 @@ public class ConfigPanel extends JPanel {
 
         ssoUserEntry = createTextField();
         ssoSPURIEntry = createTextField();
-        ssoIPURIEntry = createTextField();
         ssoPasswordEntry = createPasswordField();
         passwordEntry = createPasswordField();
         useSSOCheckbox = new JCheckBox();
@@ -806,12 +801,6 @@ public class ConfigPanel extends JPanel {
         panel.add(createLabel(Messages.getString("ConfigurationPanel.sso_sp_uri")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(ssoSPURIEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.sso_ip_uri")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(ssoIPURIEntry,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
