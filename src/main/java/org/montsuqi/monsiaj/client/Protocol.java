@@ -35,6 +35,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -362,6 +363,12 @@ public class Protocol {
         }
         con.disconnect();
         return result;
+    }
+
+    public void startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException, JSONException {
+        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, sso_sp_uri);
+        sso.connect();
+        // TODO: session_id の受け渡し
     }
 
     public void getServerInfo() throws IOException, JSONException {
