@@ -486,6 +486,46 @@ public class Config {
         setValue(i, "systemProperties", v);
     }
 
+    // SSO properties
+    public void setUseSSO(int i, boolean v) {
+        setValue(i, "useSSO", Boolean.toString(v));
+    }
+
+    public boolean getUseSSO(int i) {
+        String value = getValue(i, "useSSO");
+        if (value.isEmpty()) {
+            return false;
+        }
+        return Boolean.valueOf(value);
+    }
+
+    public void setSSOUser(int i, String v) {
+        setValue(i, "sso_user", v);
+    }
+
+    public String getSSOUser(int i) {
+        String value = getValue(i, "sso_user");
+        return value;
+    }
+
+    public void setSSOPassword(int i, String v) {
+        setValue(i, "sso_password", v);
+    }
+
+    public String getSSOPassword(int i) {
+        String value = getValue(i, "sso_password");
+        return value;
+    }
+
+    public void setSSOSPURI(int i, String v) {
+        setValue(i, "sso_sp_uri", v);
+    }
+
+    public String getSSOSPURI(int i) {
+      String value = getValue(i, "sso_sp_uri");
+      return value;
+    }
+
     public void loadPrinterConfig(int i) {
         String confStr = getValue(i, "printerConfig");
         printerConfig.loadPrinterConfig(confStr);
