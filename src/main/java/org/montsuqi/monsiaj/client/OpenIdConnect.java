@@ -38,6 +38,8 @@ public class OpenIdConnect {
     private String state;
     private String redirect_uri;
     private String nonce;
+    private String authentication_request_uri;
+    private String request_url;
 
     public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
@@ -58,14 +60,24 @@ public class OpenIdConnect {
     }
 
     private void doAuthenticationRequestToRP() throws IOException {
-      JSONObject res = request(sso_sp_uri, "GET", "");
+      JSONObject res = request(sso_sp_uri, "GET", new JSONObject());
       this.client_id = res.getString("client_id");
       this.state = res.getString("state");
       this.redirect_uri = res.getString("redirect_uri");
       this.nonce = res.getString("nonce");
+      this.authentication_request_uri = res.getJSONObject("header").getString("Location");
     }
 
-    private void doAuthenticationRequestToIP() {
+    private void doAuthenticationRequestToIP() throws IOException {
+      JSONObject params = new JSONObject();
+      params.put("response_type", "code");
+      params.put("scope", "openid");
+      params.put("client_id", client_id);
+      params.put("state", state);
+      params.put("redirect_uri", redirect_uri);
+      params.put("nonce", nonce);
+      JSONObject res = request(authentication_request_uri, "POST", params);
+      this.request_url = res.getString("request_url");
     }
 
     private void doLoginToIP() {
@@ -74,10 +86,11 @@ public class OpenIdConnect {
     private void doLoginToRP() {
     }
 
-    private JSONObject request(String uri, String method, String param) throws IOException {
+    private JSONObject request(String uri, String method, JSONObject params) throws IOException {
       URL url = new URL(uri);
       HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
       con.setInstanceFollowRedirects(false);
+      con.setRequestProperty("Accept", "application/json");
       if (method == "GET") {
           con.setDoOutput(false);
           con.setRequestMethod("GET");
@@ -85,6 +98,9 @@ public class OpenIdConnect {
           con.setDoOutput(true);
           con.setRequestMethod("POST");
           con.setRequestProperty("Content-Type", "application/json");
+          OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+          osw.write(params.toString());
+          osw.close();
       }
 
       con.connect();
@@ -102,6 +118,10 @@ public class OpenIdConnect {
 
       ByteArrayOutputStream body = getHTTPBody(con);
       JSONObject result = new JSONObject(body.toString("UTF-8"));
+
+      JSONObject headerObj = new JSONObject();
+      headerObj.put("Location", con.getHeaderField("Location"));
+      result.put("header", headerObj);
 
       con.disconnect();
 
