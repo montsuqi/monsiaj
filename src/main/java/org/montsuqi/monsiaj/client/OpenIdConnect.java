@@ -34,13 +34,18 @@ public class OpenIdConnect {
     private String sso_user;
     private String sso_password;
 
-    public OpenIdConnect(String sso_sp_uri, String sso_user, String sso_password) throws IOException {
+    private String client_id;
+    private String state;
+    private String redirect_uri;
+    private String nonce;
+
+    public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
         this.sso_user = sso_user;
         this.sso_password = sso_password;
     }
 
-    public void connect() {
+    public void connect() throws IOException {
       logger.info("try OpenId connect...");
       // バックエンドサーバへのログイン要求
       doAuthenticationRequestToRP();
@@ -52,7 +57,12 @@ public class OpenIdConnect {
       doLoginToRP();
     }
 
-    private void doAuthenticationRequestToRP() {
+    private void doAuthenticationRequestToRP() throws IOException {
+      JSONObject res = request(sso_sp_uri, "GET", "");
+      this.client_id = res.getString("client_id");
+      this.state = res.getString("state");
+      this.redirect_uri = res.getString("redirect_uri");
+      this.nonce = res.getString("nonce");
     }
 
     private void doAuthenticationRequestToIP() {
@@ -62,5 +72,54 @@ public class OpenIdConnect {
     }
 
     private void doLoginToRP() {
+    }
+
+    private JSONObject request(String uri, String method, String param) throws IOException {
+      URL url = new URL(uri);
+      HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
+      con.setInstanceFollowRedirects(false);
+      if (method == "GET") {
+          con.setDoOutput(false);
+          con.setRequestMethod("GET");
+      } else {
+          con.setDoOutput(true);
+          con.setRequestMethod("POST");
+          con.setRequestProperty("Content-Type", "application/json");
+      }
+
+      con.connect();
+      int resCode = con.getResponseCode();
+      switch (resCode) {
+          case 200:
+              break;
+          case 302:
+              break;
+          default:
+              String message = con.getResponseMessage();
+              logger.info("http error: " + resCode + " " + message);
+              System.exit(1);
+      }
+
+      ByteArrayOutputStream body = getHTTPBody(con);
+      JSONObject result = new JSONObject(body.toString("UTF-8"));
+
+      con.disconnect();
+
+      return result;
+    }
+
+    private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
+                BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
+                int length;
+                while ((length = bis.read()) != -1) {
+                    bos.write(length);
+                }
+            }
+            return bytes;
+        } catch (IOException ex) {
+            return new ByteArrayOutputStream();
+        }
     }
 }
