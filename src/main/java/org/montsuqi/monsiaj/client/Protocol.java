@@ -208,8 +208,8 @@ public class Protocol {
             Authenticator.setDefault(null);
         }
         return con;
-    }    
-    
+    }
+
     private String makeJSONRPCRequest(String method, JSONObject params) throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("jsonrpc", "2.0");
