@@ -43,6 +43,7 @@ public class OpenIdConnect {
     private String authentication_request_uri;
     private String request_url;
     private String get_session_uri;
+    private String session_id;
 
     public class OpenIdConnectError extends IOException {
     }
@@ -101,7 +102,9 @@ public class OpenIdConnect {
       logger.info("get_session_uri: " + this.get_session_uri);
     }
 
-    private void doLoginToRP() {
+    private void doLoginToRP() throws IOException {
+      JSONObject res = request(get_session_uri, "GET", new JSONObject());
+      this.session_id = res.getString("session_id");
     }
 
     private JSONObject request(String uri, String method, JSONObject params) throws IOException {
