@@ -14,6 +14,8 @@ import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -40,6 +42,10 @@ public class OpenIdConnect {
     private String nonce;
     private String authentication_request_uri;
     private String request_url;
+    private String get_session_uri;
+
+    public class OpenIdConnectError extends IOException {
+    }
 
     public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
@@ -80,7 +86,19 @@ public class OpenIdConnect {
       this.request_url = res.getString("request_url");
     }
 
-    private void doLoginToIP() {
+    private void doLoginToIP() throws IOException {
+      JSONObject params = new JSONObject();
+      params.put("response_type", "code");
+      params.put("scope", "openid");
+      params.put("client_id", client_id);
+      params.put("state", state);
+      params.put("redirect_uri", redirect_uri);
+      params.put("nonce", nonce);
+      params.put("login_id", sso_user);
+      params.put("password", sso_password);
+      JSONObject res = request(request_url, "POST", params);
+      this.get_session_uri = res.getJSONObject("header").getString("Location");
+      logger.info("get_session_uri: " + this.get_session_uri);
     }
 
     private void doLoginToRP() {
@@ -116,10 +134,15 @@ public class OpenIdConnect {
               System.exit(1);
       }
 
-      ByteArrayOutputStream body = getHTTPBody(con);
-      JSONObject result = new JSONObject(body.toString("UTF-8"));
-
       JSONObject headerObj = new JSONObject();
+
+      JSONObject result;
+      if (con.getHeaderField("Content-Type").indexOf("application/json") >= 0) {
+        ByteArrayOutputStream body = getHTTPBody(con);
+        result = new JSONObject(body.toString("UTF-8"));
+      } else {
+        result = new JSONObject();
+      }
       headerObj.put("Location", con.getHeaderField("Location"));
       result.put("header", headerObj);
 
