@@ -23,6 +23,7 @@
 package org.montsuqi.monsiaj.client;
 
 import org.montsuqi.monsiaj.util.Messages;
+import java.util.Calendar;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
+import java.security.cert.*;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -81,6 +83,7 @@ public class Protocol {
     public static final int TYPE_SSL_NO_CERT = 1;
     public static final int TYPE_SSL_PKCS12 = 2;
     public static final int TYPE_SSL_PKCS11 = 3;
+    public static final int CERT_EXPIRE_CHECK_MONTHES = 2;
 
     private static final String OS_VERSION = System.getProperty("os.name") + "-" + System.getProperty("os.version");
     private static final String JAVA_VERSION = "Java_" + System.getProperty("java.version");
@@ -90,6 +93,7 @@ public class Protocol {
     private String caCert;
     private String certFile;
     private String certFilePassphrase;
+    private SSLSocketFactoryHelper helper;
 
     public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
         this.rpcId = 1;
@@ -162,7 +166,7 @@ public class Protocol {
         if (caCert == null || caCert.isEmpty()) {
             sslSocketFactory = null;
         } else {
-            SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
+            helper = new SSLSocketFactoryHelper();
             sslSocketFactory = helper.getFactory(caCert, "", "");
             sslType = TYPE_SSL_NO_CERT;
             this.caCert = caCert;
@@ -170,7 +174,7 @@ public class Protocol {
     }
 
     public void makeSSLSocketFactoryPKCS12(final String caCert, final String certFile, final String certFilePass) throws IOException, GeneralSecurityException {
-        SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
+        helper = new SSLSocketFactoryHelper();
         sslSocketFactory = helper.getFactory(caCert, certFile, certFilePass);
         this.sslType = TYPE_SSL_PKCS12;
         this.caCert = caCert;
@@ -179,9 +183,21 @@ public class Protocol {
     }
 
     public void makeSSLSocketFactoryPKCS11(final String caCert, final String p11Lib, final String p11Slot) throws IOException, GeneralSecurityException {
-        SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
+        helper = new SSLSocketFactoryHelper();
         sslSocketFactory = helper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
         this.sslType = TYPE_SSL_PKCS11;
+    }
+
+    public boolean checkCertificateExpire() throws IOException, CertificateNotYetValidException {
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.MONTH, CERT_EXPIRE_CHECK_MONTHES);
+      X509Certificate cert = helper.certificate;
+      try {
+        cert.checkValidity(cal.getTime());
+      } catch (CertificateExpiredException e) {
+        return false;
+      }
+      return true;
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {

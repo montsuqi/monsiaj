@@ -111,6 +111,11 @@ public class Client {
             conf.setUser(num, "");
             conf.save();
         }
+        if (conf.getUseSSL(num)) {
+            if (!protocol.checkCertificateExpire()) {
+                JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.certificate_expiration_is_approaching"));
+            }
+        }
 
         protocol.getServerInfo();
         protocol.startSession();
