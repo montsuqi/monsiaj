@@ -72,7 +72,6 @@ public class SSLSocketFactoryHelper {
     }
 
     private static final Logger LOGGER = LogManager.getLogger(SSLSocketFactoryHelper.class);
-    public X509Certificate certificate;
 
     private static void validatePeerCertificates(final Certificate[] certificates, final String host) throws SSLException {
         final Certificate serverCertificate = certificates[0];
@@ -276,7 +275,6 @@ public class SSLSocketFactoryHelper {
         String pemStrs[] = splitCertFile(caCertPath);
         for (String pem : pemStrs) {
             X509Certificate cert = parseCertPem(pem);
-            this.certificate = cert;
             keystore.setCertificateEntry(cert.getSubjectDN().toString(), cert);
         }
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

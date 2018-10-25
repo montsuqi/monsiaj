@@ -112,7 +112,7 @@ public class Client {
             conf.save();
         }
         if (conf.getUseSSL(num)) {
-            if (!protocol.checkCertificateExpire()) {
+            if (!protocol.checkCertificateExpire(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num))) {
                 JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.certificate_expiration_is_approaching"));
             }
         }
