@@ -23,21 +23,20 @@
 package org.montsuqi.monsiaj.client;
 
 import org.montsuqi.monsiaj.util.Messages;
-import java.util.Calendar;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
-import java.security.cert.*;
-import java.security.KeyStore;
-import java.security.Principal;
-import java.security.Provider;
-import java.security.Security;
-import java.util.Enumeration;
-import javax.net.ssl.*;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,7 +81,6 @@ public class Protocol {
     public static final int TYPE_SSL_NO_CERT = 1;
     public static final int TYPE_SSL_PKCS12 = 2;
     public static final int TYPE_SSL_PKCS11 = 3;
-    public static final int CERT_EXPIRE_CHECK_MONTHES = 2;
 
     private static final String OS_VERSION = System.getProperty("os.name") + "-" + System.getProperty("os.version");
     private static final String JAVA_VERSION = "Java_" + System.getProperty("java.version");
@@ -184,26 +182,6 @@ public class Protocol {
         SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
         sslSocketFactory = helper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
         this.sslType = TYPE_SSL_PKCS11;
-    }
-
-    public boolean checkCertificateExpire(String fileName, String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException, CertificateNotYetValidException {
-        if (fileName == null || fileName.length() <= 0) {
-            return true;
-        }
-        final KeyStore ks = KeyStore.getInstance("PKCS12");
-        final InputStream is = new FileInputStream(fileName);
-        ks.load(is, pass.toCharArray());
-        Enumeration<String> en = ks.aliases();
-        String alias = en.nextElement();
-        X509Certificate cert = (X509Certificate)ks.getCertificate(alias);
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, CERT_EXPIRE_CHECK_MONTHES);
-        try {
-          cert.checkValidity(cal.getTime());
-        } catch (CertificateExpiredException e) {
-          return false;
-        }
-        return true;
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
