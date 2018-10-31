@@ -24,17 +24,24 @@ package org.montsuqi.monsiaj.client;
 
 import org.montsuqi.monsiaj.util.Messages;
 import java.awt.event.ActionEvent;
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.security.KeyStore;
+import java.security.Principal;
+import java.security.Provider;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.TimeZone;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.net.ssl.*;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -65,6 +72,7 @@ public class Client {
     private String focusedWindow;
     private String focusedWidget;
     private PushReceiver pushReceiver;
+    public static final int CERT_EXPIRE_CHECK_MONTHES = 2;
 
     public Client(Config conf) throws IOException {
         this.conf = conf;
@@ -110,6 +118,9 @@ public class Client {
         if (System.getProperty("monsia.config.reset_user") != null) {
             conf.setUser(num, "");
             conf.save();
+        }
+        if (conf.getUseSSL(num)) {
+            checkCertificateExpire(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
         }
 
         protocol.getServerInfo();
@@ -367,5 +378,34 @@ public class Client {
 
     public Protocol getProtocol() {
         return protocol;
+    }
+
+    private void checkCertificateExpire(String fileName, String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
+        if (fileName == null || fileName.length() <= 0) {
+            return;
+        }
+        Calendar notAfter = getNotAfterOfCertificate(fileName, pass);
+        Calendar checkDate = Calendar.getInstance();
+        checkDate.setTimeZone(TimeZone.getDefault());
+        checkDate.add(Calendar.MONTH, CERT_EXPIRE_CHECK_MONTHES);
+        if (checkDate.compareTo(notAfter) > 0) {
+            String format = Messages.getString("Client.certificate_expiration_is_approaching");
+            String alert = String.format(format, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter);
+            JOptionPane.showMessageDialog(uiControl.getTopWindow(), alert);
+        }
+    }
+
+    private Calendar getNotAfterOfCertificate(String fileName, String pass) throws SSLException, FileNotFoundException, IOException, GeneralSecurityException {
+        final KeyStore ks = KeyStore.getInstance("PKCS12");
+        final InputStream is = new FileInputStream(fileName);
+        ks.load(is, pass.toCharArray());
+        Enumeration<String> en = ks.aliases();
+        String alias = en.nextElement();
+        X509Certificate cert = (X509Certificate)ks.getCertificate(alias);
+        Date d = cert.getNotAfter();
+        Calendar result = Calendar.getInstance();
+        result.setTime(d);
+        result.setTimeZone(TimeZone.getDefault());
+        return result;
     }
 }
