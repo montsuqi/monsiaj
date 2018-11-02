@@ -69,7 +69,7 @@ public class OpenIdConnect {
         this.sso_password = sso_password;
     }
 
-    public void connect() throws IOException, LoginFailureException {
+    public String connect() throws IOException, LoginFailureException {
       logger.info("try OpenId connect...");
       // バックエンドサーバへのログイン要求
       doAuthenticationRequestToRP();
@@ -79,6 +79,8 @@ public class OpenIdConnect {
       doLoginToIP();
       // バックエンドサーバへのsession id発行要求
       doLoginToRP();
+
+      return this.rp_cookie;
     }
 
     private void doAuthenticationRequestToRP() throws IOException {
@@ -124,7 +126,6 @@ public class OpenIdConnect {
             throw e;
         }
       }
-      logger.info("get_session_uri: " + this.get_session_uri);
     }
 
     private void doLoginToRP() throws IOException {
