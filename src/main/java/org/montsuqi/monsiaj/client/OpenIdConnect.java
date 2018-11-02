@@ -25,6 +25,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+class LoginFailureException extends RuntimeException {
+}
+
+class HttpResponseException extends IOException {
+    private int statusCode;
+
+    public HttpResponseException(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public int getStatusCode() {
+        return this.statusCode;
+    }
+}
+
 /**
  * <p>
  * A class that manages OpenID Connect authentication.</p>
@@ -45,16 +60,13 @@ public class OpenIdConnect {
     private String get_session_uri;
     private String session_id;
 
-    public class OpenIdConnectError extends IOException {
-    }
-
     public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
         this.sso_user = sso_user;
         this.sso_password = sso_password;
     }
 
-    public void connect() throws IOException {
+    public void connect() throws IOException, LoginFailureException {
       logger.info("try OpenId connect...");
       // バックエンドサーバへのログイン要求
       doAuthenticationRequestToRP();
@@ -97,8 +109,16 @@ public class OpenIdConnect {
       params.put("nonce", nonce);
       params.put("login_id", sso_user);
       params.put("password", sso_password);
-      JSONObject res = request(request_url, "POST", params);
-      this.get_session_uri = res.getJSONObject("header").getString("Location");
+      try {
+          JSONObject res = request(request_url, "POST", params);
+          this.get_session_uri = res.getJSONObject("header").getString("Location");
+      } catch (HttpResponseException e) {
+        if (e.getStatusCode() == 403){
+            throw new LoginFailureException();
+        } else {
+            throw e;
+        }
+      }
       logger.info("get_session_uri: " + this.get_session_uri);
     }
 
@@ -134,7 +154,7 @@ public class OpenIdConnect {
           default:
               String message = con.getResponseMessage();
               logger.info("http error: " + resCode + " " + message);
-              System.exit(1);
+              throw new HttpResponseException(resCode);
       }
 
       JSONObject headerObj = new JSONObject();
