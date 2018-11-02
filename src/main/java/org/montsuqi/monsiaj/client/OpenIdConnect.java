@@ -60,6 +60,9 @@ public class OpenIdConnect {
     private String get_session_uri;
     private String session_id;
 
+    private String rp_cookie = "";
+    private String rp_domain = "";
+
     public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
         this.sso_user = sso_user;
@@ -79,12 +82,14 @@ public class OpenIdConnect {
     }
 
     private void doAuthenticationRequestToRP() throws IOException {
+      this.rp_domain = (new URL(sso_sp_uri)).getHost();
       JSONObject res = request(sso_sp_uri, "GET", new JSONObject());
       this.client_id = res.getString("client_id");
       this.state = res.getString("state");
       this.redirect_uri = res.getString("redirect_uri");
       this.nonce = res.getString("nonce");
       this.authentication_request_uri = res.getJSONObject("header").getString("Location");
+      this.rp_cookie = res.getJSONObject("header").getString("Set-Cookie");
     }
 
     private void doAuthenticationRequestToIP() throws IOException {
@@ -132,6 +137,10 @@ public class OpenIdConnect {
       HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
       con.setInstanceFollowRedirects(false);
       con.setRequestProperty("Accept", "application/json");
+
+      if (this.rp_domain.equals(url.getHost())) {
+        con.setRequestProperty("Cookie", this.rp_cookie);
+      }
       if (method == "GET") {
           con.setDoOutput(false);
           con.setRequestMethod("GET");
@@ -166,6 +175,7 @@ public class OpenIdConnect {
       } else {
         result = new JSONObject();
       }
+      headerObj.put("Set-Cookie", con.getHeaderField("Set-Cookie"));
       headerObj.put("Location", con.getHeaderField("Location"));
       result.put("header", headerObj);
 
