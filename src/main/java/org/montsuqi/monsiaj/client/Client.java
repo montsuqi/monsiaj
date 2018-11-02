@@ -124,7 +124,11 @@ public class Client {
         }
 
         if (conf.getUseSSO(num)) {
-            protocol.startOpenIDConnect(conf.getSSOUser(num), conf.getSSOPassword(num), conf.getSSOSPURI(num));
+            try {
+                protocol.startOpenIDConnect(conf.getSSOUser(num), conf.getSSOPassword(num), conf.getSSOSPURI(num));
+            } catch (LoginFailureException e) {
+                JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
+            }
             System.exit(1);
         } else {
           protocol.getServerInfo();
