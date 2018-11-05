@@ -776,7 +776,6 @@ public class ConfigPanel extends JPanel {
         ssoUserEntry = createTextField();
         ssoSPURIEntry = createTextField();
         ssoPasswordEntry = createPasswordField();
-        passwordEntry = createPasswordField();
         useSSOCheckbox = new JCheckBox();
 
         y = 0;
