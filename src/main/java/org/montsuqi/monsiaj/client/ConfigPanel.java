@@ -773,10 +773,10 @@ public class ConfigPanel extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ssoUserEntry = createTextField();
-        ssoSPURIEntry = createTextField();
-        ssoPasswordEntry = createPasswordField();
         useSSOCheckbox = new JCheckBox();
+        ssoUserEntry = createTextField();
+        ssoPasswordEntry = createPasswordField();
+        ssoSPURIEntry = createTextField();
 
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
