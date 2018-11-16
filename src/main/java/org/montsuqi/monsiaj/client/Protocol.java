@@ -189,14 +189,18 @@ public class Protocol {
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
         URL url = new URL(strURL);
+        return getHttpURLConnection(url);
+    }
+
+    private HttpURLConnection getHttpURLConnection(URL url) throws IOException {
         HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
 
-        if (strURL.startsWith("https")) {
+        if (url.getProtocol().equals("https")) {
             if (sslSocketFactory != null) {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
             }
         }
-        if (strURL.equals(authURI)) {
+        if (url.toString().equals(authURI)) {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -510,21 +514,7 @@ public class Protocol {
         }
 
         URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/" + oid);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        String protocol = url.getProtocol();
-        switch (protocol) {
-            case "https":
-                if (sslSocketFactory != null) {
-                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                }
-                break;
-            case "http":
-                break;
-            default:
-                throw new IOException("bad protocol");
-        }
-
+        HttpURLConnection con = getHttpURLConnection(url);
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
@@ -543,21 +533,7 @@ public class Protocol {
 
     public synchronized String postBLOB(byte[] in) throws IOException {
         URL url = new URL(this.restURIRoot + "sessions/" + this.sessionId + "/blob/");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        String protocol = url.getProtocol();
-        switch (protocol) {
-            case "https":
-                if (sslSocketFactory != null) {
-                    ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
-                }
-                break;
-            case "http":
-                break;
-            default:
-                throw new IOException("bad protocol");
-        }
-
+        HttpURLConnection con = getHttpURLConnection(url);
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("POST");
         con.setDoOutput(true);

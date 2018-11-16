@@ -140,7 +140,7 @@ public class SSLSocketFactoryHelper {
         }
         trustManagers = createCAFileTrustManagers(caCert);
         final SSLContext ctx;
-        ctx = SSLContext.getInstance("TLS");
+        ctx = SSLContext.getInstance("TLSv1.2");
         ctx.init(keyManagers, trustManagers, null);
         factory = ctx.getSocketFactory();
         SSLContext.setDefault(ctx);
@@ -154,7 +154,7 @@ public class SSLSocketFactoryHelper {
 
         final KeyStore.Builder builder = createPKCS11KeyStoreBuilder(p11Lib, p11Slot);
         final SSLContext ctx;
-        ctx = SSLContext.getInstance("TLS");
+        ctx = SSLContext.getInstance("TLSv1.2");
         keyManagers = createPKCS11KeyManagers(builder);
         trustManagers = createCAFileTrustManagers(caCert);
         ctx.init(keyManagers, trustManagers, null);
