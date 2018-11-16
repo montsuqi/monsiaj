@@ -35,6 +35,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -90,6 +91,8 @@ public class Protocol {
     private String caCert;
     private String certFile;
     private String certFilePassphrase;
+
+    private String openid_connect_rp_cookie = "";
 
     public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
         this.rpcId = 1;
@@ -310,6 +313,11 @@ public class Protocol {
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("User-Agent", USER_AGENT);
 
+        if (!this.openid_connect_rp_cookie.isEmpty()) {
+            con.setRequestProperty("Cookie", this.openid_connect_rp_cookie);
+            this.openid_connect_rp_cookie = "";
+        }
+
         try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
             osw.write(reqStr);
             osw.flush();
@@ -366,6 +374,11 @@ public class Protocol {
         }
         con.disconnect();
         return result;
+    }
+
+    public void startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException, JSONException {
+        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, sso_sp_uri);
+        this.openid_connect_rp_cookie = sso.connect();
     }
 
     public void getServerInfo() throws IOException, JSONException {
