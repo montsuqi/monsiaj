@@ -187,6 +187,10 @@ public class Protocol {
         this.sslType = TYPE_SSL_PKCS11;
     }
 
+    public void updateCertificate() {
+      // TODO
+    }
+
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
         URL url = new URL(strURL);
         return getHttpURLConnection(url);

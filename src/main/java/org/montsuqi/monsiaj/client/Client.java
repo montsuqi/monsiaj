@@ -401,7 +401,11 @@ public class Client {
         if (checkDate.compareTo(notAfter) > 0) {
             String format = Messages.getString("Client.certificate_expiration_is_approaching");
             String alert = String.format(format, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter);
-            JOptionPane.showMessageDialog(uiControl.getTopWindow(), alert);
+            String title = Messages.getString("Client.update_certificate_confirm_dialog_title");
+            int result = JOptionPane.showConfirmDialog(null, alert, title, JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+              protocol.updateCertificate();
+            }
         }
     }
 
