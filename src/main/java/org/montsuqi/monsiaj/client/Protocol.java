@@ -161,6 +161,10 @@ public class Protocol {
         return appExecTime;
     }
 
+    public SSLSocketFactory getSSLSocketFactory() {
+      return sslSocketFactory;
+    }
+
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
         if (caCert == null || caCert.isEmpty()) {
             sslSocketFactory = null;
@@ -185,10 +189,6 @@ public class Protocol {
         SSLSocketFactoryHelper helper = new SSLSocketFactoryHelper();
         sslSocketFactory = helper.getFactoryPKCS11(caCert, p11Lib, p11Slot);
         this.sslType = TYPE_SSL_PKCS11;
-    }
-
-    public void updateCertificate() {
-      // TODO
     }
 
     private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
