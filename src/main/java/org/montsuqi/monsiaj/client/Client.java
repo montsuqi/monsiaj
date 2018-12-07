@@ -120,6 +120,11 @@ public class Client {
         }
         if (conf.getUseSSL(num)) {
             CertificateManager cert = new CertificateManager(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
+            if (cert.isExpire()) {
+              String message = Messages.getString("Client.expire_certificate");
+              JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
+              System.exit(1);
+            }
             if (cert.isExpireApproaching()) {
                 Calendar notAfter = cert.getNotAfter();
                 String format = Messages.getString("Client.certificate_expiration_is_approaching");
@@ -128,7 +133,15 @@ public class Client {
                 int result = JOptionPane.showConfirmDialog(null, alert, title, JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                   cert.setSSLSocketFactory(protocol.getSSLSocketFactory());
+                  cert.setAuthURI(authURI);
                   cert.updateCertificate();
+                  conf.setClientCertificateFile(num, cert.getFileName());
+                  if (conf.getSaveClientCertificatePassword(num)) {
+                    conf.setClientCertificatePassword(num, cert.getPassword());
+                  }
+                  conf.save();
+                  String message = Messages.getString("Client.success_update_certificate");
+                  JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
                 }
             }
         }
