@@ -104,7 +104,7 @@ public class OpenIdConnect {
       params.put("nonce", nonce);
       JSONObject res = request(authentication_request_uri, "POST", params);
       String redirect_uri = res.getJSONObject("header").getString("Location");
-      res = request(redirect_uri, "POST", params);
+      res = request(redirect_uri, "GET", new JSONObject());
       this.request_url = res.getString("request_url");
     }
 
