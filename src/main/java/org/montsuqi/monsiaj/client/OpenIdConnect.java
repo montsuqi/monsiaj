@@ -62,6 +62,8 @@ public class OpenIdConnect {
 
     private String rp_cookie = "";
     private String rp_domain = "";
+    private String ip_cookie = "";
+    private String ip_domain = "";
 
     public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
@@ -120,6 +122,10 @@ public class OpenIdConnect {
       params.put("password", sso_password);
       try {
           JSONObject res = request(request_url, "POST", params);
+          redirect_uri = res.getJSONObject("header").getString("Location");
+          this.ip_cookie = res.getJSONObject("header").getString("Set-Cookie");
+          this.ip_domain = (new URL(redirect_uri)).getHost();
+          res = request(redirect_uri, "GET", new JSONObject());
           this.get_session_uri = res.getJSONObject("header").getString("Location");
       } catch (HttpResponseException e) {
         if (e.getStatusCode() == 403){
@@ -143,6 +149,8 @@ public class OpenIdConnect {
 
       if (this.rp_domain.equals(url.getHost())) {
         con.setRequestProperty("Cookie", this.rp_cookie);
+      } else if (this.ip_domain.equals(url.getHost())) {
+        con.setRequestProperty("Cookie", this.ip_cookie);
       }
       if (method == "GET") {
           con.setDoOutput(false);
