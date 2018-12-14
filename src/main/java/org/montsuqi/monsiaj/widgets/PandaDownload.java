@@ -83,6 +83,10 @@ public class PandaDownload extends JComponent {
     }
 
     public void showDialog(final String fileName, final String description, final File file) throws IOException {
+        // fileNameの無害化
+        File tmpfile = new File(fileName);
+        String baseName = tmpfile.getName();
+
         final JDialog dialog = new JDialog((JFrame) null, Messages.getString("PandaDownload.title"), true);
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         String descLine = "";
@@ -96,7 +100,7 @@ public class PandaDownload extends JComponent {
 
         JTextPane bodyText = new JTextPane();
         bodyText.setText(Messages.getString("PandaDownload.question") + "\n\n"
-                + Messages.getString("PandaDownload.filename") + fileName + "\n"
+                + Messages.getString("PandaDownload.filename") + baseName + "\n"
                 + descLine
                 + Messages.getString("PandaDownload.size") + displaySize(file.length()) + "\n");
         bodyText.setOpaque(false);
@@ -134,7 +138,7 @@ public class PandaDownload extends JComponent {
             public void actionPerformed(ActionEvent e) {
                 String dir = prefs.get(PandaDownload.class.getName(), System.getProperty("user.home"));
                 JFileChooser chooser = new JFileChooser(dir);
-                chooser.setSelectedFile(new File(fileName));
+                chooser.setSelectedFile(new File(baseName));
 
                 if (chooser.showSaveDialog(dialog) != JFileChooser.APPROVE_OPTION) {
                     return;
