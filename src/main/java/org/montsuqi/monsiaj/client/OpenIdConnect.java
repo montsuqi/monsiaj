@@ -62,6 +62,8 @@ public class OpenIdConnect {
 
     private String rp_cookie = "";
     private String rp_domain = "";
+    private String ip_cookie = "";
+    private String ip_domain = "";
 
     public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
@@ -85,7 +87,8 @@ public class OpenIdConnect {
 
     private void doAuthenticationRequestToRP() throws IOException {
       this.rp_domain = (new URL(sso_sp_uri)).getHost();
-      JSONObject res = request(sso_sp_uri, "GET", new JSONObject());
+      RequestOption option = new RequestOption();
+      JSONObject res = request(sso_sp_uri, option);
       this.client_id = res.getString("client_id");
       this.state = res.getString("state");
       this.redirect_uri = res.getString("redirect_uri");
@@ -102,7 +105,13 @@ public class OpenIdConnect {
       params.put("state", state);
       params.put("redirect_uri", redirect_uri);
       params.put("nonce", nonce);
-      JSONObject res = request(authentication_request_uri, "POST", params);
+      RequestOption option = new RequestOption();
+      option.method = "POST";
+      option.params = params;
+      JSONObject res = request(authentication_request_uri, option);
+      String redirect_uri = res.getJSONObject("header").getString("Location");
+      option = new RequestOption();
+      res = request(redirect_uri, option);
       this.request_url = res.getString("request_url");
     }
 
@@ -117,7 +126,17 @@ public class OpenIdConnect {
       params.put("login_id", sso_user);
       params.put("password", sso_password);
       try {
-          JSONObject res = request(request_url, "POST", params);
+          RequestOption option = new RequestOption();
+          option.method = "POST";
+          option.params = params;
+          JSONObject res = request(request_url, option);
+          redirect_uri = res.getJSONObject("header").getString("Location");
+          this.ip_cookie = res.getJSONObject("header").getString("Set-Cookie");
+          this.ip_domain = (new URL(redirect_uri)).getHost();
+
+          option = new RequestOption();
+          option.cookie = this.ip_cookie;
+          res = request(redirect_uri, option);
           this.get_session_uri = res.getJSONObject("header").getString("Location");
       } catch (HttpResponseException e) {
         if (e.getStatusCode() == 403){
@@ -129,20 +148,22 @@ public class OpenIdConnect {
     }
 
     private void doLoginToRP() throws IOException {
-      JSONObject res = request(get_session_uri, "GET", new JSONObject());
+      RequestOption option = new RequestOption();
+      option.cookie = this.rp_cookie;
+      JSONObject res = request(get_session_uri, option);
       this.session_id = res.getString("session_id");
     }
 
-    private JSONObject request(String uri, String method, JSONObject params) throws IOException {
+    private JSONObject request(String uri, RequestOption option) throws IOException {
       URL url = new URL(uri);
       HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
       con.setInstanceFollowRedirects(false);
       con.setRequestProperty("Accept", "application/json");
 
-      if (this.rp_domain.equals(url.getHost())) {
-        con.setRequestProperty("Cookie", this.rp_cookie);
+      if (option.cookie != null) {
+        con.setRequestProperty("Cookie", option.cookie);
       }
-      if (method == "GET") {
+      if (option.method == "GET") {
           con.setDoOutput(false);
           con.setRequestMethod("GET");
       } else {
@@ -150,7 +171,9 @@ public class OpenIdConnect {
           con.setRequestMethod("POST");
           con.setRequestProperty("Content-Type", "application/json");
           OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-          osw.write(params.toString());
+          if (option.params != null) {
+            osw.write(option.params.toString());
+          }
           osw.close();
       }
 
@@ -198,5 +221,11 @@ public class OpenIdConnect {
         } catch (IOException ex) {
             return new ByteArrayOutputStream();
         }
+    }
+
+    private class RequestOption {
+      public String method = "GET";
+      public String cookie = null;
+      public JSONObject params = null;
     }
 }
