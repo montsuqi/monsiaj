@@ -158,7 +158,13 @@ public class Config {
         prop.setProperty(Config.CURRENT_KEY, Integer.toString(current));
         tmp.putAll(prop);
         try {
-            tmp.store(new FileOutputStream(propPath), "monsiaj setting");
+            File file = new File(propPath);
+            tmp.store(new FileOutputStream(file), "monsiaj setting");
+            file.setExecutable(false);
+            file.setReadable(false, false);
+            file.setWritable(false, false);            
+            file.setReadable(true, true);
+            file.setWritable(true, true);            
         } catch (IOException ex) {
             logger.catching(ex);
         }
