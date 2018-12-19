@@ -88,7 +88,12 @@ public class Client {
 
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
-        String authURI = conf.getAuthURI(num);
+        String authURI = null;
+        if (conf.getUseSSO(num)) {
+            authURI = conf.getSSOSPURI(num);
+        } else {
+            authURI = conf.getAuthURI(num);
+        }
         authURI = authURI.replace("http://", "");
         authURI = authURI.replace("https://", "");
         if (conf.getUseSSL(num)) {
@@ -97,7 +102,11 @@ public class Client {
             authURI = "http://" + authURI;
         }
         logger.info("try connect " + authURI);
-        protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num));
+        if (conf.getUseSSO(num)) {
+            protocol = new Protocol(authURI, conf.getSSOUser(num), conf.getSSOPassword(num), true);
+        } else {
+            protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num), false);
+        }
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
                 protocol.makeSSLSocketFactoryPKCS11(conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
@@ -123,17 +132,12 @@ public class Client {
             checkCertificateExpire(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
         }
 
-        if (conf.getUseSSO(num)) {
-            try {
-                protocol.startOpenIDConnect(conf.getSSOUser(num), conf.getSSOPassword(num), conf.getSSOSPURI(num));
-                protocol.startSession();
-            } catch (LoginFailureException e) {
-                JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
-                System.exit(1);
-            }
-        } else {
-          protocol.getServerInfo();
-          protocol.startSession();
+        try {
+            protocol.getServerInfo();
+            protocol.startSession();
+        } catch (LoginFailureException e) {
+            JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
+            System.exit(1);
         }
         logger.info("connected session_id:" + protocol.getSessionId());
         startReceiving();

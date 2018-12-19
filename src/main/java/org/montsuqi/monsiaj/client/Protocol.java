@@ -69,6 +69,7 @@ public class Protocol {
     private final String user;
     private final String password;
     private boolean usePushClient;
+    private boolean useSSO;
 
     private int totalExecTime;
     private int appExecTime;
@@ -94,7 +95,7 @@ public class Protocol {
 
     private String openid_connect_rp_cookie = "";
 
-    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
+    public Protocol(String authURI, final String user, final String pass, boolean useSSO) throws IOException, GeneralSecurityException {
         this.rpcId = 1;
         this.authURI = authURI;
         this.user = user;
@@ -107,6 +108,7 @@ public class Protocol {
         this.tenantId = null;
         this.groupId = null;
         this.startupMessage = null;
+        this.useSSO = useSSO;
     }
 
     public boolean enablePushClient() {
@@ -200,7 +202,7 @@ public class Protocol {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
             }
         }
-        if (url.toString().equals(authURI)) {
+        if (url.toString().equals(authURI) && !useSSO) {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -376,9 +378,9 @@ public class Protocol {
         return result;
     }
 
-    public void startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException, JSONException {
-        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, sso_sp_uri);
-        this.openid_connect_rp_cookie = sso.connect();
+    private String startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri, JSONObject params) throws IOException, JSONException {
+        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, authURI, params);
+        return sso.connect();
     }
 
     public void getServerInfo() throws IOException, JSONException {
@@ -398,8 +400,13 @@ public class Protocol {
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
         params.put("meta", meta);
+        String startSessionURI = authURI;
 
-        JSONObject result = (JSONObject) jsonRPC(authURI, "start_session", params);
+        if (useSSO) {
+          startSessionURI = startOpenIDConnect(user, password, authURI, params);
+        }
+
+        JSONObject result = (JSONObject) jsonRPC(startSessionURI, "start_session", params);
         meta = result.getJSONObject("meta");
 
         this.sessionId = meta.getString("session_id");
