@@ -80,6 +80,7 @@ public class ConfigPanel extends JPanel {
     private JPasswordField passwordEntry;
     private JCheckBox savePasswordCheckbox;
     private JTextField authURIEntry;
+    private JCheckBox useSSOCheckbox;
     // SSL Tab
     private final JPanel sslPanel;
     private JCheckBox useSSLCheckbox;
@@ -113,12 +114,6 @@ public class ConfigPanel extends JPanel {
     private final MetalTheme systemMetalTheme;
     // Info Tab
     protected JPanel infoPanel;
-    // SSO Tab
-    private final JPanel ssoPanel;
-    private JCheckBox useSSOCheckbox;
-    private JTextField ssoUserEntry;
-    private JPasswordField ssoPasswordEntry;
-    private JTextField ssoSPURIEntry;
 
     /**
      * <p>
@@ -256,7 +251,6 @@ public class ConfigPanel extends JPanel {
         printerConfigPanel = new PrinterConfigPanel(conf.getPrinterList());
         othersPanel = createOthersPanel();
         infoPanel = createInfoPanel();
-        ssoPanel = createSSOPanel();
     }
 
     public void loadConfig(int num) {
@@ -265,6 +259,8 @@ public class ConfigPanel extends JPanel {
         String password = conf.getPassword(num);
         boolean savePassword = conf.getSavePassword(num);
         String authURI = conf.getAuthURI(num);
+        boolean use_sso = conf.getUseSSO(num);
+        useSSOCheckbox.setSelected(use_sso);
 
         userEntry.setText(user);
         // Save save_pass check field before the password itself,
@@ -304,16 +300,6 @@ public class ConfigPanel extends JPanel {
         boolean showStartupMessage = conf.getShowStartupMessage(num);
         String systemProperties = conf.getSystemProperties(num);
 
-        // SSO tab
-        boolean use_sso = conf.getUseSSO(num);
-        String ssoUser = conf.getSSOUser(num);
-        String ssoPassword = conf.getSSOPassword(num);
-        String ssoSPURI = conf.getSSOSPURI(num);
-        useSSOCheckbox.setSelected(use_sso);
-        ssoUserEntry.setText(ssoUser);
-        ssoPasswordEntry.setText(ssoPassword);
-        ssoSPURIEntry.setText(ssoSPURI);
-
         styleEntry.setText(styleFile);
         lafThemeEntry.setText(lookAndFeelThemeFile);
         for (LookAndFeelInfo laf : lafs) {
@@ -342,6 +328,7 @@ public class ConfigPanel extends JPanel {
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
         conf.setPassword(num, new String(passwordEntry.getPassword()));
         conf.setAuthURI(num, authURIEntry.getText());
+        conf.setUseSSO(num, useSSOCheckbox.isSelected());
 
         // SSL Tab
         conf.setUseSSL(num, useSSLCheckbox.isSelected());
@@ -364,12 +351,6 @@ public class ConfigPanel extends JPanel {
         conf.setTimerPeriod(num, Integer.valueOf(timerPeriodEntry.getText()));
         conf.setShowStartupMessage(num, showStartupMessageCheck.isSelected());
         conf.setSystemProperties(num, propertiesText.getText());
-
-        // SSO Tab
-        conf.setUseSSO(num, useSSOCheckbox.isSelected());
-        conf.setSSOUser(num, ssoUserEntry.getText());
-        conf.setSSOPassword(num, new String(ssoPasswordEntry.getPassword()));
-        conf.setSSOSPURI(num, ssoSPURIEntry.getText());
 
         conf.save();
     }
@@ -419,6 +400,7 @@ public class ConfigPanel extends JPanel {
         userEntry = createTextField();
         passwordEntry = createPasswordField();
         savePasswordCheckbox = new JCheckBox();
+        useSSOCheckbox = new JCheckBox();
 
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.authURI")),
@@ -442,6 +424,12 @@ public class ConfigPanel extends JPanel {
         panel.add(createLabel(Messages.getString("ConfigurationPanel.save_password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
         panel.add(savePasswordCheckbox,
+                createConstraints(1, y, 3, 1, 1.0, 0.0));
+        y++;
+
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
+                createConstraints(0, y, 1, 1, 0.0, 1.0));
+        panel.add(useSSOCheckbox,
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
@@ -768,49 +756,6 @@ public class ConfigPanel extends JPanel {
         return panel;
     }
 
-    private JPanel createSSOPanel() {
-        int y;
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        useSSOCheckbox = new JCheckBox();
-        ssoUserEntry = createTextField();
-        ssoPasswordEntry = createPasswordField();
-        ssoSPURIEntry = createTextField();
-
-        y = 0;
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(useSSOCheckbox,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.user")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(ssoUserEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.password")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(ssoPasswordEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.sso_sp_uri")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(ssoSPURIEntry,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
-
-        if (doPadding) {
-            for (int i = y; i < MAX_PANEL_ROWS; i++) {
-                panel.add(new JLabel(" "), createConstraints(0, i, MAX_PANEL_COLUMNS, 1, 1.0, 1.0));
-            }
-        }
-        return panel;
-    }
-
     public JPanel getBasicPanel() {
         return basicPanel;
     }
@@ -829,9 +774,5 @@ public class ConfigPanel extends JPanel {
 
     public JPanel getInfoPanel() {
         return infoPanel;
-    }
-
-    public JPanel getSSOPanel() {
-      return ssoPanel;
     }
 }

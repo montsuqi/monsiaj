@@ -88,12 +88,7 @@ public class Client {
 
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
-        String authURI = null;
-        if (conf.getUseSSO(num)) {
-            authURI = conf.getSSOSPURI(num);
-        } else {
-            authURI = conf.getAuthURI(num);
-        }
+        String authURI = conf.getAuthURI(num);
         authURI = authURI.replace("http://", "");
         authURI = authURI.replace("https://", "");
         if (conf.getUseSSL(num)) {
@@ -102,11 +97,7 @@ public class Client {
             authURI = "http://" + authURI;
         }
         logger.info("try connect " + authURI);
-        if (conf.getUseSSO(num)) {
-            protocol = new Protocol(authURI, conf.getSSOUser(num), conf.getSSOPassword(num), true);
-        } else {
-            protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num), false);
-        }
+        protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num), conf.getUseSSO(num));
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
                 protocol.makeSSLSocketFactoryPKCS11(conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
