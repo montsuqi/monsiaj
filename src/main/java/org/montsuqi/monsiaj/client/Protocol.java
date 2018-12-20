@@ -54,9 +54,6 @@ public class Protocol {
 
     static final Logger logger = LogManager.getLogger(Protocol.class);
     // jsonrpc
-    private String protocolVersion;
-    private String applicationVersion;
-    private String serverType;
     private int rpcId;
     private String sessionId;
     private String tenantId;
@@ -100,7 +97,6 @@ public class Protocol {
         this.authURI = authURI;
         this.user = user;
         this.password = pass;
-        this.serverType = null;
         this.usePushClient = false;
         this.sslType = TYPE_NO_SSL;
         this.totalExecTime = 0;
@@ -383,18 +379,6 @@ public class Protocol {
         return sso.connect();
     }
 
-    public void getServerInfo() throws IOException, JSONException {
-        JSONObject params = new JSONObject();
-        JSONObject result = (JSONObject) jsonRPC(authURI, "get_server_info", params);
-        this.protocolVersion = result.getString("protocol_version");
-        this.applicationVersion = result.getString("application_version");
-        this.serverType = result.getString("server_type");
-
-        logger.debug("protocol_version:" + this.protocolVersion);
-        logger.debug("application_version:" + this.applicationVersion);
-        logger.debug("server_type:" + this.serverType);
-    }
-
     public void startSession() throws IOException, JSONException {
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
@@ -442,10 +426,6 @@ public class Protocol {
         logger.info("restURIRoot:" + this.restURIRoot);
         logger.info("usePushClient:" + this.usePushClient);
         logger.info("pusherURI:" + this.pusherURI);
-    }
-
-    public String getServerType() {
-        return serverType;
     }
 
     public synchronized void endSession() throws IOException, JSONException {

@@ -133,7 +133,6 @@ public class Client {
         }
 
         try {
-            protocol.getServerInfo();
             protocol.startSession();
         } catch (LoginFailureException e) {
             JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
