@@ -4,7 +4,7 @@
     <groupId>org.montsuqi.monsiaj</groupId>
     <artifactId>monsiaj</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.11</version>
+    <version>2.0.12</version>
     <name>monsiaj</name>
     <url>https://github.com/montsuqi/monsiaj</url>
     <description>montsuqi panda client for java</description>
@@ -107,7 +107,7 @@
                                 </excludeClassifiers>                               
                                 <arguments>
                                    <argument>-tsa</argument>
-                                   <argument>http://timestamp.globalsign.com/scripts/timstamp.dll</argument>
+                                   <argument>http://timestamp.comodoca.com/rfc3161</argument>
                                 </arguments>      
                                 <keystore>${project.basedir}/keystore</keystore>
                                 <alias>alias</alias>
