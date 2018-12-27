@@ -97,7 +97,7 @@ public class Client {
             authURI = "http://" + authURI;
         }
         logger.info("try connect " + authURI);
-        protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num));
+        protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num), conf.getUseSSO(num));
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
                 protocol.makeSSLSocketFactoryPKCS11(conf.getCACertificateFile(num), conf.getPKCS11Lib(num), conf.getPKCS11Slot(num));
@@ -123,17 +123,11 @@ public class Client {
             checkCertificateExpire(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
         }
 
-        if (conf.getUseSSO(num)) {
-            try {
-                protocol.startOpenIDConnect(conf.getSSOUser(num), conf.getSSOPassword(num), conf.getSSOSPURI(num));
-                protocol.startSession();
-            } catch (LoginFailureException e) {
-                JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
-                System.exit(1);
-            }
-        } else {
-          protocol.getServerInfo();
-          protocol.startSession();
+        try {
+            protocol.startSession();
+        } catch (LoginFailureException e) {
+            JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
+            System.exit(1);
         }
         logger.info("connected session_id:" + protocol.getSessionId());
         startReceiving();

@@ -48,6 +48,7 @@ public class OpenIdConnect {
 
     static final Logger logger = LogManager.getLogger(OpenIdConnect.class);
     private String sso_sp_uri;
+    private JSONObject sso_sp_params;
     private String sso_user;
     private String sso_password;
 
@@ -65,10 +66,11 @@ public class OpenIdConnect {
     private String ip_cookie = "";
     private String ip_domain = "";
 
-    public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException {
+    public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri, JSONObject sso_sp_params) throws IOException {
         this.sso_sp_uri = sso_sp_uri;
         this.sso_user = sso_user;
         this.sso_password = sso_password;
+        this.sso_sp_params = sso_sp_params;
     }
 
     public String connect() throws IOException, LoginFailureException {
@@ -79,15 +81,14 @@ public class OpenIdConnect {
       doAuthenticationRequestToIP();
       // 認証サーバへのログイン
       doLoginToIP();
-      // バックエンドサーバへのsession id発行要求
-      doLoginToRP();
-
-      return this.rp_cookie;
+      return this.get_session_uri;
     }
 
     private void doAuthenticationRequestToRP() throws IOException {
       this.rp_domain = (new URL(sso_sp_uri)).getHost();
       RequestOption option = new RequestOption();
+      option.method = "POST";
+      option.params = sso_sp_params;
       JSONObject res = request(sso_sp_uri, option);
       this.client_id = res.getString("client_id");
       this.state = res.getString("state");
@@ -145,13 +146,6 @@ public class OpenIdConnect {
             throw e;
         }
       }
-    }
-
-    private void doLoginToRP() throws IOException {
-      RequestOption option = new RequestOption();
-      option.cookie = this.rp_cookie;
-      JSONObject res = request(get_session_uri, option);
-      this.session_id = res.getString("session_id");
     }
 
     private JSONObject request(String uri, RequestOption option) throws IOException {

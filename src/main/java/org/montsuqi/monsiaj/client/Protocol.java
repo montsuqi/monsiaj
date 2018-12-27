@@ -54,9 +54,6 @@ public class Protocol {
 
     static final Logger logger = LogManager.getLogger(Protocol.class);
     // jsonrpc
-    private String protocolVersion;
-    private String applicationVersion;
-    private String serverType;
     private int rpcId;
     private String sessionId;
     private String tenantId;
@@ -69,6 +66,7 @@ public class Protocol {
     private final String user;
     private final String password;
     private boolean usePushClient;
+    private boolean useSSO;
 
     private int totalExecTime;
     private int appExecTime;
@@ -94,12 +92,11 @@ public class Protocol {
 
     private String openid_connect_rp_cookie = "";
 
-    public Protocol(String authURI, final String user, final String pass) throws IOException, GeneralSecurityException {
+    public Protocol(String authURI, final String user, final String pass, boolean useSSO) throws IOException, GeneralSecurityException {
         this.rpcId = 1;
         this.authURI = authURI;
         this.user = user;
         this.password = pass;
-        this.serverType = null;
         this.usePushClient = false;
         this.sslType = TYPE_NO_SSL;
         this.totalExecTime = 0;
@@ -107,6 +104,7 @@ public class Protocol {
         this.tenantId = null;
         this.groupId = null;
         this.startupMessage = null;
+        this.useSSO = useSSO;
     }
 
     public boolean enablePushClient() {
@@ -200,7 +198,7 @@ public class Protocol {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
             }
         }
-        if (url.toString().equals(authURI)) {
+        if (url.toString().equals(authURI) && !useSSO) {
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -376,21 +374,9 @@ public class Protocol {
         return result;
     }
 
-    public void startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri) throws IOException, JSONException {
-        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, sso_sp_uri);
-        this.openid_connect_rp_cookie = sso.connect();
-    }
-
-    public void getServerInfo() throws IOException, JSONException {
-        JSONObject params = new JSONObject();
-        JSONObject result = (JSONObject) jsonRPC(authURI, "get_server_info", params);
-        this.protocolVersion = result.getString("protocol_version");
-        this.applicationVersion = result.getString("application_version");
-        this.serverType = result.getString("server_type");
-
-        logger.debug("protocol_version:" + this.protocolVersion);
-        logger.debug("application_version:" + this.applicationVersion);
-        logger.debug("server_type:" + this.serverType);
+    private String startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri, JSONObject params) throws IOException, JSONException {
+        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, authURI, params);
+        return sso.connect();
     }
 
     public void startSession() throws IOException, JSONException {
@@ -398,8 +384,13 @@ public class Protocol {
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
         params.put("meta", meta);
+        String startSessionURI = authURI;
 
-        JSONObject result = (JSONObject) jsonRPC(authURI, "start_session", params);
+        if (useSSO) {
+          startSessionURI = startOpenIDConnect(user, password, authURI, params);
+        }
+
+        JSONObject result = (JSONObject) jsonRPC(startSessionURI, "start_session", params);
         meta = result.getJSONObject("meta");
 
         this.sessionId = meta.getString("session_id");
@@ -435,10 +426,6 @@ public class Protocol {
         logger.info("restURIRoot:" + this.restURIRoot);
         logger.info("usePushClient:" + this.usePushClient);
         logger.info("pusherURI:" + this.pusherURI);
-    }
-
-    public String getServerType() {
-        return serverType;
     }
 
     public synchronized void endSession() throws IOException, JSONException {
