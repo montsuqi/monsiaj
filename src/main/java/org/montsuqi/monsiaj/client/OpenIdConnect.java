@@ -60,9 +60,6 @@ public class OpenIdConnect {
     private String request_url;
     private String get_session_uri;
     private String session_id;
-
-    private String rp_cookie = "";
-    private String rp_domain = "";
     private String ip_cookie = "";
     private String ip_domain = "";
 
@@ -85,7 +82,6 @@ public class OpenIdConnect {
     }
 
     private void doAuthenticationRequestToRP() throws IOException {
-      this.rp_domain = (new URL(sso_sp_uri)).getHost();
       RequestOption option = new RequestOption();
       option.method = "POST";
       option.params = sso_sp_params;
@@ -95,7 +91,6 @@ public class OpenIdConnect {
       this.redirect_uri = res.getString("redirect_uri");
       this.nonce = res.getString("nonce");
       this.authentication_request_uri = res.getJSONObject("header").getString("Location");
-      this.rp_cookie = res.getJSONObject("header").getString("Set-Cookie");
     }
 
     private void doAuthenticationRequestToIP() throws IOException {
@@ -157,6 +152,7 @@ public class OpenIdConnect {
       if (option.cookie != null) {
         con.setRequestProperty("Cookie", option.cookie);
       }
+
       if (option.method == "GET") {
           con.setDoOutput(false);
           con.setRequestMethod("GET");
