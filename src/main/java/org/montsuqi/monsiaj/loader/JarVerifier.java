@@ -1,12 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package jp.or.med.orca.monsiaj;
+package org.montsuqi.monsiaj.loader;
 
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -14,12 +15,13 @@ import java.util.jar.JarFile;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author mihara
- */
 public class JarVerifier {
+
+    private static Logger log = LogManager.getLogger(JarVerifier.class);
+    private static final String[] VALID_CERT_DN_ELEM = {"CN=ORCA Management Organization Co.\\, Ltd."};
 
     public static void main(String[] args) throws Exception {
         System.out.println(verify(new JarFile(args[0])));
@@ -43,12 +45,13 @@ public class JarVerifier {
                     X509Certificate xc = (X509Certificate) c;
                     xc.checkValidity();
                 }
-                if (!leaf.getSubjectDN().getName().contains("CN=Japan Medical Association")) {
-                    return false;
-                }                
-                return true;
-            } catch (Exception ex) {
-                // do nothing
+                for (String elem : VALID_CERT_DN_ELEM) {
+                    if (leaf.getSubjectX500Principal().getName().contains(elem)) {
+                        return true;
+                    }
+                }
+            } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException | CertificateException ex) {
+                log.debug(ex,ex);
             }
         }
         return false;

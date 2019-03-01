@@ -1,8 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package jp.or.med.orca.monsiaj;
+package org.montsuqi.monsiaj.loader;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -16,22 +12,18 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author mihara
- */
 public class Loader {
 
     private static Logger log = LogManager.getLogger(Loader.class);
-    private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client/version.txt";
-    private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client/";
+    private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client2/version";
+    private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client2/";
     private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "cache"};
-    private final String CACHE_DIR = createFilePath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
+    private final String CACHE_DIR = createPath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
     private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader.properties"};
-    private static final String PROP_PATH = createFilePath(PROP_PATH_ELEM).getAbsolutePath();
+    private static final String PROP_PATH = createPath(PROP_PATH_ELEM).getAbsolutePath();
     private Properties prop;
 
-    private static File createFilePath(String[] elements) {
+    private static File createPath(String[] elements) {
         String path = "";
         for (String elem : elements) {
             if (path.isEmpty()) {
@@ -78,33 +70,31 @@ public class Loader {
     private void updateCache(String version) throws IOException {
         log.debug("-- updateCache");
         /*
-         * キャッシュディレクトリの削除と作成
+         * キャッシュディレクトリの作成
          */
         File cacheDir = new File(CACHE_DIR);
-        FileUtils.deleteDirectory(cacheDir);
-        if (!cacheDir.mkdirs()) {
-            throw new IOException("cant make cachedir");
+        if (!cacheDir.exists()) {
+            if (!cacheDir.mkdirs()) {
+                throw new IOException("cant make cachedir");
+            }
         }
 
         /*
-         * zipファイルのダウンロード
+         * jarファイルのダウンロード
          */
-        String strURL = DOWNLOAD_URL + "monsiaj-bin-" + version + ".zip";
+        String strJarFile = "monsiaj-" + version + "-all.jar";
+        String strURL = DOWNLOAD_URL + strJarFile;
         log.info("download " + strURL);
         HttpURLConnection con = httpGet(strURL);
-        URL url = new URL(strURL);
-        File tmp = File.createTempFile("monsiaj-bin-" + version + "-", ".zip");
-        tmp.deleteOnExit();
+        File jarFile = createPath(new String[]{CACHE_DIR,strJarFile});
         BufferedInputStream in = new BufferedInputStream(con.getInputStream());
         int length;
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tmp))) {
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile))) {
             while ((length = in.read()) != -1) {
                 out.write(length);
             }
         }
         con.disconnect();
-        ZipUtils.unzip(tmp, cacheDir);
-        tmp.delete();
         log.debug("-- updateCache end");
     }
 
@@ -145,37 +135,20 @@ public class Loader {
                 log.info("use cache");
             }
             log.debug("-- checkCache end");
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             log.error("checkCache failure");
             log.error(ex.getMessage(), ex);
         }
     }
 
-    private void loadCache(File file) throws Exception {
-        URLClassLoader loader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                loadCache(f);
-            }
-        } else {
-            if (file.getName().endsWith(".jar")) {
-                if (JarVerifier.verify(new JarFile(file))) {
-                    URL u = file.toURI().toURL();
-                    Method m = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
-                    m.setAccessible(true);
-                    m.invoke(loader, new Object[]{u});
-                } else {
-                    throw new Exception("invalid jar(code sign verification error) : " + file.getName());
-                }
-            }
-        }
-    }
-
     private void invokeLauncher(String[] args) throws Exception {
-        String cacheVersion = loadCacheVersion();
-        File file = new File(CACHE_DIR + "monsiaj-bin-" + cacheVersion + "/jmareceipt.jar");
-        URLClassLoader loader = new URLClassLoader(new URL[]{new URL(file.getAbsolutePath())});
-        Class<?> cobj = loader.loadClass("jp.or.med.orca.jmareceipt.JMAReceiptLauncher");
+        String version = loadCacheVersion();
+        File file = createPath(new String[]{CACHE_DIR,"monsiaj-" + version + "-all.jar"});
+        if (!JarVerifier.verify(new JarFile(file))) {
+            throw new Exception("jar verification error");
+        }
+        URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://"+file.getAbsolutePath())});
+        Class<?> cobj = loader.loadClass("org.montsuqi.monsiaj.client.Launcher");
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
         m.setAccessible(true);
         int mods = m.getModifiers();
@@ -189,7 +162,6 @@ public class Loader {
     private void launch(String[] args) throws Exception {
         try {
             log.debug("-- launch start");
-            loadCache(new File(CACHE_DIR));
             invokeLauncher(args);
         } catch (Exception ex) {
             removeCacheVersion();
@@ -202,11 +174,6 @@ public class Loader {
         log.info("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
-        /*
-         * 起動時以降はproxyを解除、クライアント印刷などのHTTPアクセスをproxy経由にしないため
-         */
-        System.clearProperty("proxyHost");
-        System.clearProperty("proxyPort");
         loader.launch(args);
         log.info("---- Loader end");
     }

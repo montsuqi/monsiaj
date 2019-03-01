@@ -107,7 +107,7 @@
                                 </excludeClassifiers>                               
                                 <arguments>
                                    <argument>-tsa</argument>
-                                   <argument>http://timestamp.globalsign.com/scripts/timstamp.dll</argument>
+                                   <argument>http://timestamp.comodoca.com/rfc3161</argument>
                                 </arguments>      
                                 <keystore>${project.basedir}/keystore</keystore>
                                 <alias>alias</alias>
