@@ -68,7 +68,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
-                            <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
+                            <mainClass>org.montsuqi.monsiaj.loader.Loader</mainClass>
                         </manifest>
                         <manifestEntries>
                             <permissions>all-permissions</permissions>
@@ -131,9 +131,18 @@
                         </goals>
                         <configuration>
                             <tasks>
+                                <echo>mkdir out</echo>
+                                <delete dir="${project.build.directory}/out"/>      
+                                <mkdir dir="${project.build.directory}/out"/>                     
                                 <echo>rename-dist-archives</echo>
-                                <move file="${project.build.directory}/monsiaj-${project.version}-bin.zip" tofile="${project.build.directory}/monsiaj-bin-${project.version}.zip" />
-                                <move file="${project.build.directory}/monsiaj-${project.version}-src.zip" tofile="${project.build.directory}/monsiaj-src-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-bin.zip" tofile="${project.build.directory}/out/monsiaj-bin-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-src.zip" tofile="${project.build.directory}/out/monsiaj-src-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-all.jar" todir="${project.build.directory}/out" />
+                                <checksum algorithm="SHA-256" fileext=".sha256">
+                                    <fileset dir="${project.build.directory}/out/">
+                                        <include name="*"/>
+                                    </fileset>
+                                </checksum>
                             </tasks>
                         </configuration>
                     </execution>
