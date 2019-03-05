@@ -6,22 +6,25 @@
         <format>jar</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-  <fileSets>
-    <fileSet>
-      <directory>${project.build.outputDirectory}</directory>
-      <outputDirectory>/</outputDirectory>
-      <includes>
-        <include>org/montsuqi/monsiaj/loader/*</include>
-        <include>log4j2.xml</include>        
-      </includes>
-    </fileSet>
-  </fileSets>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>org/montsuqi/monsiaj/loader/*</include>
+                <include>log4j2.xml</include>        
+            </includes>
+        </fileSet>
+    </fileSets>
     <dependencySets>
         <dependencySet>
             <outputDirectory>/</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>true</unpack>
-            <scope>runtime</scope>
+            <includes>
+                <include>org.apache.logging.log4j:log4j-api:jar</include>
+                <include>org.apache.logging.log4j:log4j-core:jar</include>
+            </includes>        
         </dependencySet>
     </dependencySets>  
 </assembly>
