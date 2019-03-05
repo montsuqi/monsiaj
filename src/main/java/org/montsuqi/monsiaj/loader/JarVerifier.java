@@ -34,24 +34,34 @@ public class JarVerifier {
         if (trustCerts == null || trustCerts.length == 0) {
             return false;
         }
+        boolean invalidCN = true;
+        X509Certificate leaf = (X509Certificate) chain[0];
+        String leafName = leaf.getSubjectX500Principal().getName();
+        for (String elem : VALID_CERT_DN_ELEM) {
+            if (leafName.contains(elem)) {
+                invalidCN = false;
+            }
+        }
+        if (invalidCN) {
+            log.error("署名の証明書が不正です。 Subject: " + leafName);
+            return false;
+        }
 
         for (X509Certificate tc : trustCerts) {
-            X509Certificate root = (X509Certificate) chain[chain.length - 1];
-            X509Certificate leaf = (X509Certificate) chain[0];
-
             try {
-                root.verify(tc.getPublicKey());
+                X509Certificate p = tc;
+                for (int i = chain.length - 1; i >= 0; i--) {
+                    X509Certificate xc = (X509Certificate) chain[i];
+                    xc.verify(p.getPublicKey());
+                    p = xc;
+                }
                 for (Certificate c : chain) {
                     X509Certificate xc = (X509Certificate) c;
                     xc.checkValidity();
                 }
-                for (String elem : VALID_CERT_DN_ELEM) {
-                    if (leaf.getSubjectX500Principal().getName().contains(elem)) {
-                        return true;
-                    }
-                }
+                return true;
             } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException | CertificateException ex) {
-                log.debug(ex,ex);
+                log.debug(ex, ex);
             }
         }
         return false;
@@ -76,6 +86,7 @@ public class JarVerifier {
             try {
                 InputStream iis = jar.getInputStream(entry);
             } catch (SecurityException se) {
+                log.debug(se, se);
                 return false;
             }
             if (verifyCert(entry.getCertificates(), certs)) {

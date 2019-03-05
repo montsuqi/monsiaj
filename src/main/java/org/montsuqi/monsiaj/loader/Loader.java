@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarFile;
+import javax.swing.JOptionPane;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,20 @@ public class Loader {
     private static final String PROP_PATH = createPath(PROP_PATH_ELEM).getAbsolutePath();
     private Properties prop;
 
+    private Loader() {
+        prop = new Properties();
+        try {
+            prop.load(new FileInputStream(PROP_PATH));
+        } catch (IOException ex) {
+            // initial
+        }
+    }
+
+    private void showErrorDialog(String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
+    }
+
     private static File createPath(String[] elements) {
         String path = "";
         for (String elem : elements) {
@@ -35,22 +50,16 @@ public class Loader {
         return new File(path);
     }
 
-    private String loadCacheVersion() {
-        prop = new Properties();
-        try {
-            prop.load(new FileInputStream(PROP_PATH));
-        } catch (IOException ex) {
-            // initial
-        }
-        if (prop.containsKey("cacheVersion")) {
-            return prop.getProperty("cacheVersion");
+    private String getProperty(String key) {
+        if (prop.containsKey(key)) {
+            return prop.getProperty(key);
         } else {
             return null;
         }
     }
 
-    private void saveCacheVersion(String v) {
-        prop.setProperty("cacheVersion", v);
+    private void setProperty(String key, String value) {
+        prop.setProperty(key, value);
         try {
             prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
         } catch (IOException ex) {
@@ -58,8 +67,16 @@ public class Loader {
         }
     }
 
+    private String getCacheVersion() {
+        return getProperty("cacheVersion");
+    }
+
+    private void saveCacheVersion(String v) {
+        setProperty("cacheVersion", v);
+    }
+
     private void removeCacheVersion() {
-        prop.clear();
+        prop.remove("cacheVersion");
         try {
             prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
         } catch (IOException ex) {
@@ -84,9 +101,9 @@ public class Loader {
          */
         String strJarFile = "monsiaj-" + version + "-all.jar";
         String strURL = DOWNLOAD_URL + strJarFile;
-        log.info("download " + strURL);
+        log.info("download start " + strURL);
         HttpURLConnection con = httpGet(strURL);
-        File jarFile = createPath(new String[]{CACHE_DIR,strJarFile});
+        File jarFile = createPath(new String[]{CACHE_DIR, strJarFile});
         BufferedInputStream in = new BufferedInputStream(con.getInputStream());
         int length;
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile))) {
@@ -95,6 +112,7 @@ public class Loader {
             }
         }
         con.disconnect();
+        log.info("... complete");        
         log.debug("-- updateCache end");
     }
 
@@ -120,19 +138,25 @@ public class Loader {
     }
 
     private void checkCache() {
+        String useCache = getProperty("useCache");
+        if (useCache != null && useCache.equals("true")) {
+            log.info("skip cache check");
+            return;
+        }
+
         try {
             log.debug("-- checkCache start");
-            String cacheVersion = loadCacheVersion();
+            String cacheVersion = getCacheVersion();
             String serverVersion = getVersion();
 
             log.info("cacheVersion : " + cacheVersion);
             log.info("serverVersion: " + serverVersion);
 
-            if (cacheVersion == null || !cacheVersion.equals(serverVersion)) {
+            if (cacheVersion != null && cacheVersion.equals(serverVersion)) {
+                log.info("use cache");
+            } else {
                 updateCache(serverVersion);
                 saveCacheVersion(serverVersion);
-            } else {
-                log.info("use cache");
             }
             log.debug("-- checkCache end");
         } catch (IOException ex) {
@@ -142,12 +166,18 @@ public class Loader {
     }
 
     private void invokeLauncher(String[] args) throws Exception {
-        String version = loadCacheVersion();
-        File file = createPath(new String[]{CACHE_DIR,"monsiaj-" + version + "-all.jar"});
-        if (!JarVerifier.verify(new JarFile(file))) {
-            throw new Exception("jar verification error");
+        String version = getCacheVersion();
+        File file = createPath(new String[]{CACHE_DIR, "monsiaj-" + version + "-all.jar"});
+        String noVerify = getProperty("noVerify");
+        if (noVerify != null && noVerify.equals("true")) {
+            log.info("no verify");
+        } else {
+            if (!JarVerifier.verify(new JarFile(file))) {
+                log.error("jar sign verification error");
+                showErrorDialog("ランチャーの署名の検証に失敗しました。詳細はログを確認してください。");
+            }
         }
-        URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://"+file.getAbsolutePath())});
+        URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://" + file.getAbsolutePath())});
         Class<?> cobj = loader.loadClass("org.montsuqi.monsiaj.client.Launcher");
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
         m.setAccessible(true);
@@ -167,6 +197,7 @@ public class Loader {
             removeCacheVersion();
             log.error(ex.getMessage(), ex);
             log.info("remove cacheVersion");
+            showErrorDialog("ランチャーの起動に失敗しました。詳細はログを確認してください。");
         }
     }
 
