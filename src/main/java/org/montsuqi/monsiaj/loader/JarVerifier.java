@@ -43,7 +43,7 @@ public class JarVerifier {
             }
         }
         if (invalidCN) {
-            log.error("署名の証明書が不正です。 Subject: " + leafName);
+            log.error("invalid sign certificate. Subject: " + leafName);
             return false;
         }
 
