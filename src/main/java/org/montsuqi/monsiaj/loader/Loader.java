@@ -1,5 +1,8 @@
 package org.montsuqi.monsiaj.loader;
 
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.Font;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -8,8 +11,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarFile;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import org.apache.logging.log4j.Level;
+import javax.swing.JPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +29,7 @@ public class Loader {
     private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader.properties"};
     private static final String PROP_PATH = createPath(PROP_PATH_ELEM).getAbsolutePath();
     private Properties prop;
+    private JDialog progress;
 
     private Loader() {
         prop = new Properties();
@@ -59,7 +66,11 @@ public class Loader {
     }
 
     private void setProperty(String key, String value) {
-        prop.setProperty(key, value);
+        if (value == null) {
+            prop.remove(key);
+        } else {
+            prop.setProperty(key, value);
+        }
         try {
             prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
         } catch (IOException ex) {
@@ -71,17 +82,49 @@ public class Loader {
         return getProperty("cacheVersion");
     }
 
-    private void saveCacheVersion(String v) {
+    private void setCacheVersion(String v) {
         setProperty("cacheVersion", v);
     }
 
-    private void removeCacheVersion() {
-        prop.remove("cacheVersion");
-        try {
-            prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
-        } catch (IOException ex) {
-            log.catching(Level.ERROR, ex);
+    private String getVersionURL() {
+        String url = getProperty("versionURL");
+        if (url == null) {
+            url = VERSION_URL;
+            setProperty("versionURL", VERSION_URL);
         }
+        return url;
+    }
+
+    private String getDownloadURL() {
+        String url = getProperty("downloadURL");
+        if (url == null) {
+            url = DOWNLOAD_URL;
+            setProperty("downloadURL", DOWNLOAD_URL);
+        }
+        return url;
+    }
+
+    private void createProgress(String msg) {
+        progress = new JDialog();
+        progress.setUndecorated(true);
+
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JLabel label = new JLabel(msg);
+        label.setFont(new Font("Suns", Font.BOLD, 14));
+        panel.add(label);
+        progress.getContentPane().add(panel);
+        progress.pack();
+        progress.setLocationRelativeTo(null);
+    }
+
+    private void showProgress() {
+        progress.setVisible(true);
+    }
+
+    private void hideProgress() {
+        progress.setVisible(false);
+        progress = null;
     }
 
     private void updateCache(String version) throws IOException {
@@ -100,8 +143,12 @@ public class Loader {
          * jarファイルのダウンロード
          */
         String strJarFile = "monsiaj-" + version + "-all.jar";
-        String strURL = DOWNLOAD_URL + strJarFile;
+        String strURL = getDownloadURL() + strJarFile;
         log.info("download start " + strURL);
+        createProgress("バージョン"+ version + "のダウンロード中...");
+        EventQueue.invokeLater(() -> {
+            showProgress();
+        });
         HttpURLConnection con = httpGet(strURL);
         File jarFile = createPath(new String[]{CACHE_DIR, strJarFile});
         BufferedInputStream in = new BufferedInputStream(con.getInputStream());
@@ -112,7 +159,10 @@ public class Loader {
             }
         }
         con.disconnect();
-        log.info("... complete");        
+        EventQueue.invokeLater(() -> {
+            hideProgress();
+        });
+        log.info("... complete");
         log.debug("-- updateCache end");
     }
 
@@ -130,7 +180,7 @@ public class Loader {
     }
 
     private String getVersion() throws IOException {
-        HttpURLConnection con = httpGet(VERSION_URL);
+        HttpURLConnection con = httpGet(getVersionURL());
         BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
         String version = reader.readLine();
         con.disconnect();
@@ -156,7 +206,7 @@ public class Loader {
                 log.info("use cache");
             } else {
                 updateCache(serverVersion);
-                saveCacheVersion(serverVersion);
+                setCacheVersion(serverVersion);
             }
             log.debug("-- checkCache end");
         } catch (IOException ex) {
@@ -194,7 +244,7 @@ public class Loader {
             log.debug("-- launch start");
             invokeLauncher(args);
         } catch (Exception ex) {
-            removeCacheVersion();
+            setCacheVersion(null);
             log.error(ex.getMessage(), ex);
             log.info("remove cacheVersion");
             showErrorDialog("ランチャーの起動に失敗しました。詳細はログを確認してください。");
