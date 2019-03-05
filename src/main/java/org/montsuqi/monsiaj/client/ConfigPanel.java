@@ -427,11 +427,13 @@ public class ConfigPanel extends JPanel {
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
-        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
-                createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(useSSOCheckbox,
-                createConstraints(1, y, 3, 1, 1.0, 0.0));
-        y++;
+        if (System.getProperty("monsia.enable.sso") != null) {
+            panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
+                    createConstraints(0, y, 1, 1, 0.0, 1.0));
+            panel.add(useSSOCheckbox,
+                    createConstraints(1, y, 3, 1, 1.0, 0.0));
+            y++;
+        }
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
@@ -439,20 +441,6 @@ public class ConfigPanel extends JPanel {
             }
         }
         return panel;
-    }
-
-    private void updateSSLPanelComponentsEnabled() {
-        final boolean useSsl = useSSLCheckbox.isSelected();
-        clientCertificateEntry.setEnabled(useSsl);
-        clientCertificateButton.setEnabled(useSsl);
-        caCertificateEntry.setEnabled(useSsl);
-        caCertificateButton.setEnabled(useSsl);
-        exportPasswordEntry.setEnabled(useSsl);
-        saveClientCertificatePasswordCheckbox.setEnabled(useSsl);
-        usePKCS11Checkbox.setEnabled(useSsl);
-        pkcs11LibEntry.setEnabled(useSsl);
-        pkcs11LibButton.setEnabled(useSsl);
-        pkcs11SlotEntry.setEnabled(useSsl);
     }
 
     private void updatePKCS11PanelComponentsEnabled() {
@@ -679,7 +667,8 @@ public class ConfigPanel extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JLabel version = new JLabel("monsiaj ver." + ConfigPanel.class.getPackage().getImplementationVersion());
+        JLabel version = new JLabel("monsiaj ver." + ConfigPanel.class
+                .getPackage().getImplementationVersion());
         version.setHorizontalAlignment(SwingConstants.CENTER);
         version.setFont(new Font(null, Font.BOLD, 20));
         JLabel copy = new JLabel("Copyright (C) 2017 ORCA Project");
