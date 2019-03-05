@@ -88,7 +88,7 @@
                         <configuration>
                             <finalName>monsiaj-loader-${project.version}</finalName>
                             <descriptors>
-                                <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+                                <descriptor>src/assembly/loader.xml</descriptor>
                             </descriptors>
                             <archive>
                                 <manifest>
