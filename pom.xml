@@ -13,8 +13,8 @@
     </organization>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8+</maven.compiler.source>
+        <maven.compiler.target>1.8+</maven.compiler.target>
     </properties>
 
     <pluginRepositories>
@@ -57,32 +57,55 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.0.0</version>
-                <configuration>
-                    <finalName>monsiaj-${project.version}</finalName>
-                    <descriptors>
-                        <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
-                        <descriptor>src/assembly/bin.xml</descriptor>
-                        <descriptor>src/assembly/src.xml</descriptor>
-                    </descriptors>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
-                            <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
-                        </manifest>
-                        <manifestEntries>
-                            <permissions>all-permissions</permissions>
-                        </manifestEntries>                        
-                    </archive>
-                </configuration>
                 <executions>
                     <execution>
                         <id>make-bin-zip</id>
+                        <configuration>
+                            <finalName>monsiaj-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+                                <descriptor>src/assembly/bin.xml</descriptor>
+                                <descriptor>src/assembly/src.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
+                                    <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
+                                </manifest>
+                                <manifestEntries>
+                                    <permissions>all-permissions</permissions>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>                        
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>make-loader</id>
+                        <configuration>
+                            <finalName>monsiaj-loader-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>src/assembly/loader.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
+                                    <mainClass>org.montsuqi.monsiaj.loader.Loader</mainClass>
+                                </manifest>
+                                <manifestEntries>
+                                    <permissions>all-permissions</permissions>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>                        
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>                    
                 </executions>
             </plugin>
 
@@ -107,7 +130,7 @@
                                 </excludeClassifiers>                               
                                 <arguments>
                                    <argument>-tsa</argument>
-                                   <argument>http://timestamp.globalsign.com/scripts/timstamp.dll</argument>
+                                   <argument>http://timestamp.comodoca.com/rfc3161</argument>
                                 </arguments>      
                                 <keystore>${project.basedir}/keystore</keystore>
                                 <alias>alias</alias>
@@ -131,13 +154,31 @@
                         </goals>
                         <configuration>
                             <tasks>
+                                <echo>mkdir out</echo>
+                                <delete dir="${project.build.directory}/out"/>      
+                                <mkdir dir="${project.build.directory}/out"/>                     
                                 <echo>rename-dist-archives</echo>
-                                <move file="${project.build.directory}/monsiaj-${project.version}-bin.zip" tofile="${project.build.directory}/monsiaj-bin-${project.version}.zip" />
-                                <move file="${project.build.directory}/monsiaj-${project.version}-src.zip" tofile="${project.build.directory}/monsiaj-src-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-bin.zip" tofile="${project.build.directory}/out/monsiaj-bin-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-src.zip" tofile="${project.build.directory}/out/monsiaj-src-${project.version}.zip" />
+                                <move file="${project.build.directory}/monsiaj-${project.version}-all.jar" todir="${project.build.directory}/out" />
+                                <move file="${project.build.directory}/monsiaj-loader-${project.version}-all.jar" todir="${project.build.directory}/out" />                                
+                                <checksum algorithm="SHA-256" fileext=".sha256">
+                                    <fileset dir="${project.build.directory}/out/">
+                                        <include name="*"/>
+                                    </fileset>
+                                </checksum>
                             </tasks>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -174,7 +174,8 @@ public class SSLSocketFactoryHelper {
             out.write(configStr.getBytes());
             out.close();
         }
-        Provider p = new sun.security.pkcs11.SunPKCS11(temp.getAbsolutePath());
+        Provider proto = Security.getProvider("SunPKCS11");
+        Provider p = proto.configure(temp.getAbsolutePath());
         Security.removeProvider("IAIK");
         Security.addProvider(p);
         KeyStore.Builder builder = KeyStore.Builder.newInstance("PKCS11", p, new KeyStore.CallbackHandlerProtection(new MyCallbackHandler()));
