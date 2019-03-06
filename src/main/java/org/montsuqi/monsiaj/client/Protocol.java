@@ -159,6 +159,10 @@ public class Protocol {
         return appExecTime;
     }
 
+    public SSLSocketFactory getSSLSocketFactory() {
+      return sslSocketFactory;
+    }
+
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
         if (caCert == null || caCert.isEmpty()) {
             sslSocketFactory = null;
