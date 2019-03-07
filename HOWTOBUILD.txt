@@ -21,7 +21,9 @@ $ mvn package
 * monsiaj-src-$VERSION.zip
     * 配布用ソースアーカイブ
 * monsiaj-$VERSION-all.zip
-    * Java Web Start用署名済みjarファイル
+    * monsiaj本体jarファイル
+* monsiaj-loader-$VERSION-all.zip
+    * monsiaj自動更新jarファイル
 
 ## 署名の設定
 
