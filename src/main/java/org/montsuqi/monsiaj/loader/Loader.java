@@ -72,7 +72,13 @@ public class Loader {
             prop.setProperty(key, value);
         }
         try {
-            prop.store(new FileOutputStream(Loader.PROP_PATH), PROP_PATH);
+            File file = new File(PROP_PATH);
+            prop.store(new FileOutputStream(file), PROP_PATH);
+            file.setExecutable(false);
+            file.setReadable(false, false);
+            file.setWritable(false, false);
+            file.setReadable(true, true);
+            file.setWritable(true, true);
         } catch (IOException ex) {
             log.error(ex.getMessage(), ex);
         }
@@ -145,7 +151,7 @@ public class Loader {
         String strJarFile = "monsiaj-" + version + "-all.jar";
         String strURL = getDownloadURL() + strJarFile;
         log.info("download start " + strURL);
-        createProgress("バージョン"+ version + "のダウンロード中...");
+        createProgress("バージョン" + version + "のダウンロード中...");
         EventQueue.invokeLater(() -> {
             showProgress();
         });
