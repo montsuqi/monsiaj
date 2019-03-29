@@ -289,10 +289,11 @@ public class Protocol {
             logger.info("----");
         }
         HttpURLConnection con = getHttpURLConnection(url);
-        if (method.equals("start_session")) {
+        if (!useSSO && method.equals("start_session")) {
             String userPass = user + ":" + password;
             String base64UserPass = Base64.getEncoder().encodeToString(userPass.getBytes());
             /* 401 WWW-Authenticate: なしでもAuthヘッダを設定するため(Authenticatorでは初回はAuthヘッダをつけてくれない) */
+            logger.debug("set Auth header");
             con.setRequestProperty("Authorization", "Basic " + base64UserPass);
         }
         con.setDoOutput(true);
