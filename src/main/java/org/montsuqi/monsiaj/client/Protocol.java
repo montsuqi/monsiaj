@@ -36,7 +36,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
+import java.util.Base64;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -203,7 +203,6 @@ public class Protocol {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
             }
         }
-        Authenticator.setDefault(null);
         return con;
     }
 
@@ -291,12 +290,10 @@ public class Protocol {
         }
         HttpURLConnection con = getHttpURLConnection(url);
         if (method.equals("start_session")) {
-            Authenticator.setDefault(new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, password.toCharArray());
-                }
-            });
+            String userPass = user + ":" + password;
+            String base64UserPass = Base64.getEncoder().encodeToString(userPass.getBytes());
+            /* 401 WWW-Authenticate: なしでもAuthヘッダを設定するため(Authenticatorでは初回はAuthヘッダをつけてくれない) */
+            con.setRequestProperty("Authorization", "Basic " + base64UserPass);
         }
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
