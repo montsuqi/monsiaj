@@ -62,12 +62,15 @@ public class Protocol {
     private String rpcURI;
     private String restURIRoot;
     private String pusherURI;
-    private final String authURI;
+    private String authURI;
     private String startupMessage;
     private final String user;
     private final String password;
     private boolean usePushClient;
-    private boolean useSSO;
+    private final boolean useSSO;
+    private String protocolVersion;
+    private String applicationVersion;
+    private String serverType;
 
     private int totalExecTime;
     private int appExecTime;
@@ -106,6 +109,7 @@ public class Protocol {
         this.groupId = null;
         this.startupMessage = null;
         this.useSSO = useSSO;
+        this.serverType = "";
     }
 
     public boolean enablePushClient() {
@@ -280,6 +284,14 @@ public class Protocol {
         System.exit(0);
     }
 
+    private void setAuthHeader(HttpURLConnection con) {
+        String userPass = user + ":" + password;
+        String base64UserPass = Base64.getEncoder().encodeToString(userPass.getBytes());
+        /* 401 WWW-Authenticate: なしでもAuthヘッダを設定するため(Authenticatorでは初回はAuthヘッダをつけてくれない) */
+        con.setRequestProperty("Authorization", "Basic " + base64UserPass);
+        logger.debug("set Auth header");
+    }
+
     private synchronized Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         long st = System.currentTimeMillis();
         String reqStr = makeJSONRPCRequest(method, params);
@@ -289,12 +301,17 @@ public class Protocol {
             logger.info("----");
         }
         HttpURLConnection con = getHttpURLConnection(url);
-        if (!useSSO && method.equals("start_session")) {
-            String userPass = user + ":" + password;
-            String base64UserPass = Base64.getEncoder().encodeToString(userPass.getBytes());
-            /* 401 WWW-Authenticate: なしでもAuthヘッダを設定するため(Authenticatorでは初回はAuthヘッダをつけてくれない) */
-            logger.debug("set Auth header");
-            con.setRequestProperty("Authorization", "Basic " + base64UserPass);
+        if (!useSSO) {
+            switch (serverType) {
+                case "ginbee":
+                    if (method.equals("start_session")) {
+                        setAuthHeader(con);
+                    }
+                    break;
+                default:
+                    setAuthHeader(con);
+                    break;
+            }
         }
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
@@ -379,13 +396,14 @@ public class Protocol {
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
         params.put("meta", meta);
-        String startSessionURI = authURI;
 
         if (useSSO) {
-            startSessionURI = startOpenIDConnect(user, password, authURI, params);
+            authURI = startOpenIDConnect(user, password, authURI, params);
+        } else {
+            getServerInfo();
         }
 
-        JSONObject result = (JSONObject) jsonRPC(startSessionURI, "start_session", params);
+        JSONObject result = (JSONObject) jsonRPC(authURI, "start_session", params);
         meta = result.getJSONObject("meta");
 
         this.sessionId = meta.getString("session_id");
@@ -476,6 +494,18 @@ public class Protocol {
         params.put("meta", meta);
 
         return (JSONObject) jsonRPC(this.rpcURI, "get_message", params);
+    }
+
+    public void getServerInfo() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject result = (JSONObject) jsonRPC(authURI, "get_server_info", params);
+        this.protocolVersion = result.getString("protocol_version");
+        this.applicationVersion = result.getString("application_version");
+        this.serverType = result.getString("server_type");
+
+        logger.info("protocol_version:" + this.protocolVersion);
+        logger.info("application_version:" + this.applicationVersion);
+        logger.info("server_type:" + this.serverType);
     }
 
     public synchronized JSONArray listDownloads() throws IOException, JSONException {
