@@ -30,18 +30,9 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.security.KeyStore;
-import java.security.Principal;
-import java.security.Provider;
-import java.security.Security;
-import java.security.cert.X509Certificate;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.TimeZone;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import javax.net.ssl.*;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -121,9 +112,9 @@ public class Client {
         if (conf.getUseSSL(num)) {
             CertificateManager cert = new CertificateManager(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
             if (cert.isExpire()) {
-              String message = Messages.getString("Client.expire_certificate");
-              JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
-              System.exit(1);
+                String message = Messages.getString("Client.expire_certificate");
+                JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
+                System.exit(1);
             }
             if (cert.isExpireApproaching()) {
                 Calendar notAfter = cert.getNotAfter();
@@ -132,16 +123,16 @@ public class Client {
                 String title = Messages.getString("Client.update_certificate_confirm_dialog_title");
                 int result = JOptionPane.showConfirmDialog(null, alert, title, JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
-                  cert.setSSLSocketFactory(protocol.getSSLSocketFactory());
-                  cert.setAuthURI(authURI);
-                  cert.updateCertificate();
-                  conf.setClientCertificateFile(num, cert.getFileName());
-                  if (conf.getSaveClientCertificatePassword(num)) {
-                    conf.setClientCertificatePassword(num, cert.getPassword());
-                  }
-                  conf.save();
-                  String message = Messages.getString("Client.success_update_certificate");
-                  JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
+                    cert.setSSLSocketFactory(protocol.getSSLSocketFactory());
+                    cert.setAuthURI(authURI);
+                    cert.updateCertificate();
+                    conf.setClientCertificateFile(num, cert.getFileName());
+                    if (conf.getSaveClientCertificatePassword(num)) {
+                        conf.setClientCertificatePassword(num, cert.getPassword());
+                    }
+                    conf.save();
+                    String message = Messages.getString("Client.success_update_certificate");
+                    JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
                 }
             }
         }

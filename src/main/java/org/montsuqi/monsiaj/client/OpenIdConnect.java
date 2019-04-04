@@ -29,6 +29,7 @@ class LoginFailureException extends RuntimeException {
 }
 
 class HttpResponseException extends IOException {
+
     private int statusCode;
 
     public HttpResponseException(int statusCode) {
@@ -71,151 +72,137 @@ public class OpenIdConnect {
     }
 
     public String connect() throws IOException, LoginFailureException {
-      logger.info("try OpenId connect...");
-      // バックエンドサーバへのログイン要求
-      doAuthenticationRequestToRP();
-      // 認証サーバへのログイン要求
-      doAuthenticationRequestToIP();
-      // 認証サーバへのログイン
-      doLoginToIP();
-      return this.get_session_uri;
+        logger.info("try OpenId connect...");
+        // バックエンドサーバへのログイン要求
+        doAuthenticationRequestToRP();
+        // 認証サーバへのログイン要求
+        doAuthenticationRequestToIP();
+        // 認証サーバへのログイン
+        doLoginToIP();
+        return this.get_session_uri;
     }
 
     private void doAuthenticationRequestToRP() throws IOException {
-      RequestOption option = new RequestOption();
-      option.method = "POST";
-      option.params = sso_sp_params;
-      JSONObject res = request(sso_sp_uri, option);
-      this.client_id = res.getString("client_id");
-      this.state = res.getString("state");
-      this.redirect_uri = res.getString("redirect_uri");
-      this.nonce = res.getString("nonce");
-      this.authentication_request_uri = res.getJSONObject("header").getString("Location");
+        RequestOption option = new RequestOption();
+        option.method = "POST";
+        option.params = sso_sp_params;
+        JSONObject res = request(sso_sp_uri, option);
+        this.client_id = res.getString("client_id");
+        this.state = res.getString("state");
+        this.redirect_uri = res.getString("redirect_uri");
+        this.nonce = res.getString("nonce");
+        this.authentication_request_uri = res.getJSONObject("header").getString("Location");
     }
 
     private void doAuthenticationRequestToIP() throws IOException {
-      JSONObject params = new JSONObject();
-      params.put("response_type", "code");
-      params.put("scope", "openid");
-      params.put("client_id", client_id);
-      params.put("state", state);
-      params.put("redirect_uri", redirect_uri);
-      params.put("nonce", nonce);
-      RequestOption option = new RequestOption();
-      option.method = "POST";
-      option.params = params;
-      JSONObject res = request(authentication_request_uri, option);
-      String redirect_uri = res.getJSONObject("header").getString("Location");
-      option = new RequestOption();
-      res = request(redirect_uri, option);
-      this.request_url = res.getString("request_url");
+        JSONObject params = new JSONObject();
+        params.put("response_type", "code");
+        params.put("scope", "openid");
+        params.put("client_id", client_id);
+        params.put("state", state);
+        params.put("redirect_uri", redirect_uri);
+        params.put("nonce", nonce);
+        RequestOption option = new RequestOption();
+        option.method = "POST";
+        option.params = params;
+        JSONObject res = request(authentication_request_uri, option);
+        String redirect_uri = res.getJSONObject("header").getString("Location");
+        option = new RequestOption();
+        res = request(redirect_uri, option);
+        this.request_url = res.getString("request_url");
     }
 
     private void doLoginToIP() throws IOException {
-      JSONObject params = new JSONObject();
-      params.put("response_type", "code");
-      params.put("scope", "openid");
-      params.put("client_id", client_id);
-      params.put("state", state);
-      params.put("redirect_uri", redirect_uri);
-      params.put("nonce", nonce);
-      params.put("login_id", sso_user);
-      params.put("password", sso_password);
-      try {
-          RequestOption option = new RequestOption();
-          option.method = "POST";
-          option.params = params;
-          JSONObject res = request(request_url, option);
-          redirect_uri = res.getJSONObject("header").getString("Location");
-          this.ip_cookie = res.getJSONObject("header").getString("Set-Cookie");
-          this.ip_domain = (new URL(redirect_uri)).getHost();
+        JSONObject params = new JSONObject();
+        params.put("response_type", "code");
+        params.put("scope", "openid");
+        params.put("client_id", client_id);
+        params.put("state", state);
+        params.put("redirect_uri", redirect_uri);
+        params.put("nonce", nonce);
+        params.put("login_id", sso_user);
+        params.put("password", sso_password);
+        try {
+            RequestOption option = new RequestOption();
+            option.method = "POST";
+            option.params = params;
+            JSONObject res = request(request_url, option);
+            redirect_uri = res.getJSONObject("header").getString("Location");
+            this.ip_cookie = res.getJSONObject("header").getString("Set-Cookie");
+            this.ip_domain = (new URL(redirect_uri)).getHost();
 
-          option = new RequestOption();
-          option.cookie = this.ip_cookie;
-          res = request(redirect_uri, option);
-          this.get_session_uri = res.getJSONObject("header").getString("Location");
-      } catch (HttpResponseException e) {
-        if (e.getStatusCode() == 403){
-            throw new LoginFailureException();
-        } else {
-            throw e;
+            option = new RequestOption();
+            option.cookie = this.ip_cookie;
+            res = request(redirect_uri, option);
+            this.get_session_uri = res.getJSONObject("header").getString("Location");
+        } catch (HttpResponseException e) {
+            if (e.getStatusCode() == 403) {
+                throw new LoginFailureException();
+            } else {
+                throw e;
+            }
         }
-      }
     }
 
     private JSONObject request(String uri, RequestOption option) throws IOException {
-      URL url = new URL(uri);
-      HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
-      con.setInstanceFollowRedirects(false);
-      con.setRequestProperty("Accept", "application/json");
+        URL url = new URL(uri);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
+        con.setInstanceFollowRedirects(false);
+        con.setRequestProperty("Accept", "application/json");
 
-      if (option.cookie != null) {
-        con.setRequestProperty("Cookie", option.cookie);
-      }
-
-      if (option.method == "GET") {
-          con.setDoOutput(false);
-          con.setRequestMethod("GET");
-      } else {
-          con.setDoOutput(true);
-          con.setRequestMethod("POST");
-          con.setRequestProperty("Content-Type", "application/json");
-          OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-          if (option.params != null) {
-            osw.write(option.params.toString());
-          }
-          osw.close();
-      }
-
-      con.connect();
-      int resCode = con.getResponseCode();
-      switch (resCode) {
-          case 200:
-              break;
-          case 302:
-              break;
-          default:
-              String message = con.getResponseMessage();
-              logger.info("http error: " + resCode + " " + message);
-              throw new HttpResponseException(resCode);
-      }
-
-      JSONObject headerObj = new JSONObject();
-
-      JSONObject result;
-      if (con.getHeaderField("Content-Type").indexOf("application/json") >= 0) {
-        ByteArrayOutputStream body = getHTTPBody(con);
-        result = new JSONObject(body.toString("UTF-8"));
-      } else {
-        result = new JSONObject();
-      }
-      headerObj.put("Set-Cookie", con.getHeaderField("Set-Cookie"));
-      headerObj.put("Location", con.getHeaderField("Location"));
-      result.put("header", headerObj);
-
-      con.disconnect();
-
-      return result;
-    }
-
-    private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) {
-        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
-                BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-                int length;
-                while ((length = bis.read()) != -1) {
-                    bos.write(length);
-                }
-            }
-            return bytes;
-        } catch (IOException ex) {
-            return new ByteArrayOutputStream();
+        if (option.cookie != null) {
+            con.setRequestProperty("Cookie", option.cookie);
         }
+
+        if (option.method == "GET") {
+            con.setDoOutput(false);
+            con.setRequestMethod("GET");
+        } else {
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            if (option.params != null) {
+                osw.write(option.params.toString());
+            }
+            osw.close();
+        }
+
+        con.connect();
+        int resCode = con.getResponseCode();
+        switch (resCode) {
+            case 200:
+                break;
+            case 302:
+                break;
+            default:
+                String message = Protocol.getHTTPBody(con).toString("UTF-8");
+                logger.info("http error: " + resCode + " " + message);
+                throw new HttpResponseException(resCode);
+        }
+
+        JSONObject headerObj = new JSONObject();
+
+        JSONObject result;
+        if (con.getHeaderField("Content-Type").contains("application/json")) {
+            ByteArrayOutputStream body = Protocol.getHTTPBody(con);
+            result = new JSONObject(body.toString("UTF-8"));
+        } else {
+            result = new JSONObject();
+        }
+        headerObj.put("Set-Cookie", con.getHeaderField("Set-Cookie"));
+        headerObj.put("Location", con.getHeaderField("Location"));
+        result.put("header", headerObj);
+
+        con.disconnect();
+
+        return result;
     }
 
     private class RequestOption {
-      public String method = "GET";
-      public String cookie = null;
-      public JSONObject params = null;
+
+        public String method = "GET";
+        public String cookie = null;
+        public JSONObject params = null;
     }
 }

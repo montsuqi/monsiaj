@@ -27,6 +27,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Authenticator;
@@ -35,7 +36,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
+import java.util.Base64;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JOptionPane;
@@ -61,12 +62,15 @@ public class Protocol {
     private String rpcURI;
     private String restURIRoot;
     private String pusherURI;
-    private final String authURI;
+    private String authURI;
     private String startupMessage;
     private final String user;
     private final String password;
     private boolean usePushClient;
-    private boolean useSSO;
+    private final boolean useSSO;
+    private String protocolVersion;
+    private String applicationVersion;
+    private String serverType;
 
     private int totalExecTime;
     private int appExecTime;
@@ -105,6 +109,7 @@ public class Protocol {
         this.groupId = null;
         this.startupMessage = null;
         this.useSSO = useSSO;
+        this.serverType = "";
     }
 
     public boolean enablePushClient() {
@@ -160,7 +165,7 @@ public class Protocol {
     }
 
     public SSLSocketFactory getSSLSocketFactory() {
-      return sslSocketFactory;
+        return sslSocketFactory;
     }
 
     public void makeSSLSocketFactory(final String caCert) throws IOException, GeneralSecurityException {
@@ -201,16 +206,6 @@ public class Protocol {
             if (sslSocketFactory != null) {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
             }
-        }
-        if (url.toString().equals(authURI) && !useSSO) {
-            Authenticator.setDefault(new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, password.toCharArray());
-                }
-            });
-        } else {
-            Authenticator.setDefault(null);
         }
         return con;
     }
@@ -259,29 +254,19 @@ public class Protocol {
                 }
             }
         }
-
         return result;
     }
 
-    private ByteArrayOutputStream getHTTPBody(HttpURLConnection con) {
-        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
-                BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-                int length;
-                while ((length = bis.read()) != -1) {
-                    bos.write(length);
+    public static ByteArrayOutputStream getHTTPBody(HttpURLConnection con) {
+        try ( ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            try ( BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
+                InputStream stream;
+                try {
+                    stream = con.getInputStream();
+                } catch (IOException e) {
+                    stream = con.getErrorStream();
                 }
-            }
-            return bytes;
-        } catch (IOException ex) {
-            return new ByteArrayOutputStream();
-        }
-    }
-
-    private ByteArrayOutputStream getHTTPErrorBody(HttpURLConnection con) {
-        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
-                BufferedInputStream bis = new BufferedInputStream(con.getErrorStream());
+                BufferedInputStream bis = new BufferedInputStream(stream);
                 int length;
                 while ((length = bis.read()) != -1) {
                     bos.write(length);
@@ -299,6 +284,14 @@ public class Protocol {
         System.exit(0);
     }
 
+    private void setAuthHeader(HttpURLConnection con) {
+        String userPass = user + ":" + password;
+        String base64UserPass = Base64.getEncoder().encodeToString(userPass.getBytes());
+        /* 401 WWW-Authenticate: なしでもAuthヘッダを設定するため(Authenticatorでは初回はAuthヘッダをつけてくれない) */
+        con.setRequestProperty("Authorization", "Basic " + base64UserPass);
+        logger.debug("set Auth header");
+    }
+
     private synchronized Object jsonRPC(String url, String method, JSONObject params) throws JSONException, IOException {
         long st = System.currentTimeMillis();
         String reqStr = makeJSONRPCRequest(method, params);
@@ -308,6 +301,18 @@ public class Protocol {
             logger.info("----");
         }
         HttpURLConnection con = getHttpURLConnection(url);
+        if (!useSSO) {
+            switch (serverType) {
+                case "ginbee":
+                    if (method.equals("start_session")) {
+                        setAuthHeader(con);
+                    }
+                    break;
+                default:
+                    setAuthHeader(con);
+                    break;
+            }
+        }
         con.setDoOutput(true);
         con.setInstanceFollowRedirects(false);
         con.setRequestMethod("POST");
@@ -320,7 +325,7 @@ public class Protocol {
             this.openid_connect_rp_cookie = "";
         }
 
-        try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
+        try ( OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
             osw.write(reqStr);
             osw.flush();
         }
@@ -335,10 +340,13 @@ public class Protocol {
                 break;
             case 401:
             case 403:
-                body = getHTTPErrorBody(con).toString("UTF-8");
+                body = getHTTPBody(con).toString("UTF-8");
                 if (body.equalsIgnoreCase("NOT PERMITTED CERTIFICATE")) {
                     logger.info("403 not permitted certificate");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.certificate_error_message"), Messages.getString("Protocol.certificate_error"), JOptionPane.ERROR_MESSAGE);
+                } else if (body.equalsIgnoreCase("USER NOT IN TENANTDB")) {
+                    logger.info("401 user not in tenantdb");
+                    JOptionPane.showMessageDialog(null, Messages.getString("Protocol.user_not_in_tenantdb_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
                 } else {
                     logger.info("" + resCode + " auth error ... " + body);
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
@@ -346,7 +354,7 @@ public class Protocol {
                 System.exit(0);
                 break;
             case 503:
-                body = getHTTPErrorBody(con).toString("UTF-8");
+                body = getHTTPBody(con).toString("UTF-8");
                 if (body.equalsIgnoreCase("GINBEE_MAINTENANCE")) {
                     logger.info("503 server maintenance ... exit");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.maintenance_error_message"), Messages.getString("Protocol.maintenance_error"), JOptionPane.ERROR_MESSAGE);
@@ -361,7 +369,7 @@ public class Protocol {
         }
 
         Object result;
-        try (ByteArrayOutputStream bytes = getHTTPBody(con)) {
+        try ( ByteArrayOutputStream bytes = getHTTPBody(con)) {
             long et = System.currentTimeMillis();
             if (System.getProperty("monsia.do_profile") != null) {
                 logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
@@ -388,13 +396,14 @@ public class Protocol {
         JSONObject meta = new JSONObject();
         meta.put("client_version", PANDA_CLIENT_VERSION);
         params.put("meta", meta);
-        String startSessionURI = authURI;
 
         if (useSSO) {
-          startSessionURI = startOpenIDConnect(user, password, authURI, params);
+            authURI = startOpenIDConnect(user, password, authURI, params);
+        } else {
+            getServerInfo();
         }
 
-        JSONObject result = (JSONObject) jsonRPC(startSessionURI, "start_session", params);
+        JSONObject result = (JSONObject) jsonRPC(authURI, "start_session", params);
         meta = result.getJSONObject("meta");
 
         this.sessionId = meta.getString("session_id");
@@ -487,6 +496,18 @@ public class Protocol {
         return (JSONObject) jsonRPC(this.rpcURI, "get_message", params);
     }
 
+    public void getServerInfo() throws IOException, JSONException {
+        JSONObject params = new JSONObject();
+        JSONObject result = (JSONObject) jsonRPC(authURI, "get_server_info", params);
+        this.protocolVersion = result.getString("protocol_version");
+        this.applicationVersion = result.getString("application_version");
+        this.serverType = result.getString("server_type");
+
+        logger.info("protocol_version:" + this.protocolVersion);
+        logger.info("application_version:" + this.applicationVersion);
+        logger.info("server_type:" + this.serverType);
+    }
+
     public synchronized JSONArray listDownloads() throws IOException, JSONException {
         JSONObject params = new JSONObject();
         JSONObject meta = new JSONObject();
@@ -510,7 +531,7 @@ public class Protocol {
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
 
-        try (BufferedInputStream bis = new BufferedInputStream(con.getInputStream())) {
+        try ( BufferedInputStream bis = new BufferedInputStream(con.getInputStream())) {
             int length;
             while ((length = bis.read()) != -1) {
                 out.write(length);
@@ -531,7 +552,7 @@ public class Protocol {
         //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
         con.setRequestProperty("Content-Type", "application/octet-stream");
         con.setRequestProperty("User-Agent", USER_AGENT);
-        try (OutputStream os = con.getOutputStream()) {
+        try ( OutputStream os = con.getOutputStream()) {
             os.write(in);
             os.flush();
         }

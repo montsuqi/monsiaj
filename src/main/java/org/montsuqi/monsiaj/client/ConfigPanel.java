@@ -427,13 +427,13 @@ public class ConfigPanel extends JPanel {
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
-        if (System.getProperty("monsia.enable.sso") != null) {
+       // if (System.getProperty("monsia.enable.sso") != null) {
             panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
                     createConstraints(0, y, 1, 1, 0.0, 1.0));
             panel.add(useSSOCheckbox,
                     createConstraints(1, y, 3, 1, 1.0, 0.0));
             y++;
-        }
+        //}
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
