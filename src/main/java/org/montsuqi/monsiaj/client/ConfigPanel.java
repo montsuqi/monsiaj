@@ -227,17 +227,6 @@ public class ConfigPanel extends JPanel {
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
                 logger.warn(e);
             }
-            SwingUtilities.invokeLater(() -> {
-                Component root = SwingUtilities.getRoot(basicPanel);
-                try {
-                    if (root != null) {
-                        SwingUtilities.updateComponentTreeUI(root);
-                    }
-
-                } catch (Exception e) {
-                    logger.catching(Level.WARN, e);
-                }
-            });
         }
     }
 
