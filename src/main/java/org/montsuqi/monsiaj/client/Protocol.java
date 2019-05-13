@@ -207,6 +207,9 @@ public class Protocol {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
             }
         }
+        if (!serverType.equals("ginbee")) {
+            setAuthHeader(con);
+        }
         return con;
     }
 
