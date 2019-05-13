@@ -97,7 +97,9 @@ public class Launcher {
 
     private void installLookAndFeels() {
         try {
-            UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
+            if (System.getProperty("monsia.use.loader") == null) {
+                UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
+            }
             UIManager.installLookAndFeel("InfoNode", "net.infonode.gui.laf.InfoNodeLookAndFeel");
         } catch (Exception e) {
             logger.catching(Level.WARN, e);
@@ -264,7 +266,7 @@ public class Launcher {
         f.setIconImage(Toolkit.getDefaultToolkit().createImage(iconURL));
 
         JLabel iconLabel = new JLabel("", createIcon(), JLabel.CENTER);
-        iconLabel.setBorder(new EmptyBorder(5,5,5,5));
+        iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
         container.add(iconLabel, BorderLayout.WEST);
 
         JPanel bar = new JPanel();

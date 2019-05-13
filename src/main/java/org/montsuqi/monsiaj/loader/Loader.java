@@ -233,6 +233,7 @@ public class Loader {
                 showErrorDialog("ランチャーの署名の検証に失敗しました。詳細はログを確認してください。");
             }
         }
+        System.setProperty("monsia.use.loader", "true");
         URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()});
         Class<?> cobj = loader.loadClass("org.montsuqi.monsiaj.client.Launcher");
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
