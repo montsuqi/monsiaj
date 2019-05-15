@@ -25,7 +25,6 @@ package org.montsuqi.monsiaj.client;
 import org.montsuqi.monsiaj.util.Messages;
 import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -56,14 +55,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.text.JTextComponent;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsiaj.util.ExtensionFileFilter;
@@ -416,13 +413,11 @@ public class ConfigPanel extends JPanel {
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
-       // if (System.getProperty("monsia.enable.sso") != null) {
-            panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
-                    createConstraints(0, y, 1, 1, 0.0, 1.0));
-            panel.add(useSSOCheckbox,
-                    createConstraints(1, y, 3, 1, 1.0, 0.0));
-            y++;
-        //}
+        panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
+                createConstraints(0, y, 1, 1, 0.0, 1.0));
+        panel.add(useSSOCheckbox,
+                createConstraints(1, y, 3, 1, 1.0, 0.0));
+        y++;
 
         if (doPadding) {
             for (int i = y; i < MAX_PANEL_ROWS; i++) {
