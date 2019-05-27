@@ -30,9 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
@@ -322,6 +320,7 @@ public class Protocol {
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("X-Support-SSO", "1");        
 
         if (!this.openid_connect_rp_cookie.isEmpty()) {
             con.setRequestProperty("Cookie", this.openid_connect_rp_cookie);
