@@ -149,6 +149,7 @@ public class OpenIdConnect {
         HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
         con.setInstanceFollowRedirects(false);
         con.setRequestProperty("Accept", "application/json");
+        con.setRequestProperty("X-Support-SSO", "1");
 
         if (option.cookie != null) {
             con.setRequestProperty("Cookie", option.cookie);
