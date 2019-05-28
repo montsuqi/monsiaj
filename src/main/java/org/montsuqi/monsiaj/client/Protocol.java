@@ -320,7 +320,9 @@ public class Protocol {
         //          ((HttpsURLConnection) con).setFixedLengthStreamingMode(reqStr.length());
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("User-Agent", USER_AGENT);
-        con.setRequestProperty("X-Support-SSO", "1");        
+        if (useSSO) {
+            con.setRequestProperty("X-Support-SSO", "1");
+        }
 
         if (!this.openid_connect_rp_cookie.isEmpty()) {
             con.setRequestProperty("Cookie", this.openid_connect_rp_cookie);

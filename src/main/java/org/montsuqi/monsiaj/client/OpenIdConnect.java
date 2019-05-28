@@ -1,28 +1,13 @@
 package org.montsuqi.monsiaj.client;
 
-import org.montsuqi.monsiaj.util.Messages;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.Proxy;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 class LoginFailureException extends RuntimeException {
@@ -30,7 +15,7 @@ class LoginFailureException extends RuntimeException {
 
 class HttpResponseException extends IOException {
 
-    private int statusCode;
+    private final int statusCode;
 
     public HttpResponseException(int statusCode) {
         this.statusCode = statusCode;
@@ -48,10 +33,10 @@ class HttpResponseException extends IOException {
 public class OpenIdConnect {
 
     static final Logger logger = LogManager.getLogger(OpenIdConnect.class);
-    private String sso_sp_uri;
-    private JSONObject sso_sp_params;
-    private String sso_user;
-    private String sso_password;
+    private final String sso_sp_uri;
+    private final JSONObject sso_sp_params;
+    private final String sso_user;
+    private final String sso_password;
 
     private String client_id;
     private String state;
@@ -106,9 +91,9 @@ public class OpenIdConnect {
         option.method = "POST";
         option.params = params;
         JSONObject res = request(authentication_request_uri, option);
-        String redirect_uri = res.getJSONObject("header").getString("Location");
+        String redirect_uri_new = res.getJSONObject("header").getString("Location");
         option = new RequestOption();
-        res = request(redirect_uri, option);
+        res = request(redirect_uri_new, option);
         this.request_url = res.getString("request_url");
     }
 
@@ -149,23 +134,24 @@ public class OpenIdConnect {
         HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
         con.setInstanceFollowRedirects(false);
         con.setRequestProperty("Accept", "application/json");
+        con.setRequestProperty("X-Support-SSO", "1");
 
         if (option.cookie != null) {
             con.setRequestProperty("Cookie", option.cookie);
         }
 
-        if (option.method == "GET") {
+        if ("GET".equals(option.method)) {
             con.setDoOutput(false);
             con.setRequestMethod("GET");
         } else {
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
-            OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
-            if (option.params != null) {
-                osw.write(option.params.toString());
+            try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
+                if (option.params != null) {
+                    osw.write(option.params.toString());
+                }
             }
-            osw.close();
         }
 
         con.connect();
