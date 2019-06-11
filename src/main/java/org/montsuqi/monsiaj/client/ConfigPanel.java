@@ -23,7 +23,6 @@
 package org.montsuqi.monsiaj.client;
 
 import org.montsuqi.monsiaj.util.Messages;
-import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -39,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Enumeration;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -57,14 +55,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.text.JTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.montsuqi.monsiaj.util.ExtensionFileFilter;
-import org.montsuqi.monsiaj.util.SystemEnvironment;
 
 public class ConfigPanel extends JPanel {
 
@@ -107,7 +103,6 @@ public class ConfigPanel extends JPanel {
     private static final int MAX_PANEL_ROWS = 12;
     private static final int MAX_PANEL_COLUMNS = 4;
     private final boolean doPadding;
-    private final boolean doChangeLookAndFeel;
     private final MetalTheme systemMetalTheme;
     // Info Tab
     protected JPanel infoPanel;
@@ -160,16 +155,6 @@ public class ConfigPanel extends JPanel {
         private final String extension;
         private final String description;
 
-        /**
-         * <p>
-         * Constructs a FileSelectionAction.</p>
-         *
-         * @param entry a text field to which the path of the selected file is
-         * set.
-         * @param extension a file name extension passed to an
-         * ExtensionFIleFilter.
-         * @param description ditto.
-         */
         ThemeSelectionAction(JTextComponent entry, String extension, String description) {
             super(Messages.getString("ConfigurationPanel.browse"));
             this.entry = entry;
@@ -185,7 +170,6 @@ public class ConfigPanel extends JPanel {
             if (ret == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 entry.setText(file.getAbsolutePath());
-                changeLookAndFeel();
             }
         }
     }
@@ -204,33 +188,9 @@ public class ConfigPanel extends JPanel {
         }
     }
 
-    protected void changeLookAndFeel() {
-        changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
-    }
-
-    protected void changeLookAndFeel(String className) {
-        if (doChangeLookAndFeel) {
-            try {
-                MetalLookAndFeel.setCurrentTheme(systemMetalTheme);
-                if (className.startsWith("com.nilo.plaf.nimrod")) {
-                    System.setProperty("nimrodlf.themeFile", lafThemeEntry.getText());
-                    UIManager.setLookAndFeel(new NimRODLookAndFeel());
-                } else {
-                    UIManager.setLookAndFeel(className);
-                }
-                if (SystemEnvironment.isMacOSX() && (!className.startsWith("apple.laf.AquaLookAndFeel"))) {
-                    updateFont(new Font("Osaka", Font.PLAIN, 12));
-                }
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
-                logger.warn(e);
-            }
-        }
-    }
-
-    protected ConfigPanel(Config conf, boolean doPadding, boolean doChangeLookAndFeel) {
+    protected ConfigPanel(Config conf, boolean doPadding) {
         this.conf = conf;
         this.doPadding = doPadding;
-        this.doChangeLookAndFeel = doChangeLookAndFeel;
         this.systemMetalTheme = MetalLookAndFeel.getCurrentTheme();
         basicPanel = createBasicPanel();
         sslPanel = createSSLPanel();
@@ -533,17 +493,6 @@ public class ConfigPanel extends JPanel {
         lafThemeButton.setEnabled(isNimrod);
     }
 
-    private void updateFont(final Font font) {
-        Enumeration e = UIManager.getDefaults().keys();
-        while (e.hasMoreElements()) {
-            Object key = e.nextElement();
-            Object value = UIManager.get(key);
-            if (value instanceof Font) {
-                UIManager.put(key, font);
-            }
-        }
-    }
-
     private JPanel createOthersPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
@@ -567,7 +516,6 @@ public class ConfigPanel extends JPanel {
         }
         lookAndFeelCombo.addActionListener((ActionEvent e) -> {
             updateLAFThemeEnabled();
-            changeLookAndFeel(lafs[lookAndFeelCombo.getSelectedIndex()].getClassName());
         });
         lafThemeEntry = createTextField();
         lafThemeButton = new JButton();

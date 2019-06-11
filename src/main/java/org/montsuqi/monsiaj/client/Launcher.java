@@ -27,6 +27,7 @@ import com.nilo.plaf.nimrod.NimRODLookAndFeel;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -36,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.Enumeration;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -132,18 +134,7 @@ public class Launcher {
             /*
              * set look and feel
              */
-            try {
-                String cname = conf.getLookAndFeel(n);
-                if (cname.startsWith("com.nilo.plaf.nimrod")) {
-                    System.setProperty("nimrodlf.themeFile", conf.getLookAndFeelThemeFile(n));
-                    UIManager.setLookAndFeel(new NimRODLookAndFeel());
-                } else {
-                    UIManager.setLookAndFeel(cname);
-                }
-            } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                logger.catching(Level.WARN, e);
-                return true;
-            }
+            this.setLookAndFeel();
 
             /*
              * confirm password when the password not preserved
@@ -180,6 +171,35 @@ public class Launcher {
             return true;
         }
         return false;
+    }
+
+    private void setLookAndFeel() {
+        try {
+            int n = conf.getCurrent();
+            String lafName = conf.getLookAndFeel(n);
+            if (lafName.startsWith("com.nilo.plaf.nimrod")) {
+                System.setProperty("nimrodlf.themeFile", conf.getLookAndFeelThemeFile(n));
+                UIManager.setLookAndFeel(new NimRODLookAndFeel());
+            } else {
+                UIManager.setLookAndFeel(lafName);
+            }
+            if (SystemEnvironment.isMacOSX() && (!lafName.startsWith("apple.laf.AquaLookAndFeel"))) {
+                updateFont(new Font("Osaka", Font.PLAIN, 12));
+            }
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            logger.catching(Level.WARN, e);
+        }
+    }
+
+    private void updateFont(final Font font) {
+        Enumeration e = UIManager.getDefaults().keys();
+        while (e.hasMoreElements()) {
+            Object key = e.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof Font) {
+                UIManager.put(key, font);
+            }
+        }
     }
 
     protected JPanel createMainPanel() {
@@ -281,6 +301,7 @@ public class Launcher {
                 configPanel.saveConfig(num);
                 conf.setCurrent(num);
                 conf.applySystemProperties(conf.getCurrent());
+                Launcher.this.setLookAndFeel();
                 connect();
                 f.dispose();
             }
@@ -321,11 +342,15 @@ public class Launcher {
 
         f.setSize(800, 480);
         f.setResizable(true);
-
         f.setLocationRelativeTo(null);
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Launcher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }                
         f.setVisible(true);
-        configPanel.changeLookAndFeel();
+        
         run.requestFocus();
     }
 
@@ -342,7 +367,7 @@ public class Launcher {
     }
 
     protected ConfigPanel createConfigurationPanel() {
-        return new ConfigPanel(conf, true, true);
+        return new ConfigPanel(conf, true);
     }
 
     protected ConfigViewer createConfigurationViewer() {

@@ -209,7 +209,7 @@ public class ConfigViewer {
     }
 
     protected ConfigPanel createConfigPanel(Config conf) {
-        return new ConfigPanel(conf, false, false);
+        return new ConfigPanel(conf, false);
     }
 
     protected void editConfig(Dialog parent, final int num, final boolean newFlag) {
