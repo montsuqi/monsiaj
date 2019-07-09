@@ -368,7 +368,9 @@ public class Client {
                 if (!protocol.enablePushClient()) {
                     listDownloads();
                 }
-                getMessage();
+                if (!this.protocol.getServerType().equals("ginbee")) {
+                    getMessage();
+                }
                 stopReceiving();
             }
         } catch (IOException | JSONException ex) {
