@@ -51,6 +51,13 @@ import org.json.JSONObject;
  */
 public class Protocol {
 
+    /**
+     * @return the serverType
+     */
+    public String getServerType() {
+        return serverType;
+    }
+
     static final Logger logger = LogManager.getLogger(Protocol.class);
     // jsonrpc
     private int rpcId;
@@ -303,7 +310,7 @@ public class Protocol {
         }
         HttpURLConnection con = getHttpURLConnection(url);
         if (!useSSO) {
-            switch (serverType) {
+            switch (getServerType()) {
                 case "ginbee":
                     if (method.equals("start_session")) {
                         setAuthHeader(con);
@@ -509,7 +516,7 @@ public class Protocol {
 
         logger.info("protocol_version:" + this.protocolVersion);
         logger.info("application_version:" + this.applicationVersion);
-        logger.info("server_type:" + this.serverType);
+        logger.info("server_type:" + this.getServerType());
     }
 
     public synchronized JSONArray listDownloads() throws IOException, JSONException {
