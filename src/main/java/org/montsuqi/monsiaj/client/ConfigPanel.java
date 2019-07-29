@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -272,7 +273,8 @@ public class ConfigPanel extends JPanel {
         // Save save_pass check field before the password itself,
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
-        conf.setPassword(num, new String(passwordEntry.getPassword()));
+        String password = new String(passwordEntry.getPassword());
+        conf.setPassword(num, password.strip());
         conf.setAuthURI(num, authURIEntry.getText());
         conf.setUseSSO(num, useSSOCheckbox.isSelected());
 
@@ -280,7 +282,8 @@ public class ConfigPanel extends JPanel {
         conf.setUseSSL(num, useSSLCheckbox.isSelected());
         conf.setCACertificateFile(num, caCertificateEntry.getText());
         conf.setClientCertificateFile(num, clientCertificateEntry.getText());
-        conf.setClientCertificatePassword(num, new String(exportPasswordEntry.getPassword()));
+        String exportPassword = new String(exportPasswordEntry.getPassword());
+        conf.setClientCertificatePassword(num, exportPassword.strip());
         conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
         conf.setUsePKCS11(num, usePKCS11Checkbox.isSelected());
         conf.setPKCS11Lib(num, pkcs11LibEntry.getText());
