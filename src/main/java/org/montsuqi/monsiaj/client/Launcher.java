@@ -93,17 +93,18 @@ public class Launcher {
         this.title = title;
         SystemEnvironment.setMacMenuTitle(title);
         conf = new Config();
-        installLookAndFeels();
+        initLookAndFeel();
         TempFile.cleanOld();
     }
 
-    private void installLookAndFeels() {
+    private void initLookAndFeel() {
         try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             if (System.getProperty("monsia.use.loader") == null) {
                 UIManager.installLookAndFeel("Nimrod", "com.nilo.plaf.nimrod.NimRODLookAndFeel");
             }
             UIManager.installLookAndFeel("InfoNode", "net.infonode.gui.laf.InfoNodeLookAndFeel");
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             logger.catching(Level.WARN, e);
         }
     }
@@ -344,13 +345,8 @@ public class Launcher {
         f.setResizable(true);
         f.setLocationRelativeTo(null);
         f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Launcher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }                
         f.setVisible(true);
-        
+
         run.requestFocus();
     }
 
