@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +43,7 @@ import org.montsuqi.monsiaj.widgets.PandaTable;
  */
 class PandaTableHandler extends WidgetHandler {
 
+    static final Logger logger = LogManager.getLogger(PandaTableHandler.class);
     private static final List<String> widgetList;
 
     static {
@@ -58,6 +61,10 @@ class PandaTableHandler extends WidgetHandler {
         int trow = 0;
         if (obj.has("trow")) {
             trow = obj.getInt("trow");
+            if (trow < 0) {
+                logger.warn("" + widget.getName() + "invalid trow:" + trow);
+                trow = 0;
+            }
             if (trow >= 1) {
                 trow -= 1;
             }
@@ -91,6 +98,10 @@ class PandaTableHandler extends WidgetHandler {
         int tcolumn = 0;
         if (obj.has("tcolumn")) {
             tcolumn = obj.getInt("tcolumn");
+            if (tcolumn < 0) {
+                logger.warn("" + widget.getName() + "invalid tcolumn:" + tcolumn);
+                tcolumn = 0;
+            }
             if (tcolumn >= 1) {
                 tcolumn -= 1;
             }
@@ -99,16 +110,14 @@ class PandaTableHandler extends WidgetHandler {
             }
         }
 
-        if (obj.has("rowdata")) {           
+        if (obj.has("rowdata")) {
             JSONArray array = obj.getJSONArray("rowdata");
-//System.out.println("rowdata length:"+array.length());                            
             for (int i = 0; i < array.length(); i++) {
                 JSONObject rowObj = array.getJSONObject(i);
                 for (int j = 0; j < table.getColumns(); j++) {
-                    String key = "column" + (j + 1);                    
+                    String key = "column" + (j + 1);
                     if (rowObj.has(key)) {
                         JSONObject colObj = rowObj.getJSONObject(key);
-//System.out.println(key + " " + colObj.toString());                        
                         if (colObj.has("celldata")) {
                             table.setCell(i, j, colObj.getString("celldata"));
                         }
@@ -165,10 +174,10 @@ class PandaTableHandler extends WidgetHandler {
 
         int k = 0;
         JSONArray array = new JSONArray();
-        obj.put("rowdata", array);        
+        obj.put("rowdata", array);
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             for (int j = 0; j < table.getColumns(); j++) {
-                String val = (String)tableModel.getValueAt(i, j);
+                String val = (String) tableModel.getValueAt(i, j);
                 if (!val.isEmpty()) {
                     k = i + 1;
                 }

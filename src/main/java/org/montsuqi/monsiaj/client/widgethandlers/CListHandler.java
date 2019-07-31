@@ -34,6 +34,8 @@ import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +49,8 @@ import org.montsuqi.monsiaj.widgets.PandaCList;
  */
 class CListHandler extends WidgetHandler {
 
+    protected static final Logger logger = LogManager.getLogger(CListHandler.class);
+
     @Override
     public void set(UIControl con, Component widget, JSONObject obj, Map styleMap) throws JSONException {
         JTable table = (JTable) widget;
@@ -58,6 +62,10 @@ class CListHandler extends WidgetHandler {
         int count = 0;
         if (obj.has("count")) {
             count = obj.getInt("count");
+            if (count < 0) {
+                logger.warn("" + widget.getName() + "invalid count:"+count);
+                count = 0;
+            }
         }
 
         double rowattr = 0.0;

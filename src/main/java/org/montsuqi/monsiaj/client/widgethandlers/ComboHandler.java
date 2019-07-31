@@ -56,6 +56,10 @@ class ComboHandler extends WidgetHandler {
         int count = 0;
         if (obj.has("count")) {
             count = obj.getInt("count");
+            if (count < 0) {
+                logger.warn("" + widget.getName() + "invalid count:"+count);
+                count = 0;
+            }
         }
         
         if (obj.has("item")) {            
