@@ -273,7 +273,7 @@ public class ConfigPanel extends JPanel {
         // since setPass fetches its value from the preferences internally.
         conf.setSavePassword(num, savePasswordCheckbox.isSelected());
         String password = new String(passwordEntry.getPassword());
-        conf.setPassword(num, password.strip());
+        conf.setPassword(num, password.trim());
         conf.setAuthURI(num, authURIEntry.getText());
         conf.setUseSSO(num, useSSOCheckbox.isSelected());
 
@@ -282,7 +282,7 @@ public class ConfigPanel extends JPanel {
         conf.setCACertificateFile(num, caCertificateEntry.getText());
         conf.setClientCertificateFile(num, clientCertificateEntry.getText());
         String exportPassword = new String(exportPasswordEntry.getPassword());
-        conf.setClientCertificatePassword(num, exportPassword.strip());
+        conf.setClientCertificatePassword(num, exportPassword.trim());
         conf.setSaveClientCertificatePassword(num, saveClientCertificatePasswordCheckbox.isSelected());
         conf.setUsePKCS11(num, usePKCS11Checkbox.isSelected());
         conf.setPKCS11Lib(num, pkcs11LibEntry.getText());
