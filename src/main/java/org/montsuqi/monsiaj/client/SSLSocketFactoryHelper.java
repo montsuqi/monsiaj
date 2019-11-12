@@ -143,7 +143,6 @@ public class SSLSocketFactoryHelper {
         ctx = SSLContext.getInstance("TLSv1.2");
         ctx.init(keyManagers, trustManagers, null);
         factory = ctx.getSocketFactory();
-        SSLContext.setDefault(ctx);
         return factory;
     }
 
@@ -159,7 +158,6 @@ public class SSLSocketFactoryHelper {
         trustManagers = createCAFileTrustManagers(caCert);
         ctx.init(keyManagers, trustManagers, null);
         factory = ctx.getSocketFactory();
-        SSLContext.setDefault(ctx);
         return factory;
     }
 
