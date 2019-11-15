@@ -349,6 +349,13 @@ public class Launcher {
 
         run.requestFocus();
     }
+    
+    private static String toLowerCaseNullCheck(String str) {
+        if (str == null) {
+            str = "";
+        }
+        return str.toLowerCase();
+    }
 
     private void connect() {
         conf.save();
@@ -358,14 +365,14 @@ public class Launcher {
         } catch (java.net.UnknownHostException e) {
             showErrorDialog(e, Messages.getString("Client.unknown_host_error"), Messages.getString("Client.unknown_host_error_msg") + e.getMessage());
         } catch (javax.net.ssl.SSLException e) {
-            String msg = e.getMessage().toLowerCase();
+            String msg = toLowerCaseNullCheck(e.getMessage());
             if (msg.contains("the trustAnchors parameter must be non-empty".toLowerCase())) {
                 showErrorDialog(e, Messages.getString("Client.certificate_error"), Messages.getString("Client.invalid_ca_cert_format"));
             } else {
                 showErrorDialog(e, Messages.getString("Client.other_error"), null);
             }
         } catch (IOException e) {
-            switch (e.getMessage()) {
+            switch (toLowerCaseNullCheck(e.getMessage())) {
                 case "keystore password was incorrect":
                     showErrorDialog(e, Messages.getString("Client.certificate_error"), Messages.getString("Client.invalid_p12_pass"));
                     break;
