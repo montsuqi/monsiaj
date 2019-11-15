@@ -266,8 +266,8 @@ public class Protocol {
     }
 
     public static ByteArrayOutputStream getHTTPBody(HttpURLConnection con) {
-        try ( ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            try ( BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+            try (BufferedOutputStream bos = new BufferedOutputStream(bytes)) {
                 InputStream stream;
                 try {
                     stream = con.getInputStream();
@@ -336,7 +336,7 @@ public class Protocol {
             this.openid_connect_rp_cookie = "";
         }
 
-        try ( OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
+        try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
             osw.write(reqStr);
             osw.flush();
         }
@@ -358,6 +358,9 @@ public class Protocol {
                 } else if (body.equalsIgnoreCase("USER NOT IN TENANTDB")) {
                     logger.info("401 user not in tenantdb");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.user_not_in_tenantdb_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
+                } else if (body.equalsIgnoreCase("ON PREMISES ONLY TENANT")) {
+                    logger.info("403 on premises only tenant");
+                    JOptionPane.showMessageDialog(null, Messages.getString("Protocol.on_premises_only_tenant_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
                 } else {
                     logger.info("" + resCode + " auth error ... " + body);
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
@@ -380,7 +383,7 @@ public class Protocol {
         }
 
         Object result;
-        try ( ByteArrayOutputStream bytes = getHTTPBody(con)) {
+        try (ByteArrayOutputStream bytes = getHTTPBody(con)) {
             long et = System.currentTimeMillis();
             if (System.getProperty("monsia.do_profile") != null) {
                 logger.info(method + ":" + (et - st) + "ms request_bytes:" + reqStr.length() + " response_bytes:" + bytes.size());
@@ -542,7 +545,7 @@ public class Protocol {
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
 
-        try ( BufferedInputStream bis = new BufferedInputStream(con.getInputStream())) {
+        try (BufferedInputStream bis = new BufferedInputStream(con.getInputStream())) {
             int length;
             while ((length = bis.read()) != -1) {
                 out.write(length);
@@ -563,7 +566,7 @@ public class Protocol {
         //((HttpsURLConnection) con.setFixedLengthStreamingMode(in.length);
         con.setRequestProperty("Content-Type", "application/octet-stream");
         con.setRequestProperty("User-Agent", USER_AGENT);
-        try ( OutputStream os = con.getOutputStream()) {
+        try (OutputStream os = con.getOutputStream()) {
             os.write(in);
             os.flush();
         }
