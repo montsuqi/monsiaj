@@ -11,7 +11,7 @@ import java.io.File;
  *
  * @author mihara
  */
-public class LogFileCleaner {
+public class LogFile {
 
     private static final long VALID_TERM = 30 * 24 * 3600 * 1000; /* 30days millisec */
     public final static File LOG_DIR;

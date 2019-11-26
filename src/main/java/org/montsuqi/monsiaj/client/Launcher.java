@@ -58,7 +58,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
-import org.montsuqi.monsiaj.util.LogFileCleaner;
+import org.montsuqi.monsiaj.util.LogFile;
 import org.montsuqi.monsiaj.util.OptionParser;
 import org.montsuqi.monsiaj.util.SystemEnvironment;
 import org.montsuqi.monsiaj.util.TempFile;
@@ -96,7 +96,7 @@ public class Launcher {
         conf = new Config();
         initLookAndFeel();
         TempFile.cleanOld();
-        LogFileCleaner.cleanOld();
+        LogFile.cleanOld();
     }
 
     private void initLookAndFeel() {
