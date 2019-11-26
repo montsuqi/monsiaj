@@ -76,6 +76,7 @@ public class Protocol {
     private String protocolVersion;
     private String applicationVersion;
     private String serverType;
+    private boolean noProxy;
 
     private int totalExecTime;
     private int appExecTime;
@@ -115,6 +116,12 @@ public class Protocol {
         this.startupMessage = null;
         this.useSSO = useSSO;
         this.serverType = "";
+        /* VPN経由のみNO_PROXYを設定する */
+        if (authURI.contains("sms.orca.orcamo.jp") || authURI.contains("sms-stg.orca.orcamo.jp")) {
+            noProxy = true;
+        } else {
+            noProxy = false;
+        }
     }
 
     public boolean enablePushClient() {
@@ -205,8 +212,12 @@ public class Protocol {
     }
 
     private HttpURLConnection getHttpURLConnection(URL url) throws IOException {
-        HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
-
+        HttpURLConnection con;
+        if (noProxy) {
+            con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
+        } else {
+            con = (HttpURLConnection) url.openConnection();
+        }
         if (url.getProtocol().equals("https")) {
             if (sslSocketFactory != null) {
                 ((HttpsURLConnection) con).setSSLSocketFactory(sslSocketFactory);
