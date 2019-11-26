@@ -14,15 +14,16 @@ import java.util.UUID;
  */
 public class TempFile {
 
-    public final static File tempDirRoot;
-    public final static File tempDir;
+    private final static long VALID_PERIOD = 24 * 3600 * 1000; /* 1day millisec */
+    public final static File TEMP_DIR_ROOT;
+    public final static File TEMP_DIR;
 
     static {
-        tempDirRoot = new File(new File(new File(System.getProperty("user.home")), ".monsiaj"), "tmp");
-        tempDir = new File(tempDirRoot, UUID.randomUUID().toString());
-        tempDir.mkdirs();
+        TEMP_DIR_ROOT = new File(new File(new File(System.getProperty("user.home")), ".monsiaj"), "tmp");
+        TEMP_DIR = new File(TEMP_DIR_ROOT, UUID.randomUUID().toString());
+        TEMP_DIR.mkdirs();
     }
-    
+
     private TempFile() {
     }
 
@@ -36,10 +37,11 @@ public class TempFile {
     }
 
     public static void cleanOld() {
-        for (File f : tempDirRoot.listFiles()) {
+        long now = System.currentTimeMillis();
+        for (File f : TEMP_DIR_ROOT.listFiles()) {
             try {
-                long elaps = System.currentTimeMillis() - f.lastModified();
-                if (elaps > 86400000) { /* 1day */
+                long elaps = now - f.lastModified();
+                if (elaps > VALID_PERIOD) {
                     deleteAll(f);
                 } else {
                 }
@@ -47,15 +49,15 @@ public class TempFile {
             }
         }
     }
-    
+
     public static File createTempFile(String prefix, String suffix) {
         final String filename = prefix + "_" + UUID.randomUUID().toString() + "_" + suffix;
-        return new File(tempDir,filename);
+        return new File(TEMP_DIR,filename);
     }
-    
+
     public static void cleanTempDir() {
-        if (tempDir.exists()) {
-            deleteAll(tempDir);
+        if (TEMP_DIR.exists()) {
+            deleteAll(TEMP_DIR);
         }
     }
 }
