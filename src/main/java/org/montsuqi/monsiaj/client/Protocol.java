@@ -76,7 +76,7 @@ public class Protocol {
     private String protocolVersion;
     private String applicationVersion;
     private String serverType;
-    private boolean noProxy;
+    private boolean forceNoProxy;
 
     private int totalExecTime;
     private int appExecTime;
@@ -118,10 +118,14 @@ public class Protocol {
         this.serverType = "";
         /* VPN経由のみNO_PROXYを設定する */
         if (authURI.contains("sms.orca.orcamo.jp") || authURI.contains("sms-stg.orca.orcamo.jp")) {
-            noProxy = true;
+            forceNoProxy = true;
         } else {
-            noProxy = false;
+            forceNoProxy = false;
         }
+        logger.info("forceNoProxy:" + forceNoProxy);
+        logger.info("proxyHost:" + System.getProperty("proxyHost"));
+        logger.info("proxyPort:" + System.getProperty("proxyPort"));
+        logger.info("nonProxyHosts:" + System.getProperty("nonProxyHosts"));        
     }
 
     public boolean enablePushClient() {
@@ -213,7 +217,7 @@ public class Protocol {
 
     private HttpURLConnection getHttpURLConnection(URL url) throws IOException {
         HttpURLConnection con;
-        if (noProxy) {
+        if (forceNoProxy) {
             con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
         } else {
             con = (HttpURLConnection) url.openConnection();
