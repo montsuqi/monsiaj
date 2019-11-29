@@ -125,7 +125,7 @@ public class Protocol {
         logger.info("forceNoProxy:" + forceNoProxy);
         logger.info("proxyHost:" + System.getProperty("proxyHost"));
         logger.info("proxyPort:" + System.getProperty("proxyPort"));
-        logger.info("nonProxyHosts:" + System.getProperty("nonProxyHosts"));        
+        logger.info("nonProxyHosts:" + System.getProperty("nonProxyHosts"));
     }
 
     public boolean enablePushClient() {
@@ -365,20 +365,24 @@ public class Protocol {
                 // do nothing
                 break;
             case 401:
+                body = getHTTPBody(con).toString("UTF-8");
+                logger.info("" + resCode + " auth error ... " + body);
+                JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
+                break;
             case 403:
                 body = getHTTPBody(con).toString("UTF-8");
                 if (body.equalsIgnoreCase("NOT PERMITTED CERTIFICATE")) {
                     logger.info("403 not permitted certificate");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.certificate_error_message"), Messages.getString("Protocol.certificate_error"), JOptionPane.ERROR_MESSAGE);
                 } else if (body.equalsIgnoreCase("USER NOT IN TENANTDB")) {
-                    logger.info("401 user not in tenantdb");
+                    logger.info("403 user not in tenantdb");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.user_not_in_tenantdb_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
                 } else if (body.equalsIgnoreCase("ON PREMISES ONLY TENANT")) {
                     logger.info("403 on premises only tenant");
                     JOptionPane.showMessageDialog(null, Messages.getString("Protocol.on_premises_only_tenant_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
                 } else {
-                    logger.info("" + resCode + " auth error ... " + body);
-                    JOptionPane.showMessageDialog(null, Messages.getString("Protocol.auth_error_message"), Messages.getString("Protocol.auth_error"), JOptionPane.ERROR_MESSAGE);
+                    showHTTPErrorMessage(resCode, resMessage);
                 }
                 System.exit(0);
                 break;
