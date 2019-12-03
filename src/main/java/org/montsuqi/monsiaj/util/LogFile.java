@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class LogFile {
 
-    private static final long VALID_TERM = 30 * 24 * 3600 * 1000L; /* 30days millisec */
+    private static final long VALID_PERIOD = 30 * 24 * 3600 * 1000L; /* 30days millisec */
     public final static File LOG_DIR;
 
     static {
@@ -26,7 +26,7 @@ public class LogFile {
         for (File f : LOG_DIR.listFiles()) {
             try {
                 long elaps = now - f.lastModified();
-                if (elaps > VALID_TERM) {
+                if (elaps > VALID_PERIOD) {
                     if (f.isFile()) {
                         f.delete();
                     }
