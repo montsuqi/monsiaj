@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class LogFile {
 
-    private static final long VALID_PERIOD = 90 * 24 * 3600 * 1000L; /* 30days millisec */
+    private static final long VALID_PERIOD = 90 * 24 * 3600 * 1000L; /* 90days millisec */
     public final static File LOG_DIR;
 
     static {
