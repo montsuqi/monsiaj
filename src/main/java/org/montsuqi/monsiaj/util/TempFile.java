@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 public class TempFile {
 
-    private final static long VALID_PERIOD = 24 * 3600 * 1000; /* 1day millisec */
+    private final static long VALID_PERIOD = 24 * 3600 * 1000L; /* 1day millisec */
     public final static File TEMP_DIR_ROOT;
     public final static File TEMP_DIR;
 
