@@ -11,7 +11,7 @@ and open the template in the editor.
     <appenders>
         <File
             name="File"
-            fileName="${sys:user.home}/.monsiaj/logs/monsiaj.log.${date:yyyyMMddHHmmssSS}.txt"
+            fileName="${sys:user.home}/.monsiaj/logs/monsiaj.log.${date:yyyyMMddHHmmssSSS}.txt"
         >
             <PatternLayout
                 pattern="%d{MM/dd HH:mm:ss} [%-5p] %m%n%ex"
