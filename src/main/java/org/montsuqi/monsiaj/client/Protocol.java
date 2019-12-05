@@ -210,12 +210,12 @@ public class Protocol {
         this.sslType = TYPE_SSL_PKCS11;
     }
 
-    private HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
+    public HttpURLConnection getHttpURLConnection(String strURL) throws IOException {
         URL url = new URL(strURL);
         return getHttpURLConnection(url);
     }
 
-    private HttpURLConnection getHttpURLConnection(URL url) throws IOException {
+    public HttpURLConnection getHttpURLConnection(URL url) throws IOException {
         HttpURLConnection con;
         if (forceNoProxy) {
             con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
@@ -420,7 +420,7 @@ public class Protocol {
     }
 
     private String startOpenIDConnect(String sso_user, String sso_password, String sso_sp_uri, JSONObject params) throws IOException, JSONException {
-        OpenIdConnect sso = new OpenIdConnect(sso_user, sso_password, authURI, params);
+        OpenIdConnect sso = new OpenIdConnect(this, sso_user, sso_password, authURI, params);
         return sso.connect();
     }
 
