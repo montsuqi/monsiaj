@@ -33,6 +33,7 @@ class HttpResponseException extends IOException {
 public class OpenIdConnect {
 
     static final Logger logger = LogManager.getLogger(OpenIdConnect.class);
+    private final Protocol protocol;
     private final String sso_sp_uri;
     private final JSONObject sso_sp_params;
     private final String sso_user;
@@ -49,7 +50,8 @@ public class OpenIdConnect {
     private String ip_cookie = "";
     private String ip_domain = "";
 
-    public OpenIdConnect(String sso_user, String sso_password, String sso_sp_uri, JSONObject sso_sp_params) throws IOException {
+    public OpenIdConnect(Protocol protocol, String sso_user, String sso_password, String sso_sp_uri, JSONObject sso_sp_params) throws IOException {
+        this.protocol = protocol;
         this.sso_sp_uri = sso_sp_uri;
         this.sso_user = sso_user;
         this.sso_password = sso_password;
@@ -130,8 +132,7 @@ public class OpenIdConnect {
     }
 
     private JSONObject request(String uri, RequestOption option) throws IOException {
-        URL url = new URL(uri);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
+        HttpURLConnection con = (HttpURLConnection) protocol.getHttpURLConnection(uri);
         con.setInstanceFollowRedirects(false);
         con.setRequestProperty("Accept", "application/json");
         con.setRequestProperty("X-Support-SSO", "1");
@@ -147,7 +148,7 @@ public class OpenIdConnect {
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
-            try (OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
+            try ( OutputStreamWriter osw = new OutputStreamWriter(con.getOutputStream(), "UTF-8")) {
                 if (option.params != null) {
                     osw.write(option.params.toString());
                 }
