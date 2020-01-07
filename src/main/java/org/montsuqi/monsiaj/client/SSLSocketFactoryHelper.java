@@ -168,7 +168,7 @@ public class SSLSocketFactoryHelper {
         String configStr = "name=monsiaj\nlibrary=" + lib + "\nslot=" + slot;
         File temp = TempFile.createTempFile("pkcs11", "cfg");
         temp.deleteOnExit();
-        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
+        try ( OutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
             out.write(configStr.getBytes());
             out.close();
         }
@@ -267,17 +267,22 @@ public class SSLSocketFactoryHelper {
         return strs;
     }
 
-    private TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
-        KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(null);
+    public static KeyStore createCAFtileTrustKeyStore(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(null);
 
         String pemStrs[] = splitCertFile(caCertPath);
         for (String pem : pemStrs) {
             X509Certificate cert = parseCertPem(pem);
-            keystore.setCertificateEntry(cert.getSubjectDN().toString(), cert);
+            ks.setCertificateEntry(cert.getSubjectDN().toString(), cert);
         }
+        return ks;
+    }
+
+    private TrustManager[] createCAFileTrustManagers(String caCertPath) throws GeneralSecurityException, FileNotFoundException, IOException {
+        KeyStore ks = createCAFtileTrustKeyStore(caCertPath);
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(keystore);
+        tmf.init(ks);
         final TrustManager[] tms = tmf.getTrustManagers();
         for (TrustManager tm1 : tms) {
             if (tm1 instanceof X509TrustManager) {

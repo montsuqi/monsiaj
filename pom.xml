@@ -33,7 +33,7 @@
     </pluginRepositories>
 
     <build>
-        <plugins>            
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -42,7 +42,7 @@
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>                            
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addClasspath>true</addClasspath>
                             <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
                         </manifest>
@@ -70,14 +70,14 @@
                             <archive>
                                 <manifest>
                                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                     <mainClass>org.montsuqi.monsiaj.client.Launcher</mainClass>
                                 </manifest>
                                 <manifestEntries>
                                     <permissions>all-permissions</permissions>
                                 </manifestEntries>
                             </archive>
-                        </configuration>                        
+                        </configuration>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -93,19 +93,19 @@
                             <archive>
                                 <manifest>
                                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                     <mainClass>org.montsuqi.monsiaj.loader.Loader</mainClass>
                                 </manifest>
                                 <manifestEntries>
                                     <permissions>all-permissions</permissions>
                                 </manifestEntries>
                             </archive>
-                        </configuration>                        
+                        </configuration>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
-                    </execution>                    
+                    </execution>
                 </executions>
             </plugin>
 
@@ -127,18 +127,18 @@
                                 <excludeClassifiers>
                                     <excludeClassifier>bin</excludeClassifier>
                                     <excludeClassifier>src</excludeClassifier>
-                                </excludeClassifiers>                               
+                                </excludeClassifiers>
                                 <arguments>
                                    <argument>-tsa</argument>
                                    <argument>http://timestamp.comodoca.com/rfc3161</argument>
-                                </arguments>      
+                                </arguments>
                                 <keystore>${project.basedir}/keystore</keystore>
                                 <alias>alias</alias>
                                 <storepass>storepass</storepass>
                                 <keypass>keypass</keypass>
                             </configuration>
                         </plugin>
-            -->  
+            -->
 
             <!-- rename distribution archive  -->
             <plugin>
@@ -155,13 +155,13 @@
                         <configuration>
                             <tasks>
                                 <echo>mkdir out</echo>
-                                <delete dir="${project.build.directory}/out"/>      
-                                <mkdir dir="${project.build.directory}/out"/>                     
+                                <delete dir="${project.build.directory}/out"/>
+                                <mkdir dir="${project.build.directory}/out"/>
                                 <echo>rename-dist-archives</echo>
                                 <move file="${project.build.directory}/monsiaj-${project.version}-bin.zip" tofile="${project.build.directory}/out/monsiaj-bin-${project.version}.zip" />
                                 <move file="${project.build.directory}/monsiaj-${project.version}-src.zip" tofile="${project.build.directory}/out/monsiaj-src-${project.version}.zip" />
                                 <move file="${project.build.directory}/monsiaj-${project.version}-all.jar" todir="${project.build.directory}/out" />
-                                <move file="${project.build.directory}/monsiaj-loader-${project.version}-all.jar" todir="${project.build.directory}/out" />                                
+                                <move file="${project.build.directory}/monsiaj-loader-${project.version}-all.jar" todir="${project.build.directory}/out" />
                                 <checksum algorithm="SHA-256" fileext=".sha256">
                                     <fileset dir="${project.build.directory}/out/">
                                         <include name="*"/>
@@ -190,12 +190,11 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client -->
         <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-client</artifactId>
-            <version>9.4.19.v20190610</version>
-        </dependency>        
+            <groupId>org.glassfish.tyrus.bundles</groupId>
+            <artifactId>tyrus-standalone-client</artifactId>
+            <version>1.12</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
             <groupId>org.json</groupId>
@@ -237,5 +236,5 @@
             <artifactId>jaxb-api</artifactId>
             <version>2.3.0</version>
         </dependency>
-    </dependencies>    
+    </dependencies>
 </project>
