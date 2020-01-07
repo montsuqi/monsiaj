@@ -98,7 +98,8 @@ public class PushReceiver implements Runnable {
             String host = System.getProperty("proxyHost");
             String port = System.getProperty("proxyPort");
             if (host != null && port != null) {
-                client.getProperties().put(ClientProperties.PROXY_URI, "http://" + host + ":" + port);
+                String proxyURI = "https://" + host + ":" + port;
+                client.getProperties().put(ClientProperties.PROXY_URI, proxyURI);
             }
         }
 
@@ -210,6 +211,19 @@ public class PushReceiver implements Runnable {
         }
     }
 
+    public static class PrClientConfigurator extends ClientEndpointConfig.Configurator {
+
+        @Override
+        public void beforeRequest(Map<String, List<String>> headers) {
+            headers.put("X-GINBEE-TENANT-ID", Arrays.asList("1"));
+        }
+
+        @Override
+        public void afterResponse(HandshakeResponse handshakeResponse) {
+            // none
+        }
+    }
+
     @ClientEndpoint(configurator = PrClientConfigurator.class)
     public class PrWebSocketClient {
 
@@ -240,6 +254,7 @@ public class PushReceiver implements Runnable {
                             + "}";
                     session.getBasicRemote().sendText(subStr);
                 }
+                warnReconnect();
             } catch (IOException ex) {
                 LOGGER.error(ex, ex);
             }
@@ -247,7 +262,7 @@ public class PushReceiver implements Runnable {
 
         @OnMessage
         public void onMessage(String message) {
-            LOGGER.info("---- onMessage");
+            LOGGER.info("---- onMessage\n" + message);
             messageHandler(message);
         }
 
@@ -258,7 +273,7 @@ public class PushReceiver implements Runnable {
 
         @OnError
         public void onError(Throwable th) {
-            LOGGER.info("---- onError");
+            LOGGER.info("---- onError\n" + th.toString());
             lastPong = null;
             warnDisconnect();
         }
@@ -268,19 +283,6 @@ public class PushReceiver implements Runnable {
             LOGGER.info("---- onClose");
             lastPong = null;
             warnDisconnect();
-        }
-    }
-
-    public class PrClientConfigurator extends ClientEndpointConfig.Configurator {
-
-        @Override
-        public void beforeRequest(Map<String, List<String>> headers) {
-            headers.put("X-GINBEE-TENANT-ID", Arrays.asList("1"));
-        }
-
-        @Override
-        public void afterResponse(HandshakeResponse handshakeResponse) {
-            // none
         }
     }
 }
