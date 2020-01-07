@@ -70,6 +70,7 @@ public class PushReceiver implements Runnable {
         lastPong = null;
         reconnectWait = RECONNECT_WAIT_INIT;
         client = ClientManager.createClient();
+        client.setDefaultMaxSessionIdleTimeout(IDLE_TIMEOUT);
         // 自動再接続設定
         ClientManager.ReconnectHandler reconnectHandler = new ClientManager.ReconnectHandler() {
             @Override
