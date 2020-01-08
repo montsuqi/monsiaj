@@ -5,254 +5,164 @@
  */
 package org.montsuqi.monsiaj.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Base64;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.bind.DatatypeConverter;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketFrame;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.api.extensions.Frame;
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.json.JSONObject;
+import javax.websocket.ClientEndpoint;
+import javax.websocket.ClientEndpointConfig;
+import javax.websocket.CloseReason;
+import javax.websocket.DeploymentException;
+import javax.websocket.HandshakeResponse;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.PongMessage;
+import javax.websocket.Session;
+import org.glassfish.tyrus.client.ClientManager;
+import org.glassfish.tyrus.client.ClientProperties;
+import org.glassfish.tyrus.client.SslContextConfigurator;
+import org.glassfish.tyrus.client.SslEngineConfigurator;
 
-/**
- *
- * @author mihara
- */
 public class PushReceiver implements Runnable {
 
-    static final long WAIT_INIT = 2 * 1000;
-    static final long WAIT_MAX = 600 * 1000;
-    static final long WAIT_CONN = 10 * 1000;
+    static final long RECONNECT_WAIT_INIT = 1L;
+    static final long RECONNECT_WAIT_MAX = 600L;
     static final long IDLE_TIMEOUT = 30 * 1000;
-    static final long PING_TIMEOUT = 30 * 1000;
+    static final long PING_TIMEOUT = 30L;
+    static final long PING_INTERVAL = 10L;
 
-    static final Logger logger = LogManager.getLogger(PushReceiver.class);
+    static final Logger LOGGER = LogManager.getLogger(PushReceiver.class);
     private final URI uri;
-    private final String auth;
-    private final SslContextFactory sslContextFactory;
     private final Protocol protocol;
     private final BlockingQueue queue;
-    private WebSocketClient client;
-    private boolean loop;
     private boolean connWarned;
+    private Session session;
+    private ClientManager client;
+    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private Instant lastPong;
+    private long reconnectWait;
 
-    public PushReceiver(Protocol protocol, BlockingQueue queue) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+    public PushReceiver(Protocol protocol, BlockingQueue queue) throws URISyntaxException, KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, GeneralSecurityException {
         this.protocol = protocol;
         uri = new URI(protocol.getPusherURI());
-        String auth_in = protocol.getUser() + ":" + protocol.getPassword();
-        this.auth = Base64.getEncoder().encodeToString(auth_in.getBytes());
+        this.queue = queue;
+        connWarned = false;
+        lastPong = null;
+        reconnectWait = RECONNECT_WAIT_INIT;
+        client = ClientManager.createClient();
+        client.setDefaultMaxSessionIdleTimeout(IDLE_TIMEOUT);
+        // 自動再接続設定
+        ClientManager.ReconnectHandler reconnectHandler = new ClientManager.ReconnectHandler() {
+            @Override
+            public boolean onDisconnect(CloseReason closeReason) {
+                return true;
+            }
+
+            @Override
+            public boolean onConnectFailure(Exception exception) {
+                return true;
+            }
+
+            @Override
+            public long getDelay() {
+                reconnectWait *= 2;
+                if (reconnectWait > RECONNECT_WAIT_MAX) {
+                    reconnectWait = RECONNECT_WAIT_MAX;
+                }
+                return reconnectWait;
+            }
+        };
+        client.getProperties().put(ClientProperties.RECONNECT_HANDLER, reconnectHandler);
+
+        // PROXY設定(nonProxyHostsには未対応)
+        if (!protocol.isForceNoProxy()) {
+            String host = System.getProperty("proxyHost");
+            String port = System.getProperty("proxyPort");
+            if (host != null && port != null) {
+                String proxyURI = "https://" + host + ":" + port;
+                client.getProperties().put(ClientProperties.PROXY_URI, proxyURI);
+            }
+        }
+
+        // SSL設定
         switch (protocol.getSslType()) {
-            case Protocol.TYPE_SSL_NO_CERT:
-                sslContextFactory = new SslContextFactory();
-                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));
-                break;
             case Protocol.TYPE_SSL_PKCS11:
                 throw new java.lang.UnsupportedOperationException("PKCS11 Unsupported");
             case Protocol.TYPE_SSL_PKCS12:
-                sslContextFactory = new SslContextFactory();
-                KeyStore ks = KeyStore.getInstance("PKCS12");
-                InputStream is = new FileInputStream(protocol.getCertFile());
-                String passphrase = protocol.getCertFilePassphrase();
-                ks.load(is, passphrase.toCharArray());
-                sslContextFactory.setKeyStore(ks);
-                sslContextFactory.setKeyStorePassword(passphrase);
-                sslContextFactory.setTrustStore(createCAFileTrustKeyStore(protocol.getCaCert()));
+                KeyStore trustKs = SSLSocketFactoryHelper.createCAFtileTrustKeyStore(protocol.getCaCert());
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                String pass = UUID.randomUUID().toString();
+                trustKs.store(os, pass.toCharArray());
+
+                SslContextConfigurator sslContextConfigurator = new SslContextConfigurator();
+                sslContextConfigurator.setTrustStoreBytes(os.toByteArray());
+                sslContextConfigurator.setTrustStorePassword(pass);
+                sslContextConfigurator.setTrustStoreType("JKS");
+                sslContextConfigurator.setKeyStoreFile(protocol.getCertFile());
+                sslContextConfigurator.setKeyStorePassword(protocol.getCertFilePassphrase());
+                sslContextConfigurator.setKeyStoreType("PKCS12");
+                SslEngineConfigurator sslEngineConfigurator = new SslEngineConfigurator(sslContextConfigurator, true, false, false);
+                client.getProperties().put(ClientProperties.SSL_ENGINE_CONFIGURATOR, sslEngineConfigurator);
                 break;
             default:
-                this.sslContextFactory = null;
+                // do nothing
                 break;
         }
-        this.queue = queue;
-        client = null;
-        loop = true;
-        connWarned = false;
     }
 
     public void stop() {
-        loop = false;
-        if (client != null) {
+        if (session != null && session.isOpen()) {
             try {
-                client.stop();
-            } catch (Exception ex) {
-                logger.info(ex, ex);
+                session.close();
+            } catch (IOException ex) {
+                LOGGER.info(ex, ex);
             }
         }
     }
 
     @Override
     public void run() {
-        long waitMs = WAIT_INIT;
-        while (loop) {
-            synchronized (this) {
-                if (this.sslContextFactory != null) {
-                    client = new WebSocketClient(sslContextFactory);
-                } else {
-                    client = new WebSocketClient();
-                }
-                PusherWebSocket socket = new PusherWebSocket();
-                try {
-                    wait(waitMs);
-                    client.setMaxIdleTimeout(IDLE_TIMEOUT);
-                    client.start();
-                    ClientUpgradeRequest request = new ClientUpgradeRequest();
-                    request.setHeader("Authorization", "Basic " + this.auth);
-                    request.setHeader("X-GINBEE-TENANT-ID", "1");
-                    request.setHeader("Sec-WebSocket-Version", "13");
-                    logger.info("Connecting to : " + this.uri);
-                    client.connect(socket, this.uri, request);
-                    wait(WAIT_CONN);
-                    if (socket.getConnected()) {
-                        waitMs = WAIT_INIT;
-                        while (!socket.getClosed()) {
-                            wait(WAIT_CONN);
-                            socket.sendPing();
+        try {
+            session = client.connectToServer(new PrWebSocketClient(), uri);
+            // pingを10秒ごとに送る
+            executorService.scheduleAtFixedRate(() -> {
+                if (session != null && session.isOpen()) {
+                    try {
+                        if (lastPong != null && Instant.now().getEpochSecond() - lastPong.getEpochSecond() > PING_TIMEOUT) {
+                            LOGGER.error("Ping Error");
+                            session.close();
+                        } else {
+                            session.getBasicRemote().sendPing(null);
+                            LOGGER.debug("---- Ping");
                         }
-                    } else {
-                        client.stop();
-                        client.destroy();
-                        waitMs *= 2;
-                        if (waitMs > WAIT_MAX) {
-                            waitMs = WAIT_MAX;
-                        }
-                        logger.info("wait for reconnect: " + waitMs);
+                    } catch (IOException ex) {
+                        // do nothing
                     }
-                } catch (PusherPingTimeout ex) {
-                    logger.info("websocket ping timeout");
-                } catch (Exception ex) {
-                    logger.info(ex, ex);
                 }
-            }
-        }
-    }
-
-    private class PusherPingTimeout extends Exception {
-    }
-
-    private class PusherErrorCommand extends Exception {
-    }
-
-    @WebSocket
-    public class PusherWebSocket {
-
-        private boolean connected = false;
-        private boolean closed = false;
-        private Session session = null;
-        private long lastPongTime;
-
-        public PusherWebSocket() {
-            lastPongTime = System.currentTimeMillis();
-        }
-
-        @OnWebSocketConnect
-        public void onConnect(Session session) {
-            logger.info("---- onConnect");
-            session.setIdleTimeout(IDLE_TIMEOUT);
-            try {
-                String subStr = "{"
-                        + " \"command\"    : \"subscribe\","
-                        + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
-                        + " \"event\"      : \"*\","
-                        + " \"session_id\" : \"" + protocol.getSessionId() + "\""
-                        + "}";
-                session.getRemote().sendString(subStr);
-                String gid = protocol.getGroupId();
-                if (gid != null) {
-                    subStr = "{"
-                            + " \"command\"    : \"subscribe\","
-                            + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
-                            + " \"event\"      : \"*\","
-                            + " \"group_id\" : \"" + gid + "\""
-                            + "}";
-                    session.getRemote().sendString(subStr);
-                }
-                connected = true;
-                warnReconnect();
-                this.session = session;
-            } catch (IOException ex) {
-                logger.info(ex, ex);
-            }
-        }
-
-        @OnWebSocketMessage
-        public void onMessage(String message) throws PusherErrorCommand {
-            logger.info("---- onMessage");
-            logger.info(message);
-            messageHandler(message);
-        }
-
-        @OnWebSocketClose
-        public void onClose(int statusCode, String reason) {
-            logger.info("---- onClose");
-            logger.info(statusCode);
-            closed = true;
-            warnDisconnect();
-        }
-
-        @OnWebSocketError
-        public void onError(Session session, Throwable cause) {
-            logger.info("---- onError");
-            logger.info("Error " + session + " " + cause);
-            closed = true;
-            warnDisconnect();
-        }
-
-        @OnWebSocketFrame
-        public void onFrame(Session session, Frame frame) {
-            logger.debug("---- onFrame");
-            logger.debug(frame);
-            if (frame.getOpCode() == 0x0A) {
-                lastPongTime = System.currentTimeMillis();
-            }
-        }
-
-        public boolean getConnected() {
-            return this.connected;
-        }
-
-        public boolean getClosed() {
-            return this.closed;
-        }
-
-        public void sendPing() throws PusherPingTimeout {
-            try {
-                if ((System.currentTimeMillis() - lastPongTime) > PING_TIMEOUT) {
-                    throw new PusherPingTimeout();
-                }
-                session.getRemote().sendPing(ByteBuffer.wrap("ping".getBytes()));
-            } catch (IOException ex) {
-                logger.info(ex, ex);
-            }
+            }, PING_INTERVAL, PING_INTERVAL, TimeUnit.SECONDS);
+        } catch (DeploymentException | IOException ex) {
+            java.util.logging.Logger.getLogger(PushReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -266,7 +176,7 @@ public class PushReceiver implements Runnable {
             obj.put("event", "websocket_reconnect");
             queue.put(obj);
         } catch (InterruptedException ex) {
-            logger.error(ex, ex);
+            LOGGER.error(ex, ex);
         }
     }
 
@@ -280,64 +190,103 @@ public class PushReceiver implements Runnable {
             obj.put("event", "websocket_disconnect");
             queue.put(obj);
         } catch (InterruptedException ex) {
-            logger.error(ex, ex);
-        }        
+            LOGGER.error(ex, ex);
+        }
     }
 
-    private void messageHandler(String message) throws PusherErrorCommand {
+    private void messageHandler(String message) {
         JSONObject obj = new JSONObject(message);
         switch (obj.getString("command")) {
             case "subscribed":
-                logger.debug("subject_id:" + obj.getString("sub.id"));
+                LOGGER.debug("subject_id:" + obj.getString("sub.id"));
                 break;
             case "event":
                 JSONObject data = obj.getJSONObject("data");
                 try {
                     queue.put(data);
                 } catch (InterruptedException ex) {
-                    logger.error(ex, ex);
+                    LOGGER.error(ex, ex);
                 }
                 break;
             case "error":
-                throw new PusherErrorCommand();
+                LOGGER.error(obj.toString());
+                break;
         }
     }
 
-    private static X509Certificate parseCertPem(String pem) throws CertificateException {
-        byte[] der = DatatypeConverter.parseBase64Binary(pem);
-        CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(der));
+    public static class PrClientConfigurator extends ClientEndpointConfig.Configurator {
+
+        @Override
+        public void beforeRequest(Map<String, List<String>> headers) {
+            headers.put("X-GINBEE-TENANT-ID", Arrays.asList("1"));
+        }
+
+        @Override
+        public void afterResponse(HandshakeResponse handshakeResponse) {
+            // none
+        }
     }
 
-    private static String[] splitCertFile(String path) throws FileNotFoundException, IOException {
+    @ClientEndpoint(configurator = PrClientConfigurator.class)
+    public class PrWebSocketClient {
 
-        byte[] fileContentBytes = Files.readAllBytes(Paths.get(path));
-        String str = new String(fileContentBytes, StandardCharsets.UTF_8);
-
-        Pattern pattern = Pattern.compile("-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(str);
-        List<String> list = new ArrayList<>();
-        while (matcher.find()) {
-            list.add(matcher.group());
+        public PrWebSocketClient() {
+            super();
         }
-        String[] strs = new String[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            String s = list.get(i);
-            s = s.replace("-----BEGIN CERTIFICATE-----", "");
-            strs[i] = s.replace("-----END CERTIFICATE-----", "");
-        }
-        return strs;
-    }
 
-    public static KeyStore createCAFileTrustKeyStore(String caCertPath) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(null);
-
-        String pemStrs[] = splitCertFile(caCertPath);
-        for (String pem : pemStrs) {
-            X509Certificate cert = parseCertPem(pem);
-            keystore.setCertificateEntry(cert.getSubjectDN().toString(), cert);
+        @OnOpen
+        public void onOpen(Session session) {
+            LOGGER.info("---- onOpen");
+            lastPong = null;
+            reconnectWait = RECONNECT_WAIT_INIT;
+            try {
+                String subStr = "{"
+                        + " \"command\"    : \"subscribe\","
+                        + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
+                        + " \"event\"      : \"*\","
+                        + " \"session_id\" : \"" + protocol.getSessionId() + "\""
+                        + "}";
+                session.getBasicRemote().sendText(subStr);
+                String gid = protocol.getGroupId();
+                if (gid != null) {
+                    subStr = "{"
+                            + " \"command\"    : \"subscribe\","
+                            + " \"req.id\"     : \"" + UUID.randomUUID().toString() + "\","
+                            + " \"event\"      : \"*\","
+                            + " \"group_id\" : \"" + gid + "\""
+                            + "}";
+                    session.getBasicRemote().sendText(subStr);
+                }
+                warnReconnect();
+            } catch (IOException ex) {
+                LOGGER.error(ex, ex);
+            }
         }
-        return keystore;
+
+        @OnMessage
+        public void onMessage(String message) {
+            LOGGER.info("---- onMessage\n" + message);
+            messageHandler(message);
+        }
+
+        @OnMessage
+        public void onMessage(PongMessage pongMsg) {
+            lastPong = Instant.now();
+            LOGGER.debug("---- Pong");
+        }
+
+        @OnError
+        public void onError(Throwable th) {
+            LOGGER.info("---- onError\n" + th.toString());
+            lastPong = null;
+            warnDisconnect();
+        }
+
+        @OnClose
+        public void onClose(Session session) {
+            LOGGER.info("---- onClose");
+            lastPong = null;
+            warnDisconnect();
+        }
     }
 }

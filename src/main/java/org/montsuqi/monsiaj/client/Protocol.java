@@ -233,6 +233,10 @@ public class Protocol {
         return con;
     }
 
+    public boolean isForceNoProxy() {
+        return forceNoProxy;
+    }
+
     private String makeJSONRPCRequest(String method, JSONObject params) throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("jsonrpc", "2.0");
