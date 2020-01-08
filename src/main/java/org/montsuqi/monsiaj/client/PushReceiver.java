@@ -24,6 +24,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -47,7 +48,7 @@ public class PushReceiver implements Runnable {
 
     static final long RECONNECT_WAIT_INIT = 1L;
     static final long RECONNECT_WAIT_MAX = 600L;
-    static final long IDLE_TIMEOUT = 30L;
+    static final long IDLE_TIMEOUT = 30 * 1000;
     static final long PING_TIMEOUT = 30L;
     static final long PING_INTERVAL = 10L;
 
@@ -144,23 +145,24 @@ public class PushReceiver implements Runnable {
     public void run() {
         try {
             session = client.connectToServer(new PrWebSocketClient(), uri);
-
             // pingを10秒ごとに送る
             executorService.scheduleAtFixedRate(() -> {
                 if (session != null && session.isOpen()) {
                     try {
                         if (lastPong != null && Instant.now().getEpochSecond() - lastPong.getEpochSecond() > PING_TIMEOUT) {
+                            LOGGER.error("Ping Error");
                             session.close();
                         } else {
                             session.getBasicRemote().sendPing(null);
+                            LOGGER.debug("---- Ping");
                         }
-                    } catch (IOException e) {
+                    } catch (IOException ex) {
                         // do nothing
                     }
                 }
             }, PING_INTERVAL, PING_INTERVAL, TimeUnit.SECONDS);
         } catch (DeploymentException | IOException ex) {
-            LOGGER.warn(ex, ex);
+            java.util.logging.Logger.getLogger(PushReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -270,6 +272,7 @@ public class PushReceiver implements Runnable {
         @OnMessage
         public void onMessage(PongMessage pongMsg) {
             lastPong = Instant.now();
+            LOGGER.debug("---- Pong");
         }
 
         @OnError
