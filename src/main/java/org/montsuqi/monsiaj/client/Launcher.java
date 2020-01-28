@@ -63,7 +63,6 @@ import org.montsuqi.monsiaj.util.OptionParser;
 import org.montsuqi.monsiaj.util.SystemEnvironment;
 import org.montsuqi.monsiaj.util.TempFile;
 import org.montsuqi.monsiaj.widgets.Button;
-import org.montsuqi.monsiaj.widgets.ExceptionDialog;
 
 public class Launcher {
 
