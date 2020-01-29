@@ -14,7 +14,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -88,7 +87,7 @@ public class Loader {
     }
 
     private void removeProperty(String key) {
-        prop.remove(key);
+        setProperty(key, null);
     }
 
     private void setProperty(String key, String value) {
@@ -110,30 +109,53 @@ public class Loader {
         }
     }
 
-    private String getCacheVersion() {
-        return getProperty("cacheVersion");
+    private String getOrcaId() {
+        return getProperty("orcaId", "");
     }
 
-    private void setCacheVersion(String v) {
-        setProperty("cacheVersion", v);
+    private void setOrcaId(String val) {
+        setProperty("orcaId", val);
+    }
+
+    private String getAccessKey() {
+        return getProperty("accessKey", "");
+    }
+
+    private void setAccessKey(String val) {
+        setProperty("accessKey", val);
+    }
+
+    private boolean getSaveAccessKey() {
+        String sa = getProperty("saveAccessKey", "true");
+        if (sa.equalsIgnoreCase("true")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void setSaveAccessKey(boolean val) {
+        if (val) {
+            setProperty("saveAccessKey", "true");
+        } else {
+            setProperty("saveAccessKey", "false");
+        }
     }
 
     private String getVersionURL() {
-        String url = getProperty("versionURL");
-        if (url == null) {
-            url = VERSION_URL;
-            setProperty("versionURL", VERSION_URL);
-        }
-        return url;
+        return getProperty("versionURL", VERSION_URL);
     }
 
     private String getDownloadURL() {
-        String url = getProperty("downloadURL");
-        if (url == null) {
-            url = DOWNLOAD_URL;
-            setProperty("downloadURL", DOWNLOAD_URL);
-        }
-        return url;
+        return getProperty("downloadURL", DOWNLOAD_URL);
+    }
+
+    private String getCacheVersion() {
+        return getProperty("cacheVersion", "");
+    }
+
+    private void setCacheVersion(String val) {
+        setProperty("cacheVersion", val);
     }
 
     private void createProgress(String msg) {
@@ -231,11 +253,10 @@ public class Loader {
     private void getAccessKey(int n) {
         // 初回だけアクセスキーを設定ファイルから読み込む
         if (n == 0) {
-            orcaId = this.getProperty("orcaId", "");
-            accessKey = this.getProperty("accessKey");
-            String sa = this.getProperty("saveAccessKey", "true");
-            saveAccessKey = sa.equalsIgnoreCase("true");
-            if (accessKey != null) {
+            orcaId = getOrcaId();
+            accessKey = getAccessKey();
+            saveAccessKey = getSaveAccessKey();
+            if (!accessKey.isEmpty()) {
                 return;
             }
         }
@@ -258,11 +279,7 @@ public class Loader {
             orcaId = id.getText();
             accessKey = ak.getText();
             saveAccessKey = cak.isSelected();
-            if (saveAccessKey) {
-                setProperty("saveAccessKey", "true");
-            } else {
-                setProperty("saveAccessKey", "false");
-            }
+            setSaveAccessKey(saveAccessKey);
         } else {
             LOG.info("cancel input accessKey");
             System.exit(0);
@@ -272,22 +289,27 @@ public class Loader {
     private String getVersion() throws IOException {
         for (int i = 0; i < MAX_TRY; i++) {
             try {
+                String url = getVersionURL();
+                LOG.info("get version from " + url);
                 getAccessKey(i);
-                HttpURLConnection con = httpGet(getVersionURL());
+                HttpURLConnection con = httpGet(url);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String version = reader.readLine();
+                LOG.info("version: " + version);
                 con.disconnect();
-                setProperty("orcaId", orcaId);
+                // 認証が通った場合のみID、アクセスキーを保存
+                setOrcaId(orcaId);
                 if (saveAccessKey) {
-                    setProperty("accessKey", accessKey);
+                    setAccessKey(accessKey);
                 } else {
-                    removeProperty("accessKey");
+                    setAccessKey(null);
                 }
                 return version;
             } catch (UnAuthorized ex) {
-                // do nothing
+                LOG.info("UnAuthorized Error");
             }
         }
+        LOG.info("UnAuthorized Error limit reached");
         showErrorDialog("規定回数失敗したため終了します。");
         return ""; // not reach
     }
@@ -307,7 +329,7 @@ public class Loader {
             LOG.info("cacheVersion : " + cacheVersion);
             LOG.info("serverVersion: " + serverVersion);
 
-            if (cacheVersion != null && cacheVersion.equals(serverVersion)) {
+            if (cacheVersion.equals(serverVersion)) {
                 LOG.info("use cache");
             } else {
                 updateCache(serverVersion);
@@ -328,7 +350,7 @@ public class Loader {
             LOG.info("no verify");
         } else {
             if (!JarVerifier.verify(new JarFile(file))) {
-                setCacheVersion("");
+                setCacheVersion(null);
                 LOG.error("jar sign verification error");
                 showErrorDialog("ランチャーの署名の検証に失敗しました。詳細はログを確認してください。");
             }
