@@ -302,6 +302,8 @@ public class Loader {
                 setOrcaId(orcaId);
                 if (saveAccessKey) {
                     setAccessKey(accessKey);
+                } else {
+                    setAccessKey(null);
                 }
                 return version;
             } catch (UnAuthorized ex) {
@@ -360,9 +362,12 @@ public class Loader {
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
         m.setAccessible(true);
         int mods = m.getModifiers();
-        if (m.getReturnType() != void.class || !Modifier.isStatic(mods)
+
+        if (m.getReturnType() != void.class
+                || !Modifier.isStatic(mods)
                 || !Modifier.isPublic(mods)) {
-            throw new NoSuchMethodException("main");
+            throw new NoSuchMethodException(
+                    "main");
         }
         m.invoke(null, new Object[]{args});
     }
