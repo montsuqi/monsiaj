@@ -86,10 +86,6 @@ public class Loader {
         }
     }
 
-    private void removeProperty(String key) {
-        setProperty(key, null);
-    }
-
     private void setProperty(String key, String value) {
         if (value == null) {
             prop.remove(key);
@@ -254,10 +250,15 @@ public class Loader {
         // 初回だけアクセスキーを設定ファイルから読み込む
         if (n == 0) {
             orcaId = getOrcaId();
-            accessKey = getAccessKey();
             saveAccessKey = getSaveAccessKey();
-            if (!accessKey.isEmpty()) {
-                return;
+            if (saveAccessKey) {
+                accessKey = getAccessKey();
+                if (!accessKey.isEmpty()) {
+                    return;
+                }
+            } else {
+                accessKey = "";
+                setAccessKey(null);
             }
         }
         JTextField id = new JTextField(orcaId);
@@ -301,8 +302,6 @@ public class Loader {
                 setOrcaId(orcaId);
                 if (saveAccessKey) {
                     setAccessKey(accessKey);
-                } else {
-                    setAccessKey(null);
                 }
                 return version;
             } catch (UnAuthorized ex) {
