@@ -25,7 +25,7 @@ import org.json.JSONObject;
  */
 public class CertificateManager {
 
-    static final Logger logger = LogManager.getLogger(Protocol.class);
+    static final Logger LOG = LogManager.getLogger(Protocol.class);
     private String authURI = null;
     private SSLSocketFactory sslSocketFactory;
 
@@ -43,7 +43,7 @@ public class CertificateManager {
             put("sms-stg.orca.orcamo.jp", "auth-stg.cmo.orcamo.jp");
             put("sms-stg.glorca.orcamo.jp", "auth-stg.glcmo.orcamo.jp");
             // テスト環境
-            put("sms-test.orca.orcamo.jp", "auth-test.cmo.orcamo.jp");
+            put("sms-test.orca.orcamo.jp", "cmo-auth-test.orca.orcamo.jp");
             // デモ環境
             put("sms.orca-ng.org", "auth.orca-ng.org");
         }
@@ -95,11 +95,11 @@ public class CertificateManager {
         URL url = new URL(authURI);
         String host = AUTH_HOST_MAP.get(url.getHost());
         if (host == null) {
-            logger.info("does not support certificate update: " + authURI);
+            LOG.info("does not support certificate update: " + authURI);
             return;
         }
         URL post_url = new URL(url.getProtocol(), host, url.getPort(), "/api/cert", null);
-        logger.info(post_url.toString());
+        LOG.info(post_url.toString());
         ByteArrayOutputStream body = request(post_url.toString(), "POST");
         JSONObject result = new JSONObject(body.toString("UTF-8"));
         String get_url = result.getString("uri");
@@ -145,7 +145,7 @@ public class CertificateManager {
                 break;
             default:
                 String message = con.getResponseMessage();
-                logger.info("http error: " + resCode + " " + message);
+                LOG.info("http error: " + resCode + " " + message);
                 throw new HttpResponseException(resCode);
         }
 
