@@ -110,25 +110,25 @@ public class Client {
             conf.save();
         }
         if (conf.getUseSSL(num)) {
-            CertificateManager cert = new CertificateManager(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
-            if (cert.isExpire()) {
+            CertificateManager cm = new CertificateManager(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
+            if (cm.isExpire()) {
                 String message = Messages.getString("Client.expire_certificate");
                 JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
                 System.exit(1);
             }
-            if (cert.isExpireApproaching()) {
-                Calendar notAfter = cert.getNotAfter();
+            if (cm.isExpireApproaching()) {
+                Calendar notAfter = cm.getNotAfter();
                 String format = Messages.getString("Client.certificate_expiration_is_approaching");
                 String alert = String.format(format, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter);
                 String title = Messages.getString("Client.update_certificate_confirm_dialog_title");
                 int result = JOptionPane.showConfirmDialog(null, alert, title, JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
-                    cert.setSSLSocketFactory(protocol.getSSLSocketFactory());
-                    cert.setAuthURI(authURI);
-                    cert.updateCertificate();
-                    conf.setClientCertificateFile(num, cert.getFileName());
+                    cm.setSSLSocketFactory(protocol.getSSLSocketFactory());
+                    cm.setAuthURI(authURI);
+                    cm.updateCertificate();
+                    conf.setClientCertificateFile(num, cm.getFileName());
                     if (conf.getSaveClientCertificatePassword(num)) {
-                        conf.setClientCertificatePassword(num, cert.getPassword());
+                        conf.setClientCertificatePassword(num, cm.getPassword());
                     }
                     conf.save();
                     String message = Messages.getString("Client.success_update_certificate");
