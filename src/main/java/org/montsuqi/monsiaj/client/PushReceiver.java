@@ -48,7 +48,7 @@ public class PushReceiver implements Runnable {
 
     static final long RECONNECT_WAIT_INIT = 1L;
     static final long RECONNECT_WAIT_MAX = 600L;
-    static final long IDLE_TIMEOUT = 30*1000L;
+    static final long IDLE_TIMEOUT = 30 * 1000L;
     static final long PING_TIMEOUT = 30L;
     static final long PING_INTERVAL = 10L;
 
@@ -59,7 +59,7 @@ public class PushReceiver implements Runnable {
     private boolean connWarned;
     private Session session;
     private ClientManager client;
-    private ScheduledExecutorService executorService;
+    private ScheduledExecutorService executorService = null;
     private Instant lastPong;
     private long reconnectWait;
 
@@ -281,7 +281,10 @@ public class PushReceiver implements Runnable {
             LOGGER.info("---- onError\n" + th.toString());
             lastPong = null;
             warnDisconnect();
-            executorService.shutdownNow();
+            if (executorService != null) {
+                executorService.shutdownNow();
+                executorService = null;
+            }
         }
 
         @OnClose
@@ -289,7 +292,10 @@ public class PushReceiver implements Runnable {
             LOGGER.info("---- onClose");
             lastPong = null;
             warnDisconnect();
-            executorService.shutdown();
+            if (executorService != null) {
+                executorService.shutdownNow();
+                executorService = null;
+            }
         }
     }
 }
