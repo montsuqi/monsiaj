@@ -48,7 +48,7 @@ public class PushReceiver implements Runnable {
 
     static final long RECONNECT_WAIT_INIT = 1L;
     static final long RECONNECT_WAIT_MAX = 600L;
-    static final long IDLE_TIMEOUT = 30 * 1000;
+    static final long IDLE_TIMEOUT = 30*1000L;
     static final long PING_TIMEOUT = 30L;
     static final long PING_INTERVAL = 10L;
 
@@ -59,7 +59,7 @@ public class PushReceiver implements Runnable {
     private boolean connWarned;
     private Session session;
     private ClientManager client;
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService executorService;
     private Instant lastPong;
     private long reconnectWait;
 
@@ -145,22 +145,6 @@ public class PushReceiver implements Runnable {
     public void run() {
         try {
             session = client.connectToServer(new PrWebSocketClient(), uri);
-            // pingを10秒ごとに送る
-            executorService.scheduleAtFixedRate(() -> {
-                if (session != null && session.isOpen()) {
-                    try {
-                        if (lastPong != null && Instant.now().getEpochSecond() - lastPong.getEpochSecond() > PING_TIMEOUT) {
-                            LOGGER.error("Ping Error");
-                            session.close();
-                        } else {
-                            session.getBasicRemote().sendPing(null);
-                            LOGGER.debug("---- Ping");
-                        }
-                    } catch (IOException ex) {
-                        // do nothing
-                    }
-                }
-            }, PING_INTERVAL, PING_INTERVAL, TimeUnit.SECONDS);
         } catch (DeploymentException | IOException ex) {
             java.util.logging.Logger.getLogger(PushReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -258,6 +242,23 @@ public class PushReceiver implements Runnable {
                     session.getBasicRemote().sendText(subStr);
                 }
                 warnReconnect();
+                // pingを10秒ごとに送る
+                executorService = Executors.newScheduledThreadPool(1);
+                executorService.scheduleAtFixedRate(() -> {
+                    if (session != null && session.isOpen()) {
+                        try {
+                            if (lastPong != null && Instant.now().getEpochSecond() - lastPong.getEpochSecond() > PING_TIMEOUT) {
+                                LOGGER.error("Ping Error");
+                                session.close();
+                            } else {
+                                session.getBasicRemote().sendPing(null);
+                                LOGGER.debug("---- Ping");
+                            }
+                        } catch (IOException ex) {
+                            // do nothing
+                        }
+                    }
+                }, PING_INTERVAL, PING_INTERVAL, TimeUnit.SECONDS);
             } catch (IOException ex) {
                 LOGGER.error(ex, ex);
             }
@@ -280,6 +281,7 @@ public class PushReceiver implements Runnable {
             LOGGER.info("---- onError\n" + th.toString());
             lastPong = null;
             warnDisconnect();
+            executorService.shutdownNow();
         }
 
         @OnClose
@@ -287,6 +289,7 @@ public class PushReceiver implements Runnable {
             LOGGER.info("---- onClose");
             lastPong = null;
             warnDisconnect();
+            executorService.shutdown();
         }
     }
 }
