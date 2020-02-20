@@ -46,6 +46,18 @@ public class CertificateManager {
             put("sms-test.orca.orcamo.jp", "cmo-auth-test.orca.orcamo.jp");
             // デモ環境
             put("sms.orca-ng.org", "auth.orca-ng.org");
+            // 給管帳運用
+            put("sms.qkn.orcamo.jp", "auth.cmo.orcamo.jp");
+            put("sms.glqkn.orcamo.jp", "auth.glcmo.orcamo.jp");
+            // 給管帳ステージング
+            put("sms-stg.qkn.orcamo.jp", "auth-stg.cmo.orcamo.jp");
+            put("sms-stg.glqkn.orcamo.jp", "auth-stg.glcmo.orcamo.jp");
+            // 医見書運用
+            put("sms.ikn.orcamo.jp", "auth.cmo.orcamo.jp");
+            put("sms.glikn.orcamo.jp", "auth.glcmo.orcamo.jp");
+            // 医見書ステージング
+            put("sms-stg.ikn.orcamo.jp", "auth-stg.cmo.orcamo.jp");
+            put("sms-stg.glikn.orcamo.jp", "auth-stg.glcmo.orcamo.jp");
         }
     };
 
@@ -71,7 +83,13 @@ public class CertificateManager {
         Calendar notAfter = getNotAfter();
         Calendar checkDate = Calendar.getInstance();
         checkDate.setTimeZone(TimeZone.getDefault());
-        checkDate.add(Calendar.MONTH, CERT_EXPIRE_CHECK_MONTHES);
+        int monthes = CERT_EXPIRE_CHECK_MONTHES;
+        String strMonthes = System.getProperty("monsia.cert_expire_check_monthes");
+        if (strMonthes != null) {
+            monthes = Integer.parseInt(strMonthes);
+            if (monthes < 2) monthes = 2;
+        }
+        checkDate.add(Calendar.MONTH, monthes);
         return (checkDate.compareTo(notAfter) > 0);
     }
 
