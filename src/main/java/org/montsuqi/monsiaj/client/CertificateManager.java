@@ -52,12 +52,16 @@ public class CertificateManager {
             // 給管帳ステージング
             put("sms-stg.qkn.orcamo.jp", "auth-stg.cmo.orcamo.jp");
             put("sms-stg.glqkn.orcamo.jp", "auth-stg.glcmo.orcamo.jp");
+            // 給管帳デモ
+            put("sms.qkn.orca-ng.org", "auth.orca-ng.org");
             // 医見書運用
             put("sms.ikn.orcamo.jp", "auth.cmo.orcamo.jp");
             put("sms.glikn.orcamo.jp", "auth.glcmo.orcamo.jp");
             // 医見書ステージング
             put("sms-stg.ikn.orcamo.jp", "auth-stg.cmo.orcamo.jp");
             put("sms-stg.glikn.orcamo.jp", "auth-stg.glcmo.orcamo.jp");
+            // 医見書デモ
+            put("sms.ikn.orca-ng.org", "auth.orca-ng.org");
         }
     };
 
@@ -87,7 +91,9 @@ public class CertificateManager {
         String strMonthes = System.getProperty("monsia.cert_expire_check_monthes");
         if (strMonthes != null) {
             monthes = Integer.parseInt(strMonthes);
-            if (monthes < 2) monthes = 2;
+            if (monthes < 2) {
+                monthes = 2;
+            }
         }
         checkDate.add(Calendar.MONTH, monthes);
         return (checkDate.compareTo(notAfter) > 0);
@@ -111,10 +117,13 @@ public class CertificateManager {
 
     public void updateCertificate() throws IOException {
         URL url = new URL(authURI);
-        String host = AUTH_HOST_MAP.get(url.getHost());
+        String host = System.getProperty("monsia.update_cert_api_host");
         if (host == null) {
-            LOG.info("does not support certificate update: " + authURI);
-            return;
+            host = AUTH_HOST_MAP.get(url.getHost());
+            if (host == null) {
+                LOG.info("does not support certificate update: " + authURI);
+                return;
+            }
         }
         URL post_url = new URL(url.getProtocol(), host, url.getPort(), "/api/cert", null);
         LOG.info(post_url.toString());
@@ -152,6 +161,9 @@ public class CertificateManager {
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
+            try ( DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+                wr.write("{}".getBytes());
+            }
         }
 
         con.connect();
