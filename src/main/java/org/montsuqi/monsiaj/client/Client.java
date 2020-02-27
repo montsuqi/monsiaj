@@ -53,7 +53,7 @@ public class Client {
 
     private boolean isReceiving;
     private final Config conf;
-    private static final Logger logger = LogManager.getLogger(Client.class);
+    private static final Logger LOGGER = LogManager.getLogger(Client.class);
     private Protocol protocol;
     private final UIControl uiControl;
     private static final int DEFAULT_PING_TIMER_PERIOD = 7 * 1000;
@@ -86,7 +86,7 @@ public class Client {
         } else {
             authURI = "http://" + authURI;
         }
-        logger.info("try connect " + authURI);
+        LOGGER.info("try connect " + authURI);
         protocol = new Protocol(authURI, conf.getUser(num), conf.getPassword(num), conf.getUseSSO(num));
         if (conf.getUseSSL(num)) {
             if (conf.getUsePKCS11(num)) {
@@ -110,29 +110,33 @@ public class Client {
             conf.save();
         }
         if (conf.getUseSSL(num)) {
-            CertificateManager cert = new CertificateManager(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
-            if (cert.isExpire()) {
+            CertificateManager cm = new CertificateManager(conf.getClientCertificateFile(num), conf.getClientCertificatePassword(num));
+            if (cm.isExpire()) {
                 String message = Messages.getString("Client.expire_certificate");
                 JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
                 System.exit(1);
             }
-            if (cert.isExpireApproaching()) {
-                Calendar notAfter = cert.getNotAfter();
+            if (cm.isExpireApproaching()) {
+                Calendar notAfter = cm.getNotAfter();
                 String format = Messages.getString("Client.certificate_expiration_is_approaching");
                 String alert = String.format(format, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter, notAfter);
                 String title = Messages.getString("Client.update_certificate_confirm_dialog_title");
                 int result = JOptionPane.showConfirmDialog(null, alert, title, JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
-                    cert.setSSLSocketFactory(protocol.getSSLSocketFactory());
-                    cert.setAuthURI(authURI);
-                    cert.updateCertificate();
-                    conf.setClientCertificateFile(num, cert.getFileName());
-                    if (conf.getSaveClientCertificatePassword(num)) {
-                        conf.setClientCertificatePassword(num, cert.getPassword());
+                    try {
+                        cm.setSSLSocketFactory(protocol.getSSLSocketFactory());
+                        cm.setAuthURI(authURI);
+                        cm.updateCertificate();
+                        conf.setClientCertificateFile(num, cm.getFileName());
+                        if (conf.getSaveClientCertificatePassword(num)) {
+                            conf.setClientCertificatePassword(num, cm.getPassword());
+                        }
+                        conf.save();
+                        String message = Messages.getString("Client.success_update_certificate");
+                        JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
+                    } catch (IOException ex) {
+                        LOGGER.info(ex, ex);
                     }
-                    conf.save();
-                    String message = Messages.getString("Client.success_update_certificate");
-                    JOptionPane.showMessageDialog(uiControl.getTopWindow(), message);
                 }
             }
         }
@@ -143,7 +147,7 @@ public class Client {
             JOptionPane.showMessageDialog(uiControl.getTopWindow(), Messages.getString("Client.openid_connect.login_failure"));
             System.exit(1);
         }
-        logger.info("connected session_id:" + protocol.getSessionId());
+        LOGGER.info("connected session_id:" + protocol.getSessionId());
         startReceiving();
         windowStack = protocol.getWindow();
         updateScreen();
@@ -157,7 +161,7 @@ public class Client {
                 new Thread(pushReceiver).start();
                 new Thread(handler).start();
             } catch (URISyntaxException | KeyStoreException | FileNotFoundException | NoSuchAlgorithmException | CertificateException ex) {
-                logger.info(ex, ex);
+                LOGGER.info(ex, ex);
             }
         }
         startPing();
@@ -175,9 +179,9 @@ public class Client {
         try {
             protocol.endSession();
             pushReceiver.stop();
-            logger.info("disconnect session_id:" + protocol.getSessionId());
+            LOGGER.info("disconnect session_id:" + protocol.getSessionId());
         } catch (IOException | JSONException e) {
-            logger.warn(e, e);
+            LOGGER.warn(e, e);
         } finally {
             System.exit(0);
         }
@@ -203,8 +207,8 @@ public class Client {
         focusedWidget = windowData.getString("focused_widget");
         JSONArray windows = windowData.getJSONArray("windows");
 
-        logger.info("----");
-        logger.info("focused_window[" + focusedWindow + "]");
+        LOGGER.info("----");
+        LOGGER.info("focused_window[" + focusedWindow + "]");
 
         for (int i = 0; i < windows.length(); i++) {
             JSONObject w = windows.getJSONObject(i);
@@ -216,12 +220,12 @@ public class Client {
                 try {
                     node = new Node(Interface.parseInput(new ByteArrayInputStream(gladeData.getBytes("UTF-8")), uiControl), windowName);
                 } catch (UnsupportedEncodingException ex) {
-                    logger.info(ex, ex);
+                    LOGGER.info(ex, ex);
                     return;
                 }
                 uiControl.putNode(windowName, node);
             }
-            logger.info("show window[" + windowName + "] put_type[" + putType + "]");
+            LOGGER.info("show window[" + windowName + "] put_type[" + putType + "]");
         }
 
         for (int i = 0; i < windows.length(); i++) {
@@ -284,7 +288,7 @@ public class Client {
                 JSONObject params = new JSONObject();
                 params.put("event_data", eventData);
 
-                logger.info("window:" + windowName + " widget:" + widgetName + " event:" + event);
+                LOGGER.info("window:" + windowName + " widget:" + widgetName + " event:" + event);
 
                 long t2 = System.currentTimeMillis();
 
@@ -305,7 +309,7 @@ public class Client {
                 msg += "server_total:" + total_exec_time + "ms ";
                 msg += "server_app:" + app_exec_time + "ms ";
                 msg += "update_screen:" + (t4 - t3) + "ms";
-                logger.info(msg);
+                LOGGER.info(msg);
             }
         } catch (JSONException | IOException ex) {
             ExceptionDialog.showExceptionDialog(ex);
@@ -315,7 +319,7 @@ public class Client {
 
     private void listDownloads() throws IOException, JSONException {
         JSONArray array = protocol.listDownloads();
-        logger.debug(array);
+        LOGGER.debug(array);
         for (int j = 0; j < array.length(); j++) {
             JSONObject item = array.getJSONObject(j);
 
@@ -364,7 +368,7 @@ public class Client {
         try {
             if (!isReceiving()) {
                 startReceiving();
-                logger.debug("sendPing");
+                LOGGER.debug("sendPing");
                 if (!protocol.enablePushClient()) {
                     listDownloads();
                 }
@@ -374,7 +378,7 @@ public class Client {
                 stopReceiving();
             }
         } catch (IOException | JSONException ex) {
-            logger.catching(Level.FATAL, ex);
+            LOGGER.catching(Level.FATAL, ex);
             ExceptionDialog.showExceptionDialog(ex);
             System.exit(1);
         }
