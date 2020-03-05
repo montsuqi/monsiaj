@@ -24,15 +24,14 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.montsuqi.monsiaj.client.PrinterConfig;
 
 public class PDFPrint {
-    private static final Logger logger = LogManager.getLogger(PDFPrint.class);
-    private static final Preferences prefs = Preferences.userNodeForPackage(PDFPrint.class);
+    private static final Logger LOG = LogManager.getLogger(PDFPrint.class);
+    private static final Preferences PREFS = Preferences.userNodeForPackage(PDFPrint.class);
 
     public static void print(File file, int copies, PrintService ps) {
-        logger.debug("print start - " + file);
+        LOG.debug("print start - " + file);
         try {
             try (PDDocument document = PDDocument.load(file)) {
                 MediaSizeName size = getMediaSizeName(document);
-                
                 PrinterJob job = PrinterJob.getPrinterJob();
                 job.setPrintService(ps);
                 job.setPageable(new PDFPageable(document));
@@ -40,25 +39,23 @@ public class PDFPrint {
                 attr.add(size);
                 attr.add(new Copies(copies));
                 attr.add(new JobName(file.getName(), null));
-                
                 PageFormat pf = job.getPageFormat(attr);
                 Paper paper = pf.getPaper();
                 paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
                 pf.setPaper(paper);
-                
                 job.print(attr);
             }
         } catch (IOException | PrinterException ex) {
-            logger.warn(ex, ex);
+            LOG.warn(ex, ex);
         }
-        logger.debug("print end - " + file);
+        LOG.debug("print end - " + file);
     }
 
     public static void print(File file) {
         try {
             try (PDDocument document = PDDocument.load(file)) {
                 MediaSizeName size = getMediaSizeName(document);
-                
+
                 PrinterJob job = PrinterJob.getPrinterJob();
                 job.setPageable(new PDFPageable(document));
                 PrintService ps = loadPrintService();
@@ -71,7 +68,7 @@ public class PDFPrint {
                   attr.add(size);
                 }
                 attr.add(new JobName(file.getName(), null));
-                
+
                 if (!job.printDialog(attr)) {
                     return;
                 }
@@ -79,27 +76,27 @@ public class PDFPrint {
                 Paper paper = pf.getPaper();
                 paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
                 pf.setPaper(paper);
-                
+
                 job.print(attr);
                 savePrintService(job.getPrintService());
                 savePrintRequestAttributeSet(attr);
             }
         } catch (IOException | PrinterException ex) {
-            logger.warn(ex, ex);
+            LOG.warn(ex, ex);
         }
     }
 
     public static PrintService loadPrintService() {
-      return PrinterConfig.getPrintService(prefs.get("printService",""));
+      return PrinterConfig.getPrintService(PREFS.get("printService",""));
     }
 
     public static void savePrintService(PrintService ps) {
-      prefs.put("printService",ps.getName());
+      PREFS.put("printService",ps.getName());
     }
 
     public static PrintRequestAttributeSet loadPrintRequestAttributeSet() {
       try {
-        byte[] array = prefs.getByteArray("printRequestAttributeSet",new byte[0]);
+        byte[] array = PREFS.getByteArray("printRequestAttributeSet",new byte[0]);
         ByteArrayInputStream bais = new ByteArrayInputStream(array);
         PrintRequestAttributeSet attr;
           try (ObjectInputStream ois = new ObjectInputStream(bais)) {
@@ -107,8 +104,8 @@ public class PDFPrint {
           }
         return attr;
       } catch (IOException |ClassNotFoundException ex) {
-        logger.warn("can not load printRequestAttributeSet");
-        logger.debug(ex, ex);
+        LOG.warn("can not load printRequestAttributeSet");
+        LOG.debug(ex, ex);
       }
       return null;
     }
@@ -120,9 +117,9 @@ public class PDFPrint {
               oos.writeObject(attr);
               oos.flush();
           }
-        prefs.putByteArray("printRequestAttributeSet",baos.toByteArray());
+        PREFS.putByteArray("printRequestAttributeSet",baos.toByteArray());
       } catch (IOException ex) {
-        logger.warn(ex, ex);
+        LOG.warn(ex, ex);
       }
     }
 
