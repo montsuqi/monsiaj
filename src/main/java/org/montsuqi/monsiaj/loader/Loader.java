@@ -3,46 +3,33 @@ package org.montsuqi.monsiaj.loader;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarFile;
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Loader {
 
-    private static final Logger LOG = LogManager.getLogger(Loader.class);
-    private final String VERSION_URL = "https://dl.orca.med.or.jp/java-client/version";
-    private final String DOWNLOAD_URL = "https://dl.orca.med.or.jp/java-client/";
+    private static Logger log = LogManager.getLogger(Loader.class);
+    private final String VERSION_URL = "http://ftp.orca.med.or.jp/pub/java-client2/version";
+    private final String DOWNLOAD_URL = "http://ftp.orca.med.or.jp/pub/java-client2/";
     private final String[] CACHE_DIR_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "cache"};
     private final String CACHE_DIR = createPath(CACHE_DIR_PATH_ELEM).getAbsolutePath();
-    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader2.properties"};
+    private static final String[] PROP_PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "loader.properties"};
     private static final String PROP_PATH = createPath(PROP_PATH_ELEM).getAbsolutePath();
     private Properties prop;
     private JDialog progress;
-    private String orcaId;
-    private String accessKey;
-    private boolean saveAccessKey;
-    private static final int MAX_TRY = 5;
-
-    class UnAuthorized extends Exception {
-    }
 
     private Loader() {
         prop = new Properties();
@@ -78,14 +65,6 @@ public class Loader {
         }
     }
 
-    private String getProperty(String key, String def) {
-        if (prop.containsKey(key)) {
-            return prop.getProperty(key);
-        } else {
-            return def;
-        }
-    }
-
     private void setProperty(String key, String value) {
         if (value == null) {
             prop.remove(key);
@@ -101,57 +80,34 @@ public class Loader {
             file.setReadable(true, true);
             file.setWritable(true, true);
         } catch (IOException ex) {
-            LOG.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
         }
-    }
-
-    private String getOrcaId() {
-        return getProperty("orcaId", "");
-    }
-
-    private void setOrcaId(String val) {
-        setProperty("orcaId", val);
-    }
-
-    private String getAccessKey() {
-        return getProperty("accessKey", "");
-    }
-
-    private void setAccessKey(String val) {
-        setProperty("accessKey", val);
-    }
-
-    private boolean getSaveAccessKey() {
-        String sa = getProperty("saveAccessKey", "true");
-        if (sa.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void setSaveAccessKey(boolean val) {
-        if (val) {
-            setProperty("saveAccessKey", "true");
-        } else {
-            setProperty("saveAccessKey", "false");
-        }
-    }
-
-    private String getVersionURL() {
-        return getProperty("versionURL", VERSION_URL);
-    }
-
-    private String getDownloadURL() {
-        return getProperty("downloadURL", DOWNLOAD_URL);
     }
 
     private String getCacheVersion() {
-        return getProperty("cacheVersion", "");
+        return getProperty("cacheVersion");
     }
 
-    private void setCacheVersion(String val) {
-        setProperty("cacheVersion", val);
+    private void setCacheVersion(String v) {
+        setProperty("cacheVersion", v);
+    }
+
+    private String getVersionURL() {
+        String url = getProperty("versionURL");
+        if (url == null) {
+            url = VERSION_URL;
+            setProperty("versionURL", VERSION_URL);
+        }
+        return url;
+    }
+
+    private String getDownloadURL() {
+        String url = getProperty("downloadURL");
+        if (url == null) {
+            url = DOWNLOAD_URL;
+            setProperty("downloadURL", DOWNLOAD_URL);
+        }
+        return url;
     }
 
     private void createProgress(String msg) {
@@ -178,7 +134,7 @@ public class Loader {
     }
 
     private void updateCache(String version) throws IOException {
-        LOG.debug("-- updateCache");
+        log.debug("-- updateCache");
         /*
          * キャッシュディレクトリの作成
          */
@@ -194,152 +150,74 @@ public class Loader {
          */
         String strJarFile = "monsiaj-" + version + "-all.jar";
         String strURL = getDownloadURL() + strJarFile;
-        LOG.info("download start " + strURL);
+        log.info("download start " + strURL);
         createProgress("バージョン" + version + "のダウンロード中...");
         EventQueue.invokeLater(() -> {
             showProgress();
         });
-
-        try {
-            HttpURLConnection con = httpGet(strURL);
-            File jarFile = createPath(new String[]{CACHE_DIR, strJarFile});
-            BufferedInputStream in = new BufferedInputStream(con.getInputStream());
-            int length;
-            try ( BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile))) {
-                while ((length = in.read()) != -1) {
-                    out.write(length);
-                }
+        HttpURLConnection con = httpGet(strURL);
+        File jarFile = createPath(new String[]{CACHE_DIR, strJarFile});
+        BufferedInputStream in = new BufferedInputStream(con.getInputStream());
+        int length;
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile))) {
+            while ((length = in.read()) != -1) {
+                out.write(length);
             }
-            con.disconnect();
-            EventQueue.invokeLater(() -> {
-                hideProgress();
-            });
-            LOG.info("... complete");
-            LOG.debug("-- updateCache end");
-        } catch (UnAuthorized ex) {
-            LOG.error("unexpected UnAuthorized Error");
-            showErrorDialog("認証エラーです。医療機関ID、アクセスキーを確認してください。");
         }
+        con.disconnect();
+        EventQueue.invokeLater(() -> {
+            hideProgress();
+        });
+        log.info("... complete");
+        log.debug("-- updateCache end");
     }
 
-    private HttpURLConnection httpGet(String strURL) throws IOException, UnAuthorized {
+    private static HttpURLConnection httpGet(String strURL) throws IOException {
         URL url = new URL(strURL);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        if (orcaId != null && accessKey != null) {
-            con.setAuthenticator(new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(orcaId, accessKey.toCharArray());
-                }
-            });
-        }
-        con.setInstanceFollowRedirects(true);
+        con.setInstanceFollowRedirects(false);
         con.setRequestMethod("GET");
         con.connect();
-        switch (con.getResponseCode()) {
-            case HttpURLConnection.HTTP_OK:
-                return con;
-            case HttpURLConnection.HTTP_UNAUTHORIZED:
-                con.disconnect();
-                throw new UnAuthorized();
-            default:
-                throw new IOException("http status code:" + con.getResponseCode());
+        if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            con.disconnect();
+            throw new IOException("" + con.getResponseCode());
         }
-    }
-
-    private void getAccessKey(int n) {
-        // 初回だけアクセスキーを設定ファイルから読み込む
-        if (n == 0) {
-            orcaId = getOrcaId();
-            saveAccessKey = getSaveAccessKey();
-            if (saveAccessKey) {
-                accessKey = getAccessKey();
-                if (!accessKey.isEmpty()) {
-                    return;
-                }
-            } else {
-                accessKey = "";
-                setAccessKey(null);
-            }
-        }
-        JTextField id = new JTextField(orcaId);
-        JTextField ak = new JPasswordField();
-        JCheckBox cak = new JCheckBox("アクセスキーを保存する", saveAccessKey);
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 2));
-        panel.add(new JLabel("医療機関ID"));
-        panel.add(id);
-        panel.add(new JLabel("アクセスキー"));
-        panel.add(ak);
-        panel.add(new JLabel(""));
-        panel.add(cak);
-        Object[] options = {"OK", "キャンセル"};
-        int select = JOptionPane.showOptionDialog(null, panel, "アクセスキー入力",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                null, options, options[0]);
-        if (select == 0) {
-            orcaId = id.getText();
-            accessKey = ak.getText();
-            saveAccessKey = cak.isSelected();
-            setSaveAccessKey(saveAccessKey);
-        } else {
-            LOG.info("cancel input accessKey");
-            System.exit(0);
-        }
+        return con;
     }
 
     private String getVersion() throws IOException {
-        for (int i = 0; i < MAX_TRY; i++) {
-            try {
-                String url = getVersionURL();
-                LOG.info("get version from " + url);
-                getAccessKey(i);
-                HttpURLConnection con = httpGet(url);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String version = reader.readLine();
-                LOG.info("version: " + version);
-                con.disconnect();
-                // 認証が通った場合のみID、アクセスキーを保存
-                setOrcaId(orcaId);
-                if (saveAccessKey) {
-                    setAccessKey(accessKey);
-                } else {
-                    setAccessKey(null);
-                }
-                return version;
-            } catch (UnAuthorized ex) {
-                LOG.info("UnAuthorized Error");
-            }
-        }
-        LOG.info("UnAuthorized Error limit reached");
-        showErrorDialog("規定回数失敗したため終了します。");
-        return ""; // not reach
+        HttpURLConnection con = httpGet(getVersionURL());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String version = reader.readLine();
+        con.disconnect();
+        return version;
     }
 
     private void checkCache() {
         String useCache = getProperty("useCache");
         if (useCache != null && useCache.equals("true")) {
-            LOG.info("skip cache check");
+            log.info("skip cache check");
             return;
         }
 
         try {
-            LOG.debug("-- checkCache start");
+            log.debug("-- checkCache start");
             String cacheVersion = getCacheVersion();
             String serverVersion = getVersion();
 
-            LOG.info("cacheVersion : " + cacheVersion);
-            LOG.info("serverVersion: " + serverVersion);
+            log.info("cacheVersion : " + cacheVersion);
+            log.info("serverVersion: " + serverVersion);
 
-            if (cacheVersion.equals(serverVersion)) {
-                LOG.info("use cache");
+            if (cacheVersion != null && cacheVersion.equals(serverVersion)) {
+                log.info("use cache");
             } else {
                 updateCache(serverVersion);
                 setCacheVersion(serverVersion);
             }
-            LOG.debug("-- checkCache end");
+            log.debug("-- checkCache end");
         } catch (IOException ex) {
-            LOG.error("checkCache failure");
-            LOG.error(ex.getMessage(), ex);
+            log.error("checkCache failure");
+            log.error(ex.getMessage(), ex);
         }
     }
 
@@ -348,11 +226,10 @@ public class Loader {
         File file = createPath(new String[]{CACHE_DIR, "monsiaj-" + version + "-all.jar"});
         String noVerify = getProperty("noVerify");
         if (noVerify != null && noVerify.equals("true")) {
-            LOG.info("no verify");
+            log.info("no verify");
         } else {
             if (!JarVerifier.verify(new JarFile(file))) {
-                setCacheVersion(null);
-                LOG.error("jar sign verification error");
+                log.error("jar sign verification error");
                 showErrorDialog("ランチャーの署名の検証に失敗しました。詳細はログを確認してください。");
             }
         }
@@ -362,33 +239,30 @@ public class Loader {
         Method m = cobj.getMethod("main", new Class[]{args.getClass()});
         m.setAccessible(true);
         int mods = m.getModifiers();
-
-        if (m.getReturnType() != void.class
-                || !Modifier.isStatic(mods)
+        if (m.getReturnType() != void.class || !Modifier.isStatic(mods)
                 || !Modifier.isPublic(mods)) {
-            throw new NoSuchMethodException(
-                    "main");
+            throw new NoSuchMethodException("main");
         }
         m.invoke(null, new Object[]{args});
     }
 
     private void launch(String[] args) throws Exception {
         try {
-            LOG.debug("-- launch start");
+            log.debug("-- launch start");
             invokeLauncher(args);
         } catch (Exception ex) {
             setCacheVersion(null);
-            LOG.error(ex.getMessage(), ex);
-            LOG.info("remove cacheVersion");
+            log.error(ex.getMessage(), ex);
+            log.info("remove cacheVersion");
             showErrorDialog("ランチャーの起動に失敗しました。詳細はログを確認してください。");
         }
     }
 
     public static void main(String[] args) throws Exception {
-        LOG.info("---- Loader start");
+        log.info("---- Loader start");
         Loader loader = new Loader();
         loader.checkCache();
         loader.launch(args);
-        LOG.info("---- Loader end");
+        log.info("---- Loader end");
     }
 }
