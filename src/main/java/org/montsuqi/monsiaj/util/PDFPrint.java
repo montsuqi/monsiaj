@@ -41,8 +41,6 @@ public class PDFPrint {
                 PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
                 if (msn != null) {
                     attr.add(msn);
-                } else {
-                    attr.add(getMediaPrintableArea(doc));
                 }
                 attr.add(new Copies(copies));
                 attr.add(new JobName(file.getName(), null));
@@ -130,7 +128,7 @@ public class PDFPrint {
         }
     }
 
-    public static Rectangle2D.Float getDocumentSize(PDDocument doc) throws IOException {
+    public static MediaSizeName getMediaSizeName(PDDocument doc) throws IOException {
         PDFRenderer renderer = new PDFRenderer(doc);
         BufferedImage image = renderer.renderImageWithDPI(0, 72f);
         float w, h, swp;
@@ -141,17 +139,7 @@ public class PDFPrint {
             w = h;
             h = swp;
         }
-        return new Rectangle2D.Float(0, 0, w, h);
-    }
-
-    public static MediaSizeName getMediaSizeName(PDDocument doc) throws IOException {
-        Rectangle2D.Float rect = getDocumentSize(doc);
-        return MediaSize.findMedia(rect.width, rect.height, Size2DSyntax.INCH);
-    }
-
-    public static MediaPrintableArea getMediaPrintableArea(PDDocument doc) throws IOException {
-        Rectangle2D.Float rect = getDocumentSize(doc);
-        return new MediaPrintableArea(0, 0, rect.width, rect.height, Size2DSyntax.INCH);
+        return MediaSize.findMedia(w, h, Size2DSyntax.INCH);
     }
 
     public static void main(String args[]) throws Exception {
