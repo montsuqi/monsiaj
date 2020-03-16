@@ -59,8 +59,6 @@ public class PDFPrint {
     public static void print(File file) {
         try {
             try ( PDDocument document = PDDocument.load(file)) {
-                MediaSizeName size = getMediaSizeName(document);
-
                 PrinterJob job = PrinterJob.getPrinterJob();
                 job.setPageable(new PDFPageable(document));
                 PrintService ps = loadPrintService();
@@ -70,7 +68,10 @@ public class PDFPrint {
                 PrintRequestAttributeSet attr = loadPrintRequestAttributeSet();
                 if (attr == null) {
                     attr = new HashPrintRequestAttributeSet();
-                    attr.add(size);
+                    MediaSizeName msn = getMediaSizeName(document);
+                    if (msn != null) {
+                        attr.add(msn);
+                    }
                 }
                 attr.add(new JobName(file.getName(), null));
 
