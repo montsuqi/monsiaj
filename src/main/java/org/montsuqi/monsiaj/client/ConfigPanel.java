@@ -339,6 +339,13 @@ public class ConfigPanel extends JPanel {
         return pf;
     }
 
+    private JPanel createCheckPanel(JCheckBox cb) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(cb);
+        return panel;
+    }
+
     private JPanel createBasicPanel() {
         int y;
         JPanel panel = new JPanel(new GridBagLayout());
@@ -371,13 +378,13 @@ public class ConfigPanel extends JPanel {
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.save_password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(savePasswordCheckbox,
+        panel.add(createCheckPanel(savePasswordCheckbox),
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_sso_client_verification")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(useSSOCheckbox,
+        panel.add(createCheckPanel(useSSOCheckbox),
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
@@ -426,7 +433,7 @@ public class ConfigPanel extends JPanel {
         y = 0;
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_ssl_client_verification")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(useSSLCheckbox,
+        panel.add(createCheckPanel(useSSLCheckbox),
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
@@ -454,13 +461,13 @@ public class ConfigPanel extends JPanel {
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.save_cert_password")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(saveClientCertificatePasswordCheckbox,
+        panel.add(createCheckPanel(saveClientCertificatePasswordCheckbox),
                 createConstraints(1, y, 3, 1, 0.0, 0.0));
         y++;
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.use_pkcs11")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(usePKCS11Checkbox,
+        panel.add(createCheckPanel(usePKCS11Checkbox),
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
@@ -578,7 +585,7 @@ public class ConfigPanel extends JPanel {
 
         panel.add(createLabel(Messages.getString("ConfigurationPanel.show_startup_message")),
                 createConstraints(0, y, 1, 1, 0.0, 1.0));
-        panel.add(showStartupMessageCheck,
+        panel.add(createCheckPanel(showStartupMessageCheck),
                 createConstraints(1, y, 3, 1, 1.0, 0.0));
         y++;
 
