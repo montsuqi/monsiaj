@@ -27,11 +27,11 @@ import org.montsuqi.monsiaj.client.PrinterConfig;
 
 public class PDFPrint {
 
-    private static final Logger LOG = LogManager.getLogger(PDFPrint.class);
+    private static final Logger LOGGER = LogManager.getLogger(PDFPrint.class);
     private static final Preferences PREFS = Preferences.userNodeForPackage(PDFPrint.class);
 
     public static void print(File file, int copies, PrintService ps) {
-        LOG.debug("print start - " + file);
+        LOGGER.info("print start file:" + file + " copies:" + copies + " print_service:" + ps);
         try {
             try ( PDDocument doc = PDDocument.load(file)) {
                 MediaSizeName msn = getMediaSizeName(doc);
@@ -51,12 +51,13 @@ public class PDFPrint {
                 job.print(attr);
             }
         } catch (IOException | PrinterException ex) {
-            LOG.warn(ex, ex);
+            LOGGER.warn(ex, ex);
         }
-        LOG.debug("print end - " + file);
+        LOGGER.info("print end file:" + file);
     }
 
     public static void print(File file) {
+        LOGGER.info("print start file:" + file);
         try {
             try ( PDDocument document = PDDocument.load(file)) {
                 PrinterJob job = PrinterJob.getPrinterJob();
@@ -87,8 +88,9 @@ public class PDFPrint {
                 savePrintService(job.getPrintService());
                 savePrintRequestAttributeSet(attr);
             }
+            LOGGER.info("print end file:" + file);
         } catch (IOException | PrinterException ex) {
-            LOG.warn(ex, ex);
+            LOGGER.warn(ex, ex);
         }
     }
 
@@ -110,8 +112,8 @@ public class PDFPrint {
             }
             return attr;
         } catch (IOException | ClassNotFoundException ex) {
-            LOG.warn("can not load printRequestAttributeSet");
-            LOG.debug(ex, ex);
+            LOGGER.warn("can not load printRequestAttributeSet");
+            LOGGER.debug(ex, ex);
         }
         return null;
     }
@@ -125,7 +127,7 @@ public class PDFPrint {
             }
             PREFS.putByteArray("printRequestAttributeSet", baos.toByteArray());
         } catch (IOException ex) {
-            LOG.warn(ex, ex);
+            LOGGER.warn(ex, ex);
         }
     }
 

@@ -78,6 +78,7 @@ public class Client {
 
     void connect() throws IOException, GeneralSecurityException, JSONException {
         int num = conf.getCurrent();
+        LOGGER.info("system properties:" + conf.getSystemProperties(num));
         String authURI = conf.getAuthURI(num);
         authURI = authURI.replace("http://", "");
         authURI = authURI.replace("https://", "");
