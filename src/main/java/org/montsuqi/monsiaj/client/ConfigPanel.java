@@ -339,6 +339,7 @@ public class ConfigPanel extends JPanel {
         return pf;
     }
 
+    // チェックボックスの右側空白部分が反応するのを抑制
     private JPanel createCheckPanel(JCheckBox cb) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
