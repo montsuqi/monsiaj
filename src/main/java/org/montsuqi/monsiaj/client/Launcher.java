@@ -44,6 +44,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -64,6 +65,7 @@ import org.montsuqi.monsiaj.util.SystemEnvironment;
 import org.montsuqi.monsiaj.util.TempFile;
 import org.montsuqi.monsiaj.widgets.Button;
 import org.montsuqi.monsiaj.widgets.ExceptionDialog;
+import org.montsuqi.monsiaj.widgets.FileChooserButton;
 
 public class Launcher {
 
@@ -311,7 +313,7 @@ public class Launcher {
         });
         bar.add(run);
 
-        Button save = new Button(new AbstractAction(Messages.getString("Launcher.save_label")) {
+        Button saveButton = new Button(new AbstractAction(Messages.getString("Launcher.save_label")) {
 
             @Override
             public void actionPerformed(ActionEvent ev) {
@@ -320,9 +322,9 @@ public class Launcher {
                 conf.save();
             }
         });
-        bar.add(save);
+        bar.add(saveButton);
 
-        Button cancel = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
+        Button cancelButton = new Button(new AbstractAction(Messages.getString("Launcher.cancel_label")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -330,9 +332,9 @@ public class Launcher {
                 System.exit(0);
             }
         });
-        bar.add(cancel);
+        bar.add(cancelButton);
 
-        Button config = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
+        Button configButton = new Button(new AbstractAction(Messages.getString("Launcher.config_label")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -341,7 +343,21 @@ public class Launcher {
                 updateConfigCombo();
             }
         });
-        bar.add(config);
+        bar.add(configButton);
+
+        Button logViewerButton = new Button(new AbstractAction(Messages.getString("Launcher.logviewer_label")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final String[] PATH_ELEM = {System.getProperty("user.home"), ".monsiaj", "logs"};
+                final JFileChooser chooser = new JFileChooser(SystemEnvironment.createFilePath(PATH_ELEM).getAbsolutePath());
+                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    LogViewer lv = new LogViewer(chooser.getSelectedFile());
+                    lv.run();
+                }
+            }
+        });
+        bar.add(logViewerButton);
 
         f.setSize(800, 480);
         f.setResizable(true);
