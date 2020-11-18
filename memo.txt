@@ -1,0 +1,8 @@
+10/21 16:18:49 [INFO ] try connect https://sms-stg.glorca.orcamo.jp/rpc/
+
+
+10/21 16:19:08 [INFO ] window:M00 widget:G01 event:CLICKED
+10/21 16:19:08 [INFO ] [send_event] total:472ms make_event_data:0ms rpc_total:244ms server_total:85ms server_app:33ms update_screen:228ms
+
+
+window widget event transfer server app
