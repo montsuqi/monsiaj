@@ -34,7 +34,7 @@ import org.montsuqi.monsiaj.util.SystemEnvironment;
  */
 public class Config {
 
-    private static final Logger logger = LogManager.getLogger(Config.class);    
+    private static final Logger logger = LogManager.getLogger(Config.class);
 
     private static final String PROP_FILENAME = "monsiaj.jsonrpc.properties";
     private static final String JARPATH = System.getProperty("java.class.path");
@@ -46,19 +46,19 @@ public class Config {
     private static final String CONFIG_KEY = "monsiaj.config";
     private static final String CURRENT_KEY = "monsiaj.current";
     private static final String DEFAULT_STYLE_RESOURCE_NAME = "/style.properties";
-    
+
     private String propPath;
     private Properties prop;
     private int current;
-    
+
     private final PrinterConfig printerConfig;
-    
+
     public Config() {
         initProp();
         readProp();
         printerConfig = new PrinterConfig();
     }
-    
+
     public ArrayList<String> getPrinterList() {
         return printerConfig.getPrinterList();
     }
@@ -162,9 +162,9 @@ public class Config {
             tmp.store(new FileOutputStream(file), "monsiaj setting");
             file.setExecutable(false);
             file.setReadable(false, false);
-            file.setWritable(false, false);            
+            file.setWritable(false, false);
             file.setReadable(true, true);
-            file.setWritable(true, true);            
+            file.setWritable(true, true);
         } catch (IOException ex) {
             logger.catching(ex);
         }
@@ -467,8 +467,8 @@ public class Config {
 
     public void setTimerPeriod(int i, int p) {
         setValue(i, "timerPeriod", Integer.toString(p));
-    }    
-    
+    }
+
     // startup popup message
     public boolean getShowStartupMessage(int i) {
         String value = getValue(i, "showStartupMessage");
@@ -480,7 +480,7 @@ public class Config {
 
     public void setShowStartupMessage(int i, boolean v) {
         setValue(i, "showStartupMessage", Boolean.toString(v));
-    }    
+    }
 
     // system properties
     public String getSystemProperties(int i) {
@@ -527,8 +527,7 @@ public class Config {
     public int getCopies(String printer) {
         return printerConfig.getCopiesByConfName(printer);
     }
-            
-    
+
     public void list() {
         System.out.println("----");
         for (Enumeration e = prop.keys(); e.hasMoreElements();) {

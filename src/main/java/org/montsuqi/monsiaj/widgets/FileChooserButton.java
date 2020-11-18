@@ -21,6 +21,7 @@
  copies.
  */
 package org.montsuqi.monsiaj.widgets;
+
 import org.montsuqi.monsiaj.util.Messages;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -32,9 +33,11 @@ import javax.swing.*;
 import org.montsuqi.monsiaj.util.GtkStockIcon;
 
 /**
- * <p>A class that simulates Gtk+'s FileChooserButton.</p>
+ * <p>
+ * A class that simulates Gtk+'s FileChooserButton.</p>
  *
- * <p>It can hold a binary data with it.</p>
+ * <p>
+ * It can hold a binary data with it.</p>
  */
 public class FileChooserButton extends JComponent {
 
@@ -80,13 +83,13 @@ public class FileChooserButton extends JComponent {
         gbc.fill = GridBagConstraints.NONE;
         gbl.addLayoutComponent(browseButton, gbc);
     }
-    
+
     public JButton getBrowseButton() {
         return browseButton;
     }
 
     private class BrowseActionForLoad extends AbstractAction {
-        
+
         public void actionPerformed(ActionEvent e) {
             final String dir = prefs.get(FileChooserButton.class.getName(), System.getProperty("user.home"));
             final JFileChooser chooser = new JFileChooser(dir);
@@ -110,7 +113,7 @@ public class FileChooserButton extends JComponent {
                 in.read(bytes, 0, length);
                 in.close();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(FileChooserButton.this, e.getMessage(), Messages.getString("FileChooserButton.error"), JOptionPane.ERROR_MESSAGE); 
+                JOptionPane.showMessageDialog(FileChooserButton.this, e.getMessage(), Messages.getString("FileChooserButton.error"), JOptionPane.ERROR_MESSAGE);
             }
         }
         return bytes;
