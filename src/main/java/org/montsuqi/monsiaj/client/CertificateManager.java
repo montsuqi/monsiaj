@@ -135,13 +135,19 @@ public class CertificateManager {
         File certDir = new File(new File(new File(System.getProperty("user.home")), ".monsiaj"), "certificates");
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+        // PKCS12ファイルの保存
         File new_cert = new File(certDir, format.format(now) + ".p12");
         certDir.mkdirs();
-        FileOutputStream fos = new FileOutputStream(new_cert);
-        cert.writeTo(fos);
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(new_cert)) {
+            cert.writeTo(fos);
+        }
         fileName = new_cert.getPath();
         password = new_password;
+        // パスフレーズファイルの保存
+        File new_pass = new File(certDir, format.format(now) + ".pass");
+        try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new_pass)))) {
+            pw.print(new_password);
+        }
     }
 
     private ByteArrayOutputStream request(String uri, String method) throws IOException {
