@@ -168,7 +168,7 @@ public class NumberEntry extends Entry {
     }
 }
 
-class NumberDocument extends PlainDocument {
+class NumberDocument extends LengthLimitableDocument {
 
     private String originalFormat;
     private NumberFormat format;
@@ -209,10 +209,6 @@ class NumberDocument extends PlainDocument {
         PrecisionScale ps = new PrecisionScale(originalFormat);
         value = value.setScale(ps.precision, ps.scale);
         return value;
-    }
-
-    public void setLimit(int limit) {
-        // text_max_length、max_lengthプロパティに対応
     }
 
     void setFormat(String format) {
