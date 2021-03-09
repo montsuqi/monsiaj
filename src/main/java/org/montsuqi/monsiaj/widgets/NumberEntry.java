@@ -123,9 +123,9 @@ public class NumberEntry extends Entry {
     }
 
     public static void main(String[] args) {
-        final JFrame f = new JFrame("TestNumberEntry"); 
+        final JFrame f = new JFrame("TestNumberEntry");
         final NumberEntry ne = new NumberEntry();
-        ne.setFormat("-----"); 
+        ne.setFormat("-----");
         ne.setValue(new BigDecimal(0));
         f.getContentPane().setLayout(new BorderLayout());
         f.getContentPane().add(ne, BorderLayout.CENTER);
@@ -157,8 +157,8 @@ public class NumberEntry extends Entry {
             case KeyEvent.VK_HOME: // fall through
             case KeyEvent.VK_END:
                 if (e.getID() == KeyEvent.KEY_PRESSED || e.getID() == KeyEvent.KEY_RELEASED) {
-                setValue(NumberDocument.ZERO);
-            }
+                    setValue(NumberDocument.ZERO);
+                }
                 e.consume();
                 break;
             default:
@@ -176,7 +176,7 @@ class NumberDocument extends PlainDocument {
     private int scale;
     private int expo;
     private boolean minus = false;
-    protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9"; 
+    protected static final String DEFAULT_FORMAT = "ZZZZZZZZZ9";
     static final BigDecimal ZERO = new BigDecimal(BigInteger.ZERO);
     static final BigDecimal ONE = new BigDecimal(BigInteger.ONE);
     protected static final Logger logger = LogManager.getLogger(NumberDocument.class);
@@ -209,6 +209,10 @@ class NumberDocument extends PlainDocument {
         PrecisionScale ps = new PrecisionScale(originalFormat);
         value = value.setScale(ps.precision, ps.scale);
         return value;
+    }
+
+    public void setLimit(int limit) {
+        // text_max_length、max_lengthプロパティに対応
     }
 
     void setFormat(String format) {
@@ -313,7 +317,7 @@ class NumberDocument extends PlainDocument {
         String formatted = formatValue(value);
         remove(0, getLength());
         // treat zero value representation specially
-        if ((formatted.trim().equals("0") || formatted.trim().equals("+0")) && leaveZeroAsBlank()) { 
+        if ((formatted.trim().equals("0") || formatted.trim().equals("+0")) && leaveZeroAsBlank()) {
             // do nothing
         } else {
             super.insertString(0, formatted, a);
