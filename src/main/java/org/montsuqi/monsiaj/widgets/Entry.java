@@ -19,10 +19,10 @@ to you along with PANDA so you can know your rights and
 responsibilities.  It should be in a file named COPYING.  Among other
 things, the copyright notice and this notice must be preserved on all
 copies.
-*/
-
+ */
 package org.montsuqi.monsiaj.widgets;
 
+import java.awt.Insets;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -30,64 +30,72 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
 
-/** <p>A class to simulate Gtk+'s Entry widget.</p>
- * 
- * <p>Down arrow key moves focus out to the next component, and
- * up arrow key moves focus out to the previous component respectively.</p>
- * 
- * <p>This component uses LengthLimitableDocument by default and length of
- * the text can be set.</p>
+/**
+ * A class to simulate Gtk+'s Entry widget.
+ *
+ * Down arrow key moves focus out to the next component, and up arrow key moves
+ * focus out to the previous component respectively.
+ *
+ * This component uses LengthLimitableDocument by default and length of the text
+ * can be set.
  */
 public class Entry extends JTextField {
 
-	public Entry() {
-		super();
-		setDocument(new LengthLimitableDocument());
-		initActions();
-	}
+    public Entry() {
+        super();
+        setDocument(new LengthLimitableDocument());
+        initActions();
+        setMargin(new Insets(0,3,0,0));
+        setBorder(new EmptyBorder(0,3,0,0));
+    }
 
-	public Entry(String text, int n) {
-		super();
-		setDocument(new LengthLimitableDocument());
-		setText(text);
-		setColumns(n);
-		initActions();
-	}
+    public Entry(String text, int n) {
+        super();
+        setDocument(new LengthLimitableDocument());
+        setText(text);
+        setColumns(n);
+        initActions();
+    }
 
-	private void initActions() {
-		ActionMap actions = getActionMap();
-		InputMap inputs = getInputMap();
+    private void initActions() {
+        ActionMap actions = getActionMap();
+        InputMap inputs = getInputMap();
 
-		actions.put("focusOutNext", new FocusOutNextAction()); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext"); 
+        actions.put("focusOutNext", new FocusOutNextAction());
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "focusOutNext");
 
-		actions.put("focusOutPrevious", new FocusOutPreviousAction()); 
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious"); 
-		addFocusListener(new EntryFocusListener());
-	}
+        actions.put("focusOutPrevious", new FocusOutPreviousAction());
+        inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "focusOutPrevious");
+        addFocusListener(new EntryFocusListener());
+    }
 
-	public void setLimit(int limit) {
-		LengthLimitableDocument doc = (LengthLimitableDocument)getDocument();
-                if (limit <= 0) {
-                    limit = Integer.MAX_VALUE;
-                }
-		doc.setLimit(limit);
-	}
+    public void setLimit(int limit) {
+        LengthLimitableDocument doc = (LengthLimitableDocument) getDocument();
+        if (limit <= 0) {
+            limit = Integer.MAX_VALUE;
+        }
+        doc.setLimit(limit);
+    }
 
-	public int getLimit() {
-		LengthLimitableDocument doc = (LengthLimitableDocument)getDocument();
-		return doc.getLimit();
-	}
-	
+    public int getLimit() {
+        LengthLimitableDocument doc = (LengthLimitableDocument) getDocument();
+        return doc.getLimit();
+    }
+
     private static class EntryFocusListener implements FocusListener {
-       public void focusGained(final FocusEvent e) {
-    	   JTextField tf = (JTextField)e.getSource();
+
+        @Override
+        public void focusGained(final FocusEvent e) {
+            JTextField tf = (JTextField) e.getSource();
             tf.setCaretPosition(Math.max(0, tf.getText().length()));
         }
-       public void focusLost(final FocusEvent e) {
-    	   JTextField tf = (JTextField)e.getSource();
+
+        @Override
+        public void focusLost(final FocusEvent e) {
+            JTextField tf = (JTextField) e.getSource();
             tf.setCaretPosition(0);
-       }        
+        }
     }
 }
